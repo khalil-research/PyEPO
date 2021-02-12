@@ -75,12 +75,12 @@ class shortestPathModel(optModel):
         """
         assert len(c) == len(self.arcs), 'Size of Cost vector cannot match arcs'
         obj = quicksum(c[i] * self.x[self.arcs[i]] for i in range(len(self.arcs)))
-        self.model.setObjective(obj)
+        self._model.setObjective(obj)
 
     def solve(self):
         """
         solve model
         """
-        self.model.update()
-        self.model.optimize()
-        return [self.x[e].x for e in self.arcs], self.model.objVal
+        self._model.update()
+        self._model.optimize()
+        return [self.x[e].x for e in self.arcs], self._model.objVal

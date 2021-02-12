@@ -43,8 +43,8 @@ class optDataset(Dataset):
         solve optimization problem to get optimal solutions with given cost
         """
         self.model.setObj(cost)
-        sol = self.model.solve()
-        return sol
+        sol, obj = self.model.solve()
+        return sol, obj
 
     def __len__(self):
         """

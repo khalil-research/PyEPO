@@ -7,7 +7,7 @@ class optModel(ABC):
     """abstract class for optimization model"""
 
     def __init__(self):
-        self.model = self._getModel()
+        self._model = self._getModel()
 
     @abstractmethod
     def _getModel(self):
