@@ -56,7 +56,7 @@ class optDataset(Dataset):
         """
         return feature, cost and optimal solution
         """
-        return torch.from_numpy(self.x[index]), \
-               torch.from_numpy(self.c[index]), \
-               torch.from_numpy(self.w[index]), \
-               torch.from_numpy(self.z[index])
+        return torch.FloatTensor(self.x[index]), \
+               torch.FloatTensor(self.c[index]), \
+               torch.FloatTensor(self.w[index]), \
+               torch.FloatTensor(self.z[index])
