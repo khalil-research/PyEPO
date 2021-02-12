@@ -30,7 +30,7 @@ class optDataset(Dataset):
         """
         sols = []
         objs = []
-        print('Solve optimization problems...')
+        print('Optimizing...')
         time.sleep(1)
         for c in tqdm(self.c):
             sol, obj = self.solve(c)
