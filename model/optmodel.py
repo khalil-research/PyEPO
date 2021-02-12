@@ -29,5 +29,6 @@ class optModel(ABC):
         solve model
         Returns:
             sol: optimal solution
+            obj: optimal value
         """
         pass

@@ -83,4 +83,4 @@ class shortestPathModel(optModel):
         """
         self.model.update()
         self.model.optimize()
-        return [self.x[e].x for e in self.arcs]
+        return [self.x[e].x for e in self.arcs], self.model.objVal

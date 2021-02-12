@@ -22,19 +22,21 @@ class optDataset(Dataset):
         self.x = feats
         self.c = costs
         # find optimal solutions
-        self.w = self.getSols()
+        self.w, self.objs = self.getSols()
 
     def getSols(self):
         """
         get optimal solutions for all cost vectors
         """
         sols = []
+        objs = []
         print('Solve optimization problems...')
         time.sleep(1)
         for c in tqdm(self.c):
-            sol = self.solve(c)
+            sol, obj = self.solve(c)
             sols.append(sol)
-        return np.array(sols)
+            objs.append(obj)
+        return np.array(sols), np.array(objs)
 
     def solve(self, cost):
         """
