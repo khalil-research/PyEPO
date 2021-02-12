@@ -13,10 +13,10 @@ class shortestPathModel(optModel):
             grid: size of grid network
         """
         self.grid = grid
-        self.arcs = self.getArcs()
+        self.arcs = self._getArcs()
         super().__init__()
 
-    def getArcs(self):
+    def _getArcs(self):
         """
         get list of arcs for grid network
         """
