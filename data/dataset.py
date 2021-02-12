@@ -35,7 +35,7 @@ class optDataset(Dataset):
         for c in tqdm(self.c):
             sol, obj = self.solve(c)
             sols.append(sol)
-            objs.append(obj)
+            objs.append([obj])
         return np.array(sols), np.array(objs)
 
     def solve(self, cost):
