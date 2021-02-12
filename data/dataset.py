@@ -22,7 +22,7 @@ class optDataset(Dataset):
         self.x = feats
         self.c = costs
         # find optimal solutions
-        self.w, self.objs = self.getSols()
+        self.w, self.z = self.getSols()
 
     def getSols(self):
         """
@@ -58,4 +58,5 @@ class optDataset(Dataset):
         """
         return torch.from_numpy(self.x[index]), \
                torch.from_numpy(self.c[index]), \
-               torch.from_numpy(self.w[index])
+               torch.from_numpy(self.w[index]), \
+               torch.from_numpy(self.z[index])
