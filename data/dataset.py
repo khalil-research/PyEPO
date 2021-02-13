@@ -33,7 +33,10 @@ class optDataset(Dataset):
         print('Optimizing...')
         time.sleep(1)
         for c in tqdm(self.c):
-            sol, obj = self.solve(c)
+            try:
+                sol, obj = self.solve(c)
+            except:
+                raise ValueError("For optModel, the method 'solve' should return solution vector and objective value.")
             sols.append(sol)
             objs.append([obj])
         return np.array(sols), np.array(objs)
