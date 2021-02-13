@@ -29,6 +29,8 @@ class SPOPlusLoss(Function):
     def forward(ctx, model, pred_cost, true_cost, true_sol, true_obj):
         # check model
         assert isinstance(model, optModel), 'arg model is not an optModel'
+        # get device
+        device = pred_cost.device
         # convert tenstor
         cp = pred_cost.to('cpu').numpy()
         c = true_cost.to('cpu').numpy()
@@ -47,8 +49,8 @@ class SPOPlusLoss(Function):
             # solution
             wq.append(solq)
         # convert to tensor
-        loss = torch.FloatTensor(loss).to(pred_cost.device)
-        wq = torch.FloatTensor(wq).to(pred_cost.device)
+        loss = torch.FloatTensor(loss).to(device)
+        wq = torch.FloatTensor(wq).to(device)
         # save solutions
         ctx.save_for_backward(true_sol, wq)
         return loss
