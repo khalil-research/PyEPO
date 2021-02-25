@@ -40,7 +40,7 @@ class SPOPlusLoss(Function):
         loss = []
         wq = []
         for i in range(len(z)):
-            assert abs(z[i] - np.dot(c[i], w[i])) < 1e-5, 'Solution does not macth the objective value.'
+            assert abs(z[i] - np.dot(c[i], w[i])) < 1e-3, 'Solution {} does not macth the objective value {}.'.format(np.dot(c[i], w[i]), z[i])
             # solve
             model.setObj(2 * cp[i] - c[i])
             solq, objq = model.solve()
