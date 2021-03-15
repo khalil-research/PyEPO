@@ -6,7 +6,7 @@ from torch.autograd import Function
 import numpy as np
 from model import optModel
 
-class SPOPlusLoss(Function):
+class SPOPlus(Function):
     """
     SPO+ Loss function, a surrogate loss function of SPO Loss, which
     measure the decision error (optimality gap) of optimization problem.
@@ -18,12 +18,6 @@ class SPOPlusLoss(Function):
     The SPO+ Loss is convex with subgradient. Thus, allows us to design
     an algorithm based on stochastic gradient descent.
     """
-    def __init__(self):
-        """
-        Args:
-            model: instance of optModel
-        """
-        super().__init__()
 
     @staticmethod
     def forward(ctx, model, pred_cost, true_cost, true_sol, true_obj):

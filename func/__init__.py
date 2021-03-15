@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from .spoplus import SPOPlusLoss
+from .spoplus import SPOPlus
