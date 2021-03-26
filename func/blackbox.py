@@ -8,6 +8,7 @@ from model import optModel
 
 class blackboxOpt(Function):
     """
+    block-box optimizer function, which is diffenretiable to introduce blocks into neural networks.
     """
     @staticmethod
     def forward(ctx, model, pred_cost, lambd):
