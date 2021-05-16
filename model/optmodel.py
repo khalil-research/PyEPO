@@ -32,3 +32,12 @@ class optModel(ABC):
             obj: optimal value
         """
         pass
+
+    @abstractmethod
+    def addConstr(self, coefs, rhs):
+        """
+        add new constraint
+        Returns:
+            model: optModel
+        """
+        pass

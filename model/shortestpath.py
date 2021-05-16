@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from gurobipy import *
+import gurobipy as gp
+from gurobipy import GRB
 from model import optModel
 
 class shortestPathModel(optModel):
@@ -39,7 +40,7 @@ class shortestPathModel(optModel):
         Gurobi model
         """
         # ceate a model
-        m = Model('shortest path')
+        m = gp.Model('shortest path')
         # turn off output
         m.Params.outputFlag = 0
         # varibles
@@ -74,7 +75,7 @@ class shortestPathModel(optModel):
         set objective function
         """
         assert len(c) == len(self.arcs), 'Size of cost vector cannot match arcs'
-        obj = quicksum(c[i] * self.x[self.arcs[i]] for i in range(len(self.arcs)))
+        obj = gp.quicksum(c[i] * self.x[self.arcs[i]] for i in range(len(self.arcs)))
         self._model.setObjective(obj)
 
     def solve(self):
@@ -84,3 +85,16 @@ class shortestPathModel(optModel):
         self._model.update()
         self._model.optimize()
         return [self.x[e].x for e in self.arcs], self._model.objVal
+
+    def addConstr(self, coefs, rhs):
+        """
+        add new constraint
+        """
+        assert len(coefs) == len(self.arcs), 'Size of coef vector cannot match arcs'
+        # copy
+        new_model = shortestPathModel(self.grid)
+        # add constraint
+        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[self.arcs[i]]
+                                               for i in range(len(self.arcs)))
+                                   == rhs)
+        return new_model
