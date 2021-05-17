@@ -9,6 +9,14 @@ class optModel(ABC):
     def __init__(self):
         self._model = self._getModel()
 
+    def __repr__(self):
+        return self.__class__.__name__
+
+    @property
+    @abstractmethod
+    def num_cost(self):
+        pass
+
     @abstractmethod
     def _getModel(self):
         """
