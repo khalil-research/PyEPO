@@ -1,4 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from .spoeval import SPOEval
+from .truespo import trueSPO
+from .unambspo import unambSPO

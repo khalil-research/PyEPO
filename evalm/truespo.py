@@ -3,9 +3,9 @@
 
 import numpy as np
 
-def SPOEval(pmodel, omodel, dataloader):
+def trueSPO(pmodel, omodel, dataloader):
     """
-    calculate normalized SPO to evaluate model performence
+    calculate normalized true SPO to evaluate model performence
     args:
       pmodel: prediction model
       omodel: optModel
@@ -22,10 +22,11 @@ def SPOEval(pmodel, omodel, dataloader):
         if next(pmodel.parameters()).is_cuda:
             x, c, w, z = x.cuda(), c.cuda(), w.cuda(), z.cuda()
         # predict
-        cp = pmodel(x)
+        cp = pmodel(x).to('cpu').detach().numpy()
         # solve
         for j in range(cp.shape[0]):
-            omodel.setObj(cp[j].to('cpu').detach().numpy())
+            # opt sol for pred cost
+            omodel.setObj(cp[j])
             sol, _ = omodel.solve()
             obj = np.dot(sol, c[j].to('cpu').detach().numpy())
             # accumulate loss
