@@ -15,6 +15,9 @@ class optModel(ABC):
     @property
     @abstractmethod
     def num_cost(self):
+        """
+        number of cost to be predicted
+        """
         pass
 
     @abstractmethod
