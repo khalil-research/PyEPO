@@ -5,7 +5,7 @@ import numpy as np
 
 def trueSPO(pmodel, omodel, dataloader):
     """
-    calculate normalized true SPO to evaluate model performence
+    evaluate model performence
     args:
       pmodel: prediction model
       omodel: optModel
@@ -25,12 +25,25 @@ def trueSPO(pmodel, omodel, dataloader):
         cp = pmodel(x).to('cpu').detach().numpy()
         # solve
         for j in range(cp.shape[0]):
-            # opt sol for pred cost
-            omodel.setObj(cp[j])
-            sol, _ = omodel.solve()
-            obj = np.dot(sol, c[j].to('cpu').detach().numpy())
             # accumulate loss
-            loss += obj - z[j].item()
+            loss += calTrueSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item())
         optsum += z.sum().item()
     # normalized
     return loss / optsum
+
+def calTrueSPO(omodel, pred_cost, true_cost, true_obj):
+    """
+    calculate normalized true SPO
+    args:
+      omodel: optModel
+      pred_cost: predicted cost
+      true_cost: true cost
+      true_obj: true optimal objective value
+    """
+    # opt sol for pred cost
+    omodel.setObj(pred_cost)
+    sol, _ = omodel.solve()
+    # obj with true cost
+    obj = np.dot(sol, true_cost)
+    # loss
+    return obj - true_obj

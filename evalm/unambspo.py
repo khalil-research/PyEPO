@@ -26,18 +26,30 @@ def unambSPO(pmodel, omodel, dataloader):
         cp = pmodel(x).to('cpu').detach().numpy()
         # solve
         for j in range(cp.shape[0]):
-            # opt sol for pred cost
-            omodel.setObj(cp[j])
-            sol, objp = omodel.solve()
-            # opt for pred cost
-            wst_omodel = omodel.addConstr(cp[j], objp)
-            # opt model to find worst case
-            wst_omodel.setObj(-c[j].to('cpu').detach().numpy())
-            # solve
-            _, obj = wst_omodel.solve()
-            obj = -obj
             # accumulate loss
-            loss += obj - z[j].item()
+            loss += calunambSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item())
         optsum += z.sum().item()
     # normalized
     return loss / optsum
+
+def calUnambSPO(omodel, pred_cost, true_cost, true_obj):
+    """
+    calculate normalized unambiguous SPO
+    args:
+      omodel: optModel
+      pred_cost: predicted cost
+      true_cost: true cost
+      true_obj: true optimal objective value
+    """
+    # opt sol for pred cost
+    omodel.setObj(pred_cost)
+    sol, objp = omodel.solve()
+    # opt for pred cost
+    wst_omodel = omodel.addConstr(pred_cost, objp)
+    # opt model to find worst case
+    wst_omodel.setObj(-true_cost)
+    # solve
+    _, obj = wst_omodel.solve()
+    obj = -obj
+    # loss
+    return obj - true_obj
