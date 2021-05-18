@@ -27,7 +27,7 @@ def unambSPO(pmodel, omodel, dataloader):
         # solve
         for j in range(cp.shape[0]):
             # accumulate loss
-            loss += calunambSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item())
+            loss += calUnambSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item())
         optsum += z.sum().item()
     # normalized
     return loss / optsum
