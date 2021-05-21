@@ -123,6 +123,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-*.csv
 Test2.ipynb
 Test3.ipynb
