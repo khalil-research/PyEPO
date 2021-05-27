@@ -11,7 +11,12 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
         num_features: dimension of features
         grid: size of grid network
         deg: a fixed positive integer parameter
+        noise_withd: half witdth of random noise
+        seed: random seeds
     """
+    # positive integer parameter
+    assert type(deg) is int, 'deg = {} should be int.'.format(deg)
+    assert deg > 0, 'deg = {} should be positive.'.format(deg)
     # set seed
     np.random.seed(seed)
     # number of data points
@@ -20,11 +25,8 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
     p = num_features
     # dimension of the cost vector
     d = (grid[0] - 1) * grid[1] + (grid[1] - 1) * grid[0]
-    # random matrix parameter B*
+    # random matrix parameter B
     B = np.random.binomial(1, 0.5, (d,p))
-    # positive integer parameter
-    assert type(deg) is int, 'deg = {} should be int.'.format(deg)
-    assert deg > 0, 'deg = {} should be positive.'.format(deg)
     # feature vectors
     x = np.random.normal(0, 1, (n,p))
     # cost vectors

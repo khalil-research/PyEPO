@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
-from model import optModel
+from spo.model import optModel
 
 class optDataset(Dataset):
     """optimization problem Dataset"""

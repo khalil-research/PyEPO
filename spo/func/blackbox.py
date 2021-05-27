@@ -4,7 +4,7 @@
 import torch
 from torch.autograd import Function
 import numpy as np
-from model import optModel
+from spo.model import optModel
 
 class blackboxOpt(Function):
     """
