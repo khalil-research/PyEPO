@@ -30,7 +30,7 @@ def unambSPO(pmodel, omodel, dataloader):
             loss += calUnambSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item())
         optsum += z.sum().item()
     # normalized
-    return loss / optsum
+    return loss / abs(optsum)
 
 def calUnambSPO(omodel, pred_cost, true_cost, true_obj):
     """

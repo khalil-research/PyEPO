@@ -29,7 +29,7 @@ def trueSPO(pmodel, omodel, dataloader):
             loss += calTrueSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item())
         optsum += z.sum().item()
     # normalized
-    return loss / optsum
+    return loss / abs(optsum)
 
 def calTrueSPO(omodel, pred_cost, true_cost, true_obj):
     """
