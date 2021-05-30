@@ -100,5 +100,5 @@ class shortestPathModel(optModel):
         # add constraint
         new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[self.arcs[i]]
                                                for i in range(len(self.arcs)))
-                                   == rhs)
+                                   <= rhs)
         return new_model
