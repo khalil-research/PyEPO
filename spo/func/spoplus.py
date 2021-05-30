@@ -34,7 +34,7 @@ class SPOPlus(Function):
         loss = []
         wq = []
         for i in range(len(z)):
-            assert abs(z[i] - np.dot(c[i], w[i])) / abs(z[i]) < 1e-3, \
+            assert abs(z[i] - np.dot(c[i], w[i])) / (abs(z[i]) + 1e-3) < 1e-3, \
             'Solution {} does not macth the objective value {}.'.format(np.dot(c[i], w[i]), z[i][0])
             # solve
             model.setObj(2 * cp[i] - c[i])
