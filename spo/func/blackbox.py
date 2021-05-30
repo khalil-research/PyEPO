@@ -8,7 +8,16 @@ from spo.model import optModel
 
 class blackboxOpt(Function):
     """
-    block-box optimizer function, which is diffenretiable to introduce blocks into neural networks.
+    block-box optimizer function, which is diffenretiable to introduce
+    blocks into neural networks.
+
+    For block-box, the objective function is linear and constraints are
+    known and fixed, but the cost vector need to be predicted from
+    contextual data.
+
+    The block-box approximate gradient of optimizer smoothly. Thus,
+    allows us to design an algorithm based on stochastic gradient
+    descent.
     """
     @staticmethod
     def forward(ctx, model, pred_cost, lambd):
