@@ -27,7 +27,7 @@ def trueSPO(pmodel, omodel, dataloader):
         for j in range(cp.shape[0]):
             # accumulate loss
             loss += calTrueSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item())
-        optsum += z.abs().sum().item()
+        optsum += abs(z).sum().item()
     # normalized
     return loss / (optsum + 1e-3)
 
