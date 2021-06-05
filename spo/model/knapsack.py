@@ -67,10 +67,16 @@ class knapsackModel(optModel):
                                    <= rhs)
         return new_model
 
-    def clean(self):
+    def relax(self):
         """
-        clean model
-        Returns:
-            None
+        relax model
         """
-        self._model.dispose()
+        # copy
+        new_model = knapsackModel(self.weights, self.capacity)
+        # relax
+        new_model._model.update()
+        new_model._model = new_model._model.relax()
+        # get vars
+        new_model._model.update()
+        new_model.x = new_model._model.getVars()
+        return new_model
