@@ -3,3 +3,4 @@
 
 from .optmodel import optModel
 from .shortestpath import shortestPathModel
+from .trivialsurgery import trivialSurgeryModel
