@@ -3,7 +3,7 @@
 
 import gurobipy as gp
 from gurobipy import GRB
-from model import optModel
+from spo.model import optModel
 
 class trivialSurgeryModel(optModel):
     """optimization model for shortest path problem"""
