@@ -43,7 +43,7 @@ class knapsackModel(optModel):
         """
         set objective function
         """
-        assert len(c) == len(self.items), 'Size of cost vector cannot match items'
+        assert len(c) == len(self.items), 'Size of cost vector cannot match items.'
         obj = gp.quicksum(c[i] * self.x[i] for i in self.items)
         self._model.setObjective(obj)
 
@@ -59,7 +59,7 @@ class knapsackModel(optModel):
         """
         add new constraint
         """
-        assert len(coefs) == len(self.items), 'Size of coef vector cannot match items'
+        assert len(coefs) == len(self.items), 'Size of coef vector cannot match items.'
         # copy
         new_model = knapsackModel(self.weights, self.capacity)
         # add constraint

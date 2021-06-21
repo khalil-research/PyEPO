@@ -78,7 +78,7 @@ class shortestPathModel(optModel):
         """
         set objective function
         """
-        assert len(c) == len(self.arcs), 'Size of cost vector cannot match arcs'
+        assert len(c) == len(self.arcs), 'Size of cost vector cannot match arcs.'
         obj = gp.quicksum(c[i] * self.x[self.arcs[i]] for i in range(len(self.arcs)))
         self._model.setObjective(obj)
 
@@ -94,7 +94,7 @@ class shortestPathModel(optModel):
         """
         add new constraint
         """
-        assert len(coefs) == len(self.arcs), 'Size of coef vector cannot match arcs'
+        assert len(coefs) == len(self.arcs), 'Size of coef vector cannot match arcs.'
         # copy
         new_model = shortestPathModel(self.grid)
         # add constraint
