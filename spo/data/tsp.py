@@ -10,7 +10,7 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     Args:
         num_data: number of data points
         num_features: dimension of features
-        num_nodes: number of data points
+        num_nodes: number of node points
         deg: a fixed positive integer parameter
         noise_withd: half witdth of random noise
         seed: random seeds
