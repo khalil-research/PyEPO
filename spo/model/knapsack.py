@@ -11,7 +11,8 @@ class knapsackModel(optModel):
     def __init__(self, weights, capacity):
         """
         Args:
-            grid: size of grid network
+            weights: weights of items
+            capacity: total capacity
         """
         self.weights = weights
         self.capacity = capacity
