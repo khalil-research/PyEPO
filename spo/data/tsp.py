@@ -37,7 +37,7 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     # init cost
     c = np.repeat(org_dist.reshape(1,m,m), n, axis=0)
     for i in range(n):
-        adds = ((np.dot(B, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1) / 3 ** deg * 15
+        adds = ((np.dot(B, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1) / 3 ** deg * 3
         for j in range(m):
             for k in range(m):
                 if j == k:
