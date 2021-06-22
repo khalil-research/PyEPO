@@ -4,4 +4,5 @@
 from .optmodel import optModel
 from .shortestpath import shortestPathModel
 from .knapsack import knapsackModel
+from .tsp import tspModel
 from .trivialsurgery import trivialSurgeryModel
