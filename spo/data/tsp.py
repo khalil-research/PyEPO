@@ -27,24 +27,35 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     # number of nodes
     m = num_nodes
     # random coordinates
-    coords = np.random.uniform(0, 10, (m,2))
+    coords = np.random.uniform(0, 3, (m,2))
     # distance matrix
     org_dist = distance.cdist(coords, coords, 'euclidean')
     # random matrix parameter B
-    B = np.random.binomial(1, 0.5, (m,p)) * np.random.uniform(0, 1, (m,p))
+    B1 = np.random.binomial(1, 0.5, (m,p)) * np.random.uniform(0, 1, (m,p))
+    B2 = np.random.binomial(1, 0.5, (m*(m-1)//2,p)) * np.random.uniform(0, 1, (m*(m-1)//2,p))
     # feature vectors
     x = np.random.normal(0, 1, (n,p))
     # init cost
-    c = np.repeat(org_dist.reshape(1,m,m), n, axis=0)
+    c = np.zeros((n, m*(m-1)//2))
     for i in range(n):
-        adds = ((np.dot(B, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1) / 3 ** deg * 3
+        # from feature to node
+        cost = org_dist.copy()
+        adds = ((np.dot(B1, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1) / 3 ** deg
         for j in range(m):
             for k in range(m):
                 if j == k:
                     continue
-                c[i,j,k] += adds[j] + adds[k]
+                cost[j,k] += (adds[j] + adds[k]) / 2
+        # reshape
+        l = 0
+        for j in range(m):
+            for k in range(j+1, m):
+                c[i,l] = cost[j,k]
+                l += 1
+        # from feature to edge
+        adds = ((np.dot(B2, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1) / 3 ** deg
+        c[i] += adds
         # noise
-        a =  np.random.uniform(1-noise_width, 1+noise_width, (m,m))
-        noise = np.tril(a) + np.tril(a, -1).T
+        noise =  np.random.uniform(1-noise_width, 1+noise_width, m*(m-1)//2)
         c[i] = c[i] * noise
     return x, c
