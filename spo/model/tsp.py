@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from collections import defaultdict
+import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 from itertools import combinations
@@ -87,10 +88,8 @@ class tspModel(optModel):
         """
         set objective function
         """
-        assert len(c.shape) == 2, 'Dimension of distance matrix should be 2.'
-        assert c.shape[0] == len(self.nodes), 'Row of distance matrix cannot match items.'
-        assert c.shape[1] == len(self.nodes), 'Column of distance matrix cannot match items.'
-        obj = gp.quicksum(c[i,j] * self.x[i,j] for i, j in self.edges)
+        assert len(c) == len(self.edges), 'Size of cost vector cannot match edges.'
+        obj = gp.quicksum(c[i] * self.x[e] for i, e in enumerate(self.edges))
         self._model.setObjective(obj)
 
     def solve(self):
@@ -99,19 +98,22 @@ class tspModel(optModel):
         """
         self._model.update()
         self._model.optimize(self.subtourelim)
-        return {(i, j): self.x[i,j].x for i, j in self.edges}, self._model.objVal
+        sol = np.zeros(self.num_cost, dtype=np.uint8)
+        for i, e in enumerate(self.edges):
+            if self.x[e].x > 1e-2:
+                sol[i] = 1
+        return sol, self._model.objVal
 
-    @staticmethod
-    def getTour(sol):
+    def getTour(self, sol):
         """
         get a tour from solution
         """
         # active edges
         edges = defaultdict(list)
-        for i, j in sol:
-            if sol[i,j] > 1e-2:
-                edges[i].append(j)
-                edges[j].append(i)
+        for i, (j,k) in enumerate(self.edges):
+            if sol[i] > 1e-2:
+                edges[j].append(k)
+                edges[k].append(j)
         # get tour
         visited = {0}
         tour = [0]
@@ -130,13 +132,11 @@ class tspModel(optModel):
         """
         add new constraint
         """
-        assert len(coefs.shape) == 2, 'Dimension of distance matrix should be 2.'
-        assert coefs.shape[0] == len(self.nodes), 'Row of distance matrix cannot match items.'
-        assert coefs.shape[1] == len(self.nodes), 'Column of distance matrix cannot match items.'
+        assert len(coefs) == len(self.edges), 'Size of coef vector cannot match edges.'
         # copy
         new_model = tspModel(len(self.nodes))
         # add constraint
-        new_model._model.addConstr(gp.quicksum(coefs[i,j] * new_model.x[i,j]
-                                               for i, j in self.edges)
+        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[e]
+                                               for i, e in enumerate(self.edges))
                                    <= rhs)
         return new_model
