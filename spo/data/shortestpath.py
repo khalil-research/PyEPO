@@ -12,7 +12,7 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
         grid: size of grid network
         deg: a fixed positive integer parameter
         noise_withd: half witdth of random noise
-        seed: random seeds
+        seed: random seed
     """
     # positive integer parameter
     assert type(deg) is int, 'deg = {} should be int.'.format(deg)
