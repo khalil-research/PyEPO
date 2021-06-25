@@ -13,7 +13,7 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
         num_nodes: number of nodes
         deg: a fixed positive integer parameter
         noise_withd: half witdth of random noise
-        seed: random seeds
+        seed: random seed
     """
     # positive integer parameter
     assert type(deg) is int, 'deg = {} should be int.'.format(deg)
@@ -27,7 +27,7 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     # number of nodes
     m = num_nodes
     # random coordinates
-    coords = np.random.uniform(0, 3, (m,2))
+    coords = np.random.uniform(0, 5, (m,2))
     # distance matrix
     org_dist = distance.cdist(coords, coords, 'euclidean')
     # random matrix parameter B
@@ -40,7 +40,7 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     for i in range(n):
         # from feature to node
         cost = org_dist.copy()
-        adds = ((np.dot(B1, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1) / 3 ** deg
+        adds = ((np.dot(B1, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1)
         for j in range(m):
             for k in range(m):
                 if j == k:
@@ -53,9 +53,11 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
                 c[i,l] = cost[j,k]
                 l += 1
         # from feature to edge
-        adds = ((np.dot(B2, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1) / 3 ** deg
+        adds = ((np.dot(B2, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1).reshape(-1)
         c[i] += adds
         # noise
         noise =  np.random.uniform(1-noise_width, 1+noise_width, m*(m-1)//2)
         c[i] = c[i] * noise
+    # rounding
+    c = np.around(c, decimals=4)
     return x, c
