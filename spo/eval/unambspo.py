@@ -41,25 +41,18 @@ def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-4):
       true_cost: true cost
       true_obj: true optimal objective value
     """
+    # change precision
+    pred_cost = np.around(pred_cost / tolerance).astype(int)
     # opt sol for pred cost
     omodel.setObj(pred_cost)
     sol, objp = omodel.solve()
-    try:
-        # opt for pred cost
-        wst_omodel = omodel.addConstr(pred_cost, objp)
-        # opt model to find worst case
-        wst_omodel.setObj(-true_cost)
-        # solve
-        _, obj = wst_omodel.solve()
-    except:
-        # tolerance
-        objp += tolerance
-        # opt for pred cost
-        wst_omodel = omodel.addConstr(pred_cost, objp)
-        # opt model to find worst case
-        wst_omodel.setObj(-true_cost)
-        # solve
-        _, obj = wst_omodel.solve()
+    objp = np.ceil(np.dot(pred_cost, sol.T))
+    # opt for pred cost
+    wst_omodel = omodel.addConstr(pred_cost, objp)
+    # opt model to find worst case
+    wst_omodel.setObj(-true_cost)
+    # solve
+    _, obj = wst_omodel.solve()
     obj = -obj
     # loss
     return obj - true_obj
