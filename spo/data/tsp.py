@@ -27,7 +27,8 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     # number of nodes
     m = num_nodes
     # random coordinates
-    coords = np.random.uniform(0, 5, (m,2))
+    coords = np.concatenate((np.random.uniform(-2, 2, (m//2,2)),
+                             np.random.normal(0, 1, (m-m//2,2))))
     # distance matrix
     org_dist = distance.cdist(coords, coords, 'euclidean') * 3 ** deg
     # random matrix parameter B
@@ -38,11 +39,10 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     c = np.zeros((n, m*(m-1)//2))
     for i in range(n):
         # reshape
-        cost = org_dist.copy()
         l = 0
         for j in range(m):
             for k in range(j+1, m):
-                c[i,l] = cost[j,k]
+                c[i,l] = org_dist[j,k]
                 l += 1
         # from feature to edge
         c[i] += ((np.dot(B, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg).reshape(-1)
