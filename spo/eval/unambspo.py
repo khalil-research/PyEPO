@@ -46,6 +46,7 @@ def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-4):
     # opt sol for pred cost
     omodel.setObj(pred_cost)
     sol, objp = omodel.solve()
+    sol = np.array(sol)
     objp = np.ceil(np.dot(pred_cost, sol.T))
     # opt for pred cost
     wst_omodel = omodel.addConstr(pred_cost, objp)
