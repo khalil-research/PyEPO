@@ -78,8 +78,8 @@ class shortestPathModel(optModel):
         """
         set objective function
         """
-        assert len(c) == len(self.arcs), 'Size of cost vector cannot match arcs.'
-        obj = gp.quicksum(c[i] * self.x[self.arcs[i]] for i in range(len(self.arcs)))
+        assert len(c) == self.num_cost, 'Size of cost vector cannot match vars.'
+        obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)
 
     def solve(self):
@@ -88,17 +88,31 @@ class shortestPathModel(optModel):
         """
         self._model.update()
         self._model.optimize()
-        return [self.x[e].x for e in self.arcs], self._model.objVal
+        return [self.x[k].x for k in self.x], self._model.objVal
+
+    def copy(self):
+        """
+        copy model
+        """
+        new_model = super().copy()
+        # update model
+        self._model.update()
+        # new model
+        new_model._model = self._model.copy()
+        # variables for new model
+        x = new_model._model.getVars()
+        new_model.x = {key: x[i] for i, key in enumerate(self.x)}
+        return new_model
 
     def addConstr(self, coefs, rhs):
         """
         add new constraint
         """
-        assert len(coefs) == len(self.arcs), 'Size of coef vector cannot match arcs.'
+        assert len(coefs) == self.num_cost, 'Size of coef vector cannot cost.'
         # copy
-        new_model = shortestPathModel(self.grid)
+        new_model = self.copy()
         # add constraint
-        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[self.arcs[i]]
-                                               for i in range(len(self.arcs)))
+        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[k]
+                                               for i, k in enumerate(new_model.x))
                                    <= rhs)
         return new_model

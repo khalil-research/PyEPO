@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from abc import ABC, abstractmethod
+from copy import copy
 
 class optModel(ABC):
     """abstract class for optimization model"""
@@ -43,6 +44,13 @@ class optModel(ABC):
             obj: optimal value
         """
         pass
+
+    def copy(self):
+        """
+        copy model
+        """
+        new_model = copy(self)
+        return new_model
 
     @abstractmethod
     def addConstr(self, coefs, rhs):

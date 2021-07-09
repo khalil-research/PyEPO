@@ -88,8 +88,8 @@ class tspModel(optModel):
         """
         set objective function
         """
-        assert len(c) == len(self.edges), 'Size of cost vector cannot match edges.'
-        obj = gp.quicksum(c[i] * self.x[e] for i, e in enumerate(self.edges))
+        assert len(c) == self.num_cost, 'Size of cost vector cannot match vars.'
+        obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.edges))
         self._model.setObjective(obj)
 
     def solve(self):
@@ -128,15 +128,35 @@ class tspModel(optModel):
             tour.append(0)
         return tour
 
+    def copy(self):
+        """
+        copy model
+        """
+        new_model = super().copy()
+        # update model
+        self._model.update()
+        # new model
+        new_model._model = self._model.copy()
+        # variables for new model
+        x = new_model._model.getVars()
+        new_model.x = {key: x[i] for i, key in enumerate(self.edges)}
+        for i, j in self.edges:
+            new_model.x[j, i] = new_model.x[i, j]
+        # activate lazy constraints
+        new_model._model._x = new_model.x
+        new_model._model._n = len(self.nodes)
+        new_model._model.Params.lazyConstraints = 1
+        return new_model
+
     def addConstr(self, coefs, rhs):
         """
         add new constraint
         """
-        assert len(coefs) == len(self.edges), 'Size of coef vector cannot match edges.'
+        assert len(coefs) == self.num_cost, 'Size of coef vector cannot cost.'
         # copy
-        new_model = tspModel(len(self.nodes))
+        new_model = self.copy()
         # add constraint
-        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[e]
-                                               for i, e in enumerate(self.edges))
+        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[k]
+                                               for i, k in enumerate(new_model.edges))
                                    <= rhs)
         return new_model

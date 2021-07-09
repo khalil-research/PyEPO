@@ -43,8 +43,8 @@ class knapsackModel(optModel):
         """
         set objective function
         """
-        assert len(c) == len(self.items), 'Size of cost vector cannot match items.'
-        obj = gp.quicksum(c[i] * self.x[i] for i in self.items)
+        assert len(c) == self.num_cost, 'Size of cost vector cannot match vars.'
+        obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)
 
     def solve(self):
@@ -53,18 +53,32 @@ class knapsackModel(optModel):
         """
         self._model.update()
         self._model.optimize()
-        return [self.x[i].x for i in self.items], self._model.objVal
+        return [self.x[k].x for k in self.x], self._model.objVal
+
+    def copy(self):
+        """
+        copy model
+        """
+        new_model = super().copy()
+        # update model
+        self._model.update()
+        # new model
+        new_model._model = self._model.copy()
+        # variables for new model
+        x = new_model._model.getVars()
+        new_model.x = {key: x[i] for i, key in enumerate(self.x)}
+        return new_model
 
     def addConstr(self, coefs, rhs):
         """
         add new constraint
         """
-        assert len(coefs) == len(self.items), 'Size of coef vector cannot match items.'
+        assert len(coefs) == self.num_cost, 'Size of coef vector cannot cost.'
         # copy
-        new_model = knapsackModel(self.weights, self.capacity)
+        new_model = self.copy()
         # add constraint
-        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[i]
-                                               for i in range(self.num_cost))
+        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[k]
+                                               for i, k in enumerate(new_model.x))
                                    <= rhs)
         return new_model
 
@@ -79,5 +93,6 @@ class knapsackModel(optModel):
         new_model._model = new_model._model.relax()
         # get vars
         new_model._model.update()
-        new_model.x = new_model._model.getVars()
+        x = new_model._model.getVars()
+        new_model.x ={key: x[i] for i, key in enumerate(self.x)}
         return new_model
