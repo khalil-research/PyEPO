@@ -4,7 +4,7 @@
 import copy
 import numpy as np
 
-def unambSPO(pmodel, omodel, dataloader, tolerance=1e-4):
+def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
     """
     calculate normalized unambiguous SPO to evaluate model performence
     args:
@@ -32,7 +32,7 @@ def unambSPO(pmodel, omodel, dataloader, tolerance=1e-4):
     # normalized
     return loss / (optsum + 1e-3)
 
-def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-4):
+def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-6):
     """
     calculate normalized unambiguous SPO
     args:
