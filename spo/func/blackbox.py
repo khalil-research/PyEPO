@@ -1,10 +1,40 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import inspect
 import torch
 from torch.autograd import Function
 import numpy as np
+from pathos.multiprocessing import ProcessingPool
+import spo
 from spo.model import optModel
+
+def solveWithObj4Par(obj, args, model_name):
+    """
+    global solve function for parallel
+    """
+    # build model
+    model = eval('spo.model.{}'.format(model_name))(**args)
+    # set obj
+    model.setObj(obj)
+    # solve
+    sol, _ = model.solve()
+    return sol
+
+
+def getArgs(model):
+    """
+    get args of model
+    """
+    for mem in inspect.getmembers(model):
+        if mem[0] == '__dict__':
+            attrs = mem[1]
+            args = {}
+            for name in attrs:
+                if name in inspect.signature(model.__init__).parameters:
+                    args[name] = attrs[name]
+            return args
+
 
 class blackboxOpt(Function):
     """
@@ -21,19 +51,20 @@ class blackboxOpt(Function):
     """
     @staticmethod
     def forward(ctx, model, pred_cost, lambd):
+        ins_num = len(pred_cost)
         # check model
         assert isinstance(model, optModel), 'arg model is not an optModel'
         # get device
         device = pred_cost.device
         # convert tenstor
         cp = pred_cost.to('cpu').numpy()
-        # predicted solutions
-        wp = []
-        for i in range(len(cp)):
-            # solve
-            model.setObj(cp[i])
-            solp, _ = model.solve()
-            wp.append(solp)
+        # get class
+        model_name = type(model).__name__
+        # get args
+        args = getArgs(model)
+        # parallel computing
+        with ProcessingPool() as pool:
+            wp = pool.amap(solveWithObj4Par, cp, [args]*ins_num, [model_name]*ins_num).get()
         # convert to tensor
         pred_sol = torch.FloatTensor(wp).to(device)
         # save
@@ -45,6 +76,7 @@ class blackboxOpt(Function):
     @staticmethod
     def backward(ctx, grad_output):
         pred_cost, pred_sol = ctx.saved_tensors
+        ins_num = len(pred_cost)
         # get device
         device = pred_cost.device
         # convert tenstor
@@ -53,14 +85,15 @@ class blackboxOpt(Function):
         dl = grad_output.to('cpu').numpy()
         # perturbed costs
         cq = cp + ctx.lambd * dl
-        # init gradient
-        grad = []
-        for i in range(len(cp)):
-            # solve
-            ctx.model.setObj(cq[i])
-            solq, _ = ctx.model.solve()
-            # gradient of continuous interpolation
-            grad.append((solq - wp[i]) / ctx.lambd)
-        # convert to tensor
+        # get class
+        model_name = type(ctx.model).__name__
+        # get args
+        args = getArgs(ctx.model)
+        # parallel computing
+        with ProcessingPool() as pool:
+            sol = pool.amap(solveWithObj4Par, cq, [args]*ins_num, [model_name]*ins_num).get()
+        sol = np.array(sol)
+        # get gradient
+        grad = (sol - wp) / ctx.lambd
         grad = torch.FloatTensor(grad).to(device)
         return None, grad, None
