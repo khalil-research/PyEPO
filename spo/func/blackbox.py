@@ -77,8 +77,6 @@ class blackboxOpt(Function):
     def backward(ctx, grad_output):
         pred_cost, pred_sol = ctx.saved_tensors
         ins_num = len(pred_cost)
-        # get device
-        device = pred_cost.device
         # convert tenstor
         cp = pred_cost.to('cpu').numpy()
         wp = pred_sol.to('cpu').numpy()
