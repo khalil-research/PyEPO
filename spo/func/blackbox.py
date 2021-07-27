@@ -14,7 +14,10 @@ def solveWithObj4Par(obj, args, model_name):
     global solve function for parallel
     """
     # build model
-    model = eval('spo.model.{}'.format(model_name))(**args)
+    try:
+        model = eval(model_name)(**args)
+    except:
+        model = eval('spo.model.{}'.format(model_name))(**args)
     # set obj
     model.setObj(obj)
     # solve
@@ -90,8 +93,11 @@ class blackboxOpt(Function):
         # parallel computing
         with ProcessingPool() as pool:
             sol = pool.amap(solveWithObj4Par, cq, [args]*ins_num, [model_name]*ins_num).get()
-        sol = np.array(sol)
+        #sol = np.array(sol)
         # get gradient
-        grad = (sol - wp) / ctx.lambd
+        #rad = (sol - wp) / ctx.lambd
+        grad = []
+        for i in range(ins_num):
+            grad.append((sol[i] - wp[i]) / ctx.lambd)
         grad = torch.FloatTensor(grad).to(device)
         return None, grad, None

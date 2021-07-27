@@ -14,7 +14,10 @@ def solveWithObj4Par(obj, args, model_name):
     global solve function for parallel
     """
     # build model
-    model = eval('spo.model.{}'.format(model_name))(**args)
+    try:
+        model = eval(model_name)(**args)
+    except:
+        model = eval('spo.model.{}'.format(model_name))(**args)
     # set obj
     model.setObj(obj)
     # solve
