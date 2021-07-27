@@ -9,7 +9,7 @@ from pathos.multiprocessing import ProcessingPool
 import spo
 from spo.model import optModel
 
-def solveWithObj4Par(obj, args, model_name):
+def solveWithObj4Par(cost, args, model_name):
     """
     global solve function for parallel
     """
@@ -19,7 +19,7 @@ def solveWithObj4Par(obj, args, model_name):
     except:
         model = eval('spo.model.{}'.format(model_name))(**args)
     # set obj
-    model.setObj(obj)
+    model.setObj(cost)
     # solve
     sol, obj = model.solve()
     return sol, obj
