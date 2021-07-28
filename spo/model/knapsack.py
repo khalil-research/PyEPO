@@ -87,12 +87,31 @@ class knapsackModel(optModel):
         relax model
         """
         # copy
-        new_model = knapsackModel(self.weights, self.capacity)
-        # relax
-        new_model._model.update()
-        new_model._model = new_model._model.relax()
-        # get vars
-        new_model._model.update()
-        x = new_model._model.getVars()
-        new_model.x ={key: x[i] for i, key in enumerate(self.x)}
-        return new_model
+        model_rel = knapsackModelRel(self.weights, self.capacity)
+        return model_rel
+
+
+class knapsackModelRel(knapsackModel):
+    """relaxed optimization model for knapsack problem"""
+
+    def _getModel(self):
+        """
+        Gurobi model
+        """
+        # ceate a model
+        m = gp.Model('knapsack')
+        # turn off output
+        m.Params.outputFlag = 0
+        # varibles
+        self.x = m.addVars(self.items, name='x', ub=1)
+        # sense
+        m.modelSense = GRB.MINIMIZE
+        # constraints
+        m.addConstr(gp.quicksum(self.weights[i] * self.x[i] for i in self.items) <= self.capacity)
+        return m
+
+    def relax(self):
+        """
+        relax model
+        """
+        raise RuntimeError('Model has already been relaxed.')
