@@ -95,9 +95,7 @@ class blackboxOpt(Function):
         # parallel computing
         with ProcessingPool() as pool:
             sol = pool.amap(solveWithObj4Par, cq, [args]*ins_num, [model_name]*ins_num).get()
-        #sol = np.array(sol)
         # get gradient
-        #rad = (sol - wp) / ctx.lambd
         grad = []
         for i in range(ins_num):
             grad.append((sol[i] - wp[i]) / ctx.lambd)
