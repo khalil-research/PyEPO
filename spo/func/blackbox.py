@@ -96,8 +96,6 @@ class blackboxOpt(Function):
         with ProcessingPool() as pool:
             sol = pool.amap(solveWithObj4Par, cq, [args]*ins_num, [model_name]*ins_num).get()
         # get gradient
-        grad = []
-        for i in range(ins_num):
-            grad.append((sol[i] - wp[i]) / ctx.lambd)
+        grad = np.array(sol) - wp / ctx.lambd
         grad = torch.FloatTensor(grad).to(device)
         return None, grad, None
