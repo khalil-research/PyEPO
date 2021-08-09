@@ -41,7 +41,7 @@ class shortestPathModel(optModel):
 
     def _getModel(self):
         """
-        Gurobi model
+        Gurobi model for shortest path
         """
         # ceate a model
         m = gp.Model('shortest path')

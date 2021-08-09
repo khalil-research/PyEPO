@@ -25,7 +25,7 @@ class knapsackModel(optModel):
 
     def _getModel(self):
         """
-        Gurobi model
+        Gurobi model for knapsack
         """
         # ceate a model
         m = gp.Model('knapsack')
@@ -96,7 +96,7 @@ class knapsackModelRel(knapsackModel):
 
     def _getModel(self):
         """
-        Gurobi model
+        Gurobi model for relaxed knapsack
         """
         # ceate a model
         m = gp.Model('knapsack')

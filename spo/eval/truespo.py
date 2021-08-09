@@ -5,11 +5,13 @@ import numpy as np
 
 def trueSPO(pmodel, omodel, dataloader):
     """
-    evaluate model performence
+    calculate normalized true SPO to evaluate model performence
     args:
       pmodel: prediction model
       omodel: optModel
       dataloader: dataloader from optDataSet
+    returns:
+      loss: true SPO loss
     """
     # evaluate
     pmodel.eval()
@@ -33,12 +35,14 @@ def trueSPO(pmodel, omodel, dataloader):
 
 def calTrueSPO(omodel, pred_cost, true_cost, true_obj):
     """
-    calculate normalized true SPO
+    calculate normalized true SPO for a batch
     args:
       omodel: optModel
       pred_cost: predicted cost
       true_cost: true cost
       true_obj: true optimal objective value
+    returns:
+      loss: true SPO losses
     """
     # opt sol for pred cost
     omodel.setObj(pred_cost)

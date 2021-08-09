@@ -13,6 +13,10 @@ def genData(num_data, num_features, num_items, deg=1, noise_width=0, cor=False, 
         deg: a fixed positive integer parameter
         noise_withd: half witdth of random noise
         seed: random seed
+    returns:
+       weights: weights of items
+       x: data features
+       c: data labels, cost of objective function
     """
     # positive integer parameter
     assert type(deg) is int, 'deg = {} should be int.'.format(deg)

@@ -34,6 +34,8 @@ class sklearnPred:
         model prediction
         Args:
             x: features
+        returns:
+            cp: predicted cost
         """
         cp = np.zeros((x.shape[0],0))
         assert self.trained, 'This two-stage sklearnPred instance is not fitted yet.'

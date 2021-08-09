@@ -11,6 +11,8 @@ def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
       pmodel: prediction model
       omodel: optModel
       dataloader: dataloader from optDataSet
+    returns:
+      loss: unambiguous SPO loss
     """
     # evaluate
     pmodel.eval()
@@ -40,6 +42,8 @@ def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-6):
       pred_cost: predicted cost
       true_cost: true cost
       true_obj: true optimal objective value
+    returns:
+      loss: unambiguous SPO losses
     """
     # change precision
     pred_cost = np.around(pred_cost / tolerance).astype(int)

@@ -15,6 +15,8 @@ class optDataset(Dataset):
         """
         Args:
             model: an instance of optModel
+            feats: data features
+            costs: data labels, costs of objective function
         """
         assert isinstance(model, optModel), 'arg model is not an optModel'
         self.model = model
@@ -34,16 +36,18 @@ class optDataset(Dataset):
         time.sleep(1)
         for c in tqdm(self.c):
             try:
-                sol, obj = self.solve(c)
+                sol, obj = self._solve(c)
             except:
                 raise ValueError("For optModel, the method 'solve' should return solution vector and objective value.")
             sols.append(sol)
             objs.append([obj])
         return np.array(sols), np.array(objs)
 
-    def solve(self, cost):
+    def _solve(self, cost):
         """
         solve optimization problem to get optimal solutions with given cost
+        Args:
+            costs: cost of objective function
         """
         self.model.setObj(cost)
         sol, obj = self.model.solve()
