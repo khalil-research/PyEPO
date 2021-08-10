@@ -19,21 +19,21 @@ class optModel(ABC):
         """
         number of cost to be predicted
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def _getModel(self):
         """
         build a model from a optimization solver
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def setObj(self, c):
         """
         set objective function with given cost vector
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def solve(self):
@@ -41,16 +41,9 @@ class optModel(ABC):
         solve model
         Returns:
             sol: optimal solution
-            obj: optimal value
+            obj: objective value
         """
-        pass
-
-    def copy(self):
-        """
-        copy model
-        """
-        new_model = copy(self)
-        return new_model
+        raise NotImplementedError
 
     @abstractmethod
     def addConstr(self, coefs, rhs):
@@ -59,4 +52,4 @@ class optModel(ABC):
         Returns:
             model: optModel
         """
-        pass
+        raise NotImplementedError
