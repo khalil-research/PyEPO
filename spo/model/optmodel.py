@@ -53,3 +53,10 @@ class optModel(ABC):
             model: optModel
         """
         raise NotImplementedError
+
+    def copy(self):
+        """
+        copy model
+        """
+        new_model = copy(self)
+        return new_model
