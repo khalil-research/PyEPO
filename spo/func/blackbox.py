@@ -53,12 +53,20 @@ class blackboxOpt(Function):
     allows us to design an algorithm based on stochastic gradient
     descent.
     """
-    def __init__(self, processes=1):
+    def __init__(self, model, lambd=10, processes=1):
         """
         args:
           processes: number of processors, 0 for single-core, -1 for number of CPUs
         """
         super().__init__()
+        # optimization model
+        assert isinstance(model, optModel), 'arg model is not an optModel.'
+        global _SPO_FUNC_BB_OPTMODEL
+        _SPO_FUNC_BB_OPTMODEL = model
+        # smoothing parameter
+        assert lambd > 0, 'lambda is not positive.'
+        global _SPO_FUNC_BB_LAMBDA
+        _SPO_FUNC_BB_LAMBDA = lambd
         # num of processors
         assert processes in range(mp.cpu_count()), IndexError('Invalid processors number.')
         global _SPO_FUNC_BB_PROCESSES
@@ -66,7 +74,7 @@ class blackboxOpt(Function):
         print('Num of cores: {}'.format(_SPO_FUNC_BB_PROCESSES))
 
     @staticmethod
-    def forward(ctx, model, pred_cost, lambd=10):
+    def forward(ctx, pred_cost):
         """
         args:
           model: optModel
@@ -75,11 +83,11 @@ class blackboxOpt(Function):
           processes: number of processors, 1 for single-core, 0 for number of CPUs
         """
         ins_num = len(pred_cost)
-        # check model
-        assert isinstance(model, optModel), 'arg model is not an optModel'
         # get device
         device = pred_cost.device
-        # get num of processors
+        # get global
+        model = _SPO_FUNC_BB_OPTMODEL
+        lambd = _SPO_FUNC_BB_LAMBDA
         processes = _SPO_FUNC_BB_PROCESSES
         # convert tenstor
         cp = pred_cost.to('cpu').numpy()
@@ -106,8 +114,6 @@ class blackboxOpt(Function):
         pred_sol = torch.FloatTensor(sol).to(device)
         # save
         ctx.save_for_backward(pred_cost, pred_sol)
-        ctx.model = model
-        ctx.lambd = lambd
         return pred_sol
 
     @staticmethod
@@ -116,35 +122,37 @@ class blackboxOpt(Function):
         ins_num = len(pred_cost)
         # get device
         device = pred_cost.device
-        # get num of processors
+        # get global
+        model = _SPO_FUNC_BB_OPTMODEL
+        lambd = _SPO_FUNC_BB_LAMBDA
         processes = _SPO_FUNC_BB_PROCESSES
         # convert tenstor
         cp = pred_cost.to('cpu').numpy()
         wp = pred_sol.to('cpu').numpy()
         dl = grad_output.to('cpu').numpy()
         # perturbed costs
-        cq = cp + ctx.lambd * dl
+        cq = cp + lambd * dl
         # single-core
         if processes == 1:
             grad = []
             for i in range(len(cp)):
                 # solve
-                ctx.model.setObj(cq[i])
-                solq, _ = ctx.model.solve()
+                model.setObj(cq[i])
+                solq, _ = model.solve()
                 # gradient of continuous interpolation
-                grad.append((solq - wp[i]) / ctx.lambd)
+                grad.append((solq - wp[i]) / lambd)
         # multi-core
         else:
             # get class
-            model_name = type(ctx.model).__name__
+            model_name = type(model).__name__
             # get args
-            args = getArgs(ctx.model)
+            args = getArgs(model)
             # number of processes
             processes = mp.cpu_count() if not processes else processes
             # parallel computing
             with ProcessingPool(processes) as pool:
                 sol = pool.amap(solveWithObj4Par, cq, [args]*ins_num, [model_name]*ins_num).get()
             # get gradient
-            grad = np.array(sol) - wp / ctx.lambd
+            grad = np.array(sol) - wp / lambd
         grad = torch.FloatTensor(grad).to(device)
-        return None, grad, None
+        return grad

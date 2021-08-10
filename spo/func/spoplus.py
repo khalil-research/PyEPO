@@ -52,20 +52,24 @@ class SPOPlus(Function):
     The SPO+ Loss is convex with subgradient. Thus, allows us to design
     an algorithm based on stochastic gradient descent.
     """
-    def __init__(self, processes=1):
+    def __init__(self, model, processes=1):
         """
         args:
           processes: number of processors, 1 for single-core, 0 for number of CPUs
         """
         super().__init__()
+        # optimization model
+        assert isinstance(model, optModel), 'arg model is not an optModel'
+        global _SPO_FUNC_SPOP_OPTMODEL
+        _SPO_FUNC_SPOP_OPTMODEL = model
         # num of processors
         assert processes in range(mp.cpu_count()), IndexError('Invalid processors number.')
-        global _SPO_FUNC_SPOPLUS_PROCESSES
-        _SPO_FUNC_SPOPLUS_PROCESSES = processes
-        print('Num of cores: {}'.format(_SPO_FUNC_SPOPLUS_PROCESSES))
+        global _SPO_FUNC_SPOP_PROCESSES
+        _SPO_FUNC_SPOP_PROCESSES = processes
+        print('Num of cores: {}'.format(_SPO_FUNC_SPOP_PROCESSES))
 
     @staticmethod
-    def forward(ctx, model, pred_cost, true_cost, true_sol, true_obj):
+    def forward(ctx, pred_cost, true_cost, true_sol, true_obj):
         """
         args:
           model: optModel
@@ -74,12 +78,11 @@ class SPOPlus(Function):
           true_sol: true solutions
           true_obj: true objective values
         """
-        # check model
-        assert isinstance(model, optModel), 'arg model is not an optModel'
         # get device
         device = pred_cost.device
-        # get num of processors
-        processes = _SPO_FUNC_SPOPLUS_PROCESSES
+        # get global
+        model = _SPO_FUNC_SPOP_OPTMODEL
+        processes = _SPO_FUNC_SPOP_PROCESSES
         # convert tenstor
         cp = pred_cost.to('cpu').numpy()
         c = true_cost.to('cpu').numpy()
@@ -96,10 +99,10 @@ class SPOPlus(Function):
             sol = []
             for i in range(ins_num):
                 # solve
-                model.setObj(2 * cp[i] - c[i])
+                model.setObj(2*cp[i]-c[i])
                 solq, objq = model.solve()
                 # calculate loss
-                loss.append(- objq + 2 * np.dot(cp[i], w[i]) - z[i])
+                loss.append(-objq+2*np.dot(cp[i],w[i])-z[i])
                 # solution
                 sol.append(solq)
         # multi-core
@@ -119,7 +122,7 @@ class SPOPlus(Function):
             # calculate loss
             loss = []
             for i in range(ins_num):
-                loss.append(- obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
+                loss.append(-obj[i]+2*np.dot(cp[i],w[i])-z[i])
         # convert to tensor
         loss = torch.FloatTensor(loss).to(device)
         sol = torch.FloatTensor(sol).to(device)
@@ -131,4 +134,4 @@ class SPOPlus(Function):
     def backward(ctx, grad_output):
         w, wq = ctx.saved_tensors
         grad = 2 * (w - wq).mean(0)
-        return None, grad_output * grad, None, None, None
+        return grad_output * grad, None, None, None
