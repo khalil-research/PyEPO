@@ -5,6 +5,7 @@ import inspect
 import torch
 from torch.autograd import Function
 import numpy as np
+import multiprocessing as mp
 from pathos.multiprocessing import ProcessingPool
 import spo
 from spo.model import optModel
@@ -51,13 +52,34 @@ class SPOPlus(Function):
     The SPO+ Loss is convex with subgradient. Thus, allows us to design
     an algorithm based on stochastic gradient descent.
     """
+    def __init__(self, processes=1):
+        """
+        args:
+          processes: number of processors, 1 for single-core, 0 for number of CPUs
+        """
+        super().__init__()
+        # num of processors
+        assert processes in range(mp.cpu_count()), IndexError('Invalid processors number.')
+        global _SPO_FUNC_SPOPLUS_PROCESSES
+        _SPO_FUNC_SPOPLUS_PROCESSES = processes
+        print('Num of cores: {}'.format(_SPO_FUNC_SPOPLUS_PROCESSES))
 
     @staticmethod
     def forward(ctx, model, pred_cost, true_cost, true_sol, true_obj):
+        """
+        args:
+          model: optModel
+          pred_cost: predicted costs
+          true_cost: true costs
+          true_sol: true solutions
+          true_obj: true objective values
+        """
         # check model
         assert isinstance(model, optModel), 'arg model is not an optModel'
         # get device
         device = pred_cost.device
+        # get num of processors
+        processes = _SPO_FUNC_SPOPLUS_PROCESSES
         # convert tenstor
         cp = pred_cost.to('cpu').numpy()
         c = true_cost.to('cpu').numpy()
@@ -68,20 +90,36 @@ class SPOPlus(Function):
         for i in range(ins_num):
             assert abs(z[i] - np.dot(c[i], w[i])) / (abs(z[i]) + 1e-3) < 1e-3, \
             'Solution {} does not macth the objective value {}.'.format(np.dot(c[i], w[i]), z[i][0])
-        # get class
-        model_name = type(model).__name__
-        # get args
-        args = getArgs(model)
-        # parallel computing
-        with ProcessingPool() as pool:
-            res = pool.amap(solveWithObj4Par, 2*cp-c, [args]*ins_num, [model_name]*ins_num).get()
-        # get res
-        sol = np.array(list(map(lambda x: x[0], res)))
-        obj = np.array(list(map(lambda x: x[1], res)))
-        # calculate loss
-        loss = []
-        for i in range(ins_num):
-            loss.append(- obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
+        # single-core
+        if processes == 1:
+            loss = []
+            sol = []
+            for i in range(ins_num):
+                # solve
+                model.setObj(2 * cp[i] - c[i])
+                solq, objq = model.solve()
+                # calculate loss
+                loss.append(- objq + 2 * np.dot(cp[i], w[i]) - z[i])
+                # solution
+                sol.append(solq)
+        # multi-core
+        else:
+            # get class
+            model_name = type(model).__name__
+            # get args
+            args = getArgs(model)
+            # number of processes
+            processes = mp.cpu_count() if not processes else processes
+            # parallel computing
+            with ProcessingPool(processes=processes) as pool:
+                res = pool.amap(solveWithObj4Par, 2*cp-c, [args]*ins_num, [model_name]*ins_num).get()
+            # get res
+            sol = np.array(list(map(lambda x: x[0], res)))
+            obj = np.array(list(map(lambda x: x[1], res)))
+            # calculate loss
+            loss = []
+            for i in range(ins_num):
+                loss.append(- obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
         # convert to tensor
         loss = torch.FloatTensor(loss).to(device)
         sol = torch.FloatTensor(sol).to(device)
