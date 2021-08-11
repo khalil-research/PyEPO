@@ -16,6 +16,7 @@ class tspModel(optModel):
         Args:
             num_nodes: number of nodes
         """
+        self.num_nodes = num_nodes
         self.nodes = [i for i in range(num_nodes)]
         self.edges = [(i,j) for i in range(num_nodes) for j in range(num_nodes) if i < j]
         super().__init__()
