@@ -114,7 +114,7 @@ class SPOPlus(Function):
             # number of processes
             processes = mp.cpu_count() if not processes else processes
             # parallel computing
-            with ProcessingPool(processes=processes) as pool:
+            with ProcessingPool(processes) as pool:
                 res = pool.amap(solveWithObj4Par, 2*cp-c, [args]*ins_num, [model_name]*ins_num).get()
             # get res
             sol = np.array(list(map(lambda x: x[0], res)))
