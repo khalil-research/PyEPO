@@ -46,6 +46,8 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
                 l += 1
         # from feature to edge
         c[i] += ((np.dot(B, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg).reshape(-1)
+        # rescale
+        c[i] /= 3 ** (deg - 1)
         # noise
         noise =  np.random.uniform(1-noise_width, 1+noise_width, m*(m-1)//2)
         c[i] = c[i] * noise
