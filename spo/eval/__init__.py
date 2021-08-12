@@ -5,5 +5,5 @@
 Performance evaluation
 """
 
-from .truespo import trueSPO, calTrueSPO
-from .unambspo import unambSPO, calUnambSPO
+from spo.eval.truespo import trueSPO, calTrueSPO
+from spo.eval.unambspo import unambSPO, calUnambSPO

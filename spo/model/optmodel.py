@@ -24,39 +24,50 @@ class optModel(ABC):
     @abstractmethod
     def _getModel(self):
         """
-        abstract method to build a model from a optimization solver
+        An abstract method to build a model from a optimization solver
         """
         raise NotImplementedError
 
     @abstractmethod
     def setObj(self, c):
         """
-        abstract method to set objective function with given cost vector
+        An abstract method to set objective function
+
+        Args:
+            c (ndarray): cost of objective function
         """
         raise NotImplementedError
 
     @abstractmethod
     def solve(self):
         """
-        abstract method to solve model
-        Returns:
-            sol: optimal solution
-            obj: objective value
-        """
-        raise NotImplementedError
+        An abstract method to solve model
 
-    @abstractmethod
-    def addConstr(self, coefs, rhs):
-        """
-        abstract method to add new constraint
         Returns:
-            model: optModel
+            tuple: optimal solution (list) and objective value (float)
         """
         raise NotImplementedError
 
     def copy(self):
         """
-        abstract method to copy model
+        An abstract method to copy model
+
+        Returns:
+            optModel: new copied model
         """
         new_model = copy(self)
         return new_model
+
+    @abstractmethod
+    def addConstr(self, coefs, rhs):
+        """
+        An abstract method to add new constraint
+
+        Args:
+            coefs (ndarray): coeffcients of new constraint
+            rhs (float): right-hand side of new constraint
+
+        Returns:
+            optModel: new model with the added constraint
+        """
+        raise NotImplementedError

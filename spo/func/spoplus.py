@@ -12,9 +12,17 @@ from spo.model import optModel
 
 def solveWithObj4Par(cost, args, model_name):
     """
-    global solve function for parallel
+    A global function to solve function in parallel processors
+
+    Args:
+        cost (ndarray): cost of objective function
+        args (dict): optModel args
+        model_name (str): optModel class name
+
+    Returns:
+        tuple: optimal solution (list) and objective value (float)
     """
-    # build model
+    # rebuild model
     try:
         model = eval(model_name)(**args)
     except:
@@ -28,7 +36,13 @@ def solveWithObj4Par(cost, args, model_name):
 
 def getArgs(model):
     """
-    get args of model
+    A global function to get args of model
+
+    Args:
+        model (optModel): optimization model
+
+    Return:
+        dict: model args
     """
     for mem in inspect.getmembers(model):
         if mem[0] == '__dict__':
@@ -43,7 +57,7 @@ def getArgs(model):
 class SPOPlus(Function):
     """
     SPO+ Loss function, a surrogate loss function of SPO Loss, which
-    measure the decision error (optimality gap) of optimization problem.
+    measures the decision error (optimality gap) of optimization problem.
 
     For SPO/SPO+ Loss, the objective function is linear and constraints
     are known and fixed, but the cost vector need to be predicted from
@@ -51,12 +65,12 @@ class SPOPlus(Function):
 
     The SPO+ Loss is convex with subgradient. Thus, allows us to design
     an algorithm based on stochastic gradient descent.
+
+    Args:
+        model (optModel): optimization model
+        processes (int): number of processors, 1 for single-core, 0 for number of CPUs
     """
     def __init__(self, model, processes=1):
-        """
-        args:
-          processes: number of processors, 1 for single-core, 0 for number of CPUs
-        """
         super().__init__()
         # optimization model
         assert isinstance(model, optModel), 'arg model is not an optModel'
@@ -71,12 +85,16 @@ class SPOPlus(Function):
     @staticmethod
     def forward(ctx, pred_cost, true_cost, true_sol, true_obj):
         """
-        args:
-          model: optModel
-          pred_cost: predicted costs
-          true_cost: true costs
-          true_sol: true solutions
-          true_obj: true objective values
+        Forward pass in neural network
+
+        Args:
+            pred_cost (tensor): predicted costs
+            true_cost (tensor): true costs
+            true_sol (tensor): true solutions
+            true_obj (tensor): true objective values
+
+        Returns:
+            tensor: SPO+ loss
         """
         # get device
         device = pred_cost.device
@@ -132,6 +150,9 @@ class SPOPlus(Function):
 
     @staticmethod
     def backward(ctx, grad_output):
+        """
+        Backward pass in neural network
+        """
         w, wq = ctx.saved_tensors
         grad = 2 * (w - wq).mean(0)
         return grad_output * grad, None, None, None

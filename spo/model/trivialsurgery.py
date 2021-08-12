@@ -6,13 +6,10 @@ from gurobipy import GRB
 from spo.model import optModel
 
 class trivialSurgeryModel(optModel):
-    """optimization model for shortest path problem"""
-
+    """
+    This class is optimization model for shortest path problem
+    """
     def __init__(self, K, num_surgeries):
-        """
-        Args:
-            grid: size of grid network
-        """
         self.k = K
         self.num_surgeries = num_surgeries
         super().__init__()
@@ -23,7 +20,7 @@ class trivialSurgeryModel(optModel):
 
     def _getModel(self):
         """
-        Gurobi model
+        A method to build Gurobi model
         """
         # ceate a model
         m = gp.Model('trivial surgery')
@@ -40,7 +37,10 @@ class trivialSurgeryModel(optModel):
 
     def setObj(self, c):
         """
-        set objective function
+        A method to set objective function
+
+        Args:
+            c (ndarray): cost of objective function
         """
         assert len(c) == len(self.x), 'Size of cost vector cannot match arcs'
         obj = gp.quicksum(c[i] * self.x[i] for i in range(self.num_surgeries))
@@ -48,7 +48,10 @@ class trivialSurgeryModel(optModel):
 
     def solve(self):
         """
-        solve model
+        A method to solve model
+
+        Returns:
+            tuple: optimal solution (list) and objective value (float)
         """
         self._model.update()
         self._model.optimize()
@@ -56,7 +59,14 @@ class trivialSurgeryModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        add new constraint
+        A method to add new constraint
+
+        Args:
+            coefs (ndarray): coeffcients of new constraint
+            rhs (float): right-hand side of new constraint
+
+        Returns:
+            optModel: new model with the added constraint
         """
         # assert len(coefs) == len(self.arcs), 'Size of coef vector cannot match arcs'
         # copy

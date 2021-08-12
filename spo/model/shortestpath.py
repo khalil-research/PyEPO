@@ -6,20 +6,24 @@ from gurobipy import GRB
 from spo.model import optModel
 
 class shortestPathModel(optModel):
-    """optimization model for shortest path problem"""
+    """
+    This class is optimization model for shortest path problem
+
+    Args:
+        grid: size of grid network
+    """
 
     def __init__(self, grid):
-        """
-        Args:
-            grid: size of grid network
-        """
         self.grid = grid
         self.arcs = self._getArcs()
         super().__init__()
 
     def _getArcs(self):
         """
-        get list of arcs for grid network
+        A method to get list of arcs for grid network
+
+        Returns:
+            list: arcs
         """
         arcs = []
         for i in range(self.grid[0]):
@@ -41,7 +45,7 @@ class shortestPathModel(optModel):
 
     def _getModel(self):
         """
-        Gurobi model for shortest path
+        A method to build Gurobi model
         """
         # ceate a model
         m = gp.Model('shortest path')
@@ -76,7 +80,10 @@ class shortestPathModel(optModel):
 
     def setObj(self, c):
         """
-        set objective function
+        A method to set objective function
+
+        Args:
+            c (ndarray): cost of objective function
         """
         assert len(c) == self.num_cost, 'Size of cost vector cannot match vars.'
         obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
@@ -84,7 +91,10 @@ class shortestPathModel(optModel):
 
     def solve(self):
         """
-        solve model
+        A method to solve model
+
+        Returns:
+            tuple: optimal solution (list) and objective value (float)
         """
         self._model.update()
         self._model.optimize()
@@ -92,7 +102,10 @@ class shortestPathModel(optModel):
 
     def copy(self):
         """
-        copy model
+        A method to copy model
+
+        Returns:
+            optModel: new copied model
         """
         new_model = super().copy()
         # update model
@@ -106,7 +119,14 @@ class shortestPathModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        add new constraint
+        A method to add new constraint
+
+        Args:
+            coefs (ndarray): coeffcients of new constraint
+            rhs (float): right-hand side of new constraint
+
+        Returns:
+            optModel: new model with the added constraint
         """
         assert len(coefs) == self.num_cost, 'Size of coef vector cannot cost.'
         # copy

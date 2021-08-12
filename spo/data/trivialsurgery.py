@@ -5,12 +5,18 @@ import numpy as np
 
 def genData(num_data, num_features, num_surgeries, deg=1, noise_width=0, seed=135):
     """
-    generate synthetic data and features for shortest path
+    A function to generate synthetic data and features for surgery scheduling
+
     Args:
-        num_data: number of data points
-        num_features: dimension of features
-        grid: size of grid network
-        deg: a fixed positive integer parameter
+        num_data (int): number of data points
+        num_features (int): dimension of features
+        num_surgeries (int): number of surgeries
+        deg (int): data polynomial degree
+        noise_withd (float): half witdth of data random noise
+        seed (int): random seed
+
+    Returns:
+        tuple: data features (ndarray), costs (ndarray)
     """
     # set seed
     np.random.seed(seed)

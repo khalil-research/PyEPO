@@ -5,17 +5,18 @@ import numpy as np
 
 def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
     """
-    generate synthetic data and features for shortest path
+    A function to generate synthetic data and features for shortest path
+
     Args:
-        num_data: number of data points
-        num_features: dimension of features
-        grid: size of grid network
-        deg: a fixed positive integer parameter
-        noise_withd: half witdth of random noise
-        seed: random seed
-    returns:
-       x: data features
-       c: data labels, cost of objective function
+        num_data (int): number of data points
+        num_features (int): dimension of features
+        grid (int, int): size of grid network
+        deg (int): data polynomial degree
+        noise_withd (float): half witdth of data random noise
+        seed (int): random seed
+
+    Returns:
+       tuple: data features (ndarray), costs (ndarray)
     """
     # positive integer parameter
     assert type(deg) is int, 'deg = {} should be int.'.format(deg)

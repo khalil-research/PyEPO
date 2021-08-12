@@ -6,14 +6,18 @@ from scipy.spatial import distance
 
 def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     """
-    generate synthetic data and features for traveling salesman
+    A function to generate synthetic data and features for travelling salesman
+
     Args:
-        num_data: number of data points
-        num_features: dimension of features
-        num_nodes: number of nodes
-        deg: a fixed positive integer parameter
-        noise_withd: half witdth of random noise
-        seed: random seed
+        num_data (int): number of data points
+        num_features (int): dimension of features
+        num_nodes (int): number of nodes
+        deg (int): data polynomial degree
+        noise_withd (float): half witdth of data random noise
+        seed (int): random seed
+
+    Returns:
+        tuple: data features (ndarray), costs (ndarray)
     """
     # positive integer parameter
     assert type(deg) is int, 'deg = {} should be int.'.format(deg)

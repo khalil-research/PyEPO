@@ -9,13 +9,14 @@ from itertools import combinations
 from spo.model import optModel
 
 class tspModel(optModel):
-    """optimization model for traveling salesman problem"""
+    """
+    This class is optimization model for traveling salesman problem.
+
+    Args:
+        num_nodes: number of nodes
+    """
 
     def __init__(self, num_nodes):
-        """
-        Args:
-            num_nodes: number of nodes
-        """
         self.num_nodes = num_nodes
         self.nodes = [i for i in range(num_nodes)]
         self.edges = [(i,j) for i in range(num_nodes) for j in range(num_nodes) if i < j]
@@ -27,7 +28,7 @@ class tspModel(optModel):
 
     def _getModel(self):
         """
-        Gurobi model for DFJ formulation
+        A method to build Gurobi model
         """
         # ceate a model
         m = gp.Model('tsp')
@@ -48,9 +49,9 @@ class tspModel(optModel):
         return m
 
     @staticmethod
-    def subtourelim(model, where):
+    def _subtourelim(model, where):
         """
-        lazy constraints for subtour elimination
+        A static method to add lazy constraints for subtour elimination
         """
 
         def subtour(selected, n):
@@ -98,7 +99,7 @@ class tspModel(optModel):
         solve model
         """
         self._model.update()
-        self._model.optimize(self.subtourelim)
+        self._model.optimize(self._subtourelim)
         sol = np.zeros(self.num_cost, dtype=np.uint8)
         for i, e in enumerate(self.edges):
             if self.x[e].x > 1e-2:
@@ -107,7 +108,13 @@ class tspModel(optModel):
 
     def getTour(self, sol):
         """
-        get a tour from solution
+        A method to get a tour from solution
+
+        Args:
+            sol (list): solution
+
+        Returns:
+            list: a TSP tour
         """
         # active edges
         edges = defaultdict(list)
@@ -131,7 +138,10 @@ class tspModel(optModel):
 
     def copy(self):
         """
-        copy model
+        A method to copy model
+
+        Returns:
+            optModel: new copied model
         """
         new_model = super().copy()
         # update model
@@ -151,7 +161,14 @@ class tspModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        add new constraint
+        A method to add new constraint
+
+        Args:
+            coefs (ndarray): coeffcients of new constraint
+            rhs (float): right-hand side of new constraint
+
+        Returns:
+            optModel: new model with the added constraint
         """
         assert len(coefs) == self.num_cost, 'Size of coef vector cannot cost.'
         # copy

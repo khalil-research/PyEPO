@@ -5,8 +5,8 @@
 Optimization Model based on solvers
 """
 
-from .optmodel import optModel
-from .shortestpath import shortestPathModel
-from .knapsack import knapsackModel, knapsackModelRel
-from .tsp import tspModel
-from .trivialsurgery import trivialSurgeryModel
+from spo.model.optmodel import optModel
+from spo.model.shortestpath import shortestPathModel
+from spo.model.knapsack import knapsackModel, knapsackModelRel
+from spo.model.tsp import tspModel
+from spo.model.trivialsurgery import trivialSurgeryModel

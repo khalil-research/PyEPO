@@ -6,13 +6,15 @@ import numpy as np
 
 def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
     """
-    calculate normalized unambiguous SPO to evaluate model performence
-    args:
-      pmodel: prediction model
-      omodel: optModel
-      dataloader: dataloader from optDataSet
-    returns:
-      loss: unambiguous SPO loss
+    A function to evaluate model performence with normalized unambiguous SPO
+
+    Args:
+        pmodel (nn): neural network predictor
+        omodel (optModel): optimization model
+        dataloader (DataLoader): Torch dataloader from optDataSet
+
+    Returns:
+        float: unambiguous SPO loss
     """
     # evaluate
     pmodel.eval()
@@ -36,14 +38,16 @@ def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
 
 def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-6):
     """
-    calculate normalized unambiguous SPO
-    args:
-      omodel: optModel
-      pred_cost: predicted cost
-      true_cost: true cost
-      true_obj: true optimal objective value
-    returns:
-      loss: unambiguous SPO losses
+    A function to calculate normalized unambiguous SPO for a batch
+
+    Args:
+        omodel (optModel): optimization model
+        pred_cost (tensor): predicted costs
+        true_cost (tensor): true costs
+        true_obj (tensor): true optimal objective values
+
+    Returns:
+        float: unambiguous SPO losses
     """
     # change precision
     cp = np.around(pred_cost / tolerance).astype(int)

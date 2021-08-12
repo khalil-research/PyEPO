@@ -9,26 +9,27 @@ from tqdm import tqdm
 from spo.model import optModel
 
 class optDataset(Dataset):
-    """optimization problem Dataset"""
+    """
+    This class is Torch Dataset for optimization problems.
+
+    Args:
+        model (optModel): an instance of optModel
+        feats (ndarray): data features
+        costs (ndarray): costs of objective function
+    """
 
     def __init__(self, model, feats, costs):
-        """
-        Args:
-            model: an instance of optModel
-            feats: data features
-            costs: data labels, costs of objective function
-        """
         assert isinstance(model, optModel), 'arg model is not an optModel'
         self.model = model
         # data
         self.x = feats
         self.c = costs
         # find optimal solutions
-        self.w, self.z = self.getSols()
+        self.w, self.z = self._getSols()
 
-    def getSols(self):
+    def _getSols(self):
         """
-        get optimal solutions for all cost vectors
+        A method to get optimal solutions for all cost vectors
         """
         sols = []
         objs = []
@@ -45,9 +46,13 @@ class optDataset(Dataset):
 
     def _solve(self, cost):
         """
-        solve optimization problem to get optimal solutions with given cost
+        A method to solve optimization problem to get an optimal solution with given cost
+
         Args:
-            costs: cost of objective function
+            cost (ndarray): cost of objective function
+
+        Returns:
+            tuple: optimal solution (ndarray) and objective value (float)
         """
         self.model.setObj(cost)
         sol, obj = self.model.solve()
@@ -55,13 +60,22 @@ class optDataset(Dataset):
 
     def __len__(self):
         """
-        return the number of optimization problems
+        A method to get data size
+
+        Returns:
+            int: the number of optimization problems
         """
         return len(self.c)
 
     def __getitem__(self, index):
         """
-        return feature, cost and optimal solution
+        A method to retrieve data
+
+        Args:
+            index (int): data index
+
+        Returns:
+            tuple: data features (tensor), costs (tensor), optimal solutions (tensor) and objective values (tensor)
         """
         return torch.FloatTensor(self.x[index]), \
                torch.FloatTensor(self.c[index]), \

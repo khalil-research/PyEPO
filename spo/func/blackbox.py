@@ -12,9 +12,17 @@ from spo.model import optModel
 
 def solveWithObj4Par(cost, args, model_name):
     """
-    global solve function for parallel
+    A global function to solve function in parallel processors
+
+    Args:
+        cost (ndarray): cost of objective function
+        args (dict): optModel args
+        model_name (str): optModel class name
+
+    Returns:
+        list: optimal solution
     """
-    # build model
+    # rebuild model
     try:
         model = eval(model_name)(**args)
     except:
@@ -28,7 +36,13 @@ def solveWithObj4Par(cost, args, model_name):
 
 def getArgs(model):
     """
-    get args of model
+    A global function to get args of model
+
+    Args:
+        model (optModel): optimization model
+
+    Return:
+        dict: model args
     """
     for mem in inspect.getmembers(model):
         if mem[0] == '__dict__':
@@ -52,12 +66,13 @@ class blackboxOpt(Function):
     The block-box approximate gradient of optimizer smoothly. Thus,
     allows us to design an algorithm based on stochastic gradient
     descent.
+
+    Args:
+        model (optModel): optimization model
+        lambd (float): Black-Box parameters for function smoothing
+        processes (int): number of processors, 1 for single-core, 0 for number of CPUs
     """
     def __init__(self, model, lambd=10, processes=1):
-        """
-        args:
-          processes: number of processors, 0 for single-core, -1 for number of CPUs
-        """
         super().__init__()
         # optimization model
         assert isinstance(model, optModel), 'arg model is not an optModel.'
@@ -76,11 +91,13 @@ class blackboxOpt(Function):
     @staticmethod
     def forward(ctx, pred_cost):
         """
-        args:
-          model: optModel
-          pred_cost: predicted costs
-          lambd: Black-Box parameters for function smoothing
-          processes: number of processors, 1 for single-core, 0 for number of CPUs
+        Forward pass in neural network.
+
+        Args:
+            pred_cost: predicted costs
+
+        Returns:
+            tensor: predicted solutions
         """
         ins_num = len(pred_cost)
         # get device
@@ -118,6 +135,9 @@ class blackboxOpt(Function):
 
     @staticmethod
     def backward(ctx, grad_output):
+        """
+        Backward pass in neural network
+        """
         pred_cost, pred_sol = ctx.saved_tensors
         ins_num = len(pred_cost)
         # get device

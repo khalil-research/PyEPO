@@ -5,5 +5,5 @@
 Pytorch autograd function for SPO training
 """
 
-from .spoplus import SPOPlus
-from .blackbox import blackboxOpt
+from spo.func.spoplus import SPOPlus
+from spo.func.blackbox import blackboxOpt

@@ -6,14 +6,14 @@ from gurobipy import GRB
 from spo.model import optModel
 
 class knapsackModel(optModel):
-    """optimization model for knapsack problem"""
+    """
+    This class is optimization model for knapsack problem
 
+    Args:
+        weights (ndarray): weights of items
+        capacity (float): total capacity
+    """
     def __init__(self, weights, capacity):
-        """
-        Args:
-            weights: weights of items
-            capacity: total capacity
-        """
         self.weights = weights
         self.capacity = capacity
         self.items = [i for i in range(len(self.weights))]
@@ -25,7 +25,7 @@ class knapsackModel(optModel):
 
     def _getModel(self):
         """
-        Gurobi model for knapsack
+        A method to build Gurobi model
         """
         # ceate a model
         m = gp.Model('knapsack')
@@ -41,7 +41,10 @@ class knapsackModel(optModel):
 
     def setObj(self, c):
         """
-        set objective function
+        A method to set objective function
+
+        Args:
+            c (ndarray): cost of objective function
         """
         assert len(c) == self.num_cost, 'Size of cost vector cannot match vars.'
         obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
@@ -49,7 +52,10 @@ class knapsackModel(optModel):
 
     def solve(self):
         """
-        solve model
+        A method to solve model
+
+        Returns:
+            tuple: optimal solution (list) and objective value (float)
         """
         self._model.update()
         self._model.optimize()
@@ -57,7 +63,10 @@ class knapsackModel(optModel):
 
     def copy(self):
         """
-        copy model
+        A method to copy model
+
+        Returns:
+            optModel: new copied model
         """
         new_model = super().copy()
         # update model
@@ -71,7 +80,14 @@ class knapsackModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        add new constraint
+        A method to add new constraint
+
+        Args:
+            coefs (ndarray): coeffcients of new constraint
+            rhs (float): right-hand side of new constraint
+
+        Returns:
+            optModel: new model with the added constraint
         """
         assert len(coefs) == self.num_cost, 'Size of coef vector cannot cost.'
         # copy
@@ -84,7 +100,7 @@ class knapsackModel(optModel):
 
     def relax(self):
         """
-        relax model
+        A method to relax model
         """
         # copy
         model_rel = knapsackModelRel(self.weights, self.capacity)
@@ -92,11 +108,13 @@ class knapsackModel(optModel):
 
 
 class knapsackModelRel(knapsackModel):
-    """relaxed optimization model for knapsack problem"""
+    """
+    This class is relaxed optimization model for knapsack problem.
+    """
 
     def _getModel(self):
         """
-        Gurobi model for relaxed knapsack
+        A method to build Gurobi
         """
         # ceate a model
         m = gp.Model('knapsack')
@@ -112,6 +130,6 @@ class knapsackModelRel(knapsackModel):
 
     def relax(self):
         """
-        relax model
+        A forbidden method to relax MIP model
         """
         raise RuntimeError('Model has already been relaxed.')
