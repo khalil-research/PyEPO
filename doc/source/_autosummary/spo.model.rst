@@ -1,4 +1,4 @@
-spo.model
+﻿spo.model
 =========
 
 .. currentmodule:: spo

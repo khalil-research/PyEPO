@@ -2,9 +2,7 @@
 # coding: utf-8
 
 """
-Function
-====================================
-Pytorch autograd function for SPO training.
+Pytorch autograd function for SPO training
 """
 
 from .spoplus import SPOPlus

@@ -2,9 +2,7 @@
 # coding: utf-8
 
 """
-Evaluation
-====================================
-Performance evaluation for model.
+Performance evaluation
 """
 
 from .truespo import trueSPO, calTrueSPO

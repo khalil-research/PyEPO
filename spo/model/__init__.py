@@ -2,9 +2,7 @@
 # coding: utf-8
 
 """
-Optimization Model
-====================================
-Optimization models based on solvers.
+Optimization Model based on solvers
 """
 
 from .optmodel import optModel

@@ -1,4 +1,4 @@
-spo.func
+﻿spo.func
 ========
 
 .. currentmodule:: spo

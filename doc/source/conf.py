@@ -31,6 +31,7 @@ release = 'v0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
+              'autoapi.extension',
               'sphinx.ext.autosummary',
               'sphinx.ext.doctest',
               'sphinx.ext.intersphinx',
@@ -39,6 +40,9 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
               'sphinx.ext.napoleon'
               ]
+
+# Add any path that contain packages here, relative to this directory.
+autoapi_dirs = ['../../spo']
 
 # Turn on autosummary
 autosummary_generate = True

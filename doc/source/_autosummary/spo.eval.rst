@@ -1,4 +1,4 @@
-spo.eval
+﻿spo.eval
 ========
 
 .. currentmodule:: spo
