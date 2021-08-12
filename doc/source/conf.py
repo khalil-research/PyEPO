@@ -14,6 +14,11 @@ import os
 import sys
 sys.path.append(os.path.abspath('../..'))
 sys.path.append(os.path.abspath('../../spo'))
+sys.path.append(os.path.abspath('../../spo/data'))
+sys.path.append(os.path.abspath('../../spo/model'))
+sys.path.append(os.path.abspath('../../spo/twostage'))
+sys.path.append(os.path.abspath('../../spo/func'))
+sys.path.append(os.path.abspath('../../spo/eval'))
 
 # -- Project information -----------------------------------------------------
 

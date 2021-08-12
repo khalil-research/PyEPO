@@ -1,29 +1,6 @@
 spo.data.trivialsurgery
 =======================
 
-.. automodule:: spo.data.trivialsurgery
+.. currentmodule:: spo.data
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      genData
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: trivialsurgery

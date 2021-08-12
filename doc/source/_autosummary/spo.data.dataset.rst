@@ -1,29 +1,6 @@
 spo.data.dataset
 ================
 
-.. automodule:: spo.data.dataset
+.. currentmodule:: spo.data
 
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      optDataset
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: dataset

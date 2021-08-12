@@ -1,30 +1,6 @@
 spo.model.knapsack
 ==================
 
-.. automodule:: spo.model.knapsack
+.. currentmodule:: spo.model
 
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      knapsackModel
-      knapsackModelRel
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: knapsack

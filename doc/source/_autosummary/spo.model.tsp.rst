@@ -1,29 +1,6 @@
 spo.model.tsp
 =============
 
-.. automodule:: spo.model.tsp
+.. currentmodule:: spo.model
 
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      tspModel
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: tsp

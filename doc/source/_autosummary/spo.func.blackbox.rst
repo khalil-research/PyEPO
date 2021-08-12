@@ -1,36 +1,6 @@
 spo.func.blackbox
 =================
 
-.. automodule:: spo.func.blackbox
+.. currentmodule:: spo.func
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      getArgs
-      solveWithObj4Par
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      blackboxOpt
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: blackbox

@@ -1,29 +1,6 @@
 spo.model.trivialsurgery
 ========================
 
-.. automodule:: spo.model.trivialsurgery
+.. currentmodule:: spo.model
 
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      trivialSurgeryModel
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: trivialsurgery

@@ -1,29 +1,6 @@
 spo.data.tsp
 ============
 
-.. automodule:: spo.data.tsp
+.. currentmodule:: spo.data
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      genData
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: tsp

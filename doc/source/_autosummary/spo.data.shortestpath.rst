@@ -1,29 +1,6 @@
 spo.data.shortestpath
 =====================
 
-.. automodule:: spo.data.shortestpath
+.. currentmodule:: spo.data
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      genData
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: shortestpath

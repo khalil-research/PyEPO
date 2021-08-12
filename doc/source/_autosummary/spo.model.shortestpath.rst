@@ -1,29 +1,6 @@
 spo.model.shortestpath
 ======================
 
-.. automodule:: spo.model.shortestpath
+.. currentmodule:: spo.model
 
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      shortestPathModel
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: shortestpath

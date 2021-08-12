@@ -1,30 +1,6 @@
 spo.eval.unambspo
 =================
 
-.. automodule:: spo.eval.unambspo
+.. currentmodule:: spo.eval
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      calUnambSPO
-      unambSPO
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: unambspo

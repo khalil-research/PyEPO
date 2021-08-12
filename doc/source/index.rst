@@ -13,7 +13,6 @@ Welcome to Smart Predict then Optimize's documentation!
 
    spo
 
-
 Introduction
 ============
 This is the Documentation of SPO (Smart Predict then Optimize)

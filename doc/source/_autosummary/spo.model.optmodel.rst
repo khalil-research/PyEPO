@@ -1,29 +1,6 @@
 spo.model.optmodel
 ==================
 
-.. automodule:: spo.model.optmodel
+.. currentmodule:: spo.model
 
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      optModel
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: optmodel

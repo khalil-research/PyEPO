@@ -1,36 +1,6 @@
 spo.func.spoplus
 ================
 
-.. automodule:: spo.func.spoplus
+.. currentmodule:: spo.func
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      getArgs
-      solveWithObj4Par
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      SPOPlus
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: spoplus

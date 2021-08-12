@@ -1,6 +1,33 @@
 ﻿spo.func
 ========
 
-.. currentmodule:: spo
+.. automodule:: spo.func
 
-.. automodule:: func
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 <-- add this line
+   :recursive:
+
+   spo.func.blackbox
+   spo.func.spoplus
+

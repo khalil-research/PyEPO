@@ -1,29 +1,6 @@
 spo.data.knapsack
 =================
 
-.. automodule:: spo.data.knapsack
+.. currentmodule:: spo.data
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      genData
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: knapsack

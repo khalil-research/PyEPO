@@ -1,30 +1,6 @@
 spo.eval.truespo
 ================
 
-.. automodule:: spo.eval.truespo
+.. currentmodule:: spo.eval
 
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      calTrueSPO
-      trueSPO
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: truespo

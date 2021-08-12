@@ -1,6 +1,32 @@
 ﻿spo.twostage
 ============
 
-.. currentmodule:: spo
+.. automodule:: spo.twostage
 
-.. automodule:: twostage
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 <-- add this line
+   :recursive:
+
+   spo.twostage.sklearnpred
+

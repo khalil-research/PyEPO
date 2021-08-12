@@ -1,29 +1,6 @@
 spo.twostage.sklearnpred
 ========================
 
-.. automodule:: spo.twostage.sklearnpred
+.. currentmodule:: spo.twostage
 
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      sklearnPred
-   
-   
-
-   
-   
-   
-
-
-
+.. automodule:: sklearnpred
