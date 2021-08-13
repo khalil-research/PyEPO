@@ -6,9 +6,9 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 from itertools import combinations
-from spo.model import optModel
+from spo.model import optGRBModel
 
-class tspModel(optModel):
+class tspModel(optGRBModel):
     """
     This class is optimization model for traveling salesman problem.
 
@@ -143,7 +143,7 @@ class tspModel(optModel):
         Returns:
             optModel: new copied model
         """
-        new_model = super().copy()
+        new_model = tspModel(self.num_nodes)
         # update model
         self._model.update()
         # new model

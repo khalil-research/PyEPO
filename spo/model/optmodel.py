@@ -5,7 +5,9 @@ from abc import ABC, abstractmethod
 from copy import copy
 
 class optModel(ABC):
-    """abstract class for optimization model"""
+    """
+    This is an abstract class for optimization model
+    """
 
     def __init__(self):
         self._model = self._getModel()
