@@ -2,7 +2,9 @@
 # coding: utf-8
 
 import copy
+
 import numpy as np
+
 
 def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
     """
@@ -21,20 +23,22 @@ def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
     loss = 0
     optsum = 0
     # load data
-    for i, data in enumerate(dataloader):
+    for data in dataloader:
         x, c, w, z = data
         # cuda
         if next(pmodel.parameters()).is_cuda:
             x, c, w, z = x.cuda(), c.cuda(), w.cuda(), z.cuda()
         # pred cost
-        cp = pmodel(x).to('cpu').detach().numpy()
+        cp = pmodel(x).to("cpu").detach().numpy()
         # solve
         for j in range(cp.shape[0]):
             # accumulate loss
-            loss += calUnambSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item(), tolerance)
+            loss += calUnambSPO(omodel, cp[j], c[j].to("cpu").detach().numpy(),
+                                z[j].item(), tolerance)
         optsum += abs(z).sum().item()
     # normalized
     return loss / (optsum + 1e-3)
+
 
 def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-6):
     """
@@ -68,6 +72,5 @@ def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-6):
     except:
         tolerance *= 10
         if tolerance > 1e-1:
-            raise AttributeError('Infeasible worst case.')
-        else:
-            return calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance)
+            raise AttributeError("Infeasible worst case.")
+        return calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance)

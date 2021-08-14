@@ -2,11 +2,14 @@
 # coding: utf-8
 
 from collections import defaultdict
-import numpy as np
-import gurobipy as gp
-from gurobipy import GRB
 from itertools import combinations
+
+import gurobipy as gp
+import numpy as np
+from gurobipy import GRB
+
 from spo.model import optGRBModel
+
 
 class tspModel(optGRBModel):
     """
@@ -18,8 +21,9 @@ class tspModel(optGRBModel):
 
     def __init__(self, num_nodes):
         self.num_nodes = num_nodes
-        self.nodes = [i for i in range(num_nodes)]
-        self.edges = [(i,j) for i in range(num_nodes) for j in range(num_nodes) if i < j]
+        self.nodes = list(range(num_nodes))
+        self.edges = [(i, j) for i in range(num_nodes)
+                      for j in range(num_nodes) if i < j]
         super().__init__()
 
     @property
@@ -31,17 +35,17 @@ class tspModel(optGRBModel):
         A method to build Gurobi model
         """
         # ceate a model
-        m = gp.Model('tsp')
+        m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.edges, name='x', vtype=GRB.BINARY)
+        self.x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:
             self.x[j, i] = self.x[i, j]
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstrs(self.x.sum(i, '*') == 2 for i in self.nodes) ## 2 degree
+        m.addConstrs(self.x.sum(i, "*") == 2 for i in self.nodes)  # 2 degree
         # activate lazy constraints
         m._x = self.x
         m._n = len(self.nodes)
@@ -53,14 +57,13 @@ class tspModel(optGRBModel):
         """
         A static method to add lazy constraints for subtour elimination
         """
-
         def subtour(selected, n):
             """
             find shortest cycle
             """
             unvisited = list(range(n))
             # init dummy longest cycle
-            cycle = range(n+1)
+            cycle = range(n + 1)
             while unvisited:
                 thiscycle = []
                 neighbors = unvisited
@@ -68,7 +71,10 @@ class tspModel(optGRBModel):
                     current = neighbors[0]
                     thiscycle.append(current)
                     unvisited.remove(current)
-                    neighbors = [j for i, j in selected.select(current, '*') if j in unvisited]
+                    neighbors = [
+                        j for i, j in selected.select(current, "*")
+                        if j in unvisited
+                    ]
                 if len(cycle) > len(thiscycle):
                     cycle = thiscycle
             return cycle
@@ -76,21 +82,23 @@ class tspModel(optGRBModel):
         if where == GRB.Callback.MIPSOL:
             # selected edges
             xvals = model.cbGetSolution(model._x)
-            selected = gp.tuplelist((i, j) for i, j in model._x.keys() if xvals[i, j] > 1e-2)
+            selected = gp.tuplelist(
+                (i, j) for i, j in model._x.keys() if xvals[i, j] > 1e-2)
             # shortest cycle
             tour = subtour(selected, model._n)
             # add cuts
             if len(tour) < model._n:
-                model.cbLazy(gp.quicksum(model._x[i, j]
-                                         for i, j in combinations(tour, 2))
-                             <= len(tour)-1)
-
+                model.cbLazy(
+                    gp.quicksum(
+                        model._x[i, j]
+                        for i, j in combinations(tour, 2)) <= len(tour) - 1)
 
     def setObj(self, c):
         """
         set objective function
         """
-        assert len(c) == self.num_cost, 'Size of cost vector cannot match vars.'
+        if len(c) != self.num_cost:
+            raise AssertionError("Size of cost vector cannot match vars.")
         obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.edges))
         self._model.setObjective(obj)
 
@@ -118,7 +126,7 @@ class tspModel(optGRBModel):
         """
         # active edges
         edges = defaultdict(list)
-        for i, (j,k) in enumerate(self.edges):
+        for i, (j, k) in enumerate(self.edges):
             if sol[i] > 1e-2:
                 edges[j].append(k)
                 edges[k].append(j)
@@ -170,11 +178,12 @@ class tspModel(optGRBModel):
         Returns:
             optModel: new model with the added constraint
         """
-        assert len(coefs) == self.num_cost, 'Size of coef vector cannot cost.'
+        if len(coefs) != self.num_cost:
+            raise AssertionError("Size of coef vector cannot cost.")
         # copy
         new_model = self.copy()
         # add constraint
-        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[k]
-                                               for i, k in enumerate(new_model.edges))
-                                   <= rhs)
+        new_model._model.addConstr(
+            gp.quicksum(coefs[i] * new_model.x[k]
+                        for i, k in enumerate(new_model.edges)) <= rhs)
         return new_model

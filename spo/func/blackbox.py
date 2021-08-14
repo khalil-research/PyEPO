@@ -2,13 +2,16 @@
 # coding: utf-8
 
 import inspect
-import torch
-from torch.autograd import Function
-import numpy as np
 import multiprocessing as mp
+
+import numpy as np
+import torch
 from pathos.multiprocessing import ProcessingPool
+from torch.autograd import Function
+
 import spo
 from spo.model import optModel
+
 
 def solveWithObj4Par(cost, args, model_name):
     """
@@ -26,7 +29,7 @@ def solveWithObj4Par(cost, args, model_name):
     try:
         model = eval(model_name)(**args)
     except:
-        model = eval('spo.model.{}'.format(model_name))(**args)
+        model = eval("spo.model.{}".format(model_name))(**args)
     # set obj
     model.setObj(cost)
     # solve
@@ -45,7 +48,7 @@ def getArgs(model):
         dict: model args
     """
     for mem in inspect.getmembers(model):
-        if mem[0] == '__dict__':
+        if mem[0] == "__dict__":
             attrs = mem[1]
             args = {}
             for name in attrs:
@@ -72,21 +75,26 @@ class blackboxOpt(Function):
         lambd (float): Black-Box parameters for function smoothing
         processes (int): number of processors, 1 for single-core, 0 for number of CPUs
     """
+
     def __init__(self, model, lambd=10, processes=1):
         super().__init__()
         # optimization model
-        assert isinstance(model, optModel), 'arg model is not an optModel.'
+        if not isinstance(model, optModel):
+            raise AssertionError("arg model is not an optModel.")
         global _SPO_FUNC_BB_OPTMODEL
         _SPO_FUNC_BB_OPTMODEL = model
         # smoothing parameter
-        assert lambd > 0, 'lambda is not positive.'
+        if lambd <= 0:
+            raise AssertionError("lambda is not positive.")
         global _SPO_FUNC_BB_LAMBDA
         _SPO_FUNC_BB_LAMBDA = lambd
         # num of processors
-        assert processes in range(mp.cpu_count()), IndexError('Invalid processors number.')
+        if processes not in range(mp.cpu_count()):
+            raise IndexError("Invalid processors number {}, only {} cores.".
+                format(processes, mp.cpu_count()))
         global _SPO_FUNC_BB_PROCESSES
         _SPO_FUNC_BB_PROCESSES = processes
-        print('Num of cores: {}'.format(_SPO_FUNC_BB_PROCESSES))
+        print("Num of cores: {}".format(_SPO_FUNC_BB_PROCESSES))
 
     @staticmethod
     def forward(ctx, pred_cost):
@@ -104,10 +112,9 @@ class blackboxOpt(Function):
         device = pred_cost.device
         # get global
         model = _SPO_FUNC_BB_OPTMODEL
-        lambd = _SPO_FUNC_BB_LAMBDA
         processes = _SPO_FUNC_BB_PROCESSES
         # convert tenstor
-        cp = pred_cost.to('cpu').numpy()
+        cp = pred_cost.to("cpu").numpy()
         # single-core
         if processes == 1:
             sol = []
@@ -126,7 +133,8 @@ class blackboxOpt(Function):
             args = getArgs(model)
             # parallel computing
             with ProcessingPool(processes) as pool:
-                sol = pool.amap(solveWithObj4Par, cp, [args]*ins_num, [model_name]*ins_num).get()
+                sol = pool.amap(solveWithObj4Par, cp, [args] * ins_num,
+                                [model_name] * ins_num).get()
         # convert to tensor
         pred_sol = torch.FloatTensor(sol).to(device)
         # save
@@ -147,9 +155,9 @@ class blackboxOpt(Function):
         lambd = _SPO_FUNC_BB_LAMBDA
         processes = _SPO_FUNC_BB_PROCESSES
         # convert tenstor
-        cp = pred_cost.to('cpu').numpy()
-        wp = pred_sol.to('cpu').numpy()
-        dl = grad_output.to('cpu').numpy()
+        cp = pred_cost.to("cpu").numpy()
+        wp = pred_sol.to("cpu").numpy()
+        dl = grad_output.to("cpu").numpy()
         # perturbed costs
         cq = cp + lambd * dl
         # single-core
@@ -171,7 +179,8 @@ class blackboxOpt(Function):
             processes = mp.cpu_count() if not processes else processes
             # parallel computing
             with ProcessingPool(processes) as pool:
-                sol = pool.amap(solveWithObj4Par, cq, [args]*ins_num, [model_name]*ins_num).get()
+                sol = pool.amap(solveWithObj4Par, cq, [args] * ins_num,
+                                [model_name] * ins_num).get()
             # get gradient
             grad = []
             for i in range(ins_num):

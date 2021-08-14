@@ -3,6 +3,7 @@
 
 import numpy as np
 
+
 def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
     """
     A function to generate synthetic data and features for shortest path
@@ -19,8 +20,10 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
        tuple: data features (ndarray), costs (ndarray)
     """
     # positive integer parameter
-    assert type(deg) is int, 'deg = {} should be int.'.format(deg)
-    assert deg > 0, 'deg = {} should be positive.'.format(deg)
+    if type(deg) is not int:
+        raise AssertionError("deg = {} should be int.".format(deg))
+    if deg <= 0:
+        raise AssertionError("deg = {} should be positive.".format(deg))
     # set seed
     np.random.seed(seed)
     # number of data points
@@ -30,17 +33,17 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
     # dimension of the cost vector
     d = (grid[0] - 1) * grid[1] + (grid[1] - 1) * grid[0]
     # random matrix parameter B
-    B = np.random.binomial(1, 0.5, (d,p))
+    B = np.random.binomial(1, 0.5, (d, p))
     # feature vectors
-    x = np.random.normal(0, 1, (n,p))
+    x = np.random.normal(0, 1, (n, p))
     # cost vectors
-    c = np.zeros((n,d))
+    c = np.zeros((n, d))
     for i in range(n):
         # cost without noise
-        ci = (np.dot(B, x[i].reshape(p,1)).T / np.sqrt(p) + 3) ** deg + 1
+        ci = (np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3)**deg + 1
         # noise
-        epislon = np.random.uniform(1-noise_width, 1+noise_width, d)
+        epislon = np.random.uniform(1 - noise_width, 1 + noise_width, d)
         ci *= epislon
-        c[i,:] = ci
+        c[i, :] = ci
 
     return x, c

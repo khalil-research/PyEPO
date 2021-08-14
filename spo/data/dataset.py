@@ -2,11 +2,14 @@
 # coding: utf-8
 
 import time
+
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
+
 from spo.model import optModel
+
 
 class optDataset(Dataset):
     """
@@ -19,7 +22,8 @@ class optDataset(Dataset):
     """
 
     def __init__(self, model, feats, costs):
-        assert isinstance(model, optModel), 'arg model is not an optModel'
+        if not isinstance(model, optModel):
+            raise AssertionError("arg model is not an optModel")
         self.model = model
         # data
         self.x = feats
@@ -33,13 +37,15 @@ class optDataset(Dataset):
         """
         sols = []
         objs = []
-        print('Optimizing for optDataset...')
+        print("Optimizing for optDataset...")
         time.sleep(1)
         for c in tqdm(self.c):
             try:
                 sol, obj = self._solve(c)
             except:
-                raise ValueError("For optModel, the method 'solve' should return solution vector and objective value.")
+                raise ValueError(
+                    "For optModel, the method 'solve' should return solution vector and objective value."
+                )
             sols.append(sol)
             objs.append([obj])
         return np.array(sols), np.array(objs)
@@ -77,7 +83,9 @@ class optDataset(Dataset):
         Returns:
             tuple: data features (tensor), costs (tensor), optimal solutions (tensor) and objective values (tensor)
         """
-        return torch.FloatTensor(self.x[index]), \
-               torch.FloatTensor(self.c[index]), \
-               torch.FloatTensor(self.w[index]), \
-               torch.FloatTensor(self.z[index])
+        return (
+            torch.FloatTensor(self.x[index]),
+            torch.FloatTensor(self.c[index]),
+            torch.FloatTensor(self.w[index]),
+            torch.FloatTensor(self.z[index]),
+        )

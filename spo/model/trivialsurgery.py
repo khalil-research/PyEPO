@@ -3,12 +3,15 @@
 
 import gurobipy as gp
 from gurobipy import GRB
+
 from spo.model import optModel
+
 
 class trivialSurgeryModel(optModel):
     """
     This class is optimization model for shortest path problem
     """
+
     def __init__(self, K, num_surgeries):
         self.k = K
         self.num_surgeries = num_surgeries
@@ -23,11 +26,11 @@ class trivialSurgeryModel(optModel):
         A method to build Gurobi model
         """
         # ceate a model
-        m = gp.Model('trivial surgery')
+        m = gp.Model("trivial surgery")
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.num_surgeries, name='x', vtype=gp.GRB.BINARY)
+        self.x = m.addVars(self.num_surgeries, name="x", vtype=gp.GRB.BINARY)
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
@@ -42,7 +45,8 @@ class trivialSurgeryModel(optModel):
         Args:
             c (ndarray): cost of objective function
         """
-        assert len(c) == len(self.x), 'Size of cost vector cannot match arcs'
+        if len(c) != len(self.x):
+            raise AssertionError("Size of cost vector cannot match arcs")
         obj = gp.quicksum(c[i] * self.x[i] for i in range(self.num_surgeries))
         self._model.setObjective(obj)
 
@@ -55,7 +59,8 @@ class trivialSurgeryModel(optModel):
         """
         self._model.update()
         self._model.optimize()
-        return [self.x[e].x for e in range(self.num_surgeries)], self._model.objVal
+        return [self.x[e].x
+                for e in range(self.num_surgeries)], self._model.objVal
 
     def addConstr(self, coefs, rhs):
         """
@@ -72,7 +77,7 @@ class trivialSurgeryModel(optModel):
         # copy
         new_model = trivialSurgeryModel(self.k, self.num_surgeries)
         # add constraint
-        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[i]
-                                               for i in range(self.num_surgeries))
-                                   == rhs)
+        new_model._model.addConstr(
+            gp.quicksum(coefs[i] * new_model.x[i]
+                        for i in range(self.num_surgeries)) == rhs)
         return new_model

@@ -2,13 +2,16 @@
 # coding: utf-8
 
 import inspect
-import torch
-from torch.autograd import Function
-import numpy as np
 import multiprocessing as mp
+
+import numpy as np
+import torch
 from pathos.multiprocessing import ProcessingPool
+from torch.autograd import Function
+
 import spo
 from spo.model import optModel
+
 
 def solveWithObj4Par(cost, args, model_name):
     """
@@ -26,7 +29,7 @@ def solveWithObj4Par(cost, args, model_name):
     try:
         model = eval(model_name)(**args)
     except:
-        model = eval('spo.model.{}'.format(model_name))(**args)
+        model = eval("spo.model.{}".format(model_name))(**args)
     # set obj
     model.setObj(cost)
     # solve
@@ -45,7 +48,7 @@ def getArgs(model):
         dict: model args
     """
     for mem in inspect.getmembers(model):
-        if mem[0] == '__dict__':
+        if mem[0] == "__dict__":
             attrs = mem[1]
             args = {}
             for name in attrs:
@@ -70,17 +73,21 @@ class SPOPlus(Function):
         model (optModel): optimization model
         processes (int): number of processors, 1 for single-core, 0 for number of CPUs
     """
+
     def __init__(self, model, processes=1):
         super().__init__()
         # optimization model
-        assert isinstance(model, optModel), 'arg model is not an optModel'
+        if not isinstance(model, optModel):
+            raise AssertionError("arg model is not an optModel")
         global _SPO_FUNC_SPOP_OPTMODEL
         _SPO_FUNC_SPOP_OPTMODEL = model
         # num of processors
-        assert processes in range(mp.cpu_count()), IndexError('Invalid processors number.')
+        if processes not in range(mp.cpu_count()):
+            raise IndexError("Invalid processors number {}, only {} cores.".
+                format(processes, mp.cpu_count()))
         global _SPO_FUNC_SPOP_PROCESSES
         _SPO_FUNC_SPOP_PROCESSES = processes
-        print('Num of cores: {}'.format(_SPO_FUNC_SPOP_PROCESSES))
+        print("Num of cores: {}".format(_SPO_FUNC_SPOP_PROCESSES))
 
     @staticmethod
     def forward(ctx, pred_cost, true_cost, true_sol, true_obj):
@@ -102,25 +109,27 @@ class SPOPlus(Function):
         model = _SPO_FUNC_SPOP_OPTMODEL
         processes = _SPO_FUNC_SPOP_PROCESSES
         # convert tenstor
-        cp = pred_cost.to('cpu').numpy()
-        c = true_cost.to('cpu').numpy()
-        w = true_sol.to('cpu').numpy()
-        z = true_obj.to('cpu').numpy()
+        cp = pred_cost.to("cpu").numpy()
+        c = true_cost.to("cpu").numpy()
+        w = true_sol.to("cpu").numpy()
+        z = true_obj.to("cpu").numpy()
         # check sol
         ins_num = len(z)
         for i in range(ins_num):
-            assert abs(z[i] - np.dot(c[i], w[i])) / (abs(z[i]) + 1e-3) < 1e-3, \
-            'Solution {} does not macth the objective value {}.'.format(np.dot(c[i], w[i]), z[i][0])
+            if abs(z[i] - np.dot(c[i], w[i])) / (abs(z[i]) + 1e-3) >= 1e-3:
+                raise AssertionError(
+                    "Solution {} does not macth the objective value {}.".
+                    format(np.dot(c[i], w[i]), z[i][0]))
         # single-core
         if processes == 1:
             loss = []
             sol = []
             for i in range(ins_num):
                 # solve
-                model.setObj(2*cp[i]-c[i])
+                model.setObj(2 * cp[i] - c[i])
                 solq, objq = model.solve()
                 # calculate loss
-                loss.append(-objq+2*np.dot(cp[i],w[i])-z[i])
+                loss.append(-objq + 2 * np.dot(cp[i], w[i]) - z[i])
                 # solution
                 sol.append(solq)
         # multi-core
@@ -133,14 +142,19 @@ class SPOPlus(Function):
             processes = mp.cpu_count() if not processes else processes
             # parallel computing
             with ProcessingPool(processes) as pool:
-                res = pool.amap(solveWithObj4Par, 2*cp-c, [args]*ins_num, [model_name]*ins_num).get()
+                res = pool.amap(
+                    solveWithObj4Par,
+                    2 * cp - c,
+                    [args] * ins_num,
+                    [model_name] * ins_num,
+                ).get()
             # get res
             sol = np.array(list(map(lambda x: x[0], res)))
             obj = np.array(list(map(lambda x: x[1], res)))
             # calculate loss
             loss = []
             for i in range(ins_num):
-                loss.append(-obj[i]+2*np.dot(cp[i],w[i])-z[i])
+                loss.append(-obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
         # convert to tensor
         loss = torch.FloatTensor(loss).to(device)
         sol = torch.FloatTensor(sol).to(device)

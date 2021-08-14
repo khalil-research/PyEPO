@@ -3,7 +3,9 @@
 
 import gurobipy as gp
 from gurobipy import GRB
+
 from spo.model import optGRBModel
+
 
 class knapsackModel(optGRBModel):
     """
@@ -13,10 +15,11 @@ class knapsackModel(optGRBModel):
         weights (ndarray): weights of items
         capacity (float): total capacity
     """
+
     def __init__(self, weights, capacity):
         self.weights = weights
         self.capacity = capacity
-        self.items = [i for i in range(len(self.weights))]
+        self.items = list(range(len(self.weights)))
         super().__init__()
 
     @property
@@ -28,15 +31,17 @@ class knapsackModel(optGRBModel):
         A method to build Gurobi model
         """
         # ceate a model
-        m = gp.Model('knapsack')
+        m = gp.Model("knapsack")
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.items, name='x', vtype=GRB.BINARY)
+        self.x = m.addVars(self.items, name="x", vtype=GRB.BINARY)
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstr(gp.quicksum(self.weights[i] * self.x[i] for i in self.items) <= self.capacity)
+        m.addConstr(
+            gp.quicksum(self.weights[i] * self.x[i]
+                        for i in self.items) <= self.capacity)
         return m
 
     def relax(self):
@@ -58,19 +63,21 @@ class knapsackModelRel(knapsackModel):
         A method to build Gurobi
         """
         # ceate a model
-        m = gp.Model('knapsack')
+        m = gp.Model("knapsack")
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.items, name='x', ub=1)
+        self.x = m.addVars(self.items, name="x", ub=1)
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstr(gp.quicksum(self.weights[i] * self.x[i] for i in self.items) <= self.capacity)
+        m.addConstr(
+            gp.quicksum(self.weights[i] * self.x[i]
+                        for i in self.items) <= self.capacity)
         return m
 
     def relax(self):
         """
         A forbidden method to relax MIP model
         """
-        raise RuntimeError('Model has already been relaxed.')
+        raise RuntimeError("Model has already been relaxed.")

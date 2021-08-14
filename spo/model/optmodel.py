@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 from copy import copy
 
+
 class optModel(ABC):
     """
     This is an abstract class for optimization model
