@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""
+Abstract Abstract optimization model based on Gurobi
+"""
 
 import gurobipy as gp
 from gurobipy import GRB
