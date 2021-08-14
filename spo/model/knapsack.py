@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""
+Knapsack problem
+"""
 
 import gurobipy as gp
 from gurobipy import GRB

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""
+Abstract optimization model
+"""
 
 from abc import ABC, abstractmethod
 from copy import copy

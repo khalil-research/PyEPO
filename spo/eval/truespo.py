@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""
+True SPO loss
+"""
 
 import numpy as np
 

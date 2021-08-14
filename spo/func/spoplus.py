@@ -59,19 +59,20 @@ def getArgs(model):
 
 class SPOPlus(Function):
     """
-    SPO+ Loss function, a surrogate loss function of SPO Loss, which
-    measures the decision error (optimality gap) of optimization problem.
+    SPO+ Loss function, a surrogate loss function of SPO Loss, which measures
+    the decision error (optimality gap) of optimization problem.
 
-    For SPO/SPO+ Loss, the objective function is linear and constraints
-    are known and fixed, but the cost vector need to be predicted from
-    contextual data.
+    For SPO/SPO+ Loss, the objective function is linear and constraints are
+    known and fixed, but the cost vector need to be predicted from contextual
+    data.
 
-    The SPO+ Loss is convex with subgradient. Thus, allows us to design
-    an algorithm based on stochastic gradient descent.
+    The SPO+ Loss is convex with subgradient. Thus, allows us to design an
+    algorithm based on stochastic gradient descent.
 
     Args:
         model (optModel): optimization model
-        processes (int): number of processors, 1 for single-core, 0 for number of CPUs
+        processes (int): number of processors, 1 for single-core, 0 for number
+        of CPUs
     """
 
     def __init__(self, model, processes=1):
