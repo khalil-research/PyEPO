@@ -3,7 +3,9 @@
 
 import gurobipy as gp
 from gurobipy import GRB
+
 from spo.model import optModel
+
 
 class optGRBModel(optModel):
     """
@@ -17,7 +19,8 @@ class optGRBModel(optModel):
         Args:
             c (ndarray): cost of objective function
         """
-        assert len(c) == self.num_cost, 'Size of cost vector cannot match vars.'
+        if len(c) != self.num_cost:
+            raise AssertionError("Size of cost vector cannot match vars.")
         obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)
 
@@ -60,11 +63,12 @@ class optGRBModel(optModel):
         Returns:
             optModel: new model with the added constraint
         """
-        assert len(coefs) == self.num_cost, 'Size of coef vector cannot cost.'
+        if len(coefs) != self.num_cost:
+            raise AssertionError("Size of coef vector cannot cost.")
         # copy
         new_model = self.copy()
         # add constraint
-        new_model._model.addConstr(gp.quicksum(coefs[i] * new_model.x[k]
-                                               for i, k in enumerate(new_model.x))
-                                   <= rhs)
+        new_model._model.addConstr(
+            gp.quicksum(coefs[i] * new_model.x[k]
+                        for i, k in enumerate(new_model.x)) <= rhs)
         return new_model

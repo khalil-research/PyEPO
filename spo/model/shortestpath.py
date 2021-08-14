@@ -3,7 +3,9 @@
 
 import gurobipy as gp
 from gurobipy import GRB
+
 from spo.model import optGRBModel
+
 
 class shortestPathModel(optGRBModel):
     """
@@ -28,15 +30,15 @@ class shortestPathModel(optGRBModel):
         arcs = []
         for i in range(self.grid[0]):
             # edges on rows
-            for j in range(self.grid[1]-1):
+            for j in range(self.grid[1] - 1):
                 v = i * self.grid[1] + j
-                arcs.append((v,v+1))
+                arcs.append((v, v + 1))
             # edges in columns
             if i == self.grid[0] - 1:
                 continue
             for j in range(self.grid[1]):
                 v = i * self.grid[1] + j
-                arcs.append((v,v+self.grid[1]))
+                arcs.append((v, v + self.grid[1]))
         return arcs
 
     @property
@@ -48,11 +50,11 @@ class shortestPathModel(optGRBModel):
         A method to build Gurobi model
         """
         # ceate a model
-        m = gp.Model('shortest path')
+        m = gp.Model("shortest path")
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.arcs, name='x')
+        self.x = m.addVars(self.arcs, name="x")
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints

@@ -3,6 +3,7 @@
 
 import numpy as np
 
+
 def trueSPO(pmodel, omodel, dataloader):
     """
     A function to evaluate model performence with normalized true SPO
@@ -20,20 +21,22 @@ def trueSPO(pmodel, omodel, dataloader):
     loss = 0
     optsum = 0
     # load data
-    for i, data in enumerate(dataloader):
+    for data in dataloader:
         x, c, w, z = data
         # cuda
         if next(pmodel.parameters()).is_cuda:
             x, c, w, z = x.cuda(), c.cuda(), w.cuda(), z.cuda()
         # predict
-        cp = pmodel(x).to('cpu').detach().numpy()
+        cp = pmodel(x).to("cpu").detach().numpy()
         # solve
         for j in range(cp.shape[0]):
             # accumulate loss
-            loss += calTrueSPO(omodel, cp[j], c[j].to('cpu').detach().numpy(), z[j].item())
+            loss += calTrueSPO(omodel, cp[j], c[j].to("cpu").detach().numpy(),
+                               z[j].item())
         optsum += abs(z).sum().item()
     # normalized
     return loss / (optsum + 1e-3)
+
 
 def calTrueSPO(omodel, pred_cost, true_cost, true_obj):
     """

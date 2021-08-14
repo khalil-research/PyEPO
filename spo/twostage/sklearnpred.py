@@ -4,6 +4,7 @@
 import numpy as np
 from sklearn.base import clone
 
+
 class sklearnPred:
     """
     Two-stage prediction and optimization with scikit-learn.
@@ -26,9 +27,10 @@ class sklearnPred:
             x (ndarray): features
             c (ndarray): costs for objective fucntion
         """
-        assert len(c.shape) == 2 and c.shape[-1] == self.optimizer.num_cost, 'Dimension of cost does not macth.'
+        if not (len(c.shape) == 2 and c.shape[-1] == self.optimizer.num_cost):
+            raise AssertionError("Dimension of cost does not macth.")
         for j in range(self.optimizer.num_cost):
-            self.predictor[j].fit(x, c[:,j])
+            self.predictor[j].fit(x, c[:, j])
         self.trained = True
 
     def predict(self, x):
@@ -41,8 +43,11 @@ class sklearnPred:
         Returns:
             ndarray: predicted cost
         """
-        cp = np.zeros((x.shape[0],0))
-        assert self.trained, 'This two-stage sklearnPred instance is not fitted yet.'
+        cp = np.zeros((x.shape[0], 0))
+        if not self.trained:
+            raise AssertionError(
+                "This two-stage sklearnPred instance is not fitted yet.")
         for j in range(self.optimizer.num_cost):
-            cp = np.concatenate((cp, self.predictor[j].predict(x).reshape(-1,1)), axis=1)
+            cp = np.concatenate(
+                (cp, self.predictor[j].predict(x).reshape(-1, 1)), axis=1)
         return cp
