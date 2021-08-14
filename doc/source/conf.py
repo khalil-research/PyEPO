@@ -52,6 +52,9 @@ autoapi_dirs = ['../../spo']
 # Turn on autosummary
 autosummary_generate = True
 
+# Add defualt programming language
+hightlight_language = 'python'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_build', '_templates']
 
