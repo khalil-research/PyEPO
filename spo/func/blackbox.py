@@ -75,17 +75,17 @@ class blackboxOpt(Function):
         super().__init__()
         # optimization model
         if not isinstance(model, optModel):
-            raise AssertionError("arg model is not an optModel.")
+            raise TypeError("arg model is not an optModel.")
         global _SPO_FUNC_BB_OPTMODEL
         _SPO_FUNC_BB_OPTMODEL = model
         # smoothing parameter
         if lambd <= 0:
-            raise AssertionError("lambda is not positive.")
+            raise ValueError("lambda is not positive.")
         global _SPO_FUNC_BB_LAMBDA
         _SPO_FUNC_BB_LAMBDA = lambd
         # num of processors
         if processes not in range(mp.cpu_count()):
-            raise IndexError("Invalid processors number {}, only {} cores.".
+            raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
         global _SPO_FUNC_BB_PROCESSES
         _SPO_FUNC_BB_PROCESSES = processes

@@ -36,9 +36,9 @@ def genData(num_data,
     B = np.random.binomial(1, 0.5, (d, p))
     # positive integer parameter
     if type(deg) is not int:
-        raise AssertionError("deg = {} should be int.".format(deg))
+        raise ValueError("deg = {} should be int.".format(deg))
     if deg <= 0:
-        raise AssertionError("deg = {} should be positive.".format(deg))
+        raise ValueError("deg = {} should be positive.".format(deg))
     # feature vectors
     x = np.random.normal(0, 1, (n, p))
     # cost vectors
