@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Abstract Abstract optimization model based on Gurobi
+Abstract optimization model based on gurobipy
 """
 
 import gurobipy as gp
@@ -14,6 +14,9 @@ class optGRBModel(optModel):
     """
     This is an abstract class for Gurobi-based optimization model
     """
+
+    def __repr__(self):
+        return 'optGRBModel ' + self.__class__.__name__
 
     def setObj(self, c):
         """
