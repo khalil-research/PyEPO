@@ -76,12 +76,12 @@ class SPOPlus(Function):
         super().__init__()
         # optimization model
         if not isinstance(model, optModel):
-            raise AssertionError("arg model is not an optModel")
+            raise TypeError("arg model is not an optModel")
         global _SPO_FUNC_SPOP_OPTMODEL
         _SPO_FUNC_SPOP_OPTMODEL = model
         # num of processors
         if processes not in range(mp.cpu_count()):
-            raise IndexError("Invalid processors number {}, only {} cores.".
+            raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
         global _SPO_FUNC_SPOP_PROCESSES
         _SPO_FUNC_SPOP_PROCESSES = processes

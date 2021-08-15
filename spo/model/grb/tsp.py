@@ -101,7 +101,7 @@ class tspModel(optGRBModel):
         set objective function
         """
         if len(c) != self.num_cost:
-            raise AssertionError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector cannot match vars.")
         obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.edges))
         self._model.setObjective(obj)
 
@@ -182,7 +182,7 @@ class tspModel(optGRBModel):
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise AssertionError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector cannot cost.")
         # copy
         new_model = self.copy()
         # add constraint

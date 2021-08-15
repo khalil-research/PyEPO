@@ -26,7 +26,7 @@ class optGRBModel(optModel):
             c (ndarray): cost of objective function
         """
         if len(c) != self.num_cost:
-            raise AssertionError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector cannot match vars.")
         obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)
 
@@ -70,7 +70,7 @@ class optGRBModel(optModel):
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise AssertionError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector cannot cost.")
         # copy
         new_model = self.copy()
         # add constraint

@@ -26,7 +26,7 @@ class optDataset(Dataset):
 
     def __init__(self, model, feats, costs):
         if not isinstance(model, optModel):
-            raise AssertionError("arg model is not an optModel")
+            raise TypeError("arg model is not an optModel")
         self.model = model
         # data
         self.x = feats

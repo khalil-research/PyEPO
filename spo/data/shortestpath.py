@@ -24,9 +24,9 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
     """
     # positive integer parameter
     if type(deg) is not int:
-        raise AssertionError("deg = {} should be int.".format(deg))
+        raise ValueError("deg = {} should be int.".format(deg))
     if deg <= 0:
-        raise AssertionError("deg = {} should be positive.".format(deg))
+        raise ValueError("deg = {} should be positive.".format(deg))
     # set seed
     np.random.seed(seed)
     # number of data points
