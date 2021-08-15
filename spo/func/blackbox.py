@@ -13,23 +13,20 @@ import spo
 from spo.model import optModel
 
 
-def solveWithObj4Par(cost, args, model_name):
+def solveWithObj4Par(cost, args, model_type):
     """
     A global function to solve function in parallel processors
 
     Args:
         cost (ndarray): cost of objective function
         args (dict): optModel args
-        model_name (str): optModel class name
+        model_type (ABCMeta): optModel class type
 
     Returns:
         list: optimal solution
     """
     # rebuild model
-    try:
-        model = eval(model_name)(**args)
-    except:
-        model = eval("spo.model.{}".format(model_name))(**args)
+    model = model_type(**args)
     # set obj
     model.setObj(cost)
     # solve
@@ -126,13 +123,13 @@ class blackboxOpt(Function):
             # number of processes
             processes = mp.cpu_count() if not processes else processes
             # get class
-            model_name = type(model).__name__
+            model_type = type(model)
             # get args
             args = getArgs(model)
             # parallel computing
             with ProcessingPool(processes) as pool:
                 sol = pool.amap(solveWithObj4Par, cp, [args] * ins_num,
-                                [model_name] * ins_num).get()
+                                [model_type] * ins_num).get()
         # convert to tensor
         pred_sol = torch.FloatTensor(sol).to(device)
         # save
@@ -170,7 +167,7 @@ class blackboxOpt(Function):
         # multi-core
         else:
             # get class
-            model_name = type(model).__name__
+            model_type = type(model)
             # get args
             args = getArgs(model)
             # number of processes
@@ -178,7 +175,7 @@ class blackboxOpt(Function):
             # parallel computing
             with ProcessingPool(processes) as pool:
                 sol = pool.amap(solveWithObj4Par, cq, [args] * ins_num,
-                                [model_name] * ins_num).get()
+                                [model_type] * ins_num).get()
             # get gradient
             grad = []
             for i in range(ins_num):
