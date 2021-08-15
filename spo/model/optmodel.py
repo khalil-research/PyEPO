@@ -5,7 +5,7 @@ Abstract optimization model
 """
 
 from abc import ABC, abstractmethod
-from copy import copy
+from copy import deepcopy
 
 
 class optModel(ABC):
@@ -61,7 +61,7 @@ class optModel(ABC):
         Returns:
             optModel: new copied model
         """
-        new_model = copy(self)
+        new_model = deepcopy(self)
         return new_model
 
     @abstractmethod

@@ -4,6 +4,7 @@
 Abstract optimization model based on gurobipy
 """
 
+from copy import copy
 import gurobipy as gp
 from gurobipy import GRB
 
@@ -48,7 +49,7 @@ class optGRBModel(optModel):
         Returns:
             optModel: new copied model
         """
-        new_model = super().copy()
+        new_model = copy(self)
         # update model
         self._model.update()
         # new model
@@ -74,7 +75,7 @@ class optGRBModel(optModel):
         # copy
         new_model = self.copy()
         # add constraint
-        new_model._model.addConstr(
-            gp.quicksum(coefs[i] * new_model.x[k]
-                        for i, k in enumerate(new_model.x)) <= rhs)
+        expr = gp.quicksum(coefs[i] * new_model.x[k]
+                           for i, k in enumerate(new_model.x)) <= rhs
+        new_model._model.addConstr(expr)
         return new_model
