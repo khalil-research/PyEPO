@@ -13,23 +13,20 @@ import spo
 from spo.model import optModel
 
 
-def solveWithObj4Par(cost, args, model_name):
+def solveWithObj4Par(cost, args, model_type):
     """
     A global function to solve function in parallel processors
 
     Args:
         cost (ndarray): cost of objective function
         args (dict): optModel args
-        model_name (str): optModel class name
+        model_type (ABCMeta): optModel class type
 
     Returns:
         tuple: optimal solution (list) and objective value (float)
     """
     # rebuild model
-    try:
-        model = eval(model_name)(**args)
-    except:
-        model = eval("spo.model.{}".format(model_name))(**args)
+    model = model_type(**args)
     # set obj
     model.setObj(cost)
     # solve
@@ -136,7 +133,7 @@ class SPOPlus(Function):
         # multi-core
         else:
             # get class
-            model_name = type(model).__name__
+            model_type = type(model)
             # get args
             args = getArgs(model)
             # number of processes
@@ -147,7 +144,7 @@ class SPOPlus(Function):
                     solveWithObj4Par,
                     2 * cp - c,
                     [args] * ins_num,
-                    [model_name] * ins_num,
+                    [model_type] * ins_num,
                 ).get()
             # get res
             sol = np.array(list(map(lambda x: x[0], res)))
