@@ -11,7 +11,7 @@ import gurobipy as gp
 import numpy as np
 from gurobipy import GRB
 
-from spo.model import optGRBModel
+from spo.model.grb import optGRBModel
 
 
 class tspModel(optGRBModel):

@@ -7,7 +7,7 @@ Knapsack problem
 import gurobipy as gp
 from gurobipy import GRB
 
-from spo.model import optGRBModel
+from spo.model.grb import optGRBModel
 
 
 class knapsackModel(optGRBModel):

@@ -17,7 +17,7 @@ class optModel(ABC):
         self._model = self._getModel()
 
     def __repr__(self):
-        return self.__class__.__name__
+        return 'optModel ' + self.__class__.__name__
 
     @property
     @abstractmethod
