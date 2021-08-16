@@ -50,7 +50,7 @@ class shortestPathModel(optOmoModel):
 
     def _getModel(self):
         """
-        A method to build Gurobi model
+        A method to build pyomo model
         """
         # ceate a model
         m = pe.ConcreteModel("shortest path")

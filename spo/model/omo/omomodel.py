@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Abstract optimization model based on gurobipy
+Abstract optimization model based on pyomo
 """
 
 from copy import copy
@@ -13,7 +13,7 @@ from spo.model import optModel
 
 class optOmoModel(optModel):
     """
-    This is an abstract class for Gurobi-based optimization model
+    This is an abstract class for pyomo-based optimization model
 
     Args:
         solver: optimization solver
