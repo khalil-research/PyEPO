@@ -17,7 +17,7 @@ class optGRBModel(optModel):
     """
 
     def __repr__(self):
-        return 'optGRBModel ' + self.__class__.__name__
+        return "optGRBModel " + self.__class__.__name__
 
     def setObj(self, c):
         """
