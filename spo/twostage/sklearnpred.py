@@ -31,7 +31,7 @@ class sklearnPred:
             c (ndarray): costs for objective fucntion
         """
         if not (len(c.shape) == 2 and c.shape[-1] == self.optimizer.num_cost):
-            raise AssertionError("Dimension of cost does not macth.")
+            raise ValueError("Dimension of cost does not macth.")
         for j in range(self.optimizer.num_cost):
             self.predictor[j].fit(x, c[:, j])
         self.trained = True
@@ -48,7 +48,7 @@ class sklearnPred:
         """
         cp = np.zeros((x.shape[0], 0))
         if not self.trained:
-            raise AssertionError(
+            raise RuntimeError(
                 "This two-stage sklearnPred instance is not fitted yet.")
         for j in range(self.optimizer.num_cost):
             cp = np.concatenate(
