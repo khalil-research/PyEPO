@@ -7,7 +7,7 @@ Knapsack problem
 import numpy as np
 
 
-def genData(num_data, num_features, num_items, deg=1, noise_width=0, seed=135):
+def genData(num_data, num_features, num_items, deg=1, dim=1, noise_width=0, seed=135):
     """
     A function to generate synthetic data and features for knapsack
 
@@ -16,6 +16,7 @@ def genData(num_data, num_features, num_items, deg=1, noise_width=0, seed=135):
         num_features (int): dimension of features
         num_items (int): number of items
         deg (int): data polynomial degree
+        dim (int): dimension of multi-dimensional knapsack
         noise_withd (float): half witdth of data random noise
         seed (int): random seed
 
@@ -33,10 +34,12 @@ def genData(num_data, num_features, num_items, deg=1, noise_width=0, seed=135):
     n = num_data
     # dimension of features
     p = num_features
+    # dimension of problem
+    d = dim
     # number of items
     m = num_items
     # weights of items
-    weights = np.random.choice(range(3, 8), size=m)
+    weights = np.random.choice(range(300, 800), size=(d,m)) / 100
     # random matrix parameter B
     B = np.random.binomial(1, 0.5, (m, p))
     # feature vectors
@@ -45,9 +48,8 @@ def genData(num_data, num_features, num_items, deg=1, noise_width=0, seed=135):
     c = np.zeros((n, m), dtype=int)
     for i in range(n):
         # cost without noise
-        values = ((
-            (np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3)**deg + 1) /
-            3**deg * 5)
+        values = (((np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3) ** deg
+                  + 1) / 3**deg * 5)
         # correlation with weights
         # if cor:
         #    values += weights - 3
