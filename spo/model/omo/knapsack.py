@@ -15,14 +15,14 @@ class knapsackModel(optOmoModel):
 
     Args:
         weights (ndarray): weights of items
-        capacity (float): total capacity
-        solver: optimization solver
+        capacity (ndarray): total capacity
+        solver (str): optimization solver for pyomo
     """
 
     def __init__(self, weights, capacity, solver="glpk"):
         self.weights = weights
         self.capacity = capacity
-        self.items = list(range(len(self.weights)))
+        self.items = list(range(self.weights.shape[1]))
         super().__init__(solver)
 
     @property
@@ -42,8 +42,9 @@ class knapsackModel(optOmoModel):
         m.x = self.x
         # constraints
         m.cons = pe.ConstraintList()
-        m.cons.add(sum(self.weights[i] * self.x[i]
-                   for i in self.items) <= self.capacity)
+        for i in range(len(self.capacity)):
+            m.cons.add(sum(self.weights[i,j] * self.x[j]
+                       for j in self.items) <= self.capacity[i])
         return m
 
     def relax(self):
@@ -73,8 +74,9 @@ class knapsackModelRel(knapsackModel):
         m.x = self.x
         # constraints
         m.cons = pe.ConstraintList()
-        m.cons.add(sum(self.weights[i] * self.x[i]
-                   for i in self.items) <= self.capacity)
+        for i in range(len(self.capacity)):
+            m.cons.add(sum(self.weights[i,j] * self.x[j]
+                       for j in self.items) <= self.capacity[i])
         return m
 
     def relax(self):

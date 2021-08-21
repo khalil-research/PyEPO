@@ -16,13 +16,13 @@ class knapsackModel(optGRBModel):
 
     Args:
         weights (ndarray): weights of items
-        capacity (float): total capacity
+        capacity (ndarray): total capacity
     """
 
     def __init__(self, weights, capacity):
         self.weights = weights
         self.capacity = capacity
-        self.items = list(range(len(self.weights)))
+        self.items = list(range(self.weights.shape[1]))
         super().__init__()
 
     @property
@@ -42,9 +42,9 @@ class knapsackModel(optGRBModel):
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstr(
-            gp.quicksum(self.weights[i] * self.x[i]
-                        for i in self.items) <= self.capacity)
+        for i in range(len(self.capacity)):
+            m.addConstr(gp.quicksum(self.weights[i,j] * self.x[j]
+                        for j in self.items) <= self.capacity[i])
         return m
 
     def relax(self):
@@ -74,9 +74,9 @@ class knapsackModelRel(knapsackModel):
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstr(
-            gp.quicksum(self.weights[i] * self.x[i]
-                        for i in self.items) <= self.capacity)
+        for i in range(len(self.capacity)):
+            m.addConstr(gp.quicksum(self.weights[i,j] * self.x[j]
+                        for j in self.items) <= self.capacity[i])
         return m
 
     def relax(self):
