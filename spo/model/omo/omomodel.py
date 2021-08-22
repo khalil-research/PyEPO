@@ -25,6 +25,7 @@ class optOmoModel(optModel):
         self._model.obj = pe.Objective(sense=pe.minimize, expr=0)
         # set solver
         self.solver = solver
+        print("Solver in the background: {}".format(self.solver))
         if self.solver == "gurobi":
             self._solverfac = po.SolverFactory(self.solver, solver_io="python")
         else:
