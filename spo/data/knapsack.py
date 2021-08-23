@@ -48,11 +48,10 @@ def genData(num_data, num_features, num_items, deg=1, dim=1, noise_width=0, seed
     c = np.zeros((n, m), dtype=int)
     for i in range(n):
         # cost without noise
-        values = (((np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3) ** deg
-                  + 1) / 3**deg * 5)
-        # correlation with weights
-        # if cor:
-        #    values += weights - 3
+        values = (np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3) ** deg + 1
+        # rescale
+        values *= 5
+        values /= 3.5 ** deg
         # noise
         epislon = np.random.uniform(1 - noise_width, 1 + noise_width, m)
         values *= epislon
