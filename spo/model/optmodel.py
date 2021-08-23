@@ -77,3 +77,9 @@ class optModel(ABC):
             optModel: new model with the added constraint
         """
         raise NotImplementedError
+
+    def relax(self):
+        """
+        A unimplemented method to relax MIP model
+        """
+        raise RuntimeError("Method 'relax' is not implemented.")
