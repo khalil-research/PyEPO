@@ -43,7 +43,9 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
     c = np.zeros((n, d))
     for i in range(n):
         # cost without noise
-        ci = (np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3)**deg + 1
+        ci = (np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3) ** deg + 1
+        # rescale
+        ci /= 3.5 ** deg
         # noise
         epislon = np.random.uniform(1 - noise_width, 1 + noise_width, d)
         ci *= epislon
