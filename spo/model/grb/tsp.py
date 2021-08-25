@@ -85,7 +85,7 @@ class tspGGModel(tspABModel):
 
     def _getModel(self):
         """
-        A method to build Gurobi model for GG
+        A method to build Gurobi model
         """
         # ceate a model
         m = gp.Model("tsp")
@@ -163,12 +163,12 @@ class tspGGModel(tspABModel):
 
 class tspGGModelRel(tspGGModel):
     """
-    This class is relaxed optimization model for knapsack problem.
+    This class is relaxed optimization model for Gavish–Graves (GG) formulation.
     """
 
     def _getModel(self):
         """
-        A method to build Gurobi model for GG-relax
+        A method to build Gurobi model
         """
         # ceate a model
         m = gp.Model("tsp")
@@ -231,7 +231,7 @@ class tspDFJModel(tspABModel):
 
     def _getModel(self):
         """
-        A method to build Gurobi model for DFJ
+        A method to build Gurobi model
         """
         # ceate a model
         m = gp.Model("tsp")
@@ -333,3 +333,156 @@ class tspDFJModel(tspABModel):
             gp.quicksum(coefs[i] * new_model.x[k]
                         for i, k in enumerate(new_model.edges)) <= rhs)
         return new_model
+
+
+class tspMTZModel(tspABModel):
+    """
+    This class is optimization model for traveling salesman problem.
+    This model is based on Miller-Tucker-Zemlin (MTZ) formulation.
+
+    Args:
+        num_nodes: number of nodes
+    """
+    def _getModel(self):
+        """
+        A method to build Gurobi model
+        """
+        # ceate a model
+        m = gp.Model("tsp")
+        # turn off output
+        m.Params.outputFlag = 0
+        # varibles
+        self.x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
+        for i, j in self.edges:
+            self.x[j, i] = self.x[i, j]
+        self.u = m.addVars(self.nodes, name="u")
+        # sense
+        m.modelSense = GRB.MINIMIZE
+        # constraints
+        directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
+        self.x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
+        self.u = m.addVars(self.nodes, name="u")
+        # sense
+        m.modelSense = GRB.MINIMIZE
+        # constraints
+        m.addConstrs(self.x.sum("*", j) == 1 for j in self.nodes)
+        m.addConstrs(self.x.sum(i, "*") == 1 for i in self.nodes)
+        m.addConstrs(self.u[j] - self.u[i] >=
+                     len(self.nodes) * (self.x[i,j] - 1) + 1
+                     for (i,j) in directed_edges
+                     if (i != 0) and (j != 0))
+        return m
+
+    def setObj(self, c):
+        """
+        set objective function
+        """
+        if len(c) != self.num_cost:
+            raise ValueError("Size of cost vector cannot match vars.")
+        obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
+                          for k, (i,j) in enumerate(self.edges))
+        self._model.setObjective(obj)
+
+    def solve(self):
+        """
+        solve model
+        """
+        self._model.update()
+        self._model.optimize()
+        sol = np.zeros(self.num_cost, dtype=np.uint8)
+        for k, (i,j) in enumerate(self.edges):
+            if self.x[i,j].x > 1e-2 or self.x[j,i].x > 1e-2:
+                sol[k] = 1
+        return sol, self._model.objVal
+
+    def addConstr(self, coefs, rhs):
+        """
+        A method to add new constraint
+
+        Args:
+            coefs (ndarray): coeffcients of new constraint
+            rhs (float): right-hand side of new constraint
+
+        Returns:
+            optModel: new model with the added constraint
+        """
+        if len(coefs) != self.num_cost:
+            raise ValueError("Size of coef vector cannot cost.")
+        # copy
+        new_model = self.copy()
+        # add constraint
+        new_model._model.addConstr(
+            gp.quicksum(coefs[k] * (new_model.x[i,j] + new_model.x[j,i])
+                        for k, (i,j) in enumerate(new_model.edges)) <= rhs)
+        return new_model
+
+    def relax(self):
+        """
+        A method to relax model
+        """
+        # copy
+        model_rel = tspMTZModelRel(self.num_nodes)
+        return model_rel
+
+
+class tspMTZModelRel(tspMTZModel):
+    """
+    This class is relaxed optimization model for Miller-Tucker-Zemlin (MTZ)
+    formulation.
+    """
+
+    def _getModel(self):
+        """
+        A method to build Gurobi model
+        """
+        # ceate a model
+        m = gp.Model("tsp")
+        # turn off output
+        m.Params.outputFlag = 0
+        # varibles
+        self.x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
+        for i, j in self.edges:
+            self.x[j, i] = self.x[i, j]
+        self.u = m.addVars(self.nodes, name="u")
+        # sense
+        m.modelSense = GRB.MINIMIZE
+        # constraints
+        directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
+        self.x = m.addVars(directed_edges, name="x", ub=1)
+        self.u = m.addVars(self.nodes, name="u")
+        # sense
+        m.modelSense = GRB.MINIMIZE
+        # constraints
+        m.addConstrs(self.x.sum("*", j) == 1 for j in self.nodes)
+        m.addConstrs(self.x.sum(i, "*") == 1 for i in self.nodes)
+        m.addConstrs(self.u[j] - self.u[i] >=
+                     len(self.nodes) * (self.x[i,j] - 1) + 1
+                     for (i,j) in directed_edges
+                     if (i != 0) and (j != 0))
+        return m
+
+    def solve(self):
+        """
+        A method to solve model
+
+        Returns:
+            tuple: optimal solution (list) and objective value (float)
+        """
+        self._model.update()
+        self._model.optimize()
+        sol = np.zeros(self.num_cost)
+        for k, (i,j) in enumerate(self.edges):
+            sol[k] = self.x[i,j].x + self.x[j,i].x
+        return sol, self._model.objVal
+
+    def relax(self):
+        """
+        A forbidden method to relax MIP model
+        """
+        raise RuntimeError("Model has already been relaxed.")
+
+    def getTour(self, sol):
+        """
+        A forbidden method to get a tour from solution
+        """
+        raise RuntimeError("Relaxation Model has no integer solution.")
