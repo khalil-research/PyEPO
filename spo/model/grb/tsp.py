@@ -192,6 +192,20 @@ class tspGGModelRel(tspGGModel):
                      for (i,j) in self.x if i != 0)
         return m
 
+    def solve(self):
+        """
+        A method to solve model
+
+        Returns:
+            tuple: optimal solution (list) and objective value (float)
+        """
+        self._model.update()
+        self._model.optimize()
+        sol = np.zeros(self.num_cost)
+        for k, (i,j) in enumerate(self.edges):
+            sol[k] = self.x[i,j].x + self.x[j,i].x
+        return sol, self._model.objVal
+
     def relax(self):
         """
         A forbidden method to relax MIP model
