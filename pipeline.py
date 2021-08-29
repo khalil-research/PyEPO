@@ -5,6 +5,7 @@ SPO training pipeline
 """
 import argparse
 import os
+import time
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -12,6 +13,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 import torch
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 import spo
 
@@ -33,28 +35,26 @@ def pipeline(config):
 
     for i in range(config.expnum):
         config.seed = np.random.randint(999)
+        print("===============================================================")
         print("Experiment {}:".format(i))
+        print("===============================================================")
         # generate data
         data = genData(config)
         if config.problem == "ks":
             config.wghts, data = data[0], (data[1], data[2])
+        print()
         # build model
         model = buildModel(config)
-        # relax model
-        if config.relax:
-            print("Building model relaxation...")
-            model_rel = model.relax()
         # build data loader
-        dataset_train, dataset_test, loader_train, loader_test = \
-        buildDataLoader(data, model, config)
-        # training
-        if config.mthd == "2s":
-            print("Using two-stage predict then optimize...")
-        if config.mthd == "spo":
-            print("Using SPO+ loss...")
-        if config.mthd == "bb":
-            print("Using Black-box optimzer block...")
+        trainset, testset, trainloader, testloader = buildDataLoader(data, model,
+                                                                     config)
         print()
+        # train
+        res = train(trainset, testset, trainloader, testloader, model, config)
+        print()
+        # evaluate
+        eval(testset, testloader, res, model, config)
+        print("\n\n")
 
 
 def genData(config):
@@ -126,21 +126,82 @@ def buildDataLoader(data, model, config):
                                                         random_state=config.seed)
     # build data set
     if config.relax:
+        print("Building relaxation model...")
         model_rel = model.relax()
-        dataset_train = spo.data.dataset.optDataset(model_rel, x_train, c_train)
+        trainset = spo.data.dataset.optDataset(model_rel, x_train, c_train)
     else:
-        dataset_train = spo.data.dataset.optDataset(model, x_train, c_train)
-    dataset_test = spo.data.dataset.optDataset(model, x_test, c_test)
+        trainset = spo.data.dataset.optDataset(model, x_train, c_train)
+    testset = spo.data.dataset.optDataset(model, x_test, c_test)
     # get data loader
     print("Building Pytorch DataLoader...")
-    loader_train = DataLoader(dataset_train,
-                              batch_size=config.batch,
-                              shuffle=True)
-    loader_test = DataLoader(dataset_test,
-                             batch_size=config.batch,
-                             shuffle=False)
-    return dataset_train, dataset_test, loader_train, loader_test
+    trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
+    testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
+    return trainset, testset, trainloader, testloader
 
+
+def train(trainset, testset, trainloader, testloader, model, config):
+    """
+    training for preditc-then-optimize
+    """
+    print("Training...")
+    if config.mthd == "2s":
+        print("Using two-stage predict then optimize...")
+        res = train2Stage(trainset, model, config)
+    if config.mthd == "spo":
+        print("Using SPO+ loss...")
+        res = None
+    if config.mthd == "bb":
+        print("Using Black-box optimzer block...")
+        res = None
+    return res
+
+
+def train2Stage(trainset, model, config):
+    """
+    two-stage preditc-then-optimize training
+    """
+    # prediction model
+    if config.pred == "lr":
+        predictor = LinearRegression()
+    if config.pred == "rf":
+        predictor = RandomForestRegressor(random_state=config.seed)
+    # two-stage model
+    if config.relax:
+        print("Building relaxation model...")
+        model_rel = model.relax()
+        twostage = spo.twostage.sklearnPred(predictor, model_rel)
+    else:
+        twostage = spo.twostage.sklearnPred(predictor, model)
+    # training
+    twostage.fit(trainset.x, trainset.c)
+    return twostage
+
+
+def eval(testset, testloader, res, model, config):
+    """
+    evaluate permance
+    """
+    print("Evaluating...")
+    if config.mthd == "2s":
+        # prediction
+        c_test_pred = res.predict(testset.x)
+        truespo = 0
+        unambspo = 0
+        for i in tqdm(range(len(testset))):
+            cp_i = c_test_pred[i]
+            c_i = testset.c[i]
+            z_i = testset.z[i,0]
+            truespo += spo.eval.calTrueSPO(model, cp_i, c_i, z_i)
+            unambspo += spo.eval.calUnambSPO(model, cp_i, c_i, z_i)
+        truespo /= abs(testset.z.sum()) * 100
+        unambspo /= abs(testset.z.sum()) * 100
+        time.sleep(1)
+        print('Normalized true SPO Loss: {:.2f}%'.format(truespo))
+        print('Normalized unambiguous SPO Loss: {:.2f}%'.format(unambspo))
+    if config.mthd == "spo":
+        pass
+    if config.mthd == "bb":
+        pass
 
 if __name__ == "__main__":
 
