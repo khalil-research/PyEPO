@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 import torch
+from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -53,7 +54,7 @@ def pipeline(config):
         res = train(trainset, testset, trainloader, testloader, model, config)
         print()
         # evaluate
-        eval(testset, testloader, res, model, config)
+        truespo, unambspo = eval(testset, testloader, res, model, config)
         print("\n\n")
 
 
@@ -81,6 +82,7 @@ def genData(config):
                                     deg=config.deg, noise_width=config.noise,
                                     seed=config.seed)
     return data
+
 
 def buildModel(config):
     """
@@ -149,7 +151,7 @@ def train(trainset, testset, trainloader, testloader, model, config):
         res = train2Stage(trainset, model, config)
     if config.mthd == "spo":
         print("Using SPO+ loss...")
-        res = None
+        res = trainSPO(trainset, testset, trainloader, testloader, model, config)
     if config.mthd == "bb":
         print("Using Black-box optimzer block...")
         res = None
@@ -176,6 +178,79 @@ def train2Stage(trainset, model, config):
     twostage.fit(trainset.x, trainset.c)
     return twostage
 
+def trainSPO(trainset, testset, trainloader, testloader, model, config):
+    """
+    SPO+ training
+    """
+    # init
+    reg, optimizer, device = trainInit(config)
+    # training mode
+    reg.train()
+    # set SPO+ Loss as criterion
+    criterion = spo.func.SPOPlus(model, processes=config.proc)
+    # train
+    time.sleep(1)
+    for epoch in tqdm(range(config.epoch)):
+        # load data
+        for i, data in enumerate(trainloader):
+            x, c, w, z = data
+            x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
+            # forward pass
+            cp = reg(x)
+            loss = criterion.apply(cp, c, w, z).mean()
+            # l1 reg
+            if config.l1:
+                l1_reg = torch.abs(cp - c).sum(dim=1).mean()
+                loss += config.l1 * l1_reg
+            # l2 reg
+            if config.l2:
+                l2_reg = ((cp - c) ** 2).sum(dim=1).mean()
+                loss += config.l2 * l2_reg
+            # backward pass
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+    return reg
+
+def trainInit(config):
+    """
+    initiate neural network and optimizer
+    """
+    # build nn
+    arch = [config.feat] + config.net
+    if config.problem == "sp":
+        arch.append((config.grid[0] - 1) * config.grid[1] + \
+                    (config.grid[1] - 1) * config.grid[0])
+    if config.problem == "ks":
+        arch.append(config.items)
+    if config.problem == "tsp":
+        arch.append(config.nodes * (config.nodes - 1) // 2)
+    reg = fcNet(arch)
+    # set optimzer
+    if config.optm == "sgd":
+        optimizer = torch.optim.SGD(reg.parameters(), lr=config.lr)
+    if config.optm == "adam":
+        optimizer = torch.optim.Adam(reg.parameters(), lr=config.lr)
+    # get device
+    device = getDevice()
+    reg.to(device)
+    return reg, optimizer, device
+
+
+def getDevice():
+    """
+    get device
+    """
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print("Device:")
+        for i in range(torch.cuda.device_count()):
+            print("    {}:".format(i), torch.cuda.get_device_name(i))
+    else:
+        device = torch.device("cpu")
+        print("Device: CPU")
+    return device
+
 
 def eval(testset, testloader, res, model, config):
     """
@@ -193,15 +268,31 @@ def eval(testset, testloader, res, model, config):
             z_i = testset.z[i,0]
             truespo += spo.eval.calTrueSPO(model, cp_i, c_i, z_i)
             unambspo += spo.eval.calUnambSPO(model, cp_i, c_i, z_i)
-        truespo /= abs(testset.z.sum()) * 100
-        unambspo /= abs(testset.z.sum()) * 100
+        truespo /= abs(testset.z.sum())
+        unambspo /= abs(testset.z.sum())
         time.sleep(1)
-        print('Normalized true SPO Loss: {:.2f}%'.format(truespo))
-        print('Normalized unambiguous SPO Loss: {:.2f}%'.format(unambspo))
-    if config.mthd == "spo":
-        pass
-    if config.mthd == "bb":
-        pass
+    if (config.mthd == "spo") or (config.mthd == "bb"):
+        truespo = spo.eval.trueSPO(res, model, testloader)
+        unambspo = spo.eval.unambSPO(res, model, testloader)
+    print('Normalized true SPO Loss: {:.2f}%'.format(truespo * 100))
+    print('Normalized unambiguous SPO Loss: {:.2f}%'.format(unambspo * 100))
+    return truespo, unambspo
+
+
+class fcNet(nn.Module):
+    """
+    multi-layer fully connected neural network regression
+    """
+    def __init__(self, arch):
+        super().__init__()
+        layers = []
+        for i in range(len(arch)-1):
+            layers.append(nn.Linear(arch[i], arch[i+1]))
+        self.main = nn.Sequential(*layers)
+
+    def forward(self, x):
+        return self.main(x)
+
 
 if __name__ == "__main__":
 
@@ -228,7 +319,7 @@ if __name__ == "__main__":
                         type=str,
                         default="lr",
                         choices=["lr", "rf"],
-                        help="predictor of two-stage predict then optimiza")
+                        help="predictor of two-stage predict then optimize")
 
     # solver configuration
     parser.add_argument("--lan",
@@ -296,6 +387,37 @@ if __name__ == "__main__":
                         type=int,
                         default=32,
                         help="batch size")
+    parser.add_argument("--epoch",
+                        type=int,
+                        default=100,
+                        help="number of epochs")
+    parser.add_argument("--net",
+                        type=int,
+                        nargs='*',
+                        default=[],
+                        help="size of neural network hidden layers")
+    parser.add_argument("--optm",
+                        type=str,
+                        default="adam",
+                        choices=["sgd", "adam"],
+                        help="optimizer neural network")
+    parser.add_argument("--lr",
+                        type=float,
+                        default=1e-3,
+                        help="learning rate")
+    parser.add_argument("--l1",
+                        type=float,
+                        default=0,
+                        help="l1 regularization parameter")
+    parser.add_argument("--l2",
+                        type=float,
+                        default=0,
+                        help="l2 regularization parameter")
+    parser.add_argument("--proc",
+                        type=int,
+                        default=1,
+                        help="number of processor for optimization")
+
 
     # get configuration
     config = parser.parse_args()
