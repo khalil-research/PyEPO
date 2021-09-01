@@ -10,5 +10,6 @@ Smart "Predict, then Optimize"
 import spo.data
 import spo.model
 import spo.func
+import spo.train
 import spo.twostage
 import spo.eval
