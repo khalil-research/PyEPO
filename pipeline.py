@@ -153,7 +153,7 @@ def train(trainset, testset, trainloader, testloader, model, config):
         print("Using SPO+ loss...")
         res = trainSPO(trainset, testset, trainloader, testloader, model, config)
     if config.mthd == "bb":
-        print("Using Black-box optimzer block...")
+        print("Using Black-box optimizer block...")
         res = None
     return res
 
@@ -183,33 +183,10 @@ def trainSPO(trainset, testset, trainloader, testloader, model, config):
     SPO+ training
     """
     # init
-    reg, optimizer, device = trainInit(config)
-    # training mode
-    reg.train()
-    # set SPO+ Loss as criterion
-    criterion = spo.func.SPOPlus(model, processes=config.proc)
-    # train
-    time.sleep(1)
-    for epoch in tqdm(range(config.epoch)):
-        # load data
-        for i, data in enumerate(trainloader):
-            x, c, w, z = data
-            x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
-            # forward pass
-            cp = reg(x)
-            loss = criterion.apply(cp, c, w, z).mean()
-            # l1 reg
-            if config.l1:
-                l1_reg = torch.abs(cp - c).sum(dim=1).mean()
-                loss += config.l1 * l1_reg
-            # l2 reg
-            if config.l2:
-                l2_reg = ((cp - c) ** 2).sum(dim=1).mean()
-                loss += config.l2 * l2_reg
-            # backward pass
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+    reg, optimizer = trainInit(config)
+    spo.train.trainSPO(trainloader, reg, model, optimizer,
+                       config.epoch, config.proc, l1_lambd=config.l1,
+                       l2_lambd=config.l2, log=config.log)
     return reg
 
 def trainInit(config):
@@ -226,30 +203,12 @@ def trainInit(config):
     if config.problem == "tsp":
         arch.append(config.nodes * (config.nodes - 1) // 2)
     reg = fcNet(arch)
-    # set optimzer
+    # set optimizer
     if config.optm == "sgd":
         optimizer = torch.optim.SGD(reg.parameters(), lr=config.lr)
     if config.optm == "adam":
         optimizer = torch.optim.Adam(reg.parameters(), lr=config.lr)
-    # get device
-    device = getDevice()
-    reg.to(device)
-    return reg, optimizer, device
-
-
-def getDevice():
-    """
-    get device
-    """
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        print("Device:")
-        for i in range(torch.cuda.device_count()):
-            print("    {}:".format(i), torch.cuda.get_device_name(i))
-    else:
-        device = torch.device("cpu")
-        print("Device: CPU")
-    return device
+    return reg, optimizer
 
 
 def eval(testset, testloader, res, model, config):
@@ -320,6 +279,10 @@ if __name__ == "__main__":
                         default="lr",
                         choices=["lr", "rf"],
                         help="predictor of two-stage predict then optimize")
+    parser.add_argument("--log",
+                        type=int,
+                        default=0,
+                        help="steps of log")
 
     # solver configuration
     parser.add_argument("--lan",
