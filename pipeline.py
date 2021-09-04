@@ -112,7 +112,15 @@ def buildModel(config):
     if config.problem == "tsp":
         if config.lan == "gurobi":
             print("Building model with GurobiPy...")
-            model = spo.model.grb.tspGGModel(config.nodes)
+            if config.form == "gg":
+                print("Using Gavish–Graves formulation...")
+                model = spo.model.grb.tspGGModel(config.nodes)
+            if config.form == "dfj":
+                print("Using Danzig–Fulkerson–Johnson formulation...")
+                model = spo.model.grb.tspDFJModel(config.nodes)
+            if config.form == "mtz":
+                print("Using Miller-Tucker-Zemlin formulation...")
+                model = spo.model.grb.tspMTZModel(config.nodes)
         if config.lan == "pyomo":
             raise RuntimeError("TSP with Pyomo is not implemented.")
     return model
@@ -297,8 +305,13 @@ if __name__ == "__main__":
                         help="predictor of two-stage predict then optimize")
     parser.add_argument("--log",
                         type=int,
-                        default=0,
+                        default=10,
                         help="steps of log")
+    parser.add_argument("--form",
+                        type=str,
+                        default="gg",
+                        choices=["gg", "dfj", "mtz"],
+                        help="TSP formulation")
 
     # solver configuration
     parser.add_argument("--lan",
@@ -368,7 +381,6 @@ if __name__ == "__main__":
                         help="batch size")
     parser.add_argument("--epoch",
                         type=int,
-                        default=100,
                         help="number of epochs")
     parser.add_argument("--net",
                         type=int,
@@ -382,7 +394,6 @@ if __name__ == "__main__":
                         help="optimizer neural network")
     parser.add_argument("--lr",
                         type=float,
-                        default=1e-3,
                         help="learning rate")
     parser.add_argument("--l1",
                         type=float,
