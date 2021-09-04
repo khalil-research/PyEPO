@@ -5,7 +5,6 @@ True SPO loss
 """
 
 import numpy as np
-from tqdm import tqdm
 
 
 def trueSPO(pmodel, omodel, dataloader):
@@ -25,7 +24,7 @@ def trueSPO(pmodel, omodel, dataloader):
     loss = 0
     optsum = 0
     # load data
-    for data in tqdm(dataloader):
+    for data in dataloader:
         x, c, w, z = data
         # cuda
         if next(pmodel.parameters()).is_cuda:
