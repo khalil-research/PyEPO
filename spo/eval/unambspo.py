@@ -7,7 +7,6 @@ Unambiguous SPO loss
 import copy
 
 import numpy as np
-from tqdm import tqdm
 
 
 def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
@@ -27,7 +26,7 @@ def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
     loss = 0
     optsum = 0
     # load data
-    for data in tqdm(dataloader):
+    for data in dataloader:
         x, c, w, z = data
         # cuda
         if next(pmodel.parameters()).is_cuda:
