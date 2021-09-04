@@ -154,7 +154,7 @@ def train(trainset, testset, trainloader, testloader, model, config):
         res = trainSPO(trainloader, testloader, model, config)
     if config.mthd == "bb":
         print("Using Black-box optimizer block...")
-        res = None
+        res = trainBB(trainloader, testloader, model, config)
     return res
 
 
@@ -178,16 +178,32 @@ def train2Stage(trainset, model, config):
     twostage.fit(trainset.x, trainset.c)
     return twostage
 
+
 def trainSPO(trainloader, testloader, model, config):
     """
     SPO+ training
     """
     # init
     reg, optimizer = trainInit(config)
+    # train
     spo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
                        epoch=config.epoch, processes=config.proc,
                        l1_lambd=config.l1, l2_lambd=config.l2, log=config.log)
     return reg
+
+def trainBB(trainloader, testloader, model, config):
+    """
+    Black-Box training
+    """
+    # init
+    reg, optimizer = trainInit(config)
+    # train
+    spo.train.trainBB(reg, model, optimizer, trainloader, testloader,
+                      epoch=config.epoch, processes=config.proc,
+                      bb_lambd=config.smth, l1_lambd=config.l1,
+                      l2_lambd=config.l2, log=config.log)
+    return reg
+
 
 def trainInit(config):
     """
@@ -376,6 +392,10 @@ if __name__ == "__main__":
                         type=float,
                         default=0,
                         help="l2 regularization parameter")
+    parser.add_argument("--smth",
+                        type=float,
+                        default=10,
+                        help="smoothing parameter for Black-Box")
     parser.add_argument("--proc",
                         type=int,
                         default=1,
