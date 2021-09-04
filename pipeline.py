@@ -151,7 +151,7 @@ def train(trainset, testset, trainloader, testloader, model, config):
         res = train2Stage(trainset, model, config)
     if config.mthd == "spo":
         print("Using SPO+ loss...")
-        res = trainSPO(trainset, testset, trainloader, testloader, model, config)
+        res = trainSPO(trainloader, testloader, model, config)
     if config.mthd == "bb":
         print("Using Black-box optimizer block...")
         res = None
@@ -178,15 +178,15 @@ def train2Stage(trainset, model, config):
     twostage.fit(trainset.x, trainset.c)
     return twostage
 
-def trainSPO(trainset, testset, trainloader, testloader, model, config):
+def trainSPO(trainloader, testloader, model, config):
     """
     SPO+ training
     """
     # init
     reg, optimizer = trainInit(config)
-    spo.train.trainSPO(trainloader, reg, model, optimizer,
-                       config.epoch, config.proc, l1_lambd=config.l1,
-                       l2_lambd=config.l2, log=config.log)
+    spo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
+                       epoch=config.epoch, processes=config.proc,
+                       l1_lambd=config.l1, l2_lambd=config.l2, log=config.log)
     return reg
 
 def trainInit(config):
