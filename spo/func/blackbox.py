@@ -67,7 +67,7 @@ class blackboxOpt(Function):
 
     Args:
         model (optModel): optimization model
-        lambd (float): Black-Box parameters for function smoothing
+        lambd (float): Black-Box parameter for function smoothing
         processes (int): number of processors, 1 for single-core, 0 for all of cores
     """
 
