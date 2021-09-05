@@ -17,7 +17,19 @@ from spo.train.util import getDevice
 def trainSPO(reg, model, optimizer, trainloader, testloader=None,
              epoch=50, processes=1, l1_lambd=0, l2_lambd=0, log=0):
     """
-    function to train PyTorch nn with SPO+ loss
+    A function to train PyTorch nn with SPO+ loss
+
+    Args:
+        reg (nn): PyTorch neural network regressor
+        model (optModel): optimization model
+        optimizer (optim): PyTorch optimizer
+        trainloader (DataLoader): PyTorch DataLoader for train set
+        testloader (DataLoader): PyTorch DataLoader for test set
+        epoch (int): number of training epochs
+        processes: processes (int): number of processors, 1 for single-core, 0 for all of cores
+        l1_lambd (float): regularization weight of l1 norm
+        l2_lambd (float): regularization weight of l2 norm
+        log (int): step size of evlaution and log
     """
     # create log folder
     if not os.path.isdir("./logs"):
@@ -41,6 +53,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None,
     trueloss = None
     unambloss = None
     for epoch in pbar:
+        tick = time.time()
         # load data
         for i, data in enumerate(trainloader):
             x, c, w, z = data
@@ -70,6 +83,8 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None,
             desc = "Epoch {}, Loss: {:.4f}".format(epoch, loss.item())
             pbar.set_description(desc)
             cnt += 1
+        tock = time.time()
+        elapsed += tock - tick
         # eval
         if log and (epoch % log == 0):
             # true SPO
@@ -79,3 +94,4 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None,
             unambloss = spo.eval.unambSPO(reg, model, testloader)
             writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
     writer.close()
+    return reg, elapsed
