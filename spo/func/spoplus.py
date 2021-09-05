@@ -68,8 +68,7 @@ class SPOPlus(Function):
 
     Args:
         model (optModel): optimization model
-        processes (int): number of processors, 1 for single-core, 0 for number
-        of CPUs
+        processes (int): number of processors, 1 for single-core, 0 for all of cores
     """
 
     def __init__(self, model, processes=1):
