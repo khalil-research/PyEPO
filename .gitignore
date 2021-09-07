@@ -124,10 +124,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-Test2.ipynb
-Test3.ipynb
-Test4.ipynb
-Untitled.ipynb
-archive_notebooks/Test - Shortest Path-Copy2.ipynb
-archive_notebooks/Test - Shortest Path-Copy1.ipynb
+
+# folders
 logs/*
+archives/*
