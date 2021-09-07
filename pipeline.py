@@ -8,6 +8,7 @@ import os
 import time
 
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
@@ -20,16 +21,21 @@ import spo
 
 def pipeline(config):
     # shortest path
-    if config.problem == "sp":
-        print("Running experiments for shortest path problem:")
+    if config.prob == "sp":
+        print("Running experiments for shortest path prob:")
     # knapsack
-    if config.problem == "ks":
-        print("Running experiments for multi-dimensional knapsack problem:")
+    if config.prob == "ks":
+        print("Running experiments for multi-dimensional knapsack prob:")
     # travelling salesman
-    if config.problem == "tsp":
-        print("Running experiments for traveling salesman problem:")
+    if config.prob == "tsp":
+        print("Running experiments for traveling salesman prob:")
     print()
-
+    # create table
+    save_path = getSavePath(config)
+    if os.path.isfile(save_path):
+        df = pd.read_csv(save_path)
+    else:
+        df = pd.DataFrame(columns=["True SPO", "Unamb SPO", "Elapsed", "Epochs"])
     # set random seed
     np.random.seed(config.seed)
     torch.manual_seed(config.seed)
@@ -41,8 +47,8 @@ def pipeline(config):
         print("===============================================================")
         # generate data
         data = genData(config)
-        if config.problem == "ks":
-            config.wghts, data = data[0], (data[1], data[2])
+        if config.prob == "ks":
+            config.wght, data = data[0], (data[1], data[2])
         print()
         # build model
         model = buildModel(config)
@@ -51,10 +57,20 @@ def pipeline(config):
                                                                      config)
         print()
         # train
+        tick = time.time()
         res = train(trainset, testset, trainloader, testloader, model, config)
+        tock = time.time()
+        elapsed = tock - tick
+        print("Time elapsed: {:.4f} sec".format(elapsed))
         print()
         # evaluate
         truespo, unambspo = eval(testset, testloader, res, model, config)
+        # save
+        row = {"True SPO":truespo, "Unamb SPO":unambspo,
+               "Elapsed":elapsed, "Epochs":config.epoch}
+        df = df.append(row, ignore_index=True)
+        df.to_csv(save_path, index=False)
+        print("Saved to " + save_path + ".")
         print("\n\n")
 
 
@@ -64,20 +80,20 @@ def genData(config):
     """
     print("Generating synthetic data...")
     # shortest path
-    if config.problem == "sp":
+    if config.prob == "sp":
         data = spo.data.shortestpath.genData(config.data+1000, config.feat,
                                              config.grid, deg=config.deg,
                                              noise_width=config.noise,
                                              seed=config.seed)
     # knapsack
-    if config.problem == "ks":
+    if config.prob == "ks":
         data = spo.data.knapsack.genData(config.data+1000, config.feat,
                                          config.items,  dim=config.dim,
                                          deg=config.deg,
                                          noise_width=config.noise,
                                          seed=config.seed)
     # travelling salesman
-    if config.problem == "tsp":
+    if config.prob == "tsp":
         data = spo.data.tsp.genData(config.data+1000, config.feat, config.nodes,
                                     deg=config.deg, noise_width=config.noise,
                                     seed=config.seed)
@@ -89,7 +105,7 @@ def buildModel(config):
     build optimization model
     """
     # shortest path
-    if config.problem == "sp":
+    if config.prob == "sp":
         if config.lan == "gurobi":
             print("Building model with GurobiPy...")
             model = spo.model.grb.shortestPathModel(config.grid)
@@ -97,19 +113,16 @@ def buildModel(config):
             print("Building model with Pyomo...")
             model = spo.model.omo.shortestPathModel(config.grid, config.solver)
     # knapsack
-    if config.problem == "ks":
-        if len(config.caps) != len(config.wghts):
-            raise ValueError("Dimensional inconsistency: {} caps, {} wghts".
-                              format(len(config.caps), len(config.wghts)))
+    if config.prob == "ks":
+        caps = [config.cap] * config.dim
         if config.lan == "gurobi":
             print("Building model with GurobiPy...")
-            model = spo.model.grb.knapsackModel(config.wghts, config.caps)
+            model = spo.model.grb.knapsackModel(config.wght, caps)
         if config.lan == "pyomo":
             print("Building model with Pyomo...")
-            model = spo.model.omo.knapsackModel(config.wghts, config.caps,
-                                                config.solver)
+            model = spo.model.omo.knapsackModel(config.wght, caps, config.solver)
     # travelling salesman
-    if config.problem == "tsp":
+    if config.prob == "tsp":
         if config.lan == "gurobi":
             print("Building model with GurobiPy...")
             if config.form == "gg":
@@ -135,7 +148,7 @@ def buildDataLoader(data, model, config):
     x_train, x_test, c_train, c_test = train_test_split(x, c, test_size=1000,
                                                         random_state=config.seed)
     # build data set
-    if config.relax:
+    if config.rel:
         print("Building relaxation model...")
         model_rel = model.relax()
         trainset = spo.data.dataset.optDataset(model_rel, x_train, c_train)
@@ -176,7 +189,7 @@ def train2Stage(trainset, model, config):
     if config.pred == "rf":
         predictor = RandomForestRegressor(random_state=config.seed)
     # two-stage model
-    if config.relax:
+    if config.rel:
         print("Building relaxation model...")
         model_rel = model.relax()
         twostage = spo.twostage.sklearnPred(predictor, model_rel)
@@ -196,7 +209,7 @@ def trainSPO(trainloader, testloader, model, config):
     # train
     spo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
                        epoch=config.epoch, processes=config.proc,
-                       l1_lambd=config.l1, l2_lambd=config.l2, log=config.log)
+                       l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
     return reg
 
 def trainBB(trainloader, testloader, model, config):
@@ -209,7 +222,7 @@ def trainBB(trainloader, testloader, model, config):
     spo.train.trainBB(reg, model, optimizer, trainloader, testloader,
                       epoch=config.epoch, processes=config.proc,
                       bb_lambd=config.smth, l1_lambd=config.l1,
-                      l2_lambd=config.l2, log=config.log)
+                      l2_lambd=config.l2, log=config.elog)
     return reg
 
 
@@ -219,12 +232,12 @@ def trainInit(config):
     """
     # build nn
     arch = [config.feat] + config.net
-    if config.problem == "sp":
+    if config.prob == "sp":
         arch.append((config.grid[0] - 1) * config.grid[1] + \
                     (config.grid[1] - 1) * config.grid[0])
-    if config.problem == "ks":
+    if config.prob == "ks":
         arch.append(config.items)
-    if config.problem == "tsp":
+    if config.prob == "tsp":
         arch.append(config.nodes * (config.nodes - 1) // 2)
     reg = fcNet(arch)
     # set optimizer
@@ -262,6 +275,65 @@ def eval(testset, testloader, res, model, config):
     return truespo, unambspo
 
 
+def getSavePath(config):
+    """
+    get file path to save result
+    """
+    path = config.path
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    # problem type
+    path += "/" + config.prob
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    # problem specification
+    if config.prob == "sp":
+        path += "/" + "h{}w{}".format(*config.grid)
+    if config.prob == "ks":
+        path += "/" + "i{}d{}c{}".format(config.items, config.dim, config.cap)
+    if config.prob == "tsp":
+        path += "/" + "n{}".format(config.nodes)
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    # formulation
+    if config.prob == "tsp":
+        path += "/" + config.form
+        if not os.path.isdir(path):
+            os.mkdir(path)
+    # solver
+    path += "/" + config.lan
+    if config.lan == "pyomo":
+        path += "-" + config.solver
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    # method
+    filename = config.mthd
+    if config.mthd == "2s":
+        filename += "-" + config.pred
+    else:
+        if not config.net:
+            filename += "-lr"
+        else:
+            filename += "-fc" +"-".join(config.net)
+    if config.mthd == "bb":
+        filename += "-λ{}".format(config.smth)
+    if config.rel:
+        filename += "-rel"
+    # data size
+    filename += "_n{}p{}".format(config.data, config.feat)
+    # degree
+    filename += "_d{}".format(config.deg)
+    # noise
+    filename += "_e{}".format(config.noise)
+    # optimizer
+    filename += "_" + config.optm + str(config.lr)
+    # regularization
+    filename += "_l1{}l2{}".format(config.l1, config.l2)
+    # processors
+    filename += "_c{}".format(config.proc)
+    return path + "/" + filename + ".csv"
+
+
 class fcNet(nn.Module):
     """
     multi-layer fully connected neural network regression
@@ -295,7 +367,7 @@ if __name__ == "__main__":
                         type=int,
                         default=10,
                         help="number of experiments")
-    parser.add_argument("--relax",
+    parser.add_argument("--rel",
                         action="store_true",
                         help="train with relaxation model")
     parser.add_argument("--pred",
@@ -303,15 +375,19 @@ if __name__ == "__main__":
                         default="lr",
                         choices=["lr", "rf"],
                         help="predictor of two-stage predict then optimize")
-    parser.add_argument("--log",
+    parser.add_argument("--elog",
                         type=int,
-                        default=10,
-                        help="steps of log")
+                        default=0,
+                        help="steps of evluation and log")
     parser.add_argument("--form",
                         type=str,
                         default="gg",
                         choices=["gg", "dfj", "mtz"],
                         help="TSP formulation")
+    parser.add_argument("--path",
+                        type=str,
+                        default="./res",
+                        help="path to save result")
 
     # solver configuration
     parser.add_argument("--lan",
@@ -335,7 +411,7 @@ if __name__ == "__main__":
                         help="feature size")
     parser.add_argument("--deg",
                         type=int,
-                        default=4,
+                        default=1,
                         help="features polynomial degree")
     parser.add_argument("--noise",
                         type=float,
@@ -343,7 +419,7 @@ if __name__ == "__main__":
                         help="noise half-width")
 
     # optimization model configuration
-    parser.add_argument("--problem",
+    parser.add_argument("--prob",
                         type=str,
                         default="sp",
                         choices=["sp", "ks", "tsp"],
@@ -363,10 +439,9 @@ if __name__ == "__main__":
                         type=int,
                         default=3,
                         help="dimension for knapsack")
-    parser.add_argument("--caps",
-                        type=float,
-                        nargs='+',
-                        default=(30,30,30),
+    parser.add_argument("--cap",
+                        type=int,
+                        default=30,
                         help="dimension for knapsack")
     # tsp
     parser.add_argument("--nodes",
@@ -381,6 +456,7 @@ if __name__ == "__main__":
                         help="batch size")
     parser.add_argument("--epoch",
                         type=int,
+                        default=100,
                         help="number of epochs")
     parser.add_argument("--net",
                         type=int,
@@ -394,6 +470,7 @@ if __name__ == "__main__":
                         help="optimizer neural network")
     parser.add_argument("--lr",
                         type=float,
+                        default=1e-3,
                         help="learning rate")
     parser.add_argument("--l1",
                         type=float,
@@ -411,7 +488,6 @@ if __name__ == "__main__":
                         type=int,
                         default=1,
                         help="number of processor for optimization")
-
 
     # get configuration
     config = parser.parse_args()
