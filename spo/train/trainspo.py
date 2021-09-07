@@ -53,7 +53,6 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None,
     trueloss = None
     unambloss = None
     for epoch in pbar:
-        tick = time.time()
         # load data
         for i, data in enumerate(trainloader):
             x, c, w, z = data
@@ -83,8 +82,6 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None,
             desc = "Epoch {}, Loss: {:.4f}".format(epoch, loss.item())
             pbar.set_description(desc)
             cnt += 1
-        tock = time.time()
-        elapsed += tock - tick
         # eval
         if log and (epoch % log == 0):
             # true SPO
@@ -94,4 +91,3 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None,
             unambloss = spo.eval.unambSPO(reg, model, testloader)
             writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
     writer.close()
-    return reg, elapsed
