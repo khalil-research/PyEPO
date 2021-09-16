@@ -13,11 +13,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 import torch
-from torch import nn
-from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 import spo
+import net
+import utils
 
 def pipeline(config):
     # shortest path
@@ -31,7 +31,7 @@ def pipeline(config):
         print("Running experiments for traveling salesman prob:")
     print()
     # create table
-    save_path = getSavePath(config)
+    save_path = utils.getSavePath(config)
     if os.path.isfile(save_path):
         df = pd.read_csv(save_path)
     else:
@@ -46,15 +46,15 @@ def pipeline(config):
         print("Experiment {}:".format(i))
         print("===============================================================")
         # generate data
-        data = genData(config)
+        data = utils.genData(config)
         if config.prob == "ks":
             config.wght, data = data[0], (data[1], data[2])
         print()
         # build model
-        model = buildModel(config)
+        model = utils.buildModel(config)
         # build data loader
-        trainset, testset, trainloader, testloader = buildDataLoader(data, model,
-                                                                     config)
+        trainset, testset = utils.buildDataSet(data, model, config)
+        trainloader, testloader = utils.buildDataLoader(trainset, testset)
         print()
         # train
         tick = time.time()
@@ -72,94 +72,6 @@ def pipeline(config):
         df.to_csv(save_path, index=False)
         print("Saved to " + save_path + ".")
         print("\n\n")
-
-
-def genData(config):
-    """
-    generate synthetic data
-    """
-    print("Generating synthetic data...")
-    # shortest path
-    if config.prob == "sp":
-        data = spo.data.shortestpath.genData(config.data+1000, config.feat,
-                                             config.grid, deg=config.deg,
-                                             noise_width=config.noise,
-                                             seed=config.seed)
-    # knapsack
-    if config.prob == "ks":
-        data = spo.data.knapsack.genData(config.data+1000, config.feat,
-                                         config.items,  dim=config.dim,
-                                         deg=config.deg,
-                                         noise_width=config.noise,
-                                         seed=config.seed)
-    # travelling salesman
-    if config.prob == "tsp":
-        data = spo.data.tsp.genData(config.data+1000, config.feat, config.nodes,
-                                    deg=config.deg, noise_width=config.noise,
-                                    seed=config.seed)
-    return data
-
-
-def buildModel(config):
-    """
-    build optimization model
-    """
-    # shortest path
-    if config.prob == "sp":
-        if config.lan == "gurobi":
-            print("Building model with GurobiPy...")
-            model = spo.model.grb.shortestPathModel(config.grid)
-        if config.lan == "pyomo":
-            print("Building model with Pyomo...")
-            model = spo.model.omo.shortestPathModel(config.grid, config.solver)
-    # knapsack
-    if config.prob == "ks":
-        caps = [config.cap] * config.dim
-        if config.lan == "gurobi":
-            print("Building model with GurobiPy...")
-            model = spo.model.grb.knapsackModel(config.wght, caps)
-        if config.lan == "pyomo":
-            print("Building model with Pyomo...")
-            model = spo.model.omo.knapsackModel(config.wght, caps, config.solver)
-    # travelling salesman
-    if config.prob == "tsp":
-        if config.lan == "gurobi":
-            print("Building model with GurobiPy...")
-            if config.form == "gg":
-                print("Using Gavish–Graves formulation...")
-                model = spo.model.grb.tspGGModel(config.nodes)
-            if config.form == "dfj":
-                print("Using Danzig–Fulkerson–Johnson formulation...")
-                model = spo.model.grb.tspDFJModel(config.nodes)
-            if config.form == "mtz":
-                print("Using Miller-Tucker-Zemlin formulation...")
-                model = spo.model.grb.tspMTZModel(config.nodes)
-        if config.lan == "pyomo":
-            raise RuntimeError("TSP with Pyomo is not implemented.")
-    return model
-
-
-def buildDataLoader(data, model, config):
-    """
-    build Pytorch DataLoader
-    """
-    x, c = data
-    # data split
-    x_train, x_test, c_train, c_test = train_test_split(x, c, test_size=1000,
-                                                        random_state=config.seed)
-    # build data set
-    if config.rel:
-        print("Building relaxation model...")
-        model_rel = model.relax()
-        trainset = spo.data.dataset.optDataset(model_rel, x_train, c_train)
-    else:
-        trainset = spo.data.dataset.optDataset(model, x_train, c_train)
-    testset = spo.data.dataset.optDataset(model, x_test, c_test)
-    # get data loader
-    print("Building Pytorch DataLoader...")
-    trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
-    testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
-    return trainset, testset, trainloader, testloader
 
 
 def train(trainset, testset, trainloader, testloader, model, config):
@@ -239,7 +151,7 @@ def trainInit(config):
         arch.append(config.items)
     if config.prob == "tsp":
         arch.append(config.nodes * (config.nodes - 1) // 2)
-    reg = fcNet(arch)
+    reg = net.fcNet(arch)
     # set optimizer
     if config.optm == "sgd":
         optimizer = torch.optim.SGD(reg.parameters(), lr=config.lr)
@@ -273,80 +185,6 @@ def eval(testset, testloader, res, model, config):
     print('Normalized true SPO Loss: {:.2f}%'.format(truespo * 100))
     print('Normalized unambiguous SPO Loss: {:.2f}%'.format(unambspo * 100))
     return truespo, unambspo
-
-
-def getSavePath(config):
-    """
-    get file path to save result
-    """
-    path = config.path
-    if not os.path.isdir(path):
-        os.mkdir(path)
-    # problem type
-    path += "/" + config.prob
-    if not os.path.isdir(path):
-        os.mkdir(path)
-    # problem specification
-    if config.prob == "sp":
-        path += "/" + "h{}w{}".format(*config.grid)
-    if config.prob == "ks":
-        path += "/" + "i{}d{}c{}".format(config.items, config.dim, config.cap)
-    if config.prob == "tsp":
-        path += "/" + "n{}".format(config.nodes)
-    if not os.path.isdir(path):
-        os.mkdir(path)
-    # formulation
-    if config.prob == "tsp":
-        path += "/" + config.form
-        if not os.path.isdir(path):
-            os.mkdir(path)
-    # solver
-    path += "/" + config.lan
-    if config.lan == "pyomo":
-        path += "-" + config.solver
-    if not os.path.isdir(path):
-        os.mkdir(path)
-    # method
-    filename = config.mthd
-    if config.mthd == "2s":
-        filename += "-" + config.pred
-    else:
-        if not config.net:
-            filename += "-lr"
-        else:
-            filename += "-fc" +"-".join(config.net)
-    if config.mthd == "bb":
-        filename += "-λ{}".format(config.smth)
-    if config.rel:
-        filename += "-rel"
-    # data size
-    filename += "_n{}p{}".format(config.data, config.feat)
-    # degree
-    filename += "_d{}".format(config.deg)
-    # noise
-    filename += "_e{}".format(config.noise)
-    # optimizer
-    filename += "_" + config.optm + str(config.lr)
-    # regularization
-    filename += "_l1{}l2{}".format(config.l1, config.l2)
-    # processors
-    filename += "_c{}".format(config.proc)
-    return path + "/" + filename + ".csv"
-
-
-class fcNet(nn.Module):
-    """
-    multi-layer fully connected neural network regression
-    """
-    def __init__(self, arch):
-        super().__init__()
-        layers = []
-        for i in range(len(arch)-1):
-            layers.append(nn.Linear(arch[i], arch[i+1]))
-        self.main = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return self.main(x)
 
 
 if __name__ == "__main__":
