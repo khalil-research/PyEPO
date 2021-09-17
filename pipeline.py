@@ -3,21 +3,19 @@
 """
 SPO training pipeline
 """
+
 import argparse
 import os
 import time
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
 import torch
-from tqdm import tqdm
 
 import spo
-import net
 import utils
+import train
+import eval
 
 def pipeline(config):
     # shortest path
@@ -54,17 +52,16 @@ def pipeline(config):
         model = utils.buildModel(config)
         # build data loader
         trainset, testset = utils.buildDataSet(data, model, config)
-        trainloader, testloader = utils.buildDataLoader(trainset, testset)
         print()
         # train
         tick = time.time()
-        res = train(trainset, testset, trainloader, testloader, model, config)
+        res = train.train(trainset, testset, model, config)
         tock = time.time()
         elapsed = tock - tick
         print("Time elapsed: {:.4f} sec".format(elapsed))
         print()
         # evaluate
-        truespo, unambspo = eval(testset, testloader, res, model, config)
+        truespo, unambspo = eval.eval(testset, res, model, config)
         # save
         row = {"True SPO":truespo, "Unamb SPO":unambspo,
                "Elapsed":elapsed, "Epochs":config.epoch}
@@ -72,119 +69,6 @@ def pipeline(config):
         df.to_csv(save_path, index=False)
         print("Saved to " + save_path + ".")
         print("\n\n")
-
-
-def train(trainset, testset, trainloader, testloader, model, config):
-    """
-    training for preditc-then-optimize
-    """
-    print("Training...")
-    if config.mthd == "2s":
-        print("Using two-stage predict then optimize...")
-        res = train2Stage(trainset, model, config)
-    if config.mthd == "spo":
-        print("Using SPO+ loss...")
-        res = trainSPO(trainloader, testloader, model, config)
-    if config.mthd == "bb":
-        print("Using Black-box optimizer block...")
-        res = trainBB(trainloader, testloader, model, config)
-    return res
-
-
-def train2Stage(trainset, model, config):
-    """
-    two-stage preditc-then-optimize training
-    """
-    # prediction model
-    if config.pred == "lr":
-        predictor = LinearRegression()
-    if config.pred == "rf":
-        predictor = RandomForestRegressor(random_state=config.seed)
-    # two-stage model
-    if config.rel:
-        print("Building relaxation model...")
-        model_rel = model.relax()
-        twostage = spo.twostage.sklearnPred(predictor, model_rel)
-    else:
-        twostage = spo.twostage.sklearnPred(predictor, model)
-    # training
-    twostage.fit(trainset.x, trainset.c)
-    return twostage
-
-
-def trainSPO(trainloader, testloader, model, config):
-    """
-    SPO+ training
-    """
-    # init
-    reg, optimizer = trainInit(config)
-    # train
-    spo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
-                       epoch=config.epoch, processes=config.proc,
-                       l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
-    return reg
-
-def trainBB(trainloader, testloader, model, config):
-    """
-    Black-Box training
-    """
-    # init
-    reg, optimizer = trainInit(config)
-    # train
-    spo.train.trainBB(reg, model, optimizer, trainloader, testloader,
-                      epoch=config.epoch, processes=config.proc,
-                      bb_lambd=config.smth, l1_lambd=config.l1,
-                      l2_lambd=config.l2, log=config.elog)
-    return reg
-
-
-def trainInit(config):
-    """
-    initiate neural network and optimizer
-    """
-    # build nn
-    arch = [config.feat] + config.net
-    if config.prob == "sp":
-        arch.append((config.grid[0] - 1) * config.grid[1] + \
-                    (config.grid[1] - 1) * config.grid[0])
-    if config.prob == "ks":
-        arch.append(config.items)
-    if config.prob == "tsp":
-        arch.append(config.nodes * (config.nodes - 1) // 2)
-    reg = net.fcNet(arch)
-    # set optimizer
-    if config.optm == "sgd":
-        optimizer = torch.optim.SGD(reg.parameters(), lr=config.lr)
-    if config.optm == "adam":
-        optimizer = torch.optim.Adam(reg.parameters(), lr=config.lr)
-    return reg, optimizer
-
-
-def eval(testset, testloader, res, model, config):
-    """
-    evaluate permance
-    """
-    print("Evaluating...")
-    if config.mthd == "2s":
-        # prediction
-        c_test_pred = res.predict(testset.x)
-        truespo = 0
-        unambspo = 0
-        for i in tqdm(range(len(testset))):
-            cp_i = c_test_pred[i]
-            c_i = testset.c[i]
-            z_i = testset.z[i,0]
-            truespo += spo.eval.calTrueSPO(model, cp_i, c_i, z_i)
-            unambspo += spo.eval.calUnambSPO(model, cp_i, c_i, z_i)
-        truespo /= abs(testset.z.sum())
-        unambspo /= abs(testset.z.sum())
-        time.sleep(1)
-    if (config.mthd == "spo") or (config.mthd == "bb"):
-        truespo = spo.eval.trueSPO(res, model, testloader)
-        unambspo = spo.eval.unambSPO(res, model, testloader)
-    print('Normalized true SPO Loss: {:.2f}%'.format(truespo * 100))
-    print('Normalized unambiguous SPO Loss: {:.2f}%'.format(unambspo * 100))
-    return truespo, unambspo
 
 
 if __name__ == "__main__":
