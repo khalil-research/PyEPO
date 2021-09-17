@@ -14,8 +14,8 @@ import torch
 
 import spo
 import utils
-import train
-import eval
+from train import train
+from eval import eval
 
 def pipeline(config):
     # shortest path
@@ -55,13 +55,13 @@ def pipeline(config):
         print()
         # train
         tick = time.time()
-        res = train.train(trainset, testset, model, config)
+        res = train(trainset, testset, model, config)
         tock = time.time()
         elapsed = tock - tick
         print("Time elapsed: {:.4f} sec".format(elapsed))
         print()
         # evaluate
-        truespo, unambspo = eval.eval(testset, res, model, config)
+        truespo, unambspo = eval(testset, res, model, config)
         # save
         row = {"True SPO":truespo, "Unamb SPO":unambspo,
                "Elapsed":elapsed, "Epochs":config.epoch}
