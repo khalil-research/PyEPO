@@ -5,7 +5,7 @@ Utilities
 """
 import os
 
-from torch.utils.data import DataLoader
+from sklearn.model_selection import train_test_split
 
 import spo
 
@@ -150,14 +150,3 @@ def buildDataSet(data, model, config):
         trainset = spo.data.dataset.optDataset(model, x_train, c_train)
     testset = spo.data.dataset.optDataset(model, x_test, c_test)
     return trainset, testset
-
-
-def buildDataLoader(trainset, testset):
-    """
-    build Pytorch DataLoader
-    """
-    # get data loader
-    print("Building Pytorch DataLoader...")
-    trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
-    testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
-    return trainloader, testloader
