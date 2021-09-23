@@ -10,7 +10,7 @@ import torch
 from torch.utils.data import DataLoader
 
 import spo
-import net
+from run import net
 
 
 def train(trainset, testset, model, config):
