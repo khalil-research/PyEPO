@@ -20,11 +20,11 @@ config.rel = False
 # steps of evluation and log
 config.elog = 0
 # path to save result
-config.path='./res'
+config.path="./res"
 
 ## solver configuration
 # modelling language
-config.lan = 'gurobi'
+config.lan = "gurobi"
 # solver for Pyomo
 #config.solver = "gurobi"
 
@@ -40,7 +40,7 @@ config.noise = 0.0
 
 ## optimization model configuration
 # problem type
-config.prob = 'sp'
+config.prob = "sp"
 # network grid for shortest path
 config.grid = (20, 20)
 
@@ -52,7 +52,7 @@ config.batch = 32
 # number of epochs
 config.epoch = 100
 # optimizer neural network
-config.optm = 'adam'
+config.optm = "adam"
 # learning rate
 config.lr = 1e-2
 # l1 regularization parameter
@@ -60,4 +60,4 @@ config.l1 = 0.0
 # l2 regularization parameter
 config.l2 = 0.0
 # number of processor for optimization
-config.proc = 1
+config.proc = 32
