@@ -5,9 +5,11 @@ Submit experiments
 """
 import submitit
 
-def add(a, b):
-    return a + b
-args_dict = {"a":1, "b":9}
+from config import config
+from pipeline import pipeline
+
+# args
+args_dict = {"config":config}
 
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
@@ -21,6 +23,6 @@ executor.update_parameters(slurm_additional_parameters={"account": "def-khalile2
                            timeout_min=timeout_min,
                            mem_gb=mem_gb,
                            cpus_per_task=num_cpus)
-job = executor.submit(add, args_dict)
+job = executor.submit(pipeline, args_dict)
 print("job_id: {}, mem_gb: {}, num_cpus: {}, logs: {}" \
       .format(job.job_id, mem_gb, num_cpus, instance_logs_path))
