@@ -19,7 +19,7 @@ mem_gb = 8
 num_cpus = 32
 
 executor = submitit.AutoExecutor(folder=instance_logs_path)
-executor.update_parameters(slurm_additional_parameters={"account": "def-khalile2"},
+executor.update_parameters(slurm_additional_parameters={"account": "rrg-khalile2"},
                            timeout_min=timeout_min,
                            mem_gb=mem_gb,
                            cpus_per_task=num_cpus)
