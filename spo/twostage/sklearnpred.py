@@ -5,7 +5,7 @@ Two-stage model with Scikit-learn predictor
 """
 
 import numpy as np
-from sklearn.base import clone
+from sklearn.multioutput import MultiOutputRegressor
 
 
 class sklearnPred:
@@ -18,7 +18,7 @@ class sklearnPred:
     """
 
     def __init__(self, pmodel, omodel):
-        self.predictor = [clone(pmodel) for _ in range(omodel.num_cost)]
+        self.predictor = MultiOutputRegressor(pmodel)
         self.optimizer = omodel
         self.trained = False
 
@@ -32,8 +32,7 @@ class sklearnPred:
         """
         if not (len(c.shape) == 2 and c.shape[-1] == self.optimizer.num_cost):
             raise ValueError("Dimension of cost does not macth.")
-        for j in range(self.optimizer.num_cost):
-            self.predictor[j].fit(x, c[:, j])
+        self.predictor.fit(x, c)
         self.trained = True
 
     def predict(self, x):
@@ -46,11 +45,7 @@ class sklearnPred:
         Returns:
             ndarray: predicted cost
         """
-        cp = np.zeros((x.shape[0], 0))
         if not self.trained:
-            raise RuntimeError(
-                "This two-stage sklearnPred instance is not fitted yet.")
-        for j in range(self.optimizer.num_cost):
-            cp = np.concatenate(
-                (cp, self.predictor[j].predict(x).reshape(-1, 1)), axis=1)
-        return cp
+            raise RuntimeError("Model is not fitted yet.")
+        cp = self.predictor.predict(x)
+        return np.array(cp)
