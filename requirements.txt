@@ -6,3 +6,4 @@ Pyomo
 scipy
 pathos
 scikit_learn
+tensorboard
