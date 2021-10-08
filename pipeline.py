@@ -20,13 +20,13 @@ from run import eval
 def pipeline(config):
     # shortest path
     if config.prob == "sp":
-        print("Running experiments for shortest path prob:")
+        print("Running experiments for shortest path:")
     # knapsack
     if config.prob == "ks":
-        print("Running experiments for multi-dimensional knapsack prob:")
+        print("Running experiments for multi-dimensional knapsack:")
     # travelling salesman
     if config.prob == "tsp":
-        print("Running experiments for traveling salesman prob:")
+        print("Running experiments for traveling salesman:")
     print()
     # create table
     save_path = utils.getSavePath(config)
