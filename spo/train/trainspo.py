@@ -7,6 +7,7 @@ Train with SPO+ loss
 import os
 import time
 
+import pandas as pd
 from tqdm import tqdm
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -14,7 +15,7 @@ from torch.utils.tensorboard import SummaryWriter
 import spo
 from spo.train.util import getDevice
 
-def trainSPO(reg, model, optimizer, trainloader, testloader=None,
+def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
              epoch=50, processes=1, l1_lambd=0, l2_lambd=0, log=0):
     """
     A function to train PyTorch nn with SPO+ loss
@@ -32,13 +33,13 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None,
         log (int): step size of evlaution and log
     """
     # create log folder
-    if not os.path.isdir("./logs"):
-        os.mkdir("./logs")
+    if not os.path.isdir(self.logdir):
+        os.mkdir(self.logdir)
     # use training data for test if no test data
     if testloader is None:
         testloader = trainloader
     # init tensorboard
-    writer = SummaryWriter(log_dir="./logs")
+    writer = SummaryWriter(log_dir=self.logdir)
     # get device
     device = getDevice()
     reg.to(device)
@@ -62,7 +63,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None,
             loss = criterion.apply(cp, c, w, z).mean()
             # add logs
             if l1_lambd or l2_lambd:
-                writer.add_scalar('Train/SPO Loss', loss.item(), cnt)
+                writer.add_scalar('Train/SPO+ Loss', loss.item(), cnt)
             # l1 reg
             if l1_lambd:
                 l1_reg = l1_lambd * torch.abs(cp - c).sum(dim=1).mean()

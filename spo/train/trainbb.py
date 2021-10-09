@@ -14,7 +14,7 @@ from torch.utils.tensorboard import SummaryWriter
 import spo
 from spo.train.util import getDevice
 
-def trainBB(reg, model, optimizer, trainloader, testloader=None,
+def trainBB(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
              epoch=50, processes=1, bb_lambd=10, l1_lambd=0, l2_lambd=0, log=0):
     """
     A function to train PyTorch nn with SPO+ loss
@@ -27,19 +27,19 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None,
         testloader (DataLoader): PyTorch DataLoader for test set
         epoch (int): number of training epochs
         processes: processes (int): number of processors, 1 for single-core, 0 for all of cores
-        bb_lambd (float): Black-Box parameter for function smoothing 
+        bb_lambd (float): Black-Box parameter for function smoothing
         l1_lambd (float): regularization weight of l1 norm
         l2_lambd (float): regularization weight of l2 norm
         log (int): step size of evlaution and log
     """
     # create log folder
-    if not os.path.isdir("./logs"):
-        os.mkdir("./logs")
+    if not os.path.isdir(self.logdir):
+        os.mkdir(self.logdir)
     # use training data for test if no test data
     if testloader is None:
         testloader = trainloader
     # init tensorboard
-    writer = SummaryWriter(log_dir="./logs")
+    writer = SummaryWriter(log_dir=self.logdir)
     # get device
     device = getDevice()
     reg.to(device)
