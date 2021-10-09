@@ -7,6 +7,7 @@
 VENVS_DIR="PATH_TO_VENV"
 VENV_NAME="spo"
 GRB_VER="9.1.2"
+LOGDIR="./logs"
 
 # load module
 echo "Load module..."
@@ -43,7 +44,7 @@ if [ ! -d "./PATH_TO_VENV/spo" ]; then
   pip install pathos
   pip install scikit_learn
   pip install submitit
-  pip install tensorboard
+  pip install -U tensorboard
   pip install torch==1.7.0
 
 # activate virtual env
@@ -52,5 +53,12 @@ else
   source $VENVS_DIR/$VENV_NAME/bin/activate
 
 fi
+echo ""
+
+# tensorboard
+echo "Set tensorboard..."
+mkdir -p $LOGDIR
+tensorboard --logdir=$LOGDIR --host 0.0.0.0 &
 
 # run . create_env.sh
+# run tensorboard dev upload tensorboard --logdir
