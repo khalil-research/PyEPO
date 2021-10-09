@@ -33,13 +33,13 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None, logdir="./logs"
         log (int): step size of evlaution and log
     """
     # create log folder
-    if not os.path.isdir(self.logdir):
-        os.mkdir(self.logdir)
+    if not os.path.isdir(logdir):
+        os.mkdir(logdir)
     # use training data for test if no test data
     if testloader is None:
         testloader = trainloader
     # init tensorboard
-    writer = SummaryWriter(log_dir=self.logdir)
+    writer = SummaryWriter(log_dir=logdir)
     # get device
     device = getDevice()
     reg.to(device)
