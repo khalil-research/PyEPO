@@ -61,6 +61,8 @@ def getSavePath(config):
     filename += "_e{}".format(config.noise)
     # optimizer
     filename += "_" + config.optm + str(config.lr)
+    # batch size
+    filename += "_bs{}".format(config.batch) 
     # regularization
     filename += "_l1{}l2{}".format(config.l1, config.l2)
     # processors
