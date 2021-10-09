@@ -79,7 +79,7 @@ class SPOPlus(Function):
         global _SPO_FUNC_SPOP_OPTMODEL
         _SPO_FUNC_SPOP_OPTMODEL = model
         # num of processors
-        if processes not in range(mp.cpu_count()):
+        if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
         global _SPO_FUNC_SPOP_PROCESSES

@@ -84,7 +84,7 @@ class blackboxOpt(Function):
         global _SPO_FUNC_BB_LAMBDA
         _SPO_FUNC_BB_LAMBDA = lambd
         # num of processors
-        if processes not in range(mp.cpu_count()):
+        if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
         global _SPO_FUNC_BB_PROCESSES
