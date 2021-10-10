@@ -104,7 +104,7 @@ config_bb.epoch = None
 # optimizer neural network
 config_bb.optm = "adam"
 # learning rate
-config_bb.lr = 5e-3
+config_bb.lr = 5e-4
 # smoothing parameter for Black-Box
 config_bb.smth = 20
 # l1 regularization parameter
