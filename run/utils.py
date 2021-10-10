@@ -50,7 +50,7 @@ def getSavePath(config):
         else:
             filename += "-fc" +"-".join(config.net)
     if config.mthd == "bb":
-        filename += "-λ{}".format(config.smth)
+        filename += "-lamb{}".format(config.smth)
     if config.rel:
         filename += "-rel"
     # data size
@@ -62,7 +62,7 @@ def getSavePath(config):
     # optimizer
     filename += "_" + config.optm + str(config.lr)
     # batch size
-    filename += "_bs{}".format(config.batch) 
+    filename += "_bs{}".format(config.batch)
     # regularization
     filename += "_l1{}l2{}".format(config.l1, config.l2)
     # processors
