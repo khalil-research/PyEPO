@@ -56,6 +56,8 @@ config_2s = deepcopy(config)
 config_2s.mthd = "2s"
 # predictor
 config_2s.pred = None
+# time limit
+config_2s.timeout = 1 * config.expnum
 
 configSP["2s"] = config_2s
 
@@ -65,6 +67,8 @@ config_spo = deepcopy(config)
 ## experiments configuration
 # method
 config_spo.mthd = "spo"
+# time limit
+config_spo.timeout = 10 * config.expnum
 
 ## training configuration
 # size of neural network hidden layers
@@ -93,6 +97,8 @@ config_bb = deepcopy(config)
 ## experiments configuration
 # method
 config_bb.mthd = "bb"
+# time limit
+config_bb.timeout = 12 * config.expnum
 
 ## training configuration
 # size of neural network hidden layers

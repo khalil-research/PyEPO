@@ -46,10 +46,8 @@ config.rel = setting.rel
 
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
-timeout_min = 100
-if setting.mthd == "2s":
-    timeout_min = 10
-mem_gb = 2
+timeout_min = config.timeout
+mem_gb = 4
 num_cpus = 32
 
 # config setting
@@ -77,8 +75,8 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
     # run job
     job = executor.submit(pipeline, config)
     jobs.append(job)
-    print("job_id: {}, mem_gb: {}, num_cpus: {}, logs: {}" \
-          .format(job.job_id, mem_gb, num_cpus, instance_logs_path))
+    print("job_id: {}, mem_gb: {}, num_cpus: {}, logs: {}, timeout: {}" \
+          .format(job.job_id, mem_gb, num_cpus, instance_logs_path, timeout_min))
 
 # get outputs
 # outputs = [job.result() for job in jobs]
