@@ -63,7 +63,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
             loss = criterion.apply(cp, c, w, z).mean()
             # add logs
             if l1_lambd or l2_lambd:
-                writer.add_scalar('Train/SPO+ Loss', loss.item(), cnt)
+                writer.add_scalar('Train/SPO Loss', loss.item(), cnt)
             # l1 reg
             if l1_lambd:
                 l1_reg = l1_lambd * torch.abs(cp - c).sum(dim=1).mean()
