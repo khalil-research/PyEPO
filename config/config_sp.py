@@ -39,7 +39,7 @@ config.lan = "gurobi"
 
 ## data configuration
 # training data size
-config.data = 1000
+config.data = None
 # feature size
 config.feat = 5
 # features polynomial degree
@@ -72,11 +72,11 @@ config_spo.net = []
 # number of epochs
 config_spo.batch = 32
 # number of epochs
-config_spo.epoch = 200
+config_spo.epoch = None
 # optimizer neural network
 config_spo.optm = "adam"
 # learning rate
-config_spo.lr = 1e-2
+config_spo.lr = 1e-3
 # l1 regularization parameter
 config_spo.l1 = 0.0
 # l2 regularization parameter
@@ -98,13 +98,13 @@ config_bb.mthd = "bb"
 # size of neural network hidden layers
 config_bb.net = []
 # number of epochs
-config_bb.batch = 64
+config_bb.batch = 32
 # number of epochs
-config_bb.epoch = 200
+config_bb.epoch = None
 # optimizer neural network
 config_bb.optm = "adam"
 # learning rate
-config_bb.lr = 5e-4
+config_bb.lr = 5e-3
 # smoothing parameter for Black-Box
 config_bb.smth = 20
 # l1 regularization parameter
