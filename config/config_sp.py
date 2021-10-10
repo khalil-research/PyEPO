@@ -23,7 +23,7 @@ config.grid = (5, 5)
 # seed
 config.seed = 135
 # number of experiments
-config.expnum = 1
+config.expnum = 10
 # relaxation
 config.rel = False
 # steps of evluation and log
