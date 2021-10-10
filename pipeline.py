@@ -150,7 +150,7 @@ if __name__ == "__main__":
     parser.add_argument("--grid",
                         type=int,
                         nargs=2,
-                        default=(20,20),
+                        default=(5,5),
                         help="network grid for shortest path")
     # knapsack
     parser.add_argument("--items",
