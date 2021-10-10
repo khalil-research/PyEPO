@@ -40,33 +40,34 @@ def getSavePath(config):
         path += "-" + config.solver
     if not os.path.isdir(path):
         os.mkdir(path)
+    # data size
+    filename = "n{}p{}".format(config.data, config.feat)
+    # degree
+    filename += "-d{}".format(config.deg)
+    # noise
+    filename += "-e{}".format(config.noise)
     # method
-    filename = config.mthd
+    filename += "_" + config.mthd
     if config.mthd == "2s":
         filename += "-" + config.pred
-    else:
+    if config.rel:
+       filename += "-rel"
+    if config.mthd != "2s":
         if not config.net:
-            filename += "-lr"
+            filename += "_lr"
         else:
-            filename += "-fc" +"-".join(config.net)
+            filename += "_fc" +"-".join(config.net)
+        # optimizer
+        filename += "_" + config.optm + str(config.lr)
+        # batch size
+        filename += "_bs{}".format(config.batch)
+        # regularization
+        filename += "_l1{}l2{}".format(config.l1, config.l2)
+        # processors
+        filename += "_c{}".format(config.proc)
     if config.mthd == "bb":
         filename += "-lamb{}".format(config.smth)
-    if config.rel:
-        filename += "-rel"
-    # data size
-    filename += "_n{}p{}".format(config.data, config.feat)
-    # degree
-    filename += "_d{}".format(config.deg)
-    # noise
-    filename += "_e{}".format(config.noise)
-    # optimizer
-    filename += "_" + config.optm + str(config.lr)
-    # batch size
-    filename += "_bs{}".format(config.batch)
-    # regularization
-    filename += "_l1{}l2{}".format(config.l1, config.l2)
-    # processors
-    filename += "_c{}".format(config.proc)
+
     return path + "/" + filename + ".csv"
 
 
