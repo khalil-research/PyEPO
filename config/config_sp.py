@@ -25,7 +25,7 @@ config.seed = 135
 # number of experiments
 config.expnum = 10
 # relaxation
-config.rel = False
+config.rel = None
 # steps of evluation and log
 config.elog = 0
 # path to save result

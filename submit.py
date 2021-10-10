@@ -28,12 +28,16 @@ parser.add_argument("--pred2s",
                     type=str,
                     choices=["lr", "rf"],
                     help="predictor for two-stage")
+parser.add_argument("--rel",
+                    action="store_true",
+                    help="train with relaxation model")
 setting = parser.parse_args()
 
 # get config
 config = configs[setting.prob][setting.mthd]
 if setting.mthd == "2s":
     config.pred = setting.pred2s
+config.rel = setting.rel
 
 # test
 #def pipeline(alpha):
