@@ -77,4 +77,4 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
           .format(job.job_id, mem_gb, num_cpus, instance_logs_path))
 
 # get outputs
-outputs = [job.result() for job in jobs]
+# outputs = [job.result() for job in jobs]
