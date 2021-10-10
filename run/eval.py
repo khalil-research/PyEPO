@@ -26,8 +26,8 @@ def eval(testset, res, model, config):
             z_i = testset.z[i,0]
             truespo += spo.eval.calTrueSPO(model, cp_i, c_i, z_i)
             unambspo += spo.eval.calUnambSPO(model, cp_i, c_i, z_i)
-        truespo /= abs(testset.z.sum())
-        unambspo /= abs(testset.z.sum())
+        truespo /= abs(testset.z.sum() + 1e-3)
+        unambspo /= abs(testset.z.sum() + 1e-3)
         time.sleep(1)
     if (config.mthd == "spo") or (config.mthd == "bb"):
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
