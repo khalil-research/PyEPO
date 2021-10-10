@@ -63,9 +63,9 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
                                cpus_per_task=num_cpus)
     # set config
     config.data = data
-    if data == 1000:
+    if (setting.mthd != "2s") and (data == 1000):
         config.epoch = 300
-    if data == 100:
+    if (setting.mthd != "2s") and (data == 100):
         config.epoch = 1000
     config.noise = noise
     config.deg = deg
@@ -77,4 +77,4 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
           .format(job.job_id, mem_gb, num_cpus, instance_logs_path))
 
 # get outputs
-# outputs = [job.result() for job in jobs]
+outputs = [job.result() for job in jobs]
