@@ -63,8 +63,9 @@ def pipeline(config):
         # evaluate
         truespo, unambspo = eval(testset, res, model, config)
         # save
+        epoch = 0 if config.mthd == "2s" else config.epoch
         row = {"True SPO":truespo, "Unamb SPO":unambspo,
-               "Elapsed":elapsed, "Epochs":config.epoch}
+               "Elapsed":elapsed, "Epochs":epoch}
         df = df.append(row, ignore_index=True)
         df.to_csv(save_path, index=False)
         print("Saved to " + save_path + ".")
