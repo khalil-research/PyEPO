@@ -53,7 +53,7 @@ config.rel = setting.rel
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
 timeout_min = config.timeout
-mem_gb = 4
+mem_gb = 6
 num_cpus = 32
 
 # config setting
