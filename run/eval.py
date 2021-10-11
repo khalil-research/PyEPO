@@ -31,6 +31,9 @@ def eval(testset, res, model, config):
         time.sleep(1)
     if (config.mthd == "spo") or (config.mthd == "bb"):
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
+        # DFJ is fastest for unambSPO
+        if config.prob == "tsp":
+            model = spo.model.grb.tspDFJModel(config.nodes)
         truespo = spo.eval.trueSPO(res, model, testloader)
         unambspo = spo.eval.unambSPO(res, model, testloader)
     print('Normalized true SPO Loss: {:.2f}%'.format(truespo * 100))
