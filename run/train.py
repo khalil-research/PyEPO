@@ -83,6 +83,9 @@ def trainSPO(trainloader, testloader, model, config):
     """
     # init
     reg, optimizer = trainInit(config)
+    # relax
+    if config.rel:
+        model = model.relax()
     # train
     spo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
                        epoch=config.epoch, processes=config.proc,
@@ -96,6 +99,9 @@ def trainBB(trainloader, testloader, model, config):
     """
     # init
     reg, optimizer = trainInit(config)
+    # relax
+    if config.rel:
+        model = model.relax()
     # train
     spo.train.trainBB(reg, model, optimizer, trainloader, testloader,
                       epoch=config.epoch, processes=config.proc,
