@@ -28,6 +28,10 @@ parser.add_argument("--pred2s",
                     type=str,
                     choices=["lr", "rf"],
                     help="predictor for two-stage")
+parser.add_argument("--tspform",
+                    type=str,
+                    choices=["gg", "dfj", "mtz"],
+                    help="TSP formulation")
 parser.add_argument("--rel",
                     action="store_true",
                     help="train with relaxation model")
@@ -35,6 +39,8 @@ setting = parser.parse_args()
 
 # get config
 config = configs[setting.prob][setting.mthd]
+if setting.prob == "tsp":
+    config.form = setting.tspform
 if setting.mthd == "2s":
     config.pred = setting.pred2s
 config.rel = setting.rel
@@ -65,12 +71,18 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
                                cpus_per_task=num_cpus)
     # set config
     config.data = data
-    if (setting.mthd != "2s") and (data == 1000):
-        config.epoch = 300
-    if (setting.mthd != "2s") and (data == 100):
-        config.epoch = 1000
     config.noise = noise
     config.deg = deg
+    if (setting.mthd != "2s") and (data == 1000):
+        if setting.prob == "ks":
+            config.epoch = 100
+        else:
+            config.epoch = 300
+    if (setting.mthd != "2s") and (data == 100):
+        if setting.prob == "ks":
+            config.epoch = 300
+        else:
+            config.epoch = 1000
     print(config)
     # run job
     job = executor.submit(pipeline, config)
