@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Knapsack configuration
+Tavelling salesman configuration
 """
 
 from copy import deepcopy
@@ -19,7 +19,7 @@ config.prob = "ks"
 # number of items
 config.items = 48
 # dimension
-config.dim = 3
+config.dim = 1
 # capacity
 config.cap = 30
 
@@ -61,7 +61,7 @@ config_2s.mthd = "2s"
 # predictor
 config_2s.pred = None
 # time limit
-config_2s.timeout = 2 * config.expnum
+config_2s.timeout = 3 * config.expnum
 
 configKS["2s"] = config_2s
 
@@ -72,7 +72,7 @@ config_spo = deepcopy(config)
 # method
 config_spo.mthd = "spo"
 # time limit
-config_spo.timeout = 20 * config.expnum
+config_spo.timeout = 25 * config.expnum
 
 ## training configuration
 # size of neural network hidden layers
@@ -102,7 +102,7 @@ config_bb = deepcopy(config)
 # method
 config_bb.mthd = "bb"
 # time limit
-config_bb.timeout = 25 * config.expnum
+config_bb.timeout = 50 * config.expnum
 
 ## training configuration
 # size of neural network hidden layers
