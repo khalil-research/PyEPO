@@ -55,13 +55,12 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
             for k in range(j + 1, m):
                 c[i, l] = org_dist[j, k]
                 l += 1
-        # from feature to edge
-        c[i] += (((np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3)
-                  ** deg) / 3 ** (deg - 1)).reshape(-1)
         # noise
         noise = np.random.uniform(1 - noise_width, 1 + noise_width,
                                   m * (m - 1) // 2)
-        c[i] = c[i] * noise
+        # from feature to edge
+        c[i] += (((np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3)
+                  ** deg) / 3 ** (deg - 1)).reshape(-1) * noise
     # rounding
     c = np.around(c, decimals=4)
     return x, c
