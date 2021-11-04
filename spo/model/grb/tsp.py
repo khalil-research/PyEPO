@@ -89,8 +89,6 @@ class tspGGModel(tspABModel):
         """
         # ceate a model
         m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
         # varibles
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         self.x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)

@@ -35,8 +35,6 @@ class knapsackModel(optGRBModel):
         """
         # ceate a model
         m = gp.Model("knapsack")
-        # turn off output
-        m.Params.outputFlag = 0
         # varibles
         self.x = m.addVars(self.items, name="x", vtype=GRB.BINARY)
         # sense
