@@ -153,7 +153,9 @@ class SPOPlus(Function):
             for i in range(ins_num):
                 loss.append(-obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
         # convert to tensor
+        loss = np.array(loss)
         loss = torch.FloatTensor(loss).to(device)
+        sol = np.array(sol)
         sol = torch.FloatTensor(sol).to(device)
         # save solutions
         ctx.save_for_backward(true_sol, sol)
