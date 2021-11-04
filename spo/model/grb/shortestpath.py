@@ -54,8 +54,6 @@ class shortestPathModel(optGRBModel):
         """
         # ceate a model
         m = gp.Model("shortest path")
-        # turn off output
-        m.Params.outputFlag = 0
         # varibles
         self.x = m.addVars(self.arcs, name="x")
         # sense

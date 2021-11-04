@@ -16,6 +16,11 @@ class optGRBModel(optModel):
     This is an abstract class for Gurobi-based optimization model
     """
 
+    def __init__(self):
+        super().__init__()
+        # turn off output
+        self._model.Params.outputFlag = 0
+
     def __repr__(self):
         return "optGRBModel " + self.__class__.__name__
 
