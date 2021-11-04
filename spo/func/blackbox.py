@@ -131,6 +131,7 @@ class blackboxOpt(Function):
                 sol = pool.amap(solveWithObj4Par, cp, [args] * ins_num,
                                 [model_type] * ins_num).get()
         # convert to tensor
+        sol = np.array(sol)
         pred_sol = torch.FloatTensor(sol).to(device)
         # save
         ctx.save_for_backward(pred_cost, pred_sol)
@@ -180,5 +181,7 @@ class blackboxOpt(Function):
             grad = []
             for i in range(ins_num):
                 grad.append((sol[i] - wp[i]) / lambd)
+        # convert to tensor
+        grad = np.array(grad)
         grad = torch.FloatTensor(grad).to(device)
         return grad
