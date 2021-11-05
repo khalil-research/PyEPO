@@ -17,7 +17,7 @@ class autoSklearnPred:
     """
 
     def __init__(self, omodel):
-        self.predictor = AutoSklearnRegressor(time_left_for_this_task=120,
+        self.predictor = AutoSklearnRegressor(time_left_for_this_task=600,
                                               per_run_time_limit=30)
         self.optimizer = omodel
         self.trained = False
