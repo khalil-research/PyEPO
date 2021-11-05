@@ -19,8 +19,12 @@ def train(trainset, testset, model, config):
     """
     print("Training...")
     if config.mthd == "2s":
-        print("Using two-stage predict then optimize...")
-        res = train2Stage(trainset, model, config)
+        if config.pred == "auto":
+            print("Using auto two-stage predict then optimize...")
+            res = trainAuto2Stage(trainset, model, config)
+        else:
+            print("Using two-stage predict then optimize...")
+            res = train2Stage(trainset, model, config)
     if config.mthd == "spo":
         print("Using SPO+ loss...")
         trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
@@ -72,6 +76,22 @@ def train2Stage(trainset, model, config):
         twostage = spo.twostage.sklearnPred(predictor, model_rel)
     else:
         twostage = spo.twostage.sklearnPred(predictor, model)
+    # training
+    twostage.fit(trainset.x, trainset.c)
+    return twostage
+
+
+def trainAuto2Stage(trainset, model, config):
+    """
+    auto two-stage preditc-then-optimize training
+    """
+    # two-stage model
+    if config.rel:
+        print("Building relaxation model...")
+        model_rel = model.relax()
+        twostage = spo.twostage.autoSklearnPred(model_rel)
+    else:
+        twostage = spo.twostage.autoSklearnPred(model)
     # training
     twostage.fit(trainset.x, trainset.c)
     return twostage
