@@ -5,4 +5,7 @@ Two-stage predict then optimize model
 """
 
 from spo.twostage.sklearnpred import sklearnPred
-from spo.twostage.autosklearnpred import autoSklearnPred
+try:
+    from spo.twostage.autosklearnpred import autoSklearnPred
+except:
+    print("Auto-Sklearn is not included.")
