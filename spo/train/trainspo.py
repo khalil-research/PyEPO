@@ -74,10 +74,16 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
                 l2_reg = l2_lambd * ((cp - c) ** 2).sum(dim=1).mean()
                 writer.add_scalar('Train/L2 Reg', l1_reg.item(), cnt)
                 loss += l2_reg
+            # add hook
+            abs_grad = []
+            cp.register_hook(lambda grad:
+                             abs_grad.append(torch.abs(grad).mean().item()))
             # backward pass
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            # abs grad
+            writer.add_scalar('Train/Abs Grad', abs_grad[0], cnt)
             # add logs
             writer.add_scalar('Train/Total Loss', loss.item(), cnt)
             desc = "Epoch {}, Loss: {:.4f}".format(epoch, loss.item())
@@ -89,6 +95,6 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
             trueloss = spo.eval.trueSPO(reg, model, testloader)
             writer.add_scalar('Eval/True SPO Loss', trueloss, epoch)
             # unambiguous SPO
-            unambloss = spo.eval.unambSPO(reg, model, testloader)
-            writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
+            # unambloss = spo.eval.unambSPO(reg, model, testloader)
+            # writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
     writer.close()
