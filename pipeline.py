@@ -96,7 +96,7 @@ if __name__ == "__main__":
     parser.add_argument("--pred",
                         type=str,
                         default="lr",
-                        choices=["lr", "rf"],
+                        choices=["auto", "lr", "rf"],
                         help="predictor of two-stage predict then optimize")
     parser.add_argument("--elog",
                         type=int,

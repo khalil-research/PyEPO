@@ -26,7 +26,7 @@ parser.add_argument("--mthd",
                     help="method")
 parser.add_argument("--pred2s",
                     type=str,
-                    choices=["lr", "rf"],
+                    choices=["auto", "lr", "rf"],
                     help="predictor for two-stage")
 parser.add_argument("--tspform",
                     type=str,
@@ -43,6 +43,8 @@ if setting.prob == "tsp":
     config.form = setting.tspform
 if setting.mthd == "2s":
     config.pred = setting.pred2s
+    if setting.pred2s == "auto":
+        config.timeout *= 10
 config.rel = setting.rel
 
 # test

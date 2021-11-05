@@ -35,17 +35,20 @@ if [ ! -d "./PATH_TO_VENV/spo" ]; then
 
   # pip install
   pip install --no-index --upgrade pip
-  pip install auto-sklearn
   pip install tqdm
   pip install numpy
   pip install pandas
   pip install Pyomo==6.1.2
-  pip install scipy
+  pip install scipy==1.6
   pip install pathos
   pip install scikit_learn
-  pip install submitit
-  pip install -U tensorboard
   pip install torch==1.7.0
+  pip install -U tensorboard
+  pip install submitit
+  pip install auto-sklearn
+  pip install emcee
+  pip install scikit-optimize
+  pip install pyDOE
 
 # activate virtual env
 else

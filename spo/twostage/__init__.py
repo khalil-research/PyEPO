@@ -5,3 +5,4 @@ Two-stage predict then optimize model
 """
 
 from spo.twostage.sklearnpred import sklearnPred
+from spo.twostage.autosklearnpred import autoSklearnPred
