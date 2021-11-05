@@ -86,7 +86,7 @@ config_spo.l1 = 0.0
 # l2 regularization parameter
 config_spo.l2 = 0.0
 # number of processor for optimization
-config_spo.proc = 32
+config_spo.proc = 8
 
 configSP["spo"] = config_spo
 
@@ -118,6 +118,6 @@ config_bb.l1 = 0.0
 # l2 regularization parameter
 config_bb.l2 = 0.0
 # number of processor for optimization
-config_bb.proc = 32
+config_bb.proc = 8
 
 configSP["bb"] = config_bb
