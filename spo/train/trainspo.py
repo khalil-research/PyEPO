@@ -34,7 +34,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
     """
     # create log folder
     if not os.path.isdir(logdir):
-        os.mkdir(logdir)
+        os.makedirs(logdir, exist_ok=True)
     # use training data for test if no test data
     if testloader is None:
         testloader = trainloader
