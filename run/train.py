@@ -10,7 +10,7 @@ import torch
 from torch.utils.data import DataLoader
 
 import spo
-from run import net
+from run import net, utils
 
 
 def train(trainset, testset, model, config):
@@ -86,9 +86,11 @@ def trainSPO(trainloader, testloader, model, config):
     # relax
     if config.rel:
         model = model.relax()
+    # log dir
+    logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     spo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
-                       epoch=config.epoch, processes=config.proc,
+                       logdir=logdir, epoch=config.epoch, processes=config.proc,
                        l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
     return reg
 
@@ -102,9 +104,11 @@ def trainBB(trainloader, testloader, model, config):
     # relax
     if config.rel:
         model = model.relax()
+    # log dir
+    logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     spo.train.trainBB(reg, model, optimizer, trainloader, testloader,
-                      epoch=config.epoch, processes=config.proc,
+                      logdir=logdir, epoch=config.epoch, processes=config.proc,
                       bb_lambd=config.smth, l1_lambd=config.l1,
                       l2_lambd=config.l2, log=config.elog)
     return reg
