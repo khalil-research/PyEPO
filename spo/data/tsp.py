@@ -40,7 +40,7 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     coords = np.concatenate((np.random.uniform(-2, 2, (m // 2, 2)),
                              np.random.normal(0, 1, (m - m // 2, 2))))
     # distance matrix
-    org_dist = distance.cdist(coords, coords, "euclidean") * 3
+    org_dist = distance.cdist(coords, coords, "euclidean")
     # random matrix parameter B
     B = np.random.binomial(1, 0.5, (m * (m - 1) // 2, p)) * np.random.uniform(
         -2, 2, (m * (m - 1) // 2, p))
