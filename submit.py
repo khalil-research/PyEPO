@@ -44,7 +44,7 @@ if setting.prob == "tsp":
 if setting.mthd == "2s":
     config.pred = setting.pred2s
     if setting.pred2s == "auto":
-        config.timeout == 12 * config.expnum
+        config.timeout = 12 * config.expnum
 config.rel = setting.rel
 
 # test
