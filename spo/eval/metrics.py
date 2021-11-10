@@ -5,12 +5,19 @@ metrics for SKlearn model
 """
 
 import numpy as np
-import sklearn
 #import autosklearn.metrics
 
 def SPOError(pred_cost, true_cost, omodel):
     """
     A function to calculate normalized true SPO
+
+    Args:
+        pred_cost (tensor): predicted costs
+        true_cost (tensor): true costs
+        omodel (optModel): optimization model
+
+    Returns:
+        float: true SPO losses
     """
     assert pred_cost.shape == true_cost.shape, \
     "Shape of true and predicted value does not match."
@@ -30,3 +37,18 @@ def SPOError(pred_cost, true_cost, omodel):
         regret_sum += regret
         optobj_sum += np.abs(optobj)
     return regret_sum / (optobj_sum + 1e-7)
+
+
+def makeSkScorer(omodel):
+    """
+    A function to create sklearn scorer
+
+    Args:
+        omodel (optModel): optimization model
+
+    Returns:
+        scorer: callable object that returns a scalar score; less is better.
+    """
+    from sklearn.metrics import make_scorer
+    SPO_scorer = make_scorer(SPOError, greater_is_better=False, omodel=omodel)
+    return SPO_scorer
