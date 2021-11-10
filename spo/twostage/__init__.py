@@ -8,4 +8,4 @@ from spo.twostage.sklearnpred import sklearnPred
 try:
     from spo.twostage.autosklearnpred import autoSklearnPred
 except:
-    print("Auto-Sklearn is not included.")
+    print("Auto-Sklearn cannot be imported.")
