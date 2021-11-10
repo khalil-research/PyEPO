@@ -38,7 +38,7 @@ def trueSPO(pmodel, omodel, dataloader):
                                z[j].item())
         optsum += abs(z).sum().item()
     # normalized
-    return loss / (optsum + 1e-3)
+    return loss / (optsum + 1e-7)
 
 
 def calTrueSPO(omodel, pred_cost, true_cost, true_obj):

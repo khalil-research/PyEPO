@@ -40,7 +40,7 @@ def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
                                 z[j].item(), tolerance)
         optsum += abs(z).sum().item()
     # normalized
-    return loss / (optsum + 1e-3)
+    return loss / (optsum + 1e-7)
 
 
 def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-6):
