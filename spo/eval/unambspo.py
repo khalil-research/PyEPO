@@ -9,7 +9,7 @@ import copy
 import numpy as np
 
 
-def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
+def unambSPO(pmodel, omodel, dataloader, tolerance=1e-5):
     """
     A function to evaluate model performence with normalized unambiguous SPO
 
@@ -43,7 +43,7 @@ def unambSPO(pmodel, omodel, dataloader, tolerance=1e-6):
     return loss / (optsum + 1e-7)
 
 
-def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-6):
+def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
     """
     A function to calculate normalized unambiguous SPO for a batch
 
@@ -64,7 +64,7 @@ def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-6):
     sol = np.array(sol)
     objp = np.ceil(np.dot(cp, sol.T))
     # opt for pred cost
-    wst_omodel = omodel.addConstr(cp, objp)
+    wst_omodel = omodel.addConstr(cp, objp+1)
     # opt model to find worst case
     wst_omodel.setObj(-true_cost)
     try:
