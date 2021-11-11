@@ -18,7 +18,7 @@ gurobi_cl 1> /dev/null && echo Success || echo Fail
 echo ""
 
 # create virtual env
-if [ ! -d "./PATH_TO_VENV/spo" ]; then
+if [ ! -d "./$VENVS_DIR/$VENV_NAME" ]; then
   echo "Create venv..."
   # create source
   virtualenv --no-download $VENVS_DIR/$VENV_NAME
@@ -26,7 +26,9 @@ if [ ! -d "./PATH_TO_VENV/spo" ]; then
   echo ""
 
   echo "Install requirements..."
+
   # install gurobipy
+  echo "  Install GurobiPy..."
   cp -r $GUROBI_HOME/ .
   cd $GRB_VER
   python setup.py install
@@ -34,6 +36,7 @@ if [ ! -d "./PATH_TO_VENV/spo" ]; then
   rm -r $GRB_VER
 
   # pip install
+  echo "  Install SPO requirements..."
   pip install --no-index --upgrade pip
   pip install tqdm
   pip install numpy
@@ -44,7 +47,11 @@ if [ ! -d "./PATH_TO_VENV/spo" ]; then
   pip install scikit_learn
   pip install torch==1.7.0
   pip install -U tensorboard
+
+  echo "  Install submitit..."
   pip install submitit
+
+  echo "  Install auto-sklearn..."
   pip install auto-sklearn
   pip install emcee
   pip install scikit-optimize
