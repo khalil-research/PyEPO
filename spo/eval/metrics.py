@@ -52,3 +52,18 @@ def makeSkScorer(omodel):
     from sklearn.metrics import make_scorer
     SPO_scorer = make_scorer(SPOError, greater_is_better=False, omodel=omodel)
     return SPO_scorer
+
+
+def makeAutoSkScorer(omodel):
+    """
+    A function to create Auto-SKlearn scorer
+
+    Args:
+        omodel (optModel): optimization model
+
+    Returns:
+        scorer: callable object that returns a scalar score; less is better.
+    """
+    from autosklearn.metrics import make_scorer
+    SPO_scorer = make_scorer(SPOError, greater_is_better=False, omodel=omodel)
+    return SPO_scorer
