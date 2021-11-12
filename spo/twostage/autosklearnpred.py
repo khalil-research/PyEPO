@@ -7,7 +7,7 @@ Two-stage model with Scikit-learn predictor
 import numpy as np
 from autosklearn.regression import AutoSklearnRegressor
 
-from spo.eval.metrics import makeAutoSkScorer
+from spo import eval
 
 def autoSklearnPred(omodel):
     """
@@ -20,10 +20,11 @@ def autoSklearnPred(omodel):
         AutoSklearnRegressor: Auto-SKlearn multi-output regression model
     """
     # get metrics
-    spo_scorer = spo.eval.metrics.makeAutoSkScorer(omodel)
+    scorer = eval.makeAutoSkScorer(omodel)
+    #scorer = eval.metrics.makeTestMSEScorer(omodel)
     # build regressor
     regressor = AutoSklearnRegressor(time_left_for_this_task=600,
                                      per_run_time_limit=30,
                                      seed=135,
-                                     metric=spo_scorer)
+                                     metric=scorer)
     return regressor
