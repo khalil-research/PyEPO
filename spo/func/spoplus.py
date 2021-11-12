@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import inspect
 import multiprocessing as mp
 
 import numpy as np
@@ -11,6 +10,7 @@ from torch.autograd import Function
 
 import spo
 from spo.model import optModel
+from spo.utlis import getArgs
 
 
 def solveWithObj4Par(cost, args, model_type):
@@ -32,26 +32,6 @@ def solveWithObj4Par(cost, args, model_type):
     # solve
     sol, obj = model.solve()
     return sol, obj
-
-
-def getArgs(model):
-    """
-    A global function to get args of model
-
-    Args:
-        model (optModel): optimization model
-
-    Return:
-        dict: model args
-    """
-    for mem in inspect.getmembers(model):
-        if mem[0] == "__dict__":
-            attrs = mem[1]
-            args = {}
-            for name in attrs:
-                if name in inspect.signature(model.__init__).parameters:
-                    args[name] = attrs[name]
-            return args
 
 
 class SPOPlus(Function):
