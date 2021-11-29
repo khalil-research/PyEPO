@@ -95,6 +95,4 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
           .format(job.job_id, mem_gb, num_cpus, instance_logs_path, timeout_min))
 
 # get outputs
-outputs = [job.result() for job in jobs]
-#print(outputs[0].cv_results_)
-#print(twostage[0].show_models())
+# outputs = [job.result() for job in jobs]
