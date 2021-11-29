@@ -44,7 +44,7 @@ if setting.prob == "tsp":
 if setting.mthd == "2s":
     config.pred = setting.pred2s
     if setting.pred2s == "auto":
-        config.timeout = 12 * config.expnum
+        config.timeout = 30 * config.expnum
 config.rel = setting.rel
 
 # test
@@ -57,6 +57,8 @@ instance_logs_path = "slurm_logs_spotest"
 timeout_min = config.timeout
 mem_gb = 6
 num_cpus = 32
+import os
+os.environ["OPENBLAS_NUM_THREADS"] = str(num_cpus)
 
 # config setting
 confset = {"data":[100, 1000],
@@ -93,4 +95,6 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
           .format(job.job_id, mem_gb, num_cpus, instance_logs_path, timeout_min))
 
 # get outputs
-# outputs = [job.result() for job in jobs]
+outputs = [job.result() for job in jobs]
+#print(outputs[0].cv_results_)
+#print(twostage[0].show_models())
