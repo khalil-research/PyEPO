@@ -23,8 +23,9 @@ def autoSklearnPred(omodel):
     scorer = eval.makeAutoSkScorer(omodel)
     #scorer = eval.metrics.makeTestMSEScorer(omodel)
     # build regressor
-    regressor = AutoSklearnRegressor(time_left_for_this_task=600,
+    regressor = AutoSklearnRegressor(time_left_for_this_task=1200,
                                      per_run_time_limit=30,
                                      seed=135,
-                                     metric=scorer)
+                                     metric=scorer,
+                                     memory_limit=4096)
     return regressor
