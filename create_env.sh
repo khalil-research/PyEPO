@@ -11,6 +11,8 @@ LOGDIR="./logs"
 
 # load module
 echo "Load module..."
+module purge
+module load cuda
 module load python/3.7
 module load gurobi/$GRB_VER
 # check if the license is set
@@ -41,11 +43,12 @@ if [ ! -d "./$VENVS_DIR/$VENV_NAME" ]; then
   pip install tqdm
   pip install numpy
   pip install pandas
+  pip install matplotlib
   pip install Pyomo==6.1.2
   pip install scipy==1.6
   pip install pathos
   pip install scikit_learn
-  pip install torch==1.7.0
+  pip install --no-index torch torchvision torchtext torchaudio
   pip install -U tensorboard
 
   echo "  Install submitit..."
