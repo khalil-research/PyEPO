@@ -55,7 +55,7 @@ if [ ! -d "./$VENVS_DIR/$VENV_NAME" ]; then
   pip install submitit
 
   echo "  Install auto-sklearn..."
-  pip install auto-sklearn
+  pip install auto-sklearn==0.14.2
   pip install emcee
   pip install scikit-optimize
   pip install pyDOE
