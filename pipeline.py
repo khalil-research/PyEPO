@@ -70,9 +70,10 @@ def pipeline(config):
         df.to_csv(save_path, index=False)
         print("Saved to " + save_path + ".")
         print("\n\n")
-        if config.pred == "auto":
-            cv_result = pd.DataFrame.from_dict(res.cv_results_)
-            cv_result.to_csv(save_path[:-4]+"-cv.csv", index=False)
+        if config.mthd == "2s":
+            if config.pred == "auto":
+                cv_result = pd.DataFrame.from_dict(res.cv_results_)
+                cv_result.to_csv(save_path[:-4]+"-cv.csv", index=False)
 
 
 if __name__ == "__main__":
