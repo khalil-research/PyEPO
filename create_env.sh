@@ -45,7 +45,7 @@ if [ ! -d "./$VENVS_DIR/$VENV_NAME" ]; then
   pip install pandas
   pip install matplotlib
   pip install Pyomo==6.1.2
-  pip install scipy==1.6
+  pip install scipy
   pip install pathos
   pip install scikit_learn
   pip install --no-index torch torchvision torchtext torchaudio
