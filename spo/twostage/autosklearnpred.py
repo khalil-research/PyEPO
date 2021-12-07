@@ -72,6 +72,7 @@ def autoSklearnPred(omodel, seed):
                                      metric=spo_scorer,
                                      scoring_functions=[spo_scorer, mean_squared_error],
                                      memory_limit=4096,
+                                     n_jobs=-1,
                                      include={"data_preprocessor": ["NoPreprocessing"],
                                               "feature_preprocessor": ["no_preprocessing"]})
                                               #"regressor": ["adaboost", "ard_regression", "extra_trees",
