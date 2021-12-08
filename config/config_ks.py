@@ -19,7 +19,7 @@ config.prob = "ks"
 # number of items
 config.items = 48
 # dimension
-config.dim = 1
+config.dim = 3
 # capacity
 config.cap = 30
 
@@ -72,7 +72,7 @@ config_spo = deepcopy(config)
 # method
 config_spo.mthd = "spo"
 # time limit
-config_spo.timeout = 25 * config.expnum
+config_spo.timeout = 30 * config.expnum
 
 ## training configuration
 # size of neural network hidden layers
@@ -102,7 +102,7 @@ config_bb = deepcopy(config)
 # method
 config_bb.mthd = "bb"
 # time limit
-config_bb.timeout = 50 * config.expnum
+config_bb.timeout = 75 * config.expnum
 
 ## training configuration
 # size of neural network hidden layers
