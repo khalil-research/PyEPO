@@ -69,9 +69,9 @@ fi
 echo ""
 
 # tensorboard
-echo "Set tensorboard..."
-mkdir -p $LOGDIR
-tensorboard --logdir=$LOGDIR --host 0.0.0.0 &
+#echo "Set tensorboard..."
+#mkdir -p $LOGDIR
+#tensorboard --logdir=$LOGDIR --host 0.0.0.0 &
 
 # run . create_env.sh
 # run tensorboard dev upload tensorboard --logdir
