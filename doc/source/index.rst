@@ -6,7 +6,7 @@
 
 Welcome to Smart Predict then Optimize's documentation!
 =======================================================
-This is the Documentation of SPO (Smart Predict then Optimize
+This is the Documentation of SPO (Smart Predict then Optimize)
 
 .. toctree::
    :maxdepth: 4
@@ -28,6 +28,7 @@ API
    spo.model
    spo.twostage
    spo.func
+   spo.train
    spo.eval
 
 

@@ -31,6 +31,5 @@
    spo.data.dataset
    spo.data.knapsack
    spo.data.shortestpath
-   spo.data.trivialsurgery
    spo.data.tsp
 

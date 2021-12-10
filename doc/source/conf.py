@@ -18,7 +18,9 @@ sys.path.append(os.path.abspath('../../spo/data'))
 sys.path.append(os.path.abspath('../../spo/model'))
 sys.path.append(os.path.abspath('../../spo/twostage'))
 sys.path.append(os.path.abspath('../../spo/func'))
+sys.path.append(os.path.abspath('../../spo/train'))
 sys.path.append(os.path.abspath('../../spo/eval'))
+
 
 # -- Project information -----------------------------------------------------
 

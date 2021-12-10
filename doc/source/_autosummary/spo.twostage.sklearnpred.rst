@@ -1,6 +1,6 @@
-spo.twostage.sklearnpred
+﻿spo.twostage.sklearnpred
 ========================
 
-.. currentmodule:: spo.twostage
+.. currentmodule:: spo.twostage.sklearnpred
 
-.. automodule:: sklearnpred
+.. automodule:: spo.twostage.sklearnpred
