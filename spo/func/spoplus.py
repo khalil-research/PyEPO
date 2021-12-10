@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""
+SPO+ Loss function
+"""
 
 import multiprocessing as mp
 

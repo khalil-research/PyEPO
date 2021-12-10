@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""
+Diffenretiable Black-box optimization function
+"""
 
 import multiprocessing as mp
 
