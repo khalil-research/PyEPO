@@ -1,7 +1,7 @@
-﻿spo.model
+﻿spo.train
 =========
 
-.. automodule:: spo.model
+.. automodule:: spo.train
 
    
    
@@ -28,7 +28,7 @@
    :template: custom-module-template.rst                 <-- add this line
    :recursive:
 
-   spo.model.grb
-   spo.model.omo
-   spo.model.optmodel
+   spo.train.trainbb
+   spo.train.trainspo
+   spo.train.util
 

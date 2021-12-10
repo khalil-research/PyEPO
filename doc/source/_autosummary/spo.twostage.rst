@@ -28,5 +28,6 @@
    :template: custom-module-template.rst                 <-- add this line
    :recursive:
 
+   spo.twostage.autosklearnpred
    spo.twostage.sklearnpred
 
