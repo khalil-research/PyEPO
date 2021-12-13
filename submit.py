@@ -55,7 +55,9 @@ config.rel = setting.rel
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
 timeout_min = config.timeout
-mem_gb = 6
+mem_gb = 4
+if setting.prob == "tsp":
+    mem_gb = 8
 num_cpus = 32
 import os
 os.environ["OPENBLAS_NUM_THREADS"] = str(num_cpus)
@@ -95,4 +97,4 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
           .format(job.job_id, mem_gb, num_cpus, instance_logs_path, timeout_min))
 
 # get outputs
-# outputs = [job.result() for job in jobs]
+#outputs = [job.result() for job in jobs]
