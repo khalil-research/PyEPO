@@ -1,0 +1,92 @@
+:mod:`spo.model.optmodel`
+=========================
+
+.. py:module:: spo.model.optmodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   spo.model.optmodel.optModel
+
+
+
+.. py:class:: optModel
+
+   Bases: :class:`abc.ABC`
+
+   This is an abstract class for optimization model
+
+   .. method:: __repr__(self)
+
+      Return repr(self).
+
+
+   .. method:: num_cost(self)
+      :property:
+
+      number of cost to be predicted
+
+
+   .. method:: _getModel(self)
+      :abstractmethod:
+
+      An abstract method to build a model from a optimization solver
+
+
+   .. method:: setObj(self, c)
+      :abstractmethod:
+
+      An abstract method to set objective function
+
+      :param c: cost of objective function
+      :type c: ndarray
+
+
+   .. method:: solve(self)
+      :abstractmethod:
+
+      An abstract method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+   .. method:: copy(self)
+
+      An abstract method to copy model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+   .. method:: addConstr(self, coefs, rhs)
+      :abstractmethod:
+
+      An abstract method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+   .. method:: relax(self)
+
+      A unimplemented method to relax MIP model
+
+
+
