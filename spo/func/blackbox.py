@@ -12,7 +12,7 @@ from pathos.multiprocessing import ProcessingPool
 from torch.autograd import Function
 
 import spo
-from spo.model import optModel
+from spo.model.opt import optModel
 from spo.utlis import getArgs
 
 

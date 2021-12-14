@@ -8,7 +8,7 @@ from copy import copy
 from pyomo import opt as po
 from pyomo import environ as pe
 
-from spo.model import optModel
+from spo.model.opt import optModel
 
 
 class optOmoModel(optModel):
