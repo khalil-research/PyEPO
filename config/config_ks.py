@@ -61,7 +61,7 @@ config_2s.mthd = "2s"
 # predictor
 config_2s.pred = None
 # time limit
-config_2s.timeout = 3 * config.expnum
+config_2s.timeout = 5 * config.expnum
 
 configKS["2s"] = config_2s
 
