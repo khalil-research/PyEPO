@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Traveling salesman probelm
+Traveling salesman problem
 """
 
 import numpy as np
