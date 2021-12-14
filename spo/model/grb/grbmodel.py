@@ -8,7 +8,7 @@ from copy import copy
 import gurobipy as gp
 from gurobipy import GRB
 
-from spo.model import optModel
+from spo.model.opt import optModel
 
 
 class optGRBModel(optModel):

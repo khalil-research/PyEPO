@@ -11,7 +11,7 @@ import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-from spo.model import optModel
+from spo.model.opt import optModel
 
 
 class optDataset(Dataset):
