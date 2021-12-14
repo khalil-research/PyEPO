@@ -18,13 +18,23 @@ class optDataset(Dataset):
     """
     This class is Torch Dataset for optimization problems.
 
-    Args:
-        model (optModel): an instance of optModel
-        feats (ndarray): data features
-        costs (ndarray): costs of objective function
+    Attributes:
+        m (optModel): an instance of optModel
+        x (ndarray): data features
+        c (ndarray): costs of objective function
+        w (ndarray): optimal solutions
+        z (ndarray): optimal objective values
     """
 
     def __init__(self, model, feats, costs):
+        """
+        A method to create a optDataset from optModel
+
+        Args:
+            model (optModel): an instance of optModel
+            feats (ndarray): data features
+            costs (ndarray): costs of objective function
+        """
         if not isinstance(model, optModel):
             raise TypeError("arg model is not an optModel")
         self.model = model

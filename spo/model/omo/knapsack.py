@@ -13,13 +13,21 @@ class knapsackModel(optOmoModel):
     """
     This class is optimization model for knapsack problem
 
-    Args:
+    Attributes:
+        _model (PyOmo model): Pyomo model
+        solver (str): optimization solver in the background
         weights (ndarray): weights of items
         capacity (ndarray): total capacity
-        solver (str): optimization solver for pyomo
+        items (list): list of item index
     """
 
     def __init__(self, weights, capacity, solver="glpk"):
+        """
+        Args:
+            weights (ndarray): weights of items
+            capacity (ndarray): total capacity
+            solver (str): optimization solver in the background
+        """
         self.weights = weights
         self.capacity = capacity
         self.items = list(range(self.weights.shape[1]))

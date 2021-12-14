@@ -14,11 +14,17 @@ class shortestPathModel(optGRBModel):
     """
     This class is optimization model for shortest path problem
 
-    Args:
-        grid: size of grid network
+    Attributes:
+        _model (GurobiPy model): Gurobi model
+        grid (tuple): size of grid network
+        arcs (list): list of arcs
     """
 
     def __init__(self, grid):
+        """
+        Args:
+            grid (tuple): size of grid network
+        """
         self.grid = grid
         self.arcs = self._getArcs()
         super().__init__()

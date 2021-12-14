@@ -14,6 +14,9 @@ from spo.model import optModel
 class optGRBModel(optModel):
     """
     This is an abstract class for Gurobi-based optimization model
+
+    Attributes:
+        _model (GurobiPy model): Gurobi model
     """
 
     def __init__(self):
