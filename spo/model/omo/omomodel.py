@@ -15,11 +15,16 @@ class optOmoModel(optModel):
     """
     This is an abstract class for pyomo-based optimization model
 
-    Args:
-        solver: optimization solver
+    Attributes:
+        _model (PyOmo model): Pyomo model
+        solver (str): optimization solver in the background
     """
 
     def __init__(self, solver="glpk"):
+        """
+        Args:
+            solver (str): optimization solver in the background
+        """
         super().__init__()
         # init obj
         self._model.obj = pe.Objective(sense=pe.minimize, expr=0)

@@ -18,11 +18,17 @@ class tspABModel(optGRBModel):
     This class is optimization model for traveling salesman problem.
     This model is for further implementation of different formulation.
 
-    Args:
-        num_nodes: number of nodes
+    Attributes:
+        _model (GurobiPy model): Gurobi model
+        num_nodes (int): number of nodes
+        edges (list): list of edge index
     """
 
     def __init__(self, num_nodes):
+        """
+        Args:
+            num_nodes (int): number of nodes
+        """
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))
         self.edges = [(i, j) for i in range(num_nodes)
@@ -79,8 +85,10 @@ class tspGGModel(tspABModel):
     This class is optimization model for traveling salesman problem.
     This model is based on Gavish–Graves (GG) formulation.
 
-    Args:
-        num_nodes: number of nodes
+    Attributes:
+        _model (GurobiPy model): Gurobi model
+        num_nodes (int): number of nodes
+        edges (list): list of edge index
     """
 
     def _getModel(self):
@@ -109,7 +117,10 @@ class tspGGModel(tspABModel):
 
     def setObj(self, c):
         """
-        set objective function
+        A method to set objective function
+
+        Args:
+            c (list): cost vector
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
@@ -119,7 +130,7 @@ class tspGGModel(tspABModel):
 
     def solve(self):
         """
-        solve model
+        A method to solve model
         """
         self._model.update()
         self._model.optimize()
@@ -162,6 +173,11 @@ class tspGGModel(tspABModel):
 class tspGGModelRel(tspGGModel):
     """
     This class is relaxed optimization model for Gavish–Graves (GG) formulation.
+
+    Attributes:
+        _model (GurobiPy model): Gurobi model
+        num_nodes (int): number of nodes
+        edges (list): list of edge index
     """
 
     def _getModel(self):
@@ -223,8 +239,10 @@ class tspDFJModel(tspABModel):
     This model is based on Danzig–Fulkerson–Johnson (DFJ) formulation and
     constraint generation.
 
-    Args:
-        num_nodes: number of nodes
+    Attributes:
+        _model (GurobiPy model): Gurobi model
+        num_nodes (int): number of nodes
+        edges (list): list of edge index
     """
 
     def _getModel(self):
@@ -292,7 +310,10 @@ class tspDFJModel(tspABModel):
 
     def setObj(self, c):
         """
-        set objective function
+        A method to set objective function
+
+        Args:
+            c (list): cost vector
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
@@ -301,7 +322,7 @@ class tspDFJModel(tspABModel):
 
     def solve(self):
         """
-        solve model
+        A method to solve model
         """
         self._model.update()
         self._model.optimize(self._subtourelim)
@@ -338,8 +359,10 @@ class tspMTZModel(tspABModel):
     This class is optimization model for traveling salesman problem.
     This model is based on Miller-Tucker-Zemlin (MTZ) formulation.
 
-    Args:
-        num_nodes: number of nodes
+    Attributes:
+        _model (GurobiPy model): Gurobi model
+        num_nodes (int): number of nodes
+        edges (list): list of edge index
     """
     def _getModel(self):
         """
@@ -373,7 +396,10 @@ class tspMTZModel(tspABModel):
 
     def setObj(self, c):
         """
-        set objective function
+        A method to set objective function
+
+        Args:
+            c (list): cost vector
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
@@ -383,7 +409,7 @@ class tspMTZModel(tspABModel):
 
     def solve(self):
         """
-        solve model
+        A method to solve model
         """
         self._model.update()
         self._model.optimize()
@@ -427,6 +453,11 @@ class tspMTZModelRel(tspMTZModel):
     """
     This class is relaxed optimization model for Miller-Tucker-Zemlin (MTZ)
     formulation.
+
+    Attributes:
+        _model (GurobiPy model): Gurobi model
+        num_nodes (int): number of nodes
+        edges (list): list of edge index
     """
 
     def _getModel(self):

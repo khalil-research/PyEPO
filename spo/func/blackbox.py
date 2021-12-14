@@ -47,14 +47,15 @@ class blackboxOpt(Function):
 
     The block-box approximate gradient of optimizer smoothly. Thus, allows us to
     design an algorithm based on stochastic gradient descent.
-
-    Args:
-        model (optModel): optimization model
-        lambd (float): Black-Box parameter for function smoothing
-        processes (int): number of processors, 1 for single-core, 0 for all of cores
     """
 
     def __init__(self, model, lambd=10, processes=1):
+        """
+        Args:
+            model (optModel): optimization model
+            lambd (float): Black-Box parameter for function smoothing
+            processes (int): number of processors, 1 for single-core, 0 for all of cores
+        """
         super().__init__()
         # optimization model
         if not isinstance(model, optModel):

@@ -14,12 +14,19 @@ class knapsackModel(optGRBModel):
     """
     This class is optimization model for knapsack problem
 
-    Args:
+    Attributes:
+        _model (GurobiPy model): Gurobi model
         weights (ndarray): weights of items
         capacity (ndarray): total capacity
+        items (list): list of item index
     """
 
     def __init__(self, weights, capacity):
+        """
+        Args:
+            weights (ndarray): weights of items
+            capacity (ndarray): total capacity
+        """
         self.weights = weights
         self.capacity = capacity
         self.items = list(range(self.weights.shape[1]))

@@ -11,6 +11,9 @@ from copy import deepcopy
 class optModel(ABC):
     """
     This is an abstract class for optimization model
+
+    Attributes:
+        _model (GurobiPy model): Gurobi model
     """
 
     def __init__(self):

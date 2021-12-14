@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-metrics for SKlearn model
+Metrics for SKlearn model
 """
 
 import numpy as np
