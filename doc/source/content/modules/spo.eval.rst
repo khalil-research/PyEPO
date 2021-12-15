@@ -3,7 +3,7 @@
 
 .. automodule:: spo.eval
 
-.. rubric:: Modules
+.. rubric:: Classes
 
 .. autofunction:: spo.eval.trueSPO
 .. autofunction:: spo.eval.unambSPO
