@@ -48,6 +48,9 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon'
               ]
 
+# To document __init__()
+autoclass_content = 'both'
+
 # Add any path that contain packages here, relative to this directory.
 autoapi_dirs = ['../../spo']
 

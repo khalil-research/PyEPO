@@ -6,7 +6,7 @@ Shortest path problem
 
 from pyomo import environ as pe
 
-from spo.model.omo import optOmoModel
+from spo.model.omo.omomodel import optOmoModel
 
 
 class shortestPathModel(optOmoModel):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Shortest path problem
+Synthetic data for Shortest path problem
 """
 
 import numpy as np

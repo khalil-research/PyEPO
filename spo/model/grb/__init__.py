@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Optimization Model based on gurobipy
+Optimization Model based on GurobiPy
 """
 
 from spo.model.grb.grbmodel import optGRBModel

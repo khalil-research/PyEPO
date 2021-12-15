@@ -7,7 +7,7 @@ Shortest path problem
 import gurobipy as gp
 from gurobipy import GRB
 
-from spo.model.grb import optGRBModel
+from spo.model.grb.grbmodel import optGRBModel
 
 
 class shortestPathModel(optGRBModel):
@@ -16,8 +16,8 @@ class shortestPathModel(optGRBModel):
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        grid (tuple): size of grid network
-        arcs (list): list of arcs
+        grid (tuple): Size of grid network
+        arcs (list): List of arcs
     """
 
     def __init__(self, grid):

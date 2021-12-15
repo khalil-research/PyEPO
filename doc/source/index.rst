@@ -9,28 +9,14 @@ Welcome to Smart Predict then Optimize's documentation!
 This is the Documentation of SPO (Smart Predict then Optimize)
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
    :caption: Contents:
 
    content/intro
    content/example
+   content/api
    content/ref
-
-
-API
----
-.. autosummary::
-   :toctree: _autosummary
-   :template: custom-module-template.rst
-   :recursive:
-
-   spo.data
-   spo.model
-   spo.twostage
-   spo.func
-   spo.train
-   spo.eval
-
+   
 
 Indices and Tables
 ------------------

@@ -21,7 +21,7 @@ def solveWithObj4Par(cost, args, model_type):
     A global function to solve function in parallel processors
 
     Args:
-        cost (ndarray): cost of objective function
+        cost (np.ndarray): cost of objective function
         args (dict): optModel args
         model_type (ABCMeta): optModel class type
 
@@ -81,7 +81,7 @@ class blackboxOpt(Function):
         Forward pass in neural network.
 
         Args:
-            pred_cost: predicted costs
+            pred_cost (torch.tensor): predicted costs
 
         Returns:
             tensor: predicted solutions

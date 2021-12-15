@@ -21,7 +21,7 @@ def solveWithObj4Par(cost, args, model_type):
     A global function to solve function in parallel processors
 
     Args:
-        cost (ndarray): cost of objective function
+        cost (np.ndarray): cost of objective function
         args (dict): optModel args
         model_type (ABCMeta): optModel class type
 
@@ -76,10 +76,10 @@ class SPOPlus(Function):
         Forward pass in neural network
 
         Args:
-            pred_cost (tensor): predicted costs
-            true_cost (tensor): true costs
-            true_sol (tensor): true solutions
-            true_obj (tensor): true objective values
+            pred_cost (torch.tensor): predicted costs
+            true_cost (torch.tensor): true costs
+            true_sol (torch.tensor): true solutions
+            true_obj (torch.tensor): true objective values
 
         Returns:
             tensor: SPO+ loss
