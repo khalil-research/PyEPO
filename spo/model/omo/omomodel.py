@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Abstract optimization model based on pyomo
+Abstract optimization model based on Pyomo
 """
 
 from copy import copy
@@ -13,7 +13,7 @@ from spo.model.opt import optModel
 
 class optOmoModel(optModel):
     """
-    This is an abstract class for pyomo-based optimization model
+    This is an abstract class for Pyomo-based optimization model
 
     Attributes:
         _model (PyOmo model): Pyomo model

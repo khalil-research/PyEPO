@@ -7,7 +7,7 @@ Knapsack problem
 import gurobipy as gp
 from gurobipy import GRB
 
-from spo.model.grb import optGRBModel
+from spo.model.grb.grbmodel import optGRBModel
 
 
 class knapsackModel(optGRBModel):
@@ -16,9 +16,9 @@ class knapsackModel(optGRBModel):
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        weights (ndarray): weights of items
-        capacity (ndarray): total capacity
-        items (list): list of item index
+        weights (ndarray): Weights of items
+        capacity (ndarray): Total capacity
+        items (list): List of item index
     """
 
     def __init__(self, weights, capacity):

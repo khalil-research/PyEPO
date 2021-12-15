@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Abstract optimization model based on gurobipy
+Abstract optimization model based on GurobiPy
 """
 
 from copy import copy

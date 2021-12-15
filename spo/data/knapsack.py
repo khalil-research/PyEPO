@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Knapsack problem
+Synthetic data for knapsack problem
 """
 
 import numpy as np

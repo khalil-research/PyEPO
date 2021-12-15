@@ -11,17 +11,17 @@ import gurobipy as gp
 import numpy as np
 from gurobipy import GRB
 
-from spo.model.grb import optGRBModel
+from spo.model.grb.grbmodel import optGRBModel
 
 class tspABModel(optGRBModel):
     """
-    This class is optimization model for traveling salesman problem.
+    This abstract class is optimization model for traveling salesman problem.
     This model is for further implementation of different formulation.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        num_nodes (int): number of nodes
-        edges (list): list of edge index
+        num_nodes (int): Number of nodes
+        edges (list): List of edge index
     """
 
     def __init__(self, num_nodes):
@@ -82,13 +82,12 @@ class tspABModel(optGRBModel):
 
 class tspGGModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem.
-    This model is based on Gavish–Graves (GG) formulation.
+    This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        num_nodes (int): number of nodes
-        edges (list): list of edge index
+        num_nodes (int): Number of nodes
+        edges (list): List of edge index
     """
 
     def _getModel(self):
@@ -172,12 +171,12 @@ class tspGGModel(tspABModel):
 
 class tspGGModelRel(tspGGModel):
     """
-    This class is relaxed optimization model for Gavish–Graves (GG) formulation.
+    This class is relaxation of tspGGModel.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        num_nodes (int): number of nodes
-        edges (list): list of edge index
+        num_nodes (int): Number of nodes
+        edges (list): List of edge index
     """
 
     def _getModel(self):
@@ -235,14 +234,13 @@ class tspGGModelRel(tspGGModel):
 
 class tspDFJModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem.
-    This model is based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+    This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
     constraint generation.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        num_nodes (int): number of nodes
-        edges (list): list of edge index
+        num_nodes (int): Number of nodes
+        edges (list): List of edge index
     """
 
     def _getModel(self):
@@ -356,13 +354,12 @@ class tspDFJModel(tspABModel):
 
 class tspMTZModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem.
-    This model is based on Miller-Tucker-Zemlin (MTZ) formulation.
+    This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        num_nodes (int): number of nodes
-        edges (list): list of edge index
+        num_nodes (int): Number of nodes
+        edges (list): List of edge index
     """
     def _getModel(self):
         """
@@ -451,13 +448,12 @@ class tspMTZModel(tspABModel):
 
 class tspMTZModelRel(tspMTZModel):
     """
-    This class is relaxed optimization model for Miller-Tucker-Zemlin (MTZ)
-    formulation.
+    This class is relaxation of tspMTZModel.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        num_nodes (int): number of nodes
-        edges (list): list of edge index
+        num_nodes (int): Number of nodes
+        edges (list): List of edge index
     """
 
     def _getModel(self):

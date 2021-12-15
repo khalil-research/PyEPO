@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Optimization Model based on pyomo
+Optimization Model based on Pyomo
 """
 
 from spo.model.omo.omomodel import optOmoModel

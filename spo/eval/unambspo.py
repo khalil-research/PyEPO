@@ -49,9 +49,9 @@ def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
 
     Args:
         omodel (optModel): optimization model
-        pred_cost (tensor): predicted costs
-        true_cost (tensor): true costs
-        true_obj (tensor): true optimal objective values
+        pred_cost (torch.tensor): predicted costs
+        true_cost (torch.tensor): true costs
+        true_obj (torch.tensor): true optimal objective values
 
     Returns:
         float: unambiguous SPO losses

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Train with SPO+ loss
+Train with Black-box optimization function
 """
 
 import os
@@ -17,7 +17,7 @@ from spo.train.util import getDevice
 def trainBB(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
              epoch=50, processes=1, bb_lambd=10, l1_lambd=0, l2_lambd=0, log=0):
     """
-    A function to train PyTorch nn with SPO+ loss
+    A function to train PyTorch nn with Black-box optimization function
 
     Args:
         reg (nn): PyTorch neural network regressor
