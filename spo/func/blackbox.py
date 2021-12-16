@@ -84,7 +84,7 @@ class blackboxOpt(Function):
             pred_cost (torch.tensor): predicted costs
 
         Returns:
-            tensor: predicted solutions
+            torch.tensor: predicted solutions
         """
         ins_num = len(pred_cost)
         # get device
