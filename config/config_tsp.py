@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Shortest Path configuration
+Tavelling salesman configuration
 """
 
 from copy import deepcopy
