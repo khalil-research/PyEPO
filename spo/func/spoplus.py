@@ -82,7 +82,7 @@ class SPOPlus(Function):
             true_obj (torch.tensor): true objective values
 
         Returns:
-            tensor: SPO+ loss
+            torch.tensor: SPO+ loss
         """
         # get device
         device = pred_cost.device
