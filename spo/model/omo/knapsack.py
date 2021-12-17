@@ -17,16 +17,16 @@ class knapsackModel(optOmoModel):
     Attributes:
         _model (PyOmo model): Pyomo model
         solver (str): optimization solver in the background
-        weights (ndarray): weights of items
-        capacity (ndarray): total capacity
+        weights (np.ndarray): weights of items
+        capacity (np.ndarray): total capacity
         items (list): list of item index
     """
 
     def __init__(self, weights, capacity, solver="glpk"):
         """
         Args:
-            weights (ndarray / list): weights of items
-            capacity (ndarray / list): total capacity
+            weights (np.ndarray / list): weights of items
+            capacity (np.ndarray / list): total capacity
             solver (str): optimization solver in the background
         """
         self.weights = np.array(weights)
