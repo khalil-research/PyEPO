@@ -47,14 +47,14 @@ class knapsackModel(optOmoModel):
         # parameters
         m.its = pe.Set(initialize=self.items)
         # varibles
-        self.x = pe.Var(m.its, domain=pe.Binary)
-        m.x = self.x
+        x = pe.Var(m.its, domain=pe.Binary)
+        m.x = x
         # constraints
         m.cons = pe.ConstraintList()
         for i in range(len(self.capacity)):
-            m.cons.add(sum(self.weights[i,j] * self.x[j]
+            m.cons.add(sum(self.weights[i,j] * x[j]
                        for j in self.items) <= self.capacity[i])
-        return m
+        return m, x
 
     def relax(self):
         """
@@ -79,12 +79,12 @@ class knapsackModelRel(knapsackModel):
         # parameters
         m.its = pe.Set(initialize=self.items)
         # varibles
-        self.x = pe.Var(m.its, domain=pe.PositiveReals, bounds=(0,1))
-        m.x = self.x
+        x = pe.Var(m.its, domain=pe.PositiveReals, bounds=(0,1))
+        m.x = x
         # constraints
         m.cons = pe.ConstraintList()
         for i in range(len(self.capacity)):
-            m.cons.add(sum(self.weights[i,j] * self.x[j]
+            m.cons.add(sum(self.weights[i,j] * x[j]
                        for j in self.items) <= self.capacity[i])
         return m
 

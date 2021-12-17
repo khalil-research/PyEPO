@@ -17,7 +17,7 @@ class optModel(ABC):
     """
 
     def __init__(self):
-        self._model = self._getModel()
+        self._model, self.x = self._getModel()
 
     def __repr__(self):
         return 'optModel ' + self.__class__.__name__
@@ -34,6 +34,9 @@ class optModel(ABC):
     def _getModel(self):
         """
         An abstract method to build a model from a optimization solver
+
+        Returns:
+            tuple: optimization model and variables
         """
         raise NotImplementedError
 
