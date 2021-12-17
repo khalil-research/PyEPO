@@ -6,17 +6,17 @@
 
 Welcome to Smart Predict then Optimize's documentation!
 =======================================================
-This is the Documentation of SPO (Smart Predict then Optimize)
+This is the Documentation of ``spo`` (Smart Predict then Optimize)
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    content/intro
-   content/example
+   content/tutorial
    content/api
    content/ref
-   
+
 
 Indices and Tables
 ------------------
