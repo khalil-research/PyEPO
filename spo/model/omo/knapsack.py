@@ -86,7 +86,7 @@ class knapsackModelRel(knapsackModel):
         for i in range(len(self.capacity)):
             m.cons.add(sum(self.weights[i,j] * x[j]
                        for j in self.items) <= self.capacity[i])
-        return m
+        return m, x
 
     def relax(self):
         """
