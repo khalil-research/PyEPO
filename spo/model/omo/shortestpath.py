@@ -64,8 +64,8 @@ class shortestPathModel(optOmoModel):
         # parameters
         m.arcs = pe.Set(initialize=self.arcs)
         # varibles
-        self.x = pe.Var(m.arcs, domain=pe.PositiveReals, bounds=(0,1))
-        m.x = self.x
+        x = pe.Var(m.arcs, domain=pe.PositiveReals, bounds=(0,1))
+        m.x = x
         # constraints
         m.cons = pe.ConstraintList()
         for i in range(self.grid[0]):
@@ -75,10 +75,10 @@ class shortestPathModel(optOmoModel):
                 for e in self.arcs:
                     # flow in
                     if v == e[1]:
-                        expr += self.x[e]
+                        expr += x[e]
                     # flow out
                     elif v == e[0]:
-                        expr -= self.x[e]
+                        expr -= x[e]
                 # source
                 if i == 0 and j == 0:
                     m.cons.add(expr == -1)
@@ -88,4 +88,4 @@ class shortestPathModel(optOmoModel):
                 # transition
                 else:
                     m.cons.add(expr == 0)
-        return m
+        return m, x

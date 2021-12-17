@@ -40,18 +40,21 @@ class knapsackModel(optGRBModel):
     def _getModel(self):
         """
         A method to build Gurobi model
+
+        Returns:
+            tuple: optimization model and variables
         """
         # ceate a model
         m = gp.Model("knapsack")
         # varibles
-        self.x = m.addVars(self.items, name="x", vtype=GRB.BINARY)
+        x = m.addVars(self.items, name="x", vtype=GRB.BINARY)
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
         for i in range(len(self.capacity)):
-            m.addConstr(gp.quicksum(self.weights[i,j] * self.x[j]
+            m.addConstr(gp.quicksum(self.weights[i,j] * x[j]
                         for j in self.items) <= self.capacity[i])
-        return m
+        return m, x
 
     def relax(self):
         """
@@ -76,14 +79,14 @@ class knapsackModelRel(knapsackModel):
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.items, name="x", ub=1)
+        x = m.addVars(self.items, name="x", ub=1)
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
         for i in range(len(self.capacity)):
-            m.addConstr(gp.quicksum(self.weights[i,j] * self.x[j]
+            m.addConstr(gp.quicksum(self.weights[i,j] * x[j]
                         for j in self.items) <= self.capacity[i])
-        return m
+        return m, x
 
     def relax(self):
         """

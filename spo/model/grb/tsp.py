@@ -93,26 +93,29 @@ class tspGGModel(tspABModel):
     def _getModel(self):
         """
         A method to build Gurobi model
+
+        Returns:
+            tuple: optimization model and variables
         """
         # ceate a model
         m = gp.Model("tsp")
         # varibles
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        self.x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
-        self.y = m.addVars(directed_edges, name="y")
+        x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
+        y = m.addVars(directed_edges, name="y")
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstrs(self.x.sum("*", j) == 1 for j in self.nodes)
-        m.addConstrs(self.x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(self.y.sum(i, "*") -
-                     gp.quicksum(self.y[j,i]
+        m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
+        m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
+        m.addConstrs(y.sum(i, "*") -
+                     gp.quicksum(y[j,i]
                                  for j in self.nodes[1:]
                                  if j != i) == 1
                      for i in self.nodes[1:])
-        m.addConstrs(self.y[i,j] <= (len(self.nodes) - 1) * self.x[i,j]
-                     for (i,j) in self.x if i != 0)
-        return m
+        m.addConstrs(y[i,j] <= (len(self.nodes) - 1) * x[i,j]
+                     for (i,j) in x if i != 0)
+        return m, x
 
     def setObj(self, c):
         """
@@ -182,6 +185,9 @@ class tspGGModelRel(tspGGModel):
     def _getModel(self):
         """
         A method to build Gurobi model
+
+        Returns:
+            tuple: optimization model and variables
         """
         # ceate a model
         m = gp.Model("tsp")
@@ -189,21 +195,21 @@ class tspGGModelRel(tspGGModel):
         m.Params.outputFlag = 0
         # varibles
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        self.x = m.addVars(directed_edges, name="x", ub=1)
-        self.y = m.addVars(directed_edges, name="y")
+        x = m.addVars(directed_edges, name="x", ub=1)
+        y = m.addVars(directed_edges, name="y")
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstrs(self.x.sum("*", j) == 1 for j in self.nodes)
-        m.addConstrs(self.x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(self.y.sum(i, "*") -
-                     gp.quicksum(self.y[j,i]
+        m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
+        m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
+        m.addConstrs(y.sum(i, "*") -
+                     gp.quicksum(y[j,i]
                                  for j in self.nodes[1:]
                                  if j != i) == 1
                      for i in self.nodes[1:])
-        m.addConstrs(self.y[i,j] <= (len(self.nodes) - 1) * self.x[i,j]
-                     for (i,j) in self.x if i != 0)
-        return m
+        m.addConstrs(y[i,j] <= (len(self.nodes) - 1) * x[i,j]
+                     for (i,j) in x if i != 0)
+        return m, x
 
     def solve(self):
         """
@@ -246,24 +252,27 @@ class tspDFJModel(tspABModel):
     def _getModel(self):
         """
         A method to build Gurobi model
+
+        Returns:
+            tuple: optimization model and variables
         """
         # ceate a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
+        x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:
-            self.x[j, i] = self.x[i, j]
+            x[j, i] = x[i, j]
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstrs(self.x.sum(i, "*") == 2 for i in self.nodes)  # 2 degree
+        m.addConstrs(x.sum(i, "*") == 2 for i in self.nodes)  # 2 degree
         # activate lazy constraints
-        m._x = self.x
+        m._x = x
         m._n = len(self.nodes)
         m.Params.lazyConstraints = 1
-        return m
+        return m, x
 
     @staticmethod
     def _subtourelim(model, where):
@@ -364,32 +373,35 @@ class tspMTZModel(tspABModel):
     def _getModel(self):
         """
         A method to build Gurobi model
+
+        Returns:
+            tuple: optimization model and variables
         """
         # ceate a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
+        x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:
-            self.x[j, i] = self.x[i, j]
-        self.u = m.addVars(self.nodes, name="u")
+            x[j, i] = x[i, j]
+        u = m.addVars(self.nodes, name="u")
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        self.x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
-        self.u = m.addVars(self.nodes, name="u")
+        x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
+        u = m.addVars(self.nodes, name="u")
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstrs(self.x.sum("*", j) == 1 for j in self.nodes)
-        m.addConstrs(self.x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(self.u[j] - self.u[i] >=
-                     len(self.nodes) * (self.x[i,j] - 1) + 1
+        m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
+        m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
+        m.addConstrs(u[j] - u[i] >=
+                     len(self.nodes) * (x[i,j] - 1) + 1
                      for (i,j) in directed_edges
                      if (i != 0) and (j != 0))
-        return m
+        return m, x
 
     def setObj(self, c):
         """
@@ -459,32 +471,35 @@ class tspMTZModelRel(tspMTZModel):
     def _getModel(self):
         """
         A method to build Gurobi model
+
+        Returns:
+            tuple: optimization model and variables
         """
         # ceate a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        self.x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
+        x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:
-            self.x[j, i] = self.x[i, j]
-        self.u = m.addVars(self.nodes, name="u")
+            x[j, i] = x[i, j]
+        u = m.addVars(self.nodes, name="u")
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        self.x = m.addVars(directed_edges, name="x", ub=1)
-        self.u = m.addVars(self.nodes, name="u")
+        x = m.addVars(directed_edges, name="x", ub=1)
+        u = m.addVars(self.nodes, name="u")
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
-        m.addConstrs(self.x.sum("*", j) == 1 for j in self.nodes)
-        m.addConstrs(self.x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(self.u[j] - self.u[i] >=
-                     len(self.nodes) * (self.x[i,j] - 1) + 1
+        m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
+        m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
+        m.addConstrs(u[j] - u[i] >=
+                     len(self.nodes) * (x[i,j] - 1) + 1
                      for (i,j) in directed_edges
                      if (i != 0) and (j != 0))
-        return m
+        return m, x
 
     def solve(self):
         """

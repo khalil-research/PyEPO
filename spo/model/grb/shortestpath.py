@@ -57,11 +57,14 @@ class shortestPathModel(optGRBModel):
     def _getModel(self):
         """
         A method to build Gurobi model
+
+        Returns:
+            tuple: optimization model and variables
         """
         # ceate a model
         m = gp.Model("shortest path")
         # varibles
-        self.x = m.addVars(self.arcs, name="x")
+        x = m.addVars(self.arcs, name="x")
         # sense
         m.modelSense = GRB.MINIMIZE
         # constraints
@@ -72,10 +75,10 @@ class shortestPathModel(optGRBModel):
                 for e in self.arcs:
                     # flow in
                     if v == e[1]:
-                        expr += self.x[e]
+                        expr += x[e]
                     # flow out
                     elif v == e[0]:
-                        expr -= self.x[e]
+                        expr -= x[e]
                 # source
                 if i == 0 and j == 0:
                     m.addConstr(expr == -1)
@@ -85,4 +88,4 @@ class shortestPathModel(optGRBModel):
                 # transition
                 else:
                     m.addConstr(expr == 0)
-        return m
+        return m, x
