@@ -17,16 +17,16 @@ class knapsackModel(optGRBModel):
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        weights (ndarray): Weights of items
-        capacity (ndarray): Total capacity
+        weights (np.ndarray): Weights of items
+        capacity (np.ndarray): Total capacity
         items (list): List of item index
     """
 
     def __init__(self, weights, capacity):
         """
         Args:
-            weights (ndarray / list): weights of items
-            capacity (ndarray / list): total capacity
+            weights (np.ndarray / list): weights of items
+            capacity (np.ndarray / list): total capacity
         """
         self.weights = np.array(weights)
         self.capacity = np.array(capacity)
