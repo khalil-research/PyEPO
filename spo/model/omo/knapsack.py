@@ -4,6 +4,7 @@
 Knapsack problem
 """
 
+import numpy as np
 from pyomo import environ as pe
 
 from spo.model.omo.omomodel import optOmoModel
@@ -24,12 +25,12 @@ class knapsackModel(optOmoModel):
     def __init__(self, weights, capacity, solver="glpk"):
         """
         Args:
-            weights (ndarray): weights of items
-            capacity (ndarray): total capacity
+            weights (ndarray / list): weights of items
+            capacity (ndarray / list): total capacity
             solver (str): optimization solver in the background
         """
-        self.weights = weights
-        self.capacity = capacity
+        self.weights = np.array(weights)
+        self.capacity = np.array(capacity)
         self.items = list(range(self.weights.shape[1]))
         super().__init__(solver)
 
