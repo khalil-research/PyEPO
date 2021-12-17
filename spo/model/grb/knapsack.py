@@ -4,6 +4,7 @@
 Knapsack problem
 """
 
+import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 
@@ -24,11 +25,11 @@ class knapsackModel(optGRBModel):
     def __init__(self, weights, capacity):
         """
         Args:
-            weights (ndarray): weights of items
-            capacity (ndarray): total capacity
+            weights (ndarray / list): weights of items
+            capacity (ndarray / list): total capacity
         """
-        self.weights = weights
-        self.capacity = capacity
+        self.weights = np.array(weights)
+        self.capacity = np.array(capacity)
         self.items = list(range(self.weights.shape[1]))
         super().__init__()
 
