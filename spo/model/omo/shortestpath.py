@@ -51,10 +51,6 @@ class shortestPathModel(optOmoModel):
                 arcs.append((v, v + self.grid[1]))
         return arcs
 
-    @property
-    def num_cost(self):
-        return len(self.arcs)
-
     def _getModel(self):
         """
         A method to build pyomo model

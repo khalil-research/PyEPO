@@ -34,10 +34,6 @@ class knapsackModel(optOmoModel):
         self.items = list(range(self.weights.shape[1]))
         super().__init__(solver)
 
-    @property
-    def num_cost(self):
-        return len(self.items)
-
     def _getModel(self):
         """
         A method to build pyomo model

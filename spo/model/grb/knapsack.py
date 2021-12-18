@@ -33,10 +33,6 @@ class knapsackModel(optGRBModel):
         self.items = list(range(self.weights.shape[1]))
         super().__init__()
 
-    @property
-    def num_cost(self):
-        return len(self.items)
-
     def _getModel(self):
         """
         A method to build Gurobi model
