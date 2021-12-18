@@ -1,2 +1,2 @@
-Two-stage
-+++++++++
+Two-stage Method
+++++++++++++++++

@@ -252,8 +252,8 @@ User-defined Models
 User can build optimization problem with linear objective function.
 
 
-GurobiPy Models
----------------
+User-defined GurobiPy Models
+----------------------------
 
 User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class ``spo.model.grb.optGRBModel``.
 
@@ -296,18 +296,14 @@ In the general case, users only need to implement ``_getModel`` and  ``num_cost`
            m.addConstr(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
            return m, x
 
-       @property
-       def num_cost(self):
-           return 5
-
    model = myModel()
    cost = [- random.random() for _ in range(model.num_cost)] # random cost vector
    model.setObj(cost) # set objective function
    model.solve() # solve
 
 
-Pyomo Models
-------------
+User-defined Pyomo Models
+-------------------------
 
 User-defined models with Pyomo can be easily defined by the inheritance of the abstract class ``spo.model.omo.optOmoModel``.
 
@@ -349,11 +345,118 @@ In the general case, users only need to implement ``_getModel`` and  ``num_cost`
            m.cons.add(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
            return m, x
 
-       @property
-       def num_cost(self):
-           return 5
-
    model = myModel()
    cost = [- random.random() for _ in range(model.num_cost)] # random cost vector
    model.setObj(cost) # set objective function
    model.solve() # solve
+
+
+User-defined Models from Scratch
+--------------------------------
+
+``spo.model.opt.optModel`` provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding ``_getModel``, ``setObj``, ``solve``,  and ``num_cost``, user-defined optModel can work for SPO+ and differebntiable Black-box optimizer.
+
+.. autoclass:: spo.model.opt.optModel
+   :members: __init__, _getModel, setObj, solve, num_cost
+
+For example, we can use ``networkx`` to solve the previous shortest path problem using the Dijkstra algorithm. And ``spo.model.opt.optModel`` allows users to create a model in this way.
+
+
+.. code-block:: python
+
+   import random
+
+   import numpy as np
+   import networkx as nx
+
+   from spo.model.opt import optModel
+
+   class myShortestPathModel(optModel):
+
+       def __init__(self, grid):
+           """
+           Args:
+               grid (tuple): size of grid network
+           """
+           self.grid = grid
+           self.arcs = self._getArcs()
+           super().__init__()
+
+       def _getArcs(self):
+           """
+           A method to get list of arcs for grid network
+
+           Returns:
+               list: arcs
+           """
+           arcs = []
+           for i in range(self.grid[0]):
+               # edges on rows
+               for j in range(self.grid[1] - 1):
+                   v = i * self.grid[1] + j
+                   arcs.append((v, v + 1))
+               # edges in columns
+               if i == self.grid[0] - 1:
+                   continue
+               for j in range(self.grid[1]):
+                   v = i * self.grid[1] + j
+                   arcs.append((v, v + self.grid[1]))
+           return arcs
+
+       def _getModel(self):
+           """
+           A method to build model
+
+           Returns:
+               tuple: optimization model and variables
+           """
+           # build graph as optimization model
+           g = nx.Graph()
+           # add arcs as variables
+           g.add_edges_from(self.arcs, cost=0)
+           return g, g.edges
+
+       def setObj(self, c):
+           """
+           A method to set objective function
+
+           Args:
+               c (ndarray): cost of objective function
+           """
+           for i, e in enumerate(self.arcs):
+               self._model.edges[e]["cost"] = c[i]
+
+       def solve(self):
+           """
+           A method to solve model
+
+           Returns:
+               tuple: optimal solution (list) and objective value (float)
+           """
+           # dijkstra
+           path = nx.shortest_path(self._model, weight="cost", source=0, target=self.grid[0]*self.grid[1]-1)
+           # convert path into active edges
+           edges = []
+           u = 0
+           for v in path[1:]:
+               edges.append((u,v))
+               u = v
+           # init sol & obj
+           sol = np.zeros(self.num_cost)
+           obj = 0
+           # convert active edges into solution and obj
+           for i, e in enumerate(self.arcs):
+               if e in edges:
+                   sol[i] = 1 # active edge
+                   obj += self._model.edges[e]["cost"] # cost of active edge
+           return sol, obj
+
+   # solve model
+   cost = [random.random() for _ in range(model.num_cost)] # random cost vector
+   model.setObj(cost) # set objective function
+   sol, obj = model.solve() # solve
+   # print res
+   print('Obj: {}'.format(obj))
+   for i, e in enumerate(model.arcs):
+       if sol[i] > 1e-3:
+           print(e)
