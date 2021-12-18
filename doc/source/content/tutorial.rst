@@ -9,4 +9,6 @@ This quickstart guide tries to show the basic mechanisms of how to use ``spo`` a
    examples/model
    examples/data
    examples/twostage
+   examples/function
    examples/training
+   examples/evaluation
