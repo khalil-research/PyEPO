@@ -23,12 +23,11 @@ class optModel(ABC):
         return 'optModel ' + self.__class__.__name__
 
     @property
-    @abstractmethod
     def num_cost(self):
         """
         number of cost to be predicted
         """
-        raise NotImplementedError
+        return len(self.x)
 
     @abstractmethod
     def _getModel(self):
@@ -70,7 +69,6 @@ class optModel(ABC):
         new_model = deepcopy(self)
         return new_model
 
-    @abstractmethod
     def addConstr(self, coefs, rhs):
         """
         An abstract method to add new constraint
