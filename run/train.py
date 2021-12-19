@@ -71,7 +71,7 @@ def train2Stage(trainset, model, config):
         print("Running with Auto-SKlearn...")
         twostage = spo.twostage.autoSklearnPred(model, config.seed)
     # training
-    twostage.fit(trainset.x, trainset.c)
+    twostage.fit(trainset.feats, trainset.costs)
     return twostage
 
 
