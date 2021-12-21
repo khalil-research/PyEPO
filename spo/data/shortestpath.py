@@ -20,7 +20,7 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
         seed (int): random seed
 
     Returns:
-       tuple: data features (ndarray), costs (ndarray)
+       tuple: data features (np.ndarray), costs (np.ndarray)
     """
     # positive integer parameter
     if type(deg) is not int:

@@ -15,13 +15,13 @@ def genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed
         num_data (int): number of data points
         num_features (int): dimension of features
         num_items (int): number of items
-        deg (int): data polynomial degree
         dim (int): dimension of multi-dimensional knapsack
-        noise_withd (float): half witdth of data random noise
+        deg (int): data polynomial degree
+        noise_width (float): half witdth of data random noise
         seed (int): random seed
 
     Returns:
-       tuple: weights of items (ndarray), data features (ndarray), costs (ndarray)
+       tuple: weights of items (np.ndarray), data features (np.ndarray), costs (np.ndarray)
     """
     # positive integer parameter
     if type(deg) is not int:
