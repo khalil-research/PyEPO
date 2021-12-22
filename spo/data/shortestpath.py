@@ -16,7 +16,7 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
         num_features (int): dimension of features
         grid (int, int): size of grid network
         deg (int): data polynomial degree
-        noise_withd (float): half witdth of data random noise
+        noise_width (float): half witdth of data random noise
         seed (int): random seed
 
     Returns:
