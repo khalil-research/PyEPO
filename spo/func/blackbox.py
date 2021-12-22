@@ -39,7 +39,7 @@ def solveWithObj4Par(cost, args, model_type):
 
 class blackboxOpt(Function):
     """
-    block-box optimizer function, which is diffenretiable to introduce blocks
+    Block-box optimizer function, which is diffenretiable to introduce blocks
     into neural networks.
 
     For block-box, the objective function is linear and constraints are known

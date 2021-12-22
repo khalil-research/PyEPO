@@ -9,7 +9,7 @@ import numpy as np
 
 def trueSPO(pmodel, omodel, dataloader):
     """
-    A function to evaluate model performence with normalized true SPO
+    A function to evaluate model performance with normalized true SPO
 
     Args:
         pmodel (nn): neural network predictor
