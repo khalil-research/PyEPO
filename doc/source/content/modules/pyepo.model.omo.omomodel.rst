@@ -1,7 +1,7 @@
-spo.model.omo.omomodel
-======================
+pyepo.model.omo.omomodel
+========================
 
-.. automodule:: spo.model.omo.omomodel
+.. automodule:: pyepo.model.omo.omomodel
 
    
    

@@ -1,7 +1,7 @@
-﻿spo.data.dataset
-================
+﻿pyepo.data.dataset
+==================
 
-.. automodule:: spo.data.dataset
+.. automodule:: pyepo.data.dataset
 
    
    

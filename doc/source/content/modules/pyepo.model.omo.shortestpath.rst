@@ -1,7 +1,7 @@
-spo.model.omo.shortestpath
-==========================
+pyepo.model.omo.shortestpath
+============================
 
-.. automodule:: spo.model.omo.shortestpath
+.. automodule:: pyepo.model.omo.shortestpath
 
    
    

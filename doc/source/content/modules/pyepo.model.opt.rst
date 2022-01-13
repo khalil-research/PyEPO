@@ -1,7 +1,7 @@
-﻿spo.model.opt
-=============
+﻿pyepo.model.opt
+===============
 
-.. automodule:: spo.model.opt
+.. automodule:: pyepo.model.opt
 
    
    

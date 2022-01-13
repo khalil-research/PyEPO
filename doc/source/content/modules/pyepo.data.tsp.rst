@@ -1,7 +1,7 @@
-﻿spo.data.tsp
-============
+﻿pyepo.data.tsp
+==============
 
-.. automodule:: spo.data.tsp
+.. automodule:: pyepo.data.tsp
 
    
    
