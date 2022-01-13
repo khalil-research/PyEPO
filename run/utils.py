@@ -7,7 +7,7 @@ import os
 
 from sklearn.model_selection import train_test_split
 
-import spo
+import pyepo
 
 def getSavePath(config):
     """
@@ -78,22 +78,22 @@ def genData(config):
     print("Generating synthetic data...")
     # shortest path
     if config.prob == "sp":
-        data = spo.data.shortestpath.genData(config.data+1000, config.feat,
-                                             config.grid, deg=config.deg,
-                                             noise_width=config.noise,
-                                             seed=config.seed)
+        data = pyepo.data.shortestpath.genData(config.data+1000, config.feat,
+                                               config.grid, deg=config.deg,
+                                               noise_width=config.noise,
+                                               seed=config.seed)
     # knapsack
     if config.prob == "ks":
-        data = spo.data.knapsack.genData(config.data+1000, config.feat,
-                                         config.items,  dim=config.dim,
-                                         deg=config.deg,
-                                         noise_width=config.noise,
-                                         seed=config.seed)
+        data = pyepo.data.knapsack.genData(config.data+1000, config.feat,
+                                           config.items,  dim=config.dim,
+                                           deg=config.deg,
+                                           noise_width=config.noise,
+                                           seed=config.seed)
     # travelling salesman
     if config.prob == "tsp":
-        data = spo.data.tsp.genData(config.data+1000, config.feat, config.nodes,
-                                    deg=config.deg, noise_width=config.noise,
-                                    seed=config.seed)
+        data = pyepo.data.tsp.genData(config.data+1000, config.feat, config.nodes,
+                                      deg=config.deg, noise_width=config.noise,
+                                      seed=config.seed)
     return data
 
 
@@ -105,32 +105,32 @@ def buildModel(config):
     if config.prob == "sp":
         if config.lan == "gurobi":
             print("Building model with GurobiPy...")
-            model = spo.model.grb.shortestPathModel(config.grid)
+            model = pyepo.model.grb.shortestPathModel(config.grid)
         if config.lan == "pyomo":
             print("Building model with Pyomo...")
-            model = spo.model.omo.shortestPathModel(config.grid, config.solver)
+            model = pyepo.model.omo.shortestPathModel(config.grid, config.solver)
     # knapsack
     if config.prob == "ks":
         caps = [config.cap] * config.dim
         if config.lan == "gurobi":
             print("Building model with GurobiPy...")
-            model = spo.model.grb.knapsackModel(config.wght, caps)
+            model = pyepo.model.grb.knapsackModel(config.wght, caps)
         if config.lan == "pyomo":
             print("Building model with Pyomo...")
-            model = spo.model.omo.knapsackModel(config.wght, caps, config.solver)
+            model = pyepo.model.omo.knapsackModel(config.wght, caps, config.solver)
     # travelling salesman
     if config.prob == "tsp":
         if config.lan == "gurobi":
             print("Building model with GurobiPy...")
             if config.form == "gg":
                 print("Using Gavish–Graves formulation...")
-                model = spo.model.grb.tspGGModel(config.nodes)
+                model = pyepo.model.grb.tspGGModel(config.nodes)
             if config.form == "dfj":
                 print("Using Danzig–Fulkerson–Johnson formulation...")
-                model = spo.model.grb.tspDFJModel(config.nodes)
+                model = pyepo.model.grb.tspDFJModel(config.nodes)
             if config.form == "mtz":
                 print("Using Miller-Tucker-Zemlin formulation...")
-                model = spo.model.grb.tspMTZModel(config.nodes)
+                model = pyepo.model.grb.tspMTZModel(config.nodes)
         if config.lan == "pyomo":
             raise RuntimeError("TSP with Pyomo is not implemented.")
     return model
@@ -148,8 +148,8 @@ def buildDataSet(data, model, config):
     if config.rel:
         print("Building relaxation model...")
         model_rel = model.relax()
-        trainset = spo.data.dataset.optDataset(model_rel, x_train, c_train)
+        trainset = pyepo.data.dataset.optDataset(model_rel, x_train, c_train)
     else:
-        trainset = spo.data.dataset.optDataset(model, x_train, c_train)
-    testset = spo.data.dataset.optDataset(model, x_test, c_test)
+        trainset = pyepo.data.dataset.optDataset(model, x_train, c_train)
+    testset = pyepo.data.dataset.optDataset(model, x_test, c_test)
     return trainset, testset
