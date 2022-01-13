@@ -8,7 +8,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 import time
 
-import spo
+import pyepo
 
 def eval(testset, res, model, config):
     """
@@ -24,8 +24,8 @@ def eval(testset, res, model, config):
             cp_i = c_test_pred[i]
             c_i = testset.costs[i]
             z_i = testset.objs[i,0]
-            truespo += spo.eval.calTrueSPO(model, cp_i, c_i, z_i)
-            unambspo += spo.eval.calUnambSPO(model, cp_i, c_i, z_i)
+            truespo += pyepo.eval.calTrueSPO(model, cp_i, c_i, z_i)
+            unambspo += pyepo.eval.calUnambSPO(model, cp_i, c_i, z_i)
         truespo /= abs(testset.objs.sum() + 1e-3)
         unambspo /= abs(testset.objs.sum() + 1e-3)
         time.sleep(1)
@@ -33,9 +33,9 @@ def eval(testset, res, model, config):
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
         # DFJ is fastest for unambSPO
         if config.prob == "tsp":
-            model = spo.model.grb.tspDFJModel(config.nodes)
-        truespo = spo.eval.trueSPO(res, model, testloader)
-        unambspo = spo.eval.unambSPO(res, model, testloader)
+            model = pyepo.model.grb.tspDFJModel(config.nodes)
+        truespo = pyepo.eval.trueSPO(res, model, testloader)
+        unambspo = pyepo.eval.unambSPO(res, model, testloader)
     print('Normalized true SPO Loss: {:.2f}%'.format(truespo * 100))
     print('Normalized unambiguous SPO Loss: {:.2f}%'.format(unambspo * 100))
     return truespo, unambspo

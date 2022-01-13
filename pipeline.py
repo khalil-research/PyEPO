@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-import spo
+import pyepo
 from run import utils
 from run import train
 from run import eval

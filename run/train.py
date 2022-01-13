@@ -9,7 +9,7 @@ from sklearn.ensemble import RandomForestRegressor
 import torch
 from torch.utils.data import DataLoader
 
-import spo
+import pyepo
 from run import net, utils
 
 
@@ -19,7 +19,7 @@ def train(trainset, testset, model, config):
     """
     print("Training...")
     if config.mthd == "2s":
-        print("Using auto two-stage predict then optimize...")
+        print("Using two-stage predict then optimize...")
         res = train2Stage(trainset, model, config)
     if config.mthd == "spo":
         print("Using SPO+ loss...")
@@ -63,13 +63,13 @@ def train2Stage(trainset, model, config):
     # prediction model
     if config.pred == "lr":
         predictor = LinearRegression()
-        twostage = spo.twostage.sklearnPred(predictor)
+        twostage = pyepo.twostage.sklearnPred(predictor)
     if config.pred == "rf":
         predictor = RandomForestRegressor(random_state=config.seed)
-        twostage = spo.twostage.sklearnPred(predictor)
+        twostage = pyepo.twostage.sklearnPred(predictor)
     if config.pred == "auto":
         print("Running with Auto-SKlearn...")
-        twostage = spo.twostage.autoSklearnPred(model, config.seed)
+        twostage = pyepo.twostage.autoSklearnPred(model, config.seed)
     # training
     twostage.fit(trainset.feats, trainset.costs)
     return twostage
@@ -87,7 +87,7 @@ def trainSPO(trainloader, testloader, model, config):
     # log dir
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
-    spo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
+    pyepo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
                        logdir=logdir, epoch=config.epoch, processes=config.proc,
                        l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
     return reg
@@ -105,7 +105,7 @@ def trainBB(trainloader, testloader, model, config):
     # log dir
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
-    spo.train.trainBB(reg, model, optimizer, trainloader, testloader,
+    pyepo.train.trainBB(reg, model, optimizer, trainloader, testloader,
                       logdir=logdir, epoch=config.epoch, processes=config.proc,
                       bb_lambd=config.smth, l1_lambd=config.l1,
                       l2_lambd=config.l2, log=config.elog)
