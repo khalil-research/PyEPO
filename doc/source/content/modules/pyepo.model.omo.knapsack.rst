@@ -1,7 +1,7 @@
-spo.model.omo.knapsack
-======================
+pyepo.model.omo.knapsack
+========================
 
-.. automodule:: spo.model.omo.knapsack
+.. automodule:: pyepo.model.omo.knapsack
 
    
    

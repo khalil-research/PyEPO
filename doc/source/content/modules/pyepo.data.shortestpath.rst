@@ -1,7 +1,7 @@
-﻿spo.data.shortestpath
-=====================
+﻿pyepo.data.shortestpath
+=======================
 
-.. automodule:: spo.data.shortestpath
+.. automodule:: pyepo.data.shortestpath
 
    
    

@@ -1,7 +1,7 @@
-spo.model.grb.tsp
-=================
+pyepo.model.grb.tsp
+===================
 
-.. automodule:: spo.model.grb.tsp
+.. automodule:: pyepo.model.grb.tsp
 
    
    

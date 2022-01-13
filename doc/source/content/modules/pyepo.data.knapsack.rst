@@ -1,7 +1,7 @@
-﻿spo.data.knapsack
-=================
+﻿pyepo.data.knapsack
+===================
 
-.. automodule:: spo.data.knapsack
+.. automodule:: pyepo.data.knapsack
 
    
    

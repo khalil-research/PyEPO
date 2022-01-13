@@ -1,7 +1,7 @@
-spo.model.grb.knapsack
-======================
+pyepo.model.grb.knapsack
+========================
 
-.. automodule:: spo.model.grb.knapsack
+.. automodule:: pyepo.model.grb.knapsack
 
    
    

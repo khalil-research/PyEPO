@@ -4,9 +4,9 @@ Module
 .. toctree::
    :maxdepth: 2
 
-   modules/spo.data
-   modules/spo.model
-   modules/spo.twostage
-   modules/spo.func
-   modules/spo.train
-   modules/spo.eval
+   modules/pyepo.data
+   modules/pyepo.model
+   modules/pyepo.twostage
+   modules/pyepo.func
+   modules/pyepo.train
+   modules/pyepo.eval

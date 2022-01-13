@@ -1,15 +1,15 @@
 Model
 +++++
 
-``spo`` contains several pre-defined optimizations models with GurobiPy and Pyomo. It includes the shortest path problem (GurobiPy & Pyomo), the knapsack problem (GurobiPy & Pyomo), and the traveling salesman problem (GurobiPy).
+``PyEPO`` contains several pre-defined optimizations models with GurobiPy and Pyomo. It includes the shortest path problem (GurobiPy & Pyomo), the knapsack problem (GurobiPy & Pyomo), and the traveling salesman problem (GurobiPy).
 
 Our API is also designed to support users to define their own problems based on GurobiPy and Pyomo. Besides the API of GurobiPy & Pyomo, users can also build problems from scratch with whatever solvers and algorithms they want to use.
 
-To build optimizations models with ``spo``, users do **not** need specific costs and objective functions since the cost vector is unknown but can be estimated from data.
+To build optimizations models with ``PyEPO``, users do **not** need specific costs and objective functions since the cost vector is unknown but can be estimated from data.
 
-.. warning:: For convenience, optimization problems in ``spo`` always **minimize** the cost. Therefore, for maximization problems, we need convert them into minimization by multiplying the cost vector with -1.
+.. warning:: For convenience, optimization problems in ``PyEPO`` always **minimize** the cost. Therefore, for maximization problems, we need convert them into minimization by multiplying the cost vector with -1.
 
-Optimizations model in ``spo`` is an object of ``optModel``. The following code snippets use ``spo.model`` to build ``optModel``:
+Optimizations model in ``PyEPO`` is an object of ``optModel``. The following code snippets use ``pyepo.model`` to build ``optModel``:
 
 
 Pre-defined Models
@@ -32,17 +32,17 @@ The shortest path problem is built as Linear programming (LP) and formulated as 
 Shortest Path GurobiPy Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``optModel`` is built from ``spo.model.grb.shortestPathModel``, in which API uses GurobiPy to model the shortest path problem.
+The ``optModel`` is built from ``pyepo.model.grb.shortestPathModel``, in which API uses GurobiPy to model the shortest path problem.
 
-.. autoclass:: spo.model.grb.shortestPathModel
+.. autoclass:: pyepo.model.grb.shortestPathModel
    :members: __init__, setObj, solve, num_cost
 
 .. code-block:: python
 
-   import spo
+   import pyepo
 
    grid = (5,5) # network grid
-   sp_model = spo.model.grb.shortestPathModel(grid) # build model
+   sp_model = pyepo.model.grb.shortestPathModel(grid) # build model
 
 Users can use ``setObj`` with a specific cost vector to set current objective function and use ``solve`` to solve it.
 
@@ -56,20 +56,20 @@ Users can use ``setObj`` with a specific cost vector to set current objective fu
 Shortest Path Pyomo Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``optModel`` is built from ``spo.model.omo.shortestPathModel``, in which API uses Pyomo to model the shortest path problem.
+The ``optModel`` is built from ``pyepo.model.omo.shortestPathModel``, in which API uses Pyomo to model the shortest path problem.
 
-.. autoclass:: spo.model.omo.shortestPathModel
+.. autoclass:: pyepo.model.omo.shortestPathModel
    :members: __init__, setObj, solve, num_cost
 
-Pyomo supports a wide variety of solvers in the background (e.g. BARON, CBC, CPLEX, and Gurobi). ``spo.model.omo.shortestPathModel`` support users to call different solvers with class parameter ``solver``.
+Pyomo supports a wide variety of solvers in the background (e.g. BARON, CBC, CPLEX, and Gurobi). ``pyepo.model.omo.shortestPathModel`` support users to call different solvers with class parameter ``solver``.
 
 .. code-block:: python
 
-   import spo
+   import pyepo
 
    grid = (5,5) # network grid
-   sp_model = spo.model.omo.shortestPathModel(grid, solver="glpk") # build model with glpk
-   sp_model = spo.model.omo.shortestPathModel(grid, solver="gurobi") # build model with gurobi
+   sp_model = pyepo.model.omo.shortestPathModel(grid, solver="glpk") # build model with glpk
+   sp_model = pyepo.model.omo.shortestPathModel(grid, solver="gurobi") # build model with gurobi
 
 You can get the current list of supported solvers using the pyomo command:
 
@@ -77,7 +77,7 @@ You can get the current list of supported solvers using the pyomo command:
 
    pyomo help --solvers
 
-Same as ``spo.model.grb.shortestPathModel``, methods ``setObj`` and ``solve`` can set objective function and solve the problem.
+Same as ``pyepo.model.grb.shortestPathModel``, methods ``setObj`` and ``solve`` can set objective function and solve the problem.
 
 .. code-block:: python
 
@@ -108,20 +108,20 @@ Constraints coefficients **weights** and constraints rhs **capacities** are requ
 Knapsack GurobiPy Model
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``optModel`` is built from ``spo.model.grb.knapsackModel``, in which API uses GurobiPy to model the knapsack problem.
+The ``optModel`` is built from ``pyepo.model.grb.knapsackModel``, in which API uses GurobiPy to model the knapsack problem.
 
-.. autoclass:: spo.model.grb.knapsackModel
+.. autoclass:: pyepo.model.grb.knapsackModel
    :members: __init__, setObj, solve, num_cost, relax
 
 .. code-block:: python
 
-   import spo
+   import pyepo
 
    weights = [[3, 4, 3, 6, 4],
               [4, 5, 2, 3, 5],
               [5, 4, 6, 2, 3]] # constraints coefficients
    capacities = [12, 10, 15] # constraints rhs
-   ks_model = spo.model.grb.knapsackModel(weights, capacities) # build model
+   ks_model = pyepo.model.grb.knapsackModel(weights, capacities) # build model
 
 Users can use ``setObj`` with a specific cost vector to set current objective function and use ``solve`` to solve it.
 
@@ -143,23 +143,23 @@ In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the pr
 Knapsack Pyomo Model
 ^^^^^^^^^^^^^^^^^^^^
 
-The ``optModel`` is built from ``spo.model.omo.knapsackModel``, in which API uses Pyomo to model the knapsack problem.
+The ``optModel`` is built from ``pyepo.model.omo.knapsackModel``, in which API uses Pyomo to model the knapsack problem.
 
-.. autoclass:: spo.model.omo.knapsackModel
+.. autoclass:: pyepo.model.omo.knapsackModel
    :members: __init__, setObj, solve, num_cost, relax
 
 .. code-block:: python
 
-   import spo
+   import pyepo
 
    weights = [[3, 4, 3, 6, 4],
               [4, 5, 2, 3, 5],
               [5, 4, 6, 2, 3]] # constraints coefficients
    capacities = [12, 10, 15] # constraints rhs
-   ks_model = spo.model.omo.knapsackModel(weights, capacities, solver="glpk") # build model with glpk
-   ks_model = spo.model.omo.knapsackModel(weights, capacities, solver="gurobi") # build model with gurobi
+   ks_model = pyepo.model.omo.knapsackModel(weights, capacities, solver="glpk") # build model with glpk
+   ks_model = pyepo.model.omo.knapsackModel(weights, capacities, solver="gurobi") # build model with gurobi
 
-Same as ``spo.model.grb.knapsackModel``,  users can use ``setObj``, ``solve``, and ``relax`` methods.
+Same as ``pyepo.model.grb.knapsackModel``,  users can use ``setObj``, ``solve``, and ``relax`` methods.
 
 You can get the current list of supported solvers using the pyomo command:
 
@@ -180,7 +180,7 @@ The TSP can be formulated as an Integer Linear Programming with several formulat
 DFJ formulation
 ^^^^^^^^^^^^^^^
 
-.. autoclass:: spo.model.grb.tspDFJModel
+.. autoclass:: pyepo.model.grb.tspDFJModel
    :members: __init__, setObj, solve, num_cost
 
 The number of subtour elimination constraints for DFJ formulation is exponential. Thus, we solved it with column generation. Because of that, the linear relaxation of DFJ is **not** supported in our implementation.
@@ -189,11 +189,11 @@ Same as previous model, the code for traveling salesman problem with DFJ formula
 
 .. code-block:: python
 
-   import spo
+   import pyepo
    import random
 
    num_nodes = 20 # number of nodes
-   tsp_model = spo.model.grb.tspDFJModel(num_nodes) # build model
+   tsp_model = pyepo.model.grb.tspDFJModel(num_nodes) # build model
 
    cost = [random.random() for _ in range(tsp_model.num_cost)] # random cost vector
    tsp_model.setObj(cost) # set objective function
@@ -203,18 +203,18 @@ Same as previous model, the code for traveling salesman problem with DFJ formula
 GG formulation
 ^^^^^^^^^^^^^^
 
-.. autoclass:: spo.model.grb.tspGGModel
+.. autoclass:: pyepo.model.grb.tspGGModel
    :members: __init__, setObj, solve, num_cost, relax
 
 Same as previous model, the code for traveling salesman problem with GG formulation is as follows:
 
 .. code-block:: python
 
-   import spo
+   import pyepo
    import random
 
    num_nodes = 20 # number of nodes
-   tsp_model = spo.model.grb.tspGGModel(num_nodes) # build model
+   tsp_model = pyepo.model.grb.tspGGModel(num_nodes) # build model
 
    cost = [random.random() for _ in range(tsp_model.num_cost)] # random cost vector
    tsp_model.setObj(cost) # set objective function
@@ -226,18 +226,18 @@ Same as previous model, the code for traveling salesman problem with GG formulat
 MTZ formulation
 ^^^^^^^^^^^^^^^
 
-.. autoclass:: spo.model.grb.tspMTZModel
+.. autoclass:: pyepo.model.grb.tspMTZModel
    :members: __init__, setObj, solve, num_cost, relax
 
 Same as previous model, the code for traveling salesman problem with MTZ formulation is as follows:
 
 .. code-block:: python
 
-   import spo
+   import pyepo
    import random
 
    num_nodes = 20 # number of nodes
-   tsp_model = spo.model.grb.tspMTZModel(num_nodes) # build model
+   tsp_model = pyepo.model.grb.tspMTZModel(num_nodes) # build model
 
    cost = [random.random() for _ in range(tsp_model.num_cost)] # random cost vector
    tsp_model.setObj(cost) # set objective function
@@ -255,9 +255,9 @@ User can build optimization problem with linear objective function.
 User-defined GurobiPy Models
 ----------------------------
 
-User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class ``spo.model.grb.optGRBModel``.
+User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class ``pyepo.model.grb.optGRBModel``.
 
-.. autoclass:: spo.model.grb.optGRBModel
+.. autoclass:: pyepo.model.grb.optGRBModel
    :members: __init__, _getModel, setObj, solve, num_cost, relax
 
 
@@ -279,7 +279,7 @@ In the general case, users only need to implement ``_getModel`` and  ``num_cost`
    import gurobipy as gp
    from gurobipy import GRB
 
-   from spo.model.grb import optGRBModel
+   from pyepo.model.grb import optGRBModel
 
    class myModel(optGRBModel):
 
@@ -305,9 +305,9 @@ In the general case, users only need to implement ``_getModel`` and  ``num_cost`
 User-defined Pyomo Models
 -------------------------
 
-User-defined models with Pyomo can be easily defined by the inheritance of the abstract class ``spo.model.omo.optOmoModel``.
+User-defined models with Pyomo can be easily defined by the inheritance of the abstract class ``pyepo.model.omo.optOmoModel``.
 
-.. autoclass:: spo.model.omo.optOmoModel
+.. autoclass:: pyepo.model.omo.optOmoModel
    :members: __init__, _getModel, setObj, solve, num_cost, relax
 
 
@@ -328,7 +328,7 @@ In the general case, users only need to implement ``_getModel`` and  ``num_cost`
 
    from pyomo import environ as pe
 
-   from spo.model.omo import optOmoModel
+   from pyepo.model.omo import optOmoModel
 
    class myModel(optOmoModel):
 
@@ -354,12 +354,12 @@ In the general case, users only need to implement ``_getModel`` and  ``num_cost`
 User-defined Models from Scratch
 --------------------------------
 
-``spo.model.opt.optModel`` provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding ``_getModel``, ``setObj``, ``solve``,  and ``num_cost``, user-defined optModel can work for SPO+ and differebntiable Black-box optimizer.
+``pyepo.model.opt.optModel`` provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding ``_getModel``, ``setObj``, ``solve``,  and ``num_cost``, user-defined optModel can work for SPO+ and differebntiable Black-box optimizer.
 
-.. autoclass:: spo.model.opt.optModel
+.. autoclass:: pyepo.model.opt.optModel
    :members: __init__, _getModel, setObj, solve, num_cost
 
-For example, we can use ``networkx`` to solve the previous shortest path problem using the Dijkstra algorithm. And ``spo.model.opt.optModel`` allows users to create a model in this way.
+For example, we can use ``networkx`` to solve the previous shortest path problem using the Dijkstra algorithm. And ``pyepo.model.opt.optModel`` allows users to create a model in this way.
 
 
 .. code-block:: python
@@ -369,7 +369,7 @@ For example, we can use ``networkx`` to solve the previous shortest path problem
    import numpy as np
    import networkx as nx
 
-   from spo.model.opt import optModel
+   from pyepo.model.opt import optModel
 
    class myShortestPathModel(optModel):
 

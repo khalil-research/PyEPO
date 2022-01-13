@@ -1,7 +1,7 @@
-spo.model.grb.shortestpath
-==========================
+pyepo.model.grb.shortestpath
+============================
 
-.. automodule:: spo.model.grb.shortestpath
+.. automodule:: pyepo.model.grb.shortestpath
 
    
    
