@@ -6,5 +6,5 @@ Run experiments
 """
 
 from run import utils
-from run.train import train
+from run.train import train, trainInit
 from run.eval import eval
