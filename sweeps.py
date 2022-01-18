@@ -20,7 +20,7 @@ from run import trainInit
 
 def trainSPO():
     """
-    train with wandb
+    SPO+ train with wandb
     """
     with wandb.init() as run:
         # update config
@@ -81,6 +81,88 @@ def trainSPO():
                 # add logs
                 desc = "Epoch {}, Loss: {:.4f}".format(e, loss.item())
                 pbar.set_description(desc)
+            # eval
+            if e % 10 == 0:
+                regret = pyepo.eval.trueSPO(reg, model, testloader)
+                wandb.log({"Regret": regret})
+        # eval
+        regret = pyepo.eval.trueSPO(reg, model, testloader)
+        wandb.log({"Regret": regret})
+
+
+def trainBB():
+    """
+    Black-BOX optimizer train with wandb
+    """
+    with wandb.init() as run:
+        # update config
+        config = wandb.config
+        wandb.config.update(args)
+        print(config)
+        # generate data
+        data = utils.genData(config)
+        if config.prob == "ks":
+            config.wght, data = data[0], (data[1], -data[2])
+        # build model
+        model = utils.buildModel(config)
+        if config.rel:
+            model = model.relax()
+        # build data loader
+        trainset, testset = utils.buildDataSet(data, model, config)
+        trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
+        testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
+        # init model
+        reg, optimizer = trainInit(config)
+        reg.train()
+        # device
+        device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+        reg.to(device)
+        # set black-box optimizer
+        bb = pyepo.func.blackboxOpt(model, lambd=config.smth, processes=config.proc)
+        # set loss
+        criterion = torch.nn.L1Loss()
+        # train
+        time.sleep(1)
+        pbar = tqdm(range(config.epoch))
+        for e in pbar:
+            # load data
+            for i, data in enumerate(trainloader):
+                x, c, w, z = data
+                x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
+                # forward pass
+                cp = reg(x)
+                # black-box optimizer
+                wp = bb.apply(cp)
+                # objective value
+                zp = (wp * c).sum(1).view(-1, 1)
+                # SPO loss
+                spoloss = criterion(zp, z)
+                wandb.log({"Train/SPO": spoloss.item()})
+                # l1 reg
+                l1_reg = torch.abs(cp - c).sum(dim=1).mean()
+                wandb.log({"Train/L1": l1_reg.item()})
+                # l2 reg
+                l2_reg = ((cp - c) ** 2).sum(dim=1).mean()
+                wandb.log({"Train/L2": l2_reg.item()})
+                # add hook
+                abs_grad = []
+                cp.register_hook(lambda grad: abs_grad.append(torch.abs(grad).mean().item()))
+                # total loss
+                loss = spoloss + config.l1 * l1_reg + config.l2 * l2_reg
+                wandb.log({"Train/Total Loss": loss.item()})
+                # backward pass
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                # abs grad
+                wandb.log({"Train/Abs Grad": abs_grad[0]})
+                # add logs
+                desc = "Epoch {}, Loss: {:.4f}".format(e, loss.item())
+                pbar.set_description(desc)
+            # eval
+            if e % 10 == 0:
+                regret = pyepo.eval.trueSPO(reg, model, testloader)
+                wandb.log({"Regret": regret})
         # eval
         regret = pyepo.eval.trueSPO(reg, model, testloader)
         wandb.log({"Regret": regret})
@@ -116,9 +198,9 @@ if __name__ == "__main__":
     config.proc = 4
     config.data = setting.data # data size
     if config.data == 100:
-        config.epoch = 1000
+        config.epoch = 300
     if config.data == 1000:
-        config.epoch = 300 # epoch
+        config.epoch = 100 # epoch
     config.deg = setting.deg # polynomial degree
     config.noise = setting.noise # noise half-width
     # delete parameter to tune
@@ -130,6 +212,7 @@ if __name__ == "__main__":
         del config.smth # smoothing parameter
     del config.batch # batch size
     # delete unnecessary
+    del config.expnum
     del config.timeout
     del config.elog
     del config.path
@@ -138,7 +221,7 @@ if __name__ == "__main__":
     args = config
 
     # init config
-    sweep_config = {"name" : "my-test"}
+    sweep_config = {"name" : "PyEPO-Sweep"}
     # search method
     sweep_config["method"] = "random"
     # metric
@@ -148,9 +231,9 @@ if __name__ == "__main__":
     parameters_dict = {}
     sweep_config["parameters"] = parameters_dict
     parameters_dict["optm"] = {"values":["sgd", "adam"]} # optimizer
-    parameters_dict["lr"] = {"distribution":"uniform",
-                             "min":1e-5,
-                             "max":1e-1} # learning rate
+    parameters_dict["lr"] = {"distribution":"log_uniform",
+                             "min":math.log(1e-4),
+                             "max":math.log(1e-1)} # learning rate
     parameters_dict["l1"] = {"distribution":"uniform",
                              "min":0,
                              "max":1e-1} # l1 regularization
@@ -165,10 +248,14 @@ if __name__ == "__main__":
 
     # init
     sweep_id = wandb.sweep(sweep_config,
-                           project="PyEPO-Sweep-{}-{}-d{}e{}".format(config.prob,
-                                                                     config.mthd,
-                                                                     config.data,
-                                                                     config.noise))
+                           project="PyEPO-Sweep-{}-{}-d{}p{}e{}".format(config.prob,
+                                                                        config.mthd,
+                                                                        config.data,
+                                                                        config.deg,
+                                                                        config.noise))
     # launch agent
     count = 50
-    wandb.agent(sweep_id, function=trainSPO, count=count)
+    if config.mthd == "spo":
+        wandb.agent(sweep_id, function=trainSPO, count=count)
+    if config.mthd == "bb":
+        wandb.agent(sweep_id, function=trainBB, count=count)
