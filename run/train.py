@@ -44,7 +44,7 @@ def trainInit(config):
         arch.append((config.grid[0] - 1) * config.grid[1] + \
                     (config.grid[1] - 1) * config.grid[0])
     if config.prob == "ks":
-        arch.append(config.items)
+        arch.append(config.item)
     if config.prob == "tsp":
         arch.append(config.nodes * (config.nodes - 1) // 2)
     reg = net.fcNet(arch)

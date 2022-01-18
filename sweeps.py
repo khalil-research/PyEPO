@@ -30,7 +30,7 @@ def trainSPO():
         # generate data
         data = utils.genData(config)
         if config.prob == "ks":
-            config.wght, data = data[0], (data[1], -data[2])
+            config.wght, data = data[0].tolist(), (data[1], -data[2])
         # build model
         model = utils.buildModel(config)
         if config.rel:
@@ -102,7 +102,7 @@ def trainBB():
         # generate data
         data = utils.genData(config)
         if config.prob == "ks":
-            config.wght, data = data[0], (data[1], -data[2])
+            config.wght, data = data[0].tolist(), (data[1], -data[2])
         # build model
         model = utils.buildModel(config)
         if config.rel:
@@ -175,6 +175,10 @@ if __name__ == "__main__":
                         type=str,
                         choices=["sp", "ks", "tsp"],
                         help="problem type")
+    parser.add_argument("--ksdim",
+                        type=int,
+                        default=2,
+                        help="knapsack dimension")
     parser.add_argument("--mthd",
                         type=str,
                         choices=["spo", "bb"],
@@ -197,6 +201,8 @@ if __name__ == "__main__":
     config = configs[setting.prob][setting.mthd]
     config.proc = 4
     config.data = setting.data # data size
+    if config.prob == "ks":
+        config.dim = setting.ksdim
     if config.data == 100:
         config.epoch = 300
     if config.data == 1000:
