@@ -127,4 +127,5 @@ dmypy.json
 
 # folders
 logs/*
+wandb/*
 archives/*
