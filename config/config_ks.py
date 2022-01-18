@@ -17,7 +17,7 @@ configKS = {}
 # problem type
 config.prob = "ks"
 # number of items
-config.items = 48
+config.item = 48
 # dimension
 config.dim = None
 # capacity

@@ -24,7 +24,7 @@ def getSavePath(config):
     if config.prob == "sp":
         path += "/" + "h{}w{}".format(*config.grid)
     if config.prob == "ks":
-        path += "/" + "i{}d{}c{}".format(config.items, config.dim, config.cap)
+        path += "/" + "i{}d{}c{}".format(config.item, config.dim, config.cap)
     if config.prob == "tsp":
         path += "/" + "n{}".format(config.nodes)
     if not os.path.isdir(path):
@@ -85,7 +85,7 @@ def genData(config):
     # knapsack
     if config.prob == "ks":
         data = pyepo.data.knapsack.genData(config.data+1000, config.feat,
-                                           config.items,  dim=config.dim,
+                                           config.item, dim=config.dim,
                                            deg=config.deg,
                                            noise_width=config.noise,
                                            seed=config.seed)
