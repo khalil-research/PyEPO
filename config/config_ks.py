@@ -24,10 +24,10 @@ config.dim = None
 config.cap = 30
 
 ## experiments configuration
+# number of experiments
+config.expnum = None
 # seed
 config.seed = 135
-# number of experiments
-config.expnum = 10
 # relaxation
 config.rel = False
 # steps of evluation and log
@@ -61,7 +61,7 @@ config_2s.mthd = "2s"
 # predictor
 config_2s.pred = None
 # time limit
-config_2s.timeout = 5 * config.expnum
+config_2s.timeout = 5
 
 configKS["2s"] = config_2s
 
@@ -72,7 +72,7 @@ config_spo = deepcopy(config)
 # method
 config_spo.mthd = "spo"
 # time limit
-config_spo.timeout = 30 * config.expnum
+config_spo.timeout = 50
 
 ## training configuration
 # size of neural network hidden layers
@@ -102,7 +102,7 @@ config_bb = deepcopy(config)
 # method
 config_bb.mthd = "bb"
 # time limit
-config_bb.timeout = 75 * config.expnum
+config_bb.timeout = 90
 
 ## training configuration
 # size of neural network hidden layers

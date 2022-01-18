@@ -28,6 +28,9 @@ parser.add_argument("--pred2s",
                     type=str,
                     choices=["auto", "lr", "rf"],
                     help="predictor for two-stage")
+parser.add_argument("--ksdim",
+                    type=int,
+                    help="knapsack dimension")
 parser.add_argument("--tspform",
                     type=str,
                     choices=["gg", "dfj", "mtz"],
@@ -35,16 +38,23 @@ parser.add_argument("--tspform",
 parser.add_argument("--rel",
                     action="store_true",
                     help="train with relaxation model")
+parser.add_argument("--expnum",
+                    type=int,
+                    default=10,
+                    help="number of experiments")
 setting = parser.parse_args()
 
 # get config
 config = configs[setting.prob][setting.mthd]
+config.expnum = setting.expnum
+if setting.prob == "ks":
+    config.dim = setting.ksdim
 if setting.prob == "tsp":
     config.form = setting.tspform
 if setting.mthd == "2s":
     config.pred = setting.pred2s
-    if setting.pred2s == "auto":
-        config.timeout = 30 * config.expnum
+    if config.pred == "auto":
+        config.timeout = 30
 config.rel = setting.rel
 
 # test
@@ -54,10 +64,10 @@ config.rel = setting.rel
 
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
-timeout_min = config.timeout
-mem_gb = 4
-if setting.prob == "tsp":
-    mem_gb = 8
+timeout_min = config.timeout * config.expnum
+mem_gb = 8
+if setting.mthd == "2s" and config.pred != "auto":
+    mem_gb = 4
 num_cpus = 32
 import os
 os.environ["OPENBLAS_NUM_THREADS"] = str(num_cpus)
@@ -80,15 +90,9 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
     config.noise = noise
     config.deg = deg
     if (setting.mthd != "2s") and (data == 1000):
-        if setting.prob == "ks":
-            config.epoch = 100
-        else:
-            config.epoch = 300
+        config.epoch = 300
     if (setting.mthd != "2s") and (data == 100):
-        if setting.prob == "ks":
-            config.epoch = 300
-        else:
-            config.epoch = 1000
+        config.epoch = 1000
     print(config)
     # run job
     job = executor.submit(pipeline, config)
