@@ -62,7 +62,7 @@ def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
     omodel.setObj(cp)
     sol, objp = omodel.solve()
     sol = np.array(sol)
-    objp = np.ceil(np.dot(cp, sol.T)) + 1
+    objp = np.ceil(np.dot(cp, sol.T)) + 1e-2
     # opt for pred cost
     wst_omodel = omodel.addConstr(cp, objp)
     # opt model to find worst case
