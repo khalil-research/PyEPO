@@ -103,7 +103,7 @@ config_bb.timeout = 12
 # size of neural network hidden layers
 config_bb.net = []
 # number of epochs
-config_bb.batch = 32
+config_bb.batch = 128
 # number of epochs
 config_bb.epoch = None
 # optimizer neural network
