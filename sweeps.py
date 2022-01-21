@@ -22,7 +22,7 @@ def trainSPO():
     """
     SPO+ train with wandb
     """
-    with wandb.init() as run:
+    with wandb.init(resume=True) as run:
         # update config
         config = wandb.config
         wandb.config.update(args)
@@ -94,7 +94,7 @@ def trainBB():
     """
     Black-BOX optimizer train with wandb
     """
-    with wandb.init() as run:
+    with wandb.init(resume=True) as run:
         # update config
         config = wandb.config
         wandb.config.update(args)
@@ -237,28 +237,20 @@ if __name__ == "__main__":
     parameters_dict = {}
     sweep_config["parameters"] = parameters_dict
     parameters_dict["optm"] = {"values":["sgd", "adam"]} # optimizer
-    parameters_dict["lr"] = {"distribution":"log_uniform",
-                             "min":math.log(1e-4),
-                             "max":math.log(1e-1)} # learning rate
-    parameters_dict["l1"] = {"distribution":"uniform",
-                             "min":0,
-                             "max":1e-1} # l1 regularization
-    parameters_dict["l2"] = {"distribution":"uniform",
-                             "min":0,
-                             "max":1e-1} # l2 regularization
+    parameters_dict["lr"] = {"values":[5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1]} # learning rate
+    parameters_dict["l1"] = {"values":[0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]} # l1 regularization
+    parameters_dict["l2"] = {"values":[0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]} # l2 regularization
     if setting.mthd == "bb":
-        parameters_dict["smth"] = {"distribution":"uniform",
-                                   "min":10,
-                                   "max":20} # smoothing parameter
+        parameters_dict["smth"] = {"values":[10, 12, 16, 18, 20]} # smoothing parameter
     parameters_dict["batch"] = {"values":[32, 64, 128]} # batch size
 
     # init
     sweep_id = wandb.sweep(sweep_config,
-                           project="PyEPO-Sweep-{}-{}-d{}p{}e{}".format(config.prob,
-                                                                        config.mthd,
-                                                                        config.data,
-                                                                        config.deg,
-                                                                        config.noise))
+                           project="PyEPO-Sweep2-{}-{}-d{}p{}e{}".format(config.prob,
+                                                                         config.mthd,
+                                                                         config.data,
+                                                                         config.deg,
+                                                                         config.noise))
     # launch agent
     count = 50
     if config.mthd == "spo":
