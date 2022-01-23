@@ -203,6 +203,8 @@ if __name__ == "__main__":
     config.data = setting.data # data size
     if config.prob == "ks":
         config.dim = setting.ksdim
+    if config.prob == "tsp":
+        config.form = "dfj"
     if config.data == 100:
         config.epoch = 300
     if config.data == 1000:
