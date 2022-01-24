@@ -66,14 +66,14 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
                 writer.add_scalar('Train/SPO Loss', loss.item(), cnt)
             # l1 reg
             if l1_lambd:
-                l1_reg = l1_lambd * torch.abs(cp - c).sum(dim=1).mean()
+                l1_reg = torch.abs(cp - c).sum(dim=1).mean()
                 writer.add_scalar('Train/L1 Reg', l1_reg.item(), cnt)
-                loss += l1_reg
+                loss += l1_lambd * l1_reg
             # l2 reg
             if l2_lambd:
-                l2_reg = l2_lambd * ((cp - c) ** 2).sum(dim=1).mean()
-                writer.add_scalar('Train/L2 Reg', l1_reg.item(), cnt)
-                loss += l2_reg
+                l2_reg = ((cp - c) ** 2).sum(dim=1).mean()
+                writer.add_scalar('Train/L2 Reg', l2_reg.item(), cnt)
+                loss += l2_lambd * l2_reg
             # add hook
             abs_grad = []
             cp.register_hook(lambda grad:
