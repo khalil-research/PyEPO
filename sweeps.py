@@ -61,10 +61,10 @@ def trainSPO():
                 spoploss = criterion.apply(cp, c, w, z).mean()
                 wandb.log({"Train/SPO+": spoploss.item()})
                 # l1 reg
-                l1_reg = torch.abs(cp - c).sum(dim=1).mean()
+                l1_reg = torch.abs(cp - c).mean(dim=1).mean()
                 wandb.log({"Train/L1": l1_reg.item()})
                 # l2 reg
-                l2_reg = ((cp - c) ** 2).sum(dim=1).mean()
+                l2_reg = ((cp - c) ** 2).mean(dim=1).mean()
                 wandb.log({"Train/L2": l2_reg.item()})
                 # add hook
                 abs_grad = []
@@ -139,10 +139,10 @@ def trainBB():
                 spoloss = criterion(zp, z)
                 wandb.log({"Train/SPO": spoloss.item()})
                 # l1 reg
-                l1_reg = torch.abs(cp - c).sum(dim=1).mean()
+                l1_reg = torch.abs(cp - c).mean(dim=1).mean()
                 wandb.log({"Train/L1": l1_reg.item()})
                 # l2 reg
-                l2_reg = ((cp - c) ** 2).sum(dim=1).mean()
+                l2_reg = ((cp - c) ** 2).mean(dim=1).mean()
                 wandb.log({"Train/L2": l2_reg.item()})
                 # add hook
                 abs_grad = []
@@ -239,16 +239,16 @@ if __name__ == "__main__":
     parameters_dict = {}
     sweep_config["parameters"] = parameters_dict
     parameters_dict["optm"] = {"values":["sgd", "adam"]} # optimizer
-    parameters_dict["lr"] = {"values":[5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1]} # learning rate
-    parameters_dict["l1"] = {"values":[0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]} # l1 regularization
-    parameters_dict["l2"] = {"values":[0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]} # l2 regularization
+    parameters_dict["lr"] = {"values":[1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1]} # learning rate
+    parameters_dict["l1"] = {"values":[0, 0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]} # l1 regularization
+    parameters_dict["l2"] = {"values":[0, 0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]} # l2 regularization
     if setting.mthd == "bb":
         parameters_dict["smth"] = {"values":[10, 12, 16, 18, 20]} # smoothing parameter
     parameters_dict["batch"] = {"values":[32, 64, 128]} # batch size
 
     # init
     sweep_id = wandb.sweep(sweep_config,
-                           project="PyEPO-Sweep2-{}-{}-d{}p{}e{}".format(config.prob,
+                           project="PyEPO-Sweep3-{}-{}-d{}p{}e{}".format(config.prob,
                                                                          config.mthd,
                                                                          config.data,
                                                                          config.deg,
