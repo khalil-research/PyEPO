@@ -452,6 +452,8 @@ For example, we can use ``networkx`` to solve the previous shortest path problem
            return sol, obj
 
    # solve model
+   grid = (5,5)
+   model = myShortestPathModel(grid)
    cost = [random.random() for _ in range(model.num_cost)] # random cost vector
    model.setObj(cost) # set objective function
    sol, obj = model.solve() # solve
