@@ -272,7 +272,7 @@ For example, users can build models for the following problem:
   & \forall x_i \in \{0, 1\}
   \end{aligned}
 
-In the general case, users only need to implement ``_getModel`` and  ``num_cost`` method with GurobiPy.
+In the general case, users only need to implement ``_getModel`` method with GurobiPy.
 
 .. code-block:: python
 
@@ -322,7 +322,7 @@ Let's build models for the problem again with Pyomo:
   & \forall x_i \in \{0, 1\}
   \end{aligned}
 
-In the general case, users only need to implement ``_getModel`` and  ``num_cost`` method with Pyomo.
+In the general case, users only need to implement ``_getModel`` method with Pyomo.
 
 .. code-block:: python
 
