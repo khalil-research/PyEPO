@@ -7,6 +7,7 @@ Knapsack problem
 import numpy as np
 from pyomo import environ as pe
 
+from pyepo import EPO
 from pyepo.model.omo.omomodel import optOmoModel
 
 
@@ -38,6 +39,8 @@ class knapsackModel(optOmoModel):
         """
         A method to build pyomo model
         """
+        # sense
+        self.modelSense = EPO.MAXIMIZE
         # ceate a model
         m = pe.ConcreteModel("knapsack")
         # parameters
@@ -50,6 +53,7 @@ class knapsackModel(optOmoModel):
         for i in range(len(self.capacity)):
             m.cons.add(sum(self.weights[i,j] * x[j]
                        for j in self.items) <= self.capacity[i])
+
         return m, x
 
     def relax(self):
@@ -70,6 +74,8 @@ class knapsackModelRel(knapsackModel):
         """
         A method to build pyomo
         """
+        # sense
+        self.modelSense = EPO.MAXIMIZE
         # ceate a model
         m = pe.ConcreteModel("knapsack")
         # parameters

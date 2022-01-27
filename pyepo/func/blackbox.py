@@ -11,7 +11,7 @@ import torch
 from pathos.multiprocessing import ProcessingPool
 from torch.autograd import Function
 
-import pyepo
+from pyepo import EPO
 from pyepo.model.opt import optModel
 from pyepo.utlis import getArgs
 

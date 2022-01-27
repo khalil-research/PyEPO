@@ -11,7 +11,7 @@ import torch
 from pathos.multiprocessing import ProcessingPool
 from torch.autograd import Function
 
-import pyepo
+from pyepo import EPO
 from pyepo.model.opt import optModel
 from pyepo.utlis import getArgs
 
@@ -135,9 +135,13 @@ class SPOPlus(Function):
             # calculate loss
             loss = []
             for i in range(ins_num):
-                loss.append(-obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
+                loss.append(- obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
+        # sense
+        if model.modelSense == EPO.MINIMIZE:
+            loss = np.array(loss)
+        if model.modelSense == EPO.MAXIMIZE:
+            loss = - np.array(loss)
         # convert to tensor
-        loss = np.array(loss)
         loss = torch.FloatTensor(loss).to(device)
         sol = np.array(sol)
         sol = torch.FloatTensor(sol).to(device)
@@ -151,5 +155,9 @@ class SPOPlus(Function):
         Backward pass in neural network
         """
         w, wq = ctx.saved_tensors
-        grad = 2 * (w - wq).mean(0)
+        model = _SPO_FUNC_SPOP_OPTMODEL
+        if model.modelSense == EPO.MINIMIZE:
+            grad = 2 * (w - wq).mean(0)
+        if model.modelSense == EPO.MAXIMIZE:
+            grad = 2 * (wq - w).mean(0)
         return grad_output * grad, None, None, None

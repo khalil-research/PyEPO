@@ -8,6 +8,8 @@ import copy
 
 import numpy as np
 
+from pyepo import EPO
+
 
 def unambSPO(pmodel, omodel, dataloader, tolerance=1e-5):
     """
@@ -62,12 +64,23 @@ def calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
     omodel.setObj(cp)
     sol, objp = omodel.solve()
     sol = np.array(sol)
-    objp = np.ceil(np.dot(cp, sol.T)) + 1e-2
+    objp = np.ceil(np.dot(cp, sol.T))
     # opt for pred cost
-    wst_omodel = omodel.addConstr(cp, objp)
+    if omodel.modelSense == EPO.MINIMIZE:
+        wst_omodel = omodel.addConstr(cp, objp+1e-2)
+    if omodel.modelSense == EPO.MAXIMIZE:
+        wst_omodel = omodel.addConstr(-cp, -objp+1e-2)
     # opt model to find worst case
-    wst_omodel.setObj(-true_cost)
-    _, obj = wst_omodel.solve()
+    try:
+        wst_omodel.setObj(-true_cost)
+        _, obj = wst_omodel.solve()
+    except:
+        tolerance *= 10
+        return calUnambSPO(omodel, pred_cost, true_cost, true_obj, tolerance=tolerance)
     obj = -obj
     # loss
-    return obj - true_obj
+    if omodel.modelSense == EPO.MINIMIZE:
+        loss = obj - true_obj
+    if omodel.modelSense == EPO.MAXIMIZE:
+        loss = true_obj - obj
+    return loss

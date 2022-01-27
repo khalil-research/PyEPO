@@ -45,7 +45,7 @@ class knapsackModel(optGRBModel):
         # varibles
         x = m.addVars(self.items, name="x", vtype=GRB.BINARY)
         # sense
-        m.modelSense = GRB.MINIMIZE
+        m.modelSense = GRB.MAXIMIZE
         # constraints
         for i in range(len(self.capacity)):
             m.addConstr(gp.quicksum(self.weights[i,j] * x[j]
@@ -77,7 +77,7 @@ class knapsackModelRel(knapsackModel):
         # varibles
         x = m.addVars(self.items, name="x", ub=1)
         # sense
-        m.modelSense = GRB.MINIMIZE
+        m.modelSense = GRB.MAXIMIZE
         # constraints
         for i in range(len(self.capacity)):
             m.addConstr(gp.quicksum(self.weights[i,j] * x[j]

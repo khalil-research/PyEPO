@@ -6,6 +6,7 @@ True SPO loss
 
 import numpy as np
 
+from pyepo import EPO
 
 def trueSPO(pmodel, omodel, dataloader):
     """
@@ -60,4 +61,8 @@ def calTrueSPO(omodel, pred_cost, true_cost, true_obj):
     # obj with true cost
     obj = np.dot(sol, true_cost)
     # loss
-    return obj - true_obj
+    if omodel.modelSense == EPO.MINIMIZE:
+        loss = obj - true_obj
+    if omodel.modelSense == EPO.MAXIMIZE:
+        loss = true_obj - obj
+    return loss
