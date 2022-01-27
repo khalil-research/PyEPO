@@ -8,6 +8,7 @@ from copy import copy
 import gurobipy as gp
 from gurobipy import GRB
 
+from pyepo import EPO
 from pyepo.model.opt import optModel
 
 
@@ -21,6 +22,12 @@ class optGRBModel(optModel):
 
     def __init__(self):
         super().__init__()
+        # model sense
+        self._model.update()
+        if self._model.modelSense == GRB.MINIMIZE:
+            self.modelSense = EPO.MINIMIZE
+        if self._model.modelSense == GRB.MAXIMIZE:
+            self.modelSense = EPO.MAXIMIZE
         # turn off output
         self._model.Params.outputFlag = 0
 

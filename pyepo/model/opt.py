@@ -7,6 +7,7 @@ Abstract optimization model
 from abc import ABC, abstractmethod
 from copy import deepcopy
 
+from pyepo import EPO
 
 class optModel(ABC):
     """
@@ -17,6 +18,7 @@ class optModel(ABC):
     """
 
     def __init__(self):
+        self.modelSense = EPO.MINIMIZE # default
         self._model, self.x = self._getModel()
 
     def __repr__(self):

@@ -8,6 +8,7 @@ from copy import copy
 from pyomo import opt as po
 from pyomo import environ as pe
 
+from pyepo import EPO
 from pyepo.model.opt import optModel
 
 
@@ -27,7 +28,10 @@ class optOmoModel(optModel):
         """
         super().__init__()
         # init obj
-        self._model.obj = pe.Objective(sense=pe.minimize, expr=0)
+        if self.modelSense == EPO.MINIMIZE:
+            self._model.obj = pe.Objective(sense=pe.minimize, expr=0)
+        if self.modelSense == EPO.MAXIMIZE:
+            self._model.obj = pe.Objective(sense=pe.maximize, expr=0)
         # set solver
         self.solver = solver
         print("Solver in the background: {}".format(self.solver))
@@ -52,7 +56,10 @@ class optOmoModel(optModel):
         self._model.del_component(self._model.obj)
         # set obj
         obj = sum(c[i] * self.x[k] for i, k in enumerate(self.x))
-        self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
+        if self.modelSense == EPO.MINIMIZE:
+            self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
+        if self.modelSense == EPO.MAXIMIZE:
+            self._model.obj = pe.Objective(sense=pe.maximize, expr=obj)
 
     def solve(self):
         """
