@@ -18,7 +18,9 @@ class optModel(ABC):
     """
 
     def __init__(self):
-        self.modelSense = EPO.MINIMIZE # default
+        # default sense
+        if not hasattr(self, "modelSense"):
+            self.modelSense = EPO.MINIMIZE
         self._model, self.x = self._getModel()
 
     def __repr__(self):
