@@ -7,10 +7,6 @@ Our API is also designed to support users to define their own problems based on 
 
 To build optimizations models with ``PyEPO``, users do **not** need specific costs and objective functions since the cost vector is unknown but can be estimated from data.
 
-.. warning:: For convenience, optimization problems in ``PyEPO`` always **minimize** the cost. Therefore, for maximization problems, we need convert them into minimization by multiplying the cost vector with -1.
-
-Optimizations model in ``PyEPO`` is an object of ``optModel``. The following code snippets use ``pyepo.model`` to build ``optModel``:
-
 
 Pre-defined Models
 ==================
@@ -289,7 +285,7 @@ In the general case, users only need to implement ``_getModel`` method with Guro
            # varibles
            x = m.addVars(5, name="x", vtype=GRB.BINARY)
            # sense (must be minimize)
-           m.modelSense = GRB.MINIMIZE
+           m.modelSense = GRB.MAXIMIZE
            # constraints
            m.addConstr(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
            m.addConstr(4 * x[0] + 5 * x[1] + 2 * x[2] + 3 * x[3] + 5 * x[4] <= 10)
@@ -297,7 +293,7 @@ In the general case, users only need to implement ``_getModel`` method with Guro
            return m, x
 
    model = myModel()
-   cost = [- random.random() for _ in range(model.num_cost)] # random cost vector
+   cost = [random.random() for _ in range(model.num_cost)] # random cost vector
    model.setObj(cost) # set objective function
    model.solve() # solve
 
@@ -333,6 +329,8 @@ In the general case, users only need to implement ``_getModel`` method with Pyom
    class myModel(optOmoModel):
 
        def _getModel(self):
+           # sense
+           self.modelSense = EPO.MAXIMIZE
            # ceate a model
            m = pe.ConcreteModel()
            # varibles
@@ -346,7 +344,7 @@ In the general case, users only need to implement ``_getModel`` method with Pyom
            return m, x
 
    model = myModel()
-   cost = [- random.random() for _ in range(model.num_cost)] # random cost vector
+   cost = [random.random() for _ in range(model.num_cost)] # random cost vector
    model.setObj(cost) # set objective function
    model.solve() # solve
 
