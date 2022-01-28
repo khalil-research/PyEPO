@@ -1,4 +1,4 @@
-pyepo.model.grb.grbmodel
+﻿pyepo.model.grb.grbmodel
 ========================
 
 .. automodule:: pyepo.model.grb.grbmodel
@@ -17,7 +17,7 @@ pyepo.model.grb.grbmodel
 
    .. autosummary::
    
-      optGRBModel
+      optGrbModel
    
    
 
