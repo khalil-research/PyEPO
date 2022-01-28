@@ -29,11 +29,11 @@ def solveWithObj4Par(cost, args, model_type):
         list: optimal solution
     """
     # rebuild model
-    model = model_type(**args)
+    optmodel = model_type(**args)
     # set obj
-    model.setObj(cost)
+    optmodel.setObj(cost)
     # solve
-    sol, _ = model.solve()
+    sol, _ = optmodel.solve()
     return sol
 
 
@@ -49,19 +49,19 @@ class blackboxOpt(Function):
     design an algorithm based on stochastic gradient descent.
     """
 
-    def __init__(self, model, lambd=10, processes=1):
+    def __init__(self, optmodel, lambd=10, processes=1):
         """
         Args:
-            model (optModel): optimization model
+            optmodel (optModel): optimization model
             lambd (float): Black-Box parameter for function smoothing
             processes (int): number of processors, 1 for single-core, 0 for all of cores
         """
         super().__init__()
         # optimization model
-        if not isinstance(model, optModel):
+        if not isinstance(optmodel, optModel):
             raise TypeError("arg model is not an optModel.")
         global _SPO_FUNC_BB_OPTMODEL
-        _SPO_FUNC_BB_OPTMODEL = model
+        _SPO_FUNC_BB_OPTMODEL = optmodel
         # smoothing parameter
         if lambd <= 0:
             raise ValueError("lambda is not positive.")
@@ -90,7 +90,7 @@ class blackboxOpt(Function):
         # get device
         device = pred_cost.device
         # get global
-        model = _SPO_FUNC_BB_OPTMODEL
+        optmodel = _SPO_FUNC_BB_OPTMODEL
         processes = _SPO_FUNC_BB_PROCESSES
         # convert tenstor
         cp = pred_cost.to("cpu").numpy()
@@ -99,17 +99,17 @@ class blackboxOpt(Function):
             sol = []
             for i in range(ins_num):
                 # solve
-                model.setObj(cp[i])
-                solp, _ = model.solve()
+                optmodel.setObj(cp[i])
+                solp, _ = optmodel.solve()
                 sol.append(solp)
         # multi-core
         else:
             # number of processes
             processes = mp.cpu_count() if not processes else processes
             # get class
-            model_type = type(model)
+            model_type = type(optmodel)
             # get args
-            args = getArgs(model)
+            args = getArgs(optmodel)
             # parallel computing
             with ProcessingPool(processes) as pool:
                 sol = pool.amap(solveWithObj4Par, cp, [args] * ins_num,
@@ -131,7 +131,7 @@ class blackboxOpt(Function):
         # get device
         device = pred_cost.device
         # get global
-        model = _SPO_FUNC_BB_OPTMODEL
+        optmodel = _SPO_FUNC_BB_OPTMODEL
         lambd = _SPO_FUNC_BB_LAMBDA
         processes = _SPO_FUNC_BB_PROCESSES
         # convert tenstor
@@ -145,16 +145,16 @@ class blackboxOpt(Function):
             grad = []
             for i in range(len(cp)):
                 # solve
-                model.setObj(cq[i])
-                solq, _ = model.solve()
+                optmodel.setObj(cq[i])
+                solq, _ = optmodel.solve()
                 # gradient of continuous interpolation
                 grad.append((solq - wp[i]) / lambd)
         # multi-core
         else:
             # get class
-            model_type = type(model)
+            model_type = type(optmodel)
             # get args
-            args = getArgs(model)
+            args = getArgs(optmodel)
             # number of processes
             processes = mp.cpu_count() if not processes else processes
             # parallel computing
