@@ -19,7 +19,7 @@ The SPO+ Loss is convex with subgradient. Thus, allows us to design an algorithm
 
    import pyepo
 
-   criterion = pyepo.func.SPOPlus(sp_model, processes=8)
+   spo = pyepo.func.SPOPlus(sp_model, processes=8)
 
 
 Diffenretiable Black-box
@@ -40,4 +40,4 @@ The block-box approximate gradient of optimizer smoothly. Thus, allows us to des
 
    import pyepo
 
-   dbb_block = pyepo.func.blackboxOpt(sp_model, lambd=10, processes=8)
+   dbb = pyepo.func.blackboxOpt(sp_model, lambd=10, processes=8)
