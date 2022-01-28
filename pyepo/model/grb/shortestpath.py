@@ -7,10 +7,10 @@ Shortest path problem
 import gurobipy as gp
 from gurobipy import GRB
 
-from pyepo.model.grb.grbmodel import optGRBModel
+from pyepo.model.grb.grbmodel import optGrbModel
 
 
-class shortestPathModel(optGRBModel):
+class shortestPathModel(optGrbModel):
     """
     This class is optimization model for shortest path problem
 

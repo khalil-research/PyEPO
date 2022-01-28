@@ -11,9 +11,9 @@ import gurobipy as gp
 import numpy as np
 from gurobipy import GRB
 
-from pyepo.model.grb.grbmodel import optGRBModel
+from pyepo.model.grb.grbmodel import optGrbModel
 
-class tspABModel(optGRBModel):
+class tspABModel(optGrbModel):
     """
     This abstract class is optimization model for traveling salesman problem.
     This model is for further implementation of different formulation.
