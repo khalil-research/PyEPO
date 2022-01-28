@@ -8,10 +8,10 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 
-from pyepo.model.grb.grbmodel import optGRBModel
+from pyepo.model.grb.grbmodel import optGrbModel
 
 
-class knapsackModel(optGRBModel):
+class knapsackModel(optGrbModel):
     """
     This class is optimization model for knapsack problem
 

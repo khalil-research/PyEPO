@@ -12,7 +12,7 @@ from pyepo import EPO
 from pyepo.model.opt import optModel
 
 
-class optGRBModel(optModel):
+class optGrbModel(optModel):
     """
     This is an abstract class for Gurobi-based optimization model
 
