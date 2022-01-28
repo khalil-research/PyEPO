@@ -251,9 +251,9 @@ User can build optimization problem with linear objective function.
 User-defined GurobiPy Models
 ----------------------------
 
-User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class ``pyepo.model.grb.optGRBModel``.
+User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class ``pyepo.model.grb.optGrbModel``.
 
-.. autoclass:: pyepo.model.grb.optGRBModel
+.. autoclass:: pyepo.model.grb.optGrbModel
    :members: __init__, _getModel, setObj, solve, num_cost, relax
 
 
@@ -275,9 +275,9 @@ In the general case, users only need to implement ``_getModel`` method with Guro
    import gurobipy as gp
    from gurobipy import GRB
 
-   from pyepo.model.grb import optGRBModel
+   from pyepo.model.grb import optGrbModel
 
-   class myModel(optGRBModel):
+   class myModel(optGrbModel):
 
        def _getModel(self):
            # ceate a model
