@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Unambiguous SPO loss
+Unambiguous regret loss
 """
 
 import copy
@@ -11,9 +11,9 @@ import numpy as np
 from pyepo import EPO
 
 
-def unambSPO(predmodel, optmodel, dataloader, tolerance=1e-5):
+def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
     """
-    A function to evaluate model performance with normalized unambiguous SPO
+    A function to evaluate model performance with normalized unambiguous regret
 
     Args:
         predmodel (nn): neural network predictor
@@ -21,7 +21,7 @@ def unambSPO(predmodel, optmodel, dataloader, tolerance=1e-5):
         dataloader (DataLoader): Torch dataloader from optDataSet
 
     Returns:
-        float: unambiguous SPO loss
+        float: unambiguous regret loss
     """
     # evaluate
     predmodel.eval()
@@ -38,16 +38,16 @@ def unambSPO(predmodel, optmodel, dataloader, tolerance=1e-5):
         # solve
         for j in range(cp.shape[0]):
             # accumulate loss
-            loss += calUnambSPO(optmodel, cp[j], c[j].to("cpu").detach().numpy(),
+            loss += calUnambRegret(optmodel, cp[j], c[j].to("cpu").detach().numpy(),
                                 z[j].item(), tolerance)
         optsum += abs(z).sum().item()
     # normalized
     return loss / (optsum + 1e-7)
 
 
-def calUnambSPO(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
+def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
     """
-    A function to calculate normalized unambiguous SPO for a batch
+    A function to calculate normalized unambiguous regret for a batch
 
     Args:
         optmodel (optModel): optimization model
@@ -56,7 +56,7 @@ def calUnambSPO(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
         true_obj (torch.tensor): true optimal objective values
 
     Returns:
-        float: unambiguous SPO losses
+        float: unambiguous regret losses
     """
     # change precision
     cp = np.around(pred_cost / tolerance).astype(int)
@@ -76,7 +76,7 @@ def calUnambSPO(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
         _, obj = wst_optmodel.solve()
     except:
         tolerance *= 10
-        return calUnambSPO(optmodel, pred_cost, true_cost, true_obj, tolerance=tolerance)
+        return calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=tolerance)
     obj = -obj
     # loss
     if optmodel.modelSense == EPO.MINIMIZE:

@@ -4,6 +4,6 @@
 Performance evaluation
 """
 
-from pyepo.eval.truespo import calTrueSPO, trueSPO
-from pyepo.eval.unambspo import calUnambSPO, unambSPO
+from pyepo.eval.trueregret import calRegret, regret
+from pyepo.eval.unambregret import calUnambRegret, unambRegret
 from pyepo.eval.metrics import SPOError, makeSkScorer, makeAutoSkScorer

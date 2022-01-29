@@ -83,10 +83,10 @@ def trainSPO():
                 pbar.set_description(desc)
             # eval
             if e % 10 == 0:
-                regret = pyepo.eval.trueSPO(reg, model, testloader)
+                regret = pyepo.eval.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
         # eval
-        regret = pyepo.eval.trueSPO(reg, model, testloader)
+        regret = pyepo.eval.regret(reg, model, testloader)
         wandb.log({"Regret": regret})
 
 
@@ -161,10 +161,10 @@ def trainBB():
                 pbar.set_description(desc)
             # eval
             if e % 10 == 0:
-                regret = pyepo.eval.trueSPO(reg, model, testloader)
+                regret = pyepo.eval.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
         # eval
-        regret = pyepo.eval.trueSPO(reg, model, testloader)
+        regret = pyepo.eval.regret(reg, model, testloader)
         wandb.log({"Regret": regret})
 
 if __name__ == "__main__":
