@@ -22,8 +22,8 @@ The SPO+ Loss is convex with subgradient. Thus, allows us to design an algorithm
    spo = pyepo.func.SPOPlus(sp_model, processes=8)
 
 
-Diffenretiable Black-box
-========================
+Diffenretiable Black-box Optimizer
+==================================
 
 Diffenretiable block-box optimizer function, which introduce blocks into neural networks.
 

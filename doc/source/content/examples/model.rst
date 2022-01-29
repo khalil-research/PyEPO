@@ -121,12 +121,10 @@ The ``optModel`` is built from ``pyepo.model.grb.knapsackModel``, in which API u
 
 Users can use ``setObj`` with a specific cost vector to set current objective function and use ``solve`` to solve it.
 
-.. warning:: Since knapsack is a maximization problem, the cost vector should multiply with -1.
-
 .. code-block:: python
 
    import random
-   cost = [- random.random() for _ in range(ks_model.num_cost)] # random cost vector multiply with -1
+   cost = [random.random() for _ in range(ks_model.num_cost)] # random cost vector multiply with -1
    ks_model.setObj(cost) # set objective function
    ks_model.solve() # solve
 
