@@ -13,8 +13,8 @@ def regret(predmodel, optmodel, dataloader):
     A function to evaluate model performance with normalized true regret
 
     Args:
-        predmodel (nn): neural network predictor
-        optmodel (optModel): optimization model
+        predmodel (nn): a regression neural network for cost prediction
+        optmodel (optModel): an PyEPO optimization model
         dataloader (DataLoader): Torch dataloader from optDataSet
 
     Returns:

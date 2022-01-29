@@ -10,7 +10,7 @@ from pyepo.utlis import getArgs
 
 def SPOError(pred_cost, true_cost, model_type, args):
     """
-    A function to calculate normalized true SPO
+    A function to calculate normalized true regret
 
     Args:
         pred_cost (array): predicted costs
