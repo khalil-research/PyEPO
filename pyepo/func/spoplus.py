@@ -40,7 +40,7 @@ def solveWithObj4Par(cost, args, model_type):
 class SPOPlus(Function):
     """
     SPO+ Loss function, a surrogate loss function of SPO Loss, which measures
-    the decision error (optimality gap) of optimization problem.
+    the decision error of optimization problem.
 
     For SPO/SPO+ Loss, the objective function is linear and constraints are
     known and fixed, but the cost vector need to be predicted from contextual
@@ -53,7 +53,7 @@ class SPOPlus(Function):
     def __init__(self, optmodel, processes=1):
         """
         Args:
-            optmodel (optModel): optimization model
+            optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
         """
         super().__init__()
@@ -76,10 +76,10 @@ class SPOPlus(Function):
         Forward pass in neural network
 
         Args:
-            pred_cost (torch.tensor): predicted costs
-            true_cost (torch.tensor): true costs
-            true_sol (torch.tensor): true solutions
-            true_obj (torch.tensor): true objective values
+            pred_cost (torch.tensor): a batch of predicted values of the cost
+            true_cost (torch.tensor): a batch of true values of the cost
+            true_sol (torch.tensor): a batch of true optimal solutions
+            true_obj (torch.tensor): a batch of true optimal objective values
 
         Returns:
             torch.tensor: SPO+ loss

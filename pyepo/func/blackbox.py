@@ -39,11 +39,12 @@ def solveWithObj4Par(cost, args, model_type):
 
 class blackboxOpt(Function):
     """
-    Block-box optimizer function, which is diffenretiable to introduce blocks
-    into neural networks.
+    A autograd function for diffenretiable block-box optimizer, which yield
+    optimal a solution and derive a gradient.
 
-    For block-box, the objective function is linear and constraints are known
-    and fixed, but the cost vector need to be predicted from contextual data.
+    For diffenretiable block-box, the objective function is linear and
+    constraints are known and fixed, but the cost vector need to be predicted
+    from contextual data.
 
     The block-box approximate gradient of optimizer smoothly. Thus, allows us to
     design an algorithm based on stochastic gradient descent.
@@ -52,8 +53,8 @@ class blackboxOpt(Function):
     def __init__(self, optmodel, lambd=10, processes=1):
         """
         Args:
-            optmodel (optModel): optimization model
-            lambd (float): Black-Box parameter for function smoothing
+            optmodel (optModel): an PyEPO optimization model
+            lambd (float): a hyperparameter for diffenretiable block-box to contral interpolation degree
             processes (int): number of processors, 1 for single-core, 0 for all of cores
         """
         super().__init__()
@@ -81,7 +82,7 @@ class blackboxOpt(Function):
         Forward pass in neural network.
 
         Args:
-            pred_cost (torch.tensor): predicted costs
+            pred_cost (torch.tensor): a batch of predicted values of the cost
 
         Returns:
             torch.tensor: predicted solutions
