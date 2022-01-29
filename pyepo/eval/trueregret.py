@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-True SPO loss
+True regret loss
 """
 
 import numpy as np
 
 from pyepo import EPO
 
-def trueSPO(predmodel, optmodel, dataloader):
+def regret(predmodel, optmodel, dataloader):
     """
-    A function to evaluate model performance with normalized true SPO
+    A function to evaluate model performance with normalized true regret
 
     Args:
         predmodel (nn): neural network predictor
@@ -18,7 +18,7 @@ def trueSPO(predmodel, optmodel, dataloader):
         dataloader (DataLoader): Torch dataloader from optDataSet
 
     Returns:
-        float: true SPO loss
+        float: true regret loss
     """
     # evaluate
     predmodel.eval()
@@ -35,16 +35,16 @@ def trueSPO(predmodel, optmodel, dataloader):
         # solve
         for j in range(cp.shape[0]):
             # accumulate loss
-            loss += calTrueSPO(optmodel, cp[j], c[j].to("cpu").detach().numpy(),
+            loss += calRegret(optmodel, cp[j], c[j].to("cpu").detach().numpy(),
                                z[j].item())
         optsum += abs(z).sum().item()
     # normalized
     return loss / (optsum + 1e-7)
 
 
-def calTrueSPO(optmodel, pred_cost, true_cost, true_obj):
+def calRegret(optmodel, pred_cost, true_cost, true_obj):
     """
-    A function to calculate normalized true SPO for a batch
+    A function to calculate normalized true regret for a batch
 
     Args:
         optmodel (optModel): optimization model
@@ -53,7 +53,7 @@ def calTrueSPO(optmodel, pred_cost, true_cost, true_obj):
         true_obj (torch.tensor): true optimal objective values
 
     Returns:predmodel
-        float: true SPO losses
+        float: true regret losses
     """
     # opt sol for pred cost
     optmodel.setObj(pred_cost)

@@ -91,10 +91,10 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
             cnt += 1
         # eval
         if log and (epoch % log == 0):
-            # true SPO
-            trueloss = pyepo.eval.trueSPO(reg, model, testloader)
+            # true regret
+            trueloss = pyepo.eval.regret(reg, model, testloader)
             writer.add_scalar('Eval/True SPO Loss', trueloss, epoch)
-            # unambiguous SPO
-            # unambloss = pyepo.eval.unambSPO(reg, model, testloader)
+            # unambiguous regret
+            # unambloss = pyepo.eval.unambRegret(reg, model, testloader)
             # writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
     writer.close()
