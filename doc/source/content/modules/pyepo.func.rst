@@ -1,5 +1,5 @@
 ﻿pyepo.func
-========
+==========
 
 .. automodule:: pyepo.func
 
