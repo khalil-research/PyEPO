@@ -17,11 +17,11 @@ configKS = {}
 # problem type
 config.prob = "ks"
 # number of items
-config.item = 48
+config.item = 32
 # dimension
 config.dim = None
 # capacity
-config.cap = 30
+config.cap = 20
 
 ## experiments configuration
 # number of experiments
@@ -61,7 +61,7 @@ config_2s.mthd = "2s"
 # predictor
 config_2s.pred = None
 # time limit
-config_2s.timeout = 5
+config_2s.timeout = 3
 
 configKS["2s"] = config_2s
 
@@ -72,7 +72,7 @@ config_spo = deepcopy(config)
 # method
 config_spo.mthd = "spo"
 # time limit
-config_spo.timeout = 50
+config_spo.timeout = 30
 
 ## training configuration
 # size of neural network hidden layers
@@ -84,7 +84,7 @@ config_spo.epoch = None
 # optimizer neural network
 config_spo.optm = "adam"
 # learning rate
-config_spo.lr = 5e-3
+config_spo.lr = 1e-2
 # l1 regularization parameter
 config_spo.l1 = 0.0
 # l2 regularization parameter
@@ -102,7 +102,7 @@ config_bb = deepcopy(config)
 # method
 config_bb.mthd = "bb"
 # time limit
-config_bb.timeout = 90
+config_bb.timeout = 45
 
 ## training configuration
 # size of neural network hidden layers
@@ -114,9 +114,9 @@ config_bb.epoch = None
 # optimizer neural network
 config_bb.optm = "adam"
 # learning rate
-config_bb.lr = 1e-3
+config_bb.lr = 5e-2
 # smoothing parameter for Black-Box
-config_bb.smth = 20
+config_bb.smth = 10
 # l1 regularization parameter
 config_bb.l1 = 0.0
 # l2 regularization parameter
