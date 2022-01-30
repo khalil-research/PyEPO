@@ -99,9 +99,9 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None, logdir="./logs"
         # eval
         if log and (epoch % log == 0):
             # true SPO
-            trueloss = pyepo.eval.regret(reg, model, testloader)
+            trueloss = pyepo.metric.regret(reg, model, testloader)
             writer.add_scalar('Eval/True SPO Loss', trueloss, epoch)
             # unambiguous SPO
-            # unambloss = pyepo.eval.unambRegret(reg, model, testloader)
+            # unambloss = pyepo.metric.unambRegret(reg, model, testloader)
             # writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
     writer.close()

@@ -24,8 +24,8 @@ def eval(testset, res, model, config):
             cp_i = c_test_pred[i]
             c_i = testset.costs[i]
             z_i = testset.objs[i,0]
-            truespo += pyepo.eval.calRegret(model, cp_i, c_i, z_i)
-            unambspo += pyepo.eval.calUnambRegret(model, cp_i, c_i, z_i)
+            truespo += pyepo.metric.calRegret(model, cp_i, c_i, z_i)
+            unambspo += pyepo.metric.calUnambRegret(model, cp_i, c_i, z_i)
         truespo /= abs(testset.objs.sum() + 1e-3)
         unambspo /= abs(testset.objs.sum() + 1e-3)
         time.sleep(1)
@@ -34,8 +34,8 @@ def eval(testset, res, model, config):
         # DFJ is fastest for unambSPO
         if config.prob == "tsp":
             model = pyepo.model.grb.tspDFJModel(config.nodes)
-        truespo = pyepo.eval.regret(res, model, testloader)
-        unambspo = pyepo.eval.unambRegret(res, model, testloader)
+        truespo = pyepo.metric.regret(res, model, testloader)
+        unambspo = pyepo.metric.unambRegret(res, model, testloader)
     print('Normalized true SPO Loss: {:.2f}%'.format(truespo * 100))
     print('Normalized unambiguous SPO Loss: {:.2f}%'.format(unambspo * 100))
     return truespo, unambspo
