@@ -12,4 +12,4 @@ import pyepo.model
 import pyepo.func
 import pyepo.train
 import pyepo.twostage
-import pyepo.eval
+import pyepo.metric
