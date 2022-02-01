@@ -30,7 +30,7 @@ def trainSPO():
         # generate data
         data = utils.genData(config)
         if config.prob == "ks":
-            config.wght, data = data[0].tolist(), (data[1], -data[2])
+            config.wght, data = data[0].tolist(), (data[1], data[2])
         # build model
         model = utils.buildModel(config)
         if config.rel:
