@@ -56,7 +56,7 @@ def getSavePath(config):
         if not config.net:
             filename += "_lr"
         else:
-            filename += "_fc" +"-".join(config.net)
+            filename += "_fc" +"-".join(map(str, config.net))
         # optimizer
         filename += "_" + config.optm + str(config.lr)
         # batch size
