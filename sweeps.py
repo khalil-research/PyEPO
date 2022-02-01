@@ -82,7 +82,10 @@ def trainSPO():
                 desc = "Epoch {}, Loss: {:.4f}".format(e, loss.item())
                 pbar.set_description(desc)
             # eval
-            if e % 10 == 0:
+            if (config.data == 1000) and (e % 10 == 0):
+                regret = pyepo.metric.regret(reg, model, testloader)
+                wandb.log({"Regret": regret})
+            if (config.data == 100) and (e % 100 == 0):
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
         # eval
@@ -160,7 +163,10 @@ def trainBB():
                 desc = "Epoch {}, Loss: {:.4f}".format(e, loss.item())
                 pbar.set_description(desc)
             # eval
-            if e % 10 == 0:
+            if (config.data == 1000) and (e % 10 == 0):
+                regret = pyepo.metric.regret(reg, model, testloader)
+                wandb.log({"Regret": regret})
+            if (config.data == 100) and (e % 100 == 0):
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
         # eval
@@ -206,7 +212,7 @@ if __name__ == "__main__":
     if config.prob == "tsp":
         config.form = "dfj"
     if config.data == 100:
-        config.epoch = 300
+        config.epoch = 1000
     if config.data == 1000:
         config.epoch = 100 # epoch
     config.deg = setting.deg # polynomial degree
