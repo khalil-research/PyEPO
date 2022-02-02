@@ -7,6 +7,7 @@ PyEPO training with Sweeps
 import argparse
 import math
 import time
+import os
 
 import torch
 from torch.utils.data import DataLoader
@@ -17,6 +18,9 @@ import pyepo
 from config import configs
 from run import utils
 from run import trainInit
+
+# without this, wandb causes error.
+os.environ["WANDB_START_METHOD"] = "thread"
 
 def trainSPO():
     """
