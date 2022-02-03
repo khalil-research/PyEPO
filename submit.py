@@ -73,7 +73,7 @@ import os
 os.environ["OPENBLAS_NUM_THREADS"] = str(num_cpus)
 
 # config setting
-confset = {"data":[100, 1000],
+confset = {"data":[100, 1000, 5000],
            "noise":[0.0, 0.5],
            "deg":[1, 2, 4, 6]}
 
@@ -89,6 +89,8 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
     config.data = data
     config.noise = noise
     config.deg = deg
+    if (setting.mthd != "2s") and (data == 5000):
+        config.epoch = 50
     if (setting.mthd != "2s") and (data == 1000):
         config.epoch = 300
     if (setting.mthd != "2s") and (data == 100):
