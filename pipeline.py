@@ -33,7 +33,7 @@ def pipeline(config):
     if os.path.isfile(save_path):
         df = pd.read_csv(save_path)
     else:
-        df = pd.DataFrame(columns=["True SPO", "Unamb SPO", "Elapsed", "Epochs"])
+        df = pd.DataFrame(columns=["True SPO", "Unamb SPO", "MSE", "Elapsed", "Epochs"])
     # set random seed
     np.random.seed(config.seed)
     torch.manual_seed(config.seed)
@@ -61,10 +61,10 @@ def pipeline(config):
         print("Time elapsed: {:.4f} sec".format(elapsed))
         print()
         # evaluate
-        truespo, unambspo = eval(testset, res, model, config)
+        truespo, unambspo, mse = eval(testset, res, model, config)
         # save
         epoch = 0 if config.mthd == "2s" else config.epoch
-        row = {"True SPO":truespo, "Unamb SPO":unambspo,
+        row = {"True SPO":truespo, "Unamb SPO":unambspo, "MSE":mse,
                "Elapsed":elapsed, "Epochs":epoch}
         df = df.append(row, ignore_index=True)
         df.to_csv(save_path, index=False)
@@ -92,7 +92,7 @@ if __name__ == "__main__":
                         help="random seed")
     parser.add_argument("--expnum",
                         type=int,
-                        default=10,
+                        default=1,
                         help="number of experiments")
     parser.add_argument("--rel",
                         action="store_true",
