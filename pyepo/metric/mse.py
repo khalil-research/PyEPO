@@ -30,5 +30,5 @@ def MSE(predmodel, dataloader):
             x, c, w, z = x.cuda(), c.cuda(), w.cuda(), z.cuda()
         # predict
         cp = predmodel(x)
-        loss += ((cp - c) ** 2).sum().data
+        loss += ((cp - c) ** 2).mean(dim=1).sum().data.to("cpu").detach().numpy()
     return loss / len(dataloader.dataset)
