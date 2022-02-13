@@ -68,7 +68,7 @@ def autoSklearnPred(omodel, seed):
     pyepo_scorer = eval.makeAutoSkScorer(omodel)
     #scorer = eval.metrics.makeTestMSEScorer(omodel)
     # build regressor
-    regressor = AutoSklearnRegressor(time_left_for_this_task=1200,
+    regressor = AutoSklearnRegressor(time_left_for_this_task=3000,
                                      per_run_time_limit=300,
                                      seed=seed,
                                      metric=pyepo_scorer,
