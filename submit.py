@@ -54,7 +54,7 @@ if setting.prob == "tsp":
 if setting.mthd == "2s":
     config.pred = setting.pred2s
     if config.pred == "auto":
-        config.timeout = 30
+        config.timeout = 60
 config.rel = setting.rel
 
 # test
@@ -90,9 +90,9 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
     config.noise = noise
     config.deg = deg
     if (setting.mthd != "2s") and (data == 5000):
-        config.epoch = 50
+        config.epoch = 20
     if (setting.mthd != "2s") and (data == 1000):
-        config.epoch = 300
+        config.epoch = 100
     if (setting.mthd != "2s") and (data == 100):
         config.epoch = 1000
     print(config)
