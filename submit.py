@@ -90,9 +90,9 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
     config.noise = noise
     config.deg = deg
     if (setting.mthd != "2s") and (data == 5000):
-        config.epoch = 20
+        config.epoch = 50
     if (setting.mthd != "2s") and (data == 1000):
-        config.epoch = 100
+        config.epoch = 300
     if (setting.mthd != "2s") and (data == 100):
         config.epoch = 1000
     print(config)
