@@ -30,16 +30,19 @@ def pipeline(config):
     print()
     # create table
     save_path = utils.getSavePath(config)
-    if os.path.isfile(save_path):
+    if os.path.isfile(save_path): # exist res
         df = pd.read_csv(save_path)
+        skip = True # skip flag
     else:
         df = pd.DataFrame(columns=["True SPO", "Unamb SPO", "MSE", "Elapsed", "Epochs"])
+        skip = False # skip flag
     # set random seed
     np.random.seed(config.seed)
     torch.manual_seed(config.seed)
 
     for i in range(config.expnum):
         config.seed = np.random.randint(999)
+        print(config.seed)
         print("===============================================================")
         print("Experiment {}:".format(i))
         print("===============================================================")
@@ -48,6 +51,13 @@ def pipeline(config):
         if config.prob == "ks":
             config.wght, data = data[0], (data[1], data[2])
         print()
+        # skip exist experiments
+        if skip and (i < len(df)):
+            print("Skip experiment {}.".format(i))
+            print()
+            continue
+        else:
+            skip = False
         # build model
         model = utils.buildModel(config)
         # build data loader
@@ -201,11 +211,11 @@ if __name__ == "__main__":
                         help="learning rate")
     parser.add_argument("--l1",
                         type=float,
-                        default=0,
+                        default=0.0,
                         help="l1 regularization parameter")
     parser.add_argument("--l2",
                         type=float,
-                        default=0,
+                        default=0.0,
                         help="l2 regularization parameter")
     parser.add_argument("--smth",
                         type=float,
