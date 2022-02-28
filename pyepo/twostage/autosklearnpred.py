@@ -52,7 +52,7 @@ class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
         return ConfigurationSpace()  # Return an empty configuration as there is None
 
 
-def autoSklearnPred(omodel, seed):
+def autoSklearnPred(omodel, seed, timelimit=3000):
     """
     Two-stage prediction and optimization with auto-sklearn.
 
@@ -68,8 +68,9 @@ def autoSklearnPred(omodel, seed):
     pyepo_scorer = eval.makeAutoSkScorer(omodel)
     #scorer = eval.metrics.makeTestMSEScorer(omodel)
     # build regressor
-    regressor = AutoSklearnRegressor(time_left_for_this_task=3000,
-                                     per_run_time_limit=300,
+    regressor = AutoSklearnRegressor(time_left_for_this_task=1200,
+                                     per_run_time_limit=1200,
+                                     memory_limit=None,
                                      seed=seed,
                                      metric=pyepo_scorer,
                                      scoring_functions=[pyepo_scorer, mean_squared_error],
