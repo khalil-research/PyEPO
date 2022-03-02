@@ -42,7 +42,6 @@ def pipeline(config):
 
     for i in range(config.expnum):
         config.seed = np.random.randint(999)
-        print(config.seed)
         print("===============================================================")
         print("Experiment {}:".format(i))
         print("===============================================================")
@@ -78,12 +77,18 @@ def pipeline(config):
                "Elapsed":elapsed, "Epochs":epoch}
         df = df.append(row, ignore_index=True)
         df.to_csv(save_path, index=False)
+        # autosklean model info
+        if config.mthd == "2s" and config.pred == "auto":
+            cv_result = pd.DataFrame.from_dict(res.cv_results_)
+            cv_result["Experiment"] = i
+            if i == 0:
+                df_cv = cv_result
+            else:
+                df_cv = pd.read_csv(save_path[:-4]+"-cv.csv")
+                df = df.append(cv_result, ignore_index=True)
+            df_cv.to_csv(save_path[:-4]+"-cv.csv", index=False)
         print("Saved to " + save_path + ".")
         print("\n\n")
-        if config.mthd == "2s":
-            if config.pred == "auto":
-                cv_result = pd.DataFrame.from_dict(res.cv_results_)
-                cv_result.to_csv(save_path[:-4]+"-cv.csv", index=False)
 
 
 if __name__ == "__main__":
