@@ -12,7 +12,7 @@ from ConfigSpace.configuration_space import ConfigurationSpace
 from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
 from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
 
-from pyepo import eval
+from pyepo import metric
 
 class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
     """
@@ -52,12 +52,12 @@ class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
         return ConfigurationSpace()  # Return an empty configuration as there is None
 
 
-def autoSklearnPred(omodel, seed, timelimit=3000):
+def autoSklearnPred(optmodel, seed, timelimit=3000):
     """
     Two-stage prediction and optimization with auto-sklearn.
 
     Args:
-        omodel (optModel): optimization model
+        optmodel (optModel): optimization model
 
     Returns:
         AutoSklearnRegressor: Auto-SKlearn multi-output regression model
@@ -65,15 +65,15 @@ def autoSklearnPred(omodel, seed, timelimit=3000):
     # add NoPreprocessing component to auto-sklearn.
     data_preprocessing.add_preprocessor(NoPreprocessing)
     # get metrics
-    pyepo_scorer = eval.makeAutoSkScorer(omodel)
-    #scorer = eval.metrics.makeTestMSEScorer(omodel)
+    pyepo_scorer = metric.makeAutoSkScorer(optmodel)
+    #scorer = metric.metrics.makeTestMSEScorer(optmodel)
     # build regressor
-    regressor = AutoSklearnRegressor(time_left_for_this_task=1200,
+    regressor = AutoSklearnRegressor(time_left_for_this_task=timelimit,
                                      per_run_time_limit=1200,
                                      memory_limit=None,
                                      seed=seed,
                                      metric=pyepo_scorer,
-                                     scoring_functions=[pyepo_scorer, mean_squared_error],
+                                     #scoring_functions=[pyepo_scorer, mean_squared_error],
                                      include={"data_preprocessor": ["NoPreprocessing"],
                                               "feature_preprocessor": ["no_preprocessing"]})
                                               #"regressor": ["adaboost", "ard_regression", "extra_trees",
