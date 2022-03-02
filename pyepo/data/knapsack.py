@@ -56,6 +56,8 @@ def genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed
         epislon = np.random.uniform(1 - noise_width, 1 + noise_width, m)
         values *= epislon
         # convert into int
-        values = np.ceil(values).astype(int)
+        values = np.ceil(values)
         c[i, :] = values
+        # float
+        c = c.astype(np.float64)
     return weights, x, c

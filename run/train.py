@@ -4,6 +4,7 @@
 Model training
 """
 
+import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 import torch
@@ -60,6 +61,7 @@ def train2Stage(trainset, model, config):
     """
     two-stage preditc-then-optimize training
     """
+    feats, costs = trainset.feats, trainset.costs
     # prediction model
     if config.pred == "lr":
         predictor = LinearRegression()
@@ -70,8 +72,11 @@ def train2Stage(trainset, model, config):
     if config.pred == "auto":
         print("Running with Auto-SKlearn...")
         twostage = pyepo.twostage.autoSklearnPred(model, config.seed)
+        # avoid to be multiclass
+        if config.prob == "ks":
+            costs += np.random.randn(*costs.shape) * 1e-5
     # training
-    twostage.fit(trainset.feats, trainset.costs)
+    twostage.fit(feats, costs)
     return twostage
 
 
