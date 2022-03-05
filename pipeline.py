@@ -85,7 +85,7 @@ def pipeline(config):
                 df_cv = cv_result
             else:
                 df_cv = pd.read_csv(save_path[:-4]+"-cv.csv")
-                df_cv = df.append(cv_result, ignore_index=True)
+                df_cv = df_cv.append(cv_result, ignore_index=True)
             df_cv.to_csv(save_path[:-4]+"-cv.csv", index=False)
         print("Saved to " + save_path + ".")
         print("\n\n")
