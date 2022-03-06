@@ -93,8 +93,9 @@ def trainSPO(trainloader, testloader, model, config):
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     pyepo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
-                       logdir=logdir, epoch=config.epoch, processes=config.proc,
-                       l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
+                         logdir=logdir, epoch=config.epoch,
+                         processes=config.proc, l1_lambd=config.l1,
+                         l2_lambd=config.l2, log=config.elog)
     return reg
 
 
@@ -111,7 +112,7 @@ def trainBB(trainloader, testloader, model, config):
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     pyepo.train.trainBB(reg, model, optimizer, trainloader, testloader,
-                      logdir=logdir, epoch=config.epoch, processes=config.proc,
-                      bb_lambd=config.smth, l1_lambd=config.l1,
-                      l2_lambd=config.l2, log=config.elog)
+                        lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
+                        processes=config.proc, bb_lambd=config.smth,
+                        l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
     return reg

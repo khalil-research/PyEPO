@@ -109,6 +109,11 @@ if __name__ == "__main__":
                         type=int,
                         default=1,
                         help="number of experiments")
+    parser.add_argument("--loss",
+                        type=str,
+                        default="r",
+                        choices=["r", "h"],
+                        help="loss function for Black-Box")
     parser.add_argument("--rel",
                         action="store_true",
                         help="train with relaxation model")
