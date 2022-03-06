@@ -26,6 +26,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
         optimizer (optim): PyTorch optimizer
         trainloader (DataLoader): PyTorch DataLoader for train set
         testloader (DataLoader): PyTorch DataLoader for test set
+        logdir (str): folder path to save tensorboard log
         epoch (int): number of training epochs
         processes: processes (int): number of processors, 1 for single-core, 0 for all of cores
         l1_lambd (float): regularization weight of l1 norm

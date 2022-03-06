@@ -14,8 +14,9 @@ from torch.utils.tensorboard import SummaryWriter
 import pyepo
 from pyepo.train.util import getDevice
 
-def trainBB(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
-             epoch=50, processes=1, bb_lambd=10, l1_lambd=0, l2_lambd=0, log=0):
+def trainBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
+            logdir="./logs", epoch=50, processes=1, bb_lambd=10, l1_lambd=0,
+            l2_lambd=0, log=0):
     """
     A function to train PyTorch nn with Black-box optimization function
 
@@ -25,6 +26,8 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None, logdir="./logs"
         optimizer (optim): PyTorch optimizer
         trainloader (DataLoader): PyTorch DataLoader for train set
         testloader (DataLoader): PyTorch DataLoader for test set
+        lossfunc (str): loss function to use, "r" for regret, "h" for Hamming distance
+        logdir (str): folder path to save tensorboard log
         epoch (int): number of training epochs
         processes: processes (int): number of processors, 1 for single-core, 0 for all of cores
         bb_lambd (float): Black-Box parameter for function smoothing
@@ -32,6 +35,8 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None, logdir="./logs"
         l2_lambd (float): regularization weight of l2 norm
         log (int): step size of evlaution and log
     """
+    # check loss type
+    assert lossfunc in ["r", "h"], "argument 'lossfunc' must be 'r' or 'h'"
     # create log folder
     if not os.path.isdir(logdir):
         os.makedirs(logdir, exist_ok=True)
@@ -64,10 +69,15 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None, logdir="./logs"
             cp = reg(x)
             # black-box optimizer
             wp = bb.apply(cp)
-            # objective value
-            zp = (wp * c).sum(1).view(-1, 1)
-            # SPO loss
-            loss = criterion(zp, z)
+            # loss
+            if lossfunc == "r":
+                # objective value
+                zp = (wp * c).sum(1).view(-1, 1)
+                # regret
+                loss = criterion(zp, z)
+            if lossfunc == "h":
+                # Hamming distance
+                loss = criterion(wp, w)
             # add logs
             if l1_lambd or l2_lambd:
                 writer.add_scalar('Train/SPO Loss', loss.item(), cnt)
