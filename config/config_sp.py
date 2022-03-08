@@ -97,8 +97,11 @@ config_bb = deepcopy(config)
 ## experiments configuration
 # method
 config_bb.mthd = "bb"
+# loss
+config_bb.loss = "r"
 # time limit
 config_bb.timeout = 12
+
 ## training configuration
 # size of neural network hidden layers
 config_bb.net = []

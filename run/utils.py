@@ -67,8 +67,8 @@ def getSavePath(config):
         filename += "_c{}".format(config.proc)
     if config.mthd == "bb":
         filename += "-lamb{}".format(config.smth)
-    if config.loss == "h":
-        filename += "-h"
+        if config.loss == "h":
+            filename += "-h"
     return path + "/" + filename + ".csv"
 
 
