@@ -75,12 +75,11 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
                 zp = (wp * c).sum(1).view(-1, 1)
                 # regret
                 loss = criterion(zp, z)
+                writer.add_scalar('Train/Regret', loss.item(), cnt)
             if lossfunc == "h":
                 # Hamming distance
                 loss = criterion(wp, w)
-            # add logs
-            if l1_lambd or l2_lambd:
-                writer.add_scalar('Train/SPO Loss', loss.item(), cnt)
+                writer.add_scalar('Train/Hamming distance', loss.item(), cnt)
             # l1 reg
             if l1_lambd:
                 l1_reg = torch.abs(cp - c).mean(dim=1).mean()
