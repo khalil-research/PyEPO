@@ -97,6 +97,8 @@ config_bb = deepcopy(config)
 ## experiments configuration
 # method
 config_bb.mthd = "bb"
+# loss
+config_bb.loss = "r"
 # time limit
 config_bb.timeout = 45
 
