@@ -22,12 +22,8 @@ parser.add_argument("--prob",
                     help="problem type")
 parser.add_argument("--mthd",
                     type=str,
-                    choices=["2s", "spo", "bb"],
+                    choices=["auto", "lr", "rf", "spo", "bb"],
                     help="method")
-parser.add_argument("--pred2s",
-                    type=str,
-                    choices=["auto", "lr", "rf"],
-                    help="predictor for two-stage")
 parser.add_argument("--ksdim",
                     type=int,
                     help="knapsack dimension")
@@ -51,10 +47,9 @@ if setting.prob == "ks":
     config.dim = setting.ksdim
 if setting.prob == "tsp":
     config.form = setting.tspform
-if setting.mthd == "2s":
-    config.pred = setting.pred2s
-    if config.pred == "auto":
-        config.timeout = 60
+if setting.mthd in ["auto", "lr", "rf"]:
+    config.mthd = "2s"
+    config.pred = setting.mthd
 config.rel = setting.rel
 
 # test
@@ -66,7 +61,7 @@ config.rel = setting.rel
 instance_logs_path = "slurm_logs_spotest"
 timeout_min = config.timeout * config.expnum
 mem_gb = 8
-if setting.mthd == "2s" and config.pred != "auto":
+if setting.mthd in ["lr", "rf"]:
     mem_gb = 4
 num_cpus = 32
 import os
