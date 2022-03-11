@@ -52,18 +52,46 @@ config.deg = None
 config.noise = None
 
 
-### ========================= 2S =========================
-config_2s = deepcopy(config)
+### ========================= lr =========================
+config_lr = deepcopy(config)
 
 ## experiments configuration
 # method
-config_2s.mthd = "2s"
+config_lr.mthd = "2s"
 # predictor
-config_2s.pred = None
+config_lr.pred = "lr"
 # time limit
-config_2s.timeout = 3
+config_lr.timeout = 3
 
-configKS["2s"] = config_2s
+configKS["lr"] = config_lr
+
+### ========================= rf =========================
+config_rf = deepcopy(config)
+
+## experiments configuration
+# method
+config_rf.mthd = "2s"
+# predictor
+config_rf.pred = "rf"
+# time limit
+config_rf.timeout = 6
+
+configKS["rf"] = config_rf
+
+### ========================= auto =========================
+config_auto = deepcopy(config)
+
+## experiments configuration
+# method
+config_auto.mthd = "2s"
+# predictor
+config_auto.pred = "auto"
+# metric
+config_auto.metric = "mse"
+# time limit
+config_auto.timeout = 18
+
+configKS["auto"] = config_auto
 
 ### ========================= SPO =========================
 config_spo = deepcopy(config)
@@ -95,7 +123,7 @@ config_spo.proc = 32
 configKS["spo"] = config_spo
 
 
-### ========================= BB =========================
+### ======================== DBB =========================
 config_bb = deepcopy(config)
 
 ## experiments configuration
