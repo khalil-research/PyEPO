@@ -69,6 +69,9 @@ def getSavePath(config):
         filename += "-lamb{}".format(config.smth)
         if config.loss == "h":
             filename += "-h"
+    if config.mthd == "2s" and config.pred == "auto":
+        if config.metric == "mse":
+            filename += "-mse"
     return path + "/" + filename + ".csv"
 
 

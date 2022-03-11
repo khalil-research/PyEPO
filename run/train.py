@@ -71,7 +71,14 @@ def train2Stage(trainset, model, config):
         twostage = pyepo.twostage.sklearnPred(predictor)
     if config.pred == "auto":
         print("Running with Auto-SKlearn...")
-        twostage = pyepo.twostage.autoSklearnPred(model, config.seed)
+        if config.metric == "mse":
+            twostage = pyepo.twostage.autoSklearnPred(model, config.seed,
+                                                      timelimit=600,
+                                                      metric=config.metric)
+        if config.metric == "regret":
+            twostage = pyepo.twostage.autoSklearnPred(model, config.seed,
+                                                      timelimit=3000,
+                                                      metric=config.metric)
         # avoid to be multiclass
         if config.prob == "ks":
             costs += np.random.randn(*costs.shape) * 1e-5

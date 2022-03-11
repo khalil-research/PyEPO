@@ -12,7 +12,7 @@ from ConfigSpace.configuration_space import ConfigurationSpace
 from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
 from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
 
-from pyepo import metric
+from pyepo.metric import makeAutoSkScorer
 
 class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
     """
@@ -52,7 +52,7 @@ class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
         return ConfigurationSpace()  # Return an empty configuration as there is None
 
 
-def autoSklearnPred(optmodel, seed, timelimit=3000):
+def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
     """
     Two-stage prediction and optimization with auto-sklearn.
 
@@ -65,18 +65,29 @@ def autoSklearnPred(optmodel, seed, timelimit=3000):
     # add NoPreprocessing component to auto-sklearn.
     data_preprocessing.add_preprocessor(NoPreprocessing)
     # get metrics
-    pyepo_scorer = metric.makeAutoSkScorer(optmodel)
-    #scorer = metric.metrics.makeTestMSEScorer(optmodel)
+    pyepo_scorer = makeAutoSkScorer(optmodel)
+    #scorer = makeTestMSEScorer(optmodel)
     # build regressor
-    regressor = AutoSklearnRegressor(time_left_for_this_task=timelimit,
-                                     per_run_time_limit=1200,
-                                     memory_limit=None,
-                                     seed=seed,
-                                     metric=pyepo_scorer,
-                                     #scoring_functions=[pyepo_scorer, mean_squared_error],
-                                     include={"data_preprocessor": ["NoPreprocessing"],
-                                              "feature_preprocessor": ["no_preprocessing"]})
-                                              #"regressor": ["adaboost", "ard_regression", "extra_trees",
-                                                #            "gaussian_process", "k_nearest_neighbors",
-                                                #            "mlp", "random_forest"]})
+    if metric == "regret":
+        regressor = AutoSklearnRegressor(time_left_for_this_task=timelimit,
+                                         per_run_time_limit=1200,
+                                         memory_limit=None,
+                                         seed=seed,
+                                         metric=pyepo_scorer,
+                                         #scoring_functions=[pyepo_scorer, mean_squared_error],
+                                         include={"data_preprocessor": ["NoPreprocessing"],
+                                                  "feature_preprocessor": ["no_preprocessing"]})
+                                                  #"regressor": ["adaboost", "ard_regression", "extra_trees",
+                                                    #            "gaussian_process", "k_nearest_neighbors",
+                                                    #            "mlp", "random_forest"]})
+    elif metric == "mse":
+        regressor = AutoSklearnRegressor(time_left_for_this_task=timelimit,
+                                         per_run_time_limit=150,
+                                         memory_limit=None,
+                                         seed=seed,
+                                         metric=mean_squared_error,
+                                         include={"data_preprocessor": ["NoPreprocessing"],
+                                                  "feature_preprocessor": ["no_preprocessing"]})
+    else:
+        raise ValueError("Invalid metric {}. Metric should be 'regret' or 'mse'.".format(metric))
     return regressor

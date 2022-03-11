@@ -122,6 +122,11 @@ if __name__ == "__main__":
                         default="lr",
                         choices=["auto", "lr", "rf"],
                         help="predictor of two-stage predict then optimize")
+    parser.add_argument("--metric",
+                        type=str,
+                        default="mse",
+                        choices=["regret", "mse"],
+                        help="metric for auto-sklearm predictor")
     parser.add_argument("--elog",
                         type=int,
                         default=0,
