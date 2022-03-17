@@ -155,3 +155,37 @@ config_bb.l2 = 0.0
 config_bb.proc = 32
 
 configKS["bb"] = config_bb
+
+
+### ======================= DBB H ========================
+config_bbh = deepcopy(config)
+
+## experiments configuration
+# method
+config_bbh.mthd = "bb"
+# loss
+config_bbh.loss = "h"
+# time limit
+config_bbh.timeout = 32
+
+## training configuration
+# size of neural network hidden layers
+config_bbh.net = []
+# number of epochs
+config_bbh.batch = 32
+# number of epochs
+config_bbh.epoch = None
+# optimizer neural network
+config_bbh.optm = "adam"
+# learning rate
+config_bbh.lr = 5e-2
+# smoothing parameter for Black-Box
+config_bbh.smth = 10
+# l1 regularization parameter
+config_bbh.l1 = 0.0
+# l2 regularization parameter
+config_bbh.l2 = 0.0
+# number of processor for optimization
+config_bbh.proc = 32
+
+configKS["bbh"] = config_bbh
