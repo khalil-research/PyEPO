@@ -22,7 +22,7 @@ parser.add_argument("--prob",
                     help="problem type")
 parser.add_argument("--mthd",
                     type=str,
-                    choices=["auto", "lr", "rf", "spo", "bb"],
+                    choices=["auto", "lr", "rf", "spo", "bb", "bbh"],
                     help="method")
 parser.add_argument("--ksdim",
                     type=int,
