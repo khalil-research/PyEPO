@@ -39,7 +39,7 @@ def solveWithObj4Par(cost, args, model_type):
 
 class blackboxOpt(Function):
     """
-    A autograd function for diffenretiable block-box optimizer, which yield
+    A autograd function for diffenretiable black-box optimizer, which yield
     optimal a solution and derive a gradient.
 
     For diffenretiable block-box, the objective function is linear and

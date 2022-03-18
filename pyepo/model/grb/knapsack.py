@@ -17,8 +17,8 @@ class knapsackModel(optGrbModel):
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        weights (np.ndarray): Weights of items
-        capacity (np.ndarray): Total capacity
+        weights (np.ndarray / list): Weights of items
+        capacity (np.ndarray / listy): Total capacity
         items (list): List of item index
     """
 
@@ -54,7 +54,7 @@ class knapsackModel(optGrbModel):
 
     def relax(self):
         """
-        A method to relax model
+        A method to get linear relaxation model
         """
         # copy
         model_rel = knapsackModelRel(self.weights, self.capacity)

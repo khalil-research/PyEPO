@@ -7,17 +7,15 @@ Data
 Data Generator
 ==============
 
-``pyepo.data`` includes data generators for the shortest path, multi-dimensional knapsack, and traveling salesman.
+``pyepo.data`` includes three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, and the traveling salesman problem. ``PyEPO`` provides functions to generate these data with the adjustable data size :math:`n`, features number :math:`p`, cost number :math:`d`, polynomial degree :math:`deg`, and noise half-width :math:`\bar{\epsilon}`.
 
-The generated data include input features :math:`x` and objective function coefficients :math:`c`. Generally, we create synthetic dataset :math:`\mathcal{D} = \{(x_1, c_1), (x_2, c_2), ..., (x_n, c_n)\} \in \mathbb{R}^{n \times p}`. The feature vector :math:`x_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, I_p)`. A function :math:`f(\cdot)` with random noise encodes the features :math:`x_i` into the objective function coefficients :math:`c_i`.
-
-Here, ``deg`` is a positive integer parameter for polynomial degree and ``noise_width`` :math:`\epsilon_i^j \sim  U(1-\bar{\epsilon}_i^j, 1+\bar{\epsilon}_i^j)` is a multiplicative noise term.
+The synthetic dataset :math:`\mathcal{D}` includes features :math:`\mathbf{x}` and cost coefficients :math:`\mathbf{c}`. Thus, :math:`\mathcal{D} = \{\mathbf{(x_1, c_1), (x_2, c_2), ..., (x_n, c_n)}\}`. The feature vector :math:`\mathbf{x_i} \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I}_p)` and the corresponding cost :math:`\mathbf{c_i} \in \mathbb{R}^d` comes from a nonlinear function of :math:`\mathbf{x_i}` with additional random noise. :math:`\epsilon_i^j \sim  U(1-\bar{\epsilon}, 1+\bar{\epsilon})` is the multiplicative noise term for :math:`c_{ij}`, the :math:`j^{th}` element of cost :math:`\mathbf{c_i}`.
 
 
 Shortest Path
 -------------
 
-For the shortest path, a random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` which follows Bernoulli distribution with probability :math:`0.5`, encode the features :math:`x_i`. The cost of objective function :math:`c_{ij}` is generated from :math:`[\frac{1}{\sqrt{p}} ((\mathcal{B} x_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
+For the shortest path, a random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` which follows Bernoulli distribution with probability :math:`0.5`, encode the features :math:`x_i`. The cost of objective function :math:`c_{ij}` is generated from :math:`[\frac{1}{{3.5}^{deg}\sqrt{p}} ((\mathcal{B} x_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
 
 .. autofunction:: pyepo.data.shortestpath.genData
 
@@ -36,7 +34,7 @@ The following code is to generate data for the shortest path on the grid network
 Knapsack
 --------
 
-For the knapsack, the weights of items are fixed for the data and are randomly sampled from :math:`3` to :math:`8` with a precision of :math:`1` decimal place. Same as the shortest path, :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` is a random matrix in which all elements follow Bernoulli distribution with probability :math:`0.5`. Then, the objective function coeficients are define as :math:`c_{ij} = \lceil \frac{5}{{3.5}^{deg}} (\frac{1}{\sqrt{p}} ((\mathcal{B} x_i)_j + 3)^{deg} + 1) \cdot \epsilon_i^j \rceil`.
+Because we assume that the uncertain coefficients exist only on the objective function, the weights of items are fixed throughout the data. We define the number of items as :math:`m` and the dimension of resources is :math:`k`. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are sampled from :math:`3` to :math:`8` with a precision of :math:`1` decimal place. With the same :math:`\mathcal{B}`, cost :math:`c_{ij}` is calculated from :math:`\lceil \frac{5}{{3.5}^{deg}} [\frac{1}{\sqrt{p}} ((\mathcal{B} \mathbf{x_i})_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil`.
 
 .. autofunction:: pyepo.data.knapsack.genData
 
@@ -78,7 +76,6 @@ optDataset
 ``pyepo.data.optDataset`` is PyTorch Dataset, which stores the features and their corresponding costs of the objective function and solves optimization problems to get optimal solutions and optimal objective values.
 
 .. autoclass:: pyepo.data.dataset.optDataset
-   :members: __init__
 
 As the following example, ``optDataset`` and Pytorch ``DataLoader`` wrap the data samples, which can make the model training cleaner and more organized.
 

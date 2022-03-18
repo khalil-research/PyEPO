@@ -165,7 +165,7 @@ class tspGGModel(tspABModel):
 
     def relax(self):
         """
-        A method to relax model
+        A method to get linear relaxation model
         """
         # copy
         model_rel = tspGGModelRel(self.num_nodes)
@@ -451,7 +451,7 @@ class tspMTZModel(tspABModel):
 
     def relax(self):
         """
-        A method to relax model
+        A method to get linear relaxation model
         """
         # copy
         model_rel = tspMTZModelRel(self.num_nodes)

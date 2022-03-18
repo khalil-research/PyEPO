@@ -39,8 +39,8 @@ def solveWithObj4Par(cost, args, model_type):
 
 class SPOPlus(Function):
     """
-    SPO+ Loss function, a surrogate loss function of SPO Loss, which measures
-    the decision error of optimization problem.
+    A autograd function for SPO+ Loss, as a surrogate loss function of SPO Loss,
+    which measures the decision error of optimization problem.
 
     For SPO/SPO+ Loss, the objective function is linear and constraints are
     known and fixed, but the cost vector need to be predicted from contextual

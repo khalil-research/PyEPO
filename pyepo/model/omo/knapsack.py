@@ -58,7 +58,7 @@ class knapsackModel(optOmoModel):
 
     def relax(self):
         """
-        A method to relax model
+        A method to get linear relaxation model
         """
         # copy
         model_rel = knapsackModelRel(self.weights, self.capacity)

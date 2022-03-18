@@ -39,7 +39,7 @@ class optGrbModel(optModel):
         A method to set objective function
 
         Args:
-            c (ndarray): cost of objective function
+            c (np.ndarray / list): cost of objective function
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
@@ -79,7 +79,7 @@ class optGrbModel(optModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coeffcients of new constraint
+            coefs (np.ndarray / list): coeffcients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
