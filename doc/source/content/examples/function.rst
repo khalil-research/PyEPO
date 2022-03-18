@@ -4,11 +4,7 @@ Functions
 SPO+ Loss
 =========
 
-SPO+ Loss function, a surrogate loss function of SPO Loss, which measures the decision error (optimality gap) of optimization problem.
-
-For SPO/SPO+ Loss, the objective function is linear and constraints are known and fixed, but the cost vector need to be predicted from contextual data.
-
-The SPO+ Loss is convex with subgradient. Thus, allows us to design an algorithm based on stochastic gradient descent.
+SPO+ Loss function, a surrogate loss function of SPO Loss, measures the decision error (optimality gap) of optimization problem.
 
 .. autoclass:: pyepo.func.SPOPlus
     :members:
@@ -19,17 +15,14 @@ The SPO+ Loss is convex with subgradient. Thus, allows us to design an algorithm
 
    import pyepo
 
-   spo = pyepo.func.SPOPlus(sp_model, processes=8)
+   spo = pyepo.func.SPOPlus(sp_model, processes=2)
 
 
 Diffenretiable Black-box Optimizer
 ==================================
 
-Diffenretiable block-box optimizer function, which introduce blocks into neural networks.
+Diffenretiable black-box (DBB) optimizer function introduces optimizer block into neural networks.
 
-For DBB, the objective function is linear and constraints are known and fixed, but the cost vector need to be predicted from contextual data.
-
-The block-box approximate gradient of optimizer smoothly. Thus, allows us to design an algorithm based on stochastic gradient descent.
 
 .. autoclass:: pyepo.func.blackboxOpt
    :members:
@@ -40,4 +33,4 @@ The block-box approximate gradient of optimizer smoothly. Thus, allows us to des
 
    import pyepo
 
-   dbb = pyepo.func.blackboxOpt(sp_model, lambd=10, processes=8)
+   dbb = pyepo.func.blackboxOpt(sp_model, lambd=10, processes=2)

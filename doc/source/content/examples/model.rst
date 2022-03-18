@@ -5,13 +5,13 @@ Model
 
 Our API is also designed to support users to define their own problems based on GurobiPy and Pyomo. Besides the API of GurobiPy & Pyomo, users can also build problems from scratch with whatever solvers and algorithms they want to use.
 
-To build optimizations models with ``PyEPO``, users do **not** need specific costs and objective functions since the cost vector is unknown but can be estimated from data.
+To build optimizations models with ``PyEPO``, users do **not** need specific costs of objective functions since the cost vector is unknown but can be estimated from data.
 
 
 Pre-defined Models
 ==================
 
-Pre-defined models are some classic optimization problems, including shortest path, knapsack, and traveling salesman.
+Pre-defined models are classic optimization problems, including shortest path, knapsack, and traveling salesman.
 
 
 Shortest Path
@@ -23,7 +23,7 @@ It is a (h,w) grid network and the goal is to find the shortest path from northw
   :width: 300
   :alt: Shortest Path on the Grid Graph
 
-The shortest path problem is built as Linear programming (LP) and formulated as a minimum cost flow problem. Thus, network flow constraints are modeled as the feasible region.
+The shortest path problem is built as Linear Programming (LP) and formulated as a minimum cost flow problem. Thus, network flow constraints are modeled as the feasible region.
 
 Shortest Path GurobiPy Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -38,16 +38,16 @@ The ``optModel`` is built from ``pyepo.model.grb.shortestPathModel``, in which A
    import pyepo
 
    grid = (5,5) # network grid
-   sp_model = pyepo.model.grb.shortestPathModel(grid) # build model
+   optmodel = pyepo.model.grb.shortestPathModel(grid) # build model
 
-Users can use ``setObj`` with a specific cost vector to set current objective function and use ``solve`` to solve it.
+Users can use ``setObj`` with a specific cost vector to set current objective function and use ``solve`` to optimize.
 
 .. code-block:: python
 
    import random
-   cost = [random.random() for _ in range(sp_model.num_cost)] # random cost vector
-   sp_model.setObj(cost) # set objective function
-   sp_model.solve() # solve
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
 
 Shortest Path Pyomo Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -64,8 +64,8 @@ Pyomo supports a wide variety of solvers in the background (e.g. BARON, CBC, CPL
    import pyepo
 
    grid = (5,5) # network grid
-   sp_model = pyepo.model.omo.shortestPathModel(grid, solver="glpk") # build model with glpk
-   sp_model = pyepo.model.omo.shortestPathModel(grid, solver="gurobi") # build model with gurobi
+   optmodel = pyepo.model.omo.shortestPathModel(grid, solver="glpk") # build model with glpk
+   optmodel = pyepo.model.omo.shortestPathModel(grid, solver="gurobi") # build model with gurobi
 
 You can get the current list of supported solvers using the pyomo command:
 
@@ -73,14 +73,14 @@ You can get the current list of supported solvers using the pyomo command:
 
    pyomo help --solvers
 
-Same as ``pyepo.model.grb.shortestPathModel``, methods ``setObj`` and ``solve`` can set objective function and solve the problem.
+Same as ``pyepo.model.grb.shortestPathModel``, methods ``setObj`` and ``solve`` can specify objective function and solve the problem.
 
 .. code-block:: python
 
    import random
-   cost = [random.random() for _ in range(sp_model.num_cost)] # random cost vector
-   sp_model.setObj(cost) # set objective function
-   sp_model.solve() # solve
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
 
 
 Knapsack
@@ -99,7 +99,7 @@ Multi-dimensional knapsack problem is a knapsack problem with multiple resource 
 
 Constraints coefficients **weights** and constraints rhs **capacities** are required to create models.
 
-.. note:: The dimension of the knapsack and the number of items are implicitly defined by the array of **weights** and **capacities**.
+.. note:: The dimension of the knapsack and the number of items are implicitly defined by the shape of **weights** and **capacities**.
 
 Knapsack GurobiPy Model
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -117,22 +117,22 @@ The ``optModel`` is built from ``pyepo.model.grb.knapsackModel``, in which API u
               [4, 5, 2, 3, 5],
               [5, 4, 6, 2, 3]] # constraints coefficients
    capacities = [12, 10, 15] # constraints rhs
-   ks_model = pyepo.model.grb.knapsackModel(weights, capacities) # build model
+   optmodel = pyepo.model.grb.knapsackModel(weights, capacities) # build model
 
 Users can use ``setObj`` with a specific cost vector to set current objective function and use ``solve`` to solve it.
 
 .. code-block:: python
 
    import random
-   cost = [random.random() for _ in range(ks_model.num_cost)] # random cost vector multiply with -1
-   ks_model.setObj(cost) # set objective function
-   ks_model.solve() # solve
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
 
-In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the problem that arises by removing the integrality constraint of each variable. As an ILP, ``ks_model`` allows users to relax ILP with ``relax`` method to obtain a new relaxed ``optModel``.
+In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the problem that arises by removing the integrality constraint of each variable. As an ILP, ``optmodel`` allows users to relax ILP with ``relax`` method to obtain a new relaxed ``optModel``.
 
 .. code-block:: python
 
-   ks_model_rel = ks_model.relax() # relax
+   optmodel_rel = optmodel.relax() # relax
 
 Knapsack Pyomo Model
 ^^^^^^^^^^^^^^^^^^^^
@@ -150,8 +150,10 @@ The ``optModel`` is built from ``pyepo.model.omo.knapsackModel``, in which API u
               [4, 5, 2, 3, 5],
               [5, 4, 6, 2, 3]] # constraints coefficients
    capacities = [12, 10, 15] # constraints rhs
-   ks_model = pyepo.model.omo.knapsackModel(weights, capacities, solver="glpk") # build model with glpk
-   ks_model = pyepo.model.omo.knapsackModel(weights, capacities, solver="gurobi") # build model with gurobi
+   # build model with GLPK
+   optmodel = pyepo.model.omo.knapsackModel(weights, capacities, solver="glpk")
+   # build model with Gurobi
+   optmodel = pyepo.model.omo.knapsackModel(weights, capacities, solver="gurobi")
 
 Same as ``pyepo.model.grb.knapsackModel``,  users can use ``setObj``, ``solve``, and ``relax`` methods.
 
@@ -187,11 +189,11 @@ Same as previous model, the code for traveling salesman problem with DFJ formula
    import random
 
    num_nodes = 20 # number of nodes
-   tsp_model = pyepo.model.grb.tspDFJModel(num_nodes) # build model
+   optmodel = pyepo.model.grb.tspDFJModel(num_nodes) # build model
 
-   cost = [random.random() for _ in range(tsp_model.num_cost)] # random cost vector
-   tsp_model.setObj(cost) # set objective function
-   tsp_model.solve() # solve
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
 
 
 GG formulation
@@ -208,13 +210,13 @@ Same as previous model, the code for traveling salesman problem with GG formulat
    import random
 
    num_nodes = 20 # number of nodes
-   tsp_model = pyepo.model.grb.tspGGModel(num_nodes) # build model
+   optmodel = pyepo.model.grb.tspGGModel(num_nodes) # build model
 
-   cost = [random.random() for _ in range(tsp_model.num_cost)] # random cost vector
-   tsp_model.setObj(cost) # set objective function
-   tsp_model.solve() # solve
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
 
-   tsp_model.relax() # relax
+   optmodel.relax() # relax
 
 
 MTZ formulation
@@ -231,13 +233,13 @@ Same as previous model, the code for traveling salesman problem with MTZ formula
    import random
 
    num_nodes = 20 # number of nodes
-   tsp_model = pyepo.model.grb.tspMTZModel(num_nodes) # build model
+   optmodel = pyepo.model.grb.tspMTZModel(num_nodes) # build model
 
-   cost = [random.random() for _ in range(tsp_model.num_cost)] # random cost vector
-   tsp_model.setObj(cost) # set objective function
-   tsp_model.solve() # solve
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
 
-   tsp_model.relax() # relax
+   optmodel.relax() # relax
 
 
 User-defined Models
@@ -250,6 +252,8 @@ User-defined GurobiPy Models
 ----------------------------
 
 User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class ``pyepo.model.grb.optGrbModel``.
+
+For ``optGrbModel``, users does not need specify the sense of optimization model. Both the minimization and maximization models are correctly recognized and run by ``pyepo``.
 
 .. autoclass:: pyepo.model.grb.optGrbModel
    :members: __init__, _getModel, setObj, solve, num_cost, relax
@@ -269,6 +273,8 @@ For example, users can build models for the following problem:
 In the general case, users only need to implement ``_getModel`` method with GurobiPy.
 
 .. code-block:: python
+
+   import random
 
    import gurobipy as gp
    from gurobipy import GRB
@@ -290,10 +296,10 @@ In the general case, users only need to implement ``_getModel`` method with Guro
            m.addConstr(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
            return m, x
 
-   model = myModel()
+   myoptmodel = myModel()
    cost = [random.random() for _ in range(model.num_cost)] # random cost vector
-   model.setObj(cost) # set objective function
-   model.solve() # solve
+   myoptmodel.setObj(cost) # set objective function
+   myoptmodel.solve() # solve
 
 
 User-defined Pyomo Models
@@ -318,11 +324,16 @@ Let's build models for the problem again with Pyomo:
 
 In the general case, users only need to implement ``_getModel`` method with Pyomo.
 
+.. warning::  Unlike the ``optGrbModel``, the ``optOmoModel`` need to set ``modelSense`` in the ``_getModel``.
+
 .. code-block:: python
+
+   import random
 
    from pyomo import environ as pe
 
    from pyepo.model.omo import optOmoModel
+   from pyepo import EPO
 
    class myModel(optOmoModel):
 
@@ -355,8 +366,9 @@ User-defined Models from Scratch
 .. autoclass:: pyepo.model.opt.optModel
    :members: __init__, _getModel, setObj, solve, num_cost
 
-For example, we can use ``networkx`` to solve the previous shortest path problem using the Dijkstra algorithm. And ``pyepo.model.opt.optModel`` allows users to create a model in this way.
+.. warning::  The ``optModel`` need to set ``modelSense`` in the ``_getModel``. If not set, the default is to minimize.
 
+For example, we can use ``networkx`` to solve the previous shortest path problem using the Dijkstra algorithm. And ``pyepo.model.opt.optModel`` allows users to create a model in this way.
 
 .. code-block:: python
 

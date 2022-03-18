@@ -16,14 +16,14 @@ class shortestPathModel(optGrbModel):
 
     Attributes:
         _model (GurobiPy model): Gurobi model
-        grid (tuple): Size of grid network
+        grid (tuple of int): Size of grid network
         arcs (list): List of arcs
     """
 
     def __init__(self, grid):
         """
         Args:
-            grid (tuple): size of grid network
+            grid (tuple of int): size of grid network
         """
         self.grid = grid
         self.arcs = self._getArcs()

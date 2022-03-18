@@ -16,14 +16,14 @@ class shortestPathModel(optOmoModel):
     Attributes:
         _model (PyOmo model): Pyomo model
         solver (str): optimization solver in the background
-        grid (tuple): size of grid network
+        grid (tuple of int): size of grid network
         arcs (list): list of arcs
     """
 
     def __init__(self, grid, solver="glpk"):
         """
         Args:
-            grid (tuple): size of grid network
+            grid (tuple of int): size of grid network
             solver (str): optimization solver in the background
         """
         self.grid = grid
