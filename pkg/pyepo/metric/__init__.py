@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Performance metricuation
+Performance evaluation
 """
 
 from pyepo.metric.mse import MSE
