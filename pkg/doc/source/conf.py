@@ -12,56 +12,56 @@
 #
 import os
 import sys
-sys.path.append(os.path.abspath('../..'))
-#sys.path.append(os.path.abspath('../../pyepo'))
-sys.path.append(os.path.abspath('../../pyepo/data'))
-sys.path.append(os.path.abspath('../../pyepo/model'))
-sys.path.append(os.path.abspath('../../pyepo/twostage'))
-sys.path.append(os.path.abspath('../../pyepo/func'))
-sys.path.append(os.path.abspath('../../pyepo/train'))
-sys.path.append(os.path.abspath('../../pyepo/eval'))
+sys.path.append(os.path.abspath("../.."))
+#sys.path.append(os.path.abspath("../../pyepo"))
+sys.path.append(os.path.abspath("../../pyepo/data"))
+sys.path.append(os.path.abspath("../../pyepo/model"))
+sys.path.append(os.path.abspath("../../pyepo/twostage"))
+sys.path.append(os.path.abspath("../../pyepo/func"))
+sys.path.append(os.path.abspath("../../pyepo/train"))
+sys.path.append(os.path.abspath("../../pyepo/eval"))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'Smart Predict then Optimize'
-copyright = '2021, Bo Tang'
-author = 'Bo Tang'
+project = "PyTorch-based End-to-End Predict-then-Optimize Tool"
+copyright = "2021, Bo Tang"
+author = "Bo Tang"
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.1'
+release = "v0.1"
 
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-              'autoapi.extension',
-              'sphinx.ext.autosummary',
-              'sphinx.ext.doctest',
-              'sphinx.ext.intersphinx',
-              'sphinx.ext.todo',
-              'sphinx.ext.coverage',
-              'sphinx.ext.mathjax',
-              'sphinx.ext.napoleon'
+extensions = ["sphinx.ext.autodoc",
+              "autoapi.extension",
+              "sphinx.ext.autosummary",
+              "sphinx.ext.doctest",
+              "sphinx.ext.intersphinx",
+              "sphinx.ext.todo",
+              "sphinx.ext.coverage",
+              "sphinx.ext.mathjax",
+              "sphinx.ext.napoleon"
               ]
 
 # To document __init__()
-autoclass_content = 'both'
+autoclass_content = "both"
 
 # Add any path that contain packages here, relative to this directory.
-autoapi_dirs = ['../../pyepo']
+autoapi_dirs = ["../../pyepo"]
 
 # Turn on autosummary
 autosummary_generate = True
 
 # Add defualt programming language
-hightlight_language = 'python'
+hightlight_language = "python"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_build', '_templates']
+templates_path = ["_build", "_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -74,9 +74,9 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]

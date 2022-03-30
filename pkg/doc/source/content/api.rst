@@ -8,5 +8,4 @@ Module
    modules/pyepo.model
    modules/pyepo.twostage
    modules/pyepo.func
-   modules/pyepo.train
-   modules/pyepo.eval
+   modules/pyepo.metric
