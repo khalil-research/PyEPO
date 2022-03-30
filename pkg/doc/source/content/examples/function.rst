@@ -1,5 +1,5 @@
-Functions
-+++++++++
+Auto Grad Functions
++++++++++++++++++++
 
 SPO+ Loss
 =========
@@ -15,7 +15,7 @@ SPO+ Loss function, a surrogate loss function of SPO Loss, measures the decision
 
    import pyepo
 
-   spo = pyepo.func.SPOPlus(sp_model, processes=2)
+   spo = pyepo.func.SPOPlus(optmodel, processes=2)
 
 
 Diffenretiable Black-box Optimizer
@@ -33,4 +33,4 @@ Diffenretiable black-box (DBB) optimizer function introduces optimizer block int
 
    import pyepo
 
-   dbb = pyepo.func.blackboxOpt(sp_model, lambd=10, processes=2)
+   dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=2)
