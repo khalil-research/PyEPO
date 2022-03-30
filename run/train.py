@@ -11,7 +11,7 @@ import torch
 from torch.utils.data import DataLoader
 
 import pyepo
-from run import net, utils
+from run import net, utils, training
 
 
 def train(trainset, testset, model, config):
@@ -99,10 +99,10 @@ def trainSPO(trainloader, testloader, model, config):
     # log dir
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
-    pyepo.train.trainSPO(reg, model, optimizer, trainloader, testloader,
-                         logdir=logdir, epoch=config.epoch,
-                         processes=config.proc, l1_lambd=config.l1,
-                         l2_lambd=config.l2, log=config.elog)
+    training.trainSPO(reg, model, optimizer, trainloader, testloader,
+                      logdir=logdir, epoch=config.epoch,
+                      processes=config.proc, l1_lambd=config.l1,
+                      l2_lambd=config.l2, log=config.elog)
     return reg
 
 
@@ -118,8 +118,8 @@ def trainBB(trainloader, testloader, model, config):
     # log dir
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
-    pyepo.train.trainBB(reg, model, optimizer, trainloader, testloader,
-                        lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
-                        processes=config.proc, bb_lambd=config.smth,
-                        l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
+    training.trainBB(reg, model, optimizer, trainloader, testloader,
+                     lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
+                     processes=config.proc, bb_lambd=config.smth,
+                     l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
     return reg
