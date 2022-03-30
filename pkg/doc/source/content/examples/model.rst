@@ -297,7 +297,7 @@ In the general case, users only need to implement ``_getModel`` method with Guro
            return m, x
 
    myoptmodel = myModel()
-   cost = [random.random() for _ in range(model.num_cost)] # random cost vector
+   cost = [random.random() for _ in range(myoptmodel.num_cost)] # random cost vector
    myoptmodel.setObj(cost) # set objective function
    myoptmodel.solve() # solve
 
@@ -352,10 +352,10 @@ In the general case, users only need to implement ``_getModel`` method with Pyom
            m.cons.add(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
            return m, x
 
-   model = myModel()
-   cost = [random.random() for _ in range(model.num_cost)] # random cost vector
-   model.setObj(cost) # set objective function
-   model.solve() # solve
+   myoptmodel = myModel(solver="gurobi")
+   cost = [random.random() for _ in range(myoptmodel.num_cost)] # random cost vector
+   myoptmodel.setObj(cost) # set objective function
+   myoptmodel.solve() # solve
 
 
 User-defined Models from Scratch
@@ -461,12 +461,12 @@ For example, we can use ``networkx`` to solve the previous shortest path problem
 
    # solve model
    grid = (5,5)
-   model = myShortestPathModel(grid)
-   cost = [random.random() for _ in range(model.num_cost)] # random cost vector
-   model.setObj(cost) # set objective function
-   sol, obj = model.solve() # solve
+   myoptmodel = myShortestPathModel(grid)
+   cost = [random.random() for _ in range(myoptmodel.num_cost)] # random cost vector
+   myoptmodel.setObj(cost) # set objective function
+   sol, obj = myoptmodel.solve() # solve
    # print res
    print('Obj: {}'.format(obj))
-   for i, e in enumerate(model.arcs):
+   for i, e in enumerate(myoptmodel.arcs):
        if sol[i] > 1e-3:
            print(e)

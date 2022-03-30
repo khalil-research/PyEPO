@@ -43,9 +43,9 @@ The example to learn shortest path with linear model is as follows:
            out = self.linear(x)
            return out
    # init
-   reg = LinearRegression()
+   predmodel = LinearRegression()
    # set optimizer
-   optimizer = torch.optim.Adam(reg.parameters(), lr=1e-3)
+   optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
    # init SPO+ loss
    spo = pyepo.func.SPOPlus(optmodel, processes=8)
 
@@ -55,7 +55,7 @@ The example to learn shortest path with linear model is as follows:
        for data in dataloader:
            x, c, w, z = data
            # forward pass
-           cp = reg(x)
+           cp = predmodel(x)
            loss = spo.apply(cp, c, w, z).mean()
            # backward pass
            optimizer.zero_grad()
@@ -103,9 +103,9 @@ The example to learn shortest path with linear model is as follows:
            out = self.linear(x)
            return out
    # init
-   reg = LinearRegression()
+   predmodel = LinearRegression()
    # set optimizer
-   optimizer = torch.optim.Adam(reg.parameters(), lr=1e-3)
+   optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
    # init black-box
    dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=8)
    # init loss
@@ -117,7 +117,7 @@ The example to learn shortest path with linear model is as follows:
        for data in dataloader:
            x, c, w, z = data
            # forward pass
-           cp = reg(x)
+           cp = predmodel(x)
            # black-box optimizer
            wp = dbb.apply(cp)
            # objective value
