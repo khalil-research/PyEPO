@@ -25,7 +25,6 @@ setuptools.setup(
         "numpy",
         "scipy",
         "pathos",
-        "tqdm",
         "Pyomo>=6.1.2",
         "gurobipy>=9.1.2",
         "scikit_learn",
