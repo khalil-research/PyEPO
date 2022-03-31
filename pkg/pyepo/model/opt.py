@@ -9,7 +9,7 @@ from copy import deepcopy
 
 from pyepo import EPO
 
-class optModel(ABC):
+class optModel: #(ABC):
     """
     This is an abstract class for optimization model
 
@@ -33,7 +33,7 @@ class optModel(ABC):
         """
         return len(self.x)
 
-    @abstractmethod
+    #@abstractmethod
     def _getModel(self):
         """
         An abstract method to build a model from a optimization solver
@@ -43,7 +43,7 @@ class optModel(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
+    #@abstractmethod
     def setObj(self, c):
         """
         An abstract method to set objective function
@@ -53,7 +53,7 @@ class optModel(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
+    #@abstractmethod
     def solve(self):
         """
         An abstract method to solve model
