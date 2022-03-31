@@ -2,6 +2,14 @@
 
 ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software package that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build your optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implemented SPO+ loss and differentiable Black-Box optimizer as [PyTorch](https://pytorch.org/) autograd functions.
 
+## QuickStart
+
+You can download from our GitHub repository.
+
+```bash
+gh repo clone khalil-research/PyEPO
+```
+
 ## Dependencies
 
 * [NumPy](https://numpy.org/)
@@ -68,7 +76,8 @@ if __name__ == "__main__":
     num_data = 1000 # number of data
     num_feat = 5 # size of feature
     num_item = 10 # number of items
-    weights, x, c = pyepo.data.knapsack.genData(num_data, num_feat, num_item, dim=3, deg=4, noise_width=0.5, seed=135)
+    weights, x, c = pyepo.data.knapsack.genData(num_data, num_feat, num_item,
+                                                dim=3, deg=4, noise_width=0.5, seed=135)
 
     # init optimization model
     optmodel = myModel(weights)
@@ -103,3 +112,8 @@ if __name__ == "__main__":
     print("Regret on Training Set: {:.4f}".format(regret))
 
 ```
+
+### Reference
+* [1] [Elmachtoub, A. N., & Grigas, P. (2021). Smart “predict, then optimize”. Management Science.](https://doi.org/10.1287/mnsc.2020.3922)
+* [2] [Mandi, J., Stuckey, P. J., & Guns, T. (2020). Smart predict-and-optimize for hard combinatorial optimization problems. In Proceedings of the AAAI Conference on Artificial Intelligence.](https://doi.org/10.1609/aaai.v34i02.5521)
+* [3] [Vlastelica, M., Paulus, A., Musil, V., Martius, G., & Rolínek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.](https://arxiv.org/abs/1912.02175)
