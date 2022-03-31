@@ -2,12 +2,18 @@
 
 ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software package that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build your optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implemented SPO+ loss and differentiable Black-Box optimizer as [PyTorch](https://pytorch.org/) autograd functions.
 
-## QuickStart
+## Installation
 
-You can download from our GitHub repository.
+You can download ``PyEPO`` from our GitHub repository.
 
 ```bash
-gh repo clone khalil-research/PyEPO
+git clone https://github.com/khalil-research/PyEPO.git
+```
+
+And install it.
+
+```bash
+pip install PyEPO/pkg/.
 ```
 
 ## Dependencies
