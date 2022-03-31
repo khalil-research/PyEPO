@@ -23,7 +23,6 @@ setuptools.setup(
     # dependencies
     install_requires = [
         "numpy",
-        "pandas",
         "scipy",
         "pathos",
         "tqdm",
