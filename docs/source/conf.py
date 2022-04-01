@@ -12,14 +12,14 @@
 #
 import os
 import sys
-sys.path.append(os.path.abspath("../.."))
+sys.path.append(os.path.abspath("../../pkg"))
 #sys.path.append(os.path.abspath("../../pyepo"))
-sys.path.append(os.path.abspath("../../pyepo/data"))
-sys.path.append(os.path.abspath("../../pyepo/model"))
-sys.path.append(os.path.abspath("../../pyepo/twostage"))
-sys.path.append(os.path.abspath("../../pyepo/func"))
-sys.path.append(os.path.abspath("../../pyepo/train"))
-sys.path.append(os.path.abspath("../../pyepo/eval"))
+sys.path.append(os.path.abspath("../../pkg/pyepo/data"))
+sys.path.append(os.path.abspath("../../pkg/pyepo/model"))
+sys.path.append(os.path.abspath("../../pkg/pyepo/twostage"))
+sys.path.append(os.path.abspath("../../pkg/pyepo/func"))
+sys.path.append(os.path.abspath("../../pkg/pyepo/train"))
+sys.path.append(os.path.abspath("../../pkg/pyepo/eval"))
 
 
 # -- Project information -----------------------------------------------------
@@ -52,7 +52,7 @@ extensions = ["sphinx.ext.autodoc",
 autoclass_content = "both"
 
 # Add any path that contain packages here, relative to this directory.
-autoapi_dirs = ["../../pyepo"]
+autoapi_dirs = ["../../pkg/pyepo"]
 
 # Turn on autosummary
 autosummary_generate = True
@@ -69,7 +69,7 @@ templates_path = ["_build", "_templates"]
 exclude_patterns = []
 
 # icon
-html_favicon = "../../../images/favicon.ico"
+html_favicon = "../../images/favicon.ico"
 
 
 # -- Options for HTML output -------------------------------------------------

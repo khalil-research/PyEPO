@@ -1,4 +1,4 @@
-.. image:: ../../../../images/logo1.png
+.. image:: ../../../images/logo1.png
   :width: 1000
 
 Introduction

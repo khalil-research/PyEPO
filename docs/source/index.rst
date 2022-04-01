@@ -1,4 +1,4 @@
-.. Smart Predict then Optimize documentation master file, created by
+.. PyEPO documentation master file, created by
    sphinx-quickstart on Mon Aug  9 14:15:50 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
