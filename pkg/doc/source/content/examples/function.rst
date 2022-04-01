@@ -34,3 +34,11 @@ Diffenretiable black-box (DBB) optimizer function introduces optimizer block int
    import pyepo
 
    dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=2)
+
+
+Parallel Computation
+====================
+
+``PyEPO`` supports parallel computation for solving optimization problems in training, where the parameter ``processes`` is the number of processors to be used.
+
+.. warning::  On Windows system, there is missing ``freeze_support`` to run ``multiprocessing`` directly from ``__main__``. When ``processes`` is not 1, try ``if __name__ == "__main__":`` instead of Jupyter notebook or a PY file.
