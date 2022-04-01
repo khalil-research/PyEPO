@@ -68,6 +68,9 @@ templates_path = ["_build", "_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+# icon
+html_favicon = "../../../images/favicon.ico"
+
 
 # -- Options for HTML output -------------------------------------------------
 
