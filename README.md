@@ -29,6 +29,10 @@ pip install PyEPO/pkg/.
 * [Scikit Learn](https://scikit-learn.org/)
 * [PyTorch](http://pytorch.org/)
 
+## Documentation
+
+The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
+
 ## Issue
 
 On Windows system, there is missing ``freeze_support`` to run ``multiprocessing`` directly from ``__main__``. When ``processes`` is not 1, try ``if __name__ == "__main__":`` instead of Jupyter notebook or a PY file.
