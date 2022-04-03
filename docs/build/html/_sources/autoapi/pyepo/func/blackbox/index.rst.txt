@@ -1,0 +1,79 @@
+:mod:`pyepo.func.blackbox`
+==========================
+
+.. py:module:: pyepo.func.blackbox
+
+.. autoapi-nested-parse::
+
+   Diffenretiable Black-box optimization function
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.blackbox.blackboxOpt
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.blackbox.solveWithObj4Par
+
+
+.. function:: solveWithObj4Par(cost, args, model_type)
+
+   A global function to solve function in parallel processors
+
+   :param cost: cost of objective function
+   :type cost: np.ndarray
+   :param args: optModel args
+   :type args: dict
+   :param model_type: optModel class type
+   :type model_type: ABCMeta
+
+   :returns: optimal solution
+   :rtype: list
+
+
+.. py:class:: blackboxOpt(optmodel, lambd=10, processes=1)
+
+   Bases: :class:`torch.autograd.Function`
+
+   A autograd function for diffenretiable black-box optimizer, which yield
+   optimal a solution and derive a gradient.
+
+   For diffenretiable block-box, the objective function is linear and
+   constraints are known and fixed, but the cost vector need to be predicted
+   from contextual data.
+
+   The block-box approximate gradient of optimizer smoothly. Thus, allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   .. method:: forward(ctx, pred_cost)
+      :staticmethod:
+
+      Forward pass in neural network.
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+   .. method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass in neural network
+
+
+

@@ -1,0 +1,30 @@
+:mod:`pyepo.model`
+==================
+
+.. py:module:: pyepo.model
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on solvers
+
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   grb/index.rst
+   omo/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   opt/index.rst
+
+

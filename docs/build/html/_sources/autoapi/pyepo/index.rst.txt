@@ -1,0 +1,36 @@
+:mod:`pyepo`
+============
+
+.. py:module:: pyepo
+
+.. autoapi-nested-parse::
+
+   pyepo
+   ===
+   Smart "Predict, then Optimize"
+
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   data/index.rst
+   func/index.rst
+   metric/index.rst
+   model/index.rst
+   twostage/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   EPO/index.rst
+   utlis/index.rst
+
+

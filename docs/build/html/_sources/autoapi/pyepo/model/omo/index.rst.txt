@@ -1,0 +1,206 @@
+:mod:`pyepo.model.omo`
+======================
+
+.. py:module:: pyepo.model.omo
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on Pyomo
+
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   knapsack/index.rst
+   omomodel/index.rst
+   shortestpath/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.omo.optOmoModel
+   pyepo.model.omo.shortestPathModel
+   pyepo.model.omo.knapsackModel
+   pyepo.model.omo.knapsackModelRel
+
+
+
+.. py:class:: optOmoModel(solver='glpk')
+
+   Bases: :class:`pyepo.model.opt.optModel`
+
+   This is an abstract class for Pyomo-based optimization model
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: PyOmo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. method:: __repr__(self)
+
+      Return repr(self).
+
+
+   .. method:: setObj(self, c)
+
+      A method to set objective function
+
+      :param c: cost of objective function
+      :type c: np.ndarray / list
+
+
+   .. method:: solve(self)
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+   .. method:: copy(self)
+
+      A method to copy model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+   .. method:: addConstr(self, coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: np.ndarray / list
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+.. py:class:: shortestPathModel(grid, solver='glpk')
+
+   Bases: :class:`pyepo.model.omo.omomodel.optOmoModel`
+
+   This class is optimization model for shortest path problem
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: PyOmo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: grid
+
+      size of grid network
+
+      :type: tuple of int
+
+   .. attribute:: arcs
+
+      list of arcs
+
+      :type: list
+
+   .. method:: _getArcs(self)
+
+      A method to get list of arcs for grid network
+
+      :returns: arcs
+      :rtype: list
+
+
+   .. method:: _getModel(self)
+
+      A method to build pyomo model
+
+
+
+.. py:class:: knapsackModel(weights, capacity, solver='glpk')
+
+   Bases: :class:`pyepo.model.omo.omomodel.optOmoModel`
+
+   This class is optimization model for knapsack problem
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: PyOmo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: weights
+
+      weights of items
+
+      :type: np.ndarray
+
+   .. attribute:: capacity
+
+      total capacity
+
+      :type: np.ndarray
+
+   .. attribute:: items
+
+      list of item index
+
+      :type: list
+
+   .. method:: _getModel(self)
+
+      A method to build pyomo model
+
+
+   .. method:: relax(self)
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: knapsackModelRel(weights, capacity, solver='glpk')
+
+   Bases: :class:`pyepo.model.omo.knapsack.knapsackModel`
+
+   This class is relaxed optimization model for knapsack problem.
+
+   .. method:: _getModel(self)
+
+      A method to build pyomo
+
+
+   .. method:: relax(self)
+
+      A forbidden method to relax MIP model
+
+
+

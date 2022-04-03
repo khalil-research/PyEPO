@@ -1,0 +1,94 @@
+:mod:`pyepo.metric.metrics`
+===========================
+
+.. py:module:: pyepo.metric.metrics
+
+.. autoapi-nested-parse::
+
+   Metrics for SKlearn model
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.metric.metrics.SPOError
+   pyepo.metric.metrics.makeSkScorer
+   pyepo.metric.metrics.makeAutoSkScorer
+   pyepo.metric.metrics.testMSE
+   pyepo.metric.metrics.makeTestMSEScorer
+
+
+.. function:: SPOError(pred_cost, true_cost, model_type, args)
+
+   A function to calculate normalized true regret
+
+   :param pred_cost: predicted costs
+   :type pred_cost: numpy.array
+   :param true_cost: true costs
+   :type true_cost: numpy.array
+   :param model_type: optModel class type
+   :type model_type: ABCMeta
+   :param args: optModel args
+   :type args: dict
+
+   :returns: regret loss
+   :rtype: float
+
+
+.. function:: makeSkScorer(optmodel)
+
+   A function to create sklearn scorer
+
+   :param optmodel: optimization model
+   :type optmodel: optModel
+
+   :returns: callable object that returns a scalar score; less is better.
+   :rtype: scorer
+
+
+.. function:: makeAutoSkScorer(optmodel)
+
+   A function to create Auto-SKlearn scorer
+
+   :param optmodel: optimization model
+   :type optmodel: optModel
+
+   :returns: callable object that returns a scalar score; less is better.
+   :rtype: scorer
+
+
+.. function:: testMSE(pred_cost, true_cost, model_type, args)
+
+   A function to calculate MSE for testing
+
+   :param pred_cost: predicted costs
+   :type pred_cost: array
+   :param true_cost: true costs
+   :type true_cost: array
+   :param model_type: optModel class type
+   :type model_type: ABCMeta
+   :param args: optModel args
+   :type args: dict
+
+   :returns: mse
+   :rtype: float
+
+
+.. function:: makeTestMSEScorer(optmodel)
+
+   A function to create MSE scorer for testing
+
+   :param optmodel: optimization model
+   :type optmodel: optModel
+
+   :returns: callable object that returns a scalar score; less is better.
+   :rtype: scorer
+
+
