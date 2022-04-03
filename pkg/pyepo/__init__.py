@@ -3,8 +3,8 @@
 
 """
 pyepo
-===
-Smart "Predict, then Optimize"
+=====
+PyTorch-based End-to-End Predict-and-Optimize Tool
 """
 
 import pyepo.data
