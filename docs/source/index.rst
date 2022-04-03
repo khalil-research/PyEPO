@@ -7,7 +7,7 @@
    :width: 1000
 
 Welcome to PyEPO's documentation!
-=======================================================
+=================================
 This is the Documentation of ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming)
 
 .. toctree::
