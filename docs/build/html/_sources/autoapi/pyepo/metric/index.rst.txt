@@ -1,0 +1,158 @@
+:mod:`pyepo.metric`
+===================
+
+.. py:module:: pyepo.metric
+
+.. autoapi-nested-parse::
+
+   Performance evaluation
+
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   metrics/index.rst
+   mse/index.rst
+   regret/index.rst
+   unambregret/index.rst
+
+
+Package Contents
+----------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.metric.MSE
+   pyepo.metric.calRegret
+   pyepo.metric.regret
+   pyepo.metric.calUnambRegret
+   pyepo.metric.unambRegret
+   pyepo.metric.SPOError
+   pyepo.metric.makeSkScorer
+   pyepo.metric.makeAutoSkScorer
+
+
+.. function:: MSE(predmodel, dataloader)
+
+   A function to evaluate model performance with MSE
+
+   :param predmodel: a regression neural network for cost prediction
+   :type predmodel: nn
+   :param dataloader: Torch dataloader from optDataSet
+   :type dataloader: DataLoader
+
+   :returns: MSE loss
+   :rtype: float
+
+
+.. function:: calRegret(optmodel, pred_cost, true_cost, true_obj)
+
+   A function to calculate normalized true regret for a batch
+
+   :param optmodel: optimization model
+   :type optmodel: optModel
+   :param pred_cost: predicted costs
+   :type pred_cost: torch.tensor
+   :param true_cost: true costs
+   :type true_cost: torch.tensor
+   :param true_obj: true optimal objective values
+   :type true_obj: torch.tensor
+
+   Returns:predmodel
+       float: true regret losses
+
+
+.. function:: regret(predmodel, optmodel, dataloader)
+
+   A function to evaluate model performance with normalized true regret
+
+   :param predmodel: a regression neural network for cost prediction
+   :type predmodel: nn
+   :param optmodel: an PyEPO optimization model
+   :type optmodel: optModel
+   :param dataloader: Torch dataloader from optDataSet
+   :type dataloader: DataLoader
+
+   :returns: true regret loss
+   :rtype: float
+
+
+.. function:: calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-05)
+
+   A function to calculate normalized unambiguous regret for a batch
+
+   :param optmodel: optimization model
+   :type optmodel: optModel
+   :param pred_cost: predicted costs
+   :type pred_cost: torch.tensor
+   :param true_cost: true costs
+   :type true_cost: torch.tensor
+   :param true_obj: true optimal objective values
+   :type true_obj: torch.tensor
+
+   :returns: unambiguous regret losses
+   :rtype: float
+
+
+.. function:: unambRegret(predmodel, optmodel, dataloader, tolerance=1e-05)
+
+   A function to evaluate model performance with normalized unambiguous regret
+
+   :param predmodel: a regression neural network for cost prediction
+   :type predmodel: nn
+   :param optmodel: an PyEPO optimization model
+   :type optmodel: optModel
+   :param dataloader: Torch dataloader from optDataSet
+   :type dataloader: DataLoader
+
+   :returns: unambiguous regret loss
+   :rtype: float
+
+
+.. function:: SPOError(pred_cost, true_cost, model_type, args)
+
+   A function to calculate normalized true regret
+
+   :param pred_cost: predicted costs
+   :type pred_cost: numpy.array
+   :param true_cost: true costs
+   :type true_cost: numpy.array
+   :param model_type: optModel class type
+   :type model_type: ABCMeta
+   :param args: optModel args
+   :type args: dict
+
+   :returns: regret loss
+   :rtype: float
+
+
+.. function:: makeSkScorer(optmodel)
+
+   A function to create sklearn scorer
+
+   :param optmodel: optimization model
+   :type optmodel: optModel
+
+   :returns: callable object that returns a scalar score; less is better.
+   :rtype: scorer
+
+
+.. function:: makeAutoSkScorer(optmodel)
+
+   A function to create Auto-SKlearn scorer
+
+   :param optmodel: optimization model
+   :type optmodel: optModel
+
+   :returns: callable object that returns a scalar score; less is better.
+   :rtype: scorer
+
+

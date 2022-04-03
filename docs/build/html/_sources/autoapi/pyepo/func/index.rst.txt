@@ -1,0 +1,106 @@
+:mod:`pyepo.func`
+=================
+
+.. py:module:: pyepo.func
+
+.. autoapi-nested-parse::
+
+   Pytorch autograd function for SPO training
+
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   blackbox/index.rst
+   spoplus/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.blackboxOpt
+   pyepo.func.SPOPlus
+
+
+
+.. py:class:: blackboxOpt(optmodel, lambd=10, processes=1)
+
+   Bases: :class:`torch.autograd.Function`
+
+   A autograd function for diffenretiable black-box optimizer, which yield
+   optimal a solution and derive a gradient.
+
+   For diffenretiable block-box, the objective function is linear and
+   constraints are known and fixed, but the cost vector need to be predicted
+   from contextual data.
+
+   The block-box approximate gradient of optimizer smoothly. Thus, allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   .. method:: forward(ctx, pred_cost)
+      :staticmethod:
+
+      Forward pass in neural network.
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+   .. method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass in neural network
+
+
+
+.. py:class:: SPOPlus(optmodel, processes=1)
+
+   Bases: :class:`torch.autograd.Function`
+
+   A autograd function for SPO+ Loss, as a surrogate loss function of SPO Loss,
+   which measures the decision error of optimization problem.
+
+   For SPO/SPO+ Loss, the objective function is linear and constraints are
+   known and fixed, but the cost vector need to be predicted from contextual
+   data.
+
+   The SPO+ Loss is convex with subgradient. Thus, allows us to design an
+   algorithm based on stochastic gradient descent.
+
+   .. method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj)
+      :staticmethod:
+
+      Forward pass in neural network
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+      :param true_cost: a batch of true values of the cost
+      :type true_cost: torch.tensor
+      :param true_sol: a batch of true optimal solutions
+      :type true_sol: torch.tensor
+      :param true_obj: a batch of true optimal objective values
+      :type true_obj: torch.tensor
+
+      :returns: SPO+ loss
+      :rtype: torch.tensor
+
+
+   .. method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass in neural network
+
+
+

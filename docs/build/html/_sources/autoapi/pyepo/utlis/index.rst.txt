@@ -1,0 +1,34 @@
+:mod:`pyepo.utlis`
+==================
+
+.. py:module:: pyepo.utlis
+
+.. autoapi-nested-parse::
+
+   Utility function
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.utlis.getArgs
+
+
+.. function:: getArgs(model)
+
+   A global function to get args of model
+
+   :param model: optimization model
+   :type model: optModel
+
+   :returns: model args
+   :rtype: dict
+
+
