@@ -4,6 +4,12 @@
 
 ``PyEPO`` (PyTorch-based End-to-End Predict-and-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-and-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements SPO+ loss [[1]](https://doi.org/10.1287/mnsc.2020.3922) and differentiable Black-Box optimizer [[3]](https://arxiv.org/abs/1912.02175) as [PyTorch](https://pytorch.org/) autograd functions.
 
+
+## Documentation
+
+The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
+
+
 ## Installation
 
 You can download ``PyEPO`` from our GitHub repository.
@@ -18,6 +24,7 @@ And install it.
 pip install PyEPO/pkg/.
 ```
 
+
 ## Dependencies
 
 * [NumPy](https://numpy.org/)
@@ -29,13 +36,11 @@ pip install PyEPO/pkg/.
 * [Scikit Learn](https://scikit-learn.org/)
 * [PyTorch](http://pytorch.org/)
 
-## Documentation
-
-The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
 
 ## Issue
 
 On Windows system, there is missing ``freeze_support`` to run ``multiprocessing`` directly from ``__main__``. When ``processes`` is not 1, try ``if __name__ == "__main__":`` instead of Jupyter notebook or a PY file.
+
 
 ## Sample Code
 
@@ -128,6 +133,7 @@ if __name__ == "__main__":
     print("Regret on Training Set: {:.4f}".format(regret))
 
 ```
+
 
 ## Reference
 * [1] [Elmachtoub, A. N., & Grigas, P. (2021). Smart “predict, then optimize”. Management Science.](https://doi.org/10.1287/mnsc.2020.3922)
