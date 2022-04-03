@@ -1,7 +1,0 @@
-Hyperparameter, Importance, Correlation
-Batch Size,0.57,0.761
-Learning Rate,0.094,-0.185
-L1 Reg,0.01,-0.073
-L2 Reg,0.016,-0.171
-Optimizer Adam,0.03,-0.177
-Optimizer SDG,0.037,0.177
