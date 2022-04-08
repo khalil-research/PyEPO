@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction &mdash; PyTorch-based End-to-End Predict-and-Optimize Tool v0.1 documentation</title>
+  <title>Installation &mdash; PyTorch-based End-to-End Predict-and-Optimize Tool v0.1 documentation</title>
   
 
   
@@ -28,7 +28,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,8 +41,8 @@
   <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Installation" href="install.html" />
-    <link rel="prev" title="Welcome to PyEPO’s documentation!" href="../index.html" /> 
+    <link rel="next" title="Tutorial" href="tutorial.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,11 +88,8 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#end-to-end-predict-and-optimize-framework">End-to-End Predict-and-Optimize Framework</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref.html">Reference</a></li>
@@ -143,13 +139,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Introduction</li>
+      <li>Installation</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/content/intro.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/content/install.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -162,16 +158,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <a class="reference internal image-reference" href="../_images/logo1.png"><img alt="../_images/logo1.png" src="../_images/logo1.png" style="width: 1000px;" /></a>
-<section id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-and-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-and-optimize problems with linear objective function.</p>
-<p>The core capability of <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> is to build optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> implements SPO+ loss and differentiable Black-Box optimizer as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd functions.</p>
-<section id="end-to-end-predict-and-optimize-framework">
-<h2>End-to-End Predict-and-Optimize Framework<a class="headerlink" href="#end-to-end-predict-and-optimize-framework" title="Permalink to this headline">¶</a></h2>
-<p>A labeled dataset <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> of <span class="math notranslate nohighlight">\((x,c)\)</span> pairs is used to fit a machine learning model that directly minimizes decision error. The critical component is an optimization solver which is embedded into a neural network.</p>
-<a class="reference internal image-reference" href="../_images/e2e.png"><img alt="../_images/e2e.png" src="../_images/e2e.png" style="width: 900px;" /></a>
-</section>
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>You can download <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> from our <a class="reference external" href="https://github.com/khalil-research/PyEPO">GitHub repository</a>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://github.com/khalil-research/PyEPO.git</span>
+</pre></div>
+</div>
+<p>And install it.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install PyEPO/pkg/.</span>
+</pre></div>
+</div>
 </section>
 
 
@@ -182,10 +178,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tutorial.html" class="btn btn-neutral float-right" title="Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to PyEPO’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="intro.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

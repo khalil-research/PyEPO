@@ -8,13 +8,48 @@
 
 Welcome to PyEPO's documentation!
 =================================
-This is the Documentation of ``PyEPO`` (PyTorch-based End-to-End Predict-and-Optimize Library Tool), which aims to provide end-to-end methods for predict-and-optimize tasks.
+This is the documentation of ``PyEPO`` (PyTorch-based End-to-End Predict-and-Optimize Library Tool), which aims to provide end-to-end methods for predict-and-optimize tasks.
+
+
+Sample Code
++++++++++++
+
+.. code-block:: python
+
+   import random
+
+   import gurobipy as gp
+   from gurobipy import GRB
+
+   from pyepo.model.grb import optGrbModel
+
+   class myModel(optGrbModel):
+
+       def _getModel(self):
+           # ceate a model
+           m = gp.Model()
+           # varibles
+           x = m.addVars(5, name="x", vtype=GRB.BINARY)
+           # sense (must be minimize)
+           m.modelSense = GRB.MAXIMIZE
+           # constraints
+           m.addConstr(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
+           m.addConstr(4 * x[0] + 5 * x[1] + 2 * x[2] + 3 * x[3] + 5 * x[4] <= 10)
+           m.addConstr(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
+           return m, x
+
+   # set optimization model
+   myoptmodel = myModel()
+   # init SPO+ loss
+   spo = pyepo.func.SPOPlus(optmodel, processes=1)
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    content/intro
+   content/install
    content/tutorial
    content/api
    content/ref
