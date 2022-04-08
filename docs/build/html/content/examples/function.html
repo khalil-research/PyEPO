@@ -89,6 +89,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
@@ -180,7 +181,7 @@
 <h1>Auto Grad Functions<a class="headerlink" href="#auto-grad-functions" title="Permalink to this headline">¶</a></h1>
 <section id="spo-loss">
 <h2>SPO+ Loss<a class="headerlink" href="#spo-loss" title="Permalink to this headline">¶</a></h2>
-<p>SPO+ Loss function, a surrogate loss function of SPO Loss, measures the decision error (optimality gap) of optimization problem.</p>
+<p>SPO+ Loss function <a class="footnote-reference brackets" href="#f1" id="id1">1</a>, a surrogate loss function of SPO Loss, measures the decision error (optimality gap) of optimization problem.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus" title="Permalink to this definition">¶</a></dt>
@@ -238,7 +239,7 @@ algorithm based on stochastic gradient descent.</p>
 </section>
 <section id="diffenretiable-black-box-optimizer">
 <h2>Diffenretiable Black-box Optimizer<a class="headerlink" href="#diffenretiable-black-box-optimizer" title="Permalink to this headline">¶</a></h2>
-<p>Diffenretiable black-box (DBB) optimizer function introduces optimizer block into neural networks.</p>
+<p>Diffenretiable black-box (DBB) optimizer function <a class="footnote-reference brackets" href="#f2" id="id2">2</a> introduces optimizer block into neural networks.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt" title="Permalink to this definition">¶</a></dt>
@@ -297,6 +298,15 @@ design an algorithm based on stochastic gradient descent.</p>
 <p class="admonition-title">Warning</p>
 <p>On Windows system, there is missing <code class="docutils literal notranslate"><span class="pre">freeze_support</span></code> to run <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> directly from <code class="docutils literal notranslate"><span class="pre">__main__</span></code>. When <code class="docutils literal notranslate"><span class="pre">processes</span></code> is not 1, try <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">&quot;__main__&quot;:</span></code> instead of Jupyter notebook or a PY file.</p>
 </div>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Elmachtoub, A. N., &amp; Grigas, P. (2021). Smart “predict, then optimize”. Management Science.</p>
+</dd>
+<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Vlastelica, M., Paulus, A., Musil, V., Martius, G., &amp; Rolínek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.</p>
+</dd>
+</dl>
 </section>
 </section>
 
