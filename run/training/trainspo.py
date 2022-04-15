@@ -13,7 +13,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 import pyepo
-from pyepo.train.util import getDevice
+from .utils import getDevice
 
 def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
              epoch=50, processes=1, l1_lambd=0, l2_lambd=0, log=0):

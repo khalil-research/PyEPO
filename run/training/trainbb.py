@@ -12,7 +12,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 import pyepo
-from pyepo.train.util import getDevice
+from .utils import getDevice
 
 def trainBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
             logdir="./logs", epoch=50, processes=1, bb_lambd=10, l1_lambd=0,
