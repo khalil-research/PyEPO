@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction &mdash; PyTorch-based End-to-End Predict-and-Optimize Tool v0.1 documentation</title>
+  <title>Introduction &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> PyTorch-based End-to-End Predict-and-Optimize Tool
+            <a href="../index.html" class="icon icon-home"> PyTorch-based End-to-End Predict-then-Optimize Tool
           
 
           
@@ -90,7 +90,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#end-to-end-predict-and-optimize-framework">End-to-End Predict-and-Optimize Framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#end-to-end-predict-then-optimize-framework">End-to-End Predict-then-Optimize Framework</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -112,7 +112,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">PyTorch-based End-to-End Predict-and-Optimize Tool</a>
+          <a href="../index.html">PyTorch-based End-to-End Predict-then-Optimize Tool</a>
         
       </nav>
 
@@ -165,10 +165,10 @@
   <a class="reference internal image-reference" href="../_images/logo1.png"><img alt="../_images/logo1.png" src="../_images/logo1.png" style="width: 1000px;" /></a>
 <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-and-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-and-optimize problems with linear objective function.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with linear objective function.</p>
 <p>The core capability of <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> is to build optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> implements SPO+ loss and differentiable Black-Box optimizer as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd functions.</p>
-<section id="end-to-end-predict-and-optimize-framework">
-<h2>End-to-End Predict-and-Optimize Framework<a class="headerlink" href="#end-to-end-predict-and-optimize-framework" title="Permalink to this headline">¶</a></h2>
+<section id="end-to-end-predict-then-optimize-framework">
+<h2>End-to-End Predict-then-Optimize Framework<a class="headerlink" href="#end-to-end-predict-then-optimize-framework" title="Permalink to this headline">¶</a></h2>
 <p>A labeled dataset <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> of <span class="math notranslate nohighlight">\((x,c)\)</span> pairs is used to fit a machine learning model that directly minimizes decision error. The critical component is an optimization solver which is embedded into a neural network.</p>
 <a class="reference internal image-reference" href="../_images/e2e.png"><img alt="../_images/e2e.png" src="../_images/e2e.png" style="width: 900px;" /></a>
 </section>

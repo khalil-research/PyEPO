@@ -4,7 +4,7 @@
 """
 pyepo
 =====
-PyTorch-based End-to-End Predict-and-Optimize Tool
+PyTorch-based End-to-End Predict-then-Optimize Tool
 """
 
 import pyepo.data

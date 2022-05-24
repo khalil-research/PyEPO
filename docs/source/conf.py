@@ -24,7 +24,7 @@ sys.path.append(os.path.abspath("../../pkg/pyepo/eval"))
 
 # -- Project information -----------------------------------------------------
 
-project = "PyTorch-based End-to-End Predict-and-Optimize Tool"
+project = "PyTorch-based End-to-End Predict-then-Optimize Tool"
 copyright = "2021, Bo Tang"
 author = "Bo Tang"
 
