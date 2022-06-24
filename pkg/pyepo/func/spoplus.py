@@ -115,6 +115,7 @@ class SPOPlus(Function):
         z = true_obj.to("cpu").numpy()
         # check sol
         #_check_sol(c, w, z)
+        # solve
         if np.random.uniform() <= solve_ratio:
             sol, loss = _solve_in_forward(cp, c, w, z)
             if solve_ratio < 1:
@@ -209,7 +210,7 @@ def _cache_in_forward(cp, c, w, z):
     global _PyEPO_FUNC_SPOP_OPTMODEL
     optmodel = _PyEPO_FUNC_SPOP_OPTMODEL
     # best solution in pool
-    pool_obj = c @ pool.T
+    pool_obj = (2 * cp - c) @ pool.T
     if optmodel.modelSense == EPO.MINIMIZE:
         ind = np.argmin(pool_obj, axis=1)
     if optmodel.modelSense == EPO.MAXIMIZE:
