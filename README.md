@@ -9,7 +9,7 @@ This repository is the official implementation of the paper:
 
 Citation:
 ```
-@article{bo2022pyepo,
+@article{tang2022pyepo,
   title={PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming},
   author={Tang, Bo and and Khalil, Elias B},
   journal={Optimization Online},
