@@ -9,9 +9,9 @@ This repository is the official implementation of the paper:
 
 Citation:
 ```
-@article{bo2022pyepo,
+@article{tang2022pyepo,
   title={PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming},
-  author={Tang, Bo and and Khalil, Elias B},
+  author={Tang, Bo and Khalil, Elias B},
   journal={Optimization Online},
   year={2022},
 }
@@ -23,15 +23,22 @@ Citation:
 ``PyEPO`` (PyTorch-based End-to-End Predict-and-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-and-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements SPO+ loss [[1]](https://doi.org/10.1287/mnsc.2020.3922) and differentiable Black-Box optimizer [[3]](https://arxiv.org/abs/1912.02175) as [PyTorch](https://pytorch.org/) autograd functions.
 
 
+## Documentation
+
+The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
+
+
 ## Learning Framework
 
 <p align="center"><img width="100%" src="images/learning_framework_e2e.png" /></p>
 
 
-## Documentation
+## Features
 
-The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
-
+- Implement SPO+ [[1]](https://doi.org/10.1287/mnsc.2020.3922) and DBB [[3]](https://arxiv.org/abs/1912.02175)
+- Support [Gurobi](https://www.gurobi.com/) and [Pyomo](http://www.pyomo.org/) API
+- Support Parallel computing for optimization solver
+- Support solution caching [[4]](https://arxiv.org/abs/2011.05354) to speed up training
 
 ## Installation
 
@@ -162,3 +169,4 @@ if __name__ == "__main__":
 * [1] [Elmachtoub, A. N., & Grigas, P. (2021). Smart “predict, then optimize”. Management Science.](https://doi.org/10.1287/mnsc.2020.3922)
 * [2] [Mandi, J., Stuckey, P. J., & Guns, T. (2020). Smart predict-and-optimize for hard combinatorial optimization problems. In Proceedings of the AAAI Conference on Artificial Intelligence.](https://doi.org/10.1609/aaai.v34i02.5521)
 * [3] [Vlastelica, M., Paulus, A., Musil, V., Martius, G., & Rolínek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.](https://arxiv.org/abs/1912.02175)
+* [4] [Mulamba, Maxime, et al. "Contrastive losses and solution caching for predict-and-optimize." arXiv preprint arXiv:2011.05354 (2020).](https://arxiv.org/abs/2011.05354)
