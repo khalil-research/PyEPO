@@ -11,7 +11,7 @@ Citation:
 ```
 @article{tang2022pyepo,
   title={PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming},
-  author={Tang, Bo and and Khalil, Elias B},
+  author={Tang, Bo and Khalil, Elias B},
   journal={Optimization Online},
   year={2022},
 }
