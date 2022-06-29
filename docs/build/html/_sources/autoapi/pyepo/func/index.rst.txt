@@ -32,14 +32,14 @@ Classes
 
 
 
-.. py:class:: blackboxOpt(optmodel, lambd=10, processes=1)
+.. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :class:`torch.autograd.Function`
 
-   A autograd function for diffenretiable black-box optimizer, which yield
+   A autograd function for differentiable black-box optimizer, which yield
    optimal a solution and derive a gradient.
 
-   For diffenretiable block-box, the objective function is linear and
+   For differentiable block-box, the objective function is linear and
    constraints are known and fixed, but the cost vector need to be predicted
    from contextual data.
 
@@ -65,7 +65,7 @@ Classes
 
 
 
-.. py:class:: SPOPlus(optmodel, processes=1)
+.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :class:`torch.autograd.Function`
 

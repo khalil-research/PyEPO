@@ -27,6 +27,9 @@ Functions
 .. autoapisummary::
 
    pyepo.func.spoplus.solveWithObj4Par
+   pyepo.func.spoplus._solve_in_forward
+   pyepo.func.spoplus._cache_in_forward
+   pyepo.func.spoplus._check_sol
 
 
 .. function:: solveWithObj4Par(cost, args, model_type)
@@ -44,7 +47,7 @@ Functions
    :rtype: tuple
 
 
-.. py:class:: SPOPlus(optmodel, processes=1)
+.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :class:`torch.autograd.Function`
 
@@ -81,5 +84,20 @@ Functions
 
       Backward pass in neural network
 
+
+
+.. function:: _solve_in_forward(cp, c, w, z)
+
+   A function to solve optimization in the forward pass
+
+
+.. function:: _cache_in_forward(cp, c, w, z)
+
+   A function to use solution pool in the forward pass
+
+
+.. function:: _check_sol(c, w, z)
+
+   A function to check solution is correct
 
 
