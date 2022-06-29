@@ -1,11 +1,11 @@
 Model
 +++++
 
-``PyEPO`` contains several pre-defined optimizations models with GurobiPy and Pyomo. It includes the shortest path problem (GurobiPy & Pyomo), the knapsack problem (GurobiPy & Pyomo), and the traveling salesman problem (GurobiPy).
+``PyEPO`` contains several pre-defined optimization models with GurobiPy and Pyomo. It includes the shortest path problem (GurobiPy & Pyomo), the knapsack problem (GurobiPy & Pyomo), and the traveling salesman problem (GurobiPy).
 
 Our API is also designed to support users to define their own problems based on GurobiPy and Pyomo. Besides the API of GurobiPy & Pyomo, users can also build problems from scratch with whatever solvers and algorithms they want to use.
 
-To build optimizations models with ``PyEPO``, users do **not** need specific costs of objective functions since the cost vector is unknown but can be estimated from data.
+To build optimization models with ``PyEPO``, users do **not** need specific costs of objective functions since the cost vector is unknown but can be estimated from data.
 
 
 Pre-defined Models
