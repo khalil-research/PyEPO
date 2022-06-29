@@ -43,11 +43,11 @@ class blackboxOpt(Function):
     A autograd function for differentiable black-box optimizer, which yield
     optimal a solution and derive a gradient.
 
-    For differentiable block-box, the objective function is linear and
+    For differentiable black-box, the objective function is linear and
     constraints are known and fixed, but the cost vector need to be predicted
     from contextual data.
 
-    The block-box approximate gradient of optimizer smoothly. Thus, allows us to
+    The black-box approximate gradient of optimizer smoothly. Thus, allows us to
     design an algorithm based on stochastic gradient descent.
     """
 
@@ -55,7 +55,7 @@ class blackboxOpt(Function):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
-            lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
+            lambd (float): a hyperparameter for differentiable black-box to contral interpolation degree
             processes (int): number of processors, 1 for single-core, 0 for all of cores
         """
         super().__init__()
