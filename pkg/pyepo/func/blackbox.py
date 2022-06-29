@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Diffenretiable Black-box optimization function
+Differentiable Black-box optimization function
 """
 
 import multiprocessing as mp
@@ -40,10 +40,10 @@ def solveWithObj4Par(cost, args, model_type):
 
 class blackboxOpt(Function):
     """
-    A autograd function for diffenretiable black-box optimizer, which yield
+    A autograd function for differentiable black-box optimizer, which yield
     optimal a solution and derive a gradient.
 
-    For diffenretiable block-box, the objective function is linear and
+    For differentiable block-box, the objective function is linear and
     constraints are known and fixed, but the cost vector need to be predicted
     from contextual data.
 
@@ -55,7 +55,7 @@ class blackboxOpt(Function):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
-            lambd (float): a hyperparameter for diffenretiable block-box to contral interpolation degree
+            lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
             processes (int): number of processors, 1 for single-core, 0 for all of cores
         """
         super().__init__()

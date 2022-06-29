@@ -18,10 +18,10 @@ SPO+ Loss function, a surrogate loss function of SPO Loss, measures the decision
    spo = pyepo.func.SPOPlus(optmodel, processes=2)
 
 
-Diffenretiable Black-box Optimizer
+Differentiable Black-box Optimizer
 ==================================
 
-Diffenretiable black-box (DBB) optimizer function introduces optimizer block into neural networks.
+Differentiable black-box (DBB) optimizer function introduces optimizer block into neural networks.
 
 
 .. autoclass:: pyepo.func.blackboxOpt
