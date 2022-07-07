@@ -138,7 +138,7 @@ if __name__ == "__main__":
     # set optimizer
     optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-2)
     # init SPO+ loss
-    spo = pyepo.func.SPOPlus(optmodel, processes=1)
+    spop = pyepo.func.SPOPlus(optmodel, processes=1)
 
     # build dataset
     dataset = pyepo.data.dataset.optDataset(optmodel, x, c)
@@ -152,7 +152,7 @@ if __name__ == "__main__":
             x, c, w, z = data
             # forward pass
             cp = predmodel(x)
-            loss = spo.apply(cp, c, w, z).mean()
+            loss = spop(cp, c, w, z).mean()
             # backward pass
             optimizer.zero_grad()
             loss.backward()
