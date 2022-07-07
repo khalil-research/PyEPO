@@ -179,18 +179,18 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="../../../content/modules/pyepo.func.html#pyepo.func.blackboxOpt" title="pyepo.func.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
-<td><p>A autograd function for differentiable black-box optimizer, which yield</p></td>
+<td><p>A autograd module for differentiable black-box optimizer, which yield</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../../../content/modules/pyepo.func.html#pyepo.func.SPOPlus" title="pyepo.func.SPOPlus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPOPlus</span></code></a></p></td>
-<td><p>A autograd function for SPO+ Loss, as a surrogate loss function of SPO Loss,</p></td>
+<td><p>A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></p>
-<p>A autograd function for differentiable black-box optimizer, which yield
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>A autograd module for differentiable black-box optimizer, which yield
 optimal a solution and derive a gradient.</p>
 <p>For differentiable block-box, the objective function is linear and
 constraints are known and fixed, but the cost vector need to be predicted
@@ -199,25 +199,8 @@ from contextual data.</p>
 design an algorithm based on stochastic gradient descent.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt.forward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward pass in neural network.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>predicted solutions</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>torch.tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.blackboxOpt.backward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt.backward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Backward pass in neural network</p>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
 </dd></dl>
 
 </dd></dl>
@@ -225,8 +208,8 @@ design an algorithm based on stochastic gradient descent.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></p>
-<p>A autograd function for SPO+ Loss, as a surrogate loss function of SPO Loss,
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
 which measures the decision error of optimization problem.</p>
 <p>For SPO/SPO+ Loss, the objective function is linear and constraints are
 known and fixed, but the cost vector need to be predicted from contextual
@@ -235,30 +218,8 @@ data.</p>
 algorithm based on stochastic gradient descent.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus.forward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward pass in neural network</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p></li>
-<li><p><strong>true_cost</strong> (<em>torch.tensor</em>) – a batch of true values of the cost</p></li>
-<li><p><strong>true_sol</strong> (<em>torch.tensor</em>) – a batch of true optimal solutions</p></li>
-<li><p><strong>true_obj</strong> (<em>torch.tensor</em>) – a batch of true optimal objective values</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>SPO+ loss</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>torch.tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.SPOPlus.backward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.backward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Backward pass in neural network</p>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
 </dd></dl>
 
 </dd></dl>

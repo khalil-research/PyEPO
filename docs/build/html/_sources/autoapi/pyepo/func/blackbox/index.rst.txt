@@ -18,6 +18,7 @@ Classes
 .. autoapisummary::
 
    pyepo.func.blackbox.blackboxOpt
+   pyepo.func.blackbox.blackboxOptFunc
 
 
 
@@ -26,12 +27,77 @@ Functions
 
 .. autoapisummary::
 
-   pyepo.func.blackbox.solveWithObj4Par
    pyepo.func.blackbox._solve_in_pass
    pyepo.func.blackbox._cache_in_pass
+   pyepo.func.blackbox._solveWithObj4Par
 
 
-.. function:: solveWithObj4Par(cost, args, model_type)
+.. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :class:`torch.nn.Module`
+
+   A autograd module for differentiable black-box optimizer, which yield
+   optimal a solution and derive a gradient.
+
+   For differentiable block-box, the objective function is linear and
+   constraints are known and fixed, but the cost vector need to be predicted
+   from contextual data.
+
+   The block-box approximate gradient of optimizer smoothly. Thus, allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   .. method:: forward(self, pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: blackboxOptFunc(*args, **kwargs)
+
+   Bases: :class:`torch.autograd.Function`
+
+   A autograd function for differentiable black-box optimizer
+
+   .. method:: forward(ctx, pred_cost, lambd, optmodel, processes, solve_ratio, module)
+      :staticmethod:
+
+      Forward pass for DBB
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+      :param lambd: a hyperparameter for differentiable block-box to contral interpolation degree
+      :type lambd: float
+      :param optmodel: an PyEPO optimization model
+      :type optmodel: optModel
+      :param processes: number of processors, 1 for single-core, 0 for all of cores
+      :type processes: int
+      :param solve_ratio: the ratio of new solutions computed during training
+      :type solve_ratio: float
+      :param module: blackboxOpt modeul
+      :type module: nn.Module
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+   .. method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass for DBB
+
+
+
+.. function:: _solve_in_pass(cp, optmodel, processes)
+
+   A function to solve optimization in the forward/backward pass
+
+
+.. function:: _cache_in_pass(c, optmodel, solpool)
+
+   A function to use solution pool in the forward/backward pass
+
+
+.. function:: _solveWithObj4Par(cost, args, model_type)
 
    A global function to solve function in parallel processors
 
@@ -44,48 +110,5 @@ Functions
 
    :returns: optimal solution
    :rtype: list
-
-
-.. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
-
-   Bases: :class:`torch.autograd.Function`
-
-   A autograd function for differentiable black-box optimizer, which yield
-   optimal a solution and derive a gradient.
-
-   For differentiable block-box, the objective function is linear and
-   constraints are known and fixed, but the cost vector need to be predicted
-   from contextual data.
-
-   The block-box approximate gradient of optimizer smoothly. Thus, allows us to
-   design an algorithm based on stochastic gradient descent.
-
-   .. method:: forward(ctx, pred_cost)
-      :staticmethod:
-
-      Forward pass in neural network.
-
-      :param pred_cost: a batch of predicted values of the cost
-      :type pred_cost: torch.tensor
-
-      :returns: predicted solutions
-      :rtype: torch.tensor
-
-
-   .. method:: backward(ctx, grad_output)
-      :staticmethod:
-
-      Backward pass in neural network
-
-
-
-.. function:: _solve_in_pass(cp)
-
-   A function to solve optimization in the forward/backward pass
-
-
-.. function:: _cache_in_pass(c)
-
-   A function to use solution pool in the forward/backward pass
 
 

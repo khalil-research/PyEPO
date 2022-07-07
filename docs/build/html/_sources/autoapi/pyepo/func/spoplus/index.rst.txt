@@ -18,6 +18,7 @@ Classes
 .. autoapisummary::
 
    pyepo.func.spoplus.SPOPlus
+   pyepo.func.spoplus.SPOPlusFunc
 
 
 
@@ -26,15 +27,84 @@ Functions
 
 .. autoapisummary::
 
-   pyepo.func.spoplus.solveWithObj4Par
    pyepo.func.spoplus._solve_in_forward
    pyepo.func.spoplus._cache_in_forward
+   pyepo.func.spoplus._solveWithObj4Par
    pyepo.func.spoplus._check_sol
 
 
-.. function:: solveWithObj4Par(cost, args, model_type)
+.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
-   A global function to solve function in parallel processors
+   Bases: :class:`torch.nn.Module`
+
+   A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
+   which measures the decision error of optimization problem.
+
+   For SPO/SPO+ Loss, the objective function is linear and constraints are
+   known and fixed, but the cost vector need to be predicted from contextual
+   data.
+
+   The SPO+ Loss is convex with subgradient. Thus, allows us to design an
+   algorithm based on stochastic gradient descent.
+
+   .. method:: forward(self, pred_cost, true_cost, true_sol, true_obj)
+
+      Forward pass
+
+
+
+.. py:class:: SPOPlusFunc(*args, **kwargs)
+
+   Bases: :class:`torch.autograd.Function`
+
+   A autograd function for SPO+ Loss
+
+   .. method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj, optmodel, processes, solve_ratio, module)
+      :staticmethod:
+
+      Forward pass for SPO+
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+      :param true_cost: a batch of true values of the cost
+      :type true_cost: torch.tensor
+      :param true_sol: a batch of true optimal solutions
+      :type true_sol: torch.tensor
+      :param true_obj: a batch of true optimal objective values
+      :type true_obj: torch.tensor
+      :param optmodel: an PyEPO optimization model
+      :type optmodel: optModel
+      :param processes: number of processors, 1 for single-core, 0 for all of cores
+      :type processes: int
+      :param solve_ratio: the ratio of new solutions computed during training
+      :type solve_ratio: float
+      :param module: SPOPlus modeul
+      :type module: nn.Module
+
+      :returns: SPO+ loss
+      :rtype: torch.tensor
+
+
+   .. method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass for SPO+
+
+
+
+.. function:: _solve_in_forward(cp, c, w, z, optmodel, processes)
+
+   A function to solve optimization in the forward pass
+
+
+.. function:: _cache_in_forward(cp, c, w, z, optmodel, solpool)
+
+   A function to use solution pool in the forward pass
+
+
+.. function:: _solveWithObj4Par(cost, args, model_type)
+
+   A function to solve function in parallel processors
 
    :param cost: cost of objective function
    :type cost: np.ndarray
@@ -45,55 +115,6 @@ Functions
 
    :returns: optimal solution (list) and objective value (float)
    :rtype: tuple
-
-
-.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
-
-   Bases: :class:`torch.autograd.Function`
-
-   A autograd function for SPO+ Loss, as a surrogate loss function of SPO Loss,
-   which measures the decision error of optimization problem.
-
-   For SPO/SPO+ Loss, the objective function is linear and constraints are
-   known and fixed, but the cost vector need to be predicted from contextual
-   data.
-
-   The SPO+ Loss is convex with subgradient. Thus, allows us to design an
-   algorithm based on stochastic gradient descent.
-
-   .. method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj)
-      :staticmethod:
-
-      Forward pass in neural network
-
-      :param pred_cost: a batch of predicted values of the cost
-      :type pred_cost: torch.tensor
-      :param true_cost: a batch of true values of the cost
-      :type true_cost: torch.tensor
-      :param true_sol: a batch of true optimal solutions
-      :type true_sol: torch.tensor
-      :param true_obj: a batch of true optimal objective values
-      :type true_obj: torch.tensor
-
-      :returns: SPO+ loss
-      :rtype: torch.tensor
-
-
-   .. method:: backward(ctx, grad_output)
-      :staticmethod:
-
-      Backward pass in neural network
-
-
-
-.. function:: _solve_in_forward(cp, c, w, z)
-
-   A function to solve optimization in the forward pass
-
-
-.. function:: _cache_in_forward(cp, c, w, z)
-
-   A function to use solution pool in the forward pass
 
 
 .. function:: _check_sol(c, w, z)
