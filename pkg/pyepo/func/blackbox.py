@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Diffenretiable Black-box optimization function
+Differentiable Black-box optimization function
 """
 
 import multiprocessing as mp
@@ -20,10 +20,10 @@ from pyepo.utlis import getArgs
 
 class blackboxOpt(nn.Module):
     """
-    A autograd module for diffenretiable black-box optimizer, which yield
+    A autograd module for differentiable black-box optimizer, which yield
     optimal a solution and derive a gradient.
 
-    For diffenretiable block-box, the objective function is linear and
+    For differentiable block-box, the objective function is linear and
     constraints are known and fixed, but the cost vector need to be predicted
     from contextual data.
 
@@ -35,7 +35,7 @@ class blackboxOpt(nn.Module):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
-            lambd (float): a hyperparameter for diffenretiable block-box to contral interpolation degree
+            lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
@@ -79,7 +79,7 @@ class blackboxOpt(nn.Module):
 
 class blackboxOptFunc(Function):
     """
-    A autograd function for diffenretiable black-box optimizer
+    A autograd function for differentiable black-box optimizer
     """
 
     @staticmethod
@@ -89,7 +89,7 @@ class blackboxOptFunc(Function):
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
-            lambd (float): a hyperparameter for diffenretiable block-box to contral interpolation degree
+            lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
