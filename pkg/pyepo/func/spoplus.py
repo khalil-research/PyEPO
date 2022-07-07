@@ -10,6 +10,7 @@ import numpy as np
 import torch
 from pathos.multiprocessing import ProcessingPool
 from torch.autograd import Function
+from torch import nn
 
 from pyepo import EPO
 from pyepo.data.dataset import optDataset
@@ -17,30 +18,9 @@ from pyepo.model.opt import optModel
 from pyepo.utlis import getArgs
 
 
-def solveWithObj4Par(cost, args, model_type):
+class SPOPlus(nn.Module):
     """
-    A global function to solve function in parallel processors
-
-    Args:
-        cost (np.ndarray): cost of objective function
-        args (dict): optModel args
-        model_type (ABCMeta): optModel class type
-
-    Returns:
-        tuple: optimal solution (list) and objective value (float)
-    """
-    # rebuild model
-    optmodel = model_type(**args)
-    # set obj
-    optmodel.setObj(cost)
-    # solve
-    sol, obj = optmodel.solve()
-    return sol, obj
-
-
-class SPOPlus(Function):
-    """
-    A autograd function for SPO+ Loss, as a surrogate loss function of SPO Loss,
+    A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
     which measures the decision error of optimization problem.
 
     For SPO/SPO+ Loss, the objective function is linear and constraints are
@@ -56,58 +36,70 @@ class SPOPlus(Function):
         Args:
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_rate (float): the ratio of new solutions computed during training
+            solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
         super().__init__()
         # optimization model
         if not isinstance(optmodel, optModel):
             raise TypeError("arg model is not an optModel")
-        global _PyEPO_FUNC_SPOP_OPTMODEL
-        _PyEPO_FUNC_SPOP_OPTMODEL = optmodel
+        self.optmodel = optmodel
         # num of processors
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
-        global _PyEPO_FUNC_SPOP_PROCESSES
-        _PyEPO_FUNC_SPOP_PROCESSES = processes
-        print("Num of cores: {}".format(_PyEPO_FUNC_SPOP_PROCESSES))
+        self.processes = processes
+        print("Num of cores: {}".format(self.processes))
         # solution pool
-        if (solve_ratio < 0) or (solve_ratio > 1):
+        self.solve_ratio = solve_ratio
+        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
             raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
-                format(solve_ratio))
-        global _PyEPO_FUNC_SPOP_PSOLVE
-        _PyEPO_FUNC_SPOP_PSOLVE = solve_ratio
-        if solve_ratio < 1: # init solution pool
+                format(self.solve_ratio))
+        self.solpool = None
+        if self.solve_ratio < 1: # init solution pool
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
-            global _PyEPO_FUNC_SPOP_POOL
-            _PyEPO_FUNC_SPOP_POOL = dataset.sols.copy()
+            self.solpool = dataset.sols.copy()
+        # build carterion
+        self.spop = SPOPlusFunc()
+
+    def forward(self, pred_cost, true_cost, true_sol, true_obj):
+        """
+        Forward pass
+        """
+        loss = self.spop.apply(pred_cost, true_cost, true_sol, true_obj,
+                               self.optmodel, self.processes, self.solve_ratio,
+                               self)
+        return loss
+
+
+
+class SPOPlusFunc(Function):
+    """
+    A autograd function for SPO+ Loss
+    """
 
     @staticmethod
-    def forward(ctx, pred_cost, true_cost, true_sol, true_obj):
+    def forward(ctx, pred_cost, true_cost, true_sol, true_obj,
+                optmodel, processes, solve_ratio, module):
         """
-        Forward pass in neural network
+        Forward pass for SPO+
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
             true_cost (torch.tensor): a batch of true values of the cost
             true_sol (torch.tensor): a batch of true optimal solutions
             true_obj (torch.tensor): a batch of true optimal objective values
+            optmodel (optModel): an PyEPO optimization model
+            processes (int): number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio (float): the ratio of new solutions computed during training
+            module (nn.Module): SPOPlus modeul
 
         Returns:
             torch.tensor: SPO+ loss
         """
         # get device
         device = pred_cost.device
-        # get global
-        global _PyEPO_FUNC_SPOP_PSOLVE
-        solve_ratio = _PyEPO_FUNC_SPOP_PSOLVE
-        global _PyEPO_FUNC_SPOP_OPTMODEL
-        optmodel = _PyEPO_FUNC_SPOP_OPTMODEL
-        if solve_ratio < 1:
-            global _PyEPO_FUNC_SPOP_POOL
-            pool = _PyEPO_FUNC_SPOP_POOL
         # convert tenstor
         cp = pred_cost.to("cpu").numpy()
         c = true_cost.to("cpu").numpy()
@@ -117,11 +109,11 @@ class SPOPlus(Function):
         #_check_sol(c, w, z)
         # solve
         if np.random.uniform() <= solve_ratio:
-            sol, loss = _solve_in_forward(cp, c, w, z)
+            sol, loss = _solve_in_forward(cp, c, w, z, optmodel, processes)
             if solve_ratio < 1:
-                _PyEPO_FUNC_SPOP_POOL = np.concatenate((pool, sol))
+                module.solpool = np.concatenate((module.solpool, sol))
         else:
-            sol, loss = _cache_in_forward(cp, c, w, z)
+            sol, loss = _cache_in_forward(cp, c, w, z, optmodel, module.solpool)
         # sense
         if optmodel.modelSense == EPO.MINIMIZE:
             loss = np.array(loss)
@@ -133,31 +125,28 @@ class SPOPlus(Function):
         sol = torch.FloatTensor(sol).to(device)
         # save solutions
         ctx.save_for_backward(true_sol, sol)
+        # add other objects to ctx
+        ctx.optmodel = optmodel
         return loss
 
     @staticmethod
     def backward(ctx, grad_output):
         """
-        Backward pass in neural network
+        Backward pass for SPO+
         """
         w, wq = ctx.saved_tensors
-        optmodel = _PyEPO_FUNC_SPOP_OPTMODEL
+        optmodel = ctx.optmodel
         if optmodel.modelSense == EPO.MINIMIZE:
             grad = 2 * (w - wq).mean(0)
         if optmodel.modelSense == EPO.MAXIMIZE:
             grad = 2 * (wq - w).mean(0)
-        return grad_output * grad, None, None, None
+        return grad_output * grad, None, None, None, None, None, None, None
 
 
-def _solve_in_forward(cp, c, w, z):
+def _solve_in_forward(cp, c, w, z, optmodel, processes):
     """
     A function to solve optimization in the forward pass
     """
-    # get global
-    global _PyEPO_FUNC_SPOP_OPTMODEL
-    optmodel = _PyEPO_FUNC_SPOP_OPTMODEL
-    global _PyEPO_FUNC_SPOP_PROCESSES
-    processes = _PyEPO_FUNC_SPOP_PROCESSES
     # number of instance
     ins_num = len(z)
     # single-core
@@ -183,7 +172,7 @@ def _solve_in_forward(cp, c, w, z):
         # parallel computing
         with ProcessingPool(processes) as pool:
             res = pool.amap(
-                solveWithObj4Par,
+                _solveWithObj4Par,
                 2 * cp - c,
                 [args] * ins_num,
                 [model_type] * ins_num,
@@ -198,30 +187,46 @@ def _solve_in_forward(cp, c, w, z):
     return sol, loss
 
 
-def _cache_in_forward(cp, c, w, z):
+def _cache_in_forward(cp, c, w, z, optmodel, solpool):
     """
     A function to use solution pool in the forward pass
     """
     # number of instance
     ins_num = len(z)
-    # get global
-    global _PyEPO_FUNC_SPOP_POOL
-    pool = _PyEPO_FUNC_SPOP_POOL
-    global _PyEPO_FUNC_SPOP_OPTMODEL
-    optmodel = _PyEPO_FUNC_SPOP_OPTMODEL
     # best solution in pool
-    pool_obj = (2 * cp - c) @ pool.T
+    solpool_obj = (2 * cp - c) @ solpool.T
     if optmodel.modelSense == EPO.MINIMIZE:
-        ind = np.argmin(pool_obj, axis=1)
+        ind = np.argmin(solpool_obj, axis=1)
     if optmodel.modelSense == EPO.MAXIMIZE:
-        ind = np.argmax(pool_obj, axis=1)
-    obj = np.take_along_axis(pool_obj, ind.reshape(-1,1), axis=1).reshape(-1)
-    sol = pool[ind]
+        ind = np.argmax(solpool_obj, axis=1)
+    obj = np.take_along_axis(solpool_obj, ind.reshape(-1,1), axis=1).reshape(-1)
+    sol = solpool[ind]
     # calculate loss
     loss = []
     for i in range(ins_num):
         loss.append(- obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
     return sol, loss
+
+
+def _solveWithObj4Par(cost, args, model_type):
+    """
+    A function to solve function in parallel processors
+
+    Args:
+        cost (np.ndarray): cost of objective function
+        args (dict): optModel args
+        model_type (ABCMeta): optModel class type
+
+    Returns:
+        tuple: optimal solution (list) and objective value (float)
+    """
+    # rebuild model
+    optmodel = model_type(**args)
+    # set obj
+    optmodel.setObj(cost)
+    # solve
+    sol, obj = optmodel.solve()
+    return sol, obj
 
 
 def _check_sol(c, w, z):

@@ -56,7 +56,7 @@ The example to learn shortest path with linear model is as follows:
            x, c, w, z = data
            # forward pass
            cp = predmodel(x)
-           loss = spo.apply(cp, c, w, z).mean()
+           loss = spo(cp, c, w, z).mean()
            # backward pass
            optimizer.zero_grad()
            loss.backward()
@@ -119,7 +119,7 @@ The example to learn shortest path with linear model is as follows:
            # forward pass
            cp = predmodel(x)
            # black-box optimizer
-           wp = dbb.apply(cp)
+           wp = dbb(cp)
            # objective value
            zp = (wp * c).sum(1).view(-1, 1)
            # spo loss

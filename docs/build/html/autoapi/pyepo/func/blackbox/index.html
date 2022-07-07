@@ -170,7 +170,10 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox.blackboxOpt" title="pyepo.func.blackbox.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
-<td><p>A autograd function for differentiable black-box optimizer, which yield</p></td>
+<td><p>A autograd module for differentiable black-box optimizer, which yield</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.blackbox.blackboxOptFunc" title="pyepo.func.blackbox.blackboxOptFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOptFunc</span></code></a></p></td>
+<td><p>A autograd function for differentiable black-box optimizer</p></td>
 </tr>
 </tbody>
 </table>
@@ -183,20 +186,88 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox.solveWithObj4Par" title="pyepo.func.blackbox.solveWithObj4Par"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solveWithObj4Par</span></code></a>(cost, args, model_type)</p></td>
-<td><p>A global function to solve function in parallel processors</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.blackbox._solve_in_pass" title="pyepo.func.blackbox._solve_in_pass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_solve_in_pass</span></code></a>(cp)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox._solve_in_pass" title="pyepo.func.blackbox._solve_in_pass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_solve_in_pass</span></code></a>(cp, optmodel, processes)</p></td>
 <td><p>A function to solve optimization in the forward/backward pass</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox._cache_in_pass" title="pyepo.func.blackbox._cache_in_pass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_cache_in_pass</span></code></a>(c)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.blackbox._cache_in_pass" title="pyepo.func.blackbox._cache_in_pass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_cache_in_pass</span></code></a>(c, optmodel, solpool)</p></td>
 <td><p>A function to use solution pool in the forward/backward pass</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox._solveWithObj4Par" title="pyepo.func.blackbox._solveWithObj4Par"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_solveWithObj4Par</span></code></a>(cost, args, model_type)</p></td>
+<td><p>A global function to solve function in parallel processors</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>A autograd module for differentiable black-box optimizer, which yield
+optimal a solution and derive a gradient.</p>
+<p>For differentiable block-box, the objective function is linear and
+constraints are known and fixed, but the cost vector need to be predicted
+from contextual data.</p>
+<p>The block-box approximate gradient of optimizer smoothly. Thus, allows us to
+design an algorithm based on stochastic gradient descent.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOptFunc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">blackboxOptFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOptFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></p>
+<p>A autograd function for differentiable black-box optimizer</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOptFunc.forward">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOptFunc.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass for DBB</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p></li>
+<li><p><strong>lambd</strong> (<em>float</em>) – a hyperparameter for differentiable block-box to contral interpolation degree</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>
+<li><p><strong>solve_ratio</strong> (<em>float</em>) – the ratio of new solutions computed during training</p></li>
+<li><p><strong>module</strong> (<em>nn.Module</em>) – blackboxOpt modeul</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>predicted solutions</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOptFunc.backward">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOptFunc.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backward pass for DBB</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
-<dt class="sig sig-object py" id="pyepo.func.blackbox.solveWithObj4Par">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">solveWithObj4Par</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.solveWithObj4Par" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyepo.func.blackbox._solve_in_pass">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">_solve_in_pass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox._solve_in_pass" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function to solve optimization in the forward/backward pass</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.func.blackbox._cache_in_pass">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">_cache_in_pass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solpool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox._cache_in_pass" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function to use solution pool in the forward/backward pass</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.func.blackbox._solveWithObj4Par">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">_solveWithObj4Par</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox._solveWithObj4Par" title="Permalink to this definition">¶</a></dt>
 <dd><p>A global function to solve function in parallel processors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -213,54 +284,6 @@
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></p>
-<p>A autograd function for differentiable black-box optimizer, which yield
-optimal a solution and derive a gradient.</p>
-<p>For differentiable block-box, the objective function is linear and
-constraints are known and fixed, but the cost vector need to be predicted
-from contextual data.</p>
-<p>The block-box approximate gradient of optimizer smoothly. Thus, allows us to
-design an algorithm based on stochastic gradient descent.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.forward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward pass in neural network.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>predicted solutions</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>torch.tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.backward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.backward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Backward pass in neural network</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyepo.func.blackbox._solve_in_pass">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">_solve_in_pass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox._solve_in_pass" title="Permalink to this definition">¶</a></dt>
-<dd><p>A function to solve optimization in the forward/backward pass</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyepo.func.blackbox._cache_in_pass">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">_cache_in_pass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox._cache_in_pass" title="Permalink to this definition">¶</a></dt>
-<dd><p>A function to use solution pool in the forward/backward pass</p>
 </dd></dl>
 
 </section>
