@@ -101,7 +101,7 @@ class blackboxOptFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.to("cpu").numpy()
+        cp = pred_cost.detach().to("cpu").numpy()
         # solve
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
@@ -142,9 +142,9 @@ class blackboxOptFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.to("cpu").numpy()
-        wp = pred_sol.to("cpu").numpy()
-        dl = grad_output.to("cpu").numpy()
+        cp = pred_cost.detach().to("cpu").numpy()
+        wp = pred_sol.detach().to("cpu").numpy()
+        dl = grad_output.detach().to("cpu").numpy()
         # perturbed costs
         cq = cp + lambd * dl
         # solve
