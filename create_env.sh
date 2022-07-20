@@ -52,7 +52,7 @@ if [ ! -d "./$VENVS_DIR/$VENV_NAME" ]; then
   pip install -U tensorboard
 
   echo "  Install submitit..."
-  pip install submitit
+  pip install submitit==1.2.0
 
   echo "  Install auto-sklearn..."
   pip install auto-sklearn==0.14.6
