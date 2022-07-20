@@ -4,8 +4,8 @@
 Train with Black-box optimization function
 """
 
-import os
 import time
+import os
 
 from tqdm import tqdm
 import torch
@@ -14,7 +14,7 @@ from torch.utils.tensorboard import SummaryWriter
 import pyepo
 from .utils import getDevice
 
-def trainBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
+def trainDBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
             logdir="./logs", epoch=50, processes=1, bb_lambd=10, l1_lambd=0,
             l2_lambd=0, log=0):
     """
@@ -51,7 +51,7 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
     # training mode
     reg.train()
     # set black-box optimizer
-    bb = pyepo.func.blackboxOpt(model, lambd=bb_lambd, processes=processes)
+    dbb = pyepo.func.blackboxOpt(model, lambd=bb_lambd, processes=processes)
     # set loss
     criterion = torch.nn.L1Loss()
     # train
@@ -68,7 +68,7 @@ def trainBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
             # forward pass
             cp = reg(x)
             # black-box optimizer
-            wp = bb.apply(cp)
+            wp = dbb(cp)
             # loss
             if lossfunc == "r":
                 # objective value

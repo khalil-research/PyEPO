@@ -22,7 +22,7 @@ parser.add_argument("--prob",
                     help="problem type")
 parser.add_argument("--mthd",
                     type=str,
-                    choices=["auto", "lr", "rf", "spo", "bb", "bbh"],
+                    choices=["auto", "lr", "rf", "spo", "dbb"],
                     help="method")
 parser.add_argument("--ksdim",
                     type=int,
@@ -85,11 +85,11 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
     config.noise = noise
     config.deg = deg
     if (setting.mthd != "2s") and (data == 5000):
-        config.epoch = 50
+        config.epoch = 4
     if (setting.mthd != "2s") and (data == 1000):
-        config.epoch = 300
+        config.epoch = 20
     if (setting.mthd != "2s") and (data == 100):
-        config.epoch = 1000
+        config.epoch = 200
     print(config)
     # run job
     job = executor.submit(pipeline, config)
@@ -98,4 +98,4 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
           .format(job.job_id, mem_gb, num_cpus, instance_logs_path, timeout_min))
 
 # get outputs
-#outputs = [job.result() for job in jobs]
+outputs = [job.result() for job in jobs]

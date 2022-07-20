@@ -65,7 +65,7 @@ def getSavePath(config):
         filename += "_l1{}l2{}".format(config.l1, config.l2)
         # processors
         filename += "_c{}".format(config.proc)
-    if config.mthd == "bb":
+    if config.mthd == "dbb":
         filename += "-lamb{}".format(config.smth)
         if config.loss == "h":
             filename += "-h"

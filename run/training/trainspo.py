@@ -4,8 +4,8 @@
 Train with SPO+ loss
 """
 
-import os
 import time
+import os
 
 import pandas as pd
 from tqdm import tqdm
@@ -47,7 +47,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
     # training mode
     reg.train()
     # set SPO+ Loss as criterion
-    criterion = pyepo.func.SPOPlus(model, processes=processes)
+    spop = pyepo.func.SPOPlus(model, processes=processes)
     # train
     time.sleep(1)
     pbar = tqdm(range(epoch))
@@ -61,7 +61,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
             x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
             # forward pass
             cp = reg(x)
-            loss = criterion.apply(cp, c, w, z).mean()
+            loss = spop(cp, c, w, z).mean()
             writer.add_scalar('Train/SPO+', loss.item(), cnt)
             # l1 reg
             if l1_lambd:

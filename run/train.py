@@ -27,11 +27,11 @@ def train(trainset, testset, model, config):
         trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
         res = trainSPO(trainloader, testloader, model, config)
-    if config.mthd == "bb":
+    if config.mthd == "dbb":
         print("Using Black-box optimizer block...")
         trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
-        res = trainBB(trainloader, testloader, model, config)
+        res = trainDBB(trainloader, testloader, model, config)
     return res
 
 
@@ -106,7 +106,7 @@ def trainSPO(trainloader, testloader, model, config):
     return reg
 
 
-def trainBB(trainloader, testloader, model, config):
+def trainDBB(trainloader, testloader, model, config):
     """
     Black-Box training
     """
@@ -118,7 +118,7 @@ def trainBB(trainloader, testloader, model, config):
     # log dir
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
-    training.trainBB(reg, model, optimizer, trainloader, testloader,
+    training.trainDBB(reg, model, optimizer, trainloader, testloader,
                      lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
                      processes=config.proc, bb_lambd=config.smth,
                      l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)

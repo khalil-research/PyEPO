@@ -4,7 +4,6 @@
 SPO training pipeline
 """
 
-import argparse
 import os
 import time
 
@@ -92,14 +91,14 @@ def pipeline(config):
 
 
 if __name__ == "__main__":
-
+    import argparse
     parser = argparse.ArgumentParser()
 
     # experiments configuration
     parser.add_argument("--mthd",
                         type=str,
                         default="spo",
-                        choices=["2s", "spo", "bb"],
+                        choices=["2s", "spo", "dbb"],
                         help="method")
     parser.add_argument("--seed",
                         type=int,

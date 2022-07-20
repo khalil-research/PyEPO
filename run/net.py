@@ -14,6 +14,8 @@ class fcNet(nn.Module):
         layers = []
         for i in range(len(arch)-1):
             layers.append(nn.Linear(arch[i], arch[i+1]))
+            if i < len(arch) - 2:
+                layers.append(nn.ReLU())
         self.main = nn.Sequential(*layers)
 
     def forward(self, x):

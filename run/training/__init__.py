@@ -5,4 +5,4 @@ Neural network training
 """
 
 from run.training.trainspo import trainSPO
-from run.training.trainbb import trainBB
+from run.training.traindbb import trainDBB

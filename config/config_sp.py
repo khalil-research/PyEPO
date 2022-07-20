@@ -96,7 +96,7 @@ config_spo = deepcopy(config)
 # method
 config_spo.mthd = "spo"
 # time limit
-config_spo.timeout = 9
+config_spo.timeout = 2
 
 ## training configuration
 # size of neural network hidden layers
@@ -108,7 +108,7 @@ config_spo.epoch = None
 # optimizer neural network
 config_spo.optm = "adam"
 # learning rate
-config_spo.lr = 1e-3
+config_spo.lr = 1e-2
 # l1 regularization parameter
 config_spo.l1 = 0.0
 # l2 regularization parameter
@@ -120,68 +120,34 @@ configSP["spo"] = config_spo
 
 
 ### ======================== DBB =========================
-config_bb = deepcopy(config)
+config_dbb = deepcopy(config)
 
 ## experiments configuration
 # method
-config_bb.mthd = "bb"
+config_dbb.mthd = "dbb"
 # loss
-config_bb.loss = "r"
+config_dbb.loss = "r"
 # time limit
-config_bb.timeout = 12
+config_dbb.timeout = 3
 
 ## training configuration
 # size of neural network hidden layers
-config_bb.net = []
+config_dbb.net = []
 # number of epochs
-config_bb.batch = 128
+config_dbb.batch = 32
 # number of epochs
-config_bb.epoch = None
+config_dbb.epoch = None
 # optimizer neural network
-config_bb.optm = "adam"
+config_dbb.optm = "adam"
 # learning rate
-config_bb.lr = 1e-2
+config_dbb.lr = 1e-1
 # smoothing parameter for Black-Box
-config_bb.smth = 20
+config_dbb.smth = 20
 # l1 regularization parameter
-config_bb.l1 = 0.0
+config_dbb.l1 = 0.0
 # l2 regularization parameter
-config_bb.l2 = 0.0
+config_dbb.l2 = 0.0
 # number of processor for optimization
-config_bb.proc = 8
+config_dbb.proc = 8
 
-configSP["bb"] = config_bb
-
-
-### ======================= DBB H ========================
-config_bbh = deepcopy(config)
-
-## experiments configuration
-# method
-config_bbh.mthd = "bb"
-# loss
-config_bbh.loss = "h"
-# time limit
-config_bbh.timeout = 45
-
-## training configuration
-# size of neural network hidden layers
-config_bbh.net = []
-# number of epochs
-config_bbh.batch = 32
-# number of epochs
-config_bbh.epoch = None
-# optimizer neural network
-config_bbh.optm = "adam"
-# learning rate
-config_bbh.lr = 5e-3
-# smoothing parameter for Black-Box
-config_bbh.smth = 20
-# l1 regularization parameter
-config_bbh.l1 = 0.0
-# l2 regularization parameter
-config_bbh.l2 = 0.0
-# number of processor for optimization
-config_bbh.proc = 8
-
-configSP["bbh"] = config_bbh
+configSP["dbb"] = config_dbb
