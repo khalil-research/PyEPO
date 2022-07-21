@@ -34,6 +34,12 @@ parser.add_argument("--tspform",
 parser.add_argument("--rel",
                     action="store_true",
                     help="train with relaxation model")
+parser.add_argument("--l1",
+                    action="store_true",
+                    help="L1 regularization")
+parser.add_argument("--l2",
+                    action="store_true",
+                    help="L2 regularization")
 parser.add_argument("--expnum",
                     type=int,
                     default=10,
@@ -51,19 +57,23 @@ if setting.mthd in ["auto", "lr", "rf"]:
     config.mthd = "2s"
     config.pred = setting.mthd
 config.rel = setting.rel
-
-# test
-#def pipeline(alpha):
-#    return alpha + 6
-#config = 5
+if setting.l1:
+    config.l1 = 1e-3
+if setting.l2:
+    config.l2 = 1e-3
 
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
 timeout_min = config.timeout * config.expnum
-mem_gb = 8
 if setting.mthd in ["lr", "rf"]:
     mem_gb = 4
-num_cpus = 32
+    num_cpus = 1
+if setting.mthd in ["auto"]:
+    mem_gb = 8
+    num_cpus = 4
+if setting.mthd in ["spo", "dbb"]:
+    mem_gb = 8
+    num_cpus = config.proc
 import os
 os.environ["OPENBLAS_NUM_THREADS"] = str(num_cpus)
 
@@ -90,6 +100,10 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
         config.epoch = 20
     if (setting.mthd != "2s") and (data == 100):
         config.epoch = 200
+    # test
+    #def pipeline(alpha):
+    #    return alpha + 6
+    #config = 5
     print(config)
     # run job
     job = executor.submit(pipeline, config)
@@ -98,4 +112,4 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
           .format(job.job_id, mem_gb, num_cpus, instance_logs_path, timeout_min))
 
 # get outputs
-outputs = [job.result() for job in jobs]
+#outputs = [job.result() for job in jobs]
