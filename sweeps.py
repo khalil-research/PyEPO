@@ -50,7 +50,7 @@ def trainSPO():
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         reg.to(device)
         # set SPO+ Loss as criterion
-        criterion = pyepo.func.SPOPlus(model, processes=config.proc)
+        spop = pyepo.func.SPOPlus(model, processes=config.proc)
         # train
         time.sleep(1)
         pbar = tqdm(range(config.epoch))
@@ -62,7 +62,7 @@ def trainSPO():
                 # forward pass
                 cp = reg(x)
                 # spo+
-                spoploss = criterion.apply(cp, c, w, z).mean()
+                spoploss = spop(cp, c, w, z).mean()
                 wandb.log({"Train/SPO+": spoploss.item()})
                 # l1 reg
                 l1_reg = torch.abs(cp - c).mean(dim=1).mean()
@@ -86,10 +86,10 @@ def trainSPO():
                 desc = "Epoch {}, Loss: {:.4f}".format(e, loss.item())
                 pbar.set_description(desc)
             # eval
-            if (config.data == 1000) and (e % 10 == 0):
+            if (config.data == 1000) and (e % 2 == 0):
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
-            if (config.data == 100) and (e % 100 == 0):
+            if (config.data == 100) and (e % 20 == 0):
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
         # eval
@@ -97,7 +97,7 @@ def trainSPO():
         wandb.log({"Regret": regret})
 
 
-def trainBB():
+def trainDBB():
     """
     Black-BOX optimizer train with wandb
     """
@@ -125,7 +125,7 @@ def trainBB():
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         reg.to(device)
         # set black-box optimizer
-        bb = pyepo.func.blackboxOpt(model, lambd=config.smth, processes=config.proc)
+        dbb = pyepo.func.blackboxOpt(model, lambd=config.smth, processes=config.proc)
         # set loss
         criterion = torch.nn.L1Loss()
         # train
@@ -139,10 +139,10 @@ def trainBB():
                 # forward pass
                 cp = reg(x)
                 # black-box optimizer
-                wp = bb.apply(cp)
+                wp = dbb(cp)
                 # objective value
                 zp = (wp * c).sum(1).view(-1, 1)
-                # SPO loss
+                # regret
                 spoloss = criterion(zp, z)
                 wandb.log({"Train/SPO": spoloss.item()})
                 # l1 reg
@@ -167,10 +167,10 @@ def trainBB():
                 desc = "Epoch {}, Loss: {:.4f}".format(e, loss.item())
                 pbar.set_description(desc)
             # eval
-            if (config.data == 1000) and (e % 10 == 0):
+            if (config.data == 1000) and (e % 2 == 0):
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
-            if (config.data == 100) and (e % 100 == 0):
+            if (config.data == 100) and (e % 20 == 0):
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
         # eval
@@ -191,7 +191,7 @@ if __name__ == "__main__":
                         help="knapsack dimension")
     parser.add_argument("--mthd",
                         type=str,
-                        choices=["spo", "bb"],
+                        choices=["spo", "dbb"],
                         help="method")
     parser.add_argument("--data",
                         type=int,
@@ -216,9 +216,9 @@ if __name__ == "__main__":
     if config.prob == "tsp":
         config.form = "dfj"
     if config.data == 100:
-        config.epoch = 1000
+        config.epoch = 200
     if config.data == 1000:
-        config.epoch = 100 # epoch
+        config.epoch = 20 # epoch
     config.deg = setting.deg # polynomial degree
     config.noise = setting.noise # noise half-width
     # delete parameter to tune
@@ -258,14 +258,14 @@ if __name__ == "__main__":
 
     # init
     sweep_id = wandb.sweep(sweep_config,
-                           project="PyEPO-Sweep3-{}-{}-d{}p{}e{}".format(config.prob,
-                                                                         config.mthd,
-                                                                         config.data,
-                                                                         config.deg,
-                                                                         config.noise))
+                           project="PyEPO-Sweep-{}-{}-d{}p{}e{}".format(config.prob,
+                                                                        config.mthd,
+                                                                        config.data,
+                                                                        config.deg,
+                                                                        config.noise))
     # launch agent
-    count = 50
+    count = 80
     if config.mthd == "spo":
         wandb.agent(sweep_id, function=trainSPO, count=count)
-    if config.mthd == "bb":
-        wandb.agent(sweep_id, function=trainBB, count=count)
+    if config.mthd == "dbb":
+        wandb.agent(sweep_id, function=trainDBB, count=count)
