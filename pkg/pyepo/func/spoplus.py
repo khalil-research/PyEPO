@@ -101,10 +101,10 @@ class SPOPlusFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.to("cpu").numpy()
-        c = true_cost.to("cpu").numpy()
-        w = true_sol.to("cpu").numpy()
-        z = true_obj.to("cpu").numpy()
+        cp = pred_cost.detach().to("cpu").numpy()
+        c = true_cost.detach().to("cpu").numpy()
+        w = true_sol.detach().to("cpu").numpy()
+        z = true_obj.detach().to("cpu").numpy()
         # check sol
         #_check_sol(c, w, z)
         # solve
@@ -137,9 +137,9 @@ class SPOPlusFunc(Function):
         w, wq = ctx.saved_tensors
         optmodel = ctx.optmodel
         if optmodel.modelSense == EPO.MINIMIZE:
-            grad = 2 * (w - wq).mean(0)
+            grad = 2 * (w - wq)
         if optmodel.modelSense == EPO.MAXIMIZE:
-            grad = 2 * (wq - w).mean(0)
+            grad = 2 * (wq - w)
         return grad_output * grad, None, None, None, None, None, None, None
 
 
