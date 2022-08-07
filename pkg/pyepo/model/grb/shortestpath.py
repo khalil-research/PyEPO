@@ -66,7 +66,7 @@ class shortestPathModel(optGrbModel):
         # constraints
         for i in range(self.grid[0]):
             for j in range(self.grid[1]):
-                v = v = i * self.grid[1] + j
+                v = i * self.grid[1] + j
                 expr = 0
                 for e in self.arcs:
                     # flow in
