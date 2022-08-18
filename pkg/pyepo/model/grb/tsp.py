@@ -31,8 +31,8 @@ class tspABModel(optGrbModel):
         """
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))
-        self.edges = [(i, j) for i in range(num_nodes)
-                      for j in range(num_nodes) if i < j]
+        self.edges = [(i, j) for i in self.nodes
+                      for j in self.nodes if i < j]
         super().__init__()
 
     @property
