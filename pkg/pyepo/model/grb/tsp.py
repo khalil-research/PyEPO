@@ -66,8 +66,8 @@ class tspABModel(optGrbModel):
                 edges[j].append(k)
                 edges[k].append(j)
         # get tour
-        visited = {0}
-        tour = [0]
+        visited = {list(edges.keys())[0]}
+        tour = [list(edges.keys())[0]]
         while len(visited) < len(edges):
             i = tour[-1]
             for j in edges[i]:
