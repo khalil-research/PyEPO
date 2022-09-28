@@ -128,7 +128,7 @@ if __name__ == "__main__":
                         help="metric for auto-sklearm predictor")
     parser.add_argument("--form",
                         type=str,
-                        default="gg",
+                        default="dfj",
                         choices=["gg", "dfj", "mtz"],
                         help="TSP formulation")
     parser.add_argument("--path",

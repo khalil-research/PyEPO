@@ -30,6 +30,7 @@ parser.add_argument("--ksdim",
 parser.add_argument("--tspform",
                     type=str,
                     choices=["gg", "dfj", "mtz"],
+                    default="dfj",
                     help="TSP formulation")
 parser.add_argument("--rel",
                     action="store_true",
