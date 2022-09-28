@@ -41,9 +41,9 @@ def pipeline(config):
 
     for i in range(config.expnum):
         config.seed = np.random.randint(999)
-        print("===============================================================")
+        print("---------------------------------------------------------------")
         print("Experiment {}:".format(i))
-        print("===============================================================")
+        print("---------------------------------------------------------------")
         # generate data
         data = utils.genData(config)
         if config.prob == "ks":
@@ -242,5 +242,5 @@ if __name__ == "__main__":
     # run experiment pipeline
     pipeline(config)
 
-# python pipeline.py --prob sp --mthd spo --lan gurobi --data 1000 --deg 1 --noise 0 --epoch 100 --lr 1e-2 --proc 1
+# pythons pipeline.py --prob sp --mthd spo --lan gurobi --data 1000 --deg 1 --noise 0 --epoch 100 --lr 1e-2 --proc 1
 # tensorboard --logdir logs
