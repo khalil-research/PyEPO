@@ -30,8 +30,6 @@ config.expnum = None
 config.seed = 135
 # relaxation
 config.rel = False
-# steps of evluation and log
-config.elog = 0
 # path to save result
 config.path="./res"
 
@@ -60,8 +58,6 @@ config_lr = deepcopy(config)
 config_lr.mthd = "2s"
 # predictor
 config_lr.pred = "lr"
-# time limit
-config_lr.timeout = 3
 
 configKS["lr"] = config_lr
 
@@ -73,8 +69,6 @@ config_rf = deepcopy(config)
 config_rf.mthd = "2s"
 # predictor
 config_rf.pred = "rf"
-# time limit
-config_rf.timeout = 6
 
 configKS["rf"] = config_rf
 
@@ -88,8 +82,6 @@ config_auto.mthd = "2s"
 config_auto.pred = "auto"
 # metric
 config_auto.metric = "mse"
-# time limit
-config_auto.timeout = 18
 
 configKS["auto"] = config_auto
 
@@ -99,8 +91,6 @@ config_spo = deepcopy(config)
 ## experiments configuration
 # method
 config_spo.mthd = "spo"
-# time limit
-config_spo.timeout = 10
 
 ## training configuration
 # size of neural network hidden layers
@@ -118,7 +108,7 @@ config_spo.l1 = 0.0
 # l2 regularization parameter
 config_spo.l2 = 0.0
 # number of processor for optimization
-config_spo.proc = 32
+config_spo.proc = 1
 
 configKS["spo"] = config_spo
 
@@ -131,8 +121,6 @@ config_dbb = deepcopy(config)
 config_dbb.mthd = "dbb"
 # loss
 config_dbb.loss = "r"
-# time limit
-config_dbb.timeout = 10
 
 ## training configuration
 # size of neural network hidden layers
@@ -152,6 +140,6 @@ config_dbb.l1 = 0.0
 # l2 regularization parameter
 config_dbb.l2 = 0.0
 # number of processor for optimization
-config_dbb.proc = 32
+config_dbb.proc = 1
 
 configKS["dbb"] = config_dbb
