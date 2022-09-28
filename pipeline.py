@@ -184,7 +184,7 @@ if __name__ == "__main__":
                         help="number of items for knapsack")
     parser.add_argument("--dim",
                         type=int,
-                        default=3,
+                        default=2,
                         help="dimension for knapsack")
     parser.add_argument("--cap",
                         type=int,

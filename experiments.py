@@ -25,6 +25,7 @@ parser.add_argument("--mthd",
                     help="method")
 parser.add_argument("--ksdim",
                     type=int,
+                    default=2,
                     help="knapsack dimension")
 parser.add_argument("--tspform",
                     type=str,
