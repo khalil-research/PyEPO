@@ -257,3 +257,5 @@ if __name__ == "__main__":
         wandb.agent(sweep_id, function=trainSPO, count=count)
     if config.mthd == "dbb":
         wandb.agent(sweep_id, function=trainDBB, count=count)
+
+# python sweeps.py --prob ks --mthd spo --data 100
