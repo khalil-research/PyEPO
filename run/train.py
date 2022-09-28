@@ -96,13 +96,10 @@ def trainSPO(trainloader, testloader, model, config):
     # relax
     if config.rel:
         model = model.relax()
-    # log dir
-    logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     training.trainSPO(reg, model, optimizer, trainloader, testloader,
-                      logdir=logdir, epoch=config.epoch,
-                      processes=config.proc, l1_lambd=config.l1,
-                      l2_lambd=config.l2, log=config.elog)
+                      epoch=config.epoch, processes=config.proc,
+                      l1_lambd=config.l1, l2_lambd=config.l2)
     return reg
 
 
@@ -115,11 +112,9 @@ def trainDBB(trainloader, testloader, model, config):
     # relax
     if config.rel:
         model = model.relax()
-    # log dir
-    logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     training.trainDBB(reg, model, optimizer, trainloader, testloader,
-                     lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
+                     lossfunc=config.loss, epoch=config.epoch,
                      processes=config.proc, bb_lambd=config.smth,
-                     l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
+                     l1_lambd=config.l1, l2_lambd=config.l2)
     return reg
