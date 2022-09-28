@@ -67,7 +67,6 @@ confset = {"data":[100, 1000, 5000],
            "noise":[0.0, 0.5],
            "deg":[1, 2, 4, 6]}
 
-jobs = []
 for data, noise, deg in itertools.product(*tuple(confset.values())):
     # set config
     config.data = data
