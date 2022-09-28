@@ -126,10 +126,6 @@ if __name__ == "__main__":
                         default="mse",
                         choices=["regret", "mse"],
                         help="metric for auto-sklearm predictor")
-    parser.add_argument("--elog",
-                        type=int,
-                        default=0,
-                        help="steps of evluation and log")
     parser.add_argument("--form",
                         type=str,
                         default="gg",
