@@ -13,7 +13,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 plt.style.reload_library()
 plt.style.use("science")
+from matplotlib import patheffects as path_effects
 from matplotlib import ticker
+from matplotlib.colors import colorConverter
 import tol_colors as tc
 
 from run import utils
@@ -474,13 +476,78 @@ def regPlot(config, data, noise):
     print("Saved to " + dir)
 
 
+def tradeoffPlot(config, data, noise, deg=4):
+    # set config
+    config = deepcopy(config)
+    for c in config.values():
+        c.data = data
+        c.noise = noise
+        c.deg = deg
+    # prob name
+    prob = c.prob
+    # color map
+    cset =  tc.tol_cset('light')
+    cmap = tc.tol_cmap("sunset")(np.linspace(0, 1, 11))
+    colors = {"lr":cset.mint,
+              "rf":cset.pink,
+              "auto":cset.pear,
+              "spo":cset.orange,
+              "spo l1":cset.orange,
+              "spo l2":cset.orange,
+              "spo rel":cmap[6],
+              "spo rel(gg)":cmap[7],
+              "spo rel(mtz)":cmap[6],
+              "dbb":cset.light_blue,
+              "dbb l1":cset.light_blue,
+              "dbb l2":cset.light_blue,
+              "dbb rel":cmap[4],
+              "dbb rel(gg)":cmap[3],
+              "dbb rel(mtz)":cmap[4],}
+    w = colorConverter.to_rgba("w", alpha=0.6) # white
+    # get df
+    dfs = {}
+    for mthd in config:
+        path = utils.getSavePath(config[mthd])
+        dfs[mthd] = pd.read_csv(path)
+    # draw boxplot
+    fig, ax = plt.subplots(figsize=(12,12))
+    # init xmax & ymax
+    xmax, ymax = 0, 0
+    for mthd in dfs:
+        df, c = dfs[mthd], colorConverter.to_rgba(colors[mthd], alpha=0.6)
+        x, y = df["MSE"].mean(), df["True SPO"].mean()
+        xmax, ymax = max(x, xmax), max(y, ymax)
+        size = int((np.log(df["Elapsed"].mean())+4)*500)
+        if mthd.split(" ")[-1] == "l1":
+            ax.scatter(x, y, s=size, color=c, marker="o", hatch="++++", facecolor=w)
+        elif mthd.split(" ")[-1] == "l2":
+            ax.scatter(x, y, s=size, color=c, marker="o", hatch="OO", facecolor=w)
+        else:
+            ax.scatter(x, y, s=size, color=c, marker="o")
+        # annotate
+        txt = ax.annotate(mthd+" :{:.2f} Sec".format(df["Elapsed"].mean()), (x,y), fontsize=20, color=colors[mthd])
+        txt.set_path_effects([path_effects.withStroke(linewidth=0.75, foreground='k')])
+    plt.xlabel("Mean Squared Error", fontsize=36)
+    plt.xticks(fontsize=24)
+    plt.ylabel("Normalized Regret", fontsize=36)
+    plt.yticks(fontsize=24)
+    plt.xlim(0.0, xmax*1.1)
+    plt.ylim(0.0, ymax*1.1)
+    plt.title("Training Set Size = {}, Polynomial degree = {}, Noise Half−width = {}" \
+              .format(data, deg, noise), fontsize=24)
+    # save
+    dir = "./images/td-{}-n{}e{}.png".format(prob, data, int(10*noise))
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--plot",
                         type=str,
-                        choices=["comp", "rel", "reg"],
+                        choices=["cmp", "rel", "reg", "trd"],
                         help="figure type")
     parser.add_argument("--prob",
                         type=str,
@@ -493,12 +560,13 @@ if __name__ == "__main__":
 
     ############################################################################
     # performance comparison
-    if setting.plot == "comp":
+    if setting.plot == "cmp":
         # get config
         config = getConfig(setting.prob)
         # varying setting
         confset = {"data":[100, 1000, 5000],
                    "noise":[0.0, 0.5]}
+        # plot
         for data, noise in itertools.product(*tuple(confset.values())):
             comparisonPlot(config, data, noise)
 
@@ -522,6 +590,7 @@ if __name__ == "__main__":
             # varying setting
             confset = {"data":[100, 1000],
                        "noise":[0.0, 0.5]}
+            # plot
             for data, noise in itertools.product(*tuple(confset.values())):
                 relPlotKS(config, data, noise)
         if setting.prob == "tsp":
@@ -549,6 +618,7 @@ if __name__ == "__main__":
             # varying setting
             confset = {"data":[100, 1000],
                        "noise":[0.0, 0.5]}
+            # plot
             for data, noise in itertools.product(*tuple(confset.values())):
                 relPlotTSP(config, data, noise)
 
@@ -573,7 +643,51 @@ if __name__ == "__main__":
         # varying setting
         confset = {"data":[100, 1000],
                    "noise":[0.0, 0.5]}
+        # plot
         for data, noise in itertools.product(*tuple(confset.values())):
             regPlot(config, data, noise)
 
-# python3 plot.py --plot comp --prob sp
+    ############################################################################
+    # regularization
+    if setting.plot == "trd":
+        # get config
+        config = getConfig(setting.prob)
+        # add reg
+        config["spo l1"] = deepcopy(config["spo"])
+        config["spo l1"].l1 = 1e-3
+        config["spo l2"] = deepcopy(config["spo"])
+        config["spo l2"].l2 = 1e-3
+        config["dbb l1"] = deepcopy(config["dbb"])
+        config["dbb l1"].l1 = 1e-3
+        config["dbb l2"] = deepcopy(config["dbb"])
+        config["dbb l2"].l2 = 1e-3
+        # add relaxation
+        if setting.prob == "ks":
+            config["spo rel"] = deepcopy(config["spo"])
+            config["spo rel"].rel = True
+            config["dbb rel"] = deepcopy(config["dbb"])
+            config["dbb rel"].rel = True
+        if setting.prob == "tsp":
+            # add relaxation
+            config["spo rel(mtz)"] = deepcopy(config["spo"])
+            config["spo rel(mtz)"].form = "mtz"
+            config["spo rel(mtz)"].rel = True
+            config["dbb rel(mtz)"] = deepcopy(config["dbb"])
+            config["dbb rel(mtz)"].form = "mtz"
+            config["dbb rel(mtz)"].rel = True
+            config["spo rel(gg)"] = deepcopy(config["spo"])
+            config["spo rel(gg)"].form = "gg"
+            config["spo rel(gg)"].rel = True
+            config["dbb rel(gg)"] = deepcopy(config["dbb"])
+            config["dbb rel(gg)"].form = "gg"
+            config["dbb rel(gg)"].rel = True
+            config["spo"].form = "dfj"
+            config["dbb"].form = "dfj"
+        # varying setting
+        confset = {"data":[100, 1000],
+                   "noise":[0.5]}
+        # plot
+        for data, noise in itertools.product(*tuple(confset.values())):
+            tradeoffPlot(config, data, noise)
+
+# python3 plot.py --plot cmp --prob sp
