@@ -213,13 +213,13 @@ python3 plot.py --plot reg  --prob tsp
 
 ### MSE-Regret Trade-off (Figure 15)
 
-To examine the MSE-regret trade-off among all above method, you can draw a plot for Figure 15:
+To examine the MSE-regret trade-off among all above methods, you can draw a plot for Figure 15:
 
 ```bash
 # shortest path
-python3 plot.py --plot reg  --prob sp
+python3 plot.py --plot trd  --prob sp
 # 2D knapsack
-python3 plot.py --plot reg  --prob ks
+python3 plot.py --plot trd  --prob ks
 # TSP
-python3 plot.py --plot reg  --prob tsp
+python3 plot.py --plot trd  --prob tsp
 ```
