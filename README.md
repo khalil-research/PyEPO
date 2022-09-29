@@ -270,11 +270,11 @@ python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 1
 python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 1
 python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 1
 python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 1
-# 2D knapsack
-python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 2
-python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 2
-python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 2
-python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 2
+# 3D knapsack
+python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 3
+python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 3
+python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 3
+python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 3
 ```
 
 Once the results of the experiments are ready, you can draw a plot for Figure 17:
