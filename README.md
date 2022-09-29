@@ -164,3 +164,47 @@ Once the results of the experiments are ready, you can draw a plot for Figure 8-
 python3 plot.py --plot rel  --prob ks
 python3 plot.py --plot rel  --prob tsp
 ```
+
+
+### Regularization (Figure 11)
+
+To draw performance comparison graphs with regularization, you need to additional train and evaluate SPO+ and DBB with L1/L2 regularization of cost. In our paper, the regularization parameter is 0.001.
+
+Experiments for L1 regularization:
+
+```bash
+# shortest path
+python3 experiments.py --prob sp  --mthd spo   --expnum 10 --l1
+python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --l1
+# 2D knapsack
+python3 experiments.py --prob ks  --mthd spo   --expnum 10 --l1
+python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --l1
+# TSP
+python3 experiments.py --prob tsp --mthd spo   --expnum 10 --l1
+python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --l1
+```
+
+Experiments for L2 regularization:
+
+```bash
+# shortest path
+python3 experiments.py --prob sp  --mthd spo   --expnum 10 --l2
+python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --l2
+# 2D knapsack
+python3 experiments.py --prob ks  --mthd spo   --expnum 10 --l2
+python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --l2
+# TSP
+python3 experiments.py --prob tsp --mthd spo   --expnum 10 --l2
+python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --l2
+```
+
+Once the results of the experiments are ready, you can draw a plot for Figure 11:
+
+```bash
+# shortest path
+python3 plot.py --plot reg  --prob sp
+# 2D knapsack
+python3 plot.py --plot reg  --prob ks
+# TSP
+python3 plot.py --plot reg  --prob tsp
+```
