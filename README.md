@@ -20,7 +20,7 @@ Citation:
 
 ## Experiments
 
-To reproduce the experiments in original paper, please use the code and follow the instruction in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
+To reproduce the experiments in original paper, please use the code and follow the instruction in this [branch](https://github.com/khalil-research/PyEPO/tree/mpc).
 
 
 ## Introduction
