@@ -18,6 +18,8 @@ configTSP = {}
 config.prob = "tsp"
 # number of nodes
 config.nodes = 20
+# form
+config.form = "dfj"
 
 ## experiments configuration
 # number of experiments
