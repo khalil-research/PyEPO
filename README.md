@@ -28,18 +28,6 @@ Citation:
 The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
 
 
-## Learning Framework
-
-<p align="center"><img width="100%" src="images/learning_framework_e2e.png" /></p>
-
-
-## Features
-
-- Implement SPO+ [[1]](https://doi.org/10.1287/mnsc.2020.3922) and DBB [[3]](https://arxiv.org/abs/1912.02175)
-- Support [Gurobi](https://www.gurobi.com/) and [Pyomo](http://www.pyomo.org/) API
-- Support Parallel computing for optimization solver
-- Support solution caching [[4]](https://arxiv.org/abs/2011.05354) to speed up training
-
 ## Installation
 
 You can download ``PyEPO`` from our GitHub repository.
