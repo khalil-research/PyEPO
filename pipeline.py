@@ -242,5 +242,5 @@ if __name__ == "__main__":
     # run experiment pipeline
     pipeline(config)
 
-# pythons pipeline.py --prob sp --mthd spo --lan gurobi --data 1000 --deg 1 --noise 0 --epoch 100 --lr 1e-2 --proc 1
+# python pipeline.py --prob sp --mthd spo --lan gurobi --data 1000 --deg 1 --noise 0 --epoch 100 --lr 1e-2 --proc 1
 # tensorboard --logdir logs
