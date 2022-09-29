@@ -106,7 +106,7 @@ python3 experiments.py --prob sp  --mthd auto  --expnum 10
 Once the results of the experiments are ready, you can draw a plot for Figure 5. This figure will be saved to "./images/*"
 
 ```bash
-python3 plot.py --plot comp --prob sp
+python3 plot.py --plot cmp --prob sp
 ```
 
 Similarly, the comparison of 2D knapsack (Figure 6) and TSP (Figure 7) can be plotted as follows:
@@ -117,7 +117,7 @@ python3 experiments.py --prob ks  --mthd rf    --expnum 10
 python3 experiments.py --prob ks  --mthd spo   --expnum 10
 python3 experiments.py --prob ks  --mthd dbb   --expnum 10
 # python3 experiments.py --prob ks  --mthd auto  --expnum 10
-python3 plot.py --plot comp --prob ks
+python3 plot.py --plot cmp --prob ks
 ```
 
 ```bash
@@ -126,7 +126,7 @@ python3 experiments.py --prob tsp --mthd rf    --expnum 10
 python3 experiments.py --prob tsp --mthd spo   --expnum 10
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10
 # python3 experiments.py --prob ks  --mthd auto  --expnum 10
-python3 plot.py --plot comp --prob tsp
+python3 plot.py --plot cmp --prob tsp
 ```
 
 
