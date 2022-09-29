@@ -161,7 +161,9 @@ python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --rel --tspform gg
 Once the results of the experiments are ready, you can draw a plot for Figure 8-10:
 
 ```bash
+# 2D knapsack
 python3 plot.py --plot rel  --prob ks
+# TSP
 python3 plot.py --plot rel  --prob tsp
 ```
 
