@@ -41,6 +41,35 @@ def getDf(config, degs, mthd, col="True SPO"):
         dfs[deg] = df[col]
     return dfs
 
+def getRow(grids, n, d, e):
+    regrets = {"lr":{"mean":[],"std":[]}, "rf":{"mean":[],"std":[]}, "spo":{"mean":[],"std":[]}, "dbb":{"mean":[],"std":[]}}
+    elapses = {"lr":{"mean":[],"std":[]}, "rf":{"mean":[],"std":[]}, "spo":{"mean":[],"std":[]}, "dbb":{"mean":[],"std":[]}}
+    for g in grids:
+        l, t = getRowData(g, n, d, e)
+        for m in regrets:
+            regrets[m]["mean"].append(l[m]["mean"])
+            regrets[m]["std"].append(l[m]["std"])
+            elapses[m]["mean"].append(t[m]["mean"])
+            elapses[m]["std"].append(t[m]["std"])
+    return regrets, elapses
+
+
+def getRowData(grid, n, d, e):
+    # dir
+    dir_name = "./res/sp/h{}w{}/gurobi".format(grid[0], grid[1])
+    file_name = {}
+    file_name["lr"] = "n{}p5-d{}-e{}_2s-lr.csv".format(n,d,e)
+    file_name["rf"] = "n{}p5-d{}-e{}_2s-rf.csv".format(n,d,e)
+    file_name["spo"] = "n{}p5-d{}-e{}_spo_lr_adam0.01_bs32_l10.0l20.0_c8.csv".format(n,d,e)
+    file_name["dbb"] = "n{}p5-d{}-e{}_dbb_lr_adam0.1_bs32_l10.0l20.0_c8-lamb20.csv".format(n,d,e)
+    # load data
+    regret, elapse = {}, {}
+    for m, f in file_name.items():
+        df = pd.read_csv(dir_name + "/" + f)
+        regret[m] = {"mean":df["Unamb SPO"].mean(), "std":df["Unamb SPO"].std()}
+        elapse[m] = {"mean":df["Elapsed"].mean(), "std":df["Elapsed"].std()}
+    return regret, elapse
+
 
 def getElapsed(config, data):
     # polynomial degree
@@ -541,13 +570,85 @@ def tradeoffPlot(config, data, noise, deg=4):
     print("Saved to " + dir)
 
 
+def scalePlotSP(grids, n, d, e):
+    regrets, elapses = getRow(grids, n, d, e)
+    # color map
+    cset = tc.tol_cset('light')
+    colors = [cset.mint, cset.pink, cset.orange, cset.light_blue]
+    # x tick
+    x = np.array([i for i in range(len(grids))])
+    # time
+    fig = plt.figure(figsize=(16, 8))
+    c = colors[0]
+    plt.plot(x, elapses["lr"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x+0.012, elapses["lr"]["mean"], elapses["lr"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[1]
+    plt.plot(x, elapses["rf"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x-0.012, elapses["rf"]["mean"], elapses["rf"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[2]
+    plt.plot(x, elapses["spo"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x-0.004, elapses["spo"]["mean"], elapses["spo"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[3]
+    plt.plot(x, elapses["dbb"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x+0.004, elapses["dbb"]["mean"], elapses["dbb"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    plt.ylim(0, 600)
+    plt.xticks(x, labels=["{}x{}".format(g[0], g[1]) for g in grids], fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.xlabel("Graph Size", fontsize=36)
+    plt.ylabel("Time (Sec)", fontsize=36)
+    plt.title("Training Time on Shortest Path\nTraining Set Size = {}, Polynomial Degree = {}, Noise Half−width = {}"
+              .format(n,d,e),
+              fontsize=30)
+    plt.legend(["2-stage LR", "2-stage RF", "SPO+","DBB"], fontsize=24, ncol=2)
+    # save
+    dir = "./images/scale-sp-n{}d{}e{}-time.png".format(n,d,int(10*e))
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+    ############################################################################
+    # loss
+    fig = plt.figure(figsize=(16, 8))
+    c = colors[0]
+    plt.plot(x, regrets["lr"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x+0.012, regrets["lr"]["mean"], regrets["lr"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[1]
+    plt.plot(x, regrets["rf"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x-0.012, regrets["rf"]["mean"], regrets["rf"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[2]
+    plt.plot(x, regrets["spo"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x-0.004, regrets["spo"]["mean"], regrets["spo"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[3]
+    plt.plot(x, regrets["dbb"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x+0.004, regrets["dbb"]["mean"], regrets["dbb"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    plt.ylim(0, 0.22)
+    plt.xticks(x, labels=["{}x{}".format(w,h) for w,h in grids], fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.xlabel("Graph Size", fontsize=36)
+    plt.ylabel("Normalized Regret", fontsize=36)
+    plt.title("Test Loss on Shortest Path\nTraining Set Size = {}, Polynomial Degree = {}, Noise Half−width = {}".
+              format(n,d,e),
+              fontsize=30)
+    plt.legend(["2-stage LR", "2-stage RF", "SPO+","DBB"], fontsize=24, ncol=2)
+    # save
+    dir = "./images/scale-sp-n{}d{}e{}-loss.png".format(n,d,int(10*e))
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--plot",
                         type=str,
-                        choices=["cmp", "rel", "reg", "trd"],
+                        choices=["cmp", "rel", "reg", "trd", "scl"],
                         help="figure type")
     parser.add_argument("--prob",
                         type=str,
@@ -689,5 +790,20 @@ if __name__ == "__main__":
         # plot
         for data, noise in itertools.product(*tuple(confset.values())):
             tradeoffPlot(config, data, noise)
+
+    ############################################################################
+    # scalability
+    if setting.plot == "scl":
+        # variables
+        if setting.prob == "sp":
+            # varing grid
+            grids = [(5,5), (8,8), (10,10), (12,12), (15,15)]
+            # varying setting
+            confset = {"data":[100, 1000],
+                       "noise":[0.0, 0.5],
+                       "deg":[1,2,4,6]}
+            # plot
+            for data, noise, deg in itertools.product(*tuple(confset.values())):
+                scalePlotSP(grids, data, deg, noise)
 
 # python3 plot.py --plot cmp --prob sp
