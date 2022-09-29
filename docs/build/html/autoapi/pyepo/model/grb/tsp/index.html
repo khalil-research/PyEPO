@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,6 +27,7 @@
         <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
@@ -157,17 +158,13 @@
            <div itemprop="articleBody">
             
   <section id="module-pyepo.model.grb.tsp">
-<span id="pyepo-model-grb-tsp"></span><h1><a class="reference internal" href="../../../../../content/modules/pyepo.model.grb.tsp.html#module-pyepo.model.grb.tsp" title="pyepo.model.grb.tsp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp</span></code></a><a class="headerlink" href="#module-pyepo.model.grb.tsp" title="Permalink to this headline">¶</a></h1>
+<span id="pyepo-model-grb-tsp"></span><h1><a class="reference internal" href="../../../../../content/modules/pyepo.model.grb.tsp.html#module-pyepo.model.grb.tsp" title="pyepo.model.grb.tsp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp</span></code></a><a class="headerlink" href="#module-pyepo.model.grb.tsp" title="Permalink to this heading">¶</a></h1>
 <p>Traveling salesman probelm</p>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p></td>
 <td><p>This abstract class is optimization model for traveling salesman problem.</p></td>
@@ -200,7 +197,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel._model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
@@ -211,7 +208,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.num_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
@@ -222,7 +219,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -239,10 +236,10 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to copy model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>new copied model</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
@@ -253,13 +250,13 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.getTour" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to get a tour from solution</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>sol</strong> (<em>list</em>) – solution</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a TSP tour</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -277,7 +274,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel._model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
@@ -288,7 +285,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.num_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
@@ -299,7 +296,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -310,10 +307,10 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimization model and variables</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -324,7 +321,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.setObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
 </dd>
 </dl>
@@ -341,16 +338,16 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.addConstr" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to add new constraint</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>coefs</strong> (<em>ndarray</em>) – coeffcients of new constraint</p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>new model with the added constraint</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
@@ -374,7 +371,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel._model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
@@ -385,7 +382,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.num_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
@@ -396,7 +393,7 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -407,10 +404,10 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimization model and variables</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -421,10 +418,10 @@ This model is for further implementation of different formulation.</p>
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -455,7 +452,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel._model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
@@ -466,7 +463,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.num_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
@@ -477,7 +474,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -488,10 +485,10 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimization model and variables</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -508,7 +505,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.setObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
 </dd>
 </dl>
@@ -525,16 +522,16 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.addConstr" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to add new constraint</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>coefs</strong> (<em>ndarray</em>) – coeffcients of new constraint</p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>new model with the added constraint</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
@@ -552,7 +549,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel._model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
@@ -563,7 +560,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.num_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
@@ -574,7 +571,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -585,10 +582,10 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimization model and variables</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -599,7 +596,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.setObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
 </dd>
 </dl>
@@ -616,16 +613,16 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.addConstr" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to add new constraint</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>coefs</strong> (<em>ndarray</em>) – coeffcients of new constraint</p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>new model with the added constraint</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
@@ -649,7 +646,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel._model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
@@ -660,7 +657,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.num_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
@@ -671,7 +668,7 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -682,10 +679,10 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimization model and variables</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -696,10 +693,10 @@ constraint generation.</p>
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>

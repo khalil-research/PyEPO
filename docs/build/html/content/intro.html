@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,6 +27,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
@@ -164,11 +165,11 @@
             
   <a class="reference internal image-reference" href="../_images/logo1.png"><img alt="../_images/logo1.png" src="../_images/logo1.png" style="width: 1000px;" /></a>
 <section id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with linear objective function.</p>
 <p>The core capability of <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> is to build optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> implements SPO+ loss and differentiable Black-Box optimizer as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd functions.</p>
 <section id="end-to-end-predict-then-optimize-framework">
-<h2>End-to-End Predict-then-Optimize Framework<a class="headerlink" href="#end-to-end-predict-then-optimize-framework" title="Permalink to this headline">¶</a></h2>
+<h2>End-to-End Predict-then-Optimize Framework<a class="headerlink" href="#end-to-end-predict-then-optimize-framework" title="Permalink to this heading">¶</a></h2>
 <p>A labeled dataset <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> of <span class="math notranslate nohighlight">\((x,c)\)</span> pairs is used to fit a machine learning model that directly minimizes decision error. The critical component is an optimization solver which is embedded into a neural network.</p>
 <a class="reference internal image-reference" href="../_images/e2e.png"><img alt="../_images/e2e.png" src="../_images/e2e.png" style="width: 900px;" /></a>
 </section>

@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,6 +27,7 @@
         <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
@@ -157,17 +158,13 @@
            <div itemprop="articleBody">
             
   <section id="module-pyepo.model.grb.knapsack">
-<span id="pyepo-model-grb-knapsack"></span><h1><a class="reference internal" href="../../../../../content/modules/pyepo.model.grb.knapsack.html#module-pyepo.model.grb.knapsack" title="pyepo.model.grb.knapsack"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.knapsack</span></code></a><a class="headerlink" href="#module-pyepo.model.grb.knapsack" title="Permalink to this headline">¶</a></h1>
+<span id="pyepo-model-grb-knapsack"></span><h1><a class="reference internal" href="../../../../../content/modules/pyepo.model.grb.knapsack.html#module-pyepo.model.grb.knapsack" title="pyepo.model.grb.knapsack"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.knapsack</span></code></a><a class="headerlink" href="#module-pyepo.model.grb.knapsack" title="Permalink to this heading">¶</a></h1>
 <p>Knapsack problem</p>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.knapsack.knapsackModel" title="pyepo.model.grb.knapsack.knapsackModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModel</span></code></a></p></td>
 <td><p>This class is optimization model for knapsack problem</p></td>
@@ -187,7 +184,7 @@
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.knapsack.knapsackModel._model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
@@ -198,7 +195,7 @@
 <span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#pyepo.model.grb.knapsack.knapsackModel.weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weights of items</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray / list</p>
 </dd>
 </dl>
@@ -209,7 +206,7 @@
 <span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.grb.knapsack.knapsackModel.capacity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total capacity</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray / listy</p>
 </dd>
 </dl>
@@ -220,7 +217,7 @@
 <span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#pyepo.model.grb.knapsack.knapsackModel.items" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of item index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -231,10 +228,10 @@
 <span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.knapsack.knapsackModel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimization model and variables</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
