@@ -41,11 +41,11 @@ def getDf(config, degs, mthd, col="True SPO"):
         dfs[deg] = df[col]
     return dfs
 
-def getRow(grids, n, d, e):
+def getRowSP(grids, n, d, e):
     regrets = {"lr":{"mean":[],"std":[]}, "rf":{"mean":[],"std":[]}, "spo":{"mean":[],"std":[]}, "dbb":{"mean":[],"std":[]}}
     elapses = {"lr":{"mean":[],"std":[]}, "rf":{"mean":[],"std":[]}, "spo":{"mean":[],"std":[]}, "dbb":{"mean":[],"std":[]}}
     for g in grids:
-        l, t = getRowData(g, n, d, e)
+        l, t = getRowDataSP(g, n, d, e)
         for m in regrets:
             regrets[m]["mean"].append(l[m]["mean"])
             regrets[m]["std"].append(l[m]["std"])
@@ -54,7 +54,7 @@ def getRow(grids, n, d, e):
     return regrets, elapses
 
 
-def getRowData(grid, n, d, e):
+def getRowDataSP(grid, n, d, e):
     # dir
     dir_name = "./res/sp/h{}w{}/gurobi".format(grid[0], grid[1])
     file_name = {}
@@ -69,6 +69,33 @@ def getRowData(grid, n, d, e):
         regret[m] = {"mean":df["Unamb SPO"].mean(), "std":df["Unamb SPO"].std()}
         elapse[m] = {"mean":df["Elapsed"].mean(), "std":df["Elapsed"].std()}
     return regret, elapse
+
+def getRowKS(dims, n, d, e):
+    regrets = {"lr":{"mean":[],"std":[]}, "rf":{"mean":[],"std":[]},
+               "spo":{"mean":[],"std":[]}, "dbb":{"mean":[],"std":[]}
+              }
+    for dim in dims:
+        l = getRowDataKS(dim, n, d, e)
+        for m in regrets:
+            regrets[m]["mean"].append(l[m]["mean"])
+            regrets[m]["std"].append(l[m]["std"])
+    return regrets
+
+
+def getRowDataKS(dim, n, d, e):
+    # dir
+    dir_name = "./res/ks/i32d{}c20/gurobi".format(dim)
+    file_name = {}
+    file_name["lr"] = "n{}p5-d{}-e{}_2s-lr.csv".format(n,d,e)
+    file_name["rf"] = "n{}p5-d{}-e{}_2s-rf.csv".format(n,d,e)
+    file_name["spo"] = "n{}p5-d{}-e{}_spo_lr_adam0.01_bs32_l10.0l20.0_c32.csv".format(n,d,e)
+    file_name["dbb"] = "n{}p5-d{}-e{}_dbb_lr_adam0.1_bs32_l10.0l20.0_c32-lamb10.csv".format(n,d,e)
+    # load data
+    regret = {}
+    for m, f in file_name.items():
+        df = pd.read_csv(dir_name + "/" + f)
+        regret[m] = {"mean":df["Unamb SPO"].mean(), "std":df["Unamb SPO"].std()}
+    return regret
 
 
 def getElapsed(config, data):
@@ -571,7 +598,7 @@ def tradeoffPlot(config, data, noise, deg=4):
 
 
 def scalePlotSP(grids, n, d, e):
-    regrets, elapses = getRow(grids, n, d, e)
+    regrets, elapses = getRowSP(grids, n, d, e)
     # color map
     cset = tc.tol_cset('light')
     colors = [cset.mint, cset.pink, cset.orange, cset.light_blue]
@@ -638,6 +665,47 @@ def scalePlotSP(grids, n, d, e):
     plt.legend(["2-stage LR", "2-stage RF", "SPO+","DBB"], fontsize=24, ncol=2)
     # save
     dir = "./images/scale-sp-n{}d{}e{}-loss.png".format(n,d,int(10*e))
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+
+
+def scalePlotKS(dims, n, d, e):
+    regrets = getRowKS(dims, n, d, e)
+    # color map
+    cmap = tc.tol_cmap("sunset")(np.linspace(0, 1, 11))
+    cset =  tc.tol_cset('light')
+    colors = [cset.mint, cset.pink, cset.orange, cset.light_blue, cmap[6], cmap[4]]
+    # x tick
+    x = np.array([i for i in range(len(dims))])
+    # plot
+    fig = plt.figure(figsize=(16, 8))
+    c = colors[0]
+    plt.plot(x, regrets["lr"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x+0.012, regrets["lr"]["mean"], regrets["lr"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[1]
+    plt.plot(x, regrets["rf"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x-0.012, regrets["rf"]["mean"], regrets["rf"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[2]
+    plt.plot(x, regrets["spo"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x-0.004, regrets["spo"]["mean"], regrets["spo"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    c = colors[3]
+    plt.plot(x, regrets["dbb"]["mean"], linewidth=5, color=c, alpha=0.6)
+    plt.errorbar(x+0.004, regrets["dbb"]["mean"], regrets["dbb"]["std"], capsize=6, capthick=3,
+                 linestyle="", marker="o", markersize=8, color=c, elinewidth=3, alpha=0.6)
+    # tick and labels
+    plt.ylim(0, 0.24)
+    plt.xticks(x, dims, fontsize=28)
+    plt.yticks(fontsize=24)
+    plt.xlabel("Resource Dimension", fontsize=36)
+    plt.ylabel("Normalized Regret", fontsize=36)
+    plt.title("Test Loss on 2D Knapsack\nTraining Set Size = {}, Polynomial Degree = {}, Noise Half−width = {}".format(n,d,e),
+              fontsize=30)
+    plt.legend(["2-stage LR", "2-stage RF", "SPO+","DBB"], fontsize=24, ncol=2, loc=2)
+    # save
+    dir = "./images/scale-ks-n{}d{}e{}-loss.png".format(n,d,int(10*e))
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
 
@@ -805,5 +873,16 @@ if __name__ == "__main__":
             # plot
             for data, noise, deg in itertools.product(*tuple(confset.values())):
                 scalePlotSP(grids, data, deg, noise)
+        # constraints
+        if setting.prob == "ks":
+            # varing dimension
+            dims = [1, 2, 3]
+            # varying setting
+            confset = {"data":[100, 1000],
+                       "noise":[0.0, 0.5],
+                       "deg":[1,2,4,6]}
+            # plot
+            for data, noise, deg in itertools.product(*tuple(confset.values())):
+                scalePlotKS(dims, data, deg, noise)
 
 # python3 plot.py --plot cmp --prob sp
