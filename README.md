@@ -80,6 +80,8 @@ However, You can run `pipeline.py` for different experiment setting (including h
 python3 pipeline.py --prob sp --mthd spo --lan gurobi --data 1000 --deg 2 --noise 0.5 --epoch 20 --lr 1e-1 --batch 32 --optm adam --proc 1
 ```
 
+**Warning**: In the original paper, experiments were completed with multiple processors, while these experiments are based on a single CPU.
+
 ### Performance Comparison (Figure 5-7)
 
 To draw performance comparison graphs, you need to train and evaluate linear regression, random forest, automl, SPO+, and DBB with varying training data size in {100, 1000, 5000}, polynomial degree in {1, 2, 4, 6}, and noise half-width in {0.0, 0.5}.
@@ -222,4 +224,74 @@ python3 plot.py --plot trd  --prob sp
 python3 plot.py --plot trd  --prob ks
 # TSP
 python3 plot.py --plot trd  --prob tsp
+```
+
+
+### Training Scalability (Figure 16,17)
+
+To see the effect of increasing decision variables and/or constraints, you can change the size of the graph for the shortest path and the number of constraints for the knapsack.
+
+Experiments for the shortest path with 8x8 grid network:
+
+```bash
+python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 8 8
+python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 8 8
+python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 8 8
+python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 8 8
+```
+
+Experiments for the shortest path with 10x10 grid network:
+
+```bash
+python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 10 10
+python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 10 10
+python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 10 10
+python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 10 10
+```
+
+Experiments for the shortest path with 12x12 grid network:
+
+```bash
+python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 12 12
+python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 12 12
+python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 12 12
+python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 12 12
+```
+
+Experiments for the shortest path with 15x15 grid network:
+
+```bash
+python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 15 15
+python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 15 15
+python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 15 15
+python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 15 15
+```
+
+Once the results of the experiments are ready, you can draw a plot for Figure 16:
+
+```bash
+# shortest path
+python3 plot.py --plot scl --prob sp
+```
+
+Similarly, the experiments of 1D and 3D knapsack can be run as follows:
+
+```bash
+# 1D knapsack
+python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 1
+python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 1
+python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 1
+python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 1
+# 2D knapsack
+python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 2
+python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 2
+python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 2
+python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 2
+```
+
+Once the results of the experiments are ready, you can draw a plot for Figure 17:
+
+```bash
+# shortest path
+python3 plot.py --plot scl --prob ks
 ```
