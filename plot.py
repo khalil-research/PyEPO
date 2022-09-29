@@ -389,13 +389,98 @@ def relPlotTSP(config, data, noise):
     print("Saved to " + dir)
 
 
+def regPlot(config, data, noise):
+    # polynomial degree
+    degs = [1, 2, 4, 6]
+    # set config
+    config = deepcopy(config)
+    for c in config.values():
+        c.data = data
+        c.noise = noise
+    # prob name
+    prob = c.prob
+    # color map
+    cset =  tc.tol_cset('light')
+    colors = [cset.mint, cset.pink, cset.orange, cset.light_blue]
+    # get df
+    df_spo  = getDf(config, degs, "spo")
+    df_spo1 = getDf(config, degs, "spo l1")
+    df_spo2 = getDf(config, degs, "spo l2")
+    df_dbb  = getDf(config, degs, "dbb")
+    df_dbb1 = getDf(config, degs, "dbb l1")
+    df_dbb2 = getDf(config, degs, "dbb l2")
+    # draw boxplot
+    fig = plt.figure(figsize=(16,6))
+    c = colors[2]
+    bp1 = plt.boxplot(df_spo, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
+                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
+                      patch_artist=True, positions=np.arange(df_spo.shape[1])-0.4, widths=0.12)
+    c = colors[2]
+    bp2 = plt.boxplot(df_spo1, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
+                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
+                      patch_artist=True, positions=np.arange(df_spo.shape[1])-0.24, widths=0.12)
+    for box in bp2['boxes']:
+        box.set(hatch="++++", fill=False)
+    c = colors[2]
+    bp3 = plt.boxplot(df_spo2, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
+                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
+                      patch_artist=True, positions=np.arange(df_spo.shape[1])-0.08, widths=0.12)
+    for box in bp3["boxes"]:
+        box.set(hatch="OO", fill=False)
+    c = colors[3]
+    bp4 = plt.boxplot(df_dbb, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
+                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
+                      patch_artist=True, positions=np.arange(df_dbb.shape[1])+0.08, widths=0.12)
+    c = colors[3]
+    bp5 = plt.boxplot(df_dbb1, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
+                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
+                      patch_artist=True, positions=np.arange(df_dbb.shape[1])+0.24, widths=0.12)
+    for box in bp5["boxes"]:
+        box.set(hatch="++++", fill=False)
+    c = colors[3]
+    bp6 = plt.boxplot(df_dbb2, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
+                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
+                      patch_artist=True, positions=np.arange(df_dbb.shape[1])+0.4, widths=0.12)
+    for box in bp6["boxes"]:
+        box.set(hatch="OO", fill=False)
+    # vertical line
+    plt.axvline(x=0.5, color="k", linestyle="--", linewidth=1.5)
+    plt.axvline(x=1.5, color="k", linestyle="--", linewidth=1.5)
+    plt.axvline(x=2.5, color="k", linestyle="--", linewidth=1.5)
+    # grid
+    plt.grid(color="grey", alpha=0.5, linewidth=0.5, which="major", axis="y")
+    # labels and ticks
+    plt.xlabel("Polynomial Degree", fontsize=36)
+    plt.xticks(ticks=[0,1,2,3], labels=[1,2,4,6], fontsize=28)
+    plt.ylabel("Normalized Regret", fontsize=36)
+    plt.yticks(fontsize=24)
+    plt.xlim(-0.5, 3.5)
+    plt.ylim(-0.02, 0.38)
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter("%.2f"))
+    plt.title("Shortest Path\nTraining Set Size = {}, Noise Half−width = {}".format(data, noise), fontsize=30)
+    plt.legend([bp1["boxes"][0], bp2["boxes"][0], bp3["boxes"][0], bp4["boxes"][0], bp5["boxes"][0], bp6["boxes"][0]],
+               ["SPO+","SPO+ L1","SPO+ L2","DBB","DBB L1","DBB L2"], fontsize=22, loc=2, labelspacing=0.2,
+               handlelength=1, ncol=2)
+    # save
+    dir = "./images/reg-{}-n{}e{}.png".format(prob, data, int(10*noise))
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--plot",
                         type=str,
-                        choices=["comp", "rel"],
+                        choices=["comp", "rel", "reg"],
                         help="figure type")
     parser.add_argument("--prob",
                         type=str,
@@ -467,5 +552,28 @@ if __name__ == "__main__":
             for data, noise in itertools.product(*tuple(confset.values())):
                 relPlotTSP(config, data, noise)
 
+    ############################################################################
+    # regularization
+    if setting.plot == "reg":
+        # get config
+        config = getConfig(setting.prob)
+        # add reg
+        config["spo l1"] = deepcopy(config["spo"])
+        config["spo l1"].l1 = 1e-3
+        config["spo l2"] = deepcopy(config["spo"])
+        config["spo l2"].l2 = 1e-3
+        config["dbb l1"] = deepcopy(config["dbb"])
+        config["dbb l1"].l1 = 1e-3
+        config["dbb l2"] = deepcopy(config["dbb"])
+        config["dbb l2"].l2 = 1e-3
+        # delete 2s
+        del config["lr"]
+        del config["rf"]
+        del config["auto"]
+        # varying setting
+        confset = {"data":[100, 1000],
+                   "noise":[0.0, 0.5]}
+        for data, noise in itertools.product(*tuple(confset.values())):
+            regPlot(config, data, noise)
 
 # python3 plot.py --plot comp --prob sp
