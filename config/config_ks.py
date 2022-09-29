@@ -19,7 +19,7 @@ config.prob = "ks"
 # number of items
 config.item = 32
 # dimension
-config.dim = None
+config.dim = 2
 # capacity
 config.cap = 20
 
