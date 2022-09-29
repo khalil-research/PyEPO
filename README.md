@@ -158,7 +158,7 @@ python3 experiments.py --prob tsp --mthd spo   --expnum 10 --rel --tspform gg
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --rel --tspform gg
 ```
 
-Once the results of the experiments are ready, you can draw a plot for Figure 8,9:
+Once the results of the experiments are ready, you can draw a plot for Figure 8-10:
 
 ```bash
 python3 plot.py --plot rel  --prob ks
