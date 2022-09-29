@@ -45,7 +45,7 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 You can download ``PyEPO`` from our GitHub repository.
 
 ```bash
-git clone https://github.com/khalil-research/PyEPO.git
+git clone --branch MPC https://github.com/khalil-research/PyEPO.git
 ```
 
 And install it.
@@ -71,6 +71,14 @@ pip3 install PyEPO/pkg/.
 
 
 ## Experiments Instruction
+
+For all experiments, all hyperparameters for training (epoch, learning rate, batch size, etc.) are fixed in "./config/*"
+
+However, You can run `pipeline.py` for different experiment setting (including hyperparameters).
+
+```bash
+python3 pipeline.py --prob sp --mthd spo --lan gurobi --data 1000 --deg 2 --noise 0.5 --epoch 20 --lr 1e-1 --batch 32 --optm adam --proc 1
+```
 
 ### Performance Comparison (Figure 5-7)
 
@@ -119,4 +127,40 @@ python3 experiments.py --prob tsp --mthd spo   --expnum 10
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10
 # python3 experiments.py --prob ks  --mthd auto  --expnum 10
 python3 plot.py --plot comp --prob tsp
+```
+
+
+### Relaxation (Figure 8-10)
+
+To draw performance comparison graphs with relaxation, you need to additional train and evaluate SPO+ and DBB with linear relaxation for 2D knapsack and TSP. And TSP has different formulations.
+
+Experiments for 2D knapsack with relaxation:
+```bash
+python3 experiments.py --prob ks  --mthd spo   --expnum 10 --rel
+python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --rel
+```
+
+Experiments for TSP with relaxation (Miller-Tucker-Zemlin):
+```bash
+python3 experiments.py --prob tsp --mthd spo   --expnum 10 --rel --tspform mtz
+python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --rel --tspform mtz
+```
+
+Experiments for TSP with relaxation (Miller-Tucker-Zemlin):
+```bash
+python3 experiments.py --prob tsp --mthd spo   --expnum 10 --rel --tspform mtz
+python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --rel --tspform mtz
+```
+
+Experiments for TSP with relaxation (Gavish–Graves):
+```bash
+python3 experiments.py --prob tsp --mthd spo   --expnum 10 --rel --tspform gg
+python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --rel --tspform gg
+```
+
+Once the results of the experiments are ready, you can draw a plot for Figure 8,9:
+
+```bash
+python3 plot.py --plot rel  --prob ks
+python3 plot.py --plot rel  --prob tsp
 ```
