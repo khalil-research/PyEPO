@@ -23,6 +23,11 @@ parser.add_argument("--mthd",
                     type=str,
                     choices=["auto", "lr", "rf", "spo", "dbb"],
                     help="method")
+parser.add_argument("--spgrid",
+                    type=int,
+                    nargs=2,
+                    default=(5,5),
+                    help="network grid for shortest path")
 parser.add_argument("--ksdim",
                     type=int,
                     default=2,
@@ -50,6 +55,8 @@ setting = parser.parse_args()
 # get config
 config = configs[setting.prob][setting.mthd]
 config.expnum = setting.expnum
+if setting.prob == "sp":
+    config.grid = setting.spgrid
 if setting.prob == "ks":
     config.dim = setting.ksdim
 if setting.prob == "tsp":
