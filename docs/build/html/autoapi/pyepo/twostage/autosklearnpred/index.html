@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,6 +27,7 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
@@ -157,17 +158,13 @@
            <div itemprop="articleBody">
             
   <section id="module-pyepo.twostage.autosklearnpred">
-<span id="pyepo-twostage-autosklearnpred"></span><h1><a class="reference internal" href="#module-pyepo.twostage.autosklearnpred" title="pyepo.twostage.autosklearnpred"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage.autosklearnpred</span></code></a><a class="headerlink" href="#module-pyepo.twostage.autosklearnpred" title="Permalink to this headline">¶</a></h1>
+<span id="pyepo-twostage-autosklearnpred"></span><h1><a class="reference internal" href="#module-pyepo.twostage.autosklearnpred" title="pyepo.twostage.autosklearnpred"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage.autosklearnpred</span></code></a><a class="headerlink" href="#module-pyepo.twostage.autosklearnpred" title="Permalink to this heading">¶</a></h1>
 <p>Two-stage model with Scikit-learn predictor</p>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.twostage.autosklearnpred.NoPreprocessing" title="pyepo.twostage.autosklearnpred.NoPreprocessing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NoPreprocessing</span></code></a></p></td>
 <td><p>This is class of NoPreprocessing component for auto-sklearn</p></td>
@@ -176,12 +173,8 @@
 </table>
 </section>
 <section id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.twostage.autosklearnpred.autoSklearnPred" title="pyepo.twostage.autosklearnpred.autoSklearnPred"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autoSklearnPred</span></code></a>(optmodel, seed, timelimit, metric='mse')</p></td>
 <td><p>Two-stage prediction and optimization with auto-sklearn.</p></td>
@@ -220,13 +213,13 @@
 <span class="sig-prename descclassname"><span class="pre">pyepo.twostage.autosklearnpred.</span></span><span class="sig-name descname"><span class="pre">autoSklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timelimit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.twostage.autosklearnpred.autoSklearnPred" title="Permalink to this definition">¶</a></dt>
 <dd><p>Two-stage prediction and optimization with auto-sklearn.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>optmodel</strong> (<a class="reference internal" href="../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – optimization model</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Auto-SKlearn multi-output regression model</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>AutoSklearnRegressor</p>
 </dd>
 </dl>

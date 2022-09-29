@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,6 +27,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
@@ -173,20 +174,20 @@
            <div itemprop="articleBody">
             
   <section id="two-stage-method">
-<h1>Two-stage Method<a class="headerlink" href="#two-stage-method" title="Permalink to this headline">¶</a></h1>
+<h1>Two-stage Method<a class="headerlink" href="#two-stage-method" title="Permalink to this heading">¶</a></h1>
 <p>Two-stage approach trains a regression model <span class="math notranslate nohighlight">\(\hat{c} = g(x, \theta)\)</span> by minimizing a prediction error <span class="math notranslate nohighlight">\(l(\hat{c}, c)\)</span> such as mean square error <span class="math notranslate nohighlight">\(l_{MSE}(\hat{c}, c) = \frac{1}{n} \| \hat{c} - c \| ^ 2\)</span>. Then in an inference process, the machine learning model predicts <span class="math notranslate nohighlight">\(\hat{c} = g(x, \theta)\)</span> first. After that, the predicted value <span class="math notranslate nohighlight">\(\hat{c}\)</span> is used for solving the optimization problem.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.twostage.sklearnPred">
 <span class="sig-prename descclassname"><span class="pre">pyepo.twostage.</span></span><span class="sig-name descname"><span class="pre">sklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmodel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.twostage.sklearnPred" title="Permalink to this definition">¶</a></dt>
 <dd><p>Two-stage prediction and optimization with scikit-learn.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>pmodel</strong> (<em>Regressor</em>) – scikit-learn regression model</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>scikit-learn multi-output regression model</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MultiOutputRegressor</p>
 </dd>
 </dl>

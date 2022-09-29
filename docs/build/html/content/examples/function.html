@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,6 +27,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -178,14 +179,14 @@
            <div itemprop="articleBody">
             
   <section id="auto-grad-functions">
-<h1>Auto Grad Functions<a class="headerlink" href="#auto-grad-functions" title="Permalink to this headline">¶</a></h1>
+<h1>Auto Grad Functions<a class="headerlink" href="#auto-grad-functions" title="Permalink to this heading">¶</a></h1>
 <section id="spo-loss">
-<h2>SPO+ Loss<a class="headerlink" href="#spo-loss" title="Permalink to this headline">¶</a></h2>
-<p>SPO+ Loss function <a class="footnote-reference brackets" href="#f1" id="id1">1</a>, a surrogate loss function of SPO Loss, measures the decision error (optimality gap) of optimization problem.</p>
+<h2>SPO+ Loss<a class="headerlink" href="#spo-loss" title="Permalink to this heading">¶</a></h2>
+<p>SPO+ Loss function <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, a surrogate loss function of SPO Loss, measures the decision error (optimality gap) of optimization problem.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus" title="Permalink to this definition">¶</a></dt>
-<dd><p>A autograd function for SPO+ Loss, as a surrogate loss function of SPO Loss,
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus" title="Permalink to this definition">¶</a></dt>
+<dd><p>A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
 which measures the decision error of optimization problem.</p>
 <p>For SPO/SPO+ Loss, the objective function is linear and constraints are
 known and fixed, but the cost vector need to be predicted from contextual
@@ -193,39 +194,19 @@ data.</p>
 <p>The SPO+ Loss is convex with subgradient. Thus, allows us to design an
 algorithm based on stochastic gradient descent.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>optmodel</strong> (<a class="reference internal" href="model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
 <li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>
+<li><p><strong>solve_ratio</strong> (<em>float</em>) – the ratio of new solutions computed during training</p></li>
+<li><p><strong>dataset</strong> (<em>None/optDataset</em>) – the training data</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.SPOPlus.backward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.backward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Backward pass in neural network</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus.forward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward pass in neural network</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p></li>
-<li><p><strong>true_cost</strong> (<em>torch.tensor</em>) – a batch of true values of the cost</p></li>
-<li><p><strong>true_sol</strong> (<em>torch.tensor</em>) – a batch of true optimal solutions</p></li>
-<li><p><strong>true_obj</strong> (<em>torch.tensor</em>) – a batch of true optimal objective values</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>SPO+ loss</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>torch.tensor</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
 </dd></dl>
 
 </dd></dl>
@@ -238,48 +219,33 @@ algorithm based on stochastic gradient descent.</p>
 </div>
 </section>
 <section id="diffenretiable-black-box-optimizer">
-<h2>Diffenretiable Black-box Optimizer<a class="headerlink" href="#diffenretiable-black-box-optimizer" title="Permalink to this headline">¶</a></h2>
-<p>Diffenretiable black-box (DBB) optimizer function <a class="footnote-reference brackets" href="#f2" id="id2">2</a> introduces optimizer block into neural networks.</p>
+<h2>Diffenretiable Black-box Optimizer<a class="headerlink" href="#diffenretiable-black-box-optimizer" title="Permalink to this heading">¶</a></h2>
+<p>Diffenretiable black-box (DBB) optimizer function <a class="footnote-reference brackets" href="#f2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> introduces optimizer block into neural networks.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt" title="Permalink to this definition">¶</a></dt>
-<dd><p>A autograd function for diffenretiable black-box optimizer, which yield
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>A autograd module for differentiable black-box optimizer, which yield
 optimal a solution and derive a gradient.</p>
-<p>For diffenretiable block-box, the objective function is linear and
+<p>For differentiable block-box, the objective function is linear and
 constraints are known and fixed, but the cost vector need to be predicted
 from contextual data.</p>
 <p>The block-box approximate gradient of optimizer smoothly. Thus, allows us to
 design an algorithm based on stochastic gradient descent.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>optmodel</strong> (<a class="reference internal" href="model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
-<li><p><strong>lambd</strong> (<em>float</em>) – a hyperparameter for diffenretiable block-box to contral interpolation degree</p></li>
+<li><p><strong>lambd</strong> (<em>float</em>) – a hyperparameter for differentiable block-box to contral interpolation degree</p></li>
 <li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>
+<li><p><strong>solve_ratio</strong> (<em>float</em>) – the ratio of new solutions computed during training</p></li>
+<li><p><strong>dataset</strong> (<em>None/optDataset</em>) – the training data</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.blackboxOpt.backward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt.backward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Backward pass in neural network</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt.forward">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward pass in neural network.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>predicted solutions</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>torch.tensor</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
 </dd></dl>
 
 </dd></dl>
@@ -292,21 +258,21 @@ design an algorithm based on stochastic gradient descent.</p>
 </div>
 </section>
 <section id="parallel-computation">
-<h2>Parallel Computation<a class="headerlink" href="#parallel-computation" title="Permalink to this headline">¶</a></h2>
+<h2>Parallel Computation<a class="headerlink" href="#parallel-computation" title="Permalink to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> supports parallel computation for solving optimization problems in training, where the parameter <code class="docutils literal notranslate"><span class="pre">processes</span></code> is the number of processors to be used.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>On Windows system, there is missing <code class="docutils literal notranslate"><span class="pre">freeze_support</span></code> to run <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> directly from <code class="docutils literal notranslate"><span class="pre">__main__</span></code>. When <code class="docutils literal notranslate"><span class="pre">processes</span></code> is not 1, try <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">&quot;__main__&quot;:</span></code> instead of Jupyter notebook or a PY file.</p>
 </div>
 <p class="rubric">Footnotes</p>
-<dl class="footnote brackets">
-<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Elmachtoub, A. N., &amp; Grigas, P. (2021). Smart “predict, then optimize”. Management Science.</p>
-</dd>
-<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>Vlastelica, M., Paulus, A., Musil, V., Martius, G., &amp; Rolínek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.</p>
-</dd>
-</dl>
+<aside class="footnote brackets" id="f1" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Elmachtoub, A. N., &amp; Grigas, P. (2021). Smart “predict, then optimize”. Management Science.</p>
+</aside>
+<aside class="footnote brackets" id="f2" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Vlastelica, M., Paulus, A., Musil, V., Martius, G., &amp; Rolínek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.</p>
+</aside>
 </section>
 </section>
 

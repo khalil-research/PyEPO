@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,6 +27,7 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
@@ -157,17 +158,13 @@
            <div itemprop="articleBody">
             
   <section id="module-pyepo.data.dataset">
-<span id="pyepo-data-dataset"></span><h1><a class="reference internal" href="../../../../content/modules/pyepo.data.dataset.html#module-pyepo.data.dataset" title="pyepo.data.dataset"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data.dataset</span></code></a><a class="headerlink" href="#module-pyepo.data.dataset" title="Permalink to this headline">¶</a></h1>
+<span id="pyepo-data-dataset"></span><h1><a class="reference internal" href="../../../../content/modules/pyepo.data.dataset.html#module-pyepo.data.dataset" title="pyepo.data.dataset"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data.dataset</span></code></a><a class="headerlink" href="#module-pyepo.data.dataset" title="Permalink to this heading">¶</a></h1>
 <p>optDataset class based on PyTorch Dataset</p>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="../../../../content/examples/data.html#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p></td>
 <td><p>This class is Torch Dataset for optimization problems.</p></td>
@@ -184,7 +181,7 @@
 <span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimization models</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
@@ -195,7 +192,7 @@
 <span class="sig-name descname"><span class="pre">feats</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.feats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Data features</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
@@ -206,7 +203,7 @@
 <span class="sig-name descname"><span class="pre">costs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.costs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cost vectors</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
@@ -217,7 +214,7 @@
 <span class="sig-name descname"><span class="pre">sols</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.sols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimal solutions</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
@@ -228,7 +225,7 @@
 <span class="sig-name descname"><span class="pre">objs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.objs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimal objective values</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
@@ -245,13 +242,13 @@
 <span class="sig-name descname"><span class="pre">_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDataset._solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve optimization problem to get an optimal solution with given cost</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cost</strong> (<em>np.ndarray</em>) – cost of objective function</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>optimal solution (np.ndarray) and objective value (float)</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
@@ -262,10 +259,10 @@
 <span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDataset.__len__" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to get data size</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the number of optimization problems</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>int</p>
 </dd>
 </dl>
@@ -276,13 +273,13 @@
 <span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDataset.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to retrieve data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – data index</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>data features (torch.tensor), costs (torch.tensor), optimal solutions (torch.tensor) and objective values (torch.tensor)</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>

@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -27,6 +27,7 @@
         <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
@@ -157,17 +158,13 @@
            <div itemprop="articleBody">
             
   <section id="module-pyepo.model.grb.grbmodel">
-<span id="pyepo-model-grb-grbmodel"></span><h1><a class="reference internal" href="../../../../../content/modules/pyepo.model.grb.grbmodel.html#module-pyepo.model.grb.grbmodel" title="pyepo.model.grb.grbmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel</span></code></a><a class="headerlink" href="#module-pyepo.model.grb.grbmodel" title="Permalink to this headline">¶</a></h1>
+<span id="pyepo-model-grb-grbmodel"></span><h1><a class="reference internal" href="../../../../../content/modules/pyepo.model.grb.grbmodel.html#module-pyepo.model.grb.grbmodel" title="pyepo.model.grb.grbmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel</span></code></a><a class="headerlink" href="#module-pyepo.model.grb.grbmodel" title="Permalink to this heading">¶</a></h1>
 <p>Abstract optimization model based on GurobiPy</p>
 <section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optGrbModel</span></code></a></p></td>
 <td><p>This is an abstract class for Gurobi-based optimization model</p></td>
@@ -184,7 +181,7 @@
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.grbmodel.optGrbModel._model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
@@ -201,7 +198,7 @@
 <span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.grbmodel.optGrbModel.setObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
 </dd>
 </dl>
@@ -212,10 +209,10 @@
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.grbmodel.optGrbModel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -226,10 +223,10 @@
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.grbmodel.optGrbModel.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to copy model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>new copied model</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
@@ -240,16 +237,16 @@
 <span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.grbmodel.optGrbModel.addConstr" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to add new constraint</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>coefs</strong> (<em>np.ndarray / list</em>) – coeffcients of new constraint</p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>new model with the added constraint</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
