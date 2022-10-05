@@ -284,11 +284,11 @@ In the general case, users only need to implement ``_getModel`` method with Guro
    class myModel(optGrbModel):
 
        def _getModel(self):
-           # ceate a model
+           # create a model
            m = gp.Model()
-           # varibles
+           # variables
            x = m.addVars(5, name="x", vtype=GRB.BINARY)
-           # sense (must be minimize)
+           # model sense
            m.modelSense = GRB.MAXIMIZE
            # constraints
            m.addConstr(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
@@ -340,9 +340,9 @@ In the general case, users only need to implement ``_getModel`` method with Pyom
        def _getModel(self):
            # sense
            self.modelSense = EPO.MAXIMIZE
-           # ceate a model
+           # create a model
            m = pe.ConcreteModel()
-           # varibles
+           # variables
            x = pe.Var([0,1,2,3,4], domain=pe.Binary)
            m.x = x
            # constraints
