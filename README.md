@@ -105,7 +105,7 @@ class myModel(optGrbModel):
         m = gp.Model()
         # varibles
         x = m.addVars(self.num_item, name="x", vtype=GRB.BINARY)
-        # sense (must be minimize)
+        # model sense
         m.modelSense = GRB.MAXIMIZE
         # constraints
         m.addConstr(gp.quicksum([self.weights[0,i] * x[i] for i in range(self.num_item)]) <= 7)
