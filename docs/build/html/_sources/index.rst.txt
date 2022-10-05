@@ -30,7 +30,7 @@ Sample Code
            m = gp.Model()
            # varibles
            x = m.addVars(5, name="x", vtype=GRB.BINARY)
-           # sense (must be minimize)
+           # model sense
            m.modelSense = GRB.MAXIMIZE
            # constraints
            m.addConstr(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
