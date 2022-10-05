@@ -122,7 +122,7 @@ The example to learn shortest path with linear model is as follows:
            wp = dbb(cp)
            # objective value
            zp = (wp * c).sum(1).view(-1, 1)
-           # spo loss
+           # regret loss
            loss = criterion(zp, z)
            # backward pass
            optimizer.zero_grad()
