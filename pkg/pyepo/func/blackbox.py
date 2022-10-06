@@ -65,16 +65,16 @@ class blackboxOpt(nn.Module):
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
             self.solpool = dataset.sols.copy()
-        # build carterion
+        # build blackbox optimizer
         self.dbb = blackboxOptFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        loss = self.dbb.apply(pred_cost, self.lambd, self.optmodel,
+        sols = self.dbb.apply(pred_cost, self.lambd, self.optmodel,
                               self.processes, self.solve_ratio, self)
-        return loss
+        return sols
 
 
 class blackboxOptFunc(Function):
