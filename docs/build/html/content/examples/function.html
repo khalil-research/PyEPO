@@ -97,8 +97,8 @@
 <li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-stage Method</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Auto Grad Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#smart-predict-then-optimize-loss-spo">Smart Predict-then-Optimize Loss+ (SPO+)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#diffenretiable-black-box-optimizer-dbb">Diffenretiable Black-box Optimizer (DBB)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#perturbed-optimizer-po">Perturbed Optimizer (PO)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#differentiable-black-box-optimizer-dbb">Differentiable Black-box Optimizer (DBB)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#differentiable-perturbed-optimizer-dpo">Differentiable Perturbed Optimizer (DPO)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#perturbed-fenchel-young-loss-pyfl">Perturbed Fenchel-Young loss (PYFL)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#parallel-computation">Parallel Computation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pyepo.func.SPOPlus">SPOPlus</a></li>
@@ -223,8 +223,8 @@ algorithm based on stochastic gradient descent.</p>
 </pre></div>
 </div>
 </section>
-<section id="diffenretiable-black-box-optimizer-dbb">
-<h2>Diffenretiable Black-box Optimizer (DBB)<a class="headerlink" href="#diffenretiable-black-box-optimizer-dbb" title="Permalink to this heading">¶</a></h2>
+<section id="differentiable-black-box-optimizer-dbb">
+<h2>Differentiable Black-box Optimizer (DBB)<a class="headerlink" href="#differentiable-black-box-optimizer-dbb" title="Permalink to this heading">¶</a></h2>
 <p>Diffenretiable black-box (DBB) optimizer function <a class="footnote-reference brackets" href="#f2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> introduces optimizer block into neural networks.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt">
@@ -262,14 +262,14 @@ design an algorithm based on stochastic gradient descent.</p>
 </pre></div>
 </div>
 </section>
-<section id="perturbed-optimizer-po">
-<h2>Perturbed Optimizer (PO)<a class="headerlink" href="#perturbed-optimizer-po" title="Permalink to this heading">¶</a></h2>
-<p>Perturbed Optimizer (PO) <a class="footnote-reference brackets" href="#f3" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> uses Monte-Carlo samples to estimate solutions, which makes it differentiable.</p>
+<section id="differentiable-perturbed-optimizer-dpo">
+<h2>Differentiable Perturbed Optimizer (DPO)<a class="headerlink" href="#differentiable-perturbed-optimizer-dpo" title="Permalink to this heading">¶</a></h2>
+<p>Differentiable perturbed Optimizer (DPO) <a class="footnote-reference brackets" href="#f3" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> uses Monte-Carlo samples to estimate solutions, which makes it differentiable.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.perturbedOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedOpt" title="Permalink to this definition">¶</a></dt>
-<dd><p>A autograd module for perturbed optimizer, models of random optimizers with
-perturbed inputs.</p>
+<dd><p>A autograd module for differentiable perturbed optimizer, models of random
+optimizers with perturbed inputs.</p>
 <p>For the perturbed optimizer, the cost vector need to be predicted from
 contextual data and are perturbed with Gaussian noise.</p>
 <p>The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
@@ -303,7 +303,7 @@ Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
 </section>
 <section id="perturbed-fenchel-young-loss-pyfl">
 <h2>Perturbed Fenchel-Young loss (PYFL)<a class="headerlink" href="#perturbed-fenchel-young-loss-pyfl" title="Permalink to this heading">¶</a></h2>
-<p>Perturbed Fenchel-Young loss (PYFL) function <a class="footnote-reference brackets" href="#f3" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> uses Monte-Carlo samples to estimate solutions as PO, and the Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation.</p>
+<p>Perturbed Fenchel-Young loss (PYFL) function <a class="footnote-reference brackets" href="#f3" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> uses Monte-Carlo samples to estimate solutions as DPO, and the Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung" title="Permalink to this definition">¶</a></dt>

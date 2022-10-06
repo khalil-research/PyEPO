@@ -130,8 +130,8 @@ The example to learn shortest path with linear model is as follows:
            optimizer.step()
 
 
-Training with PO
-================
+Training with DPO
+=================
 
 The example to learn shortest path with linear model is as follows:
 

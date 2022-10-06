@@ -250,8 +250,8 @@ design an algorithm based on stochastic gradient descent.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.perturbedOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedOpt" title="Permalink to this definition">¶</a></dt>
-<dd><p>A autograd module for perturbed optimizer, models of random optimizers with
-perturbed inputs.</p>
+<dd><p>A autograd module for differentiable perturbed optimizer, models of random
+optimizers with perturbed inputs.</p>
 <p>For the perturbed optimizer, the cost vector need to be predicted from
 contextual data and are perturbed with Gaussian noise.</p>
 <p>The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
