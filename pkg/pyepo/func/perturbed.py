@@ -19,8 +19,8 @@ from pyepo.utlis import getArgs
 
 class perturbedOpt(nn.Module):
     """
-    A autograd module for perturbed optimizer, models of random optimizers with
-    perturbed inputs.
+    A autograd module for differentiable perturbed optimizer, models of random
+    optimizers with perturbed inputs.
 
     For the perturbed optimizer, the cost vector need to be predicted from
     contextual data and are perturbed with Gaussian noise.
