@@ -97,10 +97,11 @@
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Evaluation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#true-spo">True SPO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#unambiguous-spo">Unambiguous SPO</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#regret">Regret</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unambiguous-regret">Unambiguous Regret</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pyepo.metric.regret">regret</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyepo.metric.unambRegret">unambRegret</a></li>
 </ul>
@@ -180,9 +181,9 @@
             
   <section id="evaluation">
 <h1>Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this heading">¶</a></h1>
-<section id="true-spo">
-<h2>True SPO<a class="headerlink" href="#true-spo" title="Permalink to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.eval</span></code> is to evaluate model performance. SPO loss <span class="math notranslate nohighlight">\(l_{SPO}(\hat{c}, c) = c^T w^*(\hat{c}) - z^*(c)\)</span> aims to measure the error in decision-making. It evaluates the distance between the objective value of the solution from predicted cost <span class="math notranslate nohighlight">\(\hat{c}\)</span> and the true optimal objective value <span class="math notranslate nohighlight">\(z^*(c)\)</span>.</p>
+<section id="regret">
+<h2>Regret<a class="headerlink" href="#regret" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.eval</span></code> is to evaluate model performance. Regret <span class="math notranslate nohighlight">\(l_{SPO}(\hat{c}, c) = c^T w^*(\hat{c}) - z^*(c)\)</span> aims to measure the error in decision-making. It evaluates the distance between the objective value of the solution from predicted cost <span class="math notranslate nohighlight">\(\hat{c}\)</span> and the true optimal objective value <span class="math notranslate nohighlight">\(z^*(c)\)</span>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.metric.regret">
 <span class="sig-prename descclassname"><span class="pre">pyepo.metric.</span></span><span class="sig-name descname"><span class="pre">regret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.metric.regret" title="Permalink to this definition">¶</a></dt>
@@ -210,9 +211,9 @@
 </pre></div>
 </div>
 </section>
-<section id="unambiguous-spo">
-<h2>Unambiguous SPO<a class="headerlink" href="#unambiguous-spo" title="Permalink to this heading">¶</a></h2>
-<p>Given a cost vector <span class="math notranslate nohighlight">\(\hat{c}\)</span>, there may be multiple optimal solutions of <span class="math notranslate nohighlight">\(\underset{w \in S}{\min}\;\hat{c}^T w\)</span>. Unambiguous SPO Loss <span class="math notranslate nohighlight">\(l_{USPO}(\hat{c}, c) = \underset{w \in W^*(c)}{\max} w^T c - z^*(c)\)</span> considers the worst cases.</p>
+<section id="unambiguous-regret">
+<h2>Unambiguous Regret<a class="headerlink" href="#unambiguous-regret" title="Permalink to this heading">¶</a></h2>
+<p>Given a cost vector <span class="math notranslate nohighlight">\(\hat{c}\)</span>, there may be multiple optimal solutions of <span class="math notranslate nohighlight">\(\underset{w \in S}{\min}\;\hat{c}^T w\)</span>. Unambiguous Regret Loss <span class="math notranslate nohighlight">\(l_{URegret}(\hat{c}, c) = \underset{w \in W^*(c)}{\max} w^T c - z^*(c)\)</span> considers the worst cases.</p>
 <p>However, the regret and the unambiguous regret are almost same in all training procedures. Therefore, although the unambiguous regret is more theoretically rigorous, it is not necessary to consider it in practice.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.metric.unambRegret">

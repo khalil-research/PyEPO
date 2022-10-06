@@ -10,5 +10,6 @@ This quickstart guide tries to show the basic mechanisms of how to use ``PyEPO``
    examples/data
    examples/twostage
    examples/function
+   examples/pool
    examples/training
    examples/evaluation
