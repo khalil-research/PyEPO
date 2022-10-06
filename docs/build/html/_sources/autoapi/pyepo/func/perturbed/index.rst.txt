@@ -1,0 +1,177 @@
+:mod:`pyepo.func.perturbed`
+===========================
+
+.. py:module:: pyepo.func.perturbed
+
+.. autoapi-nested-parse::
+
+   Perturbed optimization function
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.perturbed.perturbedOpt
+   pyepo.func.perturbed.perturbedOptFunc
+   pyepo.func.perturbed.perturbedFenchelYoung
+   pyepo.func.perturbed.perturbedFenchelYoungFunc
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.perturbed._solve_in_forward
+   pyepo.func.perturbed._cache_in_pass
+   pyepo.func.perturbed._solveWithObj4Par
+
+
+.. py:class:: perturbedOpt(optmodel, n_samples=10, epsilon=1.0, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :class:`torch.nn.Module`
+
+   A autograd module for perturbed optimizer, models of random optimizers with
+   perturbed inputs.
+
+   For the perturbed optimizer, the cost vector need to be predicted from
+   contextual data and are perturbed with Gaussian noise.
+
+   The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. method:: forward(self, pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: perturbedOptFunc(*args, **kwargs)
+
+   Bases: :class:`torch.autograd.Function`
+
+   A autograd function for perturbed optimizer
+
+   .. method:: forward(ctx, pred_cost, optmodel, n_samples, epsilon, processes, solve_ratio, module)
+      :staticmethod:
+
+      Forward pass for perturbed
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+      :param optmodel: an PyEPO optimization model
+      :type optmodel: optModel
+      :param n_samples: number of Monte-Carlo samples
+      :type n_samples: int
+      :param epsilon: the amplitude of the perturbation
+      :type epsilon: float
+      :param processes: number of processors, 1 for single-core, 0 for all of cores
+      :type processes: int
+      :param solve_ratio: the ratio of new solutions computed during training
+      :type solve_ratio: float
+      :param module: blackboxOpt modeul
+      :type module: nn.Module
+
+      :returns: solution expectations with perturbation
+      :rtype: torch.tensor
+
+
+   .. method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass for perturbed
+
+
+
+.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, epsilon=1.0, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :class:`torch.nn.Module`
+
+   A autograd module for Fenchel-Young loss using perturbation techniques.The
+   use of the loss improves the algorithmic by the specific expression of the
+   gradients of the loss.
+
+   For the perturbed optimizer, the cost vector need to be predicted from
+   contextual data and are perturbed with Gaussian noise.
+
+   The Fenchel-Young loss allows to directly optimize a loss between the features
+   and solutions with less computation. Thus, allows us to design an algorithm
+   based on stochastic gradient descent.
+
+   .. method:: forward(self, pred_cost, true_sol)
+
+      Forward pass
+
+
+
+.. py:class:: perturbedFenchelYoungFunc(*args, **kwargs)
+
+   Bases: :class:`torch.autograd.Function`
+
+   A autograd function for Fenchel-Young loss using perturbation techniques.
+
+   .. method:: forward(ctx, pred_cost, true_sol, optmodel, n_samples, epsilon, processes, solve_ratio, module)
+      :staticmethod:
+
+      Forward pass for perturbed Fenchel-Young loss
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+      :param true_sol: a batch of true optimal solutions
+      :type true_sol: torch.tensor
+      :param optmodel: an PyEPO optimization model
+      :type optmodel: optModel
+      :param n_samples: number of Monte-Carlo samples
+      :type n_samples: int
+      :param epsilon: the amplitude of the perturbation
+      :type epsilon: float
+      :param processes: number of processors, 1 for single-core, 0 for all of cores
+      :type processes: int
+      :param solve_ratio: the ratio of new solutions computed during training
+      :type solve_ratio: float
+      :param module: blackboxOpt modeul
+      :type module: nn.Module
+
+      :returns: solution expectations with perturbation
+      :rtype: torch.tensor
+
+
+   .. method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass for perturbed Fenchel-Young loss
+
+
+
+.. function:: _solve_in_forward(ptb_c, optmodel, processes)
+
+   A function to solve optimization in the forward pass
+
+
+.. function:: _cache_in_pass(ptb_c, optmodel, solpool)
+
+   A function to use solution pool in the forward/backward pass
+
+
+.. function:: _solveWithObj4Par(perturbed_costs, args, model_type)
+
+   A global function to solve function in parallel processors
+
+   :param perturbed_costs: costsof objective function with perturbation
+   :type perturbed_costs: np.ndarray
+   :param args: optModel args
+   :type args: dict
+   :param model_type: optModel class type
+   :type model_type: ABCMeta
+
+   :returns: optimal solution
+   :rtype: list
+
+

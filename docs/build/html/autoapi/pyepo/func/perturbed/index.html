@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyepo.func.perturbed &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> PyTorch-based End-to-End Predict-then-Optimize Tool
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/api.html">Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/ref.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">PyTorch-based End-to-End Predict-then-Optimize Tool</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.perturbed</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../../_sources/autoapi/pyepo/func/perturbed/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-pyepo.func.perturbed">
+<span id="pyepo-func-perturbed"></span><h1><a class="reference internal" href="#module-pyepo.func.perturbed" title="pyepo.func.perturbed"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.perturbed</span></code></a><a class="headerlink" href="#module-pyepo.func.perturbed" title="Permalink to this heading">¶</a></h1>
+<p>Perturbed optimization function</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbed.perturbedOpt" title="pyepo.func.perturbed.perturbedOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a></p></td>
+<td><p>A autograd module for perturbed optimizer, models of random optimizers with</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbed.perturbedOptFunc" title="pyepo.func.perturbed.perturbedOptFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedOptFunc</span></code></a></p></td>
+<td><p>A autograd function for perturbed optimizer</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbed.perturbedFenchelYoung" title="pyepo.func.perturbed.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p></td>
+<td><p>A autograd module for Fenchel-Young loss using perturbation techniques.The</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbed.perturbedFenchelYoungFunc" title="pyepo.func.perturbed.perturbedFenchelYoungFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoungFunc</span></code></a></p></td>
+<td><p>A autograd function for Fenchel-Young loss using perturbation techniques.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbed._solve_in_forward" title="pyepo.func.perturbed._solve_in_forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_solve_in_forward</span></code></a>(ptb_c, optmodel, processes)</p></td>
+<td><p>A function to solve optimization in the forward pass</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbed._cache_in_pass" title="pyepo.func.perturbed._cache_in_pass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_cache_in_pass</span></code></a>(ptb_c, optmodel, solpool)</p></td>
+<td><p>A function to use solution pool in the forward/backward pass</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbed._solveWithObj4Par" title="pyepo.func.perturbed._solveWithObj4Par"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_solveWithObj4Par</span></code></a>(perturbed_costs, args, model_type)</p></td>
+<td><p>A global function to solve function in parallel processors</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedOpt">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedOpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>A autograd module for perturbed optimizer, models of random optimizers with
+perturbed inputs.</p>
+<p>For the perturbed optimizer, the cost vector need to be predicted from
+contextual data and are perturbed with Gaussian noise.</p>
+<p>The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
+Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedOpt.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedOpt.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedOptFunc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedOptFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedOptFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></p>
+<p>A autograd function for perturbed optimizer</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedOptFunc.forward">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedOptFunc.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass for perturbed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>n_samples</strong> (<em>int</em>) – number of Monte-Carlo samples</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – the amplitude of the perturbation</p></li>
+<li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>
+<li><p><strong>solve_ratio</strong> (<em>float</em>) – the ratio of new solutions computed during training</p></li>
+<li><p><strong>module</strong> (<em>nn.Module</em>) – blackboxOpt modeul</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution expectations with perturbation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedOptFunc.backward">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedOptFunc.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backward pass for perturbed</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedFenchelYoung">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedFenchelYoung" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>A autograd module for Fenchel-Young loss using perturbation techniques.The
+use of the loss improves the algorithmic by the specific expression of the
+gradients of the loss.</p>
+<p>For the perturbed optimizer, the cost vector need to be predicted from
+contextual data and are perturbed with Gaussian noise.</p>
+<p>The Fenchel-Young loss allows to directly optimize a loss between the features
+and solutions with less computation. Thus, allows us to design an algorithm
+based on stochastic gradient descent.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedFenchelYoung.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedFenchelYoung.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedFenchelYoungFunc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoungFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedFenchelYoungFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></p>
+<p>A autograd function for Fenchel-Young loss using perturbation techniques.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedFenchelYoungFunc.forward">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedFenchelYoungFunc.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass for perturbed Fenchel-Young loss</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p></li>
+<li><p><strong>true_sol</strong> (<em>torch.tensor</em>) – a batch of true optimal solutions</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>n_samples</strong> (<em>int</em>) – number of Monte-Carlo samples</p></li>
+<li><p><strong>epsilon</strong> (<em>float</em>) – the amplitude of the perturbation</p></li>
+<li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>
+<li><p><strong>solve_ratio</strong> (<em>float</em>) – the ratio of new solutions computed during training</p></li>
+<li><p><strong>module</strong> (<em>nn.Module</em>) – blackboxOpt modeul</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution expectations with perturbation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedFenchelYoungFunc.backward">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedFenchelYoungFunc.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backward pass for perturbed Fenchel-Young loss</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.func.perturbed._solve_in_forward">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">_solve_in_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ptb_c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed._solve_in_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function to solve optimization in the forward pass</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.func.perturbed._cache_in_pass">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">_cache_in_pass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ptb_c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solpool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed._cache_in_pass" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function to use solution pool in the forward/backward pass</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.func.perturbed._solveWithObj4Par">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">_solveWithObj4Par</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perturbed_costs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed._solveWithObj4Par" title="Permalink to this definition">¶</a></dt>
+<dd><p>A global function to solve function in parallel processors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>perturbed_costs</strong> (<em>np.ndarray</em>) – costsof objective function with perturbation</p></li>
+<li><p><strong>args</strong> (<em>dict</em>) – optModel args</p></li>
+<li><p><strong>model_type</strong> (<em>ABCMeta</em>) – optModel class type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>optimal solution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Bo Tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

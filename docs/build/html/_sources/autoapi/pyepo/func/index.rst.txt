@@ -16,6 +16,7 @@ Submodules
    :maxdepth: 1
 
    blackbox/index.rst
+   perturbed/index.rst
    spoplus/index.rst
 
 
@@ -29,6 +30,8 @@ Classes
 
    pyepo.func.blackboxOpt
    pyepo.func.SPOPlus
+   pyepo.func.perturbedOpt
+   pyepo.func.perturbedFenchelYoung
 
 
 
@@ -67,6 +70,46 @@ Classes
    algorithm based on stochastic gradient descent.
 
    .. method:: forward(self, pred_cost, true_cost, true_sol, true_obj)
+
+      Forward pass
+
+
+
+.. py:class:: perturbedOpt(optmodel, n_samples=10, epsilon=1.0, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :class:`torch.nn.Module`
+
+   A autograd module for perturbed optimizer, models of random optimizers with
+   perturbed inputs.
+
+   For the perturbed optimizer, the cost vector need to be predicted from
+   contextual data and are perturbed with Gaussian noise.
+
+   The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. method:: forward(self, pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, epsilon=1.0, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :class:`torch.nn.Module`
+
+   A autograd module for Fenchel-Young loss using perturbation techniques.The
+   use of the loss improves the algorithmic by the specific expression of the
+   gradients of the loss.
+
+   For the perturbed optimizer, the cost vector need to be predicted from
+   contextual data and are perturbed with Gaussian noise.
+
+   The Fenchel-Young loss allows to directly optimize a loss between the features
+   and solutions with less computation. Thus, allows us to design an algorithm
+   based on stochastic gradient descent.
+
+   .. method:: forward(self, pred_cost, true_sol)
 
       Forward pass
 

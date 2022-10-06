@@ -165,6 +165,7 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="blackbox/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.blackbox</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="perturbed/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.perturbed</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="spoplus/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.spoplus</span></code></a></li>
 </ul>
 </div>
@@ -180,6 +181,12 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../../../content/modules/pyepo.func.html#pyepo.func.SPOPlus" title="pyepo.func.SPOPlus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPOPlus</span></code></a></p></td>
 <td><p>A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../../content/modules/pyepo.func.html#pyepo.func.perturbedOpt" title="pyepo.func.perturbedOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a></p></td>
+<td><p>A autograd module for perturbed optimizer, models of random optimizers with</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../../content/modules/pyepo.func.html#pyepo.func.perturbedFenchelYoung" title="pyepo.func.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p></td>
+<td><p>A autograd module for Fenchel-Young loss using perturbation techniques.The</p></td>
 </tr>
 </tbody>
 </table>
@@ -216,6 +223,44 @@ algorithm based on stochastic gradient descent.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.perturbedOpt">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedOpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>A autograd module for perturbed optimizer, models of random optimizers with
+perturbed inputs.</p>
+<p>For the perturbed optimizer, the cost vector need to be predicted from
+contextual data and are perturbed with Gaussian noise.</p>
+<p>The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
+Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.perturbedOpt.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedOpt.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>A autograd module for Fenchel-Young loss using perturbation techniques.The
+use of the loss improves the algorithmic by the specific expression of the
+gradients of the loss.</p>
+<p>For the perturbed optimizer, the cost vector need to be predicted from
+contextual data and are perturbed with Gaussian noise.</p>
+<p>The Fenchel-Young loss allows to directly optimize a loss between the features
+and solutions with less computation. Thus, allows us to design an algorithm
+based on stochastic gradient descent.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Forward pass</p>
 </dd></dl>
 
