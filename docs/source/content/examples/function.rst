@@ -18,7 +18,7 @@ SPO+ Loss function [#f1]_, a surrogate loss function of SPO Loss, measures the d
    spo = pyepo.func.SPOPlus(optmodel, processes=2)
 
 
-Diffenretiable Black-box Optimizer (DBB)
+Differentiable Black-box Optimizer (DBB)
 ========================================
 
 Diffenretiable black-box (DBB) optimizer function [#f2]_ introduces optimizer block into neural networks.
@@ -36,10 +36,10 @@ Diffenretiable black-box (DBB) optimizer function [#f2]_ introduces optimizer bl
    dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=2)
 
 
-Perturbed Optimizer (PO)
-========================
+Differentiable Perturbed Optimizer (DPO)
+========================================
 
-Perturbed Optimizer (PO) [#f3]_ uses Monte-Carlo samples to estimate solutions, which makes it differentiable.
+Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to estimate solutions, which makes it differentiable.
 
 
 .. autoclass:: pyepo.func.perturbedOpt
@@ -57,7 +57,7 @@ Perturbed Optimizer (PO) [#f3]_ uses Monte-Carlo samples to estimate solutions, 
 Perturbed Fenchel-Young loss (PYFL)
 ===================================
 
-Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses Monte-Carlo samples to estimate solutions as PO, and the Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation.
+Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses Monte-Carlo samples to estimate solutions as DPO, and the Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation.
 
 
 .. autoclass:: pyepo.func.perturbedFenchelYoung
