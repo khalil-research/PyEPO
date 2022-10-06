@@ -40,10 +40,10 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 
 ## Features
 
-- Implement SPO+ [[1]](https://doi.org/10.1287/mnsc.2020.3922) and DBB [[3]](https://arxiv.org/abs/1912.02175)
+- Implement SPO+ [[1]](https://doi.org/10.1287/mnsc.2020.3922), DBB [[3]](https://arxiv.org/abs/1912.02175) and PerturbedOpt [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
 - Support [Gurobi](https://www.gurobi.com/) and [Pyomo](http://www.pyomo.org/) API
 - Support Parallel computing for optimization solver
-- Support solution caching [[4]](https://arxiv.org/abs/2011.05354) to speed up training
+- Support solution caching [[5]](https://arxiv.org/abs/2011.05354) to speed up training
 
 ## Installation
 
@@ -174,4 +174,5 @@ if __name__ == "__main__":
 * [1] [Elmachtoub, A. N., & Grigas, P. (2021). Smart “predict, then optimize”. Management Science.](https://doi.org/10.1287/mnsc.2020.3922)
 * [2] [Mandi, J., Stuckey, P. J., & Guns, T. (2020). Smart predict-and-optimize for hard combinatorial optimization problems. In Proceedings of the AAAI Conference on Artificial Intelligence.](https://doi.org/10.1609/aaai.v34i02.5521)
 * [3] [Vlastelica, M., Paulus, A., Musil, V., Martius, G., & Rolínek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.](https://arxiv.org/abs/1912.02175)
-* [4] [Mulamba, Maxime, et al. "Contrastive losses and solution caching for predict-and-optimize." arXiv preprint arXiv:2011.05354 (2020).](https://arxiv.org/abs/2011.05354)
+* [4] [Berthet, Q., Blondel, M., Teboul, O., Cuturi, M., Vert, J. P., & Bach, F. (2020). Learning with differentiable pertubed optimizers. Advances in neural information processing systems, 33, 9508-9519.](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
+* [5] [Mulamba, Maxime, et al. "Contrastive losses and solution caching for predict-and-optimize." arXiv preprint arXiv:2011.05354 (2020).](https://arxiv.org/abs/2011.05354)
