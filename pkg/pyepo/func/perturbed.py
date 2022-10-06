@@ -29,13 +29,16 @@ class perturbedOpt(nn.Module):
     Thus, allows us to design an algorithm based on stochastic gradient descent.
     """
 
-    def __init__(self, optmodel, n_samples=10, epsilon=1.0, processes=1):
+    def __init__(self, optmodel, n_samples=10, epsilon=1.0, processes=1,
+                 solve_ratio=1, dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             epsilon (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio (float): the ratio of new solutions computed during training
+            dataset (None/optDataset): the training data
         """
         super().__init__()
         # optimization model
@@ -52,6 +55,16 @@ class perturbedOpt(nn.Module):
                 format(processes, mp.cpu_count()))
         self.processes = processes
         print("Num of cores: {}".format(self.processes))
+        # solution pool
+        self.solve_ratio = solve_ratio
+        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
+            raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
+                format(self.solve_ratio))
+        self.solpool = None
+        if self.solve_ratio < 1: # init solution pool
+            if not isinstance(dataset, optDataset): # type checking
+                raise TypeError("dataset is not an optDataset")
+            self.solpool = dataset.sols.copy()
         # build optimizer
         self.ptb = perturbedOptFunc()
 
@@ -60,7 +73,8 @@ class perturbedOpt(nn.Module):
         Forward pass
         """
         sols = self.ptb.apply(pred_cost, self.optmodel, self.n_samples,
-                              self.epsilon, self.processes)
+                              self.epsilon, self.processes, self.solve_ratio,
+                              self)
         return sols
 
 
@@ -70,7 +84,8 @@ class perturbedOptFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, optmodel, n_samples, epsilon, processes):
+    def forward(ctx, pred_cost, optmodel, n_samples, epsilon,
+                processes, solve_ratio, module):
         """
         Forward pass for DBB
 
@@ -80,9 +95,11 @@ class perturbedOptFunc(Function):
             n_samples (int): number of Monte-Carlo samples
             epsilon (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio (float): the ratio of new solutions computed during training
+            module (nn.Module): blackboxOpt modeul
 
         Returns:
-            torch.tensor: predicted solutions
+            torch.tensor: solution expectations with perturbation
         """
         # get device
         device = pred_cost.device
@@ -92,7 +109,14 @@ class perturbedOptFunc(Function):
         noises = np.random.normal(0, 1, size=(n_samples, *cp.shape))
         ptb_c = cp + epsilon * noises
         # solve with perturbation
-        ptb_sols = _solve_in_forward(ptb_c, optmodel, processes)
+        rand_sigma = np.random.uniform()
+        if rand_sigma <= solve_ratio:
+            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes)
+            if solve_ratio < 1:
+                sols = ptb_sols.reshape(-1, cp.shape[1])
+                module.solpool = np.concatenate((module.solpool, sols))
+        else:
+            ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
         # expectation
         e_sol = ptb_sols.mean(axis=1)
         # convert to tensor
@@ -120,7 +144,7 @@ class perturbedOptFunc(Function):
                             noises,
                             torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
         grad /= n_samples * epsilon
-        return grad, None, None, None, None
+        return grad, None, None, None, None, None, None
 
 
 def _solve_in_forward(ptb_c, optmodel, processes):
@@ -154,6 +178,25 @@ def _solve_in_forward(ptb_c, optmodel, processes):
             ptb_sols = pool.amap(_solveWithObj4Par, ptb_c.transpose(1,0,2),
                                  [args] * ins_num, [model_type] * ins_num).get()
     return np.array(ptb_sols)
+
+
+def _cache_in_pass(ptb_c, optmodel, solpool):
+    """
+    A function to use solution pool in the forward/backward pass
+    """
+    # number of samples & instance
+    n_samples, ins_num, _ = ptb_c.shape
+    # init sols
+    ptb_sols = []
+    for j in range(n_samples):
+        # best solution in pool
+        solpool_obj = ptb_c[j] @ solpool.T
+        if optmodel.modelSense == EPO.MINIMIZE:
+            ind = np.argmin(solpool_obj, axis=1)
+        if optmodel.modelSense == EPO.MAXIMIZE:
+            ind = np.argmax(solpool_obj, axis=1)
+        ptb_sols.append(solpool[ind])
+    return np.array(ptb_sols).transpose(1,0,2)
 
 
 def _solveWithObj4Par(perturbed_costs, args, model_type):
