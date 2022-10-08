@@ -5,13 +5,13 @@ Model
 
 Our API is also designed to support users to define their own problems based on GurobiPy and Pyomo. Besides the API of GurobiPy & Pyomo, users can also build problems from scratch with whatever solvers and algorithms they want to use.
 
-To build optimization models with ``PyEPO``, users do **not** need specific costs of objective functions since the cost vector is unknown but can be estimated from data.
+To build optimization models with ``PyEPO``, users do **not** need specific costs of objective functions since the cost vector is unknown but will be estimated from data.
 
 
 Pre-defined Models
 ==================
 
-Pre-defined models are classic optimization problems, including shortest path, knapsack, and traveling salesman.
+Pre-defined models are classic optimization problems, including shortest path, multidimensional knapsack, and traveling salesman.
 
 
 Shortest Path
@@ -23,7 +23,7 @@ It is a (h,w) grid network and the goal is to find the shortest path from northw
   :width: 300
   :alt: Shortest Path on the Grid Graph
 
-The shortest path problem is built as Linear Programming (LP) and formulated as a minimum cost flow problem. Thus, network flow constraints are modeled as the feasible region.
+In ``PyEPO``, the shortest path problem is built as Linear Programming (LP) model and formulated as a minimum cost flow problem. Thus, network flow constraints are introduced as the feasible region.
 
 Shortest Path GurobiPy Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -40,7 +40,7 @@ The ``optModel`` is built from ``pyepo.model.grb.shortestPathModel``, in which A
    grid = (5,5) # network grid
    optmodel = pyepo.model.grb.shortestPathModel(grid) # build model
 
-Users can use ``setObj`` with a specific cost vector to set current objective function and use ``solve`` to optimize.
+Users can use ``setObj`` to assign a specific cost vector and use ``solve`` to optimize. However, ``setObj`` or  ``solve`` methods do not require manual calls during training.
 
 .. code-block:: python
 
@@ -86,7 +86,7 @@ Same as ``pyepo.model.grb.shortestPathModel``, methods ``setObj`` and ``solve`` 
 Knapsack
 --------
 
-Multi-dimensional knapsack problem is a knapsack problem with multiple resource constraints: Given a set of items, the aim is to find a collection that the total weights in is less than or equal to resource capacities and the total value is as large as possible. Let's define a 3d knapsack problem as follow:
+Multi-dimensional knapsack problem is a knapsack problem with multiple resource constraints: Given a set of items, the aim is to find a collection that the total weights in is less than or equal to resource capacities and the total value is as large as possible. Let's define a 3D knapsack problem as follow:
 
 .. math::
   \begin{aligned}
@@ -119,7 +119,7 @@ The ``optModel`` is built from ``pyepo.model.grb.knapsackModel``, in which API u
    capacities = [12, 10, 15] # constraints rhs
    optmodel = pyepo.model.grb.knapsackModel(weights, capacities) # build model
 
-Users can use ``setObj`` with a specific cost vector to set current objective function and use ``solve`` to solve it.
+Similarly, users can use ``setObj`` to assign a specific cost vector and use ``solve`` to optimize. However, ``setObj`` or  ``solve`` methods do not require manual calls during training.
 
 .. code-block:: python
 
@@ -128,7 +128,7 @@ Users can use ``setObj`` with a specific cost vector to set current objective fu
    optmodel.setObj(cost) # set objective function
    optmodel.solve() # solve
 
-In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the problem that arises by removing the integrality constraint of each variable. As an ILP, ``optmodel`` allows users to relax ILP with ``relax`` method to obtain a new relaxed ``optModel``.
+In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the problem that arises by removing the integrality constraint of each variable. As an ILP, ``optGrbModel`` allows users to relax ILP with ``relax`` method to obtain a relaxation ``optModel`` from the original.
 
 .. code-block:: python
 
@@ -253,7 +253,7 @@ User-defined GurobiPy Models
 
 User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class ``pyepo.model.grb.optGrbModel``.
 
-For ``optGrbModel``, users does not need specify the sense of optimization model. Both the minimization and maximization models are correctly recognized and run by ``pyepo``.
+For ``optGrbModel``, users does not need specify the sense ``modelSense`` as ``EPO.MINIMIZE`` or ``EPO.MINIMIZE``. Both the minimization and maximization models are correctly recognized and run by ``pyepo``.
 
 .. autoclass:: pyepo.model.grb.optGrbModel
    :members: __init__, _getModel, setObj, solve, num_cost, relax
@@ -361,14 +361,14 @@ In the general case, users only need to implement ``_getModel`` method with Pyom
 User-defined Models from Scratch
 --------------------------------
 
-``pyepo.model.opt.optModel`` provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding ``_getModel``, ``setObj``, ``solve``,  and ``num_cost``, user-defined optModel can work for SPO+ and differebntiable Black-box optimizer.
+``pyepo.model.opt.optModel`` provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding ``_getModel``, ``setObj``, ``solve``,  and ``num_cost``, user-defined ``optModel`` can work for end-to-end training.
 
 .. autoclass:: pyepo.model.opt.optModel
    :members: __init__, _getModel, setObj, solve, num_cost
 
 .. warning::  The ``optModel`` need to set ``modelSense`` in the ``_getModel``. If not set, the default is to minimize.
 
-For example, we can use ``networkx`` to solve the previous shortest path problem using the Dijkstra algorithm. And ``pyepo.model.opt.optModel`` allows users to create a model in this way.
+For example, we can use ``networkx`` to solve the previous shortest path problem using the Dijkstra algorithm. And ``pyepo.model.opt.optModel`` allows users to create a model in the following way:
 
 .. code-block:: python
 
