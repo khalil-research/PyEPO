@@ -19,8 +19,8 @@ from pyepo.utlis import getArgs
 
 class perturbedOpt(nn.Module):
     """
-    A autograd module for differentiable perturbed optimizer, models of random
-    optimizers with perturbed inputs.
+    A autograd module for differentiable perturbed optimizer, in which random
+    perturbed costs are sampled to optimize.
 
     For the perturbed optimizer, the cost vector need to be predicted from
     contextual data and are perturbed with Gaussian noise.
@@ -149,7 +149,7 @@ class perturbedOptFunc(Function):
 
 class perturbedFenchelYoung(nn.Module):
     """
-    A autograd module for Fenchel-Young loss using perturbation techniques.The
+    A autograd module for Fenchel-Young loss using perturbation techniques. The
     use of the loss improves the algorithmic by the specific expression of the
     gradients of the loss.
 

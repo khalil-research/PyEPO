@@ -21,7 +21,7 @@ SPO+ Loss function [#f1]_, a surrogate loss function of SPO Loss, measures the d
 Differentiable Black-box Optimizer (DBB)
 ========================================
 
-Diffenretiable black-box (DBB) optimizer function [#f2]_ introduces optimizer block into neural networks.
+Diffenretiable black-box (DBB) optimizer function [#f2]_ introduces optimizer block into neural networks by using interpolation to approximate gradients.
 
 
 .. autoclass:: pyepo.func.blackboxOpt
@@ -39,7 +39,7 @@ Diffenretiable black-box (DBB) optimizer function [#f2]_ introduces optimizer bl
 Differentiable Perturbed Optimizer (DPO)
 ========================================
 
-Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to estimate solutions, which makes it differentiable.
+Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to estimate solutions, which makes the solution from optimization model differentiable.
 
 
 .. autoclass:: pyepo.func.perturbedOpt
