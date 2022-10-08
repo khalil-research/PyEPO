@@ -189,15 +189,15 @@
 <h1>Model<a class="headerlink" href="#model" title="Permalink to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> contains several pre-defined optimization models with GurobiPy and Pyomo. It includes the shortest path problem (GurobiPy &amp; Pyomo), the knapsack problem (GurobiPy &amp; Pyomo), and the traveling salesman problem (GurobiPy).</p>
 <p>Our API is also designed to support users to define their own problems based on GurobiPy and Pyomo. Besides the API of GurobiPy &amp; Pyomo, users can also build problems from scratch with whatever solvers and algorithms they want to use.</p>
-<p>To build optimization models with <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code>, users do <strong>not</strong> need specific costs of objective functions since the cost vector is unknown but can be estimated from data.</p>
+<p>To build optimization models with <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code>, users do <strong>not</strong> need specific costs of objective functions since the cost vector is unknown but will be estimated from data.</p>
 <section id="pre-defined-models">
 <h2>Pre-defined Models<a class="headerlink" href="#pre-defined-models" title="Permalink to this heading">¶</a></h2>
-<p>Pre-defined models are classic optimization problems, including shortest path, knapsack, and traveling salesman.</p>
+<p>Pre-defined models are classic optimization problems, including shortest path, multidimensional knapsack, and traveling salesman.</p>
 <section id="shortest-path">
 <h3>Shortest Path<a class="headerlink" href="#shortest-path" title="Permalink to this heading">¶</a></h3>
 <p>It is a (h,w) grid network and the goal is to find the shortest path from northwest to southeast. In our examples, the grid size of network is (5,5).</p>
 <a class="reference internal image-reference" href="../../_images/shortestpath.png"><img alt="Shortest Path on the Grid Graph" src="../../_images/shortestpath.png" style="width: 300px;" /></a>
-<p>The shortest path problem is built as Linear Programming (LP) and formulated as a minimum cost flow problem. Thus, network flow constraints are modeled as the feasible region.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code>, the shortest path problem is built as Linear Programming (LP) model and formulated as a minimum cost flow problem. Thus, network flow constraints are introduced as the feasible region.</p>
 <section id="shortest-path-gurobipy-model">
 <h4>Shortest Path GurobiPy Model<a class="headerlink" href="#shortest-path-gurobipy-model" title="Permalink to this heading">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.shortestPathModel</span></code>, in which API uses GurobiPy to model the shortest path problem.</p>
@@ -292,7 +292,7 @@
 <span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="c1"># build model</span>
 </pre></div>
 </div>
-<p>Users can use <code class="docutils literal notranslate"><span class="pre">setObj</span></code> with a specific cost vector to set current objective function and use <code class="docutils literal notranslate"><span class="pre">solve</span></code> to optimize.</p>
+<p>Users can use <code class="docutils literal notranslate"><span class="pre">setObj</span></code> to assign a specific cost vector and use <code class="docutils literal notranslate"><span class="pre">solve</span></code> to optimize. However, <code class="docutils literal notranslate"><span class="pre">setObj</span></code> or  <code class="docutils literal notranslate"><span class="pre">solve</span></code> methods do not require manual calls during training.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
 <span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
 <span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
@@ -428,7 +428,7 @@
 </section>
 <section id="knapsack">
 <h3>Knapsack<a class="headerlink" href="#knapsack" title="Permalink to this heading">¶</a></h3>
-<p>Multi-dimensional knapsack problem is a knapsack problem with multiple resource constraints: Given a set of items, the aim is to find a collection that the total weights in is less than or equal to resource capacities and the total value is as large as possible. Let’s define a 3d knapsack problem as follow:</p>
+<p>Multi-dimensional knapsack problem is a knapsack problem with multiple resource constraints: Given a set of items, the aim is to find a collection that the total weights in is less than or equal to resource capacities and the total value is as large as possible. Let’s define a 3D knapsack problem as follow:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 \max_{x} &amp; \sum_{i=0}^4 c_i x_i \\
@@ -562,14 +562,14 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">knapsackModel</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">capacities</span><span class="p">)</span> <span class="c1"># build model</span>
 </pre></div>
 </div>
-<p>Users can use <code class="docutils literal notranslate"><span class="pre">setObj</span></code> with a specific cost vector to set current objective function and use <code class="docutils literal notranslate"><span class="pre">solve</span></code> to solve it.</p>
+<p>Similarly, users can use <code class="docutils literal notranslate"><span class="pre">setObj</span></code> to assign a specific cost vector and use <code class="docutils literal notranslate"><span class="pre">solve</span></code> to optimize. However, <code class="docutils literal notranslate"><span class="pre">setObj</span></code> or  <code class="docutils literal notranslate"><span class="pre">solve</span></code> methods do not require manual calls during training.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
 <span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
 <span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
 <span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
 </pre></div>
 </div>
-<p>In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the problem that arises by removing the integrality constraint of each variable. As an ILP, <code class="docutils literal notranslate"><span class="pre">optmodel</span></code> allows users to relax ILP with <code class="docutils literal notranslate"><span class="pre">relax</span></code> method to obtain a new relaxed <code class="docutils literal notranslate"><span class="pre">optModel</span></code>.</p>
+<p>In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the problem that arises by removing the integrality constraint of each variable. As an ILP, <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code> allows users to relax ILP with <code class="docutils literal notranslate"><span class="pre">relax</span></code> method to obtain a relaxation <code class="docutils literal notranslate"><span class="pre">optModel</span></code> from the original.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optmodel_rel</span> <span class="o">=</span> <span class="n">optmodel</span><span class="o">.</span><span class="n">relax</span><span class="p">()</span> <span class="c1"># relax</span>
 </pre></div>
 </div>
@@ -1027,7 +1027,7 @@ constraint generation.</p>
 <section id="user-defined-gurobipy-models">
 <h3>User-defined GurobiPy Models<a class="headerlink" href="#user-defined-gurobipy-models" title="Permalink to this heading">¶</a></h3>
 <p>User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.optGrbModel</span></code>.</p>
-<p>For <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code>, users does not need specify the sense of optimization model. Both the minimization and maximization models are correctly recognized and run by <code class="docutils literal notranslate"><span class="pre">pyepo</span></code>.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code>, users does not need specify the sense <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> as <code class="docutils literal notranslate"><span class="pre">EPO.MINIMIZE</span></code> or <code class="docutils literal notranslate"><span class="pre">EPO.MINIMIZE</span></code>. Both the minimization and maximization models are correctly recognized and run by <code class="docutils literal notranslate"><span class="pre">pyepo</span></code>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">optGrbModel</span></span><a class="headerlink" href="#pyepo.model.grb.optGrbModel" title="Permalink to this definition">¶</a></dt>
@@ -1284,7 +1284,7 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </section>
 <section id="user-defined-models-from-scratch">
 <h3>User-defined Models from Scratch<a class="headerlink" href="#user-defined-models-from-scratch" title="Permalink to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>, <code class="docutils literal notranslate"><span class="pre">setObj</span></code>, <code class="docutils literal notranslate"><span class="pre">solve</span></code>,  and <code class="docutils literal notranslate"><span class="pre">num_cost</span></code>, user-defined optModel can work for SPO+ and differebntiable Black-box optimizer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>, <code class="docutils literal notranslate"><span class="pre">setObj</span></code>, <code class="docutils literal notranslate"><span class="pre">solve</span></code>,  and <code class="docutils literal notranslate"><span class="pre">num_cost</span></code>, user-defined <code class="docutils literal notranslate"><span class="pre">optModel</span></code> can work for end-to-end training.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.opt.optModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">optModel</span></span><a class="headerlink" href="#pyepo.model.opt.optModel" title="Permalink to this definition">¶</a></dt>
@@ -1356,7 +1356,7 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <p class="admonition-title">Warning</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> need to set <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> in the <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>. If not set, the default is to minimize.</p>
 </div>
-<p>For example, we can use <code class="docutils literal notranslate"><span class="pre">networkx</span></code> to solve the previous shortest path problem using the Dijkstra algorithm. And <code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> allows users to create a model in this way.</p>
+<p>For example, we can use <code class="docutils literal notranslate"><span class="pre">networkx</span></code> to solve the previous shortest path problem using the Dijkstra algorithm. And <code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> allows users to create a model in the following way:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>

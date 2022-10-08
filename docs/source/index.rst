@@ -26,9 +26,9 @@ Sample Code
    class myModel(optGrbModel):
 
        def _getModel(self):
-           # ceate a model
+           # create a model
            m = gp.Model()
-           # varibles
+           # variables
            x = m.addVars(5, name="x", vtype=GRB.BINARY)
            # model sense
            m.modelSense = GRB.MAXIMIZE
@@ -39,7 +39,7 @@ Sample Code
            return m, x
 
    # set optimization model
-   myoptmodel = myModel()
+   optmodel = myModel()
    # init SPO+ loss
    spo = pyepo.func.SPOPlus(optmodel, processes=1)
 
