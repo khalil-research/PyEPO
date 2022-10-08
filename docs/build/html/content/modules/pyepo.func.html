@@ -203,7 +203,7 @@ algorithm based on stochastic gradient descent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>optmodel</strong> (<a class="reference internal" href="../examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
 <li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>
 <li><p><strong>solve_ratio</strong> (<em>float</em>) – the ratio of new solutions computed during training</p></li>
 <li><p><strong>dataset</strong> (<em>None/optDataset</em>) – the training data</p></li>
@@ -231,7 +231,7 @@ design an algorithm based on stochastic gradient descent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>optmodel</strong> (<a class="reference internal" href="../examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
 <li><p><strong>lambd</strong> (<em>float</em>) – a hyperparameter for differentiable block-box to contral interpolation degree</p></li>
 <li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>
 <li><p><strong>solve_ratio</strong> (<em>float</em>) – the ratio of new solutions computed during training</p></li>
@@ -250,8 +250,8 @@ design an algorithm based on stochastic gradient descent.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.perturbedOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedOpt" title="Permalink to this definition">¶</a></dt>
-<dd><p>A autograd module for differentiable perturbed optimizer, models of random
-optimizers with perturbed inputs.</p>
+<dd><p>A autograd module for differentiable perturbed optimizer, in which random
+perturbed costs are sampled to optimize.</p>
 <p>For the perturbed optimizer, the cost vector need to be predicted from
 contextual data and are perturbed with Gaussian noise.</p>
 <p>The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
@@ -259,7 +259,7 @@ Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>optmodel</strong> (<a class="reference internal" href="../examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
 <li><p><strong>n_samples</strong> (<em>int</em>) – number of Monte-Carlo samples</p></li>
 <li><p><strong>epsilon</strong> (<em>float</em>) – the amplitude of the perturbation</p></li>
 <li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>
@@ -279,7 +279,7 @@ Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung" title="Permalink to this definition">¶</a></dt>
-<dd><p>A autograd module for Fenchel-Young loss using perturbation techniques.The
+<dd><p>A autograd module for Fenchel-Young loss using perturbation techniques. The
 use of the loss improves the algorithmic by the specific expression of the
 gradients of the loss.</p>
 <p>For the perturbed optimizer, the cost vector need to be predicted from
@@ -290,7 +290,7 @@ based on stochastic gradient descent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>optmodel</strong> (<a class="reference internal" href="../examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
 <li><p><strong>n_samples</strong> (<em>int</em>) – number of Monte-Carlo samples</p></li>
 <li><p><strong>epsilon</strong> (<em>float</em>) – the amplitude of the perturbation</p></li>
 <li><p><strong>processes</strong> (<em>int</em>) – number of processors, 1 for single-core, 0 for all of cores</p></li>

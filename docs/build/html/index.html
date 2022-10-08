@@ -174,9 +174,9 @@
 <span class="k">class</span> <span class="nc">myModel</span><span class="p">(</span><span class="n">optGrbModel</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">_getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># ceate a model</span>
+        <span class="c1"># create a model</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-        <span class="c1"># varibles</span>
+        <span class="c1"># variables</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVars</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">)</span>
         <span class="c1"># model sense</span>
         <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">MAXIMIZE</span>
@@ -187,7 +187,7 @@
         <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="n">x</span>
 
 <span class="c1"># set optimization model</span>
-<span class="n">myoptmodel</span> <span class="o">=</span> <span class="n">myModel</span><span class="p">()</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">myModel</span><span class="p">()</span>
 <span class="c1"># init SPO+ loss</span>
 <span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
