@@ -282,7 +282,7 @@ def _solve_in_forward(ptb_c, optmodel, processes):
     A function to solve optimization in the forward pass
     """
     # number of instance
-    n_samples, ins_num, _ = ptb_c.shape
+    n_samples, ins_num = ptb_c.shape[0], ptb_c.shape[1]
     # single-core
     if processes == 1:
         ptb_sols = []
