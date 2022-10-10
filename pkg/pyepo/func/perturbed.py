@@ -204,10 +204,10 @@ class perturbedFenchelYoung(nn.Module):
         """
         Forward pass
         """
-        sols = self.pfy.apply(pred_cost, true_sol, self.optmodel, self.n_samples,
+        loss = self.pfy.apply(pred_cost, true_sol, self.optmodel, self.n_samples,
                               self.epsilon, self.processes, self.solve_ratio,
                               self)
-        return sols
+        return loss
 
 
 class perturbedFenchelYoungFunc(Function):
