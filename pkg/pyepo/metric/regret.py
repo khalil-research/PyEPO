@@ -59,7 +59,7 @@ def calRegret(optmodel, pred_cost, true_cost, true_obj):
     optmodel.setObj(pred_cost)
     sol, _ = optmodel.solve()
     # obj with true cost
-    obj = np.sum(sol * true_cost)
+    obj = np.dot(sol, true_cost)
     # loss
     if optmodel.modelSense == EPO.MINIMIZE:
         loss = obj - true_obj
