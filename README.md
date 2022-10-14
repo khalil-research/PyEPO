@@ -40,7 +40,7 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 
 ## Features
 
-- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **PO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) and **PFYL** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
+- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) and **PFYL** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
 - Support [Gurobi](https://www.gurobi.com/) and [Pyomo](http://www.pyomo.org/) API
 - Support Parallel computing for optimization solver
 - Support solution caching [[5]](https://arxiv.org/abs/2011.05354) to speed up training
