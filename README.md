@@ -1,4 +1,4 @@
-# PyEPO: A PyTorch-based End-to-End Predict-and-Optimize Tool
+# PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Tool
 
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
 
