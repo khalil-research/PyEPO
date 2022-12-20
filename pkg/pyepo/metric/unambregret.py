@@ -7,6 +7,7 @@ Unambiguous regret loss
 import copy
 
 import numpy as np
+import torch
 
 from pyepo import EPO
 
