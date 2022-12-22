@@ -96,7 +96,7 @@ config_spo = deepcopy(config)
 # method
 config_spo.mthd = "spo"
 # time limit
-config_spo.timeout = 12
+config_spo.timeout = 30
 
 ## training configuration
 # size of neural network hidden layers
@@ -128,7 +128,7 @@ config_dbb.mthd = "dbb"
 # loss
 config_dbb.loss = "r"
 # time limit
-config_dbb.timeout = 18
+config_dbb.timeout = 30
 
 ## training configuration
 # size of neural network hidden layers
