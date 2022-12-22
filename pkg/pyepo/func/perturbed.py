@@ -96,7 +96,7 @@ class perturbedOptFunc(Function):
             epsilon (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): blackboxOpt modeul
+            module (nn.Module): perturbedOpt module
 
         Returns:
             torch.tensor: solution expectations with perturbation
@@ -229,7 +229,7 @@ class perturbedFenchelYoungFunc(Function):
             epsilon (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): blackboxOpt modeul
+            module (nn.Module): perturbedFenchelYoung module
 
         Returns:
             torch.tensor: solution expectations with perturbation
