@@ -28,17 +28,17 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
     if deg <= 0:
         raise ValueError("deg = {} should be positive.".format(deg))
     # set seed
-    np.random.seed(seed)
-    # number of data points
+    rnd = np.random.RandomState(seed)
+    # numbrnda points
     n = num_data
     # dimension of features
     p = num_features
     # dimension of the cost vector
     d = (grid[0] - 1) * grid[1] + (grid[1] - 1) * grid[0]
     # random matrix parameter B
-    B = np.random.binomial(1, 0.5, (d, p))
+    B = rnd.binomial(1, 0.5, (d, p))
     # feature vectors
-    x = np.random.normal(0, 1, (n, p))
+    x = rnd.normal(0, 1, (n, p))
     # cost vectors
     c = np.zeros((n, d))
     for i in range(n):
@@ -47,7 +47,7 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
         # rescale
         ci /= 3.5 ** deg
         # noise
-        epislon = np.random.uniform(1 - noise_width, 1 + noise_width, d)
+        epislon = rnd.uniform(1 - noise_width, 1 + noise_width, d)
         ci *= epislon
         c[i, :] = ci
 

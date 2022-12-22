@@ -6,6 +6,7 @@ SPO training pipeline
 
 import os
 import time
+import random
 
 import numpy as np
 import pandas as pd
@@ -17,6 +18,12 @@ from run import train
 from run import eval
 
 def pipeline(config):
+    # set random seed
+    random.seed(config.seed)
+    np.random.seed(config.seed)
+    torch.manual_seed(config.seed)
+    torch.cuda.manual_seed(config.seed)
+
     # shortest path
     if config.prob == "sp":
         print("Running experiments for shortest path:")
@@ -35,12 +42,11 @@ def pipeline(config):
     else:
         df = pd.DataFrame(columns=["True SPO", "Unamb SPO", "MSE", "Elapsed", "Epochs"])
         skip = False # skip flag
-    # set random seed
-    np.random.seed(config.seed)
-    torch.manual_seed(config.seed)
 
     for i in range(config.expnum):
+        # random seed for each experiment
         config.seed = np.random.randint(999)
+        # start exp
         print("===============================================================")
         print("Experiment {}:".format(i))
         print("===============================================================")
