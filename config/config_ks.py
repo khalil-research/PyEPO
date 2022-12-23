@@ -146,7 +146,7 @@ config_dbb.optm = "adam"
 # learning rate
 config_dbb.lr = 1e-1
 # smoothing parameter for Black-Box
-config_dbb.smth = 10
+config_dbb.smth = 20
 # l1 regularization parameter
 config_dbb.l1 = 0.0
 # l2 regularization parameter
