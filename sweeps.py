@@ -209,7 +209,7 @@ if __name__ == "__main__":
     setting = parser.parse_args()
     # load config
     config = configs[setting.prob][setting.mthd]
-    config.proc = 4
+    config.proc = 8
     config.data = setting.data # data size
     if config.prob == "ks":
         config.dim = setting.ksdim
@@ -222,13 +222,11 @@ if __name__ == "__main__":
     config.deg = setting.deg # polynomial degree
     config.noise = setting.noise # noise half-width
     # delete parameter to tune
-    del config.optm # optimizer
     del config.lr # learning rate
     del config.l1 # l1 regularization
     del config.l2 # l2 regularization
     if setting.mthd == "bb":
         del config.smth # smoothing parameter
-    del config.batch # batch size
     # delete unnecessary
     del config.expnum
     del config.timeout
@@ -248,13 +246,11 @@ if __name__ == "__main__":
     # init parameters
     parameters_dict = {}
     sweep_config["parameters"] = parameters_dict
-    parameters_dict["optm"] = {"values":["sgd", "adam"]} # optimizer
     parameters_dict["lr"] = {"values":[1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1]} # learning rate
-    parameters_dict["l1"] = {"values":[0, 0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]} # l1 regularization
-    parameters_dict["l2"] = {"values":[0, 0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]} # l2 regularization
+    parameters_dict["l1"] = {"values":[0, 0, 1e-3, 1e-2, 1e-1, 1, 1e1]} # l1 regularization
+    parameters_dict["l2"] = {"values":[0, 0, 1e-3, 1e-2, 1e-1, 1e1]} # l2 regularization
     if setting.mthd == "bb":
         parameters_dict["smth"] = {"values":[10, 12, 16, 18, 20]} # smoothing parameter
-    parameters_dict["batch"] = {"values":[32, 64, 128]} # batch size
 
     # init
     sweep_id = wandb.sweep(sweep_config,
