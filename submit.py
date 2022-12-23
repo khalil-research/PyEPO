@@ -58,9 +58,9 @@ if setting.mthd in ["auto", "lr", "rf"]:
     config.pred = setting.mthd
 config.rel = setting.rel
 if setting.l1:
-    config.l1 = 1
+    config.l1 = 1e-2
 if setting.l2:
-    config.l2 = 1
+    config.l2 = 1e-2
 
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
