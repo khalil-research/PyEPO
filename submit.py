@@ -66,15 +66,17 @@ if setting.l2:
 instance_logs_path = "slurm_logs_spotest"
 # time
 timeout_min = config.timeout * config.expnum
-# memory
+# mem & cpu
 if setting.mthd in ["lr", "rf"]:
     mem_gb = 4
+    num_cpus = 1
 if setting.mthd in ["auto"]:
     mem_gb = 16
+    num_cpus = 4
 if setting.mthd in ["spo", "dbb"]:
     mem_gb = 8
-# cpu
-num_cpus = config.proc
+    num_cpus = config.proc
+
 # something to avoid crush
 import os
 os.environ["OPENBLAS_NUM_THREADS"] = str(num_cpus)
