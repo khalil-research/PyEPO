@@ -18,12 +18,6 @@ from run import train
 from run import eval
 
 def pipeline(config):
-    # set random seed
-    random.seed(config.seed)
-    np.random.seed(config.seed)
-    torch.manual_seed(config.seed)
-    torch.cuda.manual_seed(config.seed)
-
     # shortest path
     if config.prob == "sp":
         print("Running experiments for shortest path:")
@@ -45,7 +39,12 @@ def pipeline(config):
 
     for i in range(config.expnum):
         # random seed for each experiment
-        config.seed = np.random.randint(999)
+        config.seed = i
+        # set random seed
+        random.seed(config.seed)
+        np.random.seed(config.seed)
+        torch.manual_seed(config.seed)
+        torch.cuda.manual_seed(config.seed)
         # start exp
         print("===============================================================")
         print("Experiment {}:".format(i))
@@ -106,10 +105,6 @@ if __name__ == "__main__":
                         default="spo",
                         choices=["2s", "spo", "dbb"],
                         help="method")
-    parser.add_argument("--seed",
-                        type=int,
-                        default=135,
-                        help="random seed")
     parser.add_argument("--expnum",
                         type=int,
                         default=1,

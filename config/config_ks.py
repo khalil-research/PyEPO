@@ -26,8 +26,6 @@ config.cap = 20
 ## experiments configuration
 # number of experiments
 config.expnum = None
-# seed
-config.seed = 135
 # relaxation
 config.rel = False
 # steps of evluation and log
