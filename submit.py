@@ -64,16 +64,18 @@ if setting.l2:
 
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
+# time
 timeout_min = config.timeout * config.expnum
+# memory
 if setting.mthd in ["lr", "rf"]:
     mem_gb = 4
-    num_cpus = 1
 if setting.mthd in ["auto"]:
-    mem_gb = 8
-    num_cpus = 4
+    mem_gb = 16
 if setting.mthd in ["spo", "dbb"]:
     mem_gb = 8
-    num_cpus = config.proc
+# cpu
+num_cpus = config.proc
+# something to avoid crush
 import os
 os.environ["OPENBLAS_NUM_THREADS"] = str(num_cpus)
 
