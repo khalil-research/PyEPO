@@ -69,7 +69,7 @@ timeout_min = config.timeout * config.expnum
 # mem & cpu
 if setting.mthd in ["lr", "rf"]:
     mem_gb = 4
-    num_cpus = 1
+    num_cpus = 4
 if setting.mthd in ["auto"]:
     mem_gb = 16
     num_cpus = 4
