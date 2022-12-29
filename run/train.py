@@ -48,7 +48,7 @@ def trainInit(config):
         arch.append(config.item)
     if config.prob == "tsp":
         arch.append(config.nodes * (config.nodes - 1) // 2)
-    reg = net.fcNet(arch)
+    reg = net.fcNet(arch, softplus=config.sftp)
     # set optimizer
     if config.optm == "sgd":
         optimizer = torch.optim.SGD(reg.parameters(), lr=config.lr)

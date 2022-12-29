@@ -215,6 +215,9 @@ if __name__ == "__main__":
                         nargs='*',
                         default=[],
                         help="size of neural network hidden layers")
+    parser.add_argument("--sftp",
+                        action="store_true",
+                        help="positive prediction with SoftPlus activation")
     parser.add_argument("--optm",
                         type=str,
                         default="adam",

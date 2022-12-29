@@ -44,6 +44,9 @@ parser.add_argument("--expnum",
                     type=int,
                     default=10,
                     help="number of experiments")
+parser.add_argument("--sftp",
+                    action="store_true",
+                    help="positive prediction with SoftPlus activation")
 setting = parser.parse_args()
 
 # get config
@@ -61,6 +64,7 @@ if setting.l1:
     config.l1 = 1e-2
 if setting.l2:
     config.l2 = 1e-2
+config.sftp = setting.sftp
 
 # job submission parameters
 instance_logs_path = "slurm_logs_spotest"
