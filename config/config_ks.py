@@ -26,6 +26,8 @@ config.cap = 20
 ## experiments configuration
 # number of experiments
 config.expnum = None
+# seed
+config.seed = 135
 # relaxation
 config.rel = False
 # steps of evluation and log
@@ -59,7 +61,7 @@ config_lr.mthd = "2s"
 # predictor
 config_lr.pred = "lr"
 # time limit
-config_lr.timeout = 3
+config_lr.timeout = 8
 
 configKS["lr"] = config_lr
 
@@ -72,7 +74,7 @@ config_rf.mthd = "2s"
 # predictor
 config_rf.pred = "rf"
 # time limit
-config_rf.timeout = 6
+config_rf.timeout = 15
 
 configKS["rf"] = config_rf
 
@@ -87,7 +89,7 @@ config_auto.pred = "auto"
 # metric
 config_auto.metric = "mse"
 # time limit
-config_auto.timeout = 18
+config_auto.timeout = 20
 
 configKS["auto"] = config_auto
 
@@ -144,7 +146,7 @@ config_dbb.optm = "adam"
 # learning rate
 config_dbb.lr = 1e-1
 # smoothing parameter for Black-Box
-config_dbb.smth = 20
+config_dbb.smth = 10
 # l1 regularization parameter
 config_dbb.l1 = 0.0
 # l2 regularization parameter
