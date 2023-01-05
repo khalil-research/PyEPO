@@ -55,7 +55,7 @@ config_lr.mthd = "2s"
 # predictor
 config_lr.pred = "lr"
 # time limit
-config_lr.timeout = 10
+config_lr.timeout = 15
 
 configTSP["lr"] = config_lr
 
@@ -83,7 +83,7 @@ config_auto.pred = "auto"
 # metric
 config_auto.metric = "mse"
 # time limit
-config_auto.timeout = 24
+config_auto.timeout = 30
 
 configTSP["auto"] = config_auto
 
