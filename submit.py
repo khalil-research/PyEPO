@@ -71,12 +71,15 @@ instance_logs_path = "slurm_logs_spotest"
 # time
 timeout_min = config.timeout * config.expnum
 # mem & cpu
-if setting.mthd in ["lr", "rf"]:
+if setting.mthd in ["lr"]:
     mem_gb = 4
-    num_cpus = 4
+    num_cpus = 8
+if setting.mthd in ["rf"]:
+    mem_gb = 8
+    num_cpus = 8
 if setting.mthd in ["auto"]:
     mem_gb = 16
-    num_cpus = 4
+    num_cpus = 8
 if setting.mthd in ["spo", "dbb"]:
     mem_gb = 8
     num_cpus = config.proc
@@ -94,10 +97,16 @@ jobs = []
 for data, noise, deg in itertools.product(*tuple(confset.values())):
     # create executor
     executor = submitit.AutoExecutor(folder=instance_logs_path)
-    executor.update_parameters(slurm_additional_parameters={"account": "rrg-khalile2"},
-                               timeout_min=timeout_min,
-                               mem_gb=mem_gb,
-                               cpus_per_task=num_cpus)
+    if data == 5000:
+        executor.update_parameters(slurm_additional_parameters={"account": "rrg-khalile2"},
+                                   timeout_min=timeout_min,
+                                   mem_gb=mem_gb*2,
+                                   cpus_per_task=num_cpus)
+    else:
+        executor.update_parameters(slurm_additional_parameters={"account": "rrg-khalile2"},
+                                   timeout_min=timeout_min,
+                                   mem_gb=mem_gb,
+                                   cpus_per_task=num_cpus)
     # set config
     config.data = data
     config.noise = noise
