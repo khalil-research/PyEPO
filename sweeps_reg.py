@@ -262,8 +262,8 @@ if __name__ == "__main__":
     # l1 regularization
     if setting.reg == "l1":
         parameters_dict["l1"] = {"distribution":"log_uniform",
-                                 "min":1e-5,
-                                 "max":1e1}
+                                 "min":math.log(1e-5),
+                                 "max":math.log(1e1)}
     # l2 regularization
     if setting.reg == "l2":
         parameters_dict["l1"] = {"distribution":"log_uniform",
