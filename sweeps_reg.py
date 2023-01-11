@@ -8,9 +8,11 @@ import argparse
 import math
 import time
 import os
+import random
 
 import torch
 from torch.utils.data import DataLoader
+import numpy as np
 from tqdm import tqdm
 import wandb
 
@@ -18,6 +20,12 @@ import pyepo
 from config import configs
 from run import utils
 from run import trainInit
+
+# set random seed
+random.seed(42)
+np.random.seed(42)
+torch.manual_seed(42)
+torch.cuda.manual_seed(42)
 
 # without this, wandb causes error.
 os.environ["WANDB_START_METHOD"] = "thread"
@@ -45,7 +53,6 @@ def trainSPO():
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
         # init model
         reg, optimizer = trainInit(config)
-        print(reg)
         reg.train()
         # device
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -88,18 +95,12 @@ def trainSPO():
                 pbar.set_description(desc)
             # eval
             if (config.data == 1000) and (e % 2 == 0):
-                mse = pyepo.metric.MSE(reg, testloader)
-                wandb.log({"MSE": mse})
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
             if (config.data == 100) and (e % 20 == 0):
-                mse = pyepo.metric.MSE(reg, testloader)
-                wandb.log({"MSE": mse})
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
         # eval
-        mse = pyepo.metric.MSE(reg, testloader)
-        wandb.log({"MSE": mse})
         regret = pyepo.metric.regret(reg, model, testloader)
         wandb.log({"Regret": regret})
 
@@ -127,7 +128,6 @@ def trainDBB():
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
         # init model
         reg, optimizer = trainInit(config)
-        print(reg)
         reg.train()
         # device
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -150,7 +150,7 @@ def trainDBB():
                 wp = dbb(cp)
                 # objective value
                 zp = (wp * c).sum(1).view(-1, 1)
-                # SPO loss
+                # regret
                 spoloss = criterion(zp, z)
                 wandb.log({"Train/SPO": spoloss.item()})
                 # l1 reg
@@ -176,18 +176,12 @@ def trainDBB():
                 pbar.set_description(desc)
             # eval
             if (config.data == 1000) and (e % 2 == 0):
-                mse = pyepo.metric.MSE(reg, testloader)
-                wandb.log({"MSE": mse})
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
             if (config.data == 100) and (e % 20 == 0):
-                mse = pyepo.metric.MSE(reg, testloader)
-                wandb.log({"MSE": mse})
                 regret = pyepo.metric.regret(reg, model, testloader)
                 wandb.log({"Regret": regret})
         # eval
-        mse = pyepo.metric.MSE(reg, testloader)
-        wandb.log({"MSE": mse})
         regret = pyepo.metric.regret(reg, model, testloader)
         wandb.log({"Regret": regret})
 
@@ -220,12 +214,17 @@ if __name__ == "__main__":
                         type=float,
                         default=0.5,
                         help="noise half-width")
+    parser.add_argument("--reg",
+                        type=str,
+                        choices=["l1", "l2"],
+                        help="regularization")
     setting = parser.parse_args()
     # load config
     config = configs[setting.prob][setting.mthd]
-    print(config)
-    config.proc = 4
+    config.proc = 8
     config.data = setting.data # data size
+    config.seed = 42 # random seed
+    config.sftp = False # no softplus
     if config.prob == "ks":
         config.dim = setting.ksdim
     if config.prob == "tsp":
@@ -237,7 +236,10 @@ if __name__ == "__main__":
     config.deg = setting.deg # polynomial degree
     config.noise = setting.noise # noise half-width
     # delete parameter to tune
-    del config.net # neural network architecture
+    if setting.reg == "l1":
+        del config.l1 # l1 regularization
+    if setting.reg == "l2":
+        del config.l2 # l2 regularization
     # delete unnecessary
     del config.expnum
     del config.timeout
@@ -250,23 +252,33 @@ if __name__ == "__main__":
     # init config
     sweep_config = {"name" : "PyEPO-Sweep"}
     # search method
-    sweep_config["method"] = "grid"
+    sweep_config["method"] = "random"
     # metric
     metric = {"name":"Regret", "goal":"minimize"}
     sweep_config["metric"] = metric
     # init parameters
     parameters_dict = {}
     sweep_config["parameters"] = parameters_dict
-    parameters_dict["net"] = {"values":[[], [16], [64], [16,16], [64,64]]} # neural network layers
+    # l1 regularization
+    if setting.reg == "l1":
+        parameters_dict["l1"] = {"distribution":"log_uniform",
+                                 "min":1e-5,
+                                 "max":1e1}
+    # l2 regularization
+    if setting.reg == "l2":
+        parameters_dict["l1"] = {"distribution":"log_uniform",
+                                 "min":math.log(1e-5),
+                                 "max":math.log(1e1)}
     # init
     sweep_id = wandb.sweep(sweep_config,
-                           project="PyEPO-Sweep-mlp-{}-{}-d{}p{}e{}".format(config.prob,
-                                                                     config.mthd,
-                                                                     config.data,
-                                                                     config.deg,
-                                                                     config.noise))
+                           project="PyEPO-Sweep_reg-{}-{}-d{}p{}e{}".format(config.prob,
+                                                                            config.mthd,
+                                                                            config.data,
+                                                                            config.deg,
+                                                                            config.noise))
     # launch agent
+    count = 50
     if config.mthd == "spo":
-        wandb.agent(sweep_id, function=trainSPO)
+        wandb.agent(sweep_id, function=trainSPO, count=count)
     if config.mthd == "dbb":
-        wandb.agent(sweep_id, function=trainDBB)
+        wandb.agent(sweep_id, function=trainDBB, count=count)
