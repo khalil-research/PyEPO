@@ -266,16 +266,17 @@ if __name__ == "__main__":
                                  "max":math.log(1e1)}
     # l2 regularization
     if setting.reg == "l2":
-        parameters_dict["l1"] = {"distribution":"log_uniform",
+        parameters_dict["l2"] = {"distribution":"log_uniform",
                                  "min":math.log(1e-5),
                                  "max":math.log(1e1)}
     # init
     sweep_id = wandb.sweep(sweep_config,
-                           project="PyEPO-Sweep_reg-{}-{}-d{}p{}e{}".format(config.prob,
-                                                                            config.mthd,
-                                                                            config.data,
-                                                                            config.deg,
-                                                                            config.noise))
+                           project="PyEPO-Sweep_reg{}-{}-{}-d{}p{}e{}".format(setting.reg,
+                                                                              config.prob,
+                                                                              config.mthd,
+                                                                              config.data,
+                                                                              config.deg,
+                                                                              config.noise))
     # launch agent
     count = 50
     if config.mthd == "spo":
