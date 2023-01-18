@@ -137,7 +137,7 @@ def trainDBB(trainloader, testloader, model, config):
 
 def trainPFYL(trainloader, testloader, model, config):
     """
-    Black-Box training
+    Fenchel-Young loss training
     """
     # init
     reg, optimizer = trainInit(config)
