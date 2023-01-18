@@ -118,7 +118,7 @@ def trainSPO(trainloader, testloader, model, config):
 
 def trainDBB(trainloader, testloader, model, config):
     """
-    Black-Box training
+    perturbed optimizer training
     """
     # init
     reg, optimizer = trainInit(config)
@@ -128,10 +128,29 @@ def trainDBB(trainloader, testloader, model, config):
     # log dir
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
-    training.trainDBB(reg, model, optimizer, trainloader, testloader,
+    training.trainDPO(reg, model, optimizer, trainloader, testloader,
                      lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
                      processes=config.proc, bb_lambd=config.smth,
                      l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
+    return reg
+
+
+def trainDPO(trainloader, testloader, model, config):
+    """
+    Fenchel-Young loss training
+    """
+    # init
+    reg, optimizer = trainInit(config)
+    # relax
+    if config.rel:
+        model = model.relax()
+    # log dir
+    logdir = "./logs" + utils.getSavePath(config)[5:-4]
+    # train
+    training.trainPFYL(reg, model, optimizer, trainloader, testloader,
+                       logdir=logdir, epoch=config.epoch, processes=config.proc,
+                       n_samples=config.samp, epsilon=config.eps, l1_lambd=config.l1,
+                       l2_lambd=config.l2, log=config.elog)
     return reg
 
 
