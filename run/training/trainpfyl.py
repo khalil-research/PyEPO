@@ -19,7 +19,7 @@ def trainPFYL(reg, model, optimizer, trainloader, testloader=None, logdir="./log
              epoch=50, processes=1, n_samples=1, epsilon=1.0, l1_lambd=0,
              l2_lambd=0, log=0):
     """
-    A function to train PyTorch nn with SPO+ loss
+    A function to train PyTorch nn with Fenchel-Young loss
 
     Args:
         reg (nn): PyTorch neural network regressor
