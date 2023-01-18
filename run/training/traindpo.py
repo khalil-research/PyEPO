@@ -69,7 +69,7 @@ def trainDPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
             cp = reg(x)
             we = ptb(cp)
             ze = (we * c).sum(1).view(-1, 1) # objective value
-            loss = criterion(zp, z)
+            loss = criterion(ze, z)
             writer.add_scalar('Train/SPO+', loss.item(), cnt)
             # l1 reg
             if l1_lambd:

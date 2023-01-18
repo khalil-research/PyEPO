@@ -147,10 +147,10 @@ def trainDPO(trainloader, testloader, model, config):
     # log dir
     logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
-    training.trainPFYL(reg, model, optimizer, trainloader, testloader,
-                       logdir=logdir, epoch=config.epoch, processes=config.proc,
-                       n_samples=config.samp, epsilon=config.eps, l1_lambd=config.l1,
-                       l2_lambd=config.l2, log=config.elog)
+    training.trainDPO(reg, model, optimizer, trainloader, testloader,
+                      logdir=logdir, epoch=config.epoch, processes=config.proc,
+                      n_samples=config.samp, epsilon=config.eps, l1_lambd=config.l1,
+                      l2_lambd=config.l2, log=config.elog)
     return reg
 
 
