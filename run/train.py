@@ -32,6 +32,16 @@ def train(trainset, testset, model, config):
         trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
         res = trainDBB(trainloader, testloader, model, config)
+    if config.mthd == "dpo":
+        print("Using differentiable perturbed optimizer...")
+        trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
+        testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
+        res = trainDPO(trainloader, testloader, model, config)
+    if config.mthd == "pfyl":
+        print("Using perturbed Fenchel-Young loss...")
+        trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
+        testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
+        res = trainPFYL(trainloader, testloader, model, config)
     return res
 
 
@@ -122,4 +132,23 @@ def trainDBB(trainloader, testloader, model, config):
                      lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
                      processes=config.proc, bb_lambd=config.smth,
                      l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
+    return reg
+
+
+def trainPFYL(trainloader, testloader, model, config):
+    """
+    Black-Box training
+    """
+    # init
+    reg, optimizer = trainInit(config)
+    # relax
+    if config.rel:
+        model = model.relax()
+    # log dir
+    logdir = "./logs" + utils.getSavePath(config)[5:-4]
+    # train
+    training.trainPFYL(reg, model, optimizer, trainloader, testloader,
+                       logdir=logdir, epoch=config.epoch, processes=config.proc,
+                       n_samples=config.samp, epsilon=config.eps, l1_lambd=config.l1,
+                       l2_lambd=config.l2, log=config.elog)
     return reg

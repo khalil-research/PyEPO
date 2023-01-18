@@ -30,6 +30,7 @@ def pipeline(config):
     print()
     # create table
     save_path = utils.getSavePath(config)
+    print(save_path)
     if os.path.isfile(save_path): # exist res
         df = pd.read_csv(save_path)
         skip = True # skip flag
@@ -103,7 +104,7 @@ if __name__ == "__main__":
     parser.add_argument("--mthd",
                         type=str,
                         default="spo",
-                        choices=["2s", "spo", "dbb"],
+                        choices=["2s", "spo", "dbb", "dpo", "pfyl"],
                         help="method")
     parser.add_argument("--expnum",
                         type=int,
@@ -239,6 +240,14 @@ if __name__ == "__main__":
                         type=float,
                         default=10,
                         help="smoothing parameter for Black-Box")
+    parser.add_argument("--samp",
+                        type=int,
+                        default=1,
+                        help="number of samples for perturbed methods")
+    parser.add_argument("--eps",
+                        type=float,
+                        default=1.0,
+                        help="amplitude parameter for perturbed methods")
     parser.add_argument("--proc",
                         type=int,
                         default=1,
