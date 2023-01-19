@@ -22,7 +22,7 @@ parser.add_argument("--prob",
                     help="problem type")
 parser.add_argument("--mthd",
                     type=str,
-                    choices=["auto", "lr", "rf", "spo", "dbb"],
+                    choices=["auto", "lr", "rf", "spo", "dbb", "dpo", "pfyl"],
                     help="method")
 parser.add_argument("--ksdim",
                     type=int,
@@ -80,7 +80,7 @@ if setting.mthd in ["rf"]:
 if setting.mthd in ["auto"]:
     mem_gb = 16
     num_cpus = 8
-if setting.mthd in ["spo", "dbb"]:
+if setting.mthd in ["spo", "dbb", "dpo", "pfyl"]:
     mem_gb = 8
     num_cpus = config.proc
 

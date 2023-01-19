@@ -153,3 +153,71 @@ config_dbb.l2 = 0.0
 config_dbb.proc = 32
 
 configKS["dbb"] = config_dbb
+
+
+### ========================= DPO =========================
+config_dpo = deepcopy(config)
+
+## experiments configuration
+# method
+config_dpo.mthd = "dpo"
+# time limit
+config_dpo.timeout = 20
+
+## training configuration
+# size of neural network hidden layers
+config_dpo.net = []
+# number of epochs
+config_dpo.batch = 32
+# number of epochs
+config_dpo.epoch = None
+# optimizer neural network
+config_dpo.optm = "adam"
+# learning rate
+config_dpo.lr = 1e-2
+# number of samples for perturbation
+config_dpo.samp = 1
+# amplitude parameter for perturbation
+config_dpo.eps = 1.0
+# l1 regularization parameter
+config_dpo.l1 = 0.0
+# l2 regularization parameter
+config_dpo.l2 = 0.0
+# number of processor for optimization
+config_dpo.proc = 32
+
+configKS["dpo"] = config_dpo
+
+
+### ========================= PFYL =========================
+config_pfyl = deepcopy(config)
+
+## experiments configuration
+# method
+config_pfyl.mthd = "pfyl"
+# time limit
+config_pfyl.timeout = 20
+
+## training configuration
+# size of neural network hidden layers
+config_pfyl.net = []
+# number of epochs
+config_pfyl.batch = 32
+# number of epochs
+config_pfyl.epoch = None
+# optimizer neural network
+config_pfyl.optm = "adam"
+# learning rate
+config_pfyl.lr = 1e-2
+# number of samples for perturbation
+config_pfyl.samp = 1
+# amplitude parameter for perturbation
+config_pfyl.eps = 1.0
+# l1 regularization parameter
+config_pfyl.l1 = 0.0
+# l2 regularization parameter
+config_pfyl.l2 = 0.0
+# number of processor for optimization
+config_pfyl.proc = 32
+
+configKS["pfyl"] = config_pfyl
