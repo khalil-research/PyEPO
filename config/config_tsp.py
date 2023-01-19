@@ -182,7 +182,7 @@ config_dpo.l2 = 0.0
 # number of processor for optimization
 config_dpo.proc = 32
 
-configKS["dpo"] = config_dpo
+configTSP["dpo"] = config_dpo
 
 
 ### ========================= PFYL =========================
@@ -216,4 +216,4 @@ config_pfyl.l2 = 0.0
 # number of processor for optimization
 config_pfyl.proc = 32
 
-configKS["pfyl"] = config_pfyl
+configTSP["pfyl"] = config_pfyl
