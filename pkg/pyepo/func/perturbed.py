@@ -30,13 +30,14 @@ class perturbedOpt(nn.Module):
     """
 
     def __init__(self, optmodel, n_samples=10, epsilon=1.0, processes=1,
-                 solve_ratio=1, dataset=None):
+                 seed=135, solve_ratio=1, dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             epsilon (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            seed (int): random state seed
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
@@ -55,6 +56,8 @@ class perturbedOpt(nn.Module):
                 format(processes, mp.cpu_count()))
         self.processes = processes
         print("Num of cores: {}".format(self.processes))
+        # random state
+        self.rnd = np.random.RandomState(seed)
         # solution pool
         self.solve_ratio = solve_ratio
         if (self.solve_ratio < 0) or (self.solve_ratio > 1):
@@ -73,8 +76,8 @@ class perturbedOpt(nn.Module):
         Forward pass
         """
         sols = self.ptb.apply(pred_cost, self.optmodel, self.n_samples,
-                              self.epsilon, self.processes, self.solve_ratio,
-                              self)
+                              self.epsilon, self.processes, self.rnd,
+                              self.solve_ratio, self)
         return sols
 
 
@@ -85,7 +88,7 @@ class perturbedOptFunc(Function):
 
     @staticmethod
     def forward(ctx, pred_cost, optmodel, n_samples, epsilon,
-                processes, solve_ratio, module):
+                processes, rnd, solve_ratio, module):
         """
         Forward pass for perturbed
 
@@ -95,8 +98,9 @@ class perturbedOptFunc(Function):
             n_samples (int): number of Monte-Carlo samples
             epsilon (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            rnd (RondomState): numpy random state
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): blackboxOpt modeul
+            module (nn.Module): perturbedOpt module
 
         Returns:
             torch.tensor: solution expectations with perturbation
@@ -106,7 +110,7 @@ class perturbedOptFunc(Function):
         # convert tenstor
         cp = pred_cost.detach().to("cpu").numpy()
         # sample perturbations
-        noises = np.random.normal(0, 1, size=(n_samples, *cp.shape))
+        noises = rnd.normal(0, 1, size=(n_samples, *cp.shape))
         ptb_c = cp + epsilon * noises
         # solve with perturbation
         rand_sigma = np.random.uniform()
@@ -144,7 +148,7 @@ class perturbedOptFunc(Function):
                             noises,
                             torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
         grad /= n_samples * epsilon
-        return grad, None, None, None, None, None, None
+        return grad, None, None, None, None, None, None, None
 
 
 class perturbedFenchelYoung(nn.Module):
@@ -162,13 +166,14 @@ class perturbedFenchelYoung(nn.Module):
     """
 
     def __init__(self, optmodel, n_samples=10, epsilon=1.0, processes=1,
-                 solve_ratio=1, dataset=None):
+                 seed=135, solve_ratio=1, dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             epsilon (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            seed (int): random state seed
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
@@ -187,6 +192,8 @@ class perturbedFenchelYoung(nn.Module):
                 format(processes, mp.cpu_count()))
         self.processes = processes
         print("Num of cores: {}".format(self.processes))
+        # random state
+        self.rnd = np.random.RandomState(seed)
         # solution pool
         self.solve_ratio = solve_ratio
         if (self.solve_ratio < 0) or (self.solve_ratio > 1):
@@ -205,8 +212,8 @@ class perturbedFenchelYoung(nn.Module):
         Forward pass
         """
         loss = self.pfy.apply(pred_cost, true_sol, self.optmodel, self.n_samples,
-                              self.epsilon, self.processes, self.solve_ratio,
-                              self)
+                              self.epsilon, self.processes, self.rnd,
+                              self.solve_ratio, self)
         return loss
 
 
@@ -217,7 +224,7 @@ class perturbedFenchelYoungFunc(Function):
 
     @staticmethod
     def forward(ctx, pred_cost, true_sol, optmodel, n_samples, epsilon,
-                processes, solve_ratio, module):
+                processes, rnd, solve_ratio, module):
         """
         Forward pass for perturbed Fenchel-Young loss
 
@@ -228,8 +235,9 @@ class perturbedFenchelYoungFunc(Function):
             n_samples (int): number of Monte-Carlo samples
             epsilon (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            rnd (RondomState): numpy random state
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): blackboxOpt modeul
+            module (nn.Module): perturbedFenchelYoung module
 
         Returns:
             torch.tensor: solution expectations with perturbation
@@ -240,7 +248,7 @@ class perturbedFenchelYoungFunc(Function):
         cp = pred_cost.detach().to("cpu").numpy()
         w = true_sol.detach().to("cpu").numpy()
         # sample perturbations
-        noises = np.random.normal(0, 1, size=(n_samples, *cp.shape))
+        noises = rnd.normal(0, 1, size=(n_samples, *cp.shape))
         ptb_c = cp + epsilon * noises
         # solve with perturbation
         rand_sigma = np.random.uniform()
@@ -274,7 +282,7 @@ class perturbedFenchelYoungFunc(Function):
         """
         grad, = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
-        return grad * grad_output, None, None, None, None, None, None, None
+        return grad * grad_output, None, None, None, None, None, None, None, None
 
 
 def _solve_in_forward(ptb_c, optmodel, processes):
