@@ -93,7 +93,7 @@ class blackboxOptFunc(Function):
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): blackboxOpt modeul
+            module (nn.Module): blackboxOpt module
 
         Returns:
             torch.tensor: predicted solutions
