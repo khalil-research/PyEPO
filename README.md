@@ -2,6 +2,12 @@
 
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
 
+
+## Learning Framework
+
+<p align="center"><img width="100%" src="images/learning_framework_e2e.png" /></p>
+
+
 ## Publication
 
 This repository is the official implementation of the paper:
@@ -18,11 +24,6 @@ Citation:
 ```
 
 
-## Experiments
-
-To reproduce the experiments in original paper, please use the code and follow the instruction in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
-
-
 ## Introduction
 
 ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements smart predict-then-optimize+ loss [[1]](https://doi.org/10.1287/mnsc.2020.3922) and differentiable Black-Box optimizer [[3]](https://arxiv.org/abs/1912.02175), differentiable perturbed optimizer, and Fenchel-Young loss with Perturbation [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) as [PyTorch](https://pytorch.org/) autograd modules.
@@ -33,9 +34,18 @@ To reproduce the experiments in original paper, please use the code and follow t
 The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
 
 
-## Learning Framework
+## Tutorial
 
-<p align="center"><img width="100%" src="images/learning_framework_e2e.png" /></p>
+- [01 Optimization Model](https://github.com/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb)
+- [02 Optimization Dataset](https://github.com/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb)
+- [03 Training and Testing](https://github.com/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb)
+- [04 2D knapsack Solution Visualization](https://github.com/khalil-research/PyEPO/blob/main/notebooks/04%202D%20knapsack%20Solution%20Visualization.ipynb)
+- [05 Warcraft Shortest Path](https://github.com/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb)
+
+
+## Experiments
+
+To reproduce the experiments in original paper, please use the code and follow the instruction in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
 
 
 ## Features
