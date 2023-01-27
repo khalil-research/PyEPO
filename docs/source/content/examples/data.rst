@@ -15,7 +15,7 @@ The synthetic dataset :math:`\mathcal{D}` includes features :math:`\mathbf{x}` a
 Shortest Path
 -------------
 
-For the shortest path, a random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` which follows Bernoulli distribution with probability :math:`0.5`, encode the features :math:`x_i`. The cost of objective function :math:`c_{ij}` is generated from :math:`[\frac{1}{{3.5}^{deg}\sqrt{p}} ((\mathcal{B} x_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
+For the shortest path, a random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` which follows Bernoulli distribution with probability :math:`0.5`, encode the features :math:`x_i`. The cost of objective function :math:`c_{ij}` is generated from :math:`[\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} x_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
 
 .. autofunction:: pyepo.data.shortestpath.genData
 

@@ -5,7 +5,7 @@ Evaluation
 Regret
 ======
 
-``pyepo.eval`` is to evaluate model performance. Regret :math:`l_{SPO}(\hat{c}, c) = c^T w^*(\hat{c}) - z^*(c)` aims to measure the error in decision-making. It evaluates the distance between the objective value of the solution from predicted cost :math:`\hat{c}` and the true optimal objective value :math:`z^*(c)`.
+``pyepo.metric`` is to evaluate model performance. Regret :math:`l_{Regret}(\hat{c}, c) = c^T w^*(\hat{c}) - z^*(c)` aims to measure the error in decision-making. It evaluates the distance between the objective value of the solution from predicted cost :math:`\hat{c}` and the true optimal objective value :math:`z^*(c)`.
 
 .. autofunction:: pyepo.metric.regret
 
