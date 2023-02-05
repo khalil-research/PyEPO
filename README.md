@@ -36,7 +36,7 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 
 ## Tutorial
 
-- [01 Optimization Model](https://github.com/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb): Build up differentiable optimization solver
+- [01 Optimization Model](https://github.com/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb): Build up optimization solver
 - [02 Optimization Dataset](https://github.com/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb): Generate synthetic data and use optDataset 
 - [03 Training and Testing](https://github.com/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb): Train and test end-to-end predict-then-optimize for different approaches
 - [04 2D knapsack Solution Visualization](https://github.com/khalil-research/PyEPO/blob/main/notebooks/04%202D%20knapsack%20Solution%20Visualization.ipynb): Visualize solutions for knapsack problem
