@@ -7,15 +7,26 @@ Data
 Data Generator
 ==============
 
-``pyepo.data`` includes three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, and the traveling salesman problem. ``PyEPO`` provides functions to generate these data with the adjustable data size :math:`n`, features number :math:`p`, cost number :math:`d`, polynomial degree :math:`deg`, and noise half-width :math:`\bar{\epsilon}`.
+``pyepo.data`` includes synthetic datasets for three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, and the traveling salesperson problem.
 
-The synthetic dataset :math:`\mathcal{D}` includes features :math:`\mathbf{x}` and cost coefficients :math:`\mathbf{c}`. Thus, :math:`\mathcal{D} = \{\mathbf{(x_1, c_1), (x_2, c_2), ..., (x_n, c_n)}\}`. The feature vector :math:`\mathbf{x_i} \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I}_p)` and the corresponding cost :math:`\mathbf{c_i} \in \mathbb{R}^d` comes from a nonlinear function of :math:`\mathbf{x_i}` with additional random noise. :math:`\epsilon_i^j \sim  U(1-\bar{\epsilon}, 1+\bar{\epsilon})` is the multiplicative noise term for :math:`c_{ij}`, the :math:`j^{th}` element of cost :math:`\mathbf{c_i}`.
+The synthetic datasets include features :math:`\mathbf{x}` and cost coefficients :math:`\mathbf{c}`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the corresponding cost :math:`\mathbf{c}_i \in \mathbb{R}^d` comes from a polynomial function :math:`f(\mathbf{x}_i)` multiplicated with a random noise :math:`\mathbf{\epsilon}_i \sim  U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
+In general, there are several parameters that users can control:
+
+* **num_data** (:math:`n`): data size
+
+* **num_features** (:math:`p`): feature dimension of costs :math:`\mathbf{c}`
+
+* **deg** (:math:`deg`): polynomial degree of function :math:`f(\mathbf{x}_i)`
+
+* **noise_width** (:math:`\bar{\epsilon}`):  noise half-width of :math:`\mathbf{\epsilon}`
+
+* **seed**: random state seed to generate data
 
 
 Shortest Path
 -------------
 
-For the shortest path, a random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` which follows Bernoulli distribution with probability :math:`0.5`, encode the features :math:`x_i`. The cost of objective function :math:`c_{ij}` is generated from :math:`[\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} x_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
+For the shortest path, a random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` which follows Bernoulli distribution with probability :math:`0.5`, encode the features :math:`x_i`. The cost of objective function :math:`c_{ij}` is generated from :math:`c_i^j = [\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
 
 .. autofunction:: pyepo.data.shortestpath.genData
 
@@ -34,7 +45,7 @@ The following code is to generate data for the shortest path on the grid network
 Knapsack
 --------
 
-Because we assume that the uncertain coefficients exist only on the objective function, the weights of items are fixed throughout the data. We define the number of items as :math:`m` and the dimension of resources is :math:`k`. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are sampled from :math:`3` to :math:`8` with a precision of :math:`1` decimal place. With the same :math:`\mathcal{B}`, cost :math:`c_{ij}` is calculated from :math:`\lceil \frac{5}{{3.5}^{deg}} [\frac{1}{\sqrt{p}} ((\mathcal{B} \mathbf{x_i})_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil`.
+Because we assume that the uncertain coefficients exist only on the objective function, the weights of items are fixed throughout the data. We define the number of items as :math:`m` and the dimension of resources is :math:`k`. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are sampled from :math:`3` to :math:`8` with a precision of :math:`1` decimal place. With the same :math:`\mathcal{B}`, cost :math:`c_{ij}` is calculated from :math:`c_i^j = \lceil [\frac{5}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil`.
 
 .. autofunction:: pyepo.data.knapsack.genData
 
@@ -74,6 +85,8 @@ optDataset
 ==========
 
 ``pyepo.data.optDataset`` is PyTorch Dataset, which stores the features and their corresponding costs of the objective function, and **solves optimization problems to get optimal solutions and optimal objective values**.
+
+``optDataset`` is **not** necessary for training with PyEPO, but it can be easier to obtain optimal solutions and objective values when they are not available in the original data.
 
 .. autoclass:: pyepo.data.dataset.optDataset
 
