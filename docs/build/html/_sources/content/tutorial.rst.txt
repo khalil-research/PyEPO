@@ -1,7 +1,7 @@
 Tutorial
 ++++++++
 
-This quickstart guide tries to show the basic mechanisms of how to use ``PyEPO`` and illustrates the modeling capabilities of ``PyEPO`` on a variety of predict-then-optimize problems.
+This quickstart guide aims to demonstrate the fundamental mechanisms for utilizing ``PyEPO`` and highlights the modeling capabilities of ``PyEPO`` on a diverse set of predict-then-optimize problems.
 
 .. toctree::
    :maxdepth: 2

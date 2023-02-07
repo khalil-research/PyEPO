@@ -1,5 +1,5 @@
-:mod:`pyepo.data.knapsack`
-==========================
+:py:mod:`pyepo.data.knapsack`
+=============================
 
 .. py:module:: pyepo.data.knapsack
 
@@ -21,7 +21,8 @@ Functions
    pyepo.data.knapsack.genData
 
 
-.. function:: genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed=135)
+
+.. py:function:: genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed=135)
 
    A function to generate synthetic data and features for knapsack
 
@@ -37,7 +38,7 @@ Functions
    :type deg: int
    :param noise_width: half witdth of data random noise
    :type noise_width: float
-   :param seed: random seed
+   :param seed: random state seed
    :type seed: int
 
    :returns: weights of items (np.ndarray), data features (np.ndarray), costs (np.ndarray)

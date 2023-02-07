@@ -1,5 +1,5 @@
-:mod:`pyepo.func`
-=================
+:py:mod:`pyepo.func`
+====================
 
 .. py:module:: pyepo.func
 
@@ -35,9 +35,10 @@ Classes
 
 
 
+
 .. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`torch.nn.Module`
 
    A autograd module for differentiable black-box optimizer, which yield
    optimal a solution and derive a gradient.
@@ -49,7 +50,7 @@ Classes
    The block-box approximate gradient of optimizer smoothly. Thus, allows us to
    design an algorithm based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost)
+   .. py:method:: forward(pred_cost)
 
       Forward pass
 
@@ -57,7 +58,7 @@ Classes
 
 .. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`torch.nn.Module`
 
    A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
    which measures the decision error of optimization problem.
@@ -69,15 +70,15 @@ Classes
    The SPO+ Loss is convex with subgradient. Thus, allows us to design an
    algorithm based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost, true_cost, true_sol, true_obj)
+   .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj)
 
       Forward pass
 
 
 
-.. py:class:: perturbedOpt(optmodel, n_samples=10, epsilon=1.0, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: perturbedOpt(optmodel, n_samples=10, epsilon=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`torch.nn.Module`
 
    A autograd module for differentiable perturbed optimizer, in which random
    perturbed costs are sampled to optimize.
@@ -88,15 +89,15 @@ Classes
    The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
    Thus, allows us to design an algorithm based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost)
+   .. py:method:: forward(pred_cost)
 
       Forward pass
 
 
 
-.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, epsilon=1.0, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, epsilon=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`torch.nn.Module`
 
    A autograd module for Fenchel-Young loss using perturbation techniques. The
    use of the loss improves the algorithmic by the specific expression of the
@@ -109,7 +110,7 @@ Classes
    and solutions with less computation. Thus, allows us to design an algorithm
    based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost, true_sol)
+   .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
 

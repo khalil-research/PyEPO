@@ -4,7 +4,7 @@ Auto Grad Functions
 Smart Predict-then-Optimize Loss+ (SPO+)
 ========================================
 
-SPO+ Loss function [#f1]_, a surrogate loss function of SPO Loss, measures the decision error (optimality gap) of optimization problem.
+SPO+ Loss function [#f1] is a surrogate loss function of SPO Loss (Regret), which measures the decision error of optimization problem. For SPO/SPO+ Loss, the objective function is linear and constraints are known and fixed, but the cost vector need to be predicted from contextual data. The SPO+ Loss is convex with non-zero subgradient. Thus, allows us to design an algorithm based on stochastic gradient descent.
 
 .. autoclass:: pyepo.func.SPOPlus
     :members:
@@ -21,7 +21,7 @@ SPO+ Loss function [#f1]_, a surrogate loss function of SPO Loss, measures the d
 Differentiable Black-box Optimizer (DBB)
 ========================================
 
-Diffenretiable black-box (DBB) optimizer function [#f2]_ introduces optimizer block into neural networks by using interpolation to approximate gradients.
+Diffenretiable black-box (DBB) optimizer function [#f2]_ estimates gradients from interpolation, replacing the zero gradients. For differentiable block-box, the objective function is linear and constraints are known and fixed, but the cost vector need to be predicted from contextual data.
 
 
 .. autoclass:: pyepo.func.blackboxOpt
@@ -39,7 +39,7 @@ Diffenretiable black-box (DBB) optimizer function [#f2]_ introduces optimizer bl
 Differentiable Perturbed Optimizer (DPO)
 ========================================
 
-Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to estimate solutions, which makes the solution from optimization model differentiable.
+Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to estimate solutions, in which randomly perturbed costs are sampled to optimize. For the perturbed optimizer, the cost vector needs to be predicted from contextual data and are perturbed with Gaussian noise. The perturbed optimizer is differentiable in its inputs with non-zero Jacobian, thus allowing us to design an algorithm based on stochastic gradient descent.
 
 
 .. autoclass:: pyepo.func.perturbedOpt
@@ -57,7 +57,7 @@ Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to esti
 Perturbed Fenchel-Young loss (PYFL)
 ===================================
 
-Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses Monte-Carlo samples to estimate solutions as DPO, and the Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation.
+Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques with Monte-Carlo samples. The use of the loss improves the algorithmic by the specific expression of the gradients of the loss. For the perturbed optimizer, the cost vector need to be predicted from contextual data and are perturbed with Gaussian noise. The Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation. Thus, allows us to design an algorithm based on stochastic gradient descent.
 
 
 .. autoclass:: pyepo.func.perturbedFenchelYoung

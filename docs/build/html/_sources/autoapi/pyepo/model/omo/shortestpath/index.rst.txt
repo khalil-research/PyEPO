@@ -1,5 +1,5 @@
-:mod:`pyepo.model.omo.shortestpath`
-===================================
+:py:mod:`pyepo.model.omo.shortestpath`
+======================================
 
 .. py:module:: pyepo.model.omo.shortestpath
 
@@ -21,9 +21,10 @@ Classes
 
 
 
+
 .. py:class:: shortestPathModel(grid, solver='glpk')
 
-   Bases: :class:`pyepo.model.omo.omomodel.optOmoModel`
+   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
    This class is optimization model for shortest path problem
 
@@ -51,7 +52,7 @@ Classes
 
       :type: list
 
-   .. method:: _getArcs(self)
+   .. py:method:: _getArcs()
 
       A method to get list of arcs for grid network
 
@@ -59,7 +60,7 @@ Classes
       :rtype: list
 
 
-   .. method:: _getModel(self)
+   .. py:method:: _getModel()
 
       A method to build pyomo model
 
