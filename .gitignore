@@ -128,3 +128,4 @@ dmypy.json
 logs/*
 wandb/*
 archives/*
+data/*
