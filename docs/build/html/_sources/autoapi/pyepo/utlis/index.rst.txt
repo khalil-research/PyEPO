@@ -1,5 +1,5 @@
-:mod:`pyepo.utlis`
-==================
+:py:mod:`pyepo.utlis`
+=====================
 
 .. py:module:: pyepo.utlis
 
@@ -21,7 +21,8 @@ Functions
    pyepo.utlis.getArgs
 
 
-.. function:: getArgs(model)
+
+.. py:function:: getArgs(model)
 
    A global function to get args of model
 

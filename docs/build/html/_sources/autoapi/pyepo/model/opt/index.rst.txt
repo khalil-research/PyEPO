@@ -1,5 +1,5 @@
-:mod:`pyepo.model.opt`
-======================
+:py:mod:`pyepo.model.opt`
+=========================
 
 .. py:module:: pyepo.model.opt
 
@@ -21,6 +21,7 @@ Classes
 
 
 
+
 .. py:class:: optModel
 
    This is an abstract class for optimization model
@@ -31,18 +32,16 @@ Classes
 
       :type: GurobiPy model
 
-   .. method:: __repr__(self)
+   .. py:property:: num_cost
+
+      number of cost to be predicted
+
+   .. py:method:: __repr__()
 
       Return repr(self).
 
 
-   .. method:: num_cost(self)
-      :property:
-
-      number of cost to be predicted
-
-
-   .. method:: _getModel(self)
+   .. py:method:: _getModel()
       :abstractmethod:
 
       An abstract method to build a model from a optimization solver
@@ -51,7 +50,7 @@ Classes
       :rtype: tuple
 
 
-   .. method:: setObj(self, c)
+   .. py:method:: setObj(c)
       :abstractmethod:
 
       An abstract method to set objective function
@@ -60,7 +59,7 @@ Classes
       :type c: ndarray
 
 
-   .. method:: solve(self)
+   .. py:method:: solve()
       :abstractmethod:
 
       An abstract method to solve model
@@ -69,7 +68,7 @@ Classes
       :rtype: tuple
 
 
-   .. method:: copy(self)
+   .. py:method:: copy()
 
       An abstract method to copy model
 
@@ -77,7 +76,7 @@ Classes
       :rtype: optModel
 
 
-   .. method:: addConstr(self, coefs, rhs)
+   .. py:method:: addConstr(coefs, rhs)
       :abstractmethod:
 
       An abstract method to add new constraint
@@ -91,7 +90,7 @@ Classes
       :rtype: optModel
 
 
-   .. method:: relax(self)
+   .. py:method:: relax()
 
       A unimplemented method to relax MIP model
 

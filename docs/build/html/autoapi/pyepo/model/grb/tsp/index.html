@@ -189,7 +189,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspABModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspABModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel.optGrbModel</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="../grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel.optGrbModel</span></code></a></p>
 <p>This abstract class is optimization model for traveling salesman problem.
 This model is for further implementation of different formulation.</p>
 <dl class="py attribute">
@@ -225,29 +225,29 @@ This model is for further implementation of different formulation.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
+<dl class="py property">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspABModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.num_cost" title="Permalink to this definition">¶</a></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspABModel.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.copy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to copy model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>new copied model</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+<dd class="field-even"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspABModel.getTour">
-<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.getTour" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.getTour" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to get a tour from solution</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -267,7 +267,7 @@ This model is for further implementation of different formulation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspGGModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp.tspABModel</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
 <p>This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel._model">
@@ -304,7 +304,7 @@ This model is for further implementation of different formulation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel._getModel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -318,7 +318,7 @@ This model is for further implementation of different formulation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.setObj" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.setObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -329,13 +329,13 @@ This model is for further implementation of different formulation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.solve" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve model</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel.addConstr">
-<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.addConstr" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.addConstr" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to add new constraint</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -348,14 +348,14 @@ This model is for further implementation of different formulation.</p>
 <dd class="field-even"><p>new model with the added constraint</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.relax" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.relax" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to get linear relaxation model</p>
 </dd></dl>
 
@@ -364,7 +364,7 @@ This model is for further implementation of different formulation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModelRel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspGGModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspGGModel" title="pyepo.model.grb.tsp.tspGGModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp.tspGGModel</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspGGModel" title="pyepo.model.grb.tsp.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p>
 <p>This class is relaxation of tspGGModel.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModelRel._model">
@@ -401,7 +401,7 @@ This model is for further implementation of different formulation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModelRel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel._getModel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -415,7 +415,7 @@ This model is for further implementation of different formulation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModelRel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.solve" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -429,13 +429,13 @@ This model is for further implementation of different formulation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModelRel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.relax" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.relax" title="Permalink to this definition">¶</a></dt>
 <dd><p>A forbidden method to relax MIP model</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModelRel.getTour">
-<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.getTour" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModelRel.getTour" title="Permalink to this definition">¶</a></dt>
 <dd><p>A forbidden method to get a tour from solution</p>
 </dd></dl>
 
@@ -444,7 +444,7 @@ This model is for further implementation of different formulation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspDFJModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspDFJModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp.tspABModel</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
 <p>This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
 constraint generation.</p>
 <dl class="py attribute">
@@ -482,7 +482,7 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspDFJModel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel._getModel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -502,7 +502,7 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspDFJModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.setObj" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.setObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -513,13 +513,13 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspDFJModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.solve" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve model</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspDFJModel.addConstr">
-<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.addConstr" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.addConstr" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to add new constraint</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -532,7 +532,7 @@ constraint generation.</p>
 <dd class="field-even"><p>new model with the added constraint</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -542,7 +542,7 @@ constraint generation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp.tspABModel</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
 <p>This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel._model">
@@ -579,7 +579,7 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel._getModel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -593,7 +593,7 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.setObj" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.setObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -604,13 +604,13 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.solve" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve model</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel.addConstr">
-<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.addConstr" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.addConstr" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to add new constraint</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -623,14 +623,14 @@ constraint generation.</p>
 <dd class="field-even"><p>new model with the added constraint</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../../../../../content/examples/model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.relax" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.relax" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to get linear relaxation model</p>
 </dd></dl>
 
@@ -639,7 +639,7 @@ constraint generation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModelRel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspMTZModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspMTZModel" title="pyepo.model.grb.tsp.tspMTZModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp.tspMTZModel</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspMTZModel" title="pyepo.model.grb.tsp.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p>
 <p>This class is relaxation of tspMTZModel.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModelRel._model">
@@ -676,7 +676,7 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModelRel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel._getModel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -690,7 +690,7 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModelRel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.solve" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -704,13 +704,13 @@ constraint generation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModelRel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.relax" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.relax" title="Permalink to this definition">¶</a></dt>
 <dd><p>A forbidden method to relax MIP model</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModelRel.getTour">
-<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.getTour" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModelRel.getTour" title="Permalink to this definition">¶</a></dt>
 <dd><p>A forbidden method to get a tour from solution</p>
 </dd></dl>
 

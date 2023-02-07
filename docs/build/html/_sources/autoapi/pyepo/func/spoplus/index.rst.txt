@@ -1,5 +1,5 @@
-:mod:`pyepo.func.spoplus`
-=========================
+:py:mod:`pyepo.func.spoplus`
+============================
 
 .. py:module:: pyepo.func.spoplus
 
@@ -33,9 +33,10 @@ Functions
    pyepo.func.spoplus._check_sol
 
 
+
 .. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`torch.nn.Module`
 
    A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
    which measures the decision error of optimization problem.
@@ -47,7 +48,7 @@ Functions
    The SPO+ Loss is convex with subgradient. Thus, allows us to design an
    algorithm based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost, true_cost, true_sol, true_obj)
+   .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj)
 
       Forward pass
 
@@ -55,11 +56,11 @@ Functions
 
 .. py:class:: SPOPlusFunc(*args, **kwargs)
 
-   Bases: :class:`torch.autograd.Function`
+   Bases: :py:obj:`torch.autograd.Function`
 
    A autograd function for SPO+ Loss
 
-   .. method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj, optmodel, processes, solve_ratio, module)
+   .. py:method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj, optmodel, processes, solve_ratio, module)
       :staticmethod:
 
       Forward pass for SPO+
@@ -85,24 +86,24 @@ Functions
       :rtype: torch.tensor
 
 
-   .. method:: backward(ctx, grad_output)
+   .. py:method:: backward(ctx, grad_output)
       :staticmethod:
 
       Backward pass for SPO+
 
 
 
-.. function:: _solve_in_forward(cp, c, w, z, optmodel, processes)
+.. py:function:: _solve_in_forward(cp, c, w, z, optmodel, processes)
 
    A function to solve optimization in the forward pass
 
 
-.. function:: _cache_in_forward(cp, c, w, z, optmodel, solpool)
+.. py:function:: _cache_in_forward(cp, c, w, z, optmodel, solpool)
 
    A function to use solution pool in the forward pass
 
 
-.. function:: _solveWithObj4Par(cost, args, model_type)
+.. py:function:: _solveWithObj4Par(cost, args, model_type)
 
    A function to solve function in parallel processors
 
@@ -117,7 +118,7 @@ Functions
    :rtype: tuple
 
 
-.. function:: _check_sol(c, w, z)
+.. py:function:: _check_sol(c, w, z)
 
    A function to check solution is correct
 

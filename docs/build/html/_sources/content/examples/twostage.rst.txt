@@ -1,7 +1,7 @@
 Two-stage Method
 ++++++++++++++++
 
-Two-stage approach trains a regression model :math:`\hat{c} = g(x, \theta)` by minimizing a prediction error :math:`l(\hat{c}, c)` such as mean square error :math:`l_{MSE}(\hat{c}, c) = \frac{1}{n} \| \hat{c} - c \| ^ 2`. Then in an inference process, the machine learning model predicts :math:`\hat{c} = g(x, \theta)` first. After that, the predicted value :math:`\hat{c}` is used for solving the optimization problem.
+Two-stage approach trains a regression model :math:`\hat{c} = g(\mathbf{x}; \mathbf{\theta})` by minimizing a prediction error :math:`l(\hat{\mathbf{c}}, \mathbf{c})` such as mean square error :math:`l_{MSE}(\hat{\mathbf{c}}, \mathbf{c}) = \frac{1}{n} \sum_i^n \| \hat{\mathbf{c}}_i - \mathbf{c}_i \| ^ 2`. Then in an inference process, the machine learning model predicts :math:`\hat{c} = g(\mathbf{x}; \mathbf{\theta})` first. After that, the predicted value :math:`\hat{c}` is used for solving the optimization problem.
 
 .. autofunction:: pyepo.twostage.sklearnPred
 
