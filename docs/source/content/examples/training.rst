@@ -1,7 +1,7 @@
 Training
 ++++++++
 
-``pyepo.func.SPOPlus`` and ``pyepo.func.blackboxOpt`` are PyTorch modules to support automatic differentiation. Users can train neural network for end-to-end predict-then-optimize problem.
+``pyepo.func`` is extended from PyTorch modules to support automatic differentiation. Users can train neural network for end-to-end predict-then-optimize problem.
 
 Training with SPO+
 ==================
