@@ -8,8 +8,10 @@ import argparse
 import math
 import time
 import os
+import random
 
 import torch
+import numpy as np
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import wandb
@@ -26,6 +28,12 @@ def trainSPO():
     """
     SPO+ train with wandb
     """
+    # set random seed
+    random.seed(42)
+    np.random.seed(42)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed(42)
+    # run
     with wandb.init(resume=True) as run:
         # update config
         config = wandb.config
@@ -108,6 +116,12 @@ def trainPFYL():
     """
     PFYL train with wandb
     """
+    # set random seed
+    random.seed(42)
+    np.random.seed(42)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed(42)
+    # run
     with wandb.init(resume=True) as run:
         # update config
         config = wandb.config
@@ -191,6 +205,12 @@ def trainDBB():
     """
     Black-BOX optimizer train with wandb
     """
+    # set random seed
+    random.seed(42)
+    np.random.seed(42)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed(42)
+    # run
     with wandb.init(resume=True) as run:
         # update config
         config = wandb.config
@@ -342,7 +362,8 @@ if __name__ == "__main__":
     # init parameters
     parameters_dict = {}
     sweep_config["parameters"] = parameters_dict
-    parameters_dict["net"] = {"values":[[], [16], [64], [16,16], [64,64]]} # neural network layers
+    parameters_dict["net"] = {"values":[[10], [], [16], [64], [16,16], [64,64]]} # neural network layers
+    # [10] is used to warm up solver
     # init
     sweep_id = wandb.sweep(sweep_config,
                            project="PyEPO-Sweep-mlp-{}-{}-d{}p{}e{}".format(config.prob,
@@ -357,3 +378,7 @@ if __name__ == "__main__":
         wandb.agent(sweep_id, function=trainPFYL)
     if config.mthd == "dbb":
         wandb.agent(sweep_id, function=trainDBB)
+
+# python sweep_nn.py --prob sp --mthd spo
+# python sweep_nn.py --prob sp --mthd pfyl
+# python sweep_nn.py --prob sp --mthd dbb
