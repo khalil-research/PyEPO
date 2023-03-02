@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.grb.tsp`
-=============================
+:mod:`pyepo.model.grb.tsp`
+==========================
 
 .. py:module:: pyepo.model.grb.tsp
 
@@ -26,10 +26,9 @@ Classes
 
 
 
-
 .. py:class:: tspABModel(num_nodes)
 
-   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+   Bases: :class:`pyepo.model.grb.grbmodel.optGrbModel`
 
    This abstract class is optimization model for traveling salesman problem.
    This model is for further implementation of different formulation.
@@ -52,11 +51,13 @@ Classes
 
       :type: list
 
-   .. py:property:: num_cost
+   .. method:: num_cost(self)
+      :property:
 
       number of cost to be predicted
 
-   .. py:method:: copy()
+
+   .. method:: copy(self)
 
       A method to copy model
 
@@ -64,7 +65,7 @@ Classes
       :rtype: optModel
 
 
-   .. py:method:: getTour(sol)
+   .. method:: getTour(self, sol)
 
       A method to get a tour from solution
 
@@ -78,7 +79,7 @@ Classes
 
 .. py:class:: tspGGModel(num_nodes)
 
-   Bases: :py:obj:`tspABModel`
+   Bases: :class:`pyepo.model.grb.tsp.tspABModel`
 
    This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.
 
@@ -100,7 +101,7 @@ Classes
 
       :type: list
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build Gurobi model
 
@@ -108,7 +109,7 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: setObj(c)
+   .. method:: setObj(self, c)
 
       A method to set objective function
 
@@ -116,12 +117,12 @@ Classes
       :type c: list
 
 
-   .. py:method:: solve()
+   .. method:: solve(self)
 
       A method to solve model
 
 
-   .. py:method:: addConstr(coefs, rhs)
+   .. method:: addConstr(self, coefs, rhs)
 
       A method to add new constraint
 
@@ -134,7 +135,7 @@ Classes
       :rtype: optModel
 
 
-   .. py:method:: relax()
+   .. method:: relax(self)
 
       A method to get linear relaxation model
 
@@ -142,7 +143,7 @@ Classes
 
 .. py:class:: tspGGModelRel(num_nodes)
 
-   Bases: :py:obj:`tspGGModel`
+   Bases: :class:`pyepo.model.grb.tsp.tspGGModel`
 
    This class is relaxation of tspGGModel.
 
@@ -164,7 +165,7 @@ Classes
 
       :type: list
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build Gurobi model
 
@@ -172,7 +173,7 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: solve()
+   .. method:: solve(self)
 
       A method to solve model
 
@@ -180,12 +181,12 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: relax()
+   .. method:: relax(self)
 
       A forbidden method to relax MIP model
 
 
-   .. py:method:: getTour(sol)
+   .. method:: getTour(self, sol)
 
       A forbidden method to get a tour from solution
 
@@ -193,7 +194,7 @@ Classes
 
 .. py:class:: tspDFJModel(num_nodes)
 
-   Bases: :py:obj:`tspABModel`
+   Bases: :class:`pyepo.model.grb.tsp.tspABModel`
 
    This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
    constraint generation.
@@ -216,7 +217,7 @@ Classes
 
       :type: list
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build Gurobi model
 
@@ -224,13 +225,13 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: _subtourelim(model, where)
+   .. method:: _subtourelim(model, where)
       :staticmethod:
 
       A static method to add lazy constraints for subtour elimination
 
 
-   .. py:method:: setObj(c)
+   .. method:: setObj(self, c)
 
       A method to set objective function
 
@@ -238,12 +239,12 @@ Classes
       :type c: list
 
 
-   .. py:method:: solve()
+   .. method:: solve(self)
 
       A method to solve model
 
 
-   .. py:method:: addConstr(coefs, rhs)
+   .. method:: addConstr(self, coefs, rhs)
 
       A method to add new constraint
 
@@ -259,7 +260,7 @@ Classes
 
 .. py:class:: tspMTZModel(num_nodes)
 
-   Bases: :py:obj:`tspABModel`
+   Bases: :class:`pyepo.model.grb.tsp.tspABModel`
 
    This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
 
@@ -281,7 +282,7 @@ Classes
 
       :type: list
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build Gurobi model
 
@@ -289,7 +290,7 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: setObj(c)
+   .. method:: setObj(self, c)
 
       A method to set objective function
 
@@ -297,12 +298,12 @@ Classes
       :type c: list
 
 
-   .. py:method:: solve()
+   .. method:: solve(self)
 
       A method to solve model
 
 
-   .. py:method:: addConstr(coefs, rhs)
+   .. method:: addConstr(self, coefs, rhs)
 
       A method to add new constraint
 
@@ -315,7 +316,7 @@ Classes
       :rtype: optModel
 
 
-   .. py:method:: relax()
+   .. method:: relax(self)
 
       A method to get linear relaxation model
 
@@ -323,7 +324,7 @@ Classes
 
 .. py:class:: tspMTZModelRel(num_nodes)
 
-   Bases: :py:obj:`tspMTZModel`
+   Bases: :class:`pyepo.model.grb.tsp.tspMTZModel`
 
    This class is relaxation of tspMTZModel.
 
@@ -345,7 +346,7 @@ Classes
 
       :type: list
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build Gurobi model
 
@@ -353,7 +354,7 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: solve()
+   .. method:: solve(self)
 
       A method to solve model
 
@@ -361,12 +362,12 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: relax()
+   .. method:: relax(self)
 
       A forbidden method to relax MIP model
 
 
-   .. py:method:: getTour(sol)
+   .. method:: getTour(self, sol)
 
       A forbidden method to get a tour from solution
 

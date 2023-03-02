@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data.shortestpath`
-=================================
+:mod:`pyepo.data.shortestpath`
+==============================
 
 .. py:module:: pyepo.data.shortestpath
 
@@ -21,8 +21,7 @@ Functions
    pyepo.data.shortestpath.genData
 
 
-
-.. py:function:: genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135)
+.. function:: genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135)
 
    A function to generate synthetic data and features for shortest path
 

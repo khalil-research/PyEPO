@@ -1,5 +1,5 @@
-:py:mod:`pyepo.metric.unambregret`
-==================================
+:mod:`pyepo.metric.unambregret`
+===============================
 
 .. py:module:: pyepo.metric.unambregret
 
@@ -22,8 +22,7 @@ Functions
    pyepo.metric.unambregret.calUnambRegret
 
 
-
-.. py:function:: unambRegret(predmodel, optmodel, dataloader, tolerance=1e-05)
+.. function:: unambRegret(predmodel, optmodel, dataloader, tolerance=1e-05)
 
    A function to evaluate model performance with normalized unambiguous regret
 
@@ -38,7 +37,7 @@ Functions
    :rtype: float
 
 
-.. py:function:: calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-05)
+.. function:: calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-05)
 
    A function to calculate normalized unambiguous regret for a batch
 

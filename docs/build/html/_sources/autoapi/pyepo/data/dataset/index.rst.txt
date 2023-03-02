@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data.dataset`
-============================
+:mod:`pyepo.data.dataset`
+=========================
 
 .. py:module:: pyepo.data.dataset
 
@@ -21,10 +21,9 @@ Classes
 
 
 
-
 .. py:class:: optDataset(model, feats, costs)
 
-   Bases: :py:obj:`torch.utils.data.Dataset`
+   Bases: :class:`torch.utils.data.Dataset`
 
    This class is Torch Dataset for optimization problems.
 
@@ -58,12 +57,12 @@ Classes
 
       :type: np.ndarray
 
-   .. py:method:: _getSols()
+   .. method:: _getSols(self)
 
       A method to get optimal solutions for all cost vectors
 
 
-   .. py:method:: _solve(cost)
+   .. method:: _solve(self, cost)
 
       A method to solve optimization problem to get an optimal solution with given cost
 
@@ -74,7 +73,7 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: __len__()
+   .. method:: __len__(self)
 
       A method to get data size
 
@@ -82,7 +81,7 @@ Classes
       :rtype: int
 
 
-   .. py:method:: __getitem__(index)
+   .. method:: __getitem__(self, index)
 
       A method to retrieve data
 

@@ -1,5 +1,5 @@
-:py:mod:`pyepo.metric.metrics`
-==============================
+:mod:`pyepo.metric.metrics`
+===========================
 
 .. py:module:: pyepo.metric.metrics
 
@@ -25,8 +25,7 @@ Functions
    pyepo.metric.metrics.makeTestMSEScorer
 
 
-
-.. py:function:: SPOError(pred_cost, true_cost, model_type, args)
+.. function:: SPOError(pred_cost, true_cost, model_type, args)
 
    A function to calculate normalized true regret
 
@@ -43,7 +42,7 @@ Functions
    :rtype: float
 
 
-.. py:function:: makeSkScorer(optmodel)
+.. function:: makeSkScorer(optmodel)
 
    A function to create sklearn scorer
 
@@ -54,7 +53,7 @@ Functions
    :rtype: scorer
 
 
-.. py:function:: makeAutoSkScorer(optmodel)
+.. function:: makeAutoSkScorer(optmodel)
 
    A function to create Auto-SKlearn scorer
 
@@ -65,7 +64,7 @@ Functions
    :rtype: scorer
 
 
-.. py:function:: testMSE(pred_cost, true_cost, model_type, args)
+.. function:: testMSE(pred_cost, true_cost, model_type, args)
 
    A function to calculate MSE for testing
 
@@ -82,7 +81,7 @@ Functions
    :rtype: float
 
 
-.. py:function:: makeTestMSEScorer(optmodel)
+.. function:: makeTestMSEScorer(optmodel)
 
    A function to create MSE scorer for testing
 

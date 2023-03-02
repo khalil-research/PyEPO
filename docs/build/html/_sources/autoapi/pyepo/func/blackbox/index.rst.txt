@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func.blackbox`
-=============================
+:mod:`pyepo.func.blackbox`
+==========================
 
 .. py:module:: pyepo.func.blackbox
 
@@ -32,10 +32,9 @@ Functions
    pyepo.func.blackbox._solveWithObj4Par
 
 
-
 .. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
 
-   Bases: :py:obj:`torch.nn.Module`
+   Bases: :class:`torch.nn.Module`
 
    A autograd module for differentiable black-box optimizer, which yield
    optimal a solution and derive a gradient.
@@ -47,7 +46,7 @@ Functions
    The block-box approximate gradient of optimizer smoothly. Thus, allows us to
    design an algorithm based on stochastic gradient descent.
 
-   .. py:method:: forward(pred_cost)
+   .. method:: forward(self, pred_cost)
 
       Forward pass
 
@@ -55,11 +54,11 @@ Functions
 
 .. py:class:: blackboxOptFunc(*args, **kwargs)
 
-   Bases: :py:obj:`torch.autograd.Function`
+   Bases: :class:`torch.autograd.Function`
 
    A autograd function for differentiable black-box optimizer
 
-   .. py:method:: forward(ctx, pred_cost, lambd, optmodel, processes, solve_ratio, module)
+   .. method:: forward(ctx, pred_cost, lambd, optmodel, processes, solve_ratio, module)
       :staticmethod:
 
       Forward pass for DBB
@@ -81,24 +80,24 @@ Functions
       :rtype: torch.tensor
 
 
-   .. py:method:: backward(ctx, grad_output)
+   .. method:: backward(ctx, grad_output)
       :staticmethod:
 
       Backward pass for DBB
 
 
 
-.. py:function:: _solve_in_pass(cp, optmodel, processes)
+.. function:: _solve_in_pass(cp, optmodel, processes)
 
    A function to solve optimization in the forward/backward pass
 
 
-.. py:function:: _cache_in_pass(c, optmodel, solpool)
+.. function:: _cache_in_pass(c, optmodel, solpool)
 
    A function to use solution pool in the forward/backward pass
 
 
-.. py:function:: _solveWithObj4Par(cost, args, model_type)
+.. function:: _solveWithObj4Par(cost, args, model_type)
 
    A global function to solve function in parallel processors
 

@@ -1,5 +1,5 @@
-:py:mod:`pyepo.EPO`
-===================
+:mod:`pyepo.EPO`
+================
 
 .. py:module:: pyepo.EPO
 
@@ -12,12 +12,13 @@
 Module Contents
 ---------------
 
-.. py:data:: MINIMIZE
-   :value: 1
+.. data:: MINIMIZE
+   :annotation: = 1
 
    
 
-.. py:data:: MAXIMIZE
+.. data:: MAXIMIZE
+   
 
    
 
