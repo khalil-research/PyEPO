@@ -54,7 +54,7 @@ Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to esti
    dbb = pyepo.func.perturbedOpt(optmodel, n_samples=10, epsilon=0.5, processes=2)
 
 
-Perturbed Fenchel-Young loss (PYFL)
+Perturbed Fenchel-Young Loss (PYFL)
 ===================================
 
 Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques with Monte-Carlo samples. The use of the loss improves the algorithmic by the specific expression of the gradients of the loss. For the perturbed optimizer, the cost vector need to be predicted from contextual data and are perturbed with Gaussian noise. The Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation. Thus, allows us to design an algorithm based on stochastic gradient descent.
