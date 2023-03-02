@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.omo.omomodel`
-==================================
+:mod:`pyepo.model.omo.omomodel`
+===============================
 
 .. py:module:: pyepo.model.omo.omomodel
 
@@ -21,10 +21,9 @@ Classes
 
 
 
-
 .. py:class:: optOmoModel(solver='glpk')
 
-   Bases: :py:obj:`pyepo.model.opt.optModel`
+   Bases: :class:`pyepo.model.opt.optModel`
 
    This is an abstract class for Pyomo-based optimization model
 
@@ -40,12 +39,12 @@ Classes
 
       :type: str
 
-   .. py:method:: __repr__()
+   .. method:: __repr__(self)
 
       Return repr(self).
 
 
-   .. py:method:: setObj(c)
+   .. method:: setObj(self, c)
 
       A method to set objective function
 
@@ -53,7 +52,7 @@ Classes
       :type c: np.ndarray / list
 
 
-   .. py:method:: solve()
+   .. method:: solve(self)
 
       A method to solve model
 
@@ -61,7 +60,7 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: copy()
+   .. method:: copy(self)
 
       A method to copy model
 
@@ -69,7 +68,7 @@ Classes
       :rtype: optModel
 
 
-   .. py:method:: addConstr(coefs, rhs)
+   .. method:: addConstr(self, coefs, rhs)
 
       A method to add new constraint
 

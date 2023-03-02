@@ -1,5 +1,5 @@
-:py:mod:`pyepo.twostage.autosklearnpred`
-========================================
+:mod:`pyepo.twostage.autosklearnpred`
+=====================================
 
 .. py:module:: pyepo.twostage.autosklearnpred
 
@@ -29,29 +29,28 @@ Functions
    pyepo.twostage.autosklearnpred.autoSklearnPred
 
 
-
 .. py:class:: NoPreprocessing(**kwargs)
 
-   Bases: :py:obj:`autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm`
+   Bases: :class:`autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm`
 
    This is class of NoPreprocessing component for auto-sklearn
 
-   .. py:method:: fit(X, Y=None)
+   .. method:: fit(self, X, Y=None)
 
 
-   .. py:method:: transform(X)
+   .. method:: transform(self, X)
 
 
-   .. py:method:: get_properties(dataset_properties=None)
+   .. method:: get_properties(dataset_properties=None)
       :staticmethod:
 
 
-   .. py:method:: get_hyperparameter_search_space(dataset_properties=None)
+   .. method:: get_hyperparameter_search_space(dataset_properties=None)
       :staticmethod:
 
 
 
-.. py:function:: autoSklearnPred(optmodel, seed, timelimit, metric='mse')
+.. function:: autoSklearnPred(optmodel, seed, timelimit, metric='mse')
 
    Two-stage prediction and optimization with auto-sklearn.
 

@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.omo.knapsack`
-==================================
+:mod:`pyepo.model.omo.knapsack`
+===============================
 
 .. py:module:: pyepo.model.omo.knapsack
 
@@ -22,10 +22,9 @@ Classes
 
 
 
-
 .. py:class:: knapsackModel(weights, capacity, solver='glpk')
 
-   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+   Bases: :class:`pyepo.model.omo.omomodel.optOmoModel`
 
    This class is optimization model for knapsack problem
 
@@ -59,12 +58,12 @@ Classes
 
       :type: list
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build pyomo model
 
 
-   .. py:method:: relax()
+   .. method:: relax(self)
 
       A method to get linear relaxation model
 
@@ -72,16 +71,16 @@ Classes
 
 .. py:class:: knapsackModelRel(weights, capacity, solver='glpk')
 
-   Bases: :py:obj:`knapsackModel`
+   Bases: :class:`pyepo.model.omo.knapsack.knapsackModel`
 
    This class is relaxed optimization model for knapsack problem.
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build pyomo
 
 
-   .. py:method:: relax()
+   .. method:: relax(self)
 
       A forbidden method to relax MIP model
 

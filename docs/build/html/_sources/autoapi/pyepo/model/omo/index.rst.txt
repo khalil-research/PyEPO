@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.omo`
-=========================
+:mod:`pyepo.model.omo`
+======================
 
 .. py:module:: pyepo.model.omo
 
@@ -35,10 +35,9 @@ Classes
 
 
 
-
 .. py:class:: optOmoModel(solver='glpk')
 
-   Bases: :py:obj:`pyepo.model.opt.optModel`
+   Bases: :class:`pyepo.model.opt.optModel`
 
    This is an abstract class for Pyomo-based optimization model
 
@@ -54,12 +53,12 @@ Classes
 
       :type: str
 
-   .. py:method:: __repr__()
+   .. method:: __repr__(self)
 
       Return repr(self).
 
 
-   .. py:method:: setObj(c)
+   .. method:: setObj(self, c)
 
       A method to set objective function
 
@@ -67,7 +66,7 @@ Classes
       :type c: np.ndarray / list
 
 
-   .. py:method:: solve()
+   .. method:: solve(self)
 
       A method to solve model
 
@@ -75,7 +74,7 @@ Classes
       :rtype: tuple
 
 
-   .. py:method:: copy()
+   .. method:: copy(self)
 
       A method to copy model
 
@@ -83,7 +82,7 @@ Classes
       :rtype: optModel
 
 
-   .. py:method:: addConstr(coefs, rhs)
+   .. method:: addConstr(self, coefs, rhs)
 
       A method to add new constraint
 
@@ -99,7 +98,7 @@ Classes
 
 .. py:class:: shortestPathModel(grid, solver='glpk')
 
-   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+   Bases: :class:`pyepo.model.omo.omomodel.optOmoModel`
 
    This class is optimization model for shortest path problem
 
@@ -127,7 +126,7 @@ Classes
 
       :type: list
 
-   .. py:method:: _getArcs()
+   .. method:: _getArcs(self)
 
       A method to get list of arcs for grid network
 
@@ -135,7 +134,7 @@ Classes
       :rtype: list
 
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build pyomo model
 
@@ -143,7 +142,7 @@ Classes
 
 .. py:class:: knapsackModel(weights, capacity, solver='glpk')
 
-   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+   Bases: :class:`pyepo.model.omo.omomodel.optOmoModel`
 
    This class is optimization model for knapsack problem
 
@@ -177,12 +176,12 @@ Classes
 
       :type: list
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build pyomo model
 
 
-   .. py:method:: relax()
+   .. method:: relax(self)
 
       A method to get linear relaxation model
 
@@ -190,16 +189,16 @@ Classes
 
 .. py:class:: knapsackModelRel(weights, capacity, solver='glpk')
 
-   Bases: :py:obj:`knapsackModel`
+   Bases: :class:`pyepo.model.omo.knapsack.knapsackModel`
 
    This class is relaxed optimization model for knapsack problem.
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build pyomo
 
 
-   .. py:method:: relax()
+   .. method:: relax(self)
 
       A forbidden method to relax MIP model
 

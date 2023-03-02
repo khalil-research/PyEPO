@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.grb.shortestpath`
-======================================
+:mod:`pyepo.model.grb.shortestpath`
+===================================
 
 .. py:module:: pyepo.model.grb.shortestpath
 
@@ -21,10 +21,9 @@ Classes
 
 
 
-
 .. py:class:: shortestPathModel(grid)
 
-   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+   Bases: :class:`pyepo.model.grb.grbmodel.optGrbModel`
 
    This class is optimization model for shortest path problem
 
@@ -46,7 +45,7 @@ Classes
 
       :type: list
 
-   .. py:method:: _getArcs()
+   .. method:: _getArcs(self)
 
       A method to get list of arcs for grid network
 
@@ -54,7 +53,7 @@ Classes
       :rtype: list
 
 
-   .. py:method:: _getModel()
+   .. method:: _getModel(self)
 
       A method to build Gurobi model
 

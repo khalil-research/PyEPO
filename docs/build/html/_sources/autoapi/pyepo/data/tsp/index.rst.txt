@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data.tsp`
-========================
+:mod:`pyepo.data.tsp`
+=====================
 
 .. py:module:: pyepo.data.tsp
 
@@ -21,8 +21,7 @@ Functions
    pyepo.data.tsp.genData
 
 
-
-.. py:function:: genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135)
+.. function:: genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135)
 
    A function to generate synthetic data and features for travelling salesman
 

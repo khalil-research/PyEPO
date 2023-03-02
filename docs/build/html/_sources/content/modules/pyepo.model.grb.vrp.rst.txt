@@ -1,4 +1,4 @@
-﻿pyepo.model.grb.vrp
+pyepo.model.grb.vrp
 ===================
 
 .. automodule:: pyepo.model.grb.vrp
