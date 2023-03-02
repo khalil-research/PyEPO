@@ -99,7 +99,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#smart-predict-then-optimize-loss-spo">Smart Predict-then-Optimize Loss+ (SPO+)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#differentiable-black-box-optimizer-dbb">Differentiable Black-box Optimizer (DBB)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#differentiable-perturbed-optimizer-dpo">Differentiable Perturbed Optimizer (DPO)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#perturbed-fenchel-young-loss-pyfl">Perturbed Fenchel-Young loss (PYFL)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#perturbed-fenchel-young-loss-pyfl">Perturbed Fenchel-Young Loss (PYFL)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#parallel-computation">Parallel Computation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pyepo.func.SPOPlus">SPOPlus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pyepo.func.blackboxOpt">blackboxOpt</a></li>
@@ -303,7 +303,7 @@ Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
 </div>
 </section>
 <section id="perturbed-fenchel-young-loss-pyfl">
-<h2>Perturbed Fenchel-Young loss (PYFL)<a class="headerlink" href="#perturbed-fenchel-young-loss-pyfl" title="Permalink to this heading">¶</a></h2>
+<h2>Perturbed Fenchel-Young Loss (PYFL)<a class="headerlink" href="#perturbed-fenchel-young-loss-pyfl" title="Permalink to this heading">¶</a></h2>
 <p>Perturbed Fenchel-Young loss (PYFL) function <a class="footnote-reference brackets" href="#f3" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> uses perturbation techniques with Monte-Carlo samples. The use of the loss improves the algorithmic by the specific expression of the gradients of the loss. For the perturbed optimizer, the cost vector need to be predicted from contextual data and are perturbed with Gaussian noise. The Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation. Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung">
