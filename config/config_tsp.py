@@ -174,7 +174,7 @@ config_dpo.lr = 1e-2
 # number of samples for perturbation
 config_dpo.samp = 1
 # amplitude parameter for perturbation
-config_dpo.eps = 1.0
+config_dpo.sig = 1.0
 # l1 regularization parameter
 config_dpo.l1 = 0.0
 # l2 regularization parameter
@@ -208,7 +208,7 @@ config_pfyl.lr = 1e-2
 # number of samples for perturbation
 config_pfyl.samp = 1
 # amplitude parameter for perturbation
-config_pfyl.eps = 1.0
+config_pfyl.sig = 1.0
 # l1 regularization parameter
 config_pfyl.l1 = 0.0
 # l2 regularization parameter

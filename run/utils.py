@@ -70,7 +70,7 @@ def getSavePath(config):
         if config.loss == "h":
             filename += "-h"
     if (config.mthd == "dpo") or (config.mthd == "pfyl"):
-        filename += "-samp{}eps{}".format(config.samp, config.eps)
+        filename += "-samp{}eps{}".format(config.samp, config.sig)
     if config.mthd == "2s" and config.pred == "auto":
         if config.metric == "mse":
             filename += "-mse"

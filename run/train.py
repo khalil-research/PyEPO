@@ -149,7 +149,7 @@ def trainDPO(trainloader, testloader, model, config):
     # train
     training.trainDPO(reg, model, optimizer, trainloader, testloader,
                       logdir=logdir, epoch=config.epoch, processes=config.proc,
-                      n_samples=config.samp, epsilon=config.eps, l1_lambd=config.l1,
+                      n_samples=config.samp, sigma=config.sig, l1_lambd=config.l1,
                       l2_lambd=config.l2, log=config.elog)
     return reg
 
@@ -168,6 +168,6 @@ def trainPFYL(trainloader, testloader, model, config):
     # train
     training.trainPFYL(reg, model, optimizer, trainloader, testloader,
                        logdir=logdir, epoch=config.epoch, processes=config.proc,
-                       n_samples=config.samp, epsilon=config.eps, l1_lambd=config.l1,
+                       n_samples=config.samp, sigma=config.sig, l1_lambd=config.l1,
                        l2_lambd=config.l2, log=config.elog)
     return reg

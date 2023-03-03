@@ -148,7 +148,7 @@ def trainPFYL():
         reg.to(device)
         # set Fenchel-Young Loss as criterion
         pfyl = pyepo.func.perturbedFenchelYoung(model, n_samples=config.samp,
-                                                epsilon=config.eps, processes=config.proc)
+                                                sigma=config.sig, processes=config.proc)
         # train
         time.sleep(1)
         pbar = tqdm(range(config.epoch))

@@ -16,7 +16,7 @@ import pyepo
 from .utils import getDevice
 
 def trainPFYL(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
-             epoch=50, processes=1, n_samples=1, epsilon=1.0, l1_lambd=0,
+             epoch=50, processes=1, n_samples=1, sigma=1.0, l1_lambd=0,
              l2_lambd=0, log=0):
     """
     A function to train PyTorch nn with Fenchel-Young loss
@@ -31,7 +31,7 @@ def trainPFYL(reg, model, optimizer, trainloader, testloader=None, logdir="./log
         epoch (int): number of training epochs
         processes: processes (int): number of processors, 1 for single-core, 0 for all of cores
         n_samples (int): number of Monte-Carlo samples
-        epsilon (float): the amplitude of the perturbation
+        sigma (float): the amplitude of the perturbation
         l1_lambd (float): regularization weight of l1 norm
         l2_lambd (float): regularization weight of l2 norm
         log (int): step size of evlaution and log
@@ -51,7 +51,7 @@ def trainPFYL(reg, model, optimizer, trainloader, testloader=None, logdir="./log
     reg.train()
     # set FY loss as criterion
     pfyl = pyepo.func.perturbedFenchelYoung(model, n_samples=n_samples,
-                                            epsilon=epsilon, processes=processes)
+                                            sigma=sigma, processes=processes)
     # train
     time.sleep(1)
     pbar = tqdm(range(epoch))
