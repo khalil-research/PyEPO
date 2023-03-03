@@ -51,7 +51,7 @@ Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to esti
 
    import pyepo
 
-   dbb = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
+   dpo = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
 
 
 Perturbed Fenchel-Young Loss (PYFL)
@@ -69,7 +69,7 @@ Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques
 
    import pyepo
 
-   dbb = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
+   pfyl = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
 
 
 Parallel Computation
