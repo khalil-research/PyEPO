@@ -244,7 +244,7 @@ if __name__ == "__main__":
                         type=int,
                         default=1,
                         help="number of samples for perturbed methods")
-    parser.add_argument("--eps",
+    parser.add_argument("--sig",
                         type=float,
                         default=1.0,
                         help="amplitude parameter for perturbed methods")
