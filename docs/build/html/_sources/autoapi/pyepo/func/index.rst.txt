@@ -75,7 +75,7 @@ Classes
 
 
 
-.. py:class:: perturbedOpt(optmodel, n_samples=10, epsilon=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
+.. py:class:: perturbedOpt(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
    Bases: :class:`torch.nn.Module`
 
@@ -94,7 +94,7 @@ Classes
 
 
 
-.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, epsilon=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
+.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
    Bases: :class:`torch.nn.Module`
 
