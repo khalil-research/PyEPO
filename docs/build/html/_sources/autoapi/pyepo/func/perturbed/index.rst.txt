@@ -34,7 +34,7 @@ Functions
    pyepo.func.perturbed._solveWithObj4Par
 
 
-.. py:class:: perturbedOpt(optmodel, n_samples=10, epsilon=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
+.. py:class:: perturbedOpt(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
    Bases: :class:`torch.nn.Module`
 
@@ -59,7 +59,7 @@ Functions
 
    A autograd function for perturbed optimizer
 
-   .. method:: forward(ctx, pred_cost, optmodel, n_samples, epsilon, processes, rnd, solve_ratio, module)
+   .. method:: forward(ctx, pred_cost, optmodel, n_samples, sigma, processes, rnd, solve_ratio, module)
       :staticmethod:
 
       Forward pass for perturbed
@@ -70,8 +70,8 @@ Functions
       :type optmodel: optModel
       :param n_samples: number of Monte-Carlo samples
       :type n_samples: int
-      :param epsilon: the amplitude of the perturbation
-      :type epsilon: float
+      :param sigma: the amplitude of the perturbation
+      :type sigma: float
       :param processes: number of processors, 1 for single-core, 0 for all of cores
       :type processes: int
       :param rnd: numpy random state
@@ -92,7 +92,7 @@ Functions
 
 
 
-.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, epsilon=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
+.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
    Bases: :class:`torch.nn.Module`
 
@@ -119,7 +119,7 @@ Functions
 
    A autograd function for Fenchel-Young loss using perturbation techniques.
 
-   .. method:: forward(ctx, pred_cost, true_sol, optmodel, n_samples, epsilon, processes, rnd, solve_ratio, module)
+   .. method:: forward(ctx, pred_cost, true_sol, optmodel, n_samples, sigma, processes, rnd, solve_ratio, module)
       :staticmethod:
 
       Forward pass for perturbed Fenchel-Young loss
@@ -132,8 +132,8 @@ Functions
       :type optmodel: optModel
       :param n_samples: number of Monte-Carlo samples
       :type n_samples: int
-      :param epsilon: the amplitude of the perturbation
-      :type epsilon: float
+      :param sigma: the amplitude of the perturbation
+      :type sigma: float
       :param processes: number of processors, 1 for single-core, 0 for all of cores
       :type processes: int
       :param rnd: numpy random state
