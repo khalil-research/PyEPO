@@ -29,13 +29,13 @@ class perturbedOpt(nn.Module):
     Thus, allows us to design an algorithm based on stochastic gradient descent.
     """
 
-    def __init__(self, optmodel, n_samples=10, epsilon=1.0, processes=1,
+    def __init__(self, optmodel, n_samples=10, sigma=1.0, processes=1,
                  seed=135, solve_ratio=1, dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
-            epsilon (float): the amplitude of the perturbation
+            sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             seed (int): random state seed
             solve_ratio (float): the ratio of new solutions computed during training
@@ -49,7 +49,7 @@ class perturbedOpt(nn.Module):
         # number of samples
         self.n_samples = n_samples
         # perturbation amplitude
-        self.epsilon = epsilon
+        self.sigma = sigma
         # num of processors
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
@@ -76,7 +76,7 @@ class perturbedOpt(nn.Module):
         Forward pass
         """
         sols = self.ptb.apply(pred_cost, self.optmodel, self.n_samples,
-                              self.epsilon, self.processes, self.rnd,
+                              self.sigma, self.processes, self.rnd,
                               self.solve_ratio, self)
         return sols
 
@@ -87,7 +87,7 @@ class perturbedOptFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, optmodel, n_samples, epsilon,
+    def forward(ctx, pred_cost, optmodel, n_samples, sigma,
                 processes, rnd, solve_ratio, module):
         """
         Forward pass for perturbed
@@ -96,7 +96,7 @@ class perturbedOptFunc(Function):
             pred_cost (torch.tensor): a batch of predicted values of the cost
             optmodel (optModel): an PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
-            epsilon (float): the amplitude of the perturbation
+            sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             rnd (RondomState): numpy random state
             solve_ratio (float): the ratio of new solutions computed during training
@@ -111,7 +111,7 @@ class perturbedOptFunc(Function):
         cp = pred_cost.detach().to("cpu").numpy()
         # sample perturbations
         noises = rnd.normal(0, 1, size=(n_samples, *cp.shape))
-        ptb_c = cp + epsilon * noises
+        ptb_c = cp + sigma * noises
         # solve with perturbation
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
@@ -132,7 +132,7 @@ class perturbedOptFunc(Function):
         # add other objects to ctx
         ctx.optmodel = optmodel
         ctx.n_samples = n_samples
-        ctx.epsilon = epsilon
+        ctx.sigma = sigma
         return e_sol
 
     @staticmethod
@@ -143,11 +143,11 @@ class perturbedOptFunc(Function):
         ptb_sols, noises = ctx.saved_tensors
         optmodel = ctx.optmodel
         n_samples = ctx.n_samples
-        epsilon = ctx.epsilon
+        sigma = ctx.sigma
         grad = torch.einsum("nbd,bn->bd",
                             noises,
                             torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
-        grad /= n_samples * epsilon
+        grad /= n_samples * sigma
         return grad, None, None, None, None, None, None, None
 
 
@@ -165,13 +165,13 @@ class perturbedFenchelYoung(nn.Module):
     based on stochastic gradient descent.
     """
 
-    def __init__(self, optmodel, n_samples=10, epsilon=1.0, processes=1,
+    def __init__(self, optmodel, n_samples=10, sigma=1.0, processes=1,
                  seed=135, solve_ratio=1, dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
-            epsilon (float): the amplitude of the perturbation
+            sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             seed (int): random state seed
             solve_ratio (float): the ratio of new solutions computed during training
@@ -185,7 +185,7 @@ class perturbedFenchelYoung(nn.Module):
         # number of samples
         self.n_samples = n_samples
         # perturbation amplitude
-        self.epsilon = epsilon
+        self.sigma = sigma
         # num of processors
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
@@ -212,7 +212,7 @@ class perturbedFenchelYoung(nn.Module):
         Forward pass
         """
         loss = self.pfy.apply(pred_cost, true_sol, self.optmodel, self.n_samples,
-                              self.epsilon, self.processes, self.rnd,
+                              self.sigma, self.processes, self.rnd,
                               self.solve_ratio, self)
         return loss
 
@@ -223,7 +223,7 @@ class perturbedFenchelYoungFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, true_sol, optmodel, n_samples, epsilon,
+    def forward(ctx, pred_cost, true_sol, optmodel, n_samples, sigma,
                 processes, rnd, solve_ratio, module):
         """
         Forward pass for perturbed Fenchel-Young loss
@@ -233,7 +233,7 @@ class perturbedFenchelYoungFunc(Function):
             true_sol (torch.tensor): a batch of true optimal solutions
             optmodel (optModel): an PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
-            epsilon (float): the amplitude of the perturbation
+            sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             rnd (RondomState): numpy random state
             solve_ratio (float): the ratio of new solutions computed during training
@@ -249,7 +249,7 @@ class perturbedFenchelYoungFunc(Function):
         w = true_sol.detach().to("cpu").numpy()
         # sample perturbations
         noises = rnd.normal(0, 1, size=(n_samples, *cp.shape))
-        ptb_c = cp + epsilon * noises
+        ptb_c = cp + sigma * noises
         # solve with perturbation
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
