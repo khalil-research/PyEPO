@@ -45,13 +45,13 @@ Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to esti
 .. autoclass:: pyepo.func.perturbedOpt
    :members:
 
-``pyepo.func.perturbedOpt`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores. ``n_samples`` is the number of Monte-Carlo samples to estimate solutions, and ``epsilon`` is the variance of Gaussian noise perturbation.
+``pyepo.func.perturbedOpt`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores. ``n_samples`` is the number of Monte-Carlo samples to estimate solutions, and ``sigma`` is the variance of Gaussian noise perturbation.
 
 .. code-block:: python
 
    import pyepo
 
-   dbb = pyepo.func.perturbedOpt(optmodel, n_samples=10, epsilon=0.5, processes=2)
+   dpo = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
 
 
 Perturbed Fenchel-Young Loss (PYFL)
@@ -63,13 +63,13 @@ Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques
 .. autoclass:: pyepo.func.perturbedFenchelYoung
    :members:
 
-``pyepo.func.perturbedFenchelYoung`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores. ``n_samples`` is the number of Monte-Carlo samples to estimate solutions, and ``epsilon`` is the variance of Gaussian noise perturbation.
+``pyepo.func.perturbedFenchelYoung`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores. ``n_samples`` is the number of Monte-Carlo samples to estimate solutions, and ``sigma`` is the variance of Gaussian noise perturbation.
 
 .. code-block:: python
 
    import pyepo
 
-   dbb = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, epsilon=0.5, processes=2)
+   pfyl = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
 
 
 Parallel Computation
