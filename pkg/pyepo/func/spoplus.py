@@ -44,11 +44,17 @@ class SPOPlus(nn.Module):
         if not isinstance(optmodel, optModel):
             raise TypeError("arg model is not an optModel")
         self.optmodel = optmodel
-        # num of processors
+        # number of processes
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
-        self.processes = processes
+        self.processes = mp.cpu_count() if not processes else processes
+        # single-core
+        if processes == 1:
+            self.pool = None
+        # multi-core
+        else:
+            self.pool = ProcessingPool(processes)
         print("Num of cores: {}".format(self.processes))
         # solution pool
         self.solve_ratio = solve_ratio
@@ -68,8 +74,8 @@ class SPOPlus(nn.Module):
         Forward pass
         """
         loss = self.spop.apply(pred_cost, true_cost, true_sol, true_obj,
-                               self.optmodel, self.processes, self.solve_ratio,
-                               self)
+                               self.optmodel, self.processes, self.pool,
+                               self.solve_ratio, self)
         return loss
 
 
@@ -81,7 +87,7 @@ class SPOPlusFunc(Function):
 
     @staticmethod
     def forward(ctx, pred_cost, true_cost, true_sol, true_obj,
-                optmodel, processes, solve_ratio, module):
+                optmodel, processes, pool, solve_ratio, module):
         """
         Forward pass for SPO+
 
@@ -92,6 +98,7 @@ class SPOPlusFunc(Function):
             true_obj (torch.tensor): a batch of true optimal objective values
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            pool (ProcessPool): process pool object
             solve_ratio (float): the ratio of new solutions computed during training
             module (nn.Module): SPOPlus modeul
 
@@ -109,7 +116,7 @@ class SPOPlusFunc(Function):
         #_check_sol(c, w, z)
         # solve
         if np.random.uniform() <= solve_ratio:
-            sol, loss = _solve_in_forward(cp, c, w, z, optmodel, processes)
+            sol, loss = _solve_in_forward(cp, c, w, z, optmodel, processes, pool)
             if solve_ratio < 1:
                 module.solpool = np.concatenate((module.solpool, sol))
         else:
@@ -143,7 +150,7 @@ class SPOPlusFunc(Function):
         return grad_output * grad, None, None, None, None, None, None, None
 
 
-def _solve_in_forward(cp, c, w, z, optmodel, processes):
+def _solve_in_forward(cp, c, w, z, optmodel, processes, pool):
     """
     A function to solve optimization in the forward pass
     """
@@ -167,16 +174,11 @@ def _solve_in_forward(cp, c, w, z, optmodel, processes):
         model_type = type(optmodel)
         # get args
         args = getArgs(optmodel)
-        # number of processes
-        processes = mp.cpu_count() if not processes else processes
-        # parallel computing
-        with ProcessingPool(processes) as pool:
-            res = pool.amap(
-                _solveWithObj4Par,
-                2 * cp - c,
-                [args] * ins_num,
-                [model_type] * ins_num,
-            ).get()
+        res = pool.amap(
+              _solveWithObj4Par,
+              2 * cp - c,
+              [args] * ins_num,
+              [model_type] * ins_num).get()
         # get res
         sol = np.array(list(map(lambda x: x[0], res)))
         obj = np.array(list(map(lambda x: x[1], res)))
