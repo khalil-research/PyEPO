@@ -13,7 +13,7 @@ setuptools.setup(
     # description
     description = "PyTorch-based End-to-End Predict-then-Optimize Tool",
     # version
-    version = "0.2.2",
+    version = "0.2.4",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
