@@ -50,11 +50,17 @@ class perturbedOpt(nn.Module):
         self.n_samples = n_samples
         # perturbation amplitude
         self.sigma = sigma
-        # num of processors
+        # number of processes
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
-        self.processes = processes
+        self.processes = mp.cpu_count() if not processes else processes
+        # single-core
+        if processes == 1:
+            self.pool = None
+        # multi-core
+        else:
+            self.pool = ProcessingPool(processes)
         print("Num of cores: {}".format(self.processes))
         # random state
         self.rnd = np.random.RandomState(seed)
@@ -76,7 +82,7 @@ class perturbedOpt(nn.Module):
         Forward pass
         """
         sols = self.ptb.apply(pred_cost, self.optmodel, self.n_samples,
-                              self.sigma, self.processes, self.rnd,
+                              self.sigma, self.processes, self.pool, self.rnd,
                               self.solve_ratio, self)
         return sols
 
@@ -88,7 +94,7 @@ class perturbedOptFunc(Function):
 
     @staticmethod
     def forward(ctx, pred_cost, optmodel, n_samples, sigma,
-                processes, rnd, solve_ratio, module):
+                processes, pool, rnd, solve_ratio, module):
         """
         Forward pass for perturbed
 
@@ -98,6 +104,7 @@ class perturbedOptFunc(Function):
             n_samples (int): number of Monte-Carlo samples
             sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            pool (ProcessPool): process pool object
             rnd (RondomState): numpy random state
             solve_ratio (float): the ratio of new solutions computed during training
             module (nn.Module): perturbedOpt module
@@ -115,7 +122,7 @@ class perturbedOptFunc(Function):
         # solve with perturbation
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes)
+            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes, pool)
             if solve_ratio < 1:
                 sols = ptb_sols.reshape(-1, cp.shape[1])
                 module.solpool = np.concatenate((module.solpool, sols))
@@ -148,7 +155,7 @@ class perturbedOptFunc(Function):
                             noises,
                             torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
         grad /= n_samples * sigma
-        return grad, None, None, None, None, None, None, None
+        return grad, None, None, None, None, None, None, None, None
 
 
 class perturbedFenchelYoung(nn.Module):
@@ -186,11 +193,17 @@ class perturbedFenchelYoung(nn.Module):
         self.n_samples = n_samples
         # perturbation amplitude
         self.sigma = sigma
-        # num of processors
+        # number of processes
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
-        self.processes = processes
+        self.processes = mp.cpu_count() if not processes else processes
+        # single-core
+        if processes == 1:
+            self.pool = None
+        # multi-core
+        else:
+            self.pool = ProcessingPool(processes)
         print("Num of cores: {}".format(self.processes))
         # random state
         self.rnd = np.random.RandomState(seed)
@@ -212,7 +225,7 @@ class perturbedFenchelYoung(nn.Module):
         Forward pass
         """
         loss = self.pfy.apply(pred_cost, true_sol, self.optmodel, self.n_samples,
-                              self.sigma, self.processes, self.rnd,
+                              self.sigma, self.processes, self.pool, self.rnd,
                               self.solve_ratio, self)
         return loss
 
@@ -224,7 +237,7 @@ class perturbedFenchelYoungFunc(Function):
 
     @staticmethod
     def forward(ctx, pred_cost, true_sol, optmodel, n_samples, sigma,
-                processes, rnd, solve_ratio, module):
+                processes, pool, rnd, solve_ratio, module):
         """
         Forward pass for perturbed Fenchel-Young loss
 
@@ -235,6 +248,7 @@ class perturbedFenchelYoungFunc(Function):
             n_samples (int): number of Monte-Carlo samples
             sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            pool (ProcessPool): process pool object
             rnd (RondomState): numpy random state
             solve_ratio (float): the ratio of new solutions computed during training
             module (nn.Module): perturbedFenchelYoung module
@@ -253,7 +267,7 @@ class perturbedFenchelYoungFunc(Function):
         # solve with perturbation
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes)
+            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes, pool)
             if solve_ratio < 1:
                 sols = ptb_sols.reshape(-1, cp.shape[1])
                 module.solpool = np.concatenate((module.solpool, sols))
@@ -282,10 +296,10 @@ class perturbedFenchelYoungFunc(Function):
         """
         grad, = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
-        return grad * grad_output, None, None, None, None, None, None, None, None
+        return grad * grad_output, None, None, None, None, None, None, None, None, None
 
 
-def _solve_in_forward(ptb_c, optmodel, processes):
+def _solve_in_forward(ptb_c, optmodel, processes, pool):
     """
     A function to solve optimization in the forward pass
     """
@@ -305,16 +319,13 @@ def _solve_in_forward(ptb_c, optmodel, processes):
             ptb_sols.append(sols)
     # multi-core
     else:
-        # number of processes
-        processes = mp.cpu_count() if not processes else processes
         # get class
         model_type = type(optmodel)
         # get args
         args = getArgs(optmodel)
         # parallel computing
-        with ProcessingPool(processes) as pool:
-            ptb_sols = pool.amap(_solveWithObj4Par, ptb_c.transpose(1,0,2),
-                                 [args] * ins_num, [model_type] * ins_num).get()
+        ptb_sols = pool.amap(_solveWithObj4Par, ptb_c.transpose(1,0,2),
+                             [args] * ins_num, [model_type] * ins_num).get()
     return np.array(ptb_sols)
 
 
