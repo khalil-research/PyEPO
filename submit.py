@@ -47,6 +47,10 @@ parser.add_argument("--expnum",
 parser.add_argument("--sftp",
                     action="store_true",
                     help="positive prediction with SoftPlus activation")
+parser.add_argument("--ncpu",
+                    type=int,
+                    default=8,
+                    help="number of CPUs")
 setting = parser.parse_args()
 
 # get config
@@ -71,18 +75,11 @@ instance_logs_path = "slurm_logs_spotest"
 # time
 timeout_min = config.timeout * config.expnum
 # mem & cpu
-if setting.mthd in ["lr"]:
-    mem_gb = 4
-    num_cpus = 8
-if setting.mthd in ["rf"]:
-    mem_gb = 8
-    num_cpus = 8
 if setting.mthd in ["auto"]:
     mem_gb = 16
-    num_cpus = 8
-if setting.mthd in ["spo", "dbb", "dpo", "pfyl"]:
+else:
     mem_gb = 8
-    num_cpus = config.proc
+num_cpus = setting.ncpu
 
 # something to avoid crush
 import os

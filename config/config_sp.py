@@ -112,7 +112,7 @@ config_spo.l1 = 0.0
 # l2 regularization parameter
 config_spo.l2 = 0.0
 # number of processor for optimization
-config_spo.proc = 8
+config_spo.proc = 1
 
 configSP["spo"] = config_spo
 
@@ -146,7 +146,7 @@ config_dbb.l1 = 0.0
 # l2 regularization parameter
 config_dbb.l2 = 0.0
 # number of processor for optimization
-config_dbb.proc = 8
+config_dbb.proc = 1
 
 configSP["dbb"] = config_dbb
 
@@ -180,7 +180,7 @@ config_dpo.l1 = 0.0
 # l2 regularization parameter
 config_dpo.l2 = 0.0
 # number of processor for optimization
-config_dpo.proc = 8
+config_dpo.proc = 1
 
 configSP["dpo"] = config_dpo
 
@@ -214,6 +214,6 @@ config_pfyl.l1 = 0.0
 # l2 regularization parameter
 config_pfyl.l2 = 0.0
 # number of processor for optimization
-config_pfyl.proc = 8
+config_pfyl.proc = 1
 
 configSP["pfyl"] = config_pfyl
