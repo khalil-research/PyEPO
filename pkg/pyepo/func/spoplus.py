@@ -147,7 +147,7 @@ class SPOPlusFunc(Function):
             grad = 2 * (w - wq)
         if optmodel.modelSense == EPO.MAXIMIZE:
             grad = 2 * (wq - w)
-        return grad_output * grad, None, None, None, None, None, None, None
+        return grad_output * grad, None, None, None, None, None, None, None, None
 
 
 def _solve_in_forward(cp, c, w, z, optmodel, processes, pool):
