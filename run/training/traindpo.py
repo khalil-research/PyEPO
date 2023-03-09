@@ -10,7 +10,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 import torch
-from torch.utils.tensorboard import SummaryWriter
+#from torch.utils.tensorboard import SummaryWriter
 
 import pyepo
 from .utils import getDevice
@@ -43,7 +43,7 @@ def trainDPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
     if testloader is None:
         testloader = trainloader
     # init tensorboard
-    writer = SummaryWriter(log_dir=logdir)
+    #writer = SummaryWriter(log_dir=logdir)
     # get device
     device = getDevice()
     reg.to(device)
@@ -58,8 +58,8 @@ def trainDPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
     time.sleep(1)
     pbar = tqdm(range(epoch))
     cnt = 0
-    trueloss = None
-    unambloss = None
+    #trueloss = None
+    #unambloss = None
     for epoch in pbar:
         # load data
         for i, data in enumerate(trainloader):
@@ -70,38 +70,38 @@ def trainDPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
             we = ptb(cp)
             ze = (we * c).sum(1).view(-1, 1) # objective value
             loss = criterion(ze, z)
-            writer.add_scalar('Train/SPO+', loss.item(), cnt)
+            #writer.add_scalar('Train/SPO+', loss.item(), cnt)
             # l1 reg
             if l1_lambd:
                 l1_reg = torch.abs(cp - c).mean(dim=1).mean()
-                writer.add_scalar('Train/L1 Reg', l1_reg.item(), cnt)
+                #writer.add_scalar('Train/L1 Reg', l1_reg.item(), cnt)
                 loss += l1_lambd * l1_reg
             # l2 reg
             if l2_lambd:
                 l2_reg = ((cp - c) ** 2).mean(dim=1).mean()
-                writer.add_scalar('Train/L2 Reg', l2_reg.item(), cnt)
+                #writer.add_scalar('Train/L2 Reg', l2_reg.item(), cnt)
                 loss += l2_lambd * l2_reg
             # add hook
-            abs_grad = []
-            cp.register_hook(lambda grad:
-                             abs_grad.append(torch.abs(grad).mean().item()))
+            #abs_grad = []
+            #cp.register_hook(lambda grad:
+            #                 abs_grad.append(torch.abs(grad).mean().item()))
             # backward pass
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             # abs grad
-            writer.add_scalar('Train/Abs Grad', abs_grad[0], cnt)
+            #writer.add_scalar('Train/Abs Grad', abs_grad[0], cnt)
             # add logs
-            writer.add_scalar('Train/Total Loss', loss.item(), cnt)
+            #writer.add_scalar('Train/Total Loss', loss.item(), cnt)
             desc = "Epoch {}, Loss: {:.4f}".format(epoch, loss.item())
             pbar.set_description(desc)
             cnt += 1
         # eval
-        if log and (epoch % log == 0):
+        #if log and (epoch % log == 0):
             # true regret
-            trueloss = pyepo.metric.regret(reg, model, testloader)
-            writer.add_scalar('Eval/True SPO Loss', trueloss, epoch)
+            #trueloss = pyepo.metric.regret(reg, model, testloader)
+            #writer.add_scalar('Eval/True SPO Loss', trueloss, epoch)
             # unambiguous regret
             # unambloss = pyepo.metric.unambRegret(reg, model, testloader)
-            # writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
-    writer.close()
+            # #writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
+    #writer.close()
