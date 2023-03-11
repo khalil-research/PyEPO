@@ -49,7 +49,7 @@ parser.add_argument("--sftp",
                     help="positive prediction with SoftPlus activation")
 parser.add_argument("--ncpu",
                     type=int,
-                    default=8,
+                    default=32,
                     help="number of CPUs")
 setting = parser.parse_args()
 
