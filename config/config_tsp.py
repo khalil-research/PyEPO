@@ -94,7 +94,7 @@ config_spo = deepcopy(config)
 # method
 config_spo.mthd = "spo"
 # time limit
-config_spo.timeout = 30
+config_spo.timeout = 12
 
 ## training configuration
 # size of neural network hidden layers
@@ -112,7 +112,7 @@ config_spo.l1 = 0.0
 # l2 regularization parameter
 config_spo.l2 = 0.0
 # number of processor for optimization
-config_spo.proc = 8
+config_spo.proc = 1
 
 configTSP["spo"] = config_spo
 
@@ -126,7 +126,7 @@ config_dbb.mthd = "dbb"
 # loss
 config_dbb.loss = "r"
 # time limit
-config_dbb.timeout = 30
+config_dbb.timeout = 24
 
 ## training configuration
 # size of neural network hidden layers
@@ -146,7 +146,7 @@ config_dbb.l1 = 0.0
 # l2 regularization parameter
 config_dbb.l2 = 0.0
 # number of processor for optimization
-config_dbb.proc = 8
+config_dbb.proc = 1
 
 configTSP["dbb"] = config_dbb
 
@@ -158,7 +158,7 @@ config_dpo = deepcopy(config)
 # method
 config_dpo.mthd = "dpo"
 # time limit
-config_dpo.timeout = 30
+config_dpo.timeout = 12
 
 ## training configuration
 # size of neural network hidden layers
@@ -180,7 +180,7 @@ config_dpo.l1 = 0.0
 # l2 regularization parameter
 config_dpo.l2 = 0.0
 # number of processor for optimization
-config_dpo.proc = 8
+config_dpo.proc = 1
 
 configTSP["dpo"] = config_dpo
 
@@ -192,7 +192,7 @@ config_pfyl = deepcopy(config)
 # method
 config_pfyl.mthd = "pfyl"
 # time limit
-config_pfyl.timeout = 30
+config_pfyl.timeout = 12
 
 ## training configuration
 # size of neural network hidden layers
@@ -214,6 +214,6 @@ config_pfyl.l1 = 0.0
 # l2 regularization parameter
 config_pfyl.l2 = 0.0
 # number of processor for optimization
-config_pfyl.proc = 8
+config_pfyl.proc = 1
 
 configTSP["pfyl"] = config_pfyl

@@ -47,10 +47,6 @@ parser.add_argument("--expnum",
 parser.add_argument("--sftp",
                     action="store_true",
                     help="positive prediction with SoftPlus activation")
-parser.add_argument("--ncpu",
-                    type=int,
-                    default=32,
-                    help="number of CPUs")
 setting = parser.parse_args()
 
 # get config
@@ -75,11 +71,8 @@ instance_logs_path = "slurm_logs_spotest"
 # time
 timeout_min = config.timeout * config.expnum
 # mem & cpu
-if setting.mthd in ["auto"]:
-    mem_gb = 16
-else:
-    mem_gb = 8
-num_cpus = setting.ncpu
+mem_gb = 16
+num_cpus = 16
 
 # something to avoid crush
 import os
@@ -94,16 +87,10 @@ jobs = []
 for data, noise, deg in itertools.product(*tuple(confset.values())):
     # create executor
     executor = submitit.AutoExecutor(folder=instance_logs_path)
-    if data == 5000:
-        executor.update_parameters(slurm_additional_parameters={"account": "rrg-khalile2"},
-                                   timeout_min=timeout_min,
-                                   mem_gb=mem_gb*2,
-                                   cpus_per_task=num_cpus)
-    else:
-        executor.update_parameters(slurm_additional_parameters={"account": "rrg-khalile2"},
-                                   timeout_min=timeout_min,
-                                   mem_gb=mem_gb,
-                                   cpus_per_task=num_cpus)
+    executor.update_parameters(slurm_additional_parameters={"account": "rrg-khalile2"},
+                               timeout_min=timeout_min,
+                               mem_gb=mem_gb,
+                               cpus_per_task=num_cpus)
     # set config
     config.data = data
     config.noise = noise
