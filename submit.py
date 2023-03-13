@@ -60,10 +60,6 @@ if setting.mthd in ["auto", "lr", "rf"]:
     config.mthd = "2s"
     config.pred = setting.mthd
 config.rel = setting.rel
-if setting.l1:
-    config.l1 = 1e-2
-if setting.l2:
-    config.l2 = 1e-2
 config.sftp = setting.sftp
 
 # job submission parameters
@@ -81,10 +77,17 @@ os.environ["OPENBLAS_NUM_THREADS"] = str(num_cpus)
 # config setting
 confset = {"data":[100, 1000, 5000],
            "noise":[0.0, 0.5],
-           "deg":[1, 2, 4, 6]}
+           "deg":[1, 2, 4, 6],
+           "l1":[0],
+           "l2":[0]}
+# regularization
+if setting.l1:
+    confset["l1"] = [1e-3, 1e-2, 1e-1, 1e0, 1e1]
+if setting.l2:
+    confset["l2"] = [1e-3, 1e-2, 1e-1, 1e0, 1e1]
 
 jobs = []
-for data, noise, deg in itertools.product(*tuple(confset.values())):
+for data, noise, deg, l1, l2 in itertools.product(*tuple(confset.values())):
     # create executor
     executor = submitit.AutoExecutor(folder=instance_logs_path)
     executor.update_parameters(slurm_additional_parameters={"account": "rrg-khalile2"},
@@ -95,6 +98,8 @@ for data, noise, deg in itertools.product(*tuple(confset.values())):
     config.data = data
     config.noise = noise
     config.deg = deg
+    config.l1 = l1
+    config.l2 = l2
     if (setting.mthd != "2s") and (data == 5000):
         config.epoch = 4
     if (setting.mthd != "2s") and (data == 1000):
