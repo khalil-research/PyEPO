@@ -237,7 +237,7 @@ if __name__ == "__main__":
                         default=0.0,
                         help="l2 regularization parameter")
     parser.add_argument("--smth",
-                        type=float,
+                        type=int,
                         default=10,
                         help="smoothing parameter for Black-Box")
     parser.add_argument("--samp",
