@@ -29,7 +29,7 @@ setuptools.setup(
         "Pyomo>=6.1.2",
         "gurobipy>=9.1.2",
         "scikit_learn",
-        "torch>=1.7.0"],
+        "torch>=1.13.1"],
    # classifiers
     classifiers = [
         "Programming Language :: Python :: 3",
