@@ -22,8 +22,6 @@ config.grid = (5, 5)
 ## experiments configuration
 # number of experiments
 config.expnum = None
-# seed
-config.seed = 135
 # relaxation
 config.rel = None
 # path to save result
