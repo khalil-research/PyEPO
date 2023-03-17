@@ -21,7 +21,7 @@ parser.add_argument("--prob",
                     help="problem type")
 parser.add_argument("--mthd",
                     type=str,
-                    choices=["auto", "lr", "rf", "spo", "dbb"],
+                    choices=["auto", "lr", "rf", "spo", "dbb", "dpo", "pfyl"],
                     help="method")
 parser.add_argument("--spgrid",
                     type=int,
@@ -65,22 +65,33 @@ if setting.mthd in ["auto", "lr", "rf"]:
     config.mthd = "2s"
     config.pred = setting.mthd
 config.rel = setting.rel
-if setting.l1:
-    config.l1 = 1e-3
-if setting.l2:
-    config.l2 = 1e-3
 
 
 # config setting
 confset = {"data":[100, 1000, 5000],
            "noise":[0.0, 0.5],
-           "deg":[1, 2, 4, 6]}
+           "deg":[1, 2, 4, 6],
+           "l1":[0],
+           "l2":[0]}
+# regularization
+if setting.l1:
+    confset["data"] = 1000
+    confset["noise"] = 0.5
+    confset["deg"] = 4
+    confset["l1"] = [1e-3, 1e-2, 1e-1, 1e0, 1e1]
+if setting.l2:
+    confset["data"] = 1000
+    confset["noise"] = 0.5
+    confset["deg"] = 4
+    confset["l2"] = [1e-3, 1e-2, 1e-1, 1e0, 1e1]
 
-for data, noise, deg in itertools.product(*tuple(confset.values())):
+for data, noise, deg, l1, l2 in itertools.product(*tuple(confset.values())):
     # set config
     config.data = data
     config.noise = noise
     config.deg = deg
+    config.l1 = l1
+    config.l2 = l2
     if (setting.mthd != "2s") and (data == 5000):
         config.epoch = 4
     if (setting.mthd != "2s") and (data == 1000):
