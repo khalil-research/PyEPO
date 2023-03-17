@@ -49,11 +49,17 @@ class blackboxOpt(nn.Module):
         if lambd <= 0:
             raise ValueError("lambda is not positive.")
         self.lambd = lambd
-        # num of processors
+        # number of processes
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
-        self.processes = processes
+        self.processes = mp.cpu_count() if not processes else processes
+        # single-core
+        if processes == 1:
+            self.pool = None
+        # multi-core
+        else:
+            self.pool = ProcessingPool(processes)
         print("Num of cores: {}".format(self.processes))
         # solution pool
         self.solve_ratio = solve_ratio
@@ -65,16 +71,16 @@ class blackboxOpt(nn.Module):
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
             self.solpool = dataset.sols.copy()
-        # build carterion
+        # build blackbox optimizer
         self.dbb = blackboxOptFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        loss = self.dbb.apply(pred_cost, self.lambd, self.optmodel,
-                              self.processes, self.solve_ratio, self)
-        return loss
+        sols = self.dbb.apply(pred_cost, self.lambd, self.optmodel,
+                              self.processes, self.pool, self.solve_ratio, self)
+        return sols
 
 
 class blackboxOptFunc(Function):
@@ -83,7 +89,7 @@ class blackboxOptFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, lambd, optmodel, processes, solve_ratio, module):
+    def forward(ctx, pred_cost, lambd, optmodel, processes, pool, solve_ratio, module):
         """
         Forward pass for DBB
 
@@ -92,8 +98,9 @@ class blackboxOptFunc(Function):
             lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
+            pool (ProcessPool): process pool object
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): blackboxOpt modeul
+            module (nn.Module): blackboxOpt module
 
         Returns:
             torch.tensor: predicted solutions
@@ -105,7 +112,7 @@ class blackboxOptFunc(Function):
         # solve
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            sol = _solve_in_pass(cp, optmodel, processes)
+            sol = _solve_in_pass(cp, optmodel, processes, pool)
             if solve_ratio < 1:
                 module.solpool = np.concatenate((module.solpool, sol))
         else:
@@ -119,6 +126,7 @@ class blackboxOptFunc(Function):
         ctx.lambd = lambd
         ctx.optmodel = optmodel
         ctx.processes = processes
+        ctx.pool = pool
         ctx.solve_ratio = solve_ratio
         if solve_ratio < 1:
             ctx.module = module
@@ -134,6 +142,7 @@ class blackboxOptFunc(Function):
         lambd = ctx.lambd
         optmodel = ctx.optmodel
         processes = ctx.processes
+        pool = ctx.pool
         solve_ratio = ctx.solve_ratio
         rand_sigma = ctx.rand_sigma
         if solve_ratio < 1:
@@ -149,7 +158,7 @@ class blackboxOptFunc(Function):
         cq = cp + lambd * dl
         # solve
         if rand_sigma <= solve_ratio:
-            sol = _solve_in_pass(cq, optmodel, processes)
+            sol = _solve_in_pass(cq, optmodel, processes, pool)
             if solve_ratio < 1:
                 module.solpool = np.concatenate((module.solpool, sol))
         else:
@@ -161,10 +170,10 @@ class blackboxOptFunc(Function):
         # convert to tensor
         grad = np.array(grad)
         grad = torch.FloatTensor(grad).to(device)
-        return grad, None, None, None, None, None
+        return grad, None, None, None, None, None, None
 
 
-def _solve_in_pass(cp, optmodel, processes):
+def _solve_in_pass(cp, optmodel, processes, pool):
     """
     A function to solve optimization in the forward/backward pass
     """
@@ -180,16 +189,13 @@ def _solve_in_pass(cp, optmodel, processes):
             sol.append(solp)
     # multi-core
     else:
-        # number of processes
-        processes = mp.cpu_count() if not processes else processes
         # get class
         model_type = type(optmodel)
         # get args
         args = getArgs(optmodel)
         # parallel computing
-        with ProcessingPool(processes) as pool:
-            sol = pool.amap(_solveWithObj4Par, cp, [args] * ins_num,
-                            [model_type] * ins_num).get()
+        sol = pool.amap(_solveWithObj4Par, cp, [args] * ins_num,
+                        [model_type] * ins_num).get()
     return sol
 
 

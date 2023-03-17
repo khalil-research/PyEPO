@@ -6,6 +6,7 @@ Training pipeline
 
 import os
 import time
+import random
 
 import numpy as np
 import pandas as pd
@@ -35,15 +36,19 @@ def pipeline(config):
     else:
         df = pd.DataFrame(columns=["True SPO", "Unamb SPO", "MSE", "Elapsed", "Epochs"])
         skip = False # skip flag
-    # set random seed
-    np.random.seed(config.seed)
-    torch.manual_seed(config.seed)
 
     for i in range(config.expnum):
-        config.seed = np.random.randint(999)
-        print("---------------------------------------------------------------")
+        # random seed for each experiment
+        config.seed = i
+        # set random seed
+        random.seed(config.seed)
+        np.random.seed(config.seed)
+        torch.manual_seed(config.seed)
+        torch.cuda.manual_seed(config.seed)
+        # start exp
+        print("===============================================================")
         print("Experiment {}:".format(i))
-        print("---------------------------------------------------------------")
+        print("===============================================================")
         # generate data
         data = utils.genData(config)
         if config.prob == "ks":
@@ -98,12 +103,8 @@ if __name__ == "__main__":
     parser.add_argument("--mthd",
                         type=str,
                         default="spo",
-                        choices=["2s", "spo", "dbb"],
+                        choices=["2s", "spo", "dbb", "dpo", "pfyl"],
                         help="method")
-    parser.add_argument("--seed",
-                        type=int,
-                        default=135,
-                        help="random seed")
     parser.add_argument("--expnum",
                         type=int,
                         default=1,
@@ -126,9 +127,13 @@ if __name__ == "__main__":
                         default="mse",
                         choices=["regret", "mse"],
                         help="metric for auto-sklearm predictor")
+    parser.add_argument("--elog",
+                        type=int,
+                        default=0,
+                        help="steps of evluation and log")
     parser.add_argument("--form",
                         type=str,
-                        default="dfj",
+                        default="gg",
                         choices=["gg", "dfj", "mtz"],
                         help="TSP formulation")
     parser.add_argument("--path",
@@ -210,6 +215,9 @@ if __name__ == "__main__":
                         nargs='*',
                         default=[],
                         help="size of neural network hidden layers")
+    parser.add_argument("--sftp",
+                        action="store_true",
+                        help="positive prediction with SoftPlus activation")
     parser.add_argument("--optm",
                         type=str,
                         default="adam",
@@ -228,9 +236,17 @@ if __name__ == "__main__":
                         default=0.0,
                         help="l2 regularization parameter")
     parser.add_argument("--smth",
-                        type=float,
+                        type=int,
                         default=10,
                         help="smoothing parameter for Black-Box")
+    parser.add_argument("--samp",
+                        type=int,
+                        default=1,
+                        help="number of samples for perturbed methods")
+    parser.add_argument("--sig",
+                        type=float,
+                        default=1.0,
+                        help="amplitude parameter for perturbed methods")
     parser.add_argument("--proc",
                         type=int,
                         default=1,

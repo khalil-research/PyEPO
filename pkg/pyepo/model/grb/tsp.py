@@ -31,8 +31,8 @@ class tspABModel(optGrbModel):
         """
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))
-        self.edges = [(i, j) for i in range(num_nodes)
-                      for j in range(num_nodes) if i < j]
+        self.edges = [(i, j) for i in self.nodes
+                      for j in self.nodes if i < j]
         super().__init__()
 
     @property
@@ -66,8 +66,8 @@ class tspABModel(optGrbModel):
                 edges[j].append(k)
                 edges[k].append(j)
         # get tour
-        visited = {0}
-        tour = [0]
+        visited = {list(edges.keys())[0]}
+        tour = [list(edges.keys())[0]]
         while len(visited) < len(edges):
             i = tour[-1]
             for j in edges[i]:

@@ -31,7 +31,7 @@ def eval(testset, predmodel, optmodel, config):
         truespo /= abs(testset.objs.sum() + 1e-3)
         unambspo /= abs(testset.objs.sum() + 1e-3)
         time.sleep(1)
-    if (config.mthd == "spo") or (config.mthd == "dbb"):
+    else:
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
         # DFJ is fastest for unambSPO
         if config.prob == "tsp":

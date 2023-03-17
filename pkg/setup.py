@@ -13,7 +13,7 @@ setuptools.setup(
     # description
     description = "PyTorch-based End-to-End Predict-then-Optimize Tool",
     # version
-    version = "0.0.1",
+    version = "0.2.4",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
@@ -29,7 +29,7 @@ setuptools.setup(
         "Pyomo>=6.1.2",
         "gurobipy>=9.1.2",
         "scikit_learn",
-        "torch>=1.7.0"],
+        "torch>=1.13.1"],
    # classifiers
     classifiers = [
         "Programming Language :: Python :: 3",
