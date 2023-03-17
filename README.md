@@ -1,6 +1,12 @@
-# PyEPO: A PyTorch-based End-to-End Predict-and-Optimize Tool
+# PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Tool
 
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
+
+
+## Learning Framework
+
+<p align="center"><img width="100%" src="images/learning_framework_e2e.png" /></p>
+
 
 ## Publication
 
@@ -20,7 +26,7 @@ Citation:
 
 ## Introduction
 
-``PyEPO`` (PyTorch-based End-to-End Predict-and-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-and-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements SPO+ loss [[1]](https://doi.org/10.1287/mnsc.2020.3922) and differentiable Black-Box optimizer [[3]](https://arxiv.org/abs/1912.02175) as [PyTorch](https://pytorch.org/) autograd functions.
+``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements smart predict-then-optimize+ loss [[1]](https://doi.org/10.1287/mnsc.2020.3922) and differentiable Black-Box optimizer [[3]](https://arxiv.org/abs/1912.02175), differentiable perturbed optimizer, and Fenchel-Young loss with Perturbation [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) as [PyTorch](https://pytorch.org/) autograd modules.
 
 
 ## Documentation
@@ -28,18 +34,39 @@ Citation:
 The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
 
 
+## Tutorial
+
+- [01 Optimization Model](https://github.com/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb): Build up optimization solver
+- [02 Optimization Dataset](https://github.com/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb): Generate synthetic data and use optDataset 
+- [03 Training and Testing](https://github.com/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb): Train and test end-to-end predict-then-optimize for different approaches
+- [04 2D knapsack Solution Visualization](https://github.com/khalil-research/PyEPO/blob/main/notebooks/04%202D%20knapsack%20Solution%20Visualization.ipynb): Visualize solutions for knapsack problem
+- [05 Warcraft Shortest Path](https://github.com/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb): Use the Warcraft terrains dateset to train shortest path
+
+
+## Experiments
+
+To reproduce the experiments in original paper, please use the code and follow the instruction in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
+
+
+## Features
+
+- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) and **PFYL** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
+- Support [Gurobi](https://www.gurobi.com/) and [Pyomo](http://www.pyomo.org/) API
+- Support Parallel computing for optimization solver
+- Support solution caching [[5]](https://arxiv.org/abs/2011.05354) to speed up training
+
 ## Installation
 
 You can download ``PyEPO`` from our GitHub repository.
 
 ```bash
-git clone --branch MPC https://github.com/khalil-research/PyEPO.git
+git clone https://github.com/khalil-research/PyEPO.git
 ```
 
 And install it.
 
 ```bash
-pip3 install PyEPO/pkg/.
+pip install PyEPO/pkg/.
 ```
 
 
@@ -52,10 +79,12 @@ pip3 install PyEPO/pkg/.
 * [Pyomo](http://www.pyomo.org/)
 * [Gurobi](https://www.gurobi.com/)
 * [Scikit Learn](https://scikit-learn.org/)
-* [Auto-Sklearn](https://www.automl.org/automl/auto-sklearn/)
 * [PyTorch](http://pytorch.org/)
-* [SciencePlots](https://pypi.org/project/SciencePlots/)
-* [tol-colors](https://pypi.org/project/tol-colors/)
+
+
+## Issue
+
+On Windows system, there is missing ``freeze_support`` to run ``multiprocessing`` directly from ``__main__``. When ``processes`` is not 1, try ``if __name__ == "__main__":`` instead of Jupyter notebook or a PY file.
 
 
 ## Experiments Instruction
