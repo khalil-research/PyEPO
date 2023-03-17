@@ -67,8 +67,6 @@ def getSavePath(config):
         filename += "_c{}".format(config.proc)
     if config.mthd == "dbb":
         filename += "-lamb{}".format(config.smth)
-        if config.loss == "h":
-            filename += "-h"
     if (config.mthd == "dpo") or (config.mthd == "pfyl"):
         filename += "-samp{}eps{}".format(config.samp, config.sig)
     if config.mthd == "2s" and config.pred == "auto":
