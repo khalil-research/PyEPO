@@ -97,19 +97,22 @@ However, You can run `pipeline.py` for different experiment setting (including h
 python3 pipeline.py --prob sp --mthd spo --lan gurobi --data 1000 --deg 2 --noise 0.5 --epoch 20 --lr 1e-1 --batch 32 --optm adam --proc 1
 ```
 
-**Warning**: In the original paper, experiments were completed with multiple processors, while these experiments are based on a single CPU.
+**Warning**: Although `PyEPO` support multiple processors, these experiments are based on a single CPU.
 
 ### Performance Comparison (Figure 5-7)
 
-To draw performance comparison graphs, you need to train and evaluate linear regression, random forest, automl, SPO+, and DBB with varying training data size in {100, 1000, 5000}, polynomial degree in {1, 2, 4, 6}, and noise half-width in {0.0, 0.5}.
+To draw performance comparison graphs, you need to train and evaluate linear regression, random forest, automl, SPO+, DBB, DPO(*Optional*), and PFYL with varying training data size in {100, 1000, 5000}, polynomial degree in {1, 2, 4, 6}, and noise half-width in {0.0, 0.5}.
 
 Experiments for shortest path:
 
 ```bash
 python3 experiments.py --prob sp  --mthd lr    --expnum 10
 python3 experiments.py --prob sp  --mthd rf    --expnum 10
+# python3 experiments.py --prob sp  --mthd auto  --expnum 10
 python3 experiments.py --prob sp  --mthd spo   --expnum 10
 python3 experiments.py --prob sp  --mthd dbb   --expnum 10
+# python3 experiments.py --prob sp  --mthd dpo   --expnum 10
+python3 experiments.py --prob sp  --mthd pfyl  --expnum 10
 ```
 
 The argument `expnum` is the number of experiments repeated with different data randomization. For example, in the original paper, `expnum` is 10. Therefore, you can use less repetition to save time.
@@ -122,29 +125,33 @@ Experiments of automl for shortest path is ***optional***:
 python3 experiments.py --prob sp  --mthd auto  --expnum 10
 ```
 
-Once the results of the experiments are ready, you can draw a plot for Figure 5. This figure will be saved to "./images/*"
+Once the results of the experiments are ready, you can draw a plot for Figure 6. This figure will be saved to "./images/*"
 
 ```bash
 python3 plot.py --plot cmp --prob sp
 ```
 
-Similarly, the comparison of 2D knapsack (Figure 6) and TSP (Figure 7) can be plotted as follows:
+Similarly, the comparison of 2D knapsack (Figure 7) and TSP (Figure 8) can be plotted as follows:
 
 ```bash
 python3 experiments.py --prob ks  --mthd lr    --expnum 10
 python3 experiments.py --prob ks  --mthd rf    --expnum 10
+# python3 experiments.py --prob ks  --mthd auto  --expnum 10
 python3 experiments.py --prob ks  --mthd spo   --expnum 10
 python3 experiments.py --prob ks  --mthd dbb   --expnum 10
-# python3 experiments.py --prob ks  --mthd auto  --expnum 10
+# python3 experiments.py --prob ks  --mthd dpo   --expnum 10
+python3 experiments.py --prob ks  --mthd pfyl  --expnum 10
 python3 plot.py --plot cmp --prob ks
 ```
 
 ```bash
 python3 experiments.py --prob tsp --mthd lr    --expnum 10
 python3 experiments.py --prob tsp --mthd rf    --expnum 10
+# python3 experiments.py --prob ks  --mthd auto  --expnum 10
 python3 experiments.py --prob tsp --mthd spo   --expnum 10
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10
-# python3 experiments.py --prob ks  --mthd auto  --expnum 10
+# python3 experiments.py --prob tsp --mthd dpo   --expnum 10
+python3 experiments.py --prob tsp --mthd pfyl  --expnum 1
 python3 plot.py --plot cmp --prob tsp
 ```
 
@@ -157,27 +164,27 @@ Experiments for 2D knapsack with relaxation:
 ```bash
 python3 experiments.py --prob ks  --mthd spo   --expnum 10 --rel
 python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --rel
+# python3 experiments.py --prob ks  --mthd dpo   --expnum 10 --rel
+python3 experiments.py --prob ks  --mthd pfyl  --expnum 10 --rel
 ```
 
 Experiments for TSP with relaxation (Miller-Tucker-Zemlin):
 ```bash
 python3 experiments.py --prob tsp --mthd spo   --expnum 10 --rel --tspform mtz
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --rel --tspform mtz
-```
-
-Experiments for TSP with relaxation (Miller-Tucker-Zemlin):
-```bash
-python3 experiments.py --prob tsp --mthd spo   --expnum 10 --rel --tspform mtz
-python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --rel --tspform mtz
+# python3 experiments.py --prob tsp --mthd dpo   --expnum 10 --rel --tspform mtz
+python3 experiments.py --prob tsp --mthd pfyl  --expnum 10 --rel --tspform mtz
 ```
 
 Experiments for TSP with relaxation (Gavish–Graves):
 ```bash
 python3 experiments.py --prob tsp --mthd spo   --expnum 10 --rel --tspform gg
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --rel --tspform gg
+# python3 experiments.py --prob tsp --mthd dpo   --expnum 10 --rel --tspform gg
+python3 experiments.py --prob tsp --mthd pfyl  --expnum 10 --rel --tspform gg
 ```
 
-Once the results of the experiments are ready, you can draw a plot for Figure 8-10:
+Once the results of the experiments are ready, you can draw a plot for Figure 9-10:
 
 ```bash
 # 2D knapsack
@@ -197,12 +204,18 @@ Experiments for L1 regularization:
 # shortest path
 python3 experiments.py --prob sp  --mthd spo   --expnum 10 --l1
 python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --l1
+# python3 experiments.py --prob sp  --mthd dpo   --expnum 10 --l1
+python3 experiments.py --prob sp  --mthd pfyl  --expnum 10 --l1
 # 2D knapsack
 python3 experiments.py --prob ks  --mthd spo   --expnum 10 --l1
 python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --l1
+# python3 experiments.py --prob ks  --mthd dpo   --expnum 10 --l1
+python3 experiments.py --prob ks  --mthd pfyl  --expnum 10 --l1
 # TSP
 python3 experiments.py --prob tsp --mthd spo   --expnum 10 --l1
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --l1
+# python3 experiments.py --prob tsp --mthd dpo   --expnum 10 --l1
+python3 experiments.py --prob tsp --mthd pfyl  --expnum 10 --l1
 ```
 
 Experiments for L2 regularization:
@@ -211,12 +224,18 @@ Experiments for L2 regularization:
 # shortest path
 python3 experiments.py --prob sp  --mthd spo   --expnum 10 --l2
 python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --l2
+# python3 experiments.py --prob sp  --mthd dpo   --expnum 10 --l2
+python3 experiments.py --prob sp  --mthd pfyl  --expnum 10 --l2
 # 2D knapsack
 python3 experiments.py --prob ks  --mthd spo   --expnum 10 --l2
 python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --l2
+# python3 experiments.py --prob ks  --mthd dpo   --expnum 10 --l2
+python3 experiments.py --prob ks  --mthd pfyl  --expnum 10 --l2
 # TSP
 python3 experiments.py --prob tsp --mthd spo   --expnum 10 --l2
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --l2
+# python3 experiments.py --prob tsp --mthd dpo   --expnum 10 --l2
+python3 experiments.py --prob tsp --mthd pfyl  --expnum 10 --l2
 ```
 
 Once the results of the experiments are ready, you can draw a plot for Figure 11:
@@ -230,7 +249,7 @@ python3 plot.py --plot reg  --prob ks
 python3 plot.py --plot reg  --prob tsp
 ```
 
-### MSE-Regret Trade-off (Figure 15)
+### MSE-Regret Trade-off (Figure 12)
 
 To examine the MSE-regret trade-off among all above methods, you can draw a plot for Figure 15:
 
@@ -244,71 +263,71 @@ python3 plot.py --plot trd  --prob tsp
 ```
 
 
-### Training Scalability (Figure 16,17)
+### ~~Training Scalability (**Deprecated**)~~
 
-To see the effect of increasing decision variables and/or constraints, you can change the size of the graph for the shortest path and the number of constraints for the knapsack.
+~~To see the effect of increasing decision variables and/or constraints, you can change the size of the graph for the shortest path and the number of constraints for the knapsack.~~
 
-Experiments for the shortest path with 8x8 grid network:
-
-```bash
-python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 8 8
-python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 8 8
-python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 8 8
-python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 8 8
-```
-
-Experiments for the shortest path with 10x10 grid network:
+~~Experiments for the shortest path with 8x8 grid network:~~
 
 ```bash
-python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 10 10
-python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 10 10
-python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 10 10
-python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 10 10
+# python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 8 8
+# python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 8 8
+# python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 8 8
+# python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 8 8
 ```
 
-Experiments for the shortest path with 12x12 grid network:
+~~Experiments for the shortest path with 10x10 grid network:~~
 
 ```bash
-python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 12 12
-python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 12 12
-python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 12 12
-python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 12 12
+# python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 10 10
+# python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 10 10
+# python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 10 10
+# python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 10 10
 ```
 
-Experiments for the shortest path with 15x15 grid network:
+~~Experiments for the shortest path with 12x12 grid network:~~
 
 ```bash
-python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 15 15
-python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 15 15
-python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 15 15
-python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 15 15
+# python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 12 12
+# python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 12 12
+# python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 12 12
+# python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 12 12
 ```
 
-Once the results of the experiments are ready, you can draw a plot for Figure 16:
+~~Experiments for the shortest path with 15x15 grid network:~~
+
+```bash
+# python3 experiments.py --prob sp  --mthd lr    --expnum 10 --spgrid 15 15
+# python3 experiments.py --prob sp  --mthd rf    --expnum 10 --spgrid 15 15
+# python3 experiments.py --prob sp  --mthd spo   --expnum 10 --spgrid 15 15
+# python3 experiments.py --prob sp  --mthd dbb   --expnum 10 --spgrid 15 15
+```
+
+~~Once the results of the experiments are ready, you can draw a plot for Figure 16:~~
 
 ```bash
 # shortest path
-python3 plot.py --plot scl --prob sp
+# python3 plot.py --plot scl --prob sp
 ```
 
-Similarly, the experiments of 1D and 3D knapsack can be run as follows:
+~~Similarly, the experiments of 1D and 3D knapsack can be run as follows:~~
 
 ```bash
 # 1D knapsack
-python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 1
-python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 1
-python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 1
-python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 1
+# python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 1
+# python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 1
+# python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 1
+# python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 1
 # 3D knapsack
-python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 3
-python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 3
-python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 3
-python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 3
+# python3 experiments.py --prob ks  --mthd lr    --expnum 10 --ksdim 3
+# python3 experiments.py --prob ks  --mthd rf    --expnum 10 --ksdim 3
+# python3 experiments.py --prob ks  --mthd spo   --expnum 10 --ksdim 3
+# python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --ksdim 3
 ```
 
-Once the results of the experiments are ready, you can draw a plot for Figure 17:
+~~Once the results of the experiments are ready, you can draw a plot for Figure 17:~~
 
 ```bash
 # shortest path
-python3 plot.py --plot scl --prob ks
+# python3 plot.py --plot scl --prob ks
 ```
