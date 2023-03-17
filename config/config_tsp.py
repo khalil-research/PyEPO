@@ -24,8 +24,6 @@ config.form = "dfj"
 ## experiments configuration
 # number of experiments
 config.expnum = None
-# seed
-config.seed = 135
 # relaxation
 config.rel = False
 # path to save result
