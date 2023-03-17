@@ -74,10 +74,6 @@ def getSavePath(config):
     if config.mthd == "2s" and config.pred == "auto":
         if config.metric == "mse":
             filename += "-mse"
-    if config.mthd != "2s":
-        # softplus
-        if config.sftp:
-            filename += "-sf"
     return path + "/" + filename + ".csv"
 
 
