@@ -15,10 +15,11 @@ import torch
 import pyepo
 from .utils import getDevice
 
-def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
-             epoch=50, processes=1, l1_lambd=0, l2_lambd=0, log=0):
+def trainPFYL(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
+             epoch=50, processes=1, n_samples=1, sigma=1.0, l1_lambd=0,
+             l2_lambd=0, log=0):
     """
-    A function to train PyTorch nn with SPO+ loss
+    A function to train PyTorch nn with Fenchel-Young loss
 
     Args:
         reg (nn): PyTorch neural network regressor
@@ -29,6 +30,8 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
         logdir (str): folder path to save tensorboard log
         epoch (int): number of training epochs
         processes: processes (int): number of processors, 1 for single-core, 0 for all of cores
+        n_samples (int): number of Monte-Carlo samples
+        sigma (float): the amplitude of the perturbation
         l1_lambd (float): regularization weight of l1 norm
         l2_lambd (float): regularization weight of l2 norm
         log (int): step size of evlaution and log
@@ -46,8 +49,9 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
     reg.to(device)
     # training mode
     reg.train()
-    # set SPO+ Loss as criterion
-    spop = pyepo.func.SPOPlus(model, processes=processes)
+    # set FY loss as criterion
+    pfyl = pyepo.func.perturbedFenchelYoung(model, n_samples=n_samples,
+                                            sigma=sigma, processes=processes)
     # train
     time.sleep(1)
     pbar = tqdm(range(epoch))
@@ -61,7 +65,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
             x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
             # forward pass
             cp = reg(x)
-            loss = spop(cp, c, w, z).mean()
+            loss = pfyl(cp, w).mean()
             #writer.add_scalar('Train/SPO+', loss.item(), cnt)
             # l1 reg
             if l1_lambd:
@@ -93,7 +97,7 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
             # true regret
             #trueloss = pyepo.metric.regret(reg, model, testloader)
             #writer.add_scalar('Eval/True SPO Loss', trueloss, epoch)
-            #unambiguous regret
-            #unambloss = pyepo.metric.unambRegret(reg, model, testloader)
-            #writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
+            # unambiguous regret
+            # unambloss = pyepo.metric.unambRegret(reg, model, testloader)
+            # #writer.add_scalar('Eval/Unambiguous SPO Loss', unambloss, epoch)
     #writer.close()

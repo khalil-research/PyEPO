@@ -32,6 +32,16 @@ def train(trainset, testset, model, config):
         trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
         testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
         res = trainDBB(trainloader, testloader, model, config)
+    if config.mthd == "dpo":
+        print("Using differentiable perturbed optimizer...")
+        trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
+        testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
+        res = trainDPO(trainloader, testloader, model, config)
+    if config.mthd == "pfyl":
+        print("Using perturbed Fenchel-Young loss...")
+        trainloader = DataLoader(trainset, batch_size=config.batch, shuffle=True)
+        testloader = DataLoader(testset, batch_size=config.batch, shuffle=False)
+        res = trainPFYL(trainloader, testloader, model, config)
     return res
 
 
@@ -48,7 +58,7 @@ def trainInit(config):
         arch.append(config.item)
     if config.prob == "tsp":
         arch.append(config.nodes * (config.nodes - 1) // 2)
-    reg = net.fcNet(arch)
+    reg = net.fcNet(arch, softplus=config.sftp)
     # set optimizer
     if config.optm == "sgd":
         optimizer = torch.optim.SGD(reg.parameters(), lr=config.lr)
@@ -96,25 +106,68 @@ def trainSPO(trainloader, testloader, model, config):
     # relax
     if config.rel:
         model = model.relax()
+    # log dir
+    logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     training.trainSPO(reg, model, optimizer, trainloader, testloader,
-                      epoch=config.epoch, processes=config.proc,
-                      l1_lambd=config.l1, l2_lambd=config.l2)
+                      logdir=logdir, epoch=config.epoch,
+                      processes=config.proc, l1_lambd=config.l1,
+                      l2_lambd=config.l2, log=config.elog)
     return reg
 
 
 def trainDBB(trainloader, testloader, model, config):
     """
-    Black-Box training
+    perturbed optimizer training
     """
     # init
     reg, optimizer = trainInit(config)
     # relax
     if config.rel:
         model = model.relax()
+    # log dir
+    logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     training.trainDBB(reg, model, optimizer, trainloader, testloader,
-                     lossfunc=config.loss, epoch=config.epoch,
+                     lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
                      processes=config.proc, bb_lambd=config.smth,
-                     l1_lambd=config.l1, l2_lambd=config.l2)
+                     l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
+    return reg
+
+
+def trainDPO(trainloader, testloader, model, config):
+    """
+    Fenchel-Young loss training
+    """
+    # init
+    reg, optimizer = trainInit(config)
+    # relax
+    if config.rel:
+        model = model.relax()
+    # log dir
+    logdir = "./logs" + utils.getSavePath(config)[5:-4]
+    # train
+    training.trainDPO(reg, model, optimizer, trainloader, testloader,
+                      logdir=logdir, epoch=config.epoch, processes=config.proc,
+                      n_samples=config.samp, sigma=config.sig, l1_lambd=config.l1,
+                      l2_lambd=config.l2, log=config.elog)
+    return reg
+
+
+def trainPFYL(trainloader, testloader, model, config):
+    """
+    Fenchel-Young loss training
+    """
+    # init
+    reg, optimizer = trainInit(config)
+    # relax
+    if config.rel:
+        model = model.relax()
+    # log dir
+    logdir = "./logs" + utils.getSavePath(config)[5:-4]
+    # train
+    training.trainPFYL(reg, model, optimizer, trainloader, testloader,
+                       logdir=logdir, epoch=config.epoch, processes=config.proc,
+                       n_samples=config.samp, sigma=config.sig, l1_lambd=config.l1,
+                       l2_lambd=config.l2, log=config.elog)
     return reg
