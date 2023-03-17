@@ -15,8 +15,8 @@ import torch
 import pyepo
 from .utils import getDevice
 
-def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs",
-             epoch=50, processes=1, l1_lambd=0, l2_lambd=0, log=0):
+def trainSPO(reg, model, optimizer, trainloader, testloader=None,
+             epoch=50, processes=1, l1_lambd=0, l2_lambd=0):
     """
     A function to train PyTorch nn with SPO+ loss
 
@@ -26,16 +26,14 @@ def trainSPO(reg, model, optimizer, trainloader, testloader=None, logdir="./logs
         optimizer (optim): PyTorch optimizer
         trainloader (DataLoader): PyTorch DataLoader for train set
         testloader (DataLoader): PyTorch DataLoader for test set
-        logdir (str): folder path to save tensorboard log
         epoch (int): number of training epochs
         processes: processes (int): number of processors, 1 for single-core, 0 for all of cores
         l1_lambd (float): regularization weight of l1 norm
         l2_lambd (float): regularization weight of l2 norm
-        log (int): step size of evlaution and log
     """
     # create log folder
-    if not os.path.isdir(logdir):
-        os.makedirs(logdir, exist_ok=True)
+    #if not os.path.isdir(logdir):
+    #    os.makedirs(logdir, exist_ok=True)
     # use training data for test if no test data
     if testloader is None:
         testloader = trainloader

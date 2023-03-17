@@ -14,9 +14,8 @@ import torch
 import pyepo
 from .utils import getDevice
 
-def trainDBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
-            logdir="./logs", epoch=50, processes=1, bb_lambd=10, l1_lambd=0,
-            l2_lambd=0, log=0):
+def trainDBB(reg, model, optimizer, trainloader, testloader=None,
+            epoch=50, processes=1, bb_lambd=10, l1_lambd=0, l2_lambd=0):
     """
     A function to train PyTorch nn with Black-box optimization function
 
@@ -35,11 +34,9 @@ def trainDBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
         l2_lambd (float): regularization weight of l2 norm
         log (int): step size of evlaution and log
     """
-    # check loss type
-    assert lossfunc in ["r", "h"], "argument 'lossfunc' must be 'r' or 'h'"
     # create log folder
-    if not os.path.isdir(logdir):
-        os.makedirs(logdir, exist_ok=True)
+    #if not os.path.isdir(logdir):
+    #    os.makedirs(logdir, exist_ok=True)
     # use training data for test if no test data
     if testloader is None:
         testloader = trainloader
@@ -69,17 +66,11 @@ def trainDBB(reg, model, optimizer, trainloader, testloader=None, lossfunc="r",
             cp = reg(x)
             # black-box optimizer
             wp = dbb(cp)
-            # loss
-            if lossfunc == "r":
-                # objective value
-                zp = (wp * c).sum(1).view(-1, 1)
-                # regret
-                loss = criterion(zp, z)
-                #writer.add_scalar('Train/Regret', loss.item(), cnt)
-            if lossfunc == "h":
-                # Hamming distance
-                loss = criterion(wp, w)
-                #writer.add_scalar('Train/Hamming distance', loss.item(), cnt)
+            # objective value
+            zp = (wp * c).sum(1).view(-1, 1)
+            # regret
+            loss = criterion(zp, z)
+            #writer.add_scalar('Train/Regret', loss.item(), cnt)
             # l1 reg
             if l1_lambd:
                 l1_reg = torch.abs(cp - c).mean(dim=1).mean()

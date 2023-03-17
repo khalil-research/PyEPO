@@ -58,7 +58,7 @@ def trainInit(config):
         arch.append(config.item)
     if config.prob == "tsp":
         arch.append(config.nodes * (config.nodes - 1) // 2)
-    reg = net.fcNet(arch, softplus=config.sftp)
+    reg = net.fcNet(arch)
     # set optimizer
     if config.optm == "sgd":
         optimizer = torch.optim.SGD(reg.parameters(), lr=config.lr)
@@ -107,12 +107,11 @@ def trainSPO(trainloader, testloader, model, config):
     if config.rel:
         model = model.relax()
     # log dir
-    logdir = "./logs" + utils.getSavePath(config)[5:-4]
+    ##logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     training.trainSPO(reg, model, optimizer, trainloader, testloader,
-                      logdir=logdir, epoch=config.epoch,
-                      processes=config.proc, l1_lambd=config.l1,
-                      l2_lambd=config.l2, log=config.elog)
+                      epoch=config.epoch, processes=config.proc,
+                      l1_lambd=config.l1, l2_lambd=config.l2)
     return reg
 
 
@@ -126,12 +125,12 @@ def trainDBB(trainloader, testloader, model, config):
     if config.rel:
         model = model.relax()
     # log dir
-    logdir = "./logs" + utils.getSavePath(config)[5:-4]
+    #logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     training.trainDBB(reg, model, optimizer, trainloader, testloader,
-                     lossfunc=config.loss, logdir=logdir, epoch=config.epoch,
-                     processes=config.proc, bb_lambd=config.smth,
-                     l1_lambd=config.l1, l2_lambd=config.l2, log=config.elog)
+                      epoch=config.epoch, processes=config.proc,
+                      bb_lambd=config.smth, l1_lambd=config.l1,
+                      l2_lambd=config.l2)
     return reg
 
 
@@ -145,12 +144,12 @@ def trainDPO(trainloader, testloader, model, config):
     if config.rel:
         model = model.relax()
     # log dir
-    logdir = "./logs" + utils.getSavePath(config)[5:-4]
+    #logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     training.trainDPO(reg, model, optimizer, trainloader, testloader,
-                      logdir=logdir, epoch=config.epoch, processes=config.proc,
-                      n_samples=config.samp, sigma=config.sig, l1_lambd=config.l1,
-                      l2_lambd=config.l2, log=config.elog)
+                      epoch=config.epoch, processes=config.proc,
+                      n_samples=config.samp, sigma=config.sig,
+                      l1_lambd=config.l1, l2_lambd=config.l2)
     return reg
 
 
@@ -164,10 +163,10 @@ def trainPFYL(trainloader, testloader, model, config):
     if config.rel:
         model = model.relax()
     # log dir
-    logdir = "./logs" + utils.getSavePath(config)[5:-4]
+    #logdir = "./logs" + utils.getSavePath(config)[5:-4]
     # train
     training.trainPFYL(reg, model, optimizer, trainloader, testloader,
-                       logdir=logdir, epoch=config.epoch, processes=config.proc,
-                       n_samples=config.samp, sigma=config.sig, l1_lambd=config.l1,
-                       l2_lambd=config.l2, log=config.elog)
+                       epoch=config.epoch, processes=config.proc,
+                       n_samples=config.samp, sigma=config.sig,
+                       l1_lambd=config.l1, l2_lambd=config.l2)
     return reg
