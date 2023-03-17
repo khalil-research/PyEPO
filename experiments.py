@@ -71,8 +71,8 @@ config.rel = setting.rel
 confset = {"data":[100, 1000, 5000],
            "noise":[0.0, 0.5],
            "deg":[1, 2, 4, 6],
-           "l1":[0],
-           "l2":[0]}
+           "l1":[0.0],
+           "l2":[0,0]}
 # regularization
 if setting.l1:
     confset["data"] = 1000
