@@ -627,23 +627,24 @@ def tradeoffPlot(config, data, noise, deg=4):
     prob = c.prob
     # color map
     cset =  tc.tol_cset('light')
-    cmap = tc.tol_cmap("sunset")(np.linspace(0, 1, 11))
-    colors = {"lr":cset.mint,
-              "rf":cset.pink,
-              "auto":cset.pear,
-              "spo":cset.orange,
-              "spo l1":cset.orange,
-              "spo l2":cset.orange,
-              "spo rel":cmap[6],
-              "spo rel(gg)":cmap[7],
-              "spo rel(mtz)":cmap[6],
-              "dbb":cset.light_blue,
-              "dbb l1":cset.light_blue,
-              "dbb l2":cset.light_blue,
-              "dbb rel":cmap[4],
-              "dbb rel(gg)":cmap[3],
-              "dbb rel(mtz)":cmap[4],}
+    cmap = tc.tol_cmap("rainbow_discrete")(np.linspace(0, 1, 22))
+    colors = {"lr":lighten(cset.mint),
+              "rf":lighten(cset.pink),
+              "auto":lighten(cset.pear),
+              "spo":lighten(cmap[16]),
+              "spo rel":lighten(cmap[14]),
+              "spo rel(gg)":lighten(cmap[15]),
+              "spo rel(mtz)":lighten(cmap[14]),
+              "pfyl":lighten(cmap[5]),
+              "pfyl rel":lighten(cmap[3]),
+              "pfyl rel(gg)":lighten(cmap[4]),
+              "pfyl rel(mtz)":lighten(cmap[3]),
+              "dbb":lighten(cmap[7]),
+              "dbb rel":lighten(cmap[9]),
+              "dbb rel(gg)":lighten(cmap[8]),
+              "dbb rel(mtz)":lighten(cmap[9])}
     w = colorConverter.to_rgba("w", alpha=0.6) # white
+    k = colorConverter.to_rgba("k", alpha=0.5) # black
     # get df
     dfs = {}
     for mthd in config:
@@ -651,19 +652,14 @@ def tradeoffPlot(config, data, noise, deg=4):
         dfs[mthd] = pd.read_csv(path)
     # draw boxplot
     fig, ax = plt.subplots(figsize=(12,12))
-    # init xmax & ymax
+    # init xmax & ymax & ymin
     xmax, ymax = 0, 0
     for mthd in dfs:
-        df, c = dfs[mthd], colorConverter.to_rgba(colors[mthd], alpha=0.6)
+        df, c = dfs[mthd], colorConverter.to_rgba(colors[mthd], alpha=0.75)
         x, y = df["MSE"].mean(), df["True SPO"].mean()
         xmax, ymax = max(x, xmax), max(y, ymax)
-        size = int((np.log(df["Elapsed"].mean())+4)*500)
-        if mthd.split(" ")[-1] == "l1":
-            ax.scatter(x, y, s=size, color=c, marker="o", hatch="++++", facecolor=w)
-        elif mthd.split(" ")[-1] == "l2":
-            ax.scatter(x, y, s=size, color=c, marker="o", hatch="OO", facecolor=w)
-        else:
-            ax.scatter(x, y, s=size, color=c, marker="o")
+        size = int((np.log(df["Elapsed"].mean())+3)*1500)
+        ax.scatter(x, y, s=size, color=c, marker="o")
         # annotate
         txt = ax.annotate(mthd+" :{:.2f} Sec".format(df["Elapsed"].mean()), (x,y), fontsize=20, color=colors[mthd])
         txt.set_path_effects([path_effects.withStroke(linewidth=0.75, foreground='k')])
@@ -672,7 +668,7 @@ def tradeoffPlot(config, data, noise, deg=4):
     plt.ylabel("Normalized Regret", fontsize=36)
     plt.yticks(fontsize=24)
     plt.xlim(0.0, xmax*1.1)
-    plt.ylim(0.0, ymax*1.1)
+    plt.ylim(0.05, ymax*1.1)
     plt.title("Training Set Size = {}, Polynomial degree = {}, Noise Half−width = {}" \
               .format(data, deg, noise), fontsize=24)
     # save
@@ -763,6 +759,7 @@ if __name__ == "__main__":
             del config["lr"]
             del config["rf"]
             del config["auto"]
+            # delete dpo
             del config["dpo"]
             # runtime per epoch
             timePlotTSP(config)
@@ -803,19 +800,14 @@ if __name__ == "__main__":
     if setting.plot == "trd":
         # get config
         config = getConfig(setting.prob)
-        # add reg
-        config["spo l1"] = deepcopy(config["spo"])
-        config["spo l1"].l1 = 1e-3
-        config["spo l2"] = deepcopy(config["spo"])
-        config["spo l2"].l2 = 1e-3
-        config["dbb l1"] = deepcopy(config["dbb"])
-        config["dbb l1"].l1 = 1e-3
-        config["dbb l2"] = deepcopy(config["dbb"])
-        config["dbb l2"].l2 = 1e-3
+        # delete dpo
+        del config["dpo"]
         # add relaxation
         if setting.prob == "ks":
             config["spo rel"] = deepcopy(config["spo"])
             config["spo rel"].rel = True
+            config["pfyl rel"] = deepcopy(config["pfyl"])
+            config["pfyl rel"].rel = True
             config["dbb rel"] = deepcopy(config["dbb"])
             config["dbb rel"].rel = True
         if setting.prob == "tsp":
@@ -823,16 +815,23 @@ if __name__ == "__main__":
             config["spo rel(mtz)"] = deepcopy(config["spo"])
             config["spo rel(mtz)"].form = "mtz"
             config["spo rel(mtz)"].rel = True
+            config["pfyl rel(mtz)"] = deepcopy(config["pfyl"])
+            config["pfyl rel(mtz)"].form = "mtz"
+            config["pfyl rel(mtz)"].rel = True
             config["dbb rel(mtz)"] = deepcopy(config["dbb"])
             config["dbb rel(mtz)"].form = "mtz"
             config["dbb rel(mtz)"].rel = True
             config["spo rel(gg)"] = deepcopy(config["spo"])
             config["spo rel(gg)"].form = "gg"
             config["spo rel(gg)"].rel = True
+            config["pfyl rel(gg)"] = deepcopy(config["pfyl"])
+            config["pfyl rel(gg)"].form = "gg"
+            config["pfyl rel(gg)"].rel = True
             config["dbb rel(gg)"] = deepcopy(config["dbb"])
             config["dbb rel(gg)"].form = "gg"
             config["dbb rel(gg)"].rel = True
             config["spo"].form = "dfj"
+            config["pfyl"].form = "dfj"
             config["dbb"].form = "dfj"
         # varying setting
         confset = {"data":[100, 1000],
