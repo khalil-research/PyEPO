@@ -43,62 +43,6 @@ def getDf(config, degs, mthd, col="True SPO"):
         dfs[deg] = df[col]
     return dfs
 
-def getRowSP(grids, n, d, e):
-    regrets = {"lr":{"mean":[],"std":[]}, "rf":{"mean":[],"std":[]}, "spo":{"mean":[],"std":[]}, "dbb":{"mean":[],"std":[]}}
-    elapses = {"lr":{"mean":[],"std":[]}, "rf":{"mean":[],"std":[]}, "spo":{"mean":[],"std":[]}, "dbb":{"mean":[],"std":[]}}
-    for g in grids:
-        l, t = getRowDataSP(g, n, d, e)
-        for m in regrets:
-            regrets[m]["mean"].append(l[m]["mean"])
-            regrets[m]["std"].append(l[m]["std"])
-            elapses[m]["mean"].append(t[m]["mean"])
-            elapses[m]["std"].append(t[m]["std"])
-    return regrets, elapses
-
-
-def getRowDataSP(grid, n, d, e):
-    # dir
-    dir_name = "./res/sp/h{}w{}/gurobi".format(grid[0], grid[1])
-    file_name = {}
-    file_name["lr"] = "n{}p5-d{}-e{}_2s-lr.csv".format(n,d,e)
-    file_name["rf"] = "n{}p5-d{}-e{}_2s-rf.csv".format(n,d,e)
-    file_name["spo"] = "n{}p5-d{}-e{}_spo_lr_adam0.01_bs32_l10.0l20.0_c8.csv".format(n,d,e)
-    file_name["dbb"] = "n{}p5-d{}-e{}_dbb_lr_adam0.1_bs32_l10.0l20.0_c8-lamb20.csv".format(n,d,e)
-    # load data
-    regret, elapse = {}, {}
-    for m, f in file_name.items():
-        df = pd.read_csv(dir_name + "/" + f)
-        regret[m] = {"mean":df["Unamb SPO"].mean(), "std":df["Unamb SPO"].std()}
-        elapse[m] = {"mean":df["Elapsed"].mean(), "std":df["Elapsed"].std()}
-    return regret, elapse
-
-def getRowKS(dims, n, d, e):
-    regrets = {"lr":{"mean":[],"std":[]}, "rf":{"mean":[],"std":[]},
-               "spo":{"mean":[],"std":[]}, "dbb":{"mean":[],"std":[]}
-              }
-    for dim in dims:
-        l = getRowDataKS(dim, n, d, e)
-        for m in regrets:
-            regrets[m]["mean"].append(l[m]["mean"])
-            regrets[m]["std"].append(l[m]["std"])
-    return regrets
-
-
-def getRowDataKS(dim, n, d, e):
-    # dir
-    dir_name = "./res/ks/i32d{}c20/gurobi".format(dim)
-    file_name = {}
-    file_name["lr"] = "n{}p5-d{}-e{}_2s-lr.csv".format(n,d,e)
-    file_name["rf"] = "n{}p5-d{}-e{}_2s-rf.csv".format(n,d,e)
-    file_name["spo"] = "n{}p5-d{}-e{}_spo_lr_adam0.01_bs32_l10.0l20.0_c32.csv".format(n,d,e)
-    file_name["dbb"] = "n{}p5-d{}-e{}_dbb_lr_adam0.1_bs32_l10.0l20.0_c32-lamb10.csv".format(n,d,e)
-    # load data
-    regret = {}
-    for m, f in file_name.items():
-        df = pd.read_csv(dir_name + "/" + f)
-        regret[m] = {"mean":df["Unamb SPO"].mean(), "std":df["Unamb SPO"].std()}
-    return regret
-
 
 def getElapsed(config):
     # polynomial degree
@@ -129,6 +73,36 @@ def getElapsed(config):
         row = {"Method":mthd, "Elapsed_mean":elapsed_mean, "Elapsed_std":elapsed_std}
         df = df.append(row, ignore_index=True)
     return df
+
+
+def getRow(config, params, reg):
+    regrets = {"spo":pd.DataFrame(), "pfyl":pd.DataFrame(), "dbb":pd.DataFrame()}
+    mses = {"spo":pd.DataFrame(), "pfyl":pd.DataFrame(), "dbb":pd.DataFrame()}
+    # go through different l1/l2 param
+    for param in params:
+        # add reg term
+        if reg == "l1":
+            for c in config.values():
+                c.l1 = param
+        if reg == "l2":
+            for c in config.values():
+                c.l2 = param
+        # get data
+        r, s = getRegData(config, reg)
+        for m in regrets:
+            regrets[m][param] = r[m]
+            mses[m][param] = s[m]
+    return regrets, mses
+
+
+def getRegData(config, reg):
+    regret, mse = {}, {}
+    for mthd in config:
+        path = utils.getSavePath(config[mthd])
+        df = pd.read_csv(path)
+        regret[mthd] = df["Unamb SPO"]
+        mse[mthd] = df["MSE"]
+    return regret, mse
 
 
 def lighten(color, amount=0.9):
@@ -531,87 +505,153 @@ def relPlotTSP(config, data, noise):
     print("Saved to " + dir)
 
 
-def regPlot(config, data, noise):
-    # polynomial degree
-    degs = [1, 2, 4, 6]
-    # set config
+def regPlot(config, data, deg, noise, reg):
     config = deepcopy(config)
     for c in config.values():
         c.data = data
         c.noise = noise
-    # prob name
-    prob = c.prob
+        c.deg = deg
+        # get prob name
+        prob = c.prob
+    # l1/l2 params
+    params = [0.0, 1e-3, 1e-2, 1e-1, 1e0, 1e1]
+    # get rows
+    regrets, mses = getRow(config, params, reg)
     # color map
     cset =  tc.tol_cset('light')
-    colors = [cset.mint, cset.pink, cset.orange, cset.light_blue]
-    # get df
-    df_spo  = getDf(config, degs, "spo")
-    df_spo1 = getDf(config, degs, "spo l1")
-    df_spo2 = getDf(config, degs, "spo l2")
-    df_dbb  = getDf(config, degs, "dbb")
-    df_dbb1 = getDf(config, degs, "dbb l1")
-    df_dbb2 = getDf(config, degs, "dbb l2")
-    # draw boxplot
-    fig = plt.figure(figsize=(16,6))
+    cmap = tc.tol_cmap("rainbow_discrete")(np.linspace(0, 1, 22))
+    colors = [cset.mint, cset.pink, cmap[16], cmap[5], cmap[7], cmap[10]]
+    for i in range(len(colors)):
+        colors[i] = lighten(colors[i])
+    # x tick
+    x = np.array([i for i in range(len(params))])
+    # figure
+    fig = plt.figure(figsize=(32, 8))
+    # regret
+    ax1 = plt.subplot(121)
+    # line
     c = colors[2]
-    bp1 = plt.boxplot(df_spo, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
-                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
-                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                      patch_artist=True, positions=np.arange(df_spo.shape[1])-0.4, widths=0.12)
+    plt.plot(x-0.24, regrets["spo"].mean(), linewidth=3, color=c)
+    c = colors[3]
+    plt.plot(x, regrets["pfyl"].mean(), linewidth=3, color=c)
+    c = colors[4]
+    plt.plot(x+0.24, regrets["dbb"].mean(), linewidth=3, color=c)
+    # box plot
+    #===========================================================================================================================
     c = colors[2]
-    bp2 = plt.boxplot(df_spo1, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
-                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
-                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                      patch_artist=True, positions=np.arange(df_spo.shape[1])-0.24, widths=0.12)
-    for box in bp2['boxes']:
-        box.set(hatch="++++", fill=False)
-    c = colors[2]
-    bp3 = plt.boxplot(df_spo2, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
-                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
-                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                      patch_artist=True, positions=np.arange(df_spo.shape[1])-0.08, widths=0.12)
-    for box in bp3["boxes"]:
-        box.set(hatch="OO", fill=False)
+    bp1 = plt.boxplot(regrets["spo"],
+                      boxprops=dict(facecolor=c, color=c, linewidth=6),
+                      medianprops=dict(color="w", linewidth=4),
+                      whiskerprops=dict(color=c, linewidth=4),
+                      capprops=dict(color=c, linewidth=4),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=8, markeredgewidth=3),
+                      patch_artist=True, positions=np.arange(regrets["spo"].shape[1])-0.24, widths=0.06)
+    #===========================================================================================================================
     c = colors[3]
-    bp4 = plt.boxplot(df_dbb, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
-                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
-                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                      patch_artist=True, positions=np.arange(df_dbb.shape[1])+0.08, widths=0.12)
-    c = colors[3]
-    bp5 = plt.boxplot(df_dbb1, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
-                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
-                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                      patch_artist=True, positions=np.arange(df_dbb.shape[1])+0.24, widths=0.12)
-    for box in bp5["boxes"]:
-        box.set(hatch="++++", fill=False)
-    c = colors[3]
-    bp6 = plt.boxplot(df_dbb2, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
-                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
-                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                      patch_artist=True, positions=np.arange(df_dbb.shape[1])+0.4, widths=0.12)
-    for box in bp6["boxes"]:
-        box.set(hatch="OO", fill=False)
+    bp2 = plt.boxplot(regrets["pfyl"],
+                      boxprops=dict(facecolor=c, color=c, linewidth=6),
+                      medianprops=dict(color="w", linewidth=4),
+                      whiskerprops=dict(color=c, linewidth=4),
+                      capprops=dict(color=c, linewidth=4),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=8, markeredgewidth=3),
+                      patch_artist=True, positions=np.arange(regrets["pfyl"].shape[1]), widths=0.06)
+    #===========================================================================================================================
+    c = colors[4]
+    bp3 = plt.boxplot(regrets["dbb"],
+                      boxprops=dict(facecolor=c, color=c, linewidth=6),
+                      medianprops=dict(color="w", linewidth=4),
+                      whiskerprops=dict(color=c, linewidth=4),
+                      capprops=dict(color=c, linewidth=4),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=8, markeredgewidth=3),
+                      patch_artist=True, positions=np.arange(regrets["dbb"].shape[1])+0.24, widths=0.06)
     # vertical line
-    plt.axvline(x=0.5, color="k", linestyle="--", linewidth=1.5)
-    plt.axvline(x=1.5, color="k", linestyle="--", linewidth=1.5)
-    plt.axvline(x=2.5, color="k", linestyle="--", linewidth=1.5)
-    # grid
-    plt.grid(color="grey", alpha=0.5, linewidth=0.5, which="major", axis="y")
+    plt.axvline(x=0.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    plt.axvline(x=1.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    plt.axvline(x=2.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    plt.axvline(x=3.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    plt.axvline(x=4.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
     # labels and ticks
-    plt.xlabel("Polynomial Degree", fontsize=36)
-    plt.xticks(ticks=[0,1,2,3], labels=[1,2,4,6], fontsize=28)
-    plt.ylabel("Normalized Regret", fontsize=36)
-    plt.yticks(fontsize=24)
-    plt.xlim(-0.5, 3.5)
-    plt.ylim(-0.02, 0.38)
-    ax = plt.gca()
-    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter("%.2f"))
-    plt.title("Shortest Path\nTraining Set Size = {}, Noise Half−width = {}".format(data, noise), fontsize=30)
-    plt.legend([bp1["boxes"][0], bp2["boxes"][0], bp3["boxes"][0], bp4["boxes"][0], bp5["boxes"][0], bp6["boxes"][0]],
-               ["SPO+","SPO+ L1","SPO+ L2","DBB","DBB L1","DBB L2"], fontsize=22, loc=2, labelspacing=0.2,
-               handlelength=1, ncol=2)
+    plt.xlim(-0.5, 5.5)
+    plt.ylim(0, 0.32)
+    plt.xticks(x, labels=params, fontsize=44)
+    plt.yticks(fontsize=40)
+    plt.ylabel("Normalized Regret", fontsize=60)
+    plt.legend([bp1["boxes"][0], bp2["boxes"][0], bp3["boxes"][0]], ["SPO+", "PFYL", "DBB"], fontsize=40, ncol=2, loc=1)
+    plt.title("", fontsize=48)
+    # mse
+    ax1 = plt.subplot(122)
+    # line
+    c = colors[2]
+    plt.plot(x-0.24, mses["spo"].mean(), linewidth=3, color=c)
+    c = colors[3]
+    plt.plot(x, mses["pfyl"].mean(), linewidth=3, color=c)
+    c = colors[4]
+    plt.plot(x+0.24, mses["dbb"].mean(), linewidth=3, color=c)
+    # boxplot
+    #===========================================================================================================================
+    c = colors[2]
+    bp1 = plt.boxplot(mses["spo"],
+                      boxprops=dict(facecolor=c, color=c, linewidth=6),
+                      medianprops=dict(color="w", linewidth=4),
+                      whiskerprops=dict(color=c, linewidth=4),
+                      capprops=dict(color=c, linewidth=4),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=8, markeredgewidth=3),
+                      patch_artist=True, positions=np.arange(mses["spo"].shape[1])-0.24, widths=0.06)
+    #===========================================================================================================================
+    c = colors[3]
+    bp2 = plt.boxplot(mses["pfyl"],
+                      boxprops=dict(facecolor=c, color=c, linewidth=6),
+                      medianprops=dict(color="w", linewidth=4),
+                      whiskerprops=dict(color=c, linewidth=4),
+                      capprops=dict(color=c, linewidth=4),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=8, markeredgewidth=3),
+                      patch_artist=True, positions=np.arange(mses["pfyl"].shape[1]), widths=0.06)
+    #===========================================================================================================================
+    c = colors[4]
+    bp3 = plt.boxplot(mses["dbb"],
+                      boxprops=dict(facecolor=c, color=c, linewidth=6),
+                      medianprops=dict(color="w", linewidth=4),
+                      whiskerprops=dict(color=c, linewidth=4),
+                      capprops=dict(color=c, linewidth=4),
+                      flierprops=dict(markeredgecolor=c, marker="o", markersize=8, markeredgewidth=3),
+                      patch_artist=True, positions=np.arange(mses["dbb"].shape[1])+0.24, widths=0.06)
+    # vertical line
+    plt.axvline(x=0.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    plt.axvline(x=1.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    plt.axvline(x=2.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    plt.axvline(x=3.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    plt.axvline(x=4.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
+    # labels and ticks
+    plt.xlim(-0.5, 5.5)
+    plt.ylim(0, 59)
+    plt.xticks(x, labels=params, fontsize=44)
+    plt.yticks(fontsize=40)
+    plt.ylabel("MSE", fontsize=54)
+    plt.legend([bp1["boxes"][0], bp2["boxes"][0], bp3["boxes"][0]], ["SPO+", "PFYL", "DBB"], fontsize=40, ncol=2, loc=1)
+    plt.title("", fontsize=48)
+    if reg == "l1":
+        # xlabel
+        fig.text(0.5, -0.02, "L1 Parameter", ha="center", va="center", fontsize=60)
+        # title
+        plt.suptitle("Test Loss on 2D Knapsack with L1 Regularization \
+                     \nTraining Set Size = {}, Polynomial Degree = {}, Noise Half−width = {}".
+                     format(data, deg, noise),
+                     y=1.1, fontsize=60)
+    if reg == "l2":
+        # xlabel
+        fig.text(0.5, -0.02, "L2 Parameter", ha="center", va="center", fontsize=60)
+        # title
+        plt.suptitle("Test Loss on 2D Knapsack with L2 Regularization \
+                     \nTraining Set Size = {}, Polynomial Degree = {}, Noise Half−width = {}".
+                     format(data, deg, noise),
+                     y=1.1, fontsize=60)
+    # xlabel
+    if reg == "l1":
+        fig.text(0.5, -0.02, "L1 Parameter", ha="center", va="center", fontsize=60)
+    if reg == "l2":
+        fig.text(0.5, -0.02, "L2 Parameter", ha="center", va="center", fontsize=60)
     # save
-    dir = "./images/reg-{}-n{}e{}.png".format(prob, data, int(10*noise))
+    dir = "./images/{}-{}-n{}d{}e{}.png".format(reg, prob, data, deg, int(10*noise))
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
 
@@ -775,25 +815,20 @@ if __name__ == "__main__":
     if setting.plot == "reg":
         # get config
         config = getConfig(setting.prob)
-        # add reg
-        config["spo l1"] = deepcopy(config["spo"])
-        config["spo l1"].l1 = 1e-3
-        config["spo l2"] = deepcopy(config["spo"])
-        config["spo l2"].l2 = 1e-3
-        config["dbb l1"] = deepcopy(config["dbb"])
-        config["dbb l1"].l1 = 1e-3
-        config["dbb l2"] = deepcopy(config["dbb"])
-        config["dbb l2"].l2 = 1e-3
         # delete 2s
         del config["lr"]
         del config["rf"]
         del config["auto"]
+        # delete dpo
+        del config["dpo"]
         # varying setting
         confset = {"data":[100, 1000],
-                   "noise":[0.0, 0.5]}
+                   "deg": [2, 4, 6],
+                   "noise":[0.5]}
         # plot
-        for data, noise in itertools.product(*tuple(confset.values())):
-            regPlot(config, data, noise)
+        for data, deg, noise in itertools.product(*tuple(confset.values())):
+            regPlot(config, data, deg, noise, "l1")
+            regPlot(config, data, deg, noise, "l2")
 
     ############################################################################
     # regularization
