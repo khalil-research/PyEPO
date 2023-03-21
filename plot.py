@@ -28,7 +28,9 @@ def getConfig(prob):
     config["rf"]   = configs[prob]["rf"]
     config["auto"] = configs[prob]["auto"]
     config["spo"]  = configs[prob]["spo"]
+    config["pfyl"] = configs[prob]["pfyl"]
     config["dbb"]  = configs[prob]["dbb"]
+    config["dpo"]  = configs[prob]["dpo"]
     return config
 
 
@@ -130,6 +132,20 @@ def getElapsed(config, data):
     return means, stds
 
 
+def lighten(color, amount=0.9):
+    """
+    Lightens the given color by multiplying (1-luminosity) by the given amount.
+    """
+    import matplotlib.colors as mc
+    import colorsys
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = np.array(colorsys.rgb_to_hls(*mc.to_rgb(c)))
+    return colorsys.hls_to_rgb(c[0],1-amount * (1-c[1]),c[2])
+
+
 def comparisonPlot(config, data, noise):
     # polynomial degree
     degs = [1, 2, 4, 6]
@@ -142,7 +158,10 @@ def comparisonPlot(config, data, noise):
     prob = c.prob
     # color map
     cset =  tc.tol_cset('light')
-    colors = [cset.mint, cset.pink, cset.pear, cset.orange, cset.light_blue]
+    cmap = tc.tol_cmap("rainbow_discrete")(np.linspace(0, 1, 22))
+    colors = [cset.mint, cset.pink, cset.pear, cmap[16], cmap[5], cmap[7], cmap[10]]
+    for i in range(len(colors)):
+        colors[i] = lighten(colors[i])
     # automl flag
     automl = True
     # init box & label
@@ -156,7 +175,12 @@ def comparisonPlot(config, data, noise):
     except:
         automl = False # no automl data
     df_spo = getDf(config, degs, "spo")
+    df_pfyl = getDf(config, degs, "pfyl")
     df_dbb = getDf(config, degs, "dbb")
+    try:
+        df_dpo  = getDf(config, degs, "dpo")
+    except:
+        dpo = False # no dpo data
     # draw boxplot
     fig = plt.figure(figsize=(16,6))
     ########################################################################################################################
@@ -164,7 +188,7 @@ def comparisonPlot(config, data, noise):
     bp = plt.boxplot(df_lr, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                     patch_artist=True, positions=np.arange(df_spo.shape[1])-0.38, widths=0.16)
+                     patch_artist=True, positions=np.arange(df_spo.shape[1])-0.42, widths=0.11)
     boxes.append(bp["boxes"][0])
     label.append("2-stage LR")
     ########################################################################################################################
@@ -173,7 +197,7 @@ def comparisonPlot(config, data, noise):
                      medianprops=dict(color="w", alpha=0.9, linewidth=2),
                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                     patch_artist=True, positions=np.arange(df_spo.shape[1])-0.19, widths=0.16)
+                     patch_artist=True, positions=np.arange(df_spo.shape[1])-0.28, widths=0.11)
     boxes.append(bp["boxes"][0])
     label.append("2-stage RF")
     ########################################################################################################################
@@ -182,7 +206,7 @@ def comparisonPlot(config, data, noise):
         bp = plt.boxplot(df_auto, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
                          whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
                          flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                         patch_artist=True, positions=np.arange(df_spo.shape[1]), widths=0.16)
+                         patch_artist=True, positions=np.arange(df_spo.shape[1])-0.14, widths=0.11)
         boxes.append(bp["boxes"][0])
         label.append("2-stage Auto  ")
     ########################################################################################################################
@@ -190,17 +214,34 @@ def comparisonPlot(config, data, noise):
     bp = plt.boxplot(df_spo, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                     patch_artist=True, positions=np.arange(df_spo.shape[1])+0.19, widths=0.16)
+                     patch_artist=True, positions=np.arange(df_spo.shape[1])+0.00, widths=0.11)
     boxes.append(bp["boxes"][0])
     label.append("SPO+")
     ########################################################################################################################
     c = colors[4]
+    bp = plt.boxplot(df_pfyl, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
+                     whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
+                     flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
+                     patch_artist=True, positions=np.arange(df_spo.shape[1])+0.14, widths=0.11)
+    boxes.append(bp["boxes"][0])
+    label.append("PFYL")
+    ########################################################################################################################
+    c = colors[5]
     bp = plt.boxplot(df_dbb, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
                      whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
                      flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
-                     patch_artist=True, positions=np.arange(df_spo.shape[1])+0.38, widths=0.16)
+                     patch_artist=True, positions=np.arange(df_spo.shape[1])+0.28, widths=0.11)
     boxes.append(bp["boxes"][0])
     label.append("DBB")
+    ########################################################################################################################
+    if dpo:
+        c = colors[6]
+        bp = plt.boxplot(df_dpo, boxprops=dict(facecolor=c, color=c, linewidth=4), medianprops=dict(color="w", linewidth=2),
+                         whiskerprops=dict(color=c, linewidth=2), capprops=dict(color=c, linewidth=2),
+                         flierprops=dict(markeredgecolor=c, marker="o", markersize=5, markeredgewidth=2),
+                         patch_artist=True, positions=np.arange(df_spo.shape[1])+0.42, widths=0.11)
+        boxes.append(bp["boxes"][0])
+        label.append("2-stage Auto  ")
     ########################################################################################################################
     # vertical line
     plt.axvline(x=0.5, color="k", linestyle="--", linewidth=1.5)
@@ -215,8 +256,14 @@ def comparisonPlot(config, data, noise):
     plt.yticks(fontsize=24)
     plt.xlim(-0.5, 3.5)
     plt.ylim(-0.02, 0.38)
-    plt.title("Training Set Size = {},\nNoise Half−width = {}".format(data, noise), fontsize=30)
-    plt.legend(boxes, label, fontsize=22, loc=2, labelspacing=0.2, handlelength=1, ncol=2)
+    # title
+    if prob == "sp":
+        plt.title("Shortest Path\nTraining Set Size = {}, Noise Half−width = {}".format(data, noise), fontsize=30)
+    if prob == "ks":
+        plt.title("Knapsack\nTraining Set Size = {}, Noise Half−width = {}".format(data, noise), fontsize=30)
+    if prob == "tsp":
+        plt.title("TSP\nTraining Set Size = {}, Noise Half−width = {}".format(data, noise), fontsize=30)
+    plt.legend(boxes, label, fontsize=22, loc=2, labelspacing=0.2, handlelength=1, ncol=3)
     # save
     dir = "./images/{}-n{}e{}.png".format(prob, data, int(10*noise))
     fig.savefig(dir, dpi=300)
