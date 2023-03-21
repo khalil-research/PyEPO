@@ -108,10 +108,8 @@ Experiments for shortest path:
 ```bash
 python3 experiments.py --prob sp  --mthd lr    --expnum 10
 python3 experiments.py --prob sp  --mthd rf    --expnum 10
-# python3 experiments.py --prob sp  --mthd auto  --expnum 10
 python3 experiments.py --prob sp  --mthd spo   --expnum 10
 python3 experiments.py --prob sp  --mthd dbb   --expnum 10
-# python3 experiments.py --prob sp  --mthd dpo   --expnum 10
 python3 experiments.py --prob sp  --mthd pfyl  --expnum 10
 ```
 
@@ -119,10 +117,11 @@ The argument `expnum` is the number of experiments repeated with different data 
 
 **Warning:** The two-stage automated model selection and hyperparameters tuning depends on [Auto-Sklearn](https://www.automl.org/automl/auto-sklearn/), which is time-consuming. In addition, automl training requires a time limit (150 sec), so the results may be very different from the paper because of the resource allocations.
 
-Experiments of automl for shortest path is ***optional***:
+Experiments of automl and DPO for shortest path are ***optional***:
 
 ```bash
 python3 experiments.py --prob sp  --mthd auto  --expnum 10
+python3 experiments.py --prob sp  --mthd dpo   --expnum 10
 ```
 
 Once the results of the experiments are ready, you can draw a plot for Figure 6. This figure will be saved to "./images/*"
@@ -151,7 +150,7 @@ python3 experiments.py --prob tsp --mthd rf    --expnum 10
 python3 experiments.py --prob tsp --mthd spo   --expnum 10
 python3 experiments.py --prob tsp --mthd dbb   --expnum 10
 # python3 experiments.py --prob tsp --mthd dpo   --expnum 10
-python3 experiments.py --prob tsp --mthd pfyl  --expnum 1
+python3 experiments.py --prob tsp --mthd pfyl  --expnum 10
 python3 plot.py --plot cmp --prob tsp
 ```
 
