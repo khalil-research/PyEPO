@@ -241,6 +241,7 @@ def comparisonPlot(config, data, noise):
     dir = "./images/{}-n{}e{}.png".format(prob, data, int(10*noise))
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
+    plt.close()
 
 
 def timePlotKS(config):
@@ -278,6 +279,7 @@ def timePlotKS(config):
     dir = "./images/rel-ks2-time.png"
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
+    plt.close()
 
 
 def relPlotKS(config, data, noise):
@@ -360,6 +362,7 @@ def relPlotKS(config, data, noise):
     dir = "./images/rel-ks2-n{}e{}.png".format(data,int(10*noise))
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
+    plt.close()
 
 
 def timePlotTSP(config):
@@ -402,6 +405,7 @@ def timePlotTSP(config):
     dir = "./images/rel-tsp-time.png"
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
+    plt.close()
 
 
 def relPlotTSP(config, data, noise):
@@ -503,6 +507,7 @@ def relPlotTSP(config, data, noise):
     dir = "./images/rel-tsp-n{}e{}.png".format(data,int(10*noise))
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
+    plt.close()
 
 
 def regPlot(config, data, deg, noise, reg):
@@ -654,6 +659,7 @@ def regPlot(config, data, deg, noise, reg):
     dir = "./images/{}-{}-n{}d{}e{}.png".format(reg, prob, data, deg, int(10*noise))
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
+    plt.close()
 
 
 def tradeoffPlot(config, data, noise, deg=4):
@@ -715,6 +721,7 @@ def tradeoffPlot(config, data, noise, deg=4):
     dir = "./images/td-{}-n{}e{}.png".format(prob, data, int(10*noise))
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
+    plt.close()
 
 
 if __name__ == "__main__":
