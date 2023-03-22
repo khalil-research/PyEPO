@@ -101,7 +101,7 @@ python3 pipeline.py --prob sp --mthd spo --lan gurobi --data 1000 --deg 2 --nois
 
 ### Performance Comparison (Figure 5-7)
 
-To draw performance comparison graphs, you need to train and evaluate linear regression, random forest, automl, SPO+, DBB, DPO(*Optional*), and PFYL with varying training data size in {100, 1000, 5000}, polynomial degree in {1, 2, 4, 6}, and noise half-width in {0.0, 0.5}.
+To draw performance comparison plots, you need to train and evaluate linear regression, random forest, automl, SPO+, DBB, DPO(*Optional*), and PFYL with varying training data size in {100, 1000, 5000}, polynomial degree in {1, 2, 4, 6}, and noise half-width in {0.0, 0.5}.
 
 Experiments for shortest path:
 
@@ -250,7 +250,7 @@ python3 plot.py --plot reg  --prob tsp
 
 ### MSE-Regret Trade-off (Figure 12)
 
-To examine the MSE-regret trade-off among all above methods, you can draw a plot for Figure 15:
+To examine the MSE-regret trade-off among all above methods, you can draw a plot for Figure 12:
 
 ```bash
 # shortest path
@@ -261,6 +261,26 @@ python3 plot.py --plot trd  --prob ks
 python3 plot.py --plot trd  --prob tsp
 ```
 
+### Warcraft Image Data (Figure 13)
+
+We employ a truncated ResNet18 for an image dataset, Warcraft terrain map to find the shortest path. Let's train the convolutional neural network.
+
+```bash
+# SPO+
+python pipeline_wc.py --mthd spo
+# PFYL
+python pipeline_wc.py --mthd pfyl
+# DBB
+python pipeline_wc.py --mthd dbb
+# dpo
+python pipeline_wc.py --mthd dbb
+```
+
+To draw performance comparison plots:
+
+```bash
+python3 plot.py --plot wc
+```
 
 ### ~~Training Scalability (**Deprecated**)~~
 
