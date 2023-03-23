@@ -256,17 +256,19 @@ python3 plot.py --plot trd  --prob tsp
 
 ### Warcraft Image Data (Figure 13)
 
-We employ a truncated ResNet18 for an image dataset, Warcraft terrain map to find the shortest path. Let's train the convolutional neural network.
+We employ a truncated ResNet18 for an image dataset, Warcraft terrain map to find the shortest path. First, you need to download the [Warcraft Map Dataset](https://edmond.mpdl.mpg.de/dataset.xhtml?persistentId=doi:10.17617/3.YJCQ5S) and unzip it to ``./data``.
+
+Then, we can train the convolutional neural network.
 
 ```bash
 # SPO+
-python pipeline_wc.py --mthd spo
+python3 pipeline_wc.py --mthd spo
 # PFYL
-python pipeline_wc.py --mthd pfyl
+python3 pipeline_wc.py --mthd pfyl
 # DBB
-python pipeline_wc.py --mthd dbb
+python3 pipeline_wc.py --mthd dbb
 # dpo
-python pipeline_wc.py --mthd dbb
+python3 pipeline_wc.py --mthd dbb
 ```
 
 To draw performance comparison plots:
