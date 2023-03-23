@@ -8,3 +8,5 @@ Run experiments
 from run import utils
 from run.train import train, trainInit
 from run.eval import eval
+from run import net
+from run import model
