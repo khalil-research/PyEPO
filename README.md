@@ -230,11 +230,6 @@ python3 experiments.py --prob ks  --mthd spo   --expnum 10 --l2
 python3 experiments.py --prob ks  --mthd dbb   --expnum 10 --l2
 # python3 experiments.py --prob ks  --mthd dpo   --expnum 10 --l2
 python3 experiments.py --prob ks  --mthd pfyl  --expnum 10 --l2
-# TSP
-python3 experiments.py --prob tsp --mthd spo   --expnum 10 --l2
-python3 experiments.py --prob tsp --mthd dbb   --expnum 10 --l2
-# python3 experiments.py --prob tsp --mthd dpo   --expnum 10 --l2
-python3 experiments.py --prob tsp --mthd pfyl  --expnum 10 --l2
 ```
 
 Once the results of the experiments are ready, you can draw a plot for Figure 11:
@@ -244,8 +239,6 @@ Once the results of the experiments are ready, you can draw a plot for Figure 11
 python3 plot.py --plot reg  --prob sp
 # 2D knapsack
 python3 plot.py --plot reg  --prob ks
-# TSP
-python3 plot.py --plot reg  --prob tsp
 ```
 
 ### MSE-Regret Trade-off (Figure 12)
