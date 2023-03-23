@@ -126,7 +126,7 @@ dmypy.json
 .pyre/
 
 # folders
-logs/*
-wandb/*
 archives/*
 res/*
+data/*
+model/*
