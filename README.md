@@ -43,11 +43,6 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 - [05 Warcraft Shortest Path](https://github.com/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb): Use the Warcraft terrains dateset to train shortest path
 
 
-## Experiments
-
-To reproduce the experiments in original paper, please use the code and follow the instruction in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
-
-
 ## Features
 
 - Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) and **PFYL** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
