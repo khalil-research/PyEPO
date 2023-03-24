@@ -21,9 +21,9 @@ from run import utils
 from run import model
 
 # fix random seed
-random.seed(135)
-np.random.seed(135)
-torch.manual_seed(135)
+random.seed(42)
+np.random.seed(42)
+torch.manual_seed(42)
 
 DATA_DIR = "./data/warcraft_maps/warcraft_shortest_path_oneskin/12x12"
 MODEL_DIR = "./model"
@@ -141,6 +141,7 @@ def train(nnet, optmodel, loader_train, loader_test, config):
                                                   sigma=config.sig, processes=config.proc)
     # init log
     regret_log = [pyepo.metric.regret(nnet, optmodel, loader_test)]
+    print(regret_log)
     # train
     tbar = tqdm(range(config.epoch))
     for epoch in tbar:
