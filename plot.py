@@ -744,6 +744,7 @@ def wcLearningCurve(regret_logs):
     # drow learning curve on test set
     fig = plt.figure(figsize=(16,6))
     for mthd in regret_logs:
+        print(regret_logs[mthd])
         plt.plot(regret_logs[mthd], color=colors[mthd], lw=3, ls=linestyles[mthd], label=mthd)
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
@@ -908,6 +909,37 @@ def wcAcc(dfs):
     plt.title("Path Accuracy for each Instance on Test Set", fontsize=36)
     # save
     dir = "./images/wc_acc.png"
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+    plt.close()
+
+
+def wcOr(dfs):
+    # colors
+    cmap = tc.tol_cmap("rainbow_discrete")(np.linspace(0, 1, 22))
+    colors = {"2S": lighten(cmap[19]),
+              "SPO+": lighten(cmap[16]),
+              "DBB": lighten(cmap[7]),
+              "DPO": lighten(cmap[10]),
+              "PFYL": lighten(cmap[5])
+              }
+    # draw boxplot of regret per instance
+    fig = plt.figure(figsize=(16,6))
+    barplot_data, barcolors = [], []
+    for mthd in dfs:
+        barplot_data.append(dfs[mthd]["Optimal"].mean())
+        barcolors.append(colors[mthd])
+    bp = plt.bar(range(len(dfs)), barplot_data, color=barcolors)
+    # grid
+    plt.grid(color="grey", alpha=0.5, linewidth=0.5, which="major", axis="y")
+    # labels and ticks
+    plt.xticks(ticks=range(len(dfs)), fontsize=24, labels=dfs.keys())
+    plt.xlabel("Methods", fontsize=36)
+    plt.ylabel("Optimality Ratio", fontsize=36)
+    plt.yticks(fontsize=24)
+    plt.title("Optimality Ratio on Test Set", fontsize=36)
+    # save
+    dir = "./images/wc_or.png"
     fig.savefig(dir, dpi=300)
     print("Saved to " + dir)
     plt.close()
@@ -1104,5 +1136,7 @@ if __name__ == "__main__":
         wcRelRegret(dfs)
         # draw boxplot of accuracy per instance
         wcAcc(dfs)
+        # draw barplot of optimality ratio per instance
+        wcOr(dfs)
 
 # python3 plot.py --plot cmp --prob sp
