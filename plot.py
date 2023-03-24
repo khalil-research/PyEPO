@@ -4,6 +4,7 @@
 Plot
 """
 
+import os
 from copy import deepcopy
 from types import SimpleNamespace
 import itertools
@@ -724,13 +725,201 @@ def tradeoffPlot(config, data, noise, deg=4):
     plt.close()
 
 
+def wcLearningCurve(regret_logs):
+    # colors
+    cmap = tc.tol_cmap("rainbow_discrete")(np.linspace(0, 1, 22))
+    colors = {"2S": lighten(cmap[19]),
+              "SPO+": lighten(cmap[16]),
+              "DBB": lighten(cmap[7]),
+              "DPO": lighten(cmap[10]),
+              "PFYL": lighten(cmap[5])
+              }
+    # linestyles
+    linestyles = {"2S": "-",
+                  "SPO+": "--",
+                  "DBB": "-.",
+                  "DPO": ":",
+                  "PFYL": (0,(3,1,1,1,1,1))
+                  }
+    # drow learning curve on test set
+    fig = plt.figure(figsize=(16,6))
+    for mthd in regret_logs:
+        plt.plot(regret_logs[mthd], color=colors[mthd], lw=3, ls=linestyles[mthd], label=mthd)
+    plt.xticks(fontsize=24)
+    plt.yticks(fontsize=24)
+    plt.xlim(-1, 51)
+    plt.ylim(-0.05, 1.95)
+    plt.xlabel("Epochs", fontsize=36)
+    plt.ylabel("Normalized Regret", fontsize=36)
+    plt.title("Learning Curve on Test Set", fontsize=36)
+    plt.legend(fontsize=22)
+    # save
+    dir = "./images/wc_lc.png"
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+    plt.close()
+
+
+def wcRegret(dfs):
+    # colors
+    cmap = tc.tol_cmap("rainbow_discrete")(np.linspace(0, 1, 22))
+    colors = {"2S": lighten(cmap[19]),
+              "SPO+": lighten(cmap[16]),
+              "DBB": lighten(cmap[7]),
+              "DPO": lighten(cmap[10]),
+              "PFYL": lighten(cmap[5])
+              }
+    # draw boxplot of regret per instance
+    fig = plt.figure(figsize=(16,6))
+    boxplot_data, boxcolors = [], []
+    for mthd in dfs:
+        boxplot_data.append(dfs[mthd]["Regret"])
+        boxcolors.append(colors[mthd])
+    bp = plt.boxplot(boxplot_data, medianprops=dict(color="dimgrey", linewidth=2), patch_artist=True, widths=0.75)
+    for i, patch in enumerate(bp["boxes"]):
+        patch.set_facecolor(boxcolors[i])
+        patch.set_color(boxcolors[i])
+        patch.set_linewidth(4)
+    for i, patch in enumerate(bp["whiskers"]):
+        patch.set_color(boxcolors[i//2])
+        patch.set_linewidth(2)
+    for i, patch in enumerate(bp["caps"]):
+        patch.set_color(boxcolors[i//2])
+        patch.set_linewidth(3)
+    for i, patch in enumerate(bp["fliers"]):
+        patch.set_marker("o")
+        patch.set_markeredgecolor(boxcolors[i])
+        patch.set_markersize(6)
+        patch.set_markeredgewidth(2)
+    for i, patch in enumerate(bp["medians"]):
+        patch.set_color("w")
+        patch.set_linewidth(2)
+    # grid
+    plt.grid(color="grey", alpha=0.5, linewidth=0.5, which="major", axis="y")
+    # labels and ticks
+    plt.xticks(ticks=range(1, len(dfs)+1), fontsize=24, labels=dfs.keys())
+    plt.xlabel("Methods", fontsize=36)
+    plt.ylabel("Regret", fontsize=36)
+    plt.yticks(fontsize=24)
+    plt.xlim(0.5, 5.5)
+    plt.ylim(-0.2, 40)
+    plt.title("Regret for each Instance on Test Set", fontsize=36)
+    # save
+    dir = "./images/wc_reg.png"
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+    plt.close()
+
+
+def wcRelRegret(dfs):
+    # colors
+    cmap = tc.tol_cmap("rainbow_discrete")(np.linspace(0, 1, 22))
+    colors = {"2S": lighten(cmap[19]),
+              "SPO+": lighten(cmap[16]),
+              "DBB": lighten(cmap[7]),
+              "DPO": lighten(cmap[10]),
+              "PFYL": lighten(cmap[5])
+              }
+    # draw boxplot of regret per instance
+    fig = plt.figure(figsize=(16,6))
+    boxplot_data, boxcolors = [], []
+    for mthd in dfs:
+        boxplot_data.append(dfs[mthd]["Relative Regret"])
+        boxcolors.append(colors[mthd])
+    bp = plt.boxplot(boxplot_data, medianprops=dict(color="dimgrey", linewidth=2), patch_artist=True, widths=0.75)
+    for i, patch in enumerate(bp["boxes"]):
+        patch.set_facecolor(boxcolors[i])
+        patch.set_color(boxcolors[i])
+        patch.set_linewidth(4)
+    for i, patch in enumerate(bp["whiskers"]):
+        patch.set_color(boxcolors[i//2])
+        patch.set_linewidth(2)
+    for i, patch in enumerate(bp["caps"]):
+        patch.set_color(boxcolors[i//2])
+        patch.set_linewidth(3)
+    for i, patch in enumerate(bp["fliers"]):
+        patch.set_marker("o")
+        patch.set_markeredgecolor(boxcolors[i])
+        patch.set_markersize(6)
+        patch.set_markeredgewidth(2)
+    for i, patch in enumerate(bp["medians"]):
+        patch.set_color("w")
+        patch.set_linewidth(2)
+    # grid
+    plt.grid(color="grey", alpha=0.5, linewidth=0.5, which="major", axis="y")
+    # labels and ticks
+    plt.xticks(ticks=range(1, len(dfs)+1), fontsize=24, labels=dfs.keys())
+    plt.xlabel("Methods", fontsize=36)
+    plt.ylabel("Regret", fontsize=36)
+    plt.yticks(fontsize=24)
+    plt.xlim(0.5, 5.5)
+    plt.ylim(-0.05, 1.8)
+    plt.title("Relative Regret for each Instance on Test Set", fontsize=36)
+    # save
+    dir = "./images/wc_relreg.png"
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+    plt.close()
+
+
+def wcAcc(dfs):
+    # colors
+    cmap = tc.tol_cmap("rainbow_discrete")(np.linspace(0, 1, 22))
+    colors = {"2S": lighten(cmap[19]),
+              "SPO+": lighten(cmap[16]),
+              "DBB": lighten(cmap[7]),
+              "DPO": lighten(cmap[10]),
+              "PFYL": lighten(cmap[5])
+              }
+    # draw boxplot of regret per instance
+    fig = plt.figure(figsize=(16,6))
+    boxplot_data, boxcolors = [], []
+    for mthd in dfs:
+        boxplot_data.append(dfs[mthd]["Accuracy"])
+        boxcolors.append(colors[mthd])
+    bp = plt.boxplot(boxplot_data, medianprops=dict(color="dimgrey", linewidth=2), patch_artist=True, widths=0.75)
+    for i, patch in enumerate(bp["boxes"]):
+        patch.set_facecolor(boxcolors[i])
+        patch.set_color(boxcolors[i])
+        patch.set_linewidth(4)
+    for i, patch in enumerate(bp["whiskers"]):
+        patch.set_color(boxcolors[i//2])
+        patch.set_linewidth(2)
+    for i, patch in enumerate(bp["caps"]):
+        patch.set_color(boxcolors[i//2])
+        patch.set_linewidth(3)
+    for i, patch in enumerate(bp["fliers"]):
+        patch.set_marker("o")
+        patch.set_markeredgecolor(boxcolors[i])
+        patch.set_markersize(6)
+        patch.set_markeredgewidth(2)
+    for i, patch in enumerate(bp["medians"]):
+        patch.set_color("w")
+        patch.set_linewidth(2)
+    # grid
+    plt.grid(color="grey", alpha=0.5, linewidth=0.5, which="major", axis="y")
+    # labels and ticks
+    plt.xticks(ticks=range(1, len(dfs)+1), fontsize=24, labels=dfs.keys())
+    plt.xlabel("Methods", fontsize=36)
+    plt.ylabel("Regret", fontsize=36)
+    plt.yticks(fontsize=24)
+    plt.xlim(0.5, 5.5)
+    plt.ylim(0.6, 1.02)
+    plt.title("Path Accuracy for each Instance on Test Set", fontsize=36)
+    # save
+    dir = "./images/wc_acc.png"
+    fig.savefig(dir, dpi=300)
+    print("Saved to " + dir)
+    plt.close()
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--plot",
                         type=str,
-                        choices=["cmp", "rel", "reg", "trd", "scl"],
+                        choices=["cmp", "rel", "reg", "trd", "wc"],
                         help="figure type")
     parser.add_argument("--prob",
                         type=str,
@@ -881,5 +1070,39 @@ if __name__ == "__main__":
         # plot
         for data, noise in itertools.product(*tuple(confset.values())):
             tradeoffPlot(config, data, noise)
+
+    ############################################################################
+    # Warcraft
+    if setting.plot == "wc":
+        # load res
+        regret_logs, dfs = {}, {}
+        # 2s
+        if os.path.isfile("./res/wc_2s.csv"):
+            dfs["2S"] = pd.read_csv("./res/wc_2s.csv")
+            regret_logs["2S"] = pd.read_csv("./res/log_2s.csv")
+        # spo+
+        if os.path.isfile("./res/wc_spo.csv"):
+            dfs["SPO+"] = pd.read_csv("./res/wc_spo.csv")
+            regret_logs["SPO+"] = pd.read_csv("./res/log_spo.csv")
+        # dbb
+        if os.path.isfile("./res/wc_dbb.csv"):
+            dfs["DBB"] = pd.read_csv("./res/wc_dbb.csv")
+            regret_logs["DBB"] = pd.read_csv("./res/log_dbb.csv")
+        # dpo
+        if os.path.isfile("./res/wc_dpo.csv"):
+            dfs["DPO"] = pd.read_csv("./res/wc_dpo.csv")
+            regret_logs["DPO"] = pd.read_csv("./res/log_dpo.csv")
+        # pfyl
+        if os.path.isfile("./res/wc_pfyl.csv"):
+            dfs["PFYL"] = pd.read_csv("./res/wc_pfyl.csv")
+            regret_logs["PFYL"] = pd.read_csv("./res/log_pfyl.csv")
+        # drow learning curve on test set
+        wcLearningCurve(regret_logs)
+        # draw boxplot of regret per instance
+        wcRegret(dfs)
+        # draw boxplot of relative regret per instance
+        wcRelRegret(dfs)
+        # draw boxplot of accuracy per instance
+        wcAcc(dfs)
 
 # python3 plot.py --plot cmp --prob sp
