@@ -141,7 +141,6 @@ def train(nnet, optmodel, loader_train, loader_test, config):
                                                   sigma=config.sig, processes=config.proc)
     # init log
     regret_log = [pyepo.metric.regret(nnet, optmodel, loader_test)]
-    print(regret_log)
     # train
     tbar = tqdm(range(config.epoch))
     for epoch in tbar:
