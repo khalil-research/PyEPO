@@ -68,7 +68,7 @@ def pipeline(config):
     print("Save model to " + model_path + ".")
     torch.save(nnet.state_dict(), model_path)
     # save log
-    log_path = MODEL_DIR + "/log_{}.csv".format(config.mthd)
+    log_path = RES_DIR + "/log_{}.csv".format(config.mthd)
     print("Save log to " + log_path + ".")
     np.savetxt(log_path, regret_log, delimiter =", ", fmt ='% s')
     print()
