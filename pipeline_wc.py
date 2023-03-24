@@ -46,7 +46,7 @@ def pipeline(config):
     # dbb
     if config.mthd == "dbb":
         print("Running experiments for differentiable balck-box optimizer:")
-    # travelling salesman
+    # dpo
     if config.mthd == "dpo":
         print("Running experiments for differentiable perturbed optimizer:")
     print()
