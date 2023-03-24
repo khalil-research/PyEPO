@@ -1115,6 +1115,10 @@ if __name__ == "__main__":
         if os.path.isfile("./res/wc_spo.csv"):
             dfs["SPO+"] = pd.read_csv("./res/wc_spo.csv")
             regret_logs["SPO+"] = pd.read_csv("./res/log_spo.csv", header=None)
+        # pfyl
+        if os.path.isfile("./res/wc_pfyl.csv"):
+            dfs["PFYL"] = pd.read_csv("./res/wc_pfyl.csv")
+            regret_logs["PFYL"] = pd.read_csv("./res/log_pfyl.csv", header=None)
         # dbb
         if os.path.isfile("./res/wc_dbb.csv"):
             dfs["DBB"] = pd.read_csv("./res/wc_dbb.csv")
@@ -1123,10 +1127,6 @@ if __name__ == "__main__":
         if os.path.isfile("./res/wc_dpo.csv"):
             dfs["DPO"] = pd.read_csv("./res/wc_dpo.csv")
             regret_logs["DPO"] = pd.read_csv("./res/log_dpo.csv", header=None)
-        # pfyl
-        if os.path.isfile("./res/wc_pfyl.csv"):
-            dfs["PFYL"] = pd.read_csv("./res/wc_pfyl.csv")
-            regret_logs["PFYL"] = pd.read_csv("./res/log_pfyl.csv", header=None)
         # drow learning curve on test set
         wcLearningCurve(regret_logs)
         # draw boxplot of regret per instance
