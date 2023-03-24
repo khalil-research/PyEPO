@@ -261,14 +261,16 @@ We employ a truncated ResNet18 for an image dataset, Warcraft terrain map to fin
 Then, we can train the convolutional neural network.
 
 ```bash
+# 2-stage
+python3 pipeline_wc.py --mthd 2s
 # SPO+
 python3 pipeline_wc.py --mthd spo
 # PFYL
-python3 pipeline_wc.py --mthd pfyl
+python pipeline_wc.py --mthd pfyl
 # DBB
-python3 pipeline_wc.py --mthd dbb
+python pipeline_wc.py --mthd dbb --lr 1e-5
 # dpo
-python3 pipeline_wc.py --mthd dbb
+python pipeline_wc.py --mthd dpo
 ```
 
 To draw performance comparison plots:
