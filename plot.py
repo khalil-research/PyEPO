@@ -937,7 +937,7 @@ def wcOr(dfs):
     plt.xlabel("Methods", fontsize=36)
     plt.ylabel("Optimality Ratio", fontsize=36)
     plt.yticks(fontsize=24)
-    plt.title("Optimality Ratio on Test Set", fontsize=36)
+    plt.title("Ratio of the Optimality on Test Set", fontsize=36)
     # save
     dir = "./images/wc_or.png"
     fig.savefig(dir, dpi=300)
