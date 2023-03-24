@@ -62,10 +62,15 @@ def pipeline(config):
     print()
     # train
     print("Start Training...")
-    train(nnet, optmodel, loader_train, loader_test, config)
+    regret_log = train(nnet, optmodel, loader_train, loader_test, config)
+    # save model
     model_path = MODEL_DIR + "/resnet_{}.pt".format(config.mthd)
     print("Save model to " + model_path + ".")
     torch.save(nnet.state_dict(), model_path)
+    # save log
+    log_path = MODEL_DIR + "/log_{}.csv".format(config.mthd)
+    print("Save log to " + log_path + ".")
+    np.savetxt(log_path, regret_log, delimiter =", ", fmt ='% s')
     print()
     # evaluate
     print("Evaluating...")
@@ -172,6 +177,7 @@ def train(nnet, optmodel, loader_train, loader_test, config):
             # log regret
             regret = pyepo.metric.regret(nnet, optmodel, loader_test) # regret on test
             regret_log.append(regret)
+    return regret_log
 
 
 def evaluate(nnet, optmodel, dataloader):
