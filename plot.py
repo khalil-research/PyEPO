@@ -748,7 +748,7 @@ def wcLearningCurve(regret_logs):
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
     plt.xlim(-1, 51)
-    plt.ylim(-0.05, 1.95)
+    plt.ylim(-0.05, 0.85)
     plt.xlabel("Epochs", fontsize=36)
     plt.ylabel("Normalized Regret", fontsize=36)
     plt.title("Learning Curve on Test Set", fontsize=36)
