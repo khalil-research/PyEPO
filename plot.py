@@ -744,7 +744,6 @@ def wcLearningCurve(regret_logs):
     # drow learning curve on test set
     fig = plt.figure(figsize=(16,6))
     for mthd in regret_logs:
-        print(regret_logs[mthd])
         plt.plot(regret_logs[mthd], color=colors[mthd], lw=3, ls=linestyles[mthd], label=mthd)
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
@@ -1111,23 +1110,23 @@ if __name__ == "__main__":
         # 2s
         if os.path.isfile("./res/wc_2s.csv"):
             dfs["2S"] = pd.read_csv("./res/wc_2s.csv")
-            regret_logs["2S"] = pd.read_csv("./res/log_2s.csv")
+            regret_logs["2S"] = pd.read_csv("./res/log_2s.csv", header=None)
         # spo+
         if os.path.isfile("./res/wc_spo.csv"):
             dfs["SPO+"] = pd.read_csv("./res/wc_spo.csv")
-            regret_logs["SPO+"] = pd.read_csv("./res/log_spo.csv")
+            regret_logs["SPO+"] = pd.read_csv("./res/log_spo.csv", header=None)
         # dbb
         if os.path.isfile("./res/wc_dbb.csv"):
             dfs["DBB"] = pd.read_csv("./res/wc_dbb.csv")
-            regret_logs["DBB"] = pd.read_csv("./res/log_dbb.csv")
+            regret_logs["DBB"] = pd.read_csv("./res/log_dbb.csv", header=None)
         # dpo
         if os.path.isfile("./res/wc_dpo.csv"):
             dfs["DPO"] = pd.read_csv("./res/wc_dpo.csv")
-            regret_logs["DPO"] = pd.read_csv("./res/log_dpo.csv")
+            regret_logs["DPO"] = pd.read_csv("./res/log_dpo.csv", header=None)
         # pfyl
         if os.path.isfile("./res/wc_pfyl.csv"):
             dfs["PFYL"] = pd.read_csv("./res/wc_pfyl.csv")
-            regret_logs["PFYL"] = pd.read_csv("./res/log_pfyl.csv")
+            regret_logs["PFYL"] = pd.read_csv("./res/log_pfyl.csv", header=None)
         # drow learning curve on test set
         wcLearningCurve(regret_logs)
         # draw boxplot of regret per instance
