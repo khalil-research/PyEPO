@@ -850,7 +850,7 @@ def wcRelRegret(dfs):
     # labels and ticks
     plt.xticks(ticks=range(1, len(dfs)+1), fontsize=24, labels=dfs.keys())
     plt.xlabel("Methods", fontsize=36)
-    plt.ylabel("Regret", fontsize=36)
+    plt.ylabel("Relative Regret", fontsize=36)
     plt.yticks(fontsize=24)
     plt.xlim(0.5, 5.5)
     plt.ylim(-0.05, 1.8)
@@ -901,7 +901,7 @@ def wcAcc(dfs):
     # labels and ticks
     plt.xticks(ticks=range(1, len(dfs)+1), fontsize=24, labels=dfs.keys())
     plt.xlabel("Methods", fontsize=36)
-    plt.ylabel("Regret", fontsize=36)
+    plt.ylabel("Path Accuracy", fontsize=36)
     plt.yticks(fontsize=24)
     plt.xlim(0.5, 5.5)
     plt.ylim(0.6, 1.02)
@@ -934,7 +934,7 @@ def wcOr(dfs):
     # labels and ticks
     plt.xticks(ticks=range(len(dfs)), fontsize=24, labels=dfs.keys())
     plt.xlabel("Methods", fontsize=36)
-    plt.ylabel("Optimality Ratio", fontsize=36)
+    plt.ylabel("Ratio of the Optimality", fontsize=36)
     plt.yticks(fontsize=24)
     plt.title("Ratio of the Optimality on Test Set", fontsize=36)
     # save
