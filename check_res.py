@@ -18,10 +18,13 @@ for f in tqdm(files):
     if len(res) != 10:
         imcomp_list.append(f)
 
-# pint-out
+# print out
+cnt = 0
 if len(imcomp_list) == 0:
     print("No Incomplete Result.")
 else:
     print("Incomplete Results:")
     for f in imcomp_list:
         print(f)
+        cnt += 1
+    print("{} imcomplete results files.".format(cnt))
