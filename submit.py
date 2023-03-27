@@ -34,6 +34,9 @@ parser.add_argument("--tspform",
 parser.add_argument("--rel",
                     action="store_true",
                     help="train with relaxation model")
+parser.add_argument("--scal",
+                    action="store_true",
+                    help="rescale prediction")
 parser.add_argument("--l1",
                     action="store_true",
                     help="L1 regularization")
@@ -60,6 +63,7 @@ if setting.mthd in ["auto", "lr", "rf"]:
     config.mthd = "2s"
     config.pred = setting.mthd
 config.rel = setting.rel
+config.scal = setting.scal
 config.sftp = setting.sftp
 
 # job submission parameters

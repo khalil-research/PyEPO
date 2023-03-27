@@ -75,7 +75,7 @@ def pipeline(config):
         print("Time elapsed: {:.4f} sec".format(elapsed))
         print()
         # evaluate
-        truespo, unambspo, mse = eval(testset, res, model, config)
+        truespo, unambspo, mse = eval(trainset, testset, res, model, config)
         # save
         epoch = 0 if config.mthd == "2s" else config.epoch
         row = {"True SPO":truespo, "Unamb SPO":unambspo, "MSE":mse,
@@ -118,6 +118,9 @@ if __name__ == "__main__":
     parser.add_argument("--rel",
                         action="store_true",
                         help="train with relaxation model")
+    parser.add_argument("--scal",
+                        action="store_true",
+                        help="rescale prediction")
     parser.add_argument("--pred",
                         type=str,
                         default="lr",

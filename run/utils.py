@@ -78,6 +78,8 @@ def getSavePath(config):
         # softplus
         if config.sftp:
             filename += "-sf"
+        if config.scal:
+            filename += "-scal"
     return path + "/" + filename + ".csv"
 
 
