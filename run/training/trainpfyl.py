@@ -37,8 +37,8 @@ def trainPFYL(reg, model, optimizer, trainloader, testloader=None, logdir="./log
         log (int): step size of evlaution and log
     """
     # create log folder
-    if not os.path.isdir(logdir):
-        os.makedirs(logdir, exist_ok=True)
+    #if not os.path.isdir(logdir):
+    #    os.makedirs(logdir, exist_ok=True)
     # use training data for test if no test data
     if testloader is None:
         testloader = trainloader
