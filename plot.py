@@ -742,7 +742,7 @@ def wcLearningCurve(regret_logs):
                   "PFYL": (0,(3,1,1,1,1,1))
                   }
     # drow learning curve on test set
-    fig = plt.figure(figsize=(16,6))
+    fig = plt.figure(figsize=(10,6))
     for mthd in regret_logs:
         plt.plot(regret_logs[mthd], color=colors[mthd], lw=3, ls=linestyles[mthd], label=mthd)
     plt.xticks(fontsize=24)
@@ -770,7 +770,7 @@ def wcRegret(dfs):
               "PFYL": lighten(cmap[5])
               }
     # draw boxplot of regret per instance
-    fig = plt.figure(figsize=(16,6))
+    fig = plt.figure(figsize=(10,6))
     boxplot_data, boxcolors = [], []
     for mthd in dfs:
         boxplot_data.append(dfs[mthd]["Regret"])
@@ -821,7 +821,7 @@ def wcRelRegret(dfs):
               "PFYL": lighten(cmap[5])
               }
     # draw boxplot of regret per instance
-    fig = plt.figure(figsize=(16,6))
+    fig = plt.figure(figsize=(10,6))
     boxplot_data, boxcolors = [], []
     for mthd in dfs:
         boxplot_data.append(dfs[mthd]["Relative Regret"])
@@ -872,7 +872,7 @@ def wcAcc(dfs):
               "PFYL": lighten(cmap[5])
               }
     # draw boxplot of regret per instance
-    fig = plt.figure(figsize=(16,6))
+    fig = plt.figure(figsize=(10,6))
     boxplot_data, boxcolors = [], []
     for mthd in dfs:
         boxplot_data.append(dfs[mthd]["Accuracy"])
@@ -923,7 +923,7 @@ def wcOr(dfs):
               "PFYL": lighten(cmap[5])
               }
     # draw boxplot of regret per instance
-    fig = plt.figure(figsize=(16,6))
+    fig = plt.figure(figsize=(10,6))
     barplot_data, barcolors = [], []
     for mthd in dfs:
         barplot_data.append(dfs[mthd]["Optimal"].mean())
