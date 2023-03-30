@@ -52,10 +52,10 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 
 ## Installation
 
-You can download ``PyEPO`` from our GitHub repository.
+You can download ``PyEPO`` MPC branch from our GitHub repository.
 
 ```bash
-git clone https://github.com/khalil-research/PyEPO.git
+git clone --branch MPC https://github.com/khalil-research/PyEPO.git
 ```
 
 And install it.
