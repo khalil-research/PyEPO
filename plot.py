@@ -77,8 +77,10 @@ def getElapsed(config):
 
 
 def getRow(config, params, reg):
-    regrets = {"spo":pd.DataFrame(), "pfyl":pd.DataFrame(), "dbb":pd.DataFrame()}
-    mses = {"spo":pd.DataFrame(), "pfyl":pd.DataFrame(), "dbb":pd.DataFrame()}
+    regrets = {"spo":pd.DataFrame(), "pfyl":pd.DataFrame(),
+               "dbb":pd.DataFrame(), "lr":pd.DataFrame()}
+    mses = {"spo":pd.DataFrame(), "pfyl":pd.DataFrame(),
+            "dbb":pd.DataFrame(), "lr":pd.DataFrame()}
     # go through different l1/l2 param
     for param in params:
         # add reg term
@@ -517,8 +519,14 @@ def regPlot(config, data, deg, noise, reg):
         c.data = data
         c.noise = noise
         c.deg = deg
-        # get prob name
         prob = c.prob
+    # get prob name
+    if prob == "sp":
+        prob_name = "Shortest Path"
+    if prob == "ks":
+        prob_name = "2D Knapsack"
+    if prob == "tsp":
+        prob_name = "TSP"
     # l1/l2 params
     params = [0.0, 1e-3, 1e-2, 1e-1, 1e0, 1e1]
     # get rows
@@ -535,6 +543,9 @@ def regPlot(config, data, deg, noise, reg):
     fig = plt.figure(figsize=(32, 8))
     # regret
     ax1 = plt.subplot(121)
+    # lr line
+    c = colors[0]
+    line = plt.plot(range(-1, 7), [regrets["lr"][0.0].mean()]*8, linewidth=4, color=c, linestyle="--")
     # line
     c = colors[2]
     plt.plot(x-0.24, regrets["spo"].mean(), linewidth=3, color=c)
@@ -570,6 +581,7 @@ def regPlot(config, data, deg, noise, reg):
                       capprops=dict(color=c, linewidth=4),
                       flierprops=dict(markeredgecolor=c, marker="o", markersize=8, markeredgewidth=3),
                       patch_artist=True, positions=np.arange(regrets["dbb"].shape[1])+0.24, widths=0.06)
+    #===========================================================================================================================
     # vertical line
     plt.axvline(x=0.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
     plt.axvline(x=1.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
@@ -582,10 +594,15 @@ def regPlot(config, data, deg, noise, reg):
     plt.xticks(x, labels=params, fontsize=44)
     plt.yticks(fontsize=40)
     plt.ylabel("Normalized Regret", fontsize=60)
-    plt.legend([bp1["boxes"][0], bp2["boxes"][0], bp3["boxes"][0]], ["SPO+", "PFYL", "DBB"], fontsize=40, ncol=2, loc=1)
+    plt.legend([bp1["boxes"][0], bp2["boxes"][0], bp3["boxes"][0], line[0]],
+               ["SPO+", "PFYL", "DBB", "2-Stage LR"],
+               fontsize=40, ncol=2, loc=1)
     plt.title("", fontsize=48)
     # mse
     ax1 = plt.subplot(122)
+    # lr line
+    c = colors[0]
+    line = plt.plot(range(-1, 7), [mses["lr"][0.0].mean()]*8, linewidth=4, color=c, linestyle="--")
     # line
     c = colors[2]
     plt.plot(x-0.24, mses["spo"].mean(), linewidth=3, color=c)
@@ -621,6 +638,7 @@ def regPlot(config, data, deg, noise, reg):
                       capprops=dict(color=c, linewidth=4),
                       flierprops=dict(markeredgecolor=c, marker="o", markersize=8, markeredgewidth=3),
                       patch_artist=True, positions=np.arange(mses["dbb"].shape[1])+0.24, widths=0.06)
+    #===========================================================================================================================
     # vertical line
     plt.axvline(x=0.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
     plt.axvline(x=1.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
@@ -629,27 +647,33 @@ def regPlot(config, data, deg, noise, reg):
     plt.axvline(x=4.5, color="k", linestyle="--", linewidth=1, alpha=0.75)
     # labels and ticks
     plt.xlim(-0.5, 5.5)
-    plt.ylim(0, 59)
+    if prob == "sp":
+        plt.ylim(-1, 23)
+    if prob == "ks":
+        plt.ylim(-2, 59)
     plt.xticks(x, labels=params, fontsize=44)
     plt.yticks(fontsize=40)
     plt.ylabel("MSE", fontsize=54)
-    plt.legend([bp1["boxes"][0], bp2["boxes"][0], bp3["boxes"][0]], ["SPO+", "PFYL", "DBB"], fontsize=40, ncol=2, loc=1)
+    plt.legend([bp1["boxes"][0], bp2["boxes"][0], bp3["boxes"][0], line[0]],
+               ["SPO+", "PFYL", "DBB", "2-Stage LR"],
+               fontsize=40, ncol=2, loc=1)
+    # title
     plt.title("", fontsize=48)
     if reg == "l1":
         # xlabel
         fig.text(0.5, -0.02, "L1 Parameter", ha="center", va="center", fontsize=60)
         # title
-        plt.suptitle("Test Loss on 2D Knapsack with L1 Regularization \
+        plt.suptitle("Test Loss on {} with L1 Regularization \
                      \nTraining Set Size = {}, Polynomial Degree = {}, Noise Half−width = {}".
-                     format(data, deg, noise),
+                     format(prob_name, data, deg, noise),
                      y=1.1, fontsize=60)
     if reg == "l2":
         # xlabel
         fig.text(0.5, -0.02, "L2 Parameter", ha="center", va="center", fontsize=60)
         # title
-        plt.suptitle("Test Loss on 2D Knapsack with L2 Regularization \
+        plt.suptitle("Test Loss on {} with L2 Regularization \
                      \nTraining Set Size = {}, Polynomial Degree = {}, Noise Half−width = {}".
-                     format(data, deg, noise),
+                     format(prob_name, data, deg, noise),
                      y=1.1, fontsize=60)
     # xlabel
     if reg == "l1":
@@ -1043,7 +1067,6 @@ if __name__ == "__main__":
         # get config
         config = getConfig(setting.prob)
         # delete 2s
-        del config["lr"]
         del config["rf"]
         del config["auto"]
         # delete dpo
