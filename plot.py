@@ -25,13 +25,13 @@ from config import configs
 
 def getConfig(prob):
     config = {}
-    config["lr"]   = configs[prob]["lr"]
-    config["rf"]   = configs[prob]["rf"]
     config["auto"] = configs[prob]["auto"]
-    config["spo"]  = configs[prob]["spo"]
+    config["rf"]   = configs[prob]["rf"]
     config["pfyl"] = configs[prob]["pfyl"]
+    config["spo"]  = configs[prob]["spo"]
     config["dbb"]  = configs[prob]["dbb"]
     config["dpo"]  = configs[prob]["dpo"]
+    config["lr"]   = configs[prob]["lr"]
     return config
 
 
@@ -119,7 +119,21 @@ def lighten(color, amount=0.9):
     except:
         c = color
     c = np.array(colorsys.rgb_to_hls(*mc.to_rgb(c)))
-    return colorsys.hls_to_rgb(c[0],1-amount * (1-c[1]),c[2])
+    return colorsys.hls_to_rgb(c[0], 1-amount*(1-c[1]), c[2])
+
+
+def darken(color, amount=0.9):
+    """
+    Darkens the given color by multiplying (1-luminosity) by the given amount.
+    """
+    import matplotlib.colors as mc
+    import colorsys
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = np.array(colorsys.rgb_to_hls(*mc.to_rgb(c)))
+    return colorsys.hls_to_rgb(c[0], amount*c[1], c[2])
 
 
 def comparisonPlot(config, data, noise):
@@ -714,6 +728,22 @@ def tradeoffPlot(config, data, noise, deg=4):
               "dbb rel":lighten(cmap[9]),
               "dbb rel(gg)":lighten(cmap[8]),
               "dbb rel(mtz)":lighten(cmap[9])}
+    names =  {"lr":"2-stage LR",
+              "rf":"2-stage RF",
+              "auto":"2-stage Auto",
+              "spo":"SPO+",
+              "spo rel":"SPO+ Rel",
+              "spo rel(gg)":"SPO+ Rel(GG)",
+              "spo rel(mtz)":"SPO+ Rel(MTZ)",
+              "pfyl":"PFYL",
+              "pfyl rel":"PFYL Rel",
+              "pfyl rel(gg)":"PFYL Rel(GG)",
+              "pfyl rel(mtz)":"PFYL Rel(MTZ)",
+              "dbb":"DBB",
+              "dbb rel":"DBB Rel",
+              "dbb rel(gg)":"DBB Rel(GG)",
+              "dbb rel(mtz)":"DBB Rel(GG)",
+              }
     w = colorConverter.to_rgba("w", alpha=0.6) # white
     k = colorConverter.to_rgba("k", alpha=0.5) # black
     # get df
@@ -726,19 +756,27 @@ def tradeoffPlot(config, data, noise, deg=4):
     # init xmax & ymax & ymin
     xmax, ymax = 0, 0
     for mthd in dfs:
-        df, c = dfs[mthd], colorConverter.to_rgba(colors[mthd], alpha=0.75)
+        df, c = dfs[mthd], colorConverter.to_rgba(colors[mthd], alpha=1.0)
         x, y = df["MSE"].mean(), df["True SPO"].mean()
         xmax, ymax = max(x, xmax), max(y, ymax)
-        size = int((np.log(df["Elapsed"].mean())+3)*1500)
+        size = max(int(df["Elapsed"].mean() * 50), 50)
         ax.scatter(x, y, s=size, color=c, marker="o")
         # annotate
-        txt = ax.annotate(mthd+" :{:.2f} Sec".format(df["Elapsed"].mean()), (x,y), fontsize=20, color=colors[mthd])
-        txt.set_path_effects([path_effects.withStroke(linewidth=0.75, foreground='k')])
+        if (names[mthd] == "SPO+ Rel") or (names[mthd] == "SPO+ Rel(MTZ)") or \
+           (names[mthd] == "PFYL") or (names[mthd] == "PFYL Rel(GG)") or \
+           (names[mthd] == "2-stage Auto"):
+            txt = ax.annotate(names[mthd]+":{:.2f} Sec".format(df["Elapsed"].mean()), (x,y),
+                              fontsize=24, color=darken(colors[mthd], 0.8), weight="black")
+        else:
+            txt = ax.annotate(names[mthd]+":{:.2f} Sec".format(df["Elapsed"].mean()), (x,y),
+                              fontsize=24, color=darken(colors[mthd]), weight="black")
+        txt.set_path_effects([path_effects.withStroke(linewidth=0.25, foreground=k),
+                              path_effects.Normal()])
     plt.xlabel("Mean Squared Error", fontsize=36)
     plt.xticks(fontsize=24)
     plt.ylabel("Normalized Regret", fontsize=36)
     plt.yticks(fontsize=24)
-    plt.xlim(0.0, xmax*1.1)
+    plt.xlim(-1.0, xmax*1.1)
     plt.ylim(0.05, ymax*1.1)
     plt.title("Training Set Size = {}, Polynomial degree = {}, Noise Half−width = {}" \
               .format(data, deg, noise), fontsize=24)
