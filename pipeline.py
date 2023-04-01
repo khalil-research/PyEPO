@@ -197,7 +197,7 @@ if __name__ == "__main__":
                         help="dimension for knapsack")
     parser.add_argument("--cap",
                         type=int,
-                        default=30,
+                        default=20,
                         help="capacity for knapsack")
     # tsp
     parser.add_argument("--nodes",
