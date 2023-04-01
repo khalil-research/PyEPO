@@ -189,7 +189,7 @@ if __name__ == "__main__":
     # knapsack
     parser.add_argument("--item",
                         type=int,
-                        default=48,
+                        default=32,
                         help="number of items for knapsack")
     parser.add_argument("--dim",
                         type=int,
