@@ -71,8 +71,8 @@ instance_logs_path = "slurm_logs_spotest"
 # time
 timeout_min = config.timeout * config.expnum
 # mem & cpu
-mem_gb = 16
-num_cpus = 16
+mem_gb = 32
+num_cpus = 32
 
 # something to avoid crush
 import os
