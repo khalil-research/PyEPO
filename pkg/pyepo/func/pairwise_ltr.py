@@ -22,7 +22,7 @@ class PairwiseLTR(nn.Module):
         which measures the difference in how the predicted cost vector and the true cost vector rank a pool
         of feasible solutions.
 
-        For the pairwise learning to rank loss, the constraints are known and fixed,
+        For the listwise learning to rank loss, the constraints are known and fixed,
         but the cost vector needs to be predicted from contextual data.
     """
 
