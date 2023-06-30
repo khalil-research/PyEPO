@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Pairwise Learning To Rank Loss function
+Pointwise Learning To Rank Loss function
 """
 
 import multiprocessing as mp
@@ -16,13 +16,13 @@ from pyepo.model.opt import optModel
 from pyepo.utlis import getArgs
 
 
-class PairwiseLTR(nn.Module):
+class PointwiseLTR(nn.Module):
     """
-        An autograd module for the pairwise learning to rank loss,
+        An autograd module for the pointwise learning to rank loss,
         which measures the difference in how the predicted cost vector and the true cost vector rank a pool
         of feasible solutions.
 
-        For the pairwise learning to rank loss, the constraints are known and fixed,
+        For the pointwise learning to rank loss, the constraints are known and fixed,
         but the cost vector needs to be predicted from contextual data.
     """
 
@@ -71,17 +71,11 @@ class PairwiseLTR(nn.Module):
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
 
-        loss = 0
-        relu = nn.ReLU()
-        for i in range(len(pred_cost)):
-            solpool_obj_c_i = torch.matmul(true_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
-            solpool_obj_cp_i = torch.matmul(pred_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
-            _, indices = np.unique((self.optmodel.modelSense * solpool_obj_c_i).detach().numpy(), return_index=True)
-            big_ind = [indices[0] for _ in range(len(indices) - 1)]
-            small_ind = [indices[p + 1] for p in range(len(indices) - 1)]
-            loss += relu(self.optmodel.modelSense * (solpool_obj_cp_i[big_ind] - solpool_obj_cp_i[small_ind])).mean()
+        solpool_obj_c = torch.matmul(true_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
+        solpool_obj_cp = torch.matmul(pred_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
+        loss = (solpool_obj_c - solpool_obj_cp).square().mean()
 
-        return loss/len(pred_cost)
+        return loss
 
 def _solve_in_forward(cp, optmodel, processes, pool):
     """
