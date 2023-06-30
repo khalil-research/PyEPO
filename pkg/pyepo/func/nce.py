@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Pairwise Learning To Rank Loss function
+Noise Contrastive Estimation Loss function
 """
 
 import multiprocessing as mp
@@ -16,13 +16,11 @@ from pyepo.model.opt import optModel
 from pyepo.utlis import getArgs
 
 
-class PairwiseLTR(nn.Module):
+class NCE(nn.Module):
     """
-        An autograd module for the pairwise learning to rank loss,
-        which measures the difference in how the predicted cost vector and the true cost vector rank a pool
-        of feasible solutions.
+        An autograd module for the noise contrastive estimation loss.
 
-        For the pairwise learning to rank loss, the constraints are known and fixed,
+        For the noise contrastive estimation learning to rank loss, the constraints are known and fixed,
         but the cost vector needs to be predicted from contextual data.
     """
 
@@ -60,7 +58,7 @@ class PairwiseLTR(nn.Module):
             raise TypeError("dataset is not an optDataset")
         self.solpool = dataset.sols.copy()
 
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost, true_sol):
         """
         Forward pass
         """
@@ -72,16 +70,12 @@ class PairwiseLTR(nn.Module):
             self.solpool = np.concatenate((self.solpool, sol))
 
         loss = 0
-        relu = nn.ReLU()
         for i in range(len(pred_cost)):
-            solpool_obj_c_i = torch.matmul(true_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
+            obj_cp_i = torch.matmul(pred_cost[i], true_sol[i])
             solpool_obj_cp_i = torch.matmul(pred_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
-            _, indices = np.unique((self.optmodel.modelSense * solpool_obj_c_i).detach().numpy(), return_index=True)
-            big_ind = [indices[0] for _ in range(len(indices) - 1)]
-            small_ind = [indices[p + 1] for p in range(len(indices) - 1)]
-            loss += relu(self.optmodel.modelSense * (solpool_obj_cp_i[big_ind] - solpool_obj_cp_i[small_ind])).mean()
+            loss += self.optmodel.modelSense * (obj_cp_i - solpool_obj_cp_i).sum()
 
-        return loss/len(pred_cost)
+        return loss / (len(pred_cost)*len(self.solpool))
 
 def _solve_in_forward(cp, optmodel, processes, pool):
     """
