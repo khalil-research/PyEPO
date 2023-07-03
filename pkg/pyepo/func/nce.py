@@ -20,7 +20,7 @@ class NCE(nn.Module):
     """
         An autograd module for the noise contrastive estimation loss.
 
-        For the noise contrastive estimation learning to rank loss, the constraints are known and fixed,
+        For the noise contrastive loss, the constraints are known and fixed,
         but the cost vector needs to be predicted from contextual data.
     """
 
@@ -76,6 +76,7 @@ class NCE(nn.Module):
             loss += self.optmodel.modelSense * (obj_cp_i - solpool_obj_cp_i).sum()
 
         return loss / (len(pred_cost)*len(self.solpool))
+
 
 def _solve_in_forward(cp, optmodel, processes, pool):
     """
