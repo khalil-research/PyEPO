@@ -84,15 +84,18 @@ class listwiseLTR(learningToRank):
         """
         Forward pass
         """
+        # get device
+        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
+        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
-        solpool_obj_c = torch.matmul(true_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
-        solpool_obj_cp = torch.matmul(pred_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
+        solpool_obj_c = torch.matmul(true_cost, solpool.T)
+        solpool_obj_cp = torch.matmul(pred_cost, solpool.T)
         loss = -(F.log_softmax(-self.optmodel.modelSense * solpool_obj_cp, dim=1) *
                   F.softmax(-self.optmodel.modelSense * solpool_obj_c, dim=1))
         # reduction
@@ -128,18 +131,21 @@ class pairwiseLTR(learningToRank):
         """
         Forward pass
         """
+        # get device
+        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
+        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
         loss = 0
         relu = nn.ReLU()
         for i in range(len(pred_cost)):
-            solpool_obj_c_i = torch.matmul(true_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
-            solpool_obj_cp_i = torch.matmul(pred_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
+            solpool_obj_c_i = torch.matmul(true_cost[i], solpool.T)
+            solpool_obj_cp_i = torch.matmul(pred_cost[i], solpool.T)
             _, indices = np.unique((self.optmodel.modelSense * solpool_obj_c_i).detach().numpy(), return_index=True)
             big_ind = [indices[0] for _ in range(len(indices) - 1)]
             small_ind = [indices[p + 1] for p in range(len(indices) - 1)]
@@ -178,15 +184,18 @@ class pointwiseLTR(learningToRank):
         """
         Forward pass
         """
+        # get device
+        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
+        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
-        solpool_obj_c = torch.matmul(true_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
-        solpool_obj_cp = torch.matmul(pred_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
+        solpool_obj_c = torch.matmul(true_cost, solpool.T)
+        solpool_obj_cp = torch.matmul(pred_cost, solpool.T)
         loss = (solpool_obj_c - solpool_obj_cp).square()
         # reduction
         if reduction == "mean":
