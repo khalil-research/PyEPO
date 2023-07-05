@@ -69,13 +69,22 @@ class SPOPlus(nn.Module):
         # build carterion
         self.spop = SPOPlusFunc()
 
-    def forward(self, pred_cost, true_cost, true_sol, true_obj):
+    def forward(self, pred_cost, true_cost, true_sol, true_obj, reduction="mean"):
         """
         Forward pass
         """
         loss = self.spop.apply(pred_cost, true_cost, true_sol, true_obj,
                                self.optmodel, self.processes, self.pool,
                                self.solve_ratio, self)
+        # reduction
+        if reduction == "mean":
+            loss = torch.mean(loss)
+        elif reduction == "sum":
+            loss = torch.sum(loss)
+        elif reduction == "none":
+            loss = loss
+        else:
+            raise ValueError("No reduction '{}'.".format(reduction))
         return loss
 
 

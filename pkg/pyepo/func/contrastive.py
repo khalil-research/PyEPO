@@ -57,7 +57,7 @@ class NCE(nn.Module):
             raise TypeError("dataset is not an optDataset")
         self.solpool = dataset.sols.copy()
 
-    def forward(self, pred_cost, true_sol):
+    def forward(self, pred_cost, true_sol, reduction="mean"):
         """
         Forward pass
         """
@@ -73,7 +73,17 @@ class NCE(nn.Module):
             obj_cp_i = torch.matmul(pred_cost[i], true_sol[i])
             solpool_obj_cp_i = torch.matmul(pred_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
             loss.append(self.optmodel.modelSense * (obj_cp_i - solpool_obj_cp_i).sum())
-        return torch.stack(loss)
+        loss = torch.stack(loss)
+        # reduction
+        if reduction == "mean":
+            loss = torch.mean(loss)
+        elif reduction == "sum":
+            loss = torch.sum(loss)
+        elif reduction == "none":
+            loss = loss
+        else:
+            raise ValueError("No reduction '{}'.".format(reduction))
+        return loss
 
 
 def _solve_in_forward(cp, optmodel, processes, pool):
