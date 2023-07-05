@@ -7,3 +7,5 @@ Pytorch autograd function for SPO training
 from pyepo.func.blackbox import blackboxOpt
 from pyepo.func.spoplus import SPOPlus
 from pyepo.func.perturbed import perturbedOpt, perturbedFenchelYoung
+from pyepo.func.contrastive import NCE
+from pyepo.func.rank import listwiseLTR, pairwiseLTR, pointwiseLTR

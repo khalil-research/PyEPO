@@ -15,7 +15,7 @@ from pyepo.model.opt import optModel
 from pyepo.utlis import getArgs
 
 
-class LearningToRank(nn.Module):
+class learningToRank(nn.Module):
     """
         An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
         vector and the true cost vector rank a pool of feasible solutions.
@@ -63,10 +63,9 @@ class LearningToRank(nn.Module):
         pass
 
 
-class ListwiseLTR(LearningToRank):
+class listwiseLTR(learningToRank):
     """
         An autograd module for the listwise learning to rank loss.
-
         For the listwise learning to rank loss, the constraints are known and fixed,
         but the cost vector needs to be predicted from contextual data.
     """
@@ -87,23 +86,21 @@ class ListwiseLTR(LearningToRank):
         """
         # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
-
+        # solve
         if np.random.uniform() <= self.solve_ratio:
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
-
+        # get loss
         solpool_obj_c = torch.matmul(true_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
         solpool_obj_cp = torch.matmul(pred_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
         loss = -(F.log_softmax(-self.optmodel.modelSense * solpool_obj_cp, dim=1) *
                   F.softmax(-self.optmodel.modelSense * solpool_obj_c, dim=1)).mean()
-
         return loss
 
 
-class PairwiseLTR(LearningToRank):
+class pairwiseLTR(learningToRank):
     """
         An autograd module for the pairwise learning to rank loss.
-
         For the pairwise learning to rank loss, the constraints are known and fixed,
         but the cost vector needs to be predicted from contextual data.
     """
@@ -124,11 +121,11 @@ class PairwiseLTR(LearningToRank):
         """
         # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
-
+        # solve
         if np.random.uniform() <= self.solve_ratio:
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
-
+        # get loss
         loss = 0
         relu = nn.ReLU()
         for i in range(len(pred_cost)):
@@ -138,14 +135,12 @@ class PairwiseLTR(LearningToRank):
             big_ind = [indices[0] for _ in range(len(indices) - 1)]
             small_ind = [indices[p + 1] for p in range(len(indices) - 1)]
             loss += relu(self.optmodel.modelSense * (solpool_obj_cp_i[big_ind] - solpool_obj_cp_i[small_ind])).mean()
-
         return loss/len(pred_cost)
 
 
-class PointwiseLTR(LearningToRank):
+class pointwiseLTR(learningToRank):
     """
         An autograd module for the pointwise learning to rank loss.
-
         For the pointwise learning to rank loss, the constraints are known and fixed,
         but the cost vector needs to be predicted from contextual data.
     """
@@ -166,15 +161,14 @@ class PointwiseLTR(LearningToRank):
         """
         # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
-
+        # solve
         if np.random.uniform() <= self.solve_ratio:
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
-
+        # get loss
         solpool_obj_c = torch.matmul(true_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
         solpool_obj_cp = torch.matmul(pred_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
         loss = (solpool_obj_c - solpool_obj_cp).square().mean()
-
         return loss
 
 
