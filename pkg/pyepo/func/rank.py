@@ -55,7 +55,7 @@ class learningToRank(nn.Module):
         self.solpool = dataset.sols.copy()
 
     @abstractmethod
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost, true_cost, reduction="mean"):
         """
         Forward pass
         """
@@ -80,7 +80,7 @@ class listwiseLTR(learningToRank):
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
 
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost, true_cost, reduction="mean"):
         """
         Forward pass
         """
@@ -94,7 +94,16 @@ class listwiseLTR(learningToRank):
         solpool_obj_c = torch.matmul(true_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
         solpool_obj_cp = torch.matmul(pred_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
         loss = -(F.log_softmax(-self.optmodel.modelSense * solpool_obj_cp, dim=1) *
-                  F.softmax(-self.optmodel.modelSense * solpool_obj_c, dim=1)).mean()
+                  F.softmax(-self.optmodel.modelSense * solpool_obj_c, dim=1))
+        # reduction
+        if reduction == "mean":
+            loss = torch.mean(loss)
+        elif reduction == "sum":
+            loss = torch.sum(loss)
+        elif reduction == "none":
+            loss = loss
+        else:
+            raise ValueError("No reduction '{}'.".format(reduction))
         return loss
 
 
@@ -115,7 +124,7 @@ class pairwiseLTR(learningToRank):
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
 
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost, true_cost, reduction="mean"):
         """
         Forward pass
         """
@@ -134,8 +143,18 @@ class pairwiseLTR(learningToRank):
             _, indices = np.unique((self.optmodel.modelSense * solpool_obj_c_i).detach().numpy(), return_index=True)
             big_ind = [indices[0] for _ in range(len(indices) - 1)]
             small_ind = [indices[p + 1] for p in range(len(indices) - 1)]
-            loss += relu(self.optmodel.modelSense * (solpool_obj_cp_i[big_ind] - solpool_obj_cp_i[small_ind])).mean()
-        return loss/len(pred_cost)
+            loss += relu(self.optmodel.modelSense * (solpool_obj_cp_i[big_ind] - solpool_obj_cp_i[small_ind]))
+        loss /= len(pred_cost)
+        # reduction
+        if reduction == "mean":
+            loss = torch.mean(loss)
+        elif reduction == "sum":
+            loss = torch.sum(loss)
+        elif reduction == "none":
+            loss = loss
+        else:
+            raise ValueError("No reduction '{}'.".format(reduction))
+        return loss
 
 
 class pointwiseLTR(learningToRank):
@@ -155,7 +174,7 @@ class pointwiseLTR(learningToRank):
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
 
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost, true_cost, reduction="mean"):
         """
         Forward pass
         """
@@ -168,7 +187,16 @@ class pointwiseLTR(learningToRank):
         # get loss
         solpool_obj_c = torch.matmul(true_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
         solpool_obj_cp = torch.matmul(pred_cost, torch.from_numpy(self.solpool.T.astype(np.float32)))
-        loss = (solpool_obj_c - solpool_obj_cp).square().mean()
+        loss = (solpool_obj_c - solpool_obj_cp).square()
+        # reduction
+        if reduction == "mean":
+            loss = torch.mean(loss)
+        elif reduction == "sum":
+            loss = torch.sum(loss)
+        elif reduction == "none":
+            loss = loss
+        else:
+            raise ValueError("No reduction '{}'.".format(reduction))
         return loss
 
 

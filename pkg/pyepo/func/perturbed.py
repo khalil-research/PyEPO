@@ -220,13 +220,22 @@ class perturbedFenchelYoung(nn.Module):
         # build optimizer
         self.pfy = perturbedFenchelYoungFunc()
 
-    def forward(self, pred_cost, true_sol):
+    def forward(self, pred_cost, true_sol, reduction="mean"):
         """
         Forward pass
         """
         loss = self.pfy.apply(pred_cost, true_sol, self.optmodel, self.n_samples,
                               self.sigma, self.processes, self.pool, self.rnd,
                               self.solve_ratio, self)
+        # reduction
+        if reduction == "mean":
+            loss = torch.mean(loss)
+        elif reduction == "sum":
+            loss = torch.sum(loss)
+        elif reduction == "none":
+            loss = loss
+        else:
+            raise ValueError("No reduction '{}'.".format(reduction))
         return loss
 
 
