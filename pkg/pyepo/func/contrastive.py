@@ -61,17 +61,20 @@ class NCE(nn.Module):
         """
         Forward pass
         """
+        # get device
+        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
+        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
         loss = []
         for i in range(len(pred_cost)):
             obj_cp_i = torch.matmul(pred_cost[i], true_sol[i])
-            solpool_obj_cp_i = torch.matmul(pred_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
+            solpool_obj_cp_i = torch.matmul(pred_cost[i], solpool.T)
             loss.append(self.optmodel.modelSense * (obj_cp_i - solpool_obj_cp_i).sum())
         loss = torch.stack(loss)
         # reduction
