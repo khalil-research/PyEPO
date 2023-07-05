@@ -19,7 +19,6 @@ from pyepo.utlis import getArgs
 class NCE(nn.Module):
     """
         An autograd module for the noise contrastive estimation loss.
-
         For the noise contrastive loss, the constraints are known and fixed,
         but the cost vector needs to be predicted from contextual data.
     """
@@ -64,18 +63,17 @@ class NCE(nn.Module):
         """
         # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
-
+        # solve
         if np.random.uniform() <= self.solve_ratio:
             sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
-
-        loss = 0
+        # get loss
+        loss = []
         for i in range(len(pred_cost)):
             obj_cp_i = torch.matmul(pred_cost[i], true_sol[i])
             solpool_obj_cp_i = torch.matmul(pred_cost[i], torch.from_numpy(self.solpool.T.astype(np.float32)))
-            loss += self.optmodel.modelSense * (obj_cp_i - solpool_obj_cp_i).sum()
-
-        return loss / (len(pred_cost)*len(self.solpool))
+            loss.append(self.optmodel.modelSense * (obj_cp_i - solpool_obj_cp_i).sum())
+        return torch.stack(loss)
 
 
 def _solve_in_forward(cp, optmodel, processes, pool):
