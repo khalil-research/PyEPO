@@ -98,7 +98,7 @@ class pairwiseLTR(optModule):
             self.solpool = np.concatenate((self.solpool, sol))
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
-        loss = 0
+        loss = []
         relu = nn.ReLU()
         for i in range(len(pred_cost)):
             solpool_obj_c_i = torch.matmul(true_cost[i], solpool.T)
@@ -106,8 +106,8 @@ class pairwiseLTR(optModule):
             _, indices = np.unique((self.optmodel.modelSense * solpool_obj_c_i).detach().numpy(), return_index=True)
             big_ind = [indices[0] for _ in range(len(indices) - 1)]
             small_ind = [indices[p + 1] for p in range(len(indices) - 1)]
-            loss += relu(self.optmodel.modelSense * (solpool_obj_cp_i[big_ind] - solpool_obj_cp_i[small_ind]))
-        loss /= len(pred_cost)
+            loss.append(relu(self.optmodel.modelSense * (solpool_obj_cp_i[big_ind] - solpool_obj_cp_i[small_ind])))
+        loss = torch.stack(loss)
         # reduction
         if reduction == "mean":
             loss = torch.mean(loss)
