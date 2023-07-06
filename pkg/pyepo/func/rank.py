@@ -7,6 +7,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
+from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.data.dataset import optDataset
 from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
@@ -47,10 +48,14 @@ class listwiseLTR(optModule):
             self.solpool = np.concatenate((self.solpool, sol))
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
-        solpool_obj_c = torch.matmul(true_cost, solpool.T)
-        solpool_obj_cp = torch.matmul(pred_cost, solpool.T)
-        loss = -(F.log_softmax(-self.optmodel.modelSense * solpool_obj_cp, dim=1) *
-                  F.softmax(-self.optmodel.modelSense * solpool_obj_c, dim=1))
+        objpool_c = torch.matmul(true_cost, solpool.T)
+        objpool_cp = torch.matmul(pred_cost, solpool.T)
+        if self.optmodel.modelSense == EPO.MINIMIZE:
+            loss = - (F.log_softmax(objpool_cp, dim=1) *
+                      F.softmax(objpool_c, dim=1))
+        if self.optmodel.modelSense == EPO.MAXIMIZE:
+            loss = - (F.log_softmax(- objpool_cp, dim=1) *
+                      F.softmax(- objpool_c, dim=1))
         # reduction
         if reduction == "mean":
             loss = torch.mean(loss)
@@ -101,12 +106,17 @@ class pairwiseLTR(optModule):
         loss = []
         relu = nn.ReLU()
         for i in range(len(pred_cost)):
-            solpool_obj_c_i = torch.matmul(true_cost[i], solpool.T)
-            solpool_obj_cp_i = torch.matmul(pred_cost[i], solpool.T)
-            _, indices = np.unique((self.optmodel.modelSense * solpool_obj_c_i).detach().numpy(), return_index=True)
+            objpool_c_i = torch.matmul(true_cost[i], solpool.T)
+            objpool_cp_i = torch.matmul(pred_cost[i], solpool.T)
+            _, indices = np.unique(objpool_c_i.detach().numpy(), return_index=True)
+            if self.optmodel.modelSense == EPO.MINIMIZE:
+                indices = indices[::-1]
             big_ind = [indices[0] for _ in range(len(indices) - 1)]
             small_ind = [indices[p + 1] for p in range(len(indices) - 1)]
-            loss.append(relu(self.optmodel.modelSense * (solpool_obj_cp_i[big_ind] - solpool_obj_cp_i[small_ind])))
+            if self.optmodel.modelSense == EPO.MINIMIZE:
+                loss.append(relu(objpool_cp_i[small_ind] - objpool_cp_i[big_ind]))
+            if self.optmodel.modelSense == EPO.MAXIMIZE:
+                loss.append(relu(objpool_cp_i[big_ind] - objpool_cp_i[small_ind]))
         loss = torch.stack(loss)
         # reduction
         if reduction == "mean":
@@ -155,9 +165,9 @@ class pointwiseLTR(optModule):
             self.solpool = np.concatenate((self.solpool, sol))
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
-        solpool_obj_c = torch.matmul(true_cost, solpool.T)
-        solpool_obj_cp = torch.matmul(pred_cost, solpool.T)
-        loss = (solpool_obj_c - solpool_obj_cp).square()
+        objpool_c = torch.matmul(true_cost, solpool.T)
+        objpool_cp = torch.matmul(pred_cost, solpool.T)
+        loss = (objpool_c - objpool_cp).square()
         # reduction
         if reduction == "mean":
             loss = torch.mean(loss)
