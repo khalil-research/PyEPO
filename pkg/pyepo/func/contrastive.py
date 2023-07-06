@@ -7,6 +7,7 @@ Noise Contrastive Estimation Loss function
 import numpy as np
 import torch
 
+from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.data.dataset import optDataset
 from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
@@ -50,8 +51,11 @@ class NCE(optModule):
         loss = []
         for i in range(len(pred_cost)):
             obj_cp_i = torch.matmul(pred_cost[i], true_sol[i])
-            pred_objpool_cp_i = torch.matmul(pred_cost[i], solpool.T)
-            loss.append(self.optmodel.modelSense * (obj_cp_i - pred_objpool_cp_i).sum())
+            objpool_cp_i = torch.matmul(pred_cost[i], solpool.T)
+            if self.optmodel.modelSense == EPO.MINIMIZE:
+                loss.append((objpool_cp_i - obj_cp_i).mean())
+            if self.optmodel.modelSense == EPO.MAXIMIZE:
+                loss.append((obj_cp_i - objpool_cp_i).mean())
         loss = torch.stack(loss)
         # reduction
         if reduction == "mean":
