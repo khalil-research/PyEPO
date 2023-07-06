@@ -13,7 +13,8 @@ from torch import nn
 
 from pyepo.data.dataset import optDataset
 from pyepo.model.opt import optModel
-from pyepo.utlis import getArgs
+
+from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 
 class NCE(nn.Module):
@@ -67,7 +68,7 @@ class NCE(nn.Module):
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
         if np.random.uniform() <= self.solve_ratio:
-            sol = _solve_in_forward(cp, self.optmodel, self.processes, self.pool)
+            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
@@ -87,67 +88,3 @@ class NCE(nn.Module):
         else:
             raise ValueError("No reduction '{}'.".format(reduction))
         return loss
-
-
-def _solve_in_forward(cp, optmodel, processes, pool):
-    """
-    A function to solve optimization in the forward pass
-    """
-    # number of instance
-    ins_num = len(cp)
-    # single-core
-    if processes == 1:
-        sol = []
-        for i in range(ins_num):
-            # solve
-            optmodel.setObj(cp[i])
-            solq, _ = optmodel.solve()
-            # solution
-            sol.append(solq)
-    # multi-core
-    else:
-        # get class
-        model_type = type(optmodel)
-        # get args
-        args = getArgs(optmodel)
-        res = pool.amap(
-              _solveWithObj4Par,
-              cp,
-              [args] * ins_num,
-              [model_type] * ins_num).get()
-        # get res
-        sol = np.array(list(map(lambda x: x[0], res)))
-    return sol
-
-
-def _solveWithObj4Par(cost, args, model_type):
-    """
-    A function to solve function in parallel processors
-
-    Args:
-        cost (np.ndarray): cost of objective function
-        args (dict): optModel args
-        model_type (ABCMeta): optModel class type
-
-    Returns:
-        tuple: optimal solution (list) and objective value (float)
-    """
-    # rebuild model
-    optmodel = model_type(**args)
-    # set obj
-    optmodel.setObj(cost)
-    # solve
-    sol, obj = optmodel.solve()
-    return sol, obj
-
-
-def _check_sol(c, w, z):
-    """
-    A function to check solution is correct
-    """
-    ins_num = len(z)
-    for i in range(ins_num):
-        if abs(z[i] - np.dot(c[i], w[i])) / (abs(z[i]) + 1e-3) >= 1e-3:
-            raise AssertionError(
-                "Solution {} does not macth the objective value {}.".
-                format(np.dot(c[i], w[i]), z[i][0]))

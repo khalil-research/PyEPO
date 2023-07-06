@@ -17,6 +17,7 @@ from pyepo.data.dataset import optDataset
 from pyepo.model.opt import optModel
 from pyepo.utlis import getArgs
 
+
 class perturbedOpt(nn.Module):
     """
     A autograd module for differentiable perturbed optimizer, in which random
@@ -122,7 +123,7 @@ class perturbedOptFunc(Function):
         # solve with perturbation
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes, pool)
+            ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
             if solve_ratio < 1:
                 sols = ptb_sols.reshape(-1, cp.shape[1])
                 module.solpool = np.concatenate((module.solpool, sols))
@@ -276,7 +277,7 @@ class perturbedFenchelYoungFunc(Function):
         # solve with perturbation
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes, pool)
+            ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
             if solve_ratio < 1:
                 sols = ptb_sols.reshape(-1, cp.shape[1])
                 module.solpool = np.concatenate((module.solpool, sols))
@@ -308,7 +309,7 @@ class perturbedFenchelYoungFunc(Function):
         return grad * grad_output, None, None, None, None, None, None, None, None, None
 
 
-def _solve_in_forward(ptb_c, optmodel, processes, pool):
+def _solve_in_pass(ptb_c, optmodel, processes, pool):
     """
     A function to solve optimization in the forward pass
     """

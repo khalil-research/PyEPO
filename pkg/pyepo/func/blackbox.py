@@ -15,7 +15,8 @@ from torch import nn
 from pyepo import EPO
 from pyepo.data.dataset import optDataset
 from pyepo.model.opt import optModel
-from pyepo.utlis import getArgs
+
+from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 
 class blackboxOpt(nn.Module):
@@ -112,11 +113,11 @@ class blackboxOptFunc(Function):
         # solve
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            sol = _solve_in_pass(cp, optmodel, processes, pool)
+            sol, _ = _solve_in_pass(cp, optmodel, processes, pool)
             if solve_ratio < 1:
                 module.solpool = np.concatenate((module.solpool, sol))
         else:
-            sol = _cache_in_pass(cp, optmodel, module.solpool)
+            sol, _ = _cache_in_pass(cp, optmodel, module.solpool)
         # convert to tensor
         sol = np.array(sol)
         pred_sol = torch.FloatTensor(sol).to(device)
@@ -158,11 +159,11 @@ class blackboxOptFunc(Function):
         cq = cp + lambd * dl
         # solve
         if rand_sigma <= solve_ratio:
-            sol = _solve_in_pass(cq, optmodel, processes, pool)
+            sol, _ = _solve_in_pass(cq, optmodel, processes, pool)
             if solve_ratio < 1:
                 module.solpool = np.concatenate((module.solpool, sol))
         else:
-            sol = _cache_in_pass(cq, optmodel, module.solpool)
+            sol, _ = _cache_in_pass(cq, optmodel, module.solpool)
         # get gradient
         grad = []
         for i in range(len(sol)):
@@ -171,66 +172,3 @@ class blackboxOptFunc(Function):
         grad = np.array(grad)
         grad = torch.FloatTensor(grad).to(device)
         return grad, None, None, None, None, None, None
-
-
-def _solve_in_pass(cp, optmodel, processes, pool):
-    """
-    A function to solve optimization in the forward/backward pass
-    """
-    # number of instance
-    ins_num = len(cp)
-    # single-core
-    if processes == 1:
-        sol = []
-        for i in range(ins_num):
-            # solve
-            optmodel.setObj(cp[i])
-            solp, _ = optmodel.solve()
-            sol.append(solp)
-    # multi-core
-    else:
-        # get class
-        model_type = type(optmodel)
-        # get args
-        args = getArgs(optmodel)
-        # parallel computing
-        sol = pool.amap(_solveWithObj4Par, cp, [args] * ins_num,
-                        [model_type] * ins_num).get()
-    return sol
-
-
-def _cache_in_pass(c, optmodel, solpool):
-    """
-    A function to use solution pool in the forward/backward pass
-    """
-    # number of instance
-    ins_num = len(c)
-    # best solution in pool
-    solpool_obj = c @ solpool.T
-    if optmodel.modelSense == EPO.MINIMIZE:
-        ind = np.argmin(solpool_obj, axis=1)
-    if optmodel.modelSense == EPO.MAXIMIZE:
-        ind = np.argmax(solpool_obj, axis=1)
-    sol = solpool[ind]
-    return sol
-
-
-def _solveWithObj4Par(cost, args, model_type):
-    """
-    A global function to solve function in parallel processors
-
-    Args:
-        cost (np.ndarray): cost of objective function
-        args (dict): optModel args
-        model_type (ABCMeta): optModel class type
-
-    Returns:
-        list: optimal solution
-    """
-    # rebuild model
-    optmodel = model_type(**args)
-    # set obj
-    optmodel.setObj(cost)
-    # solve
-    sol, _ = optmodel.solve()
-    return sol
