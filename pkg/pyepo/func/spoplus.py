@@ -15,8 +15,8 @@ from torch import nn
 from pyepo import EPO
 from pyepo.data.dataset import optDataset
 from pyepo.model.opt import optModel
-from pyepo.utlis import getArgs
 
+from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 class SPOPlus(nn.Module):
     """
@@ -125,11 +125,11 @@ class SPOPlusFunc(Function):
         #_check_sol(c, w, z)
         # solve
         if np.random.uniform() <= solve_ratio:
-            sol, obj = _solve_in_forward(2*cp-c, optmodel, processes, pool)
+            sol, obj = _solve_in_pass(2*cp-c, optmodel, processes, pool)
             if solve_ratio < 1:
                 module.solpool = np.concatenate((module.solpool, sol))
         else:
-            sol, obj = _cache_in_forward(2*cp-c, optmodel, module.solpool)
+            sol, obj = _cache_in_pass(2*cp-c, optmodel, module.solpool)
         # calculate loss
         loss = []
         for i in range(len(cp)):
@@ -161,88 +161,3 @@ class SPOPlusFunc(Function):
         if optmodel.modelSense == EPO.MAXIMIZE:
             grad = 2 * (wq - w)
         return grad_output * grad, None, None, None, None, None, None, None, None
-
-
-def _solve_in_forward(cq, optmodel, processes, pool):
-    """
-    A function to solve optimization in the forward pass
-    """
-    # number of instance
-    ins_num = len(cq)
-    # single-core
-    if processes == 1:
-        obj = []
-        sol = []
-        for i in range(ins_num):
-            # solve
-            optmodel.setObj(cq[i])
-            solq, objq = optmodel.solve()
-            # calculate loss
-            obj.append(objq)
-            # solution
-            sol.append(solq)
-    # multi-core
-    else:
-        # get class
-        model_type = type(optmodel)
-        # get args
-        args = getArgs(optmodel)
-        res = pool.amap(
-              _solveWithObj4Par,
-              cq,
-              [args] * ins_num,
-              [model_type] * ins_num).get()
-        # get res
-        sol = np.array(list(map(lambda x: x[0], res)))
-        obj = np.array(list(map(lambda x: x[1], res)))
-    return sol, obj
-
-
-def _cache_in_forward(cq, optmodel, solpool):
-    """
-    A function to use solution pool in the forward pass
-    """
-    # number of instance
-    ins_num = len(z)
-    # best solution in pool
-    solpool_obj = cq @ solpool.T
-    if optmodel.modelSense == EPO.MINIMIZE:
-        ind = np.argmin(solpool_obj, axis=1)
-    if optmodel.modelSense == EPO.MAXIMIZE:
-        ind = np.argmax(solpool_obj, axis=1)
-    obj = np.take_along_axis(solpool_obj, ind.reshape(-1,1), axis=1).reshape(-1)
-    sol = solpool[ind]
-    return sol, obj
-
-
-def _solveWithObj4Par(cost, args, model_type):
-    """
-    A function to solve function in parallel processors
-
-    Args:
-        cost (np.ndarray): cost of objective function
-        args (dict): optModel args
-        model_type (ABCMeta): optModel class type
-
-    Returns:
-        tuple: optimal solution (list) and objective value (float)
-    """
-    # rebuild model
-    optmodel = model_type(**args)
-    # set obj
-    optmodel.setObj(cost)
-    # solve
-    sol, obj = optmodel.solve()
-    return sol, obj
-
-
-def _check_sol(c, w, z):
-    """
-    A function to check solution is correct
-    """
-    ins_num = len(z)
-    for i in range(ins_num):
-        if abs(z[i] - np.dot(c[i], w[i])) / (abs(z[i]) + 1e-3) >= 1e-3:
-            raise AssertionError(
-                "Solution {} does not macth the objective value {}.".
-                format(np.dot(c[i], w[i]), z[i][0]))
