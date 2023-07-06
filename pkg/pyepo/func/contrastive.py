@@ -4,20 +4,14 @@
 Noise Contrastive Estimation Loss function
 """
 
-import multiprocessing as mp
-
 import numpy as np
 import torch
-from pathos.multiprocessing import ProcessingPool
-from torch import nn
 
-from pyepo.data.dataset import optDataset
-from pyepo.model.opt import optModel
-
+from pyepo.func.abcmodule import optModule
 from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 
-class NCE(nn.Module):
+class NCE(optModule):
     """
         An autograd module for the noise contrastive estimation loss.
         For the noise contrastive loss, the constraints are known and fixed,
@@ -32,28 +26,8 @@ class NCE(nn.Module):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__()
-        # optimization model
-        if not isinstance(optmodel, optModel):
-            raise TypeError("arg model is not an optModel")
-        self.optmodel = optmodel
-        # number of processes
-        if processes not in range(mp.cpu_count()+1):
-            raise ValueError("Invalid processors number {}, only {} cores.".
-                format(processes, mp.cpu_count()))
-        self.processes = mp.cpu_count() if not processes else processes
-        # single-core
-        if processes == 1:
-            self.pool = None
-        # multi-core
-        else:
-            self.pool = ProcessingPool(processes)
-        print("Num of cores: {}".format(self.processes))
+        super().__init__(optmodel, processes, solve_ratio, dataset)
         # solution pool
-        self.solve_ratio = solve_ratio
-        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
-            raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
-                format(self.solve_ratio))
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
         self.solpool = dataset.sols.copy()
