@@ -50,8 +50,8 @@ class NCE(optModule):
         loss = []
         for i in range(len(pred_cost)):
             obj_cp_i = torch.matmul(pred_cost[i], true_sol[i])
-            solpool_obj_cp_i = torch.matmul(pred_cost[i], solpool.T)
-            loss.append(self.optmodel.modelSense * (obj_cp_i - solpool_obj_cp_i).sum())
+            pred_objpool_cp_i = torch.matmul(pred_cost[i], solpool.T)
+            loss.append(self.optmodel.modelSense * (obj_cp_i - pred_objpool_cp_i).sum())
         loss = torch.stack(loss)
         # reduction
         if reduction == "mean":
