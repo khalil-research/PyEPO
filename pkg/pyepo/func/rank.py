@@ -2,69 +2,17 @@
 Learning To Rank Loss functions
 """
 
-import multiprocessing as mp
-from abc import abstractmethod
 import numpy as np
 import torch
 import torch.nn.functional as F
-from pathos.multiprocessing import ProcessingPool
 from torch import nn
 
+from pyepo.func.abcmodule import optModule
 from pyepo.data.dataset import optDataset
-from pyepo.model.opt import optModel
-
 from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 
-class learningToRank(nn.Module):
-    """
-        An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
-        vector and the true cost vector rank a pool of feasible solutions.
-    """
-    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
-        """
-        Args:
-            optmodel (optModel): an PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
-        """
-        super().__init__()
-        # optimization model
-        if not isinstance(optmodel, optModel):
-            raise TypeError("arg model is not an optModel")
-        self.optmodel = optmodel
-        # number of processes
-        if processes not in range(mp.cpu_count()+1):
-            raise ValueError("Invalid processors number {}, only {} cores.".
-                format(processes, mp.cpu_count()))
-        self.processes = mp.cpu_count() if not processes else processes
-        # single-core
-        if processes == 1:
-            self.pool = None
-        # multi-core
-        else:
-            self.pool = ProcessingPool(processes)
-        print("Num of cores: {}".format(self.processes))
-        # solution pool
-        self.solve_ratio = solve_ratio
-        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
-            raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
-                format(self.solve_ratio))
-        if not isinstance(dataset, optDataset): # type checking
-            raise TypeError("dataset is not an optDataset")
-        self.solpool = dataset.sols.copy()
-
-    @abstractmethod
-    def forward(self, pred_cost, true_cost, reduction="mean"):
-        """
-        Forward pass
-        """
-        # convert tensor
-        pass
-
-
-class listwiseLTR(learningToRank):
+class listwiseLTR(optModule):
     """
         An autograd module for the listwise learning to rank loss.
         For the listwise learning to rank loss, the constraints are known and fixed,
@@ -80,6 +28,10 @@ class listwiseLTR(learningToRank):
             dataset (None/optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
+        # solution pool
+        if not isinstance(dataset, optDataset): # type checking
+            raise TypeError("dataset is not an optDataset")
+        self.solpool = dataset.sols.copy()
 
     def forward(self, pred_cost, true_cost, reduction="mean"):
         """
@@ -111,7 +63,7 @@ class listwiseLTR(learningToRank):
         return loss
 
 
-class pairwiseLTR(learningToRank):
+class pairwiseLTR(optModule):
     """
         An autograd module for the pairwise learning to rank loss.
         For the pairwise learning to rank loss, the constraints are known and fixed,
@@ -127,6 +79,10 @@ class pairwiseLTR(learningToRank):
             dataset (None/optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
+        # solution pool
+        if not isinstance(dataset, optDataset): # type checking
+            raise TypeError("dataset is not an optDataset")
+        self.solpool = dataset.sols.copy()
 
     def forward(self, pred_cost, true_cost, reduction="mean"):
         """
@@ -164,7 +120,7 @@ class pairwiseLTR(learningToRank):
         return loss
 
 
-class pointwiseLTR(learningToRank):
+class pointwiseLTR(optModule):
     """
         An autograd module for the pointwise learning to rank loss.
         For the pointwise learning to rank loss, the constraints are known and fixed,
@@ -180,6 +136,10 @@ class pointwiseLTR(learningToRank):
             dataset (None/optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
+        # solution pool
+        if not isinstance(dataset, optDataset): # type checking
+            raise TypeError("dataset is not an optDataset")
+        self.solpool = dataset.sols.copy()
 
     def forward(self, pred_cost, true_cost, reduction="mean"):
         """
