@@ -34,7 +34,7 @@ class listwiseLTR(optModule):
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
-        self.solpool = dataset.sols.copy()
+        self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
 
     def forward(self, pred_cost, true_cost, reduction="mean"):
         """
@@ -47,7 +47,10 @@ class listwiseLTR(optModule):
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
+            # add into solpool
             self.solpool = np.concatenate((self.solpool, sol))
+            # remove duplicate
+            self.solpool = np.unique(self.solpool, axis=0)
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get obj for solpool
         objpool_c = true_cost @ solpool.T
@@ -90,7 +93,7 @@ class pairwiseLTR(optModule):
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
-        self.solpool = dataset.sols.copy()
+        self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
 
     def forward(self, pred_cost, true_cost, reduction="mean"):
         """
@@ -103,7 +106,10 @@ class pairwiseLTR(optModule):
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
+            # add into solpool
             self.solpool = np.concatenate((self.solpool, sol))
+            # remove duplicate
+            self.solpool = np.unique(self.solpool, axis=0)
         # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get obj for solpool
@@ -154,7 +160,7 @@ class pointwiseLTR(optModule):
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
-        self.solpool = dataset.sols.copy()
+        self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
 
     def forward(self, pred_cost, true_cost, reduction="mean"):
         """
@@ -167,7 +173,10 @@ class pointwiseLTR(optModule):
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
+            # add into solpool
             self.solpool = np.concatenate((self.solpool, sol))
+            # remove duplicate
+            self.solpool = np.unique(self.solpool, axis=0)
         # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get obj for solpool as score

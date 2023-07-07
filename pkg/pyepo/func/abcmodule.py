@@ -8,6 +8,7 @@ from abc import abstractmethod
 import multiprocessing as mp
 from pathos.multiprocessing import ProcessingPool
 
+import numpy as np
 from torch import nn
 
 from pyepo.data.dataset import optDataset
@@ -53,7 +54,7 @@ class optModule(nn.Module):
         if self.solve_ratio < 1: # init solution pool
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
-            self.solpool = dataset.sols.copy()
+            self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
 
     @abstractmethod
     def forward(self, pred_cost, true_cost, reduction="mean"):
