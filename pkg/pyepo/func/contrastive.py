@@ -47,9 +47,11 @@ class NCE(optModule):
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
-        # get loss
+        # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
+        # get obj for solpool
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
+        # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = (objpool_cp - obj_cp).mean(axis=1)
         if self.optmodel.modelSense == EPO.MAXIMIZE:
