@@ -117,17 +117,23 @@ class pairwiseLTR(optModule):
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
         # init relu as max(0,x)
         relu = nn.ReLU()
-        # get loss
+        # init loss
         loss = []
         for i in range(len(pred_cost)):
-            _, indices = np.unique(objpool_c[i].cpu().detach().numpy(), return_index=True)
+            # get best
             if self.optmodel.modelSense == EPO.MINIMIZE:
-                indices = indices[::-1].copy()
-            best_ind, rest_ind = indices[0], indices[1:]
-            if self.optmodel.modelSense == EPO.MINIMIZE:
-                loss.append(relu(objpool_cp[i,rest_ind] - objpool_cp[i,best_ind]).mean())
+                best_ind = torch.argmin(objpool_c[i])
             if self.optmodel.modelSense == EPO.MAXIMIZE:
-                loss.append(relu(objpool_cp[i,best_ind] - objpool_cp[i,rest_ind]).mean())
+                best_ind = torch.argmax(objpool_c[i])
+            objpool_cp_best = objpool_cp[i, best_ind]
+            # get rest
+            rest_ind = [j for j in range(len(objpool_cp[i])) if j != best_ind]
+            objpool_cp_rest = objpool_cp[i, rest_ind]
+            # get loss
+            if self.optmodel.modelSense == EPO.MINIMIZE:
+                loss.append(relu(objpool_cp_best - objpool_cp_rest).mean())
+            if self.optmodel.modelSense == EPO.MAXIMIZE:
+                loss.append(relu(objpool_cp_rest - objpool_cp_best).mean())
         loss = torch.stack(loss)
         # reduction
         if reduction == "mean":
