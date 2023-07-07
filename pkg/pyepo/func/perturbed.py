@@ -95,7 +95,10 @@ class perturbedOptFunc(Function):
             ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
             if solve_ratio < 1:
                 sols = ptb_sols.reshape(-1, cp.shape[1])
+                # add into solpool
                 module.solpool = np.concatenate((module.solpool, sols))
+                # remove duplicate
+                module.solpool = np.unique(module.solpool, axis=0)
         else:
             ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
         # solution expectation
@@ -223,7 +226,10 @@ class perturbedFenchelYoungFunc(Function):
             ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
             if solve_ratio < 1:
                 sols = ptb_sols.reshape(-1, cp.shape[1])
+                # add into solpool
                 module.solpool = np.concatenate((module.solpool, sols))
+                # remove duplicate
+                module.solpool = np.unique(module.solpool, axis=0)
         else:
             ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
         # solution expectation
