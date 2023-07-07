@@ -110,7 +110,7 @@ class pairwiseLTR(optModule):
         for i in range(len(pred_cost)):
             objpool_c_i = torch.matmul(true_cost[i], solpool.T)
             objpool_cp_i = torch.matmul(pred_cost[i], solpool.T)
-            _, indices = np.unique(objpool_c_i.detach().numpy(), return_index=True)
+            _, indices = np.unique(objpool_c_i.cpu().detach().numpy(), return_index=True)
             if self.optmodel.modelSense == EPO.MINIMIZE:
                 indices = indices[::-1]
             big_ind = [indices[0] for _ in range(len(indices) - 1)]
