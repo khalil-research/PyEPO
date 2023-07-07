@@ -4,20 +4,16 @@
 Perturbed optimization function
 """
 
-import multiprocessing as mp
-
 import numpy as np
 import torch
-from pathos.multiprocessing import ProcessingPool
 from torch.autograd import Function
-from torch import nn
 
 from pyepo import EPO
-from pyepo.data.dataset import optDataset
-from pyepo.model.opt import optModel
+from pyepo.func.abcmodule import optModule
 from pyepo.utlis import getArgs
 
-class perturbedOpt(nn.Module):
+
+class perturbedOpt(optModule):
     """
     A autograd module for differentiable perturbed optimizer, in which random
     perturbed costs are sampled to optimize.
@@ -41,39 +37,13 @@ class perturbedOpt(nn.Module):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__()
-        # optimization model
-        if not isinstance(optmodel, optModel):
-            raise TypeError("arg model is not an optModel")
-        self.optmodel = optmodel
+        super().__init__(optmodel, processes, solve_ratio, dataset)
         # number of samples
         self.n_samples = n_samples
         # perturbation amplitude
         self.sigma = sigma
-        # number of processes
-        if processes not in range(mp.cpu_count()+1):
-            raise ValueError("Invalid processors number {}, only {} cores.".
-                format(processes, mp.cpu_count()))
-        self.processes = mp.cpu_count() if not processes else processes
-        # single-core
-        if processes == 1:
-            self.pool = None
-        # multi-core
-        else:
-            self.pool = ProcessingPool(processes)
-        print("Num of cores: {}".format(self.processes))
         # random state
         self.rnd = np.random.RandomState(seed)
-        # solution pool
-        self.solve_ratio = solve_ratio
-        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
-            raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
-                format(self.solve_ratio))
-        self.solpool = None
-        if self.solve_ratio < 1: # init solution pool
-            if not isinstance(dataset, optDataset): # type checking
-                raise TypeError("dataset is not an optDataset")
-            self.solpool = dataset.sols.copy()
         # build optimizer
         self.ptb = perturbedOptFunc()
 
@@ -107,7 +77,7 @@ class perturbedOptFunc(Function):
             pool (ProcessPool): process pool object
             rnd (RondomState): numpy random state
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): perturbedOpt module
+            module (optModule): perturbedOpt module
 
         Returns:
             torch.tensor: solution expectations with perturbation
@@ -122,10 +92,13 @@ class perturbedOptFunc(Function):
         # solve with perturbation
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes, pool)
+            ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
             if solve_ratio < 1:
                 sols = ptb_sols.reshape(-1, cp.shape[1])
+                # add into solpool
                 module.solpool = np.concatenate((module.solpool, sols))
+                # remove duplicate
+                module.solpool = np.unique(module.solpool, axis=0)
         else:
             ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
         # solution expectation
@@ -158,7 +131,7 @@ class perturbedOptFunc(Function):
         return grad, None, None, None, None, None, None, None, None
 
 
-class perturbedFenchelYoung(nn.Module):
+class perturbedFenchelYoung(optModule):
     """
     A autograd module for Fenchel-Young loss using perturbation techniques. The
     use of the loss improves the algorithmic by the specific expression of the
@@ -184,49 +157,32 @@ class perturbedFenchelYoung(nn.Module):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__()
-        # optimization model
-        if not isinstance(optmodel, optModel):
-            raise TypeError("arg model is not an optModel")
-        self.optmodel = optmodel
+        super().__init__(optmodel, processes, solve_ratio, dataset)
         # number of samples
         self.n_samples = n_samples
         # perturbation amplitude
         self.sigma = sigma
-        # number of processes
-        if processes not in range(mp.cpu_count()+1):
-            raise ValueError("Invalid processors number {}, only {} cores.".
-                format(processes, mp.cpu_count()))
-        self.processes = mp.cpu_count() if not processes else processes
-        # single-core
-        if processes == 1:
-            self.pool = None
-        # multi-core
-        else:
-            self.pool = ProcessingPool(processes)
-        print("Num of cores: {}".format(self.processes))
         # random state
         self.rnd = np.random.RandomState(seed)
-        # solution pool
-        self.solve_ratio = solve_ratio
-        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
-            raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
-                format(self.solve_ratio))
-        self.solpool = None
-        if self.solve_ratio < 1: # init solution pool
-            if not isinstance(dataset, optDataset): # type checking
-                raise TypeError("dataset is not an optDataset")
-            self.solpool = dataset.sols.copy()
         # build optimizer
         self.pfy = perturbedFenchelYoungFunc()
 
-    def forward(self, pred_cost, true_sol):
+    def forward(self, pred_cost, true_sol, reduction="mean"):
         """
         Forward pass
         """
         loss = self.pfy.apply(pred_cost, true_sol, self.optmodel, self.n_samples,
                               self.sigma, self.processes, self.pool, self.rnd,
                               self.solve_ratio, self)
+        # reduction
+        if reduction == "mean":
+            loss = torch.mean(loss)
+        elif reduction == "sum":
+            loss = torch.sum(loss)
+        elif reduction == "none":
+            loss = loss
+        else:
+            raise ValueError("No reduction '{}'.".format(reduction))
         return loss
 
 
@@ -251,7 +207,7 @@ class perturbedFenchelYoungFunc(Function):
             pool (ProcessPool): process pool object
             rnd (RondomState): numpy random state
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): perturbedFenchelYoung module
+            module (optModule): perturbedFenchelYoung module
 
         Returns:
             torch.tensor: solution expectations with perturbation
@@ -267,10 +223,13 @@ class perturbedFenchelYoungFunc(Function):
         # solve with perturbation
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_forward(ptb_c, optmodel, processes, pool)
+            ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
             if solve_ratio < 1:
                 sols = ptb_sols.reshape(-1, cp.shape[1])
+                # add into solpool
                 module.solpool = np.concatenate((module.solpool, sols))
+                # remove duplicate
+                module.solpool = np.unique(module.solpool, axis=0)
         else:
             ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
         # solution expectation
@@ -299,7 +258,7 @@ class perturbedFenchelYoungFunc(Function):
         return grad * grad_output, None, None, None, None, None, None, None, None, None
 
 
-def _solve_in_forward(ptb_c, optmodel, processes, pool):
+def _solve_in_pass(ptb_c, optmodel, processes, pool):
     """
     A function to solve optimization in the forward pass
     """

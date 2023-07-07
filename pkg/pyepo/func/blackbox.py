@@ -4,21 +4,16 @@
 Differentiable Black-box optimization function
 """
 
-import multiprocessing as mp
-
 import numpy as np
 import torch
-from pathos.multiprocessing import ProcessingPool
 from torch.autograd import Function
-from torch import nn
 
+from pyepo.func.abcmodule import optModule
 from pyepo import EPO
-from pyepo.data.dataset import optDataset
-from pyepo.model.opt import optModel
-from pyepo.utlis import getArgs
+from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 
-class blackboxOpt(nn.Module):
+class blackboxOpt(optModule):
     """
     A autograd module for differentiable black-box optimizer, which yield
     optimal a solution and derive a gradient.
@@ -40,37 +35,11 @@ class blackboxOpt(nn.Module):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__()
-        # optimization model
-        if not isinstance(optmodel, optModel):
-            raise TypeError("arg model is not an optModel.")
-        self.optmodel = optmodel
+        super().__init__(optmodel, processes, solve_ratio, dataset)
         # smoothing parameter
         if lambd <= 0:
             raise ValueError("lambda is not positive.")
         self.lambd = lambd
-        # number of processes
-        if processes not in range(mp.cpu_count()+1):
-            raise ValueError("Invalid processors number {}, only {} cores.".
-                format(processes, mp.cpu_count()))
-        self.processes = mp.cpu_count() if not processes else processes
-        # single-core
-        if processes == 1:
-            self.pool = None
-        # multi-core
-        else:
-            self.pool = ProcessingPool(processes)
-        print("Num of cores: {}".format(self.processes))
-        # solution pool
-        self.solve_ratio = solve_ratio
-        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
-            raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
-                format(self.solve_ratio))
-        self.solpool = None
-        if self.solve_ratio < 1: # init solution pool
-            if not isinstance(dataset, optDataset): # type checking
-                raise TypeError("dataset is not an optDataset")
-            self.solpool = dataset.sols.copy()
         # build blackbox optimizer
         self.dbb = blackboxOptFunc()
 
@@ -100,7 +69,7 @@ class blackboxOptFunc(Function):
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             pool (ProcessPool): process pool object
             solve_ratio (float): the ratio of new solutions computed during training
-            module (nn.Module): blackboxOpt module
+            module (optModule): blackboxOpt module
 
         Returns:
             torch.tensor: predicted solutions
@@ -112,11 +81,14 @@ class blackboxOptFunc(Function):
         # solve
         rand_sigma = np.random.uniform()
         if rand_sigma <= solve_ratio:
-            sol = _solve_in_pass(cp, optmodel, processes, pool)
+            sol, _ = _solve_in_pass(cp, optmodel, processes, pool)
             if solve_ratio < 1:
+                # add into solpool
                 module.solpool = np.concatenate((module.solpool, sol))
+                # remove duplicate
+                module.solpool = np.unique(module.solpool, axis=0)
         else:
-            sol = _cache_in_pass(cp, optmodel, module.solpool)
+            sol, _ = _cache_in_pass(cp, optmodel, module.solpool)
         # convert to tensor
         sol = np.array(sol)
         pred_sol = torch.FloatTensor(sol).to(device)
@@ -158,11 +130,14 @@ class blackboxOptFunc(Function):
         cq = cp + lambd * dl
         # solve
         if rand_sigma <= solve_ratio:
-            sol = _solve_in_pass(cq, optmodel, processes, pool)
+            sol, _ = _solve_in_pass(cq, optmodel, processes, pool)
             if solve_ratio < 1:
+                # add into solpool
                 module.solpool = np.concatenate((module.solpool, sol))
+                # remove duplicate
+                module.solpool = np.unique(module.solpool, axis=0)
         else:
-            sol = _cache_in_pass(cq, optmodel, module.solpool)
+            sol, _ = _cache_in_pass(cq, optmodel, module.solpool)
         # get gradient
         grad = []
         for i in range(len(sol)):
@@ -171,66 +146,3 @@ class blackboxOptFunc(Function):
         grad = np.array(grad)
         grad = torch.FloatTensor(grad).to(device)
         return grad, None, None, None, None, None, None
-
-
-def _solve_in_pass(cp, optmodel, processes, pool):
-    """
-    A function to solve optimization in the forward/backward pass
-    """
-    # number of instance
-    ins_num = len(cp)
-    # single-core
-    if processes == 1:
-        sol = []
-        for i in range(ins_num):
-            # solve
-            optmodel.setObj(cp[i])
-            solp, _ = optmodel.solve()
-            sol.append(solp)
-    # multi-core
-    else:
-        # get class
-        model_type = type(optmodel)
-        # get args
-        args = getArgs(optmodel)
-        # parallel computing
-        sol = pool.amap(_solveWithObj4Par, cp, [args] * ins_num,
-                        [model_type] * ins_num).get()
-    return sol
-
-
-def _cache_in_pass(c, optmodel, solpool):
-    """
-    A function to use solution pool in the forward/backward pass
-    """
-    # number of instance
-    ins_num = len(c)
-    # best solution in pool
-    solpool_obj = c @ solpool.T
-    if optmodel.modelSense == EPO.MINIMIZE:
-        ind = np.argmin(solpool_obj, axis=1)
-    if optmodel.modelSense == EPO.MAXIMIZE:
-        ind = np.argmax(solpool_obj, axis=1)
-    sol = solpool[ind]
-    return sol
-
-
-def _solveWithObj4Par(cost, args, model_type):
-    """
-    A global function to solve function in parallel processors
-
-    Args:
-        cost (np.ndarray): cost of objective function
-        args (dict): optModel args
-        model_type (ABCMeta): optModel class type
-
-    Returns:
-        list: optimal solution
-    """
-    # rebuild model
-    optmodel = model_type(**args)
-    # set obj
-    optmodel.setObj(cost)
-    # solve
-    sol, _ = optmodel.solve()
-    return sol
