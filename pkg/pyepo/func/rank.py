@@ -28,7 +28,7 @@ class listwiseLTR(optModule):
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            dataset (optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
         # solution pool
@@ -83,7 +83,7 @@ class pairwiseLTR(optModule):
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            dataset (optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
         # solution pool
@@ -145,7 +145,7 @@ class pointwiseLTR(optModule):
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            dataset (optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
         # solution pool
