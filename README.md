@@ -26,7 +26,7 @@ Citation:
 
 ## Introduction
 
-``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements smart predict-then-optimize+ loss [[1]](https://doi.org/10.1287/mnsc.2020.3922) and differentiable Black-Box optimizer [[3]](https://arxiv.org/abs/1912.02175), differentiable perturbed optimizer, and Fenchel-Young loss with Perturbation [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) as [PyTorch](https://pytorch.org/) autograd modules.
+``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements smart predict-then-optimize+ loss [[1]](https://doi.org/10.1287/mnsc.2020.3922), differentiable Black-Box optimizer [[3]](https://arxiv.org/abs/1912.02175), differentiable perturbed optimizer, Fenchel-Young loss with Perturbation [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), noise-contrastive estimation [[5]](https://www.ijcai.org/proceedings/2021/390) and learning to rank losses [[6]](https://proceedings.mlr.press/v162/mandi22a/mandi22a.pdf) as [PyTorch](https://pytorch.org/) autograd modules.
 
 
 ## Documentation
@@ -37,7 +37,7 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 ## Tutorial
 
 - [01 Optimization Model](https://github.com/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb): Build up optimization solver
-- [02 Optimization Dataset](https://github.com/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb): Generate synthetic data and use optDataset 
+- [02 Optimization Dataset](https://github.com/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb): Generate synthetic data and use optDataset
 - [03 Training and Testing](https://github.com/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb): Train and test end-to-end predict-then-optimize for different approaches
 - [04 2D knapsack Solution Visualization](https://github.com/khalil-research/PyEPO/blob/main/notebooks/04%202D%20knapsack%20Solution%20Visualization.ipynb): Visualize solutions for knapsack problem
 - [05 Warcraft Shortest Path](https://github.com/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb): Use the Warcraft terrains dateset to train shortest path
@@ -50,10 +50,10 @@ To reproduce the experiments in original paper, please use the code and follow t
 
 ## Features
 
-- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) and **PFYL** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
+- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **PFYL** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **NCE** [[5]](https://www.ijcai.org/proceedings/2021/390) and **LTR** [[6]](https://proceedings.mlr.press/v162/mandi22a/mandi22a.pdf).
 - Support [Gurobi](https://www.gurobi.com/) and [Pyomo](http://www.pyomo.org/) API
 - Support Parallel computing for optimization solver
-- Support solution caching [[5]](https://arxiv.org/abs/2011.05354) to speed up training
+- Support solution caching [[5]](https://www.ijcai.org/proceedings/2021/390) to speed up training
 
 ## Installation
 
@@ -167,7 +167,7 @@ if __name__ == "__main__":
             x, c, w, z = data
             # forward pass
             cp = predmodel(x)
-            loss = spop(cp, c, w, z).mean()
+            loss = spop(cp, c, w, z)
             # backward pass
             optimizer.zero_grad()
             loss.backward()
@@ -185,4 +185,5 @@ if __name__ == "__main__":
 * [2] [Mandi, J., Stuckey, P. J., & Guns, T. (2020). Smart predict-and-optimize for hard combinatorial optimization problems. In Proceedings of the AAAI Conference on Artificial Intelligence.](https://doi.org/10.1609/aaai.v34i02.5521)
 * [3] [Vlastelica, M., Paulus, A., Musil, V., Martius, G., & Rolínek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.](https://arxiv.org/abs/1912.02175)
 * [4] [Berthet, Q., Blondel, M., Teboul, O., Cuturi, M., Vert, J. P., & Bach, F. (2020). Learning with differentiable pertubed optimizers. Advances in neural information processing systems, 33, 9508-9519.](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
-* [5] [Mulamba, Maxime, et al. "Contrastive losses and solution caching for predict-and-optimize." arXiv preprint arXiv:2011.05354 (2020).](https://arxiv.org/abs/2011.05354)
+* [5] [Mulamba, M., Mandi, J., Diligenti, M., Lombardi, M., Bucarey, V., & Guns, T. (2021). Contrastive losses and solution caching for predict-and-optimize. Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence.](https://www.ijcai.org/proceedings/2021/390)
+* [6] [Mandi, J., Bucarey, V., Mulamba, M., & Guns, T. (2022). Decision-focused learning: through the lens of learning to rank. Proceedings of the 39th International Conference on Machine Learning.](https://proceedings.mlr.press/v162/mandi22a.html)
