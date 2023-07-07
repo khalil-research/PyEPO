@@ -49,9 +49,10 @@ class listwiseLTR(optModule):
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
-        # get loss
+        # get obj for solpool
         objpool_c = true_cost @ solpool.T
         objpool_cp = pred_cost @ solpool.T
+        # get cross entropy loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = - (F.log_softmax(objpool_cp, dim=1) *
                       F.softmax(objpool_c, dim=1))
@@ -103,22 +104,24 @@ class pairwiseLTR(optModule):
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
+        # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
+        # get obj for solpool
+        objpool_c = torch.einsum("bd,nd->bn", true_cost, solpool)
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
+        # init relu as max(0,x)
+        relu = nn.ReLU()
         # get loss
         loss = []
-        relu = nn.ReLU()
         for i in range(len(pred_cost)):
-            objpool_c_i = torch.matmul(true_cost[i], solpool.T)
-            objpool_cp_i = torch.matmul(pred_cost[i], solpool.T)
-            _, indices = np.unique(objpool_c_i.cpu().detach().numpy(), return_index=True)
+            _, indices = np.unique(objpool_c[i].cpu().detach().numpy(), return_index=True)
             if self.optmodel.modelSense == EPO.MINIMIZE:
-                indices = indices[::-1]
-            big_ind = [indices[0] for _ in range(len(indices) - 1)]
-            small_ind = [indices[p + 1] for p in range(len(indices) - 1)]
+                indices = indices[::-1].copy()
+            best_ind, rest_ind = indices[0], indices[1:]
             if self.optmodel.modelSense == EPO.MINIMIZE:
-                loss.append(relu(objpool_cp_i[small_ind] - objpool_cp_i[big_ind]))
+                loss.append(relu(objpool_cp[i,rest_ind] - objpool_cp[i,best_ind]).mean())
             if self.optmodel.modelSense == EPO.MAXIMIZE:
-                loss.append(relu(objpool_cp_i[big_ind] - objpool_cp_i[small_ind]))
+                loss.append(relu(objpool_cp[i,best_ind] - objpool_cp[i,rest_ind]).mean())
         loss = torch.stack(loss)
         # reduction
         if reduction == "mean":
@@ -165,10 +168,12 @@ class pointwiseLTR(optModule):
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             self.solpool = np.concatenate((self.solpool, sol))
+        # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
-        # get loss
-        objpool_c = torch.matmul(true_cost, solpool.T)
-        objpool_cp = torch.matmul(pred_cost, solpool.T)
+        # get obj for solpool as score
+        objpool_c = true_cost @ solpool.T
+        objpool_cp = pred_cost @ solpool.T
+        # get squared loss
         loss = (objpool_c - objpool_cp).square()
         # reduction
         if reduction == "mean":
