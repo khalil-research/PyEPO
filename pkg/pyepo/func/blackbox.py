@@ -132,10 +132,10 @@ class blackboxOptFunc(Function):
         if rand_sigma <= solve_ratio:
             sol, _ = _solve_in_pass(cq, optmodel, processes, pool)
             if solve_ratio < 1:
-                # check duplication
-                if not np.any(np.all(module.solpool==sol, axis=1)):
-                    # add into solpool
-                    module.solpool = np.concatenate((module.solpool, sol))
+                # add into solpool
+                module.solpool = np.concatenate((module.solpool, sol))
+                # remove duplicate
+                module.solpool = np.unique(module.solpool, axis=0)
         else:
             sol, _ = _cache_in_pass(cq, optmodel, module.solpool)
         # get gradient
