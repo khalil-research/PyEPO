@@ -6,6 +6,7 @@ Utility function
 
 import numpy as np
 
+from pyepo import EPO
 from pyepo.utlis import getArgs
 
 
