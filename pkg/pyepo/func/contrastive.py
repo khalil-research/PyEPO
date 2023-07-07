@@ -48,15 +48,12 @@ class NCE(optModule):
             self.solpool = np.concatenate((self.solpool, sol))
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
-        loss = []
-        for i in range(len(pred_cost)):
-            obj_cp_i = torch.matmul(pred_cost[i], true_sol[i])
-            objpool_cp_i = torch.matmul(pred_cost[i], solpool.T)
-            if self.optmodel.modelSense == EPO.MINIMIZE:
-                loss.append((objpool_cp_i - obj_cp_i).mean())
-            if self.optmodel.modelSense == EPO.MAXIMIZE:
-                loss.append((obj_cp_i - objpool_cp_i).mean())
-        loss = torch.stack(loss)
+        obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
+        if self.optmodel.modelSense == EPO.MINIMIZE:
+            loss = (objpool_cp - obj_cp).mean(axis=1)
+        if self.optmodel.modelSense == EPO.MAXIMIZE:
+            loss = (obj_cp - objpool_cp).mean(axis=1)
         # reduction
         if reduction == "mean":
             loss = torch.mean(loss)
