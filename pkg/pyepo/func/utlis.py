@@ -85,7 +85,7 @@ def _check_sol(c, w, z):
     """
     ins_num = len(z)
     for i in range(ins_num):
-        if abs(z[i] - np.dot(c[i], w[i])) / (abs(z[i]) + 1e-3) >= 1e-3:
+        if abs(z[i] - c[i] @ w[i]) / (abs(z[i]) + 1e-3) >= 1e-3:
             raise AssertionError(
                 "Solution {} does not macth the objective value {}.".
-                format(np.dot(c[i], w[i]), z[i][0]))
+                format(c[i] @ w[i], z[i][0]))

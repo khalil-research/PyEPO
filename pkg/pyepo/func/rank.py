@@ -48,8 +48,8 @@ class listwiseLTR(optModule):
             self.solpool = np.concatenate((self.solpool, sol))
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get loss
-        objpool_c = torch.matmul(true_cost, solpool.T)
-        objpool_cp = torch.matmul(pred_cost, solpool.T)
+        objpool_c = true_cost @ solpool.T
+        objpool_cp = pred_cost @ solpool.T
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = - (F.log_softmax(objpool_cp, dim=1) *
                       F.softmax(objpool_c, dim=1))
