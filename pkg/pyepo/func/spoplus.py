@@ -14,7 +14,7 @@ from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 class SPOPlus(optModule):
     """
-    A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
+    An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
     which measures the decision error of optimization problem.
 
     For SPO/SPO+ Loss, the objective function is linear and constraints are
