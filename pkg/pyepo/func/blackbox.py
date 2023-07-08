@@ -15,7 +15,7 @@ from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 class blackboxOpt(optModule):
     """
-    A autograd module for differentiable black-box optimizer, which yield
+    An autograd module for differentiable black-box optimizer, which yield
     optimal a solution and derive a gradient.
 
     For differentiable block-box, the objective function is linear and
