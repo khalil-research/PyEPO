@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Noise Contrastive Estimation Loss function
+Noise contrastive estimation loss function
 """
 
 import numpy as np
@@ -15,9 +15,13 @@ from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 class NCE(optModule):
     """
-        An autograd module for the noise contrastive estimation loss.
-        For the noise contrastive loss, the constraints are known and fixed,
-        but the cost vector needs to be predicted from contextual data.
+    An autograd module for noise contrastive estimation as surrogate loss
+    functions, based on viewing non-optimal solutions as negative examples.
+
+    For the NCE, the cost vector needs to be predicted from contextual data and
+    maximizes the separation of the probability of the optimal solution.
+
+    Thus, allows us to design an algorithm based on stochastic gradient descent.
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -26,7 +30,7 @@ class NCE(optModule):
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            dataset (None/optDataset): the training data, usually this is simply the training set
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
         # solution pool

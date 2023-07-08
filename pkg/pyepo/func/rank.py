@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Learning To Rank Loss functions
+Learning to rank Losses
 """
 
 import numpy as np
@@ -17,9 +17,13 @@ from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 
 class listwiseLTR(optModule):
     """
-        An autograd module for the listwise learning to rank loss.
-        For the listwise learning to rank loss, the constraints are known and fixed,
-        but the cost vector needs to be predicted from contextual data.
+    An autograd module for listwise learning to rank, where the goal is to learn
+    an objective function that ranks a pool of feasible solutions correctly.
+
+    For the listwise LTR, the cost vector needs to be predicted from contextual
+    data, and the loss measures the scores of the whole ranked lists.
+
+    Thus, allows us to design an algorithm based on stochastic gradient descent.
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -28,7 +32,7 @@ class listwiseLTR(optModule):
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
-            dataset (optDataset): the training data
+            dataset (optDataset): the training data, usually this is simply the training set
         """
         super().__init__(optmodel, processes, solve_ratio, dataset)
         # solution pool
@@ -51,11 +55,12 @@ class listwiseLTR(optModule):
             self.solpool = np.concatenate((self.solpool, sol))
             # remove duplicate
             self.solpool = np.unique(self.solpool, axis=0)
+        # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
-        # get obj for solpool
-        objpool_c = true_cost @ solpool.T
-        objpool_cp = pred_cost @ solpool.T
-        # get cross entropy loss
+        # obj for solpool
+        objpool_c = true_cost @ solpool.T # true cost
+        objpool_cp = pred_cost @ solpool.T # pred cost
+        # cross entropy loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = - (F.log_softmax(objpool_cp, dim=1) *
                       F.softmax(objpool_c, dim=1))
@@ -76,9 +81,13 @@ class listwiseLTR(optModule):
 
 class pairwiseLTR(optModule):
     """
-        An autograd module for the pairwise learning to rank loss.
-        For the pairwise learning to rank loss, the constraints are known and fixed,
-        but the cost vector needs to be predicted from contextual data.
+    An autograd module for pairwise learning to rank, where the goal is to learn
+    an objective function that ranks a pool of feasible solutions correctly.
+
+    For the pairwise LTR, the cost vector needs to be predicted from contextual
+    data, and the loss learns the relative ordering of pairs of items.
+
+    Thus, allows us to design an algorithm based on stochastic gradient descent.
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -112,24 +121,24 @@ class pairwiseLTR(optModule):
             self.solpool = np.unique(self.solpool, axis=0)
         # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
-        # get obj for solpool
-        objpool_c = torch.einsum("bd,nd->bn", true_cost, solpool)
-        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
+        # obj for solpool
+        objpool_c = torch.einsum("bd,nd->bn", true_cost, solpool) # true cost
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool) # pred cost
         # init relu as max(0,x)
         relu = nn.ReLU()
         # init loss
         loss = []
         for i in range(len(pred_cost)):
-            # get best
+            # best sol
             if self.optmodel.modelSense == EPO.MINIMIZE:
                 best_ind = torch.argmin(objpool_c[i])
             if self.optmodel.modelSense == EPO.MAXIMIZE:
                 best_ind = torch.argmax(objpool_c[i])
             objpool_cp_best = objpool_cp[i, best_ind]
-            # get rest
+            # rest sol
             rest_ind = [j for j in range(len(objpool_cp[i])) if j != best_ind]
             objpool_cp_rest = objpool_cp[i, rest_ind]
-            # get loss
+            # best vs rest loss
             if self.optmodel.modelSense == EPO.MINIMIZE:
                 loss.append(relu(objpool_cp_best - objpool_cp_rest).mean())
             if self.optmodel.modelSense == EPO.MAXIMIZE:
@@ -149,9 +158,14 @@ class pairwiseLTR(optModule):
 
 class pointwiseLTR(optModule):
     """
-        An autograd module for the pointwise learning to rank loss.
-        For the pointwise learning to rank loss, the constraints are known and fixed,
-        but the cost vector needs to be predicted from contextual data.
+    An autograd module for pointwise learning to rank, where the goal is to
+    learn an objective function that ranks a pool of feasible solutions
+    correctly.
+
+    For the pointwise LTR, the cost vector needs to be predicted from contextual
+    data, and calculates the ranking scores of the items.
+
+    Thus, allows us to design an algorithm based on stochastic gradient descent.
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -185,10 +199,10 @@ class pointwiseLTR(optModule):
             self.solpool = np.unique(self.solpool, axis=0)
         # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
-        # get obj for solpool as score
-        objpool_c = true_cost @ solpool.T
-        objpool_cp = pred_cost @ solpool.T
-        # get squared loss
+        # obj for solpool as score
+        objpool_c = true_cost @ solpool.T # true cost
+        objpool_cp = pred_cost @ solpool.T # pred cost
+        # squared loss
         loss = (objpool_c - objpool_cp).square()
         # reduction
         if reduction == "mean":
