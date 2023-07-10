@@ -6,25 +6,33 @@
 .. rubric:: Classes
 
 .. autoclass:: pyepo.func.SPOPlus
+    :noindex:
     :members:
 
 .. autoclass:: pyepo.func.blackboxOpt
-   :members:
+    :noindex:
+    :members:
 
 .. autoclass:: pyepo.func.perturbedOpt
-   :members:
+    :noindex:
+    :members:
 
 .. autoclass:: pyepo.func.perturbedFenchelYoung
-   :members:
+    :noindex:
+    :members:
 
 .. autoclass:: pyepo.func.NCE
-   :members:
+    :noindex:
+    :members:
 
 .. autoclass:: pyepo.func.pointwiseLTR
-   :members:
+    :noindex:
+    :members:
 
 .. autoclass:: pyepo.func.pairwiseLTR
-   :members:
+    :noindex:
+    :members:
 
 .. autoclass:: pyepo.func.listwiseLTR
-   :members:
+    :noindex:
+    :members:

@@ -7,6 +7,7 @@ Smart Predict-then-Optimize Loss+ (SPO+)
 SPO+ Loss function [#f1]_ is a surrogate loss function of SPO Loss (Regret), which measures the decision error of optimization problem. For SPO/SPO+ Loss, the objective function is linear and constraints are known and fixed, but the cost vector need to be predicted from contextual data. The SPO+ Loss is convex with non-zero subgradient. Thus, allows us to design an algorithm based on stochastic gradient descent.
 
 .. autoclass:: pyepo.func.SPOPlus
+    :noindex:
     :members:
 
 ``pyepo.func.SPOPlus`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, **0 for using all available cores**.
@@ -25,7 +26,8 @@ Diffenretiable black-box (DBB) optimizer function [#f2]_ estimates gradients fro
 
 
 .. autoclass:: pyepo.func.blackboxOpt
-   :members:
+    :noindex:
+    :members:
 
 ``pyepo.func.blackboxOpt`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores. ``lambd`` is a hyperparameter for function smoothing. The range of ``lambd`` should be **10** to **20**.
 
@@ -43,7 +45,8 @@ Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to esti
 
 
 .. autoclass:: pyepo.func.perturbedOpt
-   :members:
+    :noindex:
+    :members:
 
 ``pyepo.func.perturbedOpt`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores. ``n_samples`` is the number of Monte-Carlo samples to estimate solutions, and ``sigma`` is the variance of Gaussian noise perturbation.
 
@@ -61,7 +64,8 @@ Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques
 
 
 .. autoclass:: pyepo.func.perturbedFenchelYoung
-   :members:
+    :noindex:
+    :members:
 
 ``pyepo.func.perturbedFenchelYoung`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores. ``n_samples`` is the number of Monte-Carlo samples to estimate solutions, and ``sigma`` is the variance of Gaussian noise perturbation.
 
@@ -79,6 +83,7 @@ Noise Contrastive Estimation (NCE)
 NCE Loss function [#f4]_ is a surrogate loss function based on viewing non-optimal solutions as negative examples. For NCE Loss, the constraints are known and fixed, but the cost vector need to be predicted from contextual data. It allows us to design an algorithm based on stochastic gradient descent.
 
 .. autoclass:: pyepo.func.NCE
+    :noindex:
     :members:
 
 ``pyepo.func.NCE`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, **0 for using all available cores**.
@@ -96,13 +101,16 @@ Learning to Rank (LTR)
 NCE Loss function [#f5]_ is to learn an objective function that ranks a pool of feasible solutions correctly. For LTR Loss, the constraints are known and fixed, but the cost vector need to be predicted from contextual data. It allows us to design an algorithm based on stochastic gradient descent.
 
 .. autoclass:: pyepo.func.pointwiseLTR
-   :members:
+    :noindex:
+    :members:
 
 .. autoclass:: pyepo.func.pairwiseLTR
-   :members:
+    :noindex:
+    :members:
 
 .. autoclass:: pyepo.func.listwiseLTR
-   :members:
+    :noindex:
+    :members:
 
 ``pyepo.func.pointwiseLTR``, ``pyepo.func.pairwiseLTR``, and ``pyepo.func.listwiseLTR`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, **0 for using all available cores**.
 

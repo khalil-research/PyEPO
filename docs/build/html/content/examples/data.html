@@ -101,10 +101,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#traveling-salesperson">Traveling Salesperson</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#optdataset">optDataset</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyepo.data.dataset.optDataset">optDataset</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#optdataset">optDataset</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-stage Method</a></li>
@@ -203,8 +200,8 @@ In general, there are several parameters that users can control:</p>
 <h3>Shortest Path<a class="headerlink" href="#shortest-path" title="Permalink to this heading">¶</a></h3>
 <p>For the shortest path, a random matrix <span class="math notranslate nohighlight">\(\mathcal{B} \in \mathbb{R}^{d \times p}\)</span> which follows Bernoulli distribution with probability <span class="math notranslate nohighlight">\(0.5\)</span>, encode the features <span class="math notranslate nohighlight">\(x_i\)</span>. The cost of objective function <span class="math notranslate nohighlight">\(c_{ij}\)</span> is generated from <span class="math notranslate nohighlight">\(c_i^j = [\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j\)</span>.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="pyepo.data.shortestpath.genData">
-<span class="sig-prename descclassname"><span class="pre">pyepo.data.shortestpath.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.shortestpath.genData" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.shortestpath.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A function to generate synthetic data and features for shortest path</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -240,8 +237,8 @@ In general, there are several parameters that users can control:</p>
 <h3>Knapsack<a class="headerlink" href="#knapsack" title="Permalink to this heading">¶</a></h3>
 <p>Because we assume that the uncertain coefficients exist only on the objective function, the weights of items are fixed throughout the data. We define the number of items as <span class="math notranslate nohighlight">\(m\)</span> and the dimension of resources is <span class="math notranslate nohighlight">\(k\)</span>. The weights <span class="math notranslate nohighlight">\(\mathcal{W} \in \mathbb{R}^{k \times m}\)</span> are sampled from <span class="math notranslate nohighlight">\(3\)</span> to <span class="math notranslate nohighlight">\(8\)</span> with a precision of <span class="math notranslate nohighlight">\(1\)</span> decimal place. With the same <span class="math notranslate nohighlight">\(\mathcal{B}\)</span>, cost <span class="math notranslate nohighlight">\(c_{ij}\)</span> is calculated from <span class="math notranslate nohighlight">\(c_i^j = \lceil [\frac{5}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil\)</span>.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="pyepo.data.knapsack.genData">
-<span class="sig-prename descclassname"><span class="pre">pyepo.data.knapsack.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.knapsack.genData" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.knapsack.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A function to generate synthetic data and features for knapsack</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -279,8 +276,8 @@ In general, there are several parameters that users can control:</p>
 <h3>Traveling Salesperson<a class="headerlink" href="#traveling-salesperson" title="Permalink to this heading">¶</a></h3>
 <p>The distance consists of two parts: one comes from Euclidean distance, the other derived from feature encoding. For Euclidean distance, we create coordinates from the mixture of Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, I)\)</span> and uniform distribution <span class="math notranslate nohighlight">\(\textbf{U}(-2, 2)\)</span>. For feature encoding, it is <span class="math notranslate nohighlight">\(\frac{1}{{3}^{deg - 1}} (\frac{1}{\sqrt{p}} (\mathcal{B} x_i)_j + 3)^{deg} \cdot \epsilon_i\)</span>, where the elements of <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> come from the multiplication of Bernoulli <span class="math notranslate nohighlight">\(\textbf{B}(0.5)\)</span> and uniform <span class="math notranslate nohighlight">\(\textbf{U}(-2, 2)\)</span>.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="pyepo.data.tsp.genData">
-<span class="sig-prename descclassname"><span class="pre">pyepo.data.tsp.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.tsp.genData" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.tsp.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A function to generate synthetic data and features for travelling salesman</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -318,23 +315,23 @@ In general, there are several parameters that users can control:</p>
 <p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDataset</span></code> is PyTorch Dataset, which stores the features and their corresponding costs of the objective function, and <strong>solves optimization problems to get optimal solutions and optimal objective values</strong>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">optDataset</span></code> is <strong>not</strong> necessary for training with PyEPO, but it can be easier to obtain optimal solutions and objective values when they are not available in the original data.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.data.dataset.optDataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDataset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This class is Torch Dataset for optimization problems.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.data.dataset.optDataset.model">
-<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">model</span></span></dt>
 <dd><p>Optimization models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.data.dataset.optDataset.feats">
-<span class="sig-name descname"><span class="pre">feats</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.feats" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">feats</span></span></dt>
 <dd><p>Data features</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -344,8 +341,8 @@ In general, there are several parameters that users can control:</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.data.dataset.optDataset.costs">
-<span class="sig-name descname"><span class="pre">costs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.costs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">costs</span></span></dt>
 <dd><p>Cost vectors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -355,8 +352,8 @@ In general, there are several parameters that users can control:</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.data.dataset.optDataset.sols">
-<span class="sig-name descname"><span class="pre">sols</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.sols" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">sols</span></span></dt>
 <dd><p>Optimal solutions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -366,8 +363,8 @@ In general, there are several parameters that users can control:</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.data.dataset.optDataset.objs">
-<span class="sig-name descname"><span class="pre">objs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.objs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">objs</span></span></dt>
 <dd><p>Optimal objective values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -380,7 +377,7 @@ In general, there are several parameters that users can control:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<a class="reference internal" href="model.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an instance of optModel</p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an instance of optModel</p></li>
 <li><p><strong>feats</strong> (<em>np.ndarray</em>) – data features</p></li>
 <li><p><strong>costs</strong> (<em>np.ndarray</em>) – costs of objective function</p></li>
 </ul>
