@@ -158,7 +158,7 @@
            <div itemprop="articleBody">
             
   <section id="module-pyepo.model.omo.knapsack">
-<span id="pyepo-model-omo-knapsack"></span><h1><a class="reference internal" href="../../../../../content/modules/pyepo.model.omo.knapsack.html#module-pyepo.model.omo.knapsack" title="pyepo.model.omo.knapsack"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo.knapsack</span></code></a><a class="headerlink" href="#module-pyepo.model.omo.knapsack" title="Permalink to this heading">¶</a></h1>
+<span id="pyepo-model-omo-knapsack"></span><h1><a class="reference internal" href="#module-pyepo.model.omo.knapsack" title="pyepo.model.omo.knapsack"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo.knapsack</span></code></a><a class="headerlink" href="#module-pyepo.model.omo.knapsack" title="Permalink to this heading">¶</a></h1>
 <p>Knapsack problem</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
@@ -177,7 +177,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.omo.knapsack.knapsackModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel" title="pyepo.model.omo.omomodel.optOmoModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel.optOmoModel</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="../omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel" title="pyepo.model.omo.omomodel.optOmoModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel.optOmoModel</span></code></a></p>
 <p>This class is optimization model for knapsack problem</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.omo.knapsack.knapsackModel._model">
@@ -236,13 +236,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.knapsack.knapsackModel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModel._getModel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build pyomo model</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.knapsack.knapsackModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModel.relax" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModel.relax" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to get linear relaxation model</p>
 </dd></dl>
 
@@ -251,17 +251,17 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.omo.knapsack.knapsackModelRel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModelRel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyepo.model.omo.knapsack.knapsackModel" title="pyepo.model.omo.knapsack.knapsackModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyepo.model.omo.knapsack.knapsackModel</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.omo.knapsack.knapsackModel" title="pyepo.model.omo.knapsack.knapsackModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModel</span></code></a></p>
 <p>This class is relaxed optimization model for knapsack problem.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.knapsack.knapsackModelRel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModelRel._getModel" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModelRel._getModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>A method to build pyomo</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.knapsack.knapsackModelRel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModelRel.relax" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsack.knapsackModelRel.relax" title="Permalink to this definition">¶</a></dt>
 <dd><p>A forbidden method to relax MIP model</p>
 </dd></dl>
 

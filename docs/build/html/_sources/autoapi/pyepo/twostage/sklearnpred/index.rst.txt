@@ -1,5 +1,5 @@
-:mod:`pyepo.twostage.sklearnpred`
-=================================
+:py:mod:`pyepo.twostage.sklearnpred`
+====================================
 
 .. py:module:: pyepo.twostage.sklearnpred
 
@@ -21,7 +21,8 @@ Functions
    pyepo.twostage.sklearnpred.sklearnPred
 
 
-.. function:: sklearnPred(pmodel)
+
+.. py:function:: sklearnPred(pmodel)
 
    Two-stage prediction and optimization with scikit-learn.
 

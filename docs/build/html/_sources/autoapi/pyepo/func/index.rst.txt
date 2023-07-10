@@ -1,5 +1,5 @@
-:mod:`pyepo.func`
-=================
+:py:mod:`pyepo.func`
+====================
 
 .. py:module:: pyepo.func
 
@@ -15,9 +15,13 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
+   abcmodule/index.rst
    blackbox/index.rst
+   contrastive/index.rst
    perturbed/index.rst
+   rank/index.rst
    spoplus/index.rst
+   utlis/index.rst
 
 
 Package Contents
@@ -32,14 +36,19 @@ Classes
    pyepo.func.SPOPlus
    pyepo.func.perturbedOpt
    pyepo.func.perturbedFenchelYoung
+   pyepo.func.NCE
+   pyepo.func.listwiseLTR
+   pyepo.func.pairwiseLTR
+   pyepo.func.pointwiseLTR
+
 
 
 
 .. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   A autograd module for differentiable black-box optimizer, which yield
+   An autograd module for differentiable black-box optimizer, which yield
    optimal a solution and derive a gradient.
 
    For differentiable block-box, the objective function is linear and
@@ -49,7 +58,7 @@ Classes
    The block-box approximate gradient of optimizer smoothly. Thus, allows us to
    design an algorithm based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost)
+   .. py:method:: forward(pred_cost)
 
       Forward pass
 
@@ -57,9 +66,9 @@ Classes
 
 .. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
+   An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
    which measures the decision error of optimization problem.
 
    For SPO/SPO+ Loss, the objective function is linear and constraints are
@@ -69,7 +78,7 @@ Classes
    The SPO+ Loss is convex with subgradient. Thus, allows us to design an
    algorithm based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost, true_cost, true_sol, true_obj)
+   .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj, reduction='mean')
 
       Forward pass
 
@@ -77,9 +86,9 @@ Classes
 
 .. py:class:: perturbedOpt(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   A autograd module for differentiable perturbed optimizer, in which random
+   An autograd module for differentiable perturbed optimizer, in which random
    perturbed costs are sampled to optimize.
 
    For the perturbed optimizer, the cost vector need to be predicted from
@@ -88,7 +97,7 @@ Classes
    The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
    Thus, allows us to design an algorithm based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost)
+   .. py:method:: forward(pred_cost)
 
       Forward pass
 
@@ -96,9 +105,9 @@ Classes
 
 .. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   A autograd module for Fenchel-Young loss using perturbation techniques. The
+   An autograd module for Fenchel-Young loss using perturbation techniques. The
    use of the loss improves the algorithmic by the specific expression of the
    gradients of the loss.
 
@@ -109,7 +118,80 @@ Classes
    and solutions with less computation. Thus, allows us to design an algorithm
    based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost, true_sol)
+   .. py:method:: forward(pred_cost, true_sol, reduction='mean')
+
+      Forward pass
+
+
+
+.. py:class:: NCE(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for noise contrastive estimation as surrogate loss
+   functions, based on viewing non-optimal solutions as negative examples.
+
+   For the NCE, the cost vector needs to be predicted from contextual data and
+   maximizes the separation of the probability of the optimal solution.
+
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. py:method:: forward(pred_cost, true_sol, reduction='mean')
+
+      Forward pass
+
+
+
+.. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for listwise learning to rank, where the goal is to learn
+   an objective function that ranks a pool of feasible solutions correctly.
+
+   For the listwise LTR, the cost vector needs to be predicted from contextual
+   data, and the loss measures the scores of the whole ranked lists.
+
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+
+      Forward pass
+
+
+
+.. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for pairwise learning to rank, where the goal is to learn
+   an objective function that ranks a pool of feasible solutions correctly.
+
+   For the pairwise LTR, the cost vector needs to be predicted from contextual
+   data, and the loss learns the relative ordering of pairs of items.
+
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+
+      Forward pass
+
+
+
+.. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for pointwise learning to rank, where the goal is to
+   learn an objective function that ranks a pool of feasible solutions
+   correctly.
+
+   For the pointwise LTR, the cost vector needs to be predicted from contextual
+   data, and calculates the ranking scores of the items.
+
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
 
       Forward pass
 

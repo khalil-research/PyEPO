@@ -1,0 +1,81 @@
+:py:mod:`pyepo.func.rank`
+=========================
+
+.. py:module:: pyepo.func.rank
+
+.. autoapi-nested-parse::
+
+   Learning to rank Losses
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.rank.listwiseLTR
+   pyepo.func.rank.pairwiseLTR
+   pyepo.func.rank.pointwiseLTR
+
+
+
+
+.. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for listwise learning to rank, where the goal is to learn
+   an objective function that ranks a pool of feasible solutions correctly.
+
+   For the listwise LTR, the cost vector needs to be predicted from contextual
+   data, and the loss measures the scores of the whole ranked lists.
+
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+
+      Forward pass
+
+
+
+.. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for pairwise learning to rank, where the goal is to learn
+   an objective function that ranks a pool of feasible solutions correctly.
+
+   For the pairwise LTR, the cost vector needs to be predicted from contextual
+   data, and the loss learns the relative ordering of pairs of items.
+
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+
+      Forward pass
+
+
+
+.. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for pointwise learning to rank, where the goal is to
+   learn an objective function that ranks a pool of feasible solutions
+   correctly.
+
+   For the pointwise LTR, the cost vector needs to be predicted from contextual
+   data, and calculates the ranking scores of the items.
+
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+
+      Forward pass
+
+
+

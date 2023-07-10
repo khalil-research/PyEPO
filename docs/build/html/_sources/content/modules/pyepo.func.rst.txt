@@ -16,3 +16,15 @@
 
 .. autoclass:: pyepo.func.perturbedFenchelYoung
    :members:
+
+.. autoclass:: pyepo.func.NCE
+   :members:
+
+.. autoclass:: pyepo.func.pointwiseLTR
+   :members:
+
+.. autoclass:: pyepo.func.pairwiseLTR
+   :members:
+
+.. autoclass:: pyepo.func.listwiseLTR
+   :members:

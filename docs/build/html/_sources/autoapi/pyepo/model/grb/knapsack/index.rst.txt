@@ -1,5 +1,5 @@
-:mod:`pyepo.model.grb.knapsack`
-===============================
+:py:mod:`pyepo.model.grb.knapsack`
+==================================
 
 .. py:module:: pyepo.model.grb.knapsack
 
@@ -22,9 +22,10 @@ Classes
 
 
 
+
 .. py:class:: knapsackModel(weights, capacity)
 
-   Bases: :class:`pyepo.model.grb.grbmodel.optGrbModel`
+   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
    This class is optimization model for knapsack problem
 
@@ -52,7 +53,7 @@ Classes
 
       :type: list
 
-   .. method:: _getModel(self)
+   .. py:method:: _getModel()
 
       A method to build Gurobi model
 
@@ -60,7 +61,7 @@ Classes
       :rtype: tuple
 
 
-   .. method:: relax(self)
+   .. py:method:: relax()
 
       A method to get linear relaxation model
 
@@ -68,16 +69,16 @@ Classes
 
 .. py:class:: knapsackModelRel(weights, capacity)
 
-   Bases: :class:`pyepo.model.grb.knapsack.knapsackModel`
+   Bases: :py:obj:`knapsackModel`
 
    This class is relaxed optimization model for knapsack problem.
 
-   .. method:: _getModel(self)
+   .. py:method:: _getModel()
 
       A method to build Gurobi
 
 
-   .. method:: relax(self)
+   .. py:method:: relax()
 
       A forbidden method to relax MIP model
 
