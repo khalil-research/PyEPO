@@ -1,5 +1,5 @@
-:mod:`pyepo`
-============
+:py:mod:`pyepo`
+===============
 
 .. py:module:: pyepo
 

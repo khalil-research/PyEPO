@@ -1,5 +1,5 @@
-:mod:`pyepo.metric`
-===================
+:py:mod:`pyepo.metric`
+======================
 
 .. py:module:: pyepo.metric
 
@@ -40,7 +40,8 @@ Functions
    pyepo.metric.makeAutoSkScorer
 
 
-.. function:: MSE(predmodel, dataloader)
+
+.. py:function:: MSE(predmodel, dataloader)
 
    A function to evaluate model performance with MSE
 
@@ -53,7 +54,7 @@ Functions
    :rtype: float
 
 
-.. function:: calRegret(optmodel, pred_cost, true_cost, true_obj)
+.. py:function:: calRegret(optmodel, pred_cost, true_cost, true_obj)
 
    A function to calculate normalized true regret for a batch
 
@@ -70,7 +71,7 @@ Functions
        float: true regret losses
 
 
-.. function:: regret(predmodel, optmodel, dataloader)
+.. py:function:: regret(predmodel, optmodel, dataloader)
 
    A function to evaluate model performance with normalized true regret
 
@@ -85,7 +86,7 @@ Functions
    :rtype: float
 
 
-.. function:: calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-05)
+.. py:function:: calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-05)
 
    A function to calculate normalized unambiguous regret for a batch
 
@@ -102,7 +103,7 @@ Functions
    :rtype: float
 
 
-.. function:: unambRegret(predmodel, optmodel, dataloader, tolerance=1e-05)
+.. py:function:: unambRegret(predmodel, optmodel, dataloader, tolerance=1e-05)
 
    A function to evaluate model performance with normalized unambiguous regret
 
@@ -117,7 +118,7 @@ Functions
    :rtype: float
 
 
-.. function:: SPOError(pred_cost, true_cost, model_type, args)
+.. py:function:: SPOError(pred_cost, true_cost, model_type, args)
 
    A function to calculate normalized true regret
 
@@ -134,7 +135,7 @@ Functions
    :rtype: float
 
 
-.. function:: makeSkScorer(optmodel)
+.. py:function:: makeSkScorer(optmodel)
 
    A function to create sklearn scorer
 
@@ -145,7 +146,7 @@ Functions
    :rtype: scorer
 
 
-.. function:: makeAutoSkScorer(optmodel)
+.. py:function:: makeAutoSkScorer(optmodel)
 
    A function to create Auto-SKlearn scorer
 

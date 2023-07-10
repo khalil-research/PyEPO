@@ -3,6 +3,8 @@ Data
 
 ``pyepo.data`` contains synthetic data generator and a dataset class ``optDataset`` to wrap data samples.
 
+For more information and details about the Dataset, please see the `02 Optimization Dataset <https://github.com/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb>`_
+
 
 Data Generator
 ==============

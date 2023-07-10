@@ -1,5 +1,5 @@
-:mod:`pyepo.func.spoplus`
-=========================
+:py:mod:`pyepo.func.spoplus`
+============================
 
 .. py:module:: pyepo.func.spoplus
 
@@ -22,22 +22,12 @@ Classes
 
 
 
-Functions
-~~~~~~~~~
-
-.. autoapisummary::
-
-   pyepo.func.spoplus._solve_in_forward
-   pyepo.func.spoplus._cache_in_forward
-   pyepo.func.spoplus._solveWithObj4Par
-   pyepo.func.spoplus._check_sol
-
 
 .. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
-   Bases: :class:`torch.nn.Module`
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   A autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
+   An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
    which measures the decision error of optimization problem.
 
    For SPO/SPO+ Loss, the objective function is linear and constraints are
@@ -47,7 +37,7 @@ Functions
    The SPO+ Loss is convex with subgradient. Thus, allows us to design an
    algorithm based on stochastic gradient descent.
 
-   .. method:: forward(self, pred_cost, true_cost, true_sol, true_obj)
+   .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj, reduction='mean')
 
       Forward pass
 
@@ -55,11 +45,11 @@ Functions
 
 .. py:class:: SPOPlusFunc(*args, **kwargs)
 
-   Bases: :class:`torch.autograd.Function`
+   Bases: :py:obj:`torch.autograd.Function`
 
    A autograd function for SPO+ Loss
 
-   .. method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj, optmodel, processes, solve_ratio, module)
+   .. py:method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj, optmodel, processes, pool, solve_ratio, module)
       :staticmethod:
 
       Forward pass for SPO+
@@ -76,49 +66,21 @@ Functions
       :type optmodel: optModel
       :param processes: number of processors, 1 for single-core, 0 for all of cores
       :type processes: int
+      :param pool: process pool object
+      :type pool: ProcessPool
       :param solve_ratio: the ratio of new solutions computed during training
       :type solve_ratio: float
       :param module: SPOPlus modeul
-      :type module: nn.Module
+      :type module: optModule
 
       :returns: SPO+ loss
       :rtype: torch.tensor
 
 
-   .. method:: backward(ctx, grad_output)
+   .. py:method:: backward(ctx, grad_output)
       :staticmethod:
 
       Backward pass for SPO+
 
-
-
-.. function:: _solve_in_forward(cp, c, w, z, optmodel, processes)
-
-   A function to solve optimization in the forward pass
-
-
-.. function:: _cache_in_forward(cp, c, w, z, optmodel, solpool)
-
-   A function to use solution pool in the forward pass
-
-
-.. function:: _solveWithObj4Par(cost, args, model_type)
-
-   A function to solve function in parallel processors
-
-   :param cost: cost of objective function
-   :type cost: np.ndarray
-   :param args: optModel args
-   :type args: dict
-   :param model_type: optModel class type
-   :type model_type: ABCMeta
-
-   :returns: optimal solution (list) and objective value (float)
-   :rtype: tuple
-
-
-.. function:: _check_sol(c, w, z)
-
-   A function to check solution is correct
 
 

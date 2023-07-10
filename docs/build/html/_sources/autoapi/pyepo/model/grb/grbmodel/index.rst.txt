@@ -1,5 +1,5 @@
-:mod:`pyepo.model.grb.grbmodel`
-===============================
+:py:mod:`pyepo.model.grb.grbmodel`
+==================================
 
 .. py:module:: pyepo.model.grb.grbmodel
 
@@ -21,9 +21,10 @@ Classes
 
 
 
+
 .. py:class:: optGrbModel
 
-   Bases: :class:`pyepo.model.opt.optModel`
+   Bases: :py:obj:`pyepo.model.opt.optModel`
 
    This is an abstract class for Gurobi-based optimization model
 
@@ -33,12 +34,12 @@ Classes
 
       :type: GurobiPy model
 
-   .. method:: __repr__(self)
+   .. py:method:: __repr__()
 
       Return repr(self).
 
 
-   .. method:: setObj(self, c)
+   .. py:method:: setObj(c)
 
       A method to set objective function
 
@@ -46,7 +47,7 @@ Classes
       :type c: np.ndarray / list
 
 
-   .. method:: solve(self)
+   .. py:method:: solve()
 
       A method to solve model
 
@@ -54,7 +55,7 @@ Classes
       :rtype: tuple
 
 
-   .. method:: copy(self)
+   .. py:method:: copy()
 
       A method to copy model
 
@@ -62,7 +63,7 @@ Classes
       :rtype: optModel
 
 
-   .. method:: addConstr(self, coefs, rhs)
+   .. py:method:: addConstr(coefs, rhs)
 
       A method to add new constraint
 
