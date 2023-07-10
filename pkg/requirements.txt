@@ -1,0 +1,8 @@
+torch>=1.13.1
+gurobipy>=9.1.2
+tqdm
+numpy
+Pyomo
+scipy
+pathos
+scikit_learn
