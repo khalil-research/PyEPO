@@ -3,7 +3,7 @@ Training
 
 ``pyepo.func`` is extended from PyTorch modules to support automatic differentiation. Users can train neural network for end-to-end predict-then-optimize problem.
 
-For more information and details about the Training and Testing, please see the `03 Training and Testing <https://github.com/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_
+For more information and details about the Training and Testing, please see the `03 Training and Testing <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_
 
 
 Training with SPO+

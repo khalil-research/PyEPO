@@ -9,7 +9,7 @@ Model
 
 To build optimization models with ``PyEPO``, users do **not** need specific costs of objective functions since the cost vector is unknown but will be estimated from data.
 
-For more information and details about the Optimization Model, please see the `03 Training and Testing <https://github.com/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_
+For more information and details about the Optimization Model, please see the `01 Optimization Model: <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_
 
 
 User-defined Models
