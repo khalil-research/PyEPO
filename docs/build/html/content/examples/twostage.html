@@ -95,10 +95,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Two-stage Method</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyepo.twostage.sklearnPred">sklearnPred</a></li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Two-stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
@@ -178,8 +175,8 @@
 <h1>Two-stage Method<a class="headerlink" href="#two-stage-method" title="Permalink to this heading">¶</a></h1>
 <p>Two-stage approach trains a regression model <span class="math notranslate nohighlight">\(\hat{c} = g(\mathbf{x}; \mathbf{\theta})\)</span> by minimizing a prediction error <span class="math notranslate nohighlight">\(l(\hat{\mathbf{c}}, \mathbf{c})\)</span> such as mean square error <span class="math notranslate nohighlight">\(l_{MSE}(\hat{\mathbf{c}}, \mathbf{c}) = \frac{1}{n} \sum_i^n \| \hat{\mathbf{c}}_i - \mathbf{c}_i \| ^ 2\)</span>. Then in an inference process, the machine learning model predicts <span class="math notranslate nohighlight">\(\hat{c} = g(\mathbf{x}; \mathbf{\theta})\)</span> first. After that, the predicted value <span class="math notranslate nohighlight">\(\hat{c}\)</span> is used for solving the optimization problem.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="pyepo.twostage.sklearnPred">
-<span class="sig-prename descclassname"><span class="pre">pyepo.twostage.</span></span><span class="sig-name descname"><span class="pre">sklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmodel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.twostage.sklearnPred" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.twostage.</span></span><span class="sig-name descname"><span class="pre">sklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmodel</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Two-stage prediction and optimization with scikit-learn.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

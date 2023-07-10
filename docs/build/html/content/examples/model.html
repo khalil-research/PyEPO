@@ -206,12 +206,12 @@
 <p>User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.optGrbModel</span></code>.</p>
 <p>For <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code>, users does not need specify the sense <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> as <code class="docutils literal notranslate"><span class="pre">EPO.MINIMIZE</span></code> or <code class="docutils literal notranslate"><span class="pre">EPO.MINIMIZE</span></code>. Both the minimization and maximization models are correctly recognized and run by <code class="docutils literal notranslate"><span class="pre">pyepo</span></code>.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">optGrbModel</span></span><a class="headerlink" href="#pyepo.model.grb.optGrbModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">optGrbModel</span></span></dt>
 <dd><p>This is an abstract class for Gurobi-based optimization model</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.optGrbModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -221,13 +221,13 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.optGrbModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.optGrbModel._getModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>An abstract method to build a model from a optimization solver</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -240,20 +240,20 @@
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.optGrbModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.optGrbModel.relax" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A unimplemented method to relax MIP model</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.optGrbModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -263,8 +263,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.optGrbModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -321,12 +321,12 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <h3>User-defined Pyomo Models<a class="headerlink" href="#user-defined-pyomo-models" title="Permalink to this heading">¶</a></h3>
 <p>User-defined models with Pyomo can be easily defined by the inheritance of the abstract class <code class="docutils literal notranslate"><span class="pre">pyepo.model.omo.optOmoModel</span></code>.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">optOmoModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.optOmoModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">optOmoModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This is an abstract class for Pyomo-based optimization model</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.omo.optOmoModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Pyomo model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -336,8 +336,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel.solver">
-<span class="sig-name descname"><span class="pre">solver</span></span><a class="headerlink" href="#pyepo.model.omo.optOmoModel.solver" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solver</span></span></dt>
 <dd><p>optimization solver in the background</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -352,8 +352,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.optOmoModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p>
@@ -362,8 +362,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.optOmoModel._getModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>An abstract method to build a model from a optimization solver</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -376,20 +376,20 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.omo.optOmoModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.optOmoModel.relax" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A unimplemented method to relax MIP model</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.optOmoModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -399,8 +399,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.optOmoModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.optOmoModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -463,12 +463,12 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <h3>User-defined Models from Scratch<a class="headerlink" href="#user-defined-models-from-scratch" title="Permalink to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>, <code class="docutils literal notranslate"><span class="pre">setObj</span></code>, <code class="docutils literal notranslate"><span class="pre">solve</span></code>,  and <code class="docutils literal notranslate"><span class="pre">num_cost</span></code>, user-defined <code class="docutils literal notranslate"><span class="pre">optModel</span></code> can work for end-to-end training.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.opt.optModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">optModel</span></span><a class="headerlink" href="#pyepo.model.opt.optModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">optModel</span></span></dt>
 <dd><p>This is an abstract class for optimization model</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.opt.optModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.opt.optModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -478,13 +478,13 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.opt.optModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.optModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.opt.optModel._getModel">
-<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.optModel._getModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>An abstract method to build a model from a optimization solver</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -497,14 +497,14 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.opt.optModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.opt.optModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.opt.optModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.optModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>An abstract method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -514,8 +514,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.opt.optModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.optModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>An abstract method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -648,12 +648,12 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <h4>Shortest Path GurobiPy Model<a class="headerlink" href="#shortest-path-gurobipy-model" title="Permalink to this heading">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.shortestPathModel</span></code>, in which API uses GurobiPy to model the shortest path problem.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestPathModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.shortestPathModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This class is optimization model for shortest path problem</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestPathModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.shortestPathModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -663,8 +663,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestPathModel.grid">
-<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#pyepo.model.grb.shortestPathModel.grid" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">grid</span></span></dt>
 <dd><p>Size of grid network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -674,8 +674,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestPathModel.arcs">
-<span class="sig-name descname"><span class="pre">arcs</span></span><a class="headerlink" href="#pyepo.model.grb.shortestPathModel.arcs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">arcs</span></span></dt>
 <dd><p>List of arcs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -690,8 +690,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestPathModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.shortestPathModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>grid</strong> (<em>tuple of int</em>) – size of grid network</p>
@@ -700,14 +700,14 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestPathModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.shortestPathModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestPathModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.shortestPathModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -717,8 +717,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestPathModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.shortestPathModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -750,12 +750,12 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <h4>Shortest Path Pyomo Model<a class="headerlink" href="#shortest-path-pyomo-model" title="Permalink to this heading">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.omo.shortestPathModel</span></code>, in which API uses Pyomo to model the shortest path problem.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This class is optimization model for shortest path problem</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Pyomo model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -765,8 +765,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel.solver">
-<span class="sig-name descname"><span class="pre">solver</span></span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel.solver" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solver</span></span></dt>
 <dd><p>optimization solver in the background</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -776,8 +776,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel.grid">
-<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel.grid" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">grid</span></span></dt>
 <dd><p>size of grid network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -787,8 +787,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel.arcs">
-<span class="sig-name descname"><span class="pre">arcs</span></span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel.arcs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">arcs</span></span></dt>
 <dd><p>list of arcs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -806,8 +806,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -819,14 +819,14 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -836,8 +836,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestPathModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.shortestPathModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -892,12 +892,12 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <h4>Knapsack GurobiPy Model<a class="headerlink" href="#knapsack-gurobipy-model" title="Permalink to this heading">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.knapsackModel</span></code>, in which API uses GurobiPy to model the knapsack problem.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.knapsackModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This class is optimization model for knapsack problem</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.knapsackModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -907,8 +907,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#pyepo.model.grb.knapsackModel.weights" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">weights</span></span></dt>
 <dd><p>Weights of items</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -918,8 +918,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel.capacity">
-<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.grb.knapsackModel.capacity" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">capacity</span></span></dt>
 <dd><p>Total capacity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -929,8 +929,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel.items">
-<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#pyepo.model.grb.knapsackModel.items" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">items</span></span></dt>
 <dd><p>List of item index</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -948,8 +948,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.knapsackModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em><span class="sig-paren">)</span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -961,20 +961,20 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.knapsackModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.knapsackModel.relax" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to get linear relaxation model</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.knapsackModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -984,8 +984,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.knapsackModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.knapsackModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1024,12 +1024,12 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <h4>Knapsack Pyomo Model<a class="headerlink" href="#knapsack-pyomo-model" title="Permalink to this heading">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.omo.knapsackModel</span></code>, in which API uses Pyomo to model the knapsack problem.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsackModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This class is optimization model for knapsack problem</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.omo.knapsackModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Pyomo model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1039,8 +1039,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.solver">
-<span class="sig-name descname"><span class="pre">solver</span></span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.solver" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solver</span></span></dt>
 <dd><p>optimization solver in the background</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1050,8 +1050,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.weights" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">weights</span></span></dt>
 <dd><p>weights of items</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1061,8 +1061,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.capacity">
-<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.capacity" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">capacity</span></span></dt>
 <dd><p>total capacity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1072,8 +1072,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.items">
-<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.items" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">items</span></span></dt>
 <dd><p>list of item index</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1092,8 +1092,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1106,20 +1106,20 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.relax" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to get linear relaxation model</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1129,8 +1129,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.knapsackModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.knapsackModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1174,13 +1174,13 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 <section id="dfj-formulation">
 <h4>DFJ formulation<a class="headerlink" href="#dfj-formulation" title="Permalink to this heading">¶</a></h4>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspDFJModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspDFJModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspDFJModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspDFJModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
 constraint generation.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspDFJModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tspDFJModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1190,8 +1190,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspDFJModel.num_nodes">
-<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tspDFJModel.num_nodes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1201,8 +1201,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspDFJModel.edges">
-<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tspDFJModel.edges" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">edges</span></span></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1217,8 +1217,8 @@ constraint generation.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspDFJModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspDFJModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
@@ -1227,14 +1227,14 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspDFJModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.tspDFJModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspDFJModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspDFJModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1244,8 +1244,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspDFJModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspDFJModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 </dd></dl>
 
@@ -1268,12 +1268,12 @@ constraint generation.</p>
 <section id="gg-formulation">
 <h4>GG formulation<a class="headerlink" href="#gg-formulation" title="Permalink to this heading">¶</a></h4>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspGGModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspGGModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspGGModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tspGGModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1283,8 +1283,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel.num_nodes">
-<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tspGGModel.num_nodes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1294,8 +1294,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel.edges">
-<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tspGGModel.edges" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">edges</span></span></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1310,8 +1310,8 @@ constraint generation.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspGGModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
@@ -1320,20 +1320,20 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.tspGGModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspGGModel.relax" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to get linear relaxation model</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspGGModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1343,8 +1343,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspGGModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspGGModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 </dd></dl>
 
@@ -1368,12 +1368,12 @@ constraint generation.</p>
 <section id="mtz-formulation">
 <h4>MTZ formulation<a class="headerlink" href="#mtz-formulation" title="Permalink to this heading">¶</a></h4>
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel._model">
-<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel._model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
 <dd><p>Gurobi model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1383,8 +1383,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel.num_nodes">
-<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel.num_nodes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span></dt>
 <dd><p>Number of nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1394,8 +1394,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel.edges">
-<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel.edges" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">edges</span></span></dt>
 <dd><p>List of edge index</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1410,8 +1410,8 @@ constraint generation.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
@@ -1420,20 +1420,20 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel.num_cost">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel.num_cost" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
 <dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel.relax">
-<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel.relax" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to get linear relaxation model</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel.setObj" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A method to set objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1443,8 +1443,8 @@ constraint generation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel.solve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>A method to solve model</p>
 </dd></dl>
 

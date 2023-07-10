@@ -2,12 +2,14 @@
 ==========
 
 .. automodule:: pyepo.data
+    :noindex:
 
 .. rubric:: Modules
 
 .. autosummary::
-   :toctree:
-   :recursive:
+    :noindex:
+    :toctree:
+    :recursive:
 
    pyepo.data.dataset
    pyepo.data.shortestpath
