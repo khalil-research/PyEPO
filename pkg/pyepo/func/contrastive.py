@@ -60,9 +60,9 @@ class NCE(optModule):
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
-            loss = (objpool_cp - obj_cp).mean(axis=1)
-        if self.optmodel.modelSense == EPO.MAXIMIZE:
             loss = (obj_cp - objpool_cp).mean(axis=1)
+        if self.optmodel.modelSense == EPO.MAXIMIZE:
+            loss = (objpool_cp - obj_cp).mean(axis=1)
         # reduction
         if reduction == "mean":
             loss = torch.mean(loss)
