@@ -56,7 +56,6 @@ class SPOPlus(optModule):
         return loss
 
 
-
 class SPOPlusFunc(Function):
     """
     A autograd function for SPO+ Loss
