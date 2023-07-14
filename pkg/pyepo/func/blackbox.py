@@ -24,6 +24,8 @@ class blackboxOpt(optModule):
 
     The block-box approximate gradient of optimizer smoothly. Thus, allows us to
     design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://arxiv.org/abs/1912.02175>
     """
 
     def __init__(self, optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None):
