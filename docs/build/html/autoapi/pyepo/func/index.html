@@ -158,7 +158,7 @@
            <div itemprop="articleBody">
             
   <section id="module-pyepo.func">
-<span id="pyepo-func"></span><h1><a class="reference internal" href="../../../content/modules/pyepo.func.html#module-pyepo.func" title="pyepo.func"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a><a class="headerlink" href="#module-pyepo.func" title="Permalink to this heading">¶</a></h1>
+<span id="pyepo-func"></span><h1><a class="reference internal" href="#module-pyepo.func" title="pyepo.func"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a><a class="headerlink" href="#module-pyepo.func" title="Permalink to this heading">¶</a></h1>
 <p>Pytorch autograd function for end-to-end training</p>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
@@ -180,35 +180,58 @@
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackboxOpt" title="pyepo.func.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
-<td><p>An autograd module for differentiable black-box optimizer, which yield</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.SPOPlus" title="pyepo.func.SPOPlus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPOPlus</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.SPOPlus" title="pyepo.func.SPOPlus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPOPlus</span></code></a></p></td>
 <td><p>An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbedOpt" title="pyepo.func.perturbedOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.blackboxOpt" title="pyepo.func.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
+<td><p>An autograd module for differentiable black-box optimizer, which yield</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.negativeIdentity" title="pyepo.func.negativeIdentity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a></p></td>
+<td><p>An autograd module for differentiable optimizer, which yield optimal a</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbedOpt" title="pyepo.func.perturbedOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a></p></td>
 <td><p>An autograd module for differentiable perturbed optimizer, in which random</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbedFenchelYoung" title="pyepo.func.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbedFenchelYoung" title="pyepo.func.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p></td>
 <td><p>An autograd module for Fenchel-Young loss using perturbation techniques. The</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.NCE" title="pyepo.func.NCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NCE</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.NCE" title="pyepo.func.NCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NCE</span></code></a></p></td>
 <td><p>An autograd module for noise contrastive estimation as surrogate loss</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.contrastiveMAP" title="pyepo.func.contrastiveMAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contrastiveMAP</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.contrastiveMAP" title="pyepo.func.contrastiveMAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contrastiveMAP</span></code></a></p></td>
 <td><p>An autograd module for Maximum A Posterior contrastive estimation as</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.listwiseLTR" title="pyepo.func.listwiseLTR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">listwiseLTR</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.listwiseLTR" title="pyepo.func.listwiseLTR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">listwiseLTR</span></code></a></p></td>
 <td><p>An autograd module for listwise learning to rank, where the goal is to learn</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.pairwiseLTR" title="pyepo.func.pairwiseLTR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pairwiseLTR</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.pairwiseLTR" title="pyepo.func.pairwiseLTR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pairwiseLTR</span></code></a></p></td>
 <td><p>An autograd module for pairwise learning to rank, where the goal is to learn</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.pointwiseLTR" title="pyepo.func.pointwiseLTR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pointwiseLTR</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.pointwiseLTR" title="pyepo.func.pointwiseLTR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pointwiseLTR</span></code></a></p></td>
 <td><p>An autograd module for pointwise learning to rank, where the goal is to</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.SPOPlus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
+<p>An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
+which measures the decision error of optimization problem.</p>
+<p>For SPO/SPO+ Loss, the objective function is linear and constraints are
+known and fixed, but the cost vector need to be predicted from contextual
+data.</p>
+<p>The SPO+ Loss is convex with subgradient. Thus, allows us to design an
+algorithm based on stochastic gradient descent.</p>
+<p>Reference: &lt;<a class="reference external" href="https://doi.org/10.1287/mnsc.2020.3922">https://doi.org/10.1287/mnsc.2020.3922</a>&gt;</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.SPOPlus.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt" title="Permalink to this definition">¶</a></dt>
@@ -230,20 +253,22 @@ design an algorithm based on stochastic gradient descent.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pyepo.func.SPOPlus">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyepo.func.negativeIdentity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">negativeIdentity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.negativeIdentity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
-which measures the decision error of optimization problem.</p>
-<p>For SPO/SPO+ Loss, the objective function is linear and constraints are
-known and fixed, but the cost vector need to be predicted from contextual
-data.</p>
-<p>The SPO+ Loss is convex with subgradient. Thus, allows us to design an
-algorithm based on stochastic gradient descent.</p>
-<p>Reference: &lt;<a class="reference external" href="https://doi.org/10.1287/mnsc.2020.3922">https://doi.org/10.1287/mnsc.2020.3922</a>&gt;</p>
+<p>An autograd module for differentiable optimizer, which yield optimal a
+solution and use negative identity as gradient on the backward pass.</p>
+<p>For negative identity backpropagation, the objective function is linear and
+constraints are known and fixed, but the cost vector need to be predicted
+from contextual data.</p>
+<p>If the interpolation hyperparameter λ aligns with an appropriate step size,
+then the identity update is tantamount to DBB. However, the identity update
+does not require an additional call to the solver during the backward pass
+and tuning an additional hyperparameter λ.</p>
+<p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a>&gt;</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.SPOPlus.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyepo.func.negativeIdentity.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.negativeIdentity.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Forward pass</p>
 </dd></dl>
 
