@@ -23,6 +23,8 @@ class perturbedOpt(optModule):
 
     The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
     Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
     """
 
     def __init__(self, optmodel, n_samples=10, sigma=1.0, processes=1,
@@ -143,6 +145,8 @@ class perturbedFenchelYoung(optModule):
     The Fenchel-Young loss allows to directly optimize a loss between the features
     and solutions with less computation. Thus, allows us to design an algorithm
     based on stochastic gradient descent.
+
+    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
     """
 
     def __init__(self, optmodel, n_samples=10, sigma=1.0, processes=1,
