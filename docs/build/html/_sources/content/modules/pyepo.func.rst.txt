@@ -2,7 +2,7 @@
 ==========
 
 .. automodule:: pyepo.func
-.. rubric:: Classes
+    :noindex:
 
 Smart Predict-then-Optimize Loss+ (SPO+)
 ----------------------------------------
