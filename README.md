@@ -82,11 +82,6 @@ pip install PyEPO/pkg/.
 * [PyTorch](http://pytorch.org/)
 
 
-## Issue
-
-On Windows system, there is missing ``freeze_support`` to run ``multiprocessing`` directly from ``__main__``. When ``processes`` is not 1, try ``if __name__ == "__main__":`` instead of Jupyter notebook or a PY file.
-
-
 ## Sample Code
 
 ```python
