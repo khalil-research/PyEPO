@@ -121,7 +121,6 @@ class blackboxOptFunc(Function):
         rand_sigma = ctx.rand_sigma
         if solve_ratio < 1:
             module = ctx.module
-        ins_num = len(pred_cost)
         # get device
         device = pred_cost.device
         # convert tenstor
@@ -148,3 +147,93 @@ class blackboxOptFunc(Function):
         grad = np.array(grad)
         grad = torch.FloatTensor(grad).to(device)
         return grad, None, None, None, None, None, None
+
+
+class negativeIdentity(optModule):
+    """
+    An autograd module for differentiable optimizer, which yield optimal a
+    solution and use negative identity as gradient on the backward pass.
+
+    For negative identity backpropagation, the objective function is linear and
+    constraints are known and fixed, but the cost vector need to be predicted
+    from contextual data.
+
+    If the interpolation hyperparameter λ aligns with an appropriate step size,
+    then the identity update is tantamount to DBB. However, the identity update
+    does not require an additional call to the solver during the backward pass
+    and tuning an additional hyperparameter λ.
+
+    Reference: <https://arxiv.org/abs/2205.15213>
+    """
+
+    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
+        """
+        Args:
+            optmodel (optModel): an PyEPO optimization model
+            processes (int): number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio (float): the ratio of new solutions computed during training
+            dataset (None/optDataset): the training data
+        """
+        super().__init__(optmodel, processes, solve_ratio, dataset)
+        # build blackbox optimizer
+        self.nid = negativeIdentityFunc()
+
+    def forward(self, pred_cost):
+        """
+        Forward pass
+        """
+        sols = self.nid.apply(pred_cost, self.optmodel, self.processes,
+                              self.pool, self.solve_ratio, self)
+        return sols
+
+
+class negativeIdentityFunc(Function):
+    """
+    A autograd function for differentiable black-box optimizer
+    """
+
+    @staticmethod
+    def forward(ctx, pred_cost, optmodel, processes, pool, solve_ratio, module):
+        """
+        Forward pass for NID
+
+        Args:
+            pred_cost (torch.tensor): a batch of predicted values of the cost
+            optmodel (optModel): an PyEPO optimization model
+            processes (int): number of processors, 1 for single-core, 0 for all of cores
+            pool (ProcessPool): process pool object
+            solve_ratio (float): the ratio of new solutions computed during training
+            module (optModule): blackboxOpt module
+
+        Returns:
+            torch.tensor: predicted solutions
+        """
+        # get device
+        device = pred_cost.device
+        # convert tenstor
+        cp = pred_cost.detach().to("cpu").numpy()
+        # solve
+        rand_sigma = np.random.uniform()
+        if rand_sigma <= solve_ratio:
+            sol, _ = _solve_in_pass(cp, optmodel, processes, pool)
+            if solve_ratio < 1:
+                # add into solpool
+                module.solpool = np.concatenate((module.solpool, sol))
+                # remove duplicate
+                module.solpool = np.unique(module.solpool, axis=0)
+        else:
+            sol, _ = _cache_in_pass(cp, optmodel, module.solpool)
+        # convert to tensor
+        pred_sol = torch.FloatTensor(np.array(sol)).to(device)
+        return pred_sol
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        """
+        Backward pass for NID
+        """
+        # get device
+        device = grad_output.device
+        # identity matrix
+        I = torch.eye(grad_output.shape[1]).to(device)
+        return grad_output @ (-I), None, None, None, None, None
