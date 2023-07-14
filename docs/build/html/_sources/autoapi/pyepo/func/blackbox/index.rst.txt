@@ -37,6 +37,8 @@ Classes
    The block-box approximate gradient of optimizer smoothly. Thus, allows us to
    design an algorithm based on stochastic gradient descent.
 
+   Reference: <https://arxiv.org/abs/1912.02175>
+
    .. py:method:: forward(pred_cost)
 
       Forward pass

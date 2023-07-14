@@ -206,6 +206,7 @@ perturbed costs are sampled to optimize.</p>
 contextual data and are perturbed with Gaussian noise.</p>
 <p>The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
 Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>Reference: &lt;<a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedOpt.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedOpt.forward" title="Permalink to this definition">¶</a></dt>
@@ -266,6 +267,7 @@ contextual data and are perturbed with Gaussian noise.</p>
 <p>The Fenchel-Young loss allows to directly optimize a loss between the features
 and solutions with less computation. Thus, allows us to design an algorithm
 based on stochastic gradient descent.</p>
+<p>Reference: &lt;<a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedFenchelYoung.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedFenchelYoung.forward" title="Permalink to this definition">¶</a></dt>

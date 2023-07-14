@@ -5,7 +5,7 @@
 
 .. autoapi-nested-parse::
 
-   Pytorch autograd function for SPO training
+   Pytorch autograd function for end-to-end training
 
 
 
@@ -37,6 +37,7 @@ Classes
    pyepo.func.perturbedOpt
    pyepo.func.perturbedFenchelYoung
    pyepo.func.NCE
+   pyepo.func.contrastiveMAP
    pyepo.func.listwiseLTR
    pyepo.func.pairwiseLTR
    pyepo.func.pointwiseLTR
@@ -58,6 +59,8 @@ Classes
    The block-box approximate gradient of optimizer smoothly. Thus, allows us to
    design an algorithm based on stochastic gradient descent.
 
+   Reference: <https://arxiv.org/abs/1912.02175>
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -78,6 +81,8 @@ Classes
    The SPO+ Loss is convex with subgradient. Thus, allows us to design an
    algorithm based on stochastic gradient descent.
 
+   Reference: <https://doi.org/10.1287/mnsc.2020.3922>
+
    .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj, reduction='mean')
 
       Forward pass
@@ -96,6 +101,8 @@ Classes
 
    The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
    Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
    .. py:method:: forward(pred_cost)
 
@@ -118,6 +125,8 @@ Classes
    and solutions with less computation. Thus, allows us to design an algorithm
    based on stochastic gradient descent.
 
+   Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
+
    .. py:method:: forward(pred_cost, true_sol, reduction='mean')
 
       Forward pass
@@ -135,6 +144,28 @@ Classes
    maximizes the separation of the probability of the optimal solution.
 
    Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://www.ijcai.org/proceedings/2021/390>
+
+   .. py:method:: forward(pred_cost, true_sol, reduction='mean')
+
+      Forward pass
+
+
+
+.. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for Maximum A Posterior contrastive estimation as
+   surrogate loss functions, which is a efficient self-contrastive algorithm.
+
+   For the MAP, the cost vector needs to be predicted from contextual data and
+   maximizes the separation of the probability of the optimal solution.
+
+   Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://www.ijcai.org/proceedings/2021/390>
 
    .. py:method:: forward(pred_cost, true_sol, reduction='mean')
 
@@ -154,6 +185,8 @@ Classes
 
    Thus, allows us to design an algorithm based on stochastic gradient descent.
 
+   Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
+
    .. py:method:: forward(pred_cost, true_cost, reduction='mean')
 
       Forward pass
@@ -171,6 +204,8 @@ Classes
    data, and the loss learns the relative ordering of pairs of items.
 
    Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
    .. py:method:: forward(pred_cost, true_cost, reduction='mean')
 
@@ -190,6 +225,8 @@ Classes
    data, and calculates the ranking scores of the items.
 
    Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
    .. py:method:: forward(pred_cost, true_cost, reduction='mean')
 

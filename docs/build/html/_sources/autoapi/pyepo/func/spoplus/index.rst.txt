@@ -37,6 +37,8 @@ Classes
    The SPO+ Loss is convex with subgradient. Thus, allows us to design an
    algorithm based on stochastic gradient descent.
 
+   Reference: <https://doi.org/10.1287/mnsc.2020.3922>
+
    .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj, reduction='mean')
 
       Forward pass
