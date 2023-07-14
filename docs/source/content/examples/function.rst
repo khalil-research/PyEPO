@@ -80,7 +80,7 @@ Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques
 Noise Contrastive Estimation (NCE)
 ==================================
 
-NCE Loss function [#f4]_ is a surrogate loss function based on viewing non-optimal solutions as negative examples. For NCE Loss, the constraints are known and fixed, but the cost vector need to be predicted from contextual data.
+Noise Contrastive Estimation (NCE) [#f4]_ serve as surrogate loss function based on negative examples. The key idea is to work with a small set of non-optimal solutions as negative samples. Thus, we can maximizes the difference  of the probability between optimal solution and others.
 
 .. autoclass:: pyepo.func.NCE
     :noindex:
@@ -98,7 +98,7 @@ NCE Loss function [#f4]_ is a surrogate loss function based on viewing non-optim
 Contrastive Maximum A Posterior Estimation (CMAP)
 =================================================
 
-Contrastive MAP Loss function [#f4]_ is a surrogate loss function which is efficient self-contrastive algorithm to takes a single sample. For CMAP Loss, the constraints are known and fixed, and the cost vector need to be predicted from contextual data.
+Contrastive Maximum A Posteriori (CMAP) Loss function [#f4]_ is a special case of NCE where only samples the best one. It is simple but efficient.
 
 .. autoclass:: pyepo.func.contrastiveMAP
     :noindex:
@@ -116,7 +116,7 @@ Contrastive MAP Loss function [#f4]_ is a surrogate loss function which is effic
 Learning to Rank (LTR)
 ======================
 
-LTR Loss function [#f5]_ is to learn an objective function that ranks a pool of feasible solutions correctly. For LTR Loss, the constraints are known and fixed, but the cost vector need to be predicted from contextual data.
+LTR Loss function [#f5]_ is to learn an objective function that ranks a pool of feasible solutions correctly. LTR methods assign scores to the disparate solutions in pool, then establish surrogate loss functions predicated on these scores with the intention of ranking the optimal solution best.
 
 Pointwise loss calculates the ranking scores of the items.
 
