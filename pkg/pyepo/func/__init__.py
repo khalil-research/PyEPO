@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Pytorch autograd function for SPO training
+Pytorch autograd function for end-to-end training
 """
 
 from pyepo.func.blackbox import blackboxOpt

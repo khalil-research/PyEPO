@@ -24,6 +24,8 @@ class listwiseLTR(optModule):
     data, and the loss measures the scores of the whole ranked lists.
 
     Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -88,6 +90,8 @@ class pairwiseLTR(optModule):
     data, and the loss learns the relative ordering of pairs of items.
 
     Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -166,6 +170,8 @@ class pointwiseLTR(optModule):
     data, and calculates the ranking scores of the items.
 
     Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):

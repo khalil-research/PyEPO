@@ -60,7 +60,7 @@ To reproduce the experiments in original paper, please use the code and follow t
 You can download ``PyEPO`` from our GitHub repository.
 
 ```bash
-git clone https://github.com/khalil-research/PyEPO.git
+git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
 ```
 
 And install it.

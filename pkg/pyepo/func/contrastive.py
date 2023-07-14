@@ -22,6 +22,8 @@ class NCE(optModule):
     maximizes the separation of the probability of the optimal solution.
 
     Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://www.ijcai.org/proceedings/2021/390> 
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -84,6 +86,8 @@ class contrastiveMAP(optModule):
     maximizes the separation of the probability of the optimal solution.
 
     Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://www.ijcai.org/proceedings/2021/390>
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
