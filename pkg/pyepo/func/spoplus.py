@@ -23,6 +23,8 @@ class SPOPlus(optModule):
 
     The SPO+ Loss is convex with subgradient. Thus, allows us to design an
     algorithm based on stochastic gradient descent.
+
+    Reference: <https://doi.org/10.1287/mnsc.2020.3922>
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -54,7 +56,6 @@ class SPOPlus(optModule):
         else:
             raise ValueError("No reduction '{}'.".format(reduction))
         return loss
-
 
 
 class SPOPlusFunc(Function):
