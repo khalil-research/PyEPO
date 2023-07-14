@@ -32,8 +32,9 @@ Classes
 
 .. autoapisummary::
 
-   pyepo.func.blackboxOpt
    pyepo.func.SPOPlus
+   pyepo.func.blackboxOpt
+   pyepo.func.negativeIdentity
    pyepo.func.perturbedOpt
    pyepo.func.perturbedFenchelYoung
    pyepo.func.NCE
@@ -42,6 +43,28 @@ Classes
    pyepo.func.pairwiseLTR
    pyepo.func.pointwiseLTR
 
+
+
+
+.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
+   which measures the decision error of optimization problem.
+
+   For SPO/SPO+ Loss, the objective function is linear and constraints are
+   known and fixed, but the cost vector need to be predicted from contextual
+   data.
+
+   The SPO+ Loss is convex with subgradient. Thus, allows us to design an
+   algorithm based on stochastic gradient descent.
+
+   Reference: <https://doi.org/10.1287/mnsc.2020.3922>
+
+   .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj, reduction='mean')
+
+      Forward pass
 
 
 
@@ -67,23 +90,25 @@ Classes
 
 
 
-.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
-   which measures the decision error of optimization problem.
+   An autograd module for differentiable optimizer, which yield optimal a
+   solution and use negative identity as gradient on the backward pass.
 
-   For SPO/SPO+ Loss, the objective function is linear and constraints are
-   known and fixed, but the cost vector need to be predicted from contextual
-   data.
+   For negative identity backpropagation, the objective function is linear and
+   constraints are known and fixed, but the cost vector need to be predicted
+   from contextual data.
 
-   The SPO+ Loss is convex with subgradient. Thus, allows us to design an
-   algorithm based on stochastic gradient descent.
+   If the interpolation hyperparameter λ aligns with an appropriate step size,
+   then the identity update is tantamount to DBB. However, the identity update
+   does not require an additional call to the solver during the backward pass
+   and tuning an additional hyperparameter λ.
 
-   Reference: <https://doi.org/10.1287/mnsc.2020.3922>
+   Reference: <https://arxiv.org/abs/2205.15213>
 
-   .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj, reduction='mean')
+   .. py:method:: forward(pred_cost)
 
       Forward pass
 
