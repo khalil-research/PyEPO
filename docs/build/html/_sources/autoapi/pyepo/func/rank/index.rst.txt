@@ -36,6 +36,8 @@ Classes
 
    Thus, allows us to design an algorithm based on stochastic gradient descent.
 
+   Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
+
    .. py:method:: forward(pred_cost, true_cost, reduction='mean')
 
       Forward pass
@@ -53,6 +55,8 @@ Classes
    data, and the loss learns the relative ordering of pairs of items.
 
    Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
    .. py:method:: forward(pred_cost, true_cost, reduction='mean')
 
@@ -72,6 +76,8 @@ Classes
    data, and calculates the ranking scores of the items.
 
    Thus, allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
    .. py:method:: forward(pred_cost, true_cost, reduction='mean')
 

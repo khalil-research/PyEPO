@@ -50,7 +50,7 @@ The example to learn shortest path with linear model is as follows:
    # set optimizer
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
    # init SPO+ loss
-   spo = pyepo.func.SPOPlus(optmodel, processes=8)
+   spo = pyepo.func.SPOPlus(optmodel, processes=2)
 
    # training
    num_epochs = 20
@@ -110,7 +110,7 @@ The example to learn shortest path with linear model is as follows:
    # set optimizer
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
    # init black-box
-   dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=8)
+   dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=2)
    # init loss
    criterion = nn.L1Loss()
 
@@ -177,7 +177,7 @@ The example to learn shortest path with linear model is as follows:
    # set optimizer
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
    # init perturbed optimizer
-   ptb = pyepo.func.perturbedOpt(optmodel, n_samples=10, epsilon=0.5, processes=8)
+   ptb = pyepo.func.perturbedOpt(optmodel, n_samples=10, epsilon=0.5, processes=2)
    # init loss
    criterion = nn.MSELoss()
 
@@ -242,7 +242,7 @@ The example to learn shortest path with linear model is as follows:
    # set optimizer
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
    # init PFY loss
-   pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, epsilon=0.5, processes=8)
+   pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, epsilon=0.5, processes=2)
 
    # training
    num_epochs = 20
@@ -303,7 +303,7 @@ The example to learn shortest path with linear model is as follows:
               # set optimizer
               optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
               # init PFY loss
-              pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, epsilon=0.5, processes=8)
+              pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, epsilon=0.5, processes=2)
 
               # training
               num_epochs = 20

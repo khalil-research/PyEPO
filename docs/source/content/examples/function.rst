@@ -4,7 +4,7 @@ Auto Grad Functions
 Smart Predict-then-Optimize Loss+ (SPO+)
 ========================================
 
-SPO+ Loss function [#f1]_ is a surrogate loss function of SPO Loss (Regret), which measures the decision error of optimization problem. For SPO/SPO+ Loss, the objective function is linear and constraints are known and fixed, but the cost vector need to be predicted from contextual data. The SPO+ Loss is convex with non-zero subgradient. Thus, allows us to design an algorithm based on stochastic gradient descent.
+SPO+ Loss function [#f1]_ is a surrogate loss function of SPO Loss (Regret), which measures the decision error of optimization problem. For SPO/SPO+ Loss, the objective function is linear and constraints are known and fixed, but the cost vector need to be predicted from contextual data. The SPO+ Loss is convex with non-zero subgradient.
 
 .. autoclass:: pyepo.func.SPOPlus
     :noindex:
@@ -41,7 +41,7 @@ Diffenretiable black-box (DBB) optimizer function [#f2]_ estimates gradients fro
 Differentiable Perturbed Optimizer (DPO)
 ========================================
 
-Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to estimate solutions, in which randomly perturbed costs are sampled to optimize. For the perturbed optimizer, the cost vector needs to be predicted from contextual data and are perturbed with Gaussian noise. The perturbed optimizer is differentiable in its inputs with non-zero Jacobian, thus allowing us to design an algorithm based on stochastic gradient descent.
+Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to estimate solutions, in which randomly perturbed costs are sampled to optimize. For the perturbed optimizer, the cost vector needs to be predicted from contextual data and are perturbed with Gaussian noise. The perturbed optimizer is differentiable in its inputs with non-zero Jacobian.
 
 
 .. autoclass:: pyepo.func.perturbedOpt
@@ -57,10 +57,11 @@ Differentiable perturbed Optimizer (DPO) [#f3]_ uses Monte-Carlo samples to esti
    dpo = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
 
 
+
 Perturbed Fenchel-Young Loss (PYFL)
 ===================================
 
-Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques with Monte-Carlo samples. The use of the loss improves the algorithmic by the specific expression of the gradients of the loss. For the perturbed optimizer, the cost vector need to be predicted from contextual data and are perturbed with Gaussian noise. The Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation. Thus, allows us to design an algorithm based on stochastic gradient descent.
+Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques with Monte-Carlo samples. The use of the loss improves the algorithmic by the specific expression of the gradients of the loss. For the perturbed optimizer, the cost vector need to be predicted from contextual data and are perturbed with Gaussian noise. The Fenchel-Young loss allows to directly optimize a loss between the features and solutions with less computation.
 
 
 .. autoclass:: pyepo.func.perturbedFenchelYoung
@@ -73,14 +74,13 @@ Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques
 
    import pyepo
 
-   pfyl = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
-
+   pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
 
 
 Noise Contrastive Estimation (NCE)
 ==================================
 
-NCE Loss function [#f4]_ is a surrogate loss function based on viewing non-optimal solutions as negative examples. For NCE Loss, the constraints are known and fixed, but the cost vector need to be predicted from contextual data. It allows us to design an algorithm based on stochastic gradient descent.
+NCE Loss function [#f4]_ is a surrogate loss function based on viewing non-optimal solutions as negative examples. For NCE Loss, the constraints are known and fixed, but the cost vector need to be predicted from contextual data.
 
 .. autoclass:: pyepo.func.NCE
     :noindex:
@@ -95,18 +95,42 @@ NCE Loss function [#f4]_ is a surrogate loss function based on viewing non-optim
    nce = pyepo.func.NCE(optmodel, processes=2, solve_ratio=0.05, dataset=dataset_train)
 
 
+Contrastive Maximum A Posterior Estimation (CMAP)
+=================================================
+
+Contrastive MAP Loss function [#f4]_ is a surrogate loss function which is efficient self-contrastive algorithm to takes a single sample. For CMAP Loss, the constraints are known and fixed, and the cost vector need to be predicted from contextual data.
+
+.. autoclass:: pyepo.func.contrastiveMAP
+    :noindex:
+    :members:
+
+``pyepo.func.contrastiveMAP`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, **0 for using all available cores**.
+
+.. code-block:: python
+
+   import pyepo
+
+   cmap = pyepo.func.contrastiveMAP(optmodel, processes=2, solve_ratio=0.05, dataset=dataset_train)
+
+
 Learning to Rank (LTR)
 ======================
 
-NCE Loss function [#f5]_ is to learn an objective function that ranks a pool of feasible solutions correctly. For LTR Loss, the constraints are known and fixed, but the cost vector need to be predicted from contextual data. It allows us to design an algorithm based on stochastic gradient descent.
+LTR Loss function [#f5]_ is to learn an objective function that ranks a pool of feasible solutions correctly. For LTR Loss, the constraints are known and fixed, but the cost vector need to be predicted from contextual data.
+
+Pointwise loss calculates the ranking scores of the items.
 
 .. autoclass:: pyepo.func.pointwiseLTR
     :noindex:
     :members:
 
+Pairwise loss learns the relative ordering of pairs of items.
+
 .. autoclass:: pyepo.func.pairwiseLTR
     :noindex:
     :members:
+
+Listwise loss measures the scores of the whole ranked lists.
 
 .. autoclass:: pyepo.func.listwiseLTR
     :noindex:

@@ -186,6 +186,7 @@ an objective function that ranks a pool of feasible solutions correctly.</p>
 <p>For the listwise LTR, the cost vector needs to be predicted from contextual
 data, and the loss measures the scores of the whole ranked lists.</p>
 <p>Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.rank.listwiseLTR.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.rank.listwiseLTR.forward" title="Permalink to this definition">¶</a></dt>
@@ -203,6 +204,7 @@ an objective function that ranks a pool of feasible solutions correctly.</p>
 <p>For the pairwise LTR, the cost vector needs to be predicted from contextual
 data, and the loss learns the relative ordering of pairs of items.</p>
 <p>Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.rank.pairwiseLTR.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.rank.pairwiseLTR.forward" title="Permalink to this definition">¶</a></dt>
@@ -221,6 +223,7 @@ correctly.</p>
 <p>For the pointwise LTR, the cost vector needs to be predicted from contextual
 data, and calculates the ranking scores of the items.</p>
 <p>Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.rank.pointwiseLTR.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.rank.pointwiseLTR.forward" title="Permalink to this definition">¶</a></dt>
