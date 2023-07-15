@@ -42,17 +42,19 @@ Diffenretiable black-box (DBB) optimizer function [#f2]_ estimates gradients fro
 Negative Identity Backpropagation (NID)
 ========================================
 
+Negative Identity Backpropagation (NID) [#f6]_ treats the solver as a negative identity mapping during the backward pass, which is equivalent to DBB with certain hyperparameter. It is hyperparameter-free and does not require any additional computationally expensive call to the solver on the backward pass.
+
 .. autoclass:: pyepo.func.negativeIdentity
     :noindex:
     :members:
 
-Negative Identity Backpropagation (NID) [#f6]_ treats the solver as a negative identity mapping during the backward pass, which is equivalent to DBB with certain hyperparameter. It is hyperparameter-free and does not require any additional computationally expensive call to the solver on the backward pass.
+``pyepo.func.negativeIdentity`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores.
 
 .. code-block:: python
 
    import pyepo
 
-   dbb = pyepo.func.negativeIdentity(optmodel, processes=2)
+   nid = pyepo.func.negativeIdentity(optmodel, processes=2)
 
 
 Differentiable Perturbed Optimizer (DPO)
@@ -173,7 +175,10 @@ Parallel Computation
 
 ``PyEPO`` supports parallel computation for solving optimization problems in training, where the parameter ``processes`` is the number of processors to be used.
 
-.. warning::  On Windows system, there is missing ``freeze_support`` to run ``multiprocessing`` directly from ``__main__``. When ``processes`` is not 1, try ``if __name__ == "__main__":`` instead of Jupyter notebook or a PY file.
+.. image:: ../../images/parallel-tsp.png
+   :width: 650
+
+The figure shows that the increasing of processes reduces the runtime.
 
 .. rubric:: Footnotes
 

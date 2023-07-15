@@ -264,6 +264,7 @@ design an algorithm based on stochastic gradient descent.</p>
 </section>
 <section id="negative-identity-backpropagation-nid">
 <h2>Negative Identity Backpropagation (NID)<a class="headerlink" href="#negative-identity-backpropagation-nid" title="Permalink to this heading">¶</a></h2>
+<p>Negative Identity Backpropagation (NID) <a class="footnote-reference brackets" href="#f6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> treats the solver as a negative identity mapping during the backward pass, which is equivalent to DBB with certain hyperparameter. It is hyperparameter-free and does not require any additional computationally expensive call to the solver on the backward pass.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">negativeIdentity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
@@ -295,10 +296,10 @@ and tuning an additional hyperparameter λ.</p>
 
 </dd></dl>
 
-<p>Negative Identity Backpropagation (NID) <a class="footnote-reference brackets" href="#f6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> treats the solver as a negative identity mapping during the backward pass, which is equivalent to DBB with certain hyperparameter. It is hyperparameter-free and does not require any additional computationally expensive call to the solver on the backward pass.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.func.negativeIdentity</span></code> supports to solve optimization problems in parallel, parameter <code class="docutils literal notranslate"><span class="pre">processes</span></code> is the number of processors, 0 for using all available cores.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
 
-<span class="n">dbb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">negativeIdentity</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">nid</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">negativeIdentity</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -563,10 +564,8 @@ data, and the loss measures the scores of the whole ranked lists.</p>
 <section id="parallel-computation">
 <h2>Parallel Computation<a class="headerlink" href="#parallel-computation" title="Permalink to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> supports parallel computation for solving optimization problems in training, where the parameter <code class="docutils literal notranslate"><span class="pre">processes</span></code> is the number of processors to be used.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>On Windows system, there is missing <code class="docutils literal notranslate"><span class="pre">freeze_support</span></code> to run <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> directly from <code class="docutils literal notranslate"><span class="pre">__main__</span></code>. When <code class="docutils literal notranslate"><span class="pre">processes</span></code> is not 1, try <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">&quot;__main__&quot;:</span></code> instead of Jupyter notebook or a PY file.</p>
-</div>
+<a class="reference internal image-reference" href="../../_images/parallel-tsp.png"><img alt="../../_images/parallel-tsp.png" src="../../_images/parallel-tsp.png" style="width: 650px;" /></a>
+<p>The figure shows that the increasing of processes reduces the runtime.</p>
 <p class="rubric">Footnotes</p>
 <aside class="footnote brackets" id="f1" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
