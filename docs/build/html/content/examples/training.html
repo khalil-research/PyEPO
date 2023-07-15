@@ -231,6 +231,7 @@
         <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
         <span class="c1"># forward pass</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># SPO+ loss</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">spo</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
         <span class="c1"># backward pass</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
@@ -356,7 +357,7 @@
         <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="c1"># perturbed optimizer</span>
         <span class="n">we</span> <span class="o">=</span> <span class="n">ptb</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="c1"># loss</span>
+        <span class="c1"># MSE loss</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
         <span class="c1"># backward pass</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
@@ -535,7 +536,7 @@
         <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
         <span class="c1"># forward pass</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># noise contrastive estimation loss</span>
+        <span class="c1"># learning-to-rank loss</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">ltr</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
         <span class="c1"># backward pass</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
