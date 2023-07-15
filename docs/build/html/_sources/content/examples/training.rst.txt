@@ -384,4 +384,4 @@ The example to learn shortest path with linear model is as follows:
            # backward pass
            optimizer.zero_grad()
            loss.backward()
-           optimizer.step()s
+           optimizer.step()
