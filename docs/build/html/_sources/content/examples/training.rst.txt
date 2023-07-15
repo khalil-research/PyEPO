@@ -59,6 +59,7 @@ The example to learn shortest path with linear model is as follows:
            x, c, w, z = data
            # forward pass
            cp = predmodel(x)
+           # SPO+ loss
            loss = spo(cp, c, w, z)
            # backward pass
            optimizer.zero_grad()
@@ -190,7 +191,7 @@ The example to learn shortest path with linear model is as follows:
            cp = predmodel(x)
            # perturbed optimizer
            we = ptb(cp)
-           # loss
+           # MSE loss
            loss = criterion(we, w)
            # backward pass
            optimizer.zero_grad()
@@ -378,7 +379,7 @@ The example to learn shortest path with linear model is as follows:
            x, c, w, z = data
            # forward pass
            cp = predmodel(x)
-           # noise contrastive estimation loss
+           # learning-to-rank loss
            loss = ltr(cp, c)
            # backward pass
            optimizer.zero_grad()
