@@ -225,6 +225,8 @@ class negativeIdentityFunc(Function):
             sol, _ = _cache_in_pass(cp, optmodel, module.solpool)
         # convert to tensor
         pred_sol = torch.FloatTensor(np.array(sol)).to(device)
+        # add other objects to ctx
+        ctx.optmodel = optmodel
         return pred_sol
 
     @staticmethod
@@ -232,8 +234,13 @@ class negativeIdentityFunc(Function):
         """
         Backward pass for NID
         """
+        optmodel = ctx.optmodel
         # get device
         device = grad_output.device
         # identity matrix
         I = torch.eye(grad_output.shape[1]).to(device)
-        return grad_output @ (-I), None, None, None, None, None
+        if optmodel.modelSense == EPO.MINIMIZE:
+            grad = - I
+        if optmodel.modelSense == EPO.MAXIMIZE:
+            grad = I
+        return grad_output @ grad, None, None, None, None, None
