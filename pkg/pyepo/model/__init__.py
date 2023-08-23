@@ -5,5 +5,15 @@ Optimization Model based on solvers
 """
 
 from pyepo.model import opt
-from pyepo.model import grb
-from pyepo.model import omo
+try:
+    from pyepo.model import grb
+except:
+    pass
+try:
+    from pyepo.model import copt
+except:
+    pass
+try:
+    from pyepo.model import omo
+except:
+    pass

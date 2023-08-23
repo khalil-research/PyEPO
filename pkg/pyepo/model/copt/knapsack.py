@@ -5,13 +5,14 @@ Knapsack problem
 """
 
 import numpy as np
-from pyomo import environ as pe
+from coptpy import Envr
+from coptpy import COPT
 
 from pyepo import EPO
-from pyepo.model.omo.omomodel import optOmoModel
+from pyepo.model.copt.coptmodel import optCoptModel
 
 
-class knapsackModel(optOmoModel):
+class knapsackModel(optCoptModel):
     """
     This class is optimization model for knapsack problem
 
@@ -23,7 +24,7 @@ class knapsackModel(optOmoModel):
         items (list): list of item index
     """
 
-    def __init__(self, weights, capacity, solver="glpk"):
+    def __init__(self, weights, capacity):
         """
         Args:
             weights (np.ndarray / list): weights of items
@@ -33,27 +34,22 @@ class knapsackModel(optOmoModel):
         self.weights = np.array(weights)
         self.capacity = np.array(capacity)
         self.items = list(range(self.weights.shape[1]))
-        super().__init__(solver)
+        super().__init__()
 
     def _getModel(self):
         """
         A method to build pyomo model
         """
-        # sense
-        self.modelSense = EPO.MAXIMIZE
         # ceate a model
-        m = pe.ConcreteModel("knapsack")
-        # parameters
-        m.its = pe.Set(initialize=self.items)
+        m = Envr().createModel("knapsack")
         # varibles
-        x = pe.Var(m.its, domain=pe.Binary)
-        m.x = x
+        x = m.addVars(self.items, vtype=COPT.BINARY)
+        # sense
+        m.setObjSense(COPT.MAXIMIZE)
         # constraints
-        m.cons = pe.ConstraintList()
         for i in range(len(self.capacity)):
-            m.cons.add(sum(self.weights[i,j] * x[j]
-                       for j in self.items) <= self.capacity[i])
-
+            m.addConstr(sum(self.weights[i,j] * x[j]
+                        for j in self.items) <= self.capacity[i])
         return m, x
 
     def relax(self):
@@ -61,7 +57,7 @@ class knapsackModel(optOmoModel):
         A method to get linear relaxation model
         """
         # copy
-        model_rel = knapsackModelRel(self.weights, self.capacity, self.solver)
+        model_rel = knapsackModelRel(self.weights, self.capacity)
         return model_rel
 
 
@@ -74,20 +70,16 @@ class knapsackModelRel(knapsackModel):
         """
         A method to build pyomo
         """
-        # sense
-        self.modelSense = EPO.MAXIMIZE
         # ceate a model
-        m = pe.ConcreteModel("knapsack")
-        # parameters
-        m.its = pe.Set(initialize=self.items)
+        m = Envr().createModel("knapsack")
         # varibles
-        x = pe.Var(m.its, domain=pe.PositiveReals, bounds=(0,1))
-        m.x = x
+        x = m.addVars(self.items, vtype=COPT.CONTINUOUS, lb=0, ub=1)
+        # sense
+        m.setObjSense(COPT.MAXIMIZE)
         # constraints
-        m.cons = pe.ConstraintList()
         for i in range(len(self.capacity)):
-            m.cons.add(sum(self.weights[i,j] * x[j]
-                       for j in self.items) <= self.capacity[i])
+            m.addConstr(sum(self.weights[i,j] * x[j]
+                        for j in self.items) <= self.capacity[i])
         return m, x
 
     def relax(self):
@@ -108,7 +100,7 @@ if __name__ == "__main__":
     capacity = [20, 20]
     
     # solve model
-    optmodel = knapsackModel(weights=weights, capacity=capacity, solver="gurobi") # init model
+    optmodel = knapsackModel(weights=weights, capacity=capacity) # init model
     optmodel = optmodel.copy()
     optmodel.setObj(cost) # set objective function
     sol, obj = optmodel.solve() # solve
