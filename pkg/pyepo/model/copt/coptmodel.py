@@ -35,7 +35,7 @@ class optCoptModel(optModel):
         self._model.setParam("Logging", 0)
 
     def __repr__(self):
-        return "optOmoModel " + self.__class__.__name__
+        return "optCoptModel " + self.__class__.__name__
 
     def setObj(self, c):
         """
