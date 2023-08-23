@@ -6,7 +6,6 @@ Abstract optimization model based on Cardinal Optimizer（COPT）
 
 from copy import copy
 
-from coptpy import Envr
 from coptpy import COPT
 
 from pyepo import EPO
