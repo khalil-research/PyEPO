@@ -61,7 +61,7 @@ class knapsackModel(optOmoModel):
         A method to get linear relaxation model
         """
         # copy
-        model_rel = knapsackModelRel(self.weights, self.capacity)
+        model_rel = knapsackModelRel(self.weights, self.capacity, self.solver)
         return model_rel
 
 
