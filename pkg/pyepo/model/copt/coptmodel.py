@@ -72,7 +72,6 @@ class optCoptModel(optModel):
         # new model
         new_model._model = self._model.clone()
         # variables for new model
-        new_model.x = new_model._model.getVars()
         x = new_model._model.getVars()
         new_model.x = {key: x[i] for i, key in enumerate(self.x)}
         return new_model
