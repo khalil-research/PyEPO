@@ -9,7 +9,7 @@ from copy import deepcopy
 
 from pyepo import EPO
 
-class optModel: #(ABC):
+class optModel(ABC):
     """
     This is an abstract class for optimization model
 
