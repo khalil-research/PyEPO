@@ -67,7 +67,7 @@ class blackboxOptFunc(Function):
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
-            lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
+            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             pool (ProcessPool): process pool object
