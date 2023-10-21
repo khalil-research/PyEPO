@@ -1,0 +1,101 @@
+:py:mod:`pyepo.model.copt.knapsack`
+===================================
+
+.. py:module:: pyepo.model.copt.knapsack
+
+.. autoapi-nested-parse::
+
+   Knapsack problem
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.copt.knapsack.knapsackModel
+   pyepo.model.copt.knapsack.knapsackModelRel
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.copt.knapsack.cost
+
+
+.. py:class:: knapsackModel(weights, capacity)
+
+   Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
+
+   This class is optimization model for knapsack problem
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: PyOmo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: weights
+
+      weights of items
+
+      :type: np.ndarray
+
+   .. attribute:: capacity
+
+      total capacity
+
+      :type: np.ndarray
+
+   .. attribute:: items
+
+      list of item index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build pyomo model
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: knapsackModelRel(weights, capacity)
+
+   Bases: :py:obj:`knapsackModel`
+
+   This class is relaxed optimization model for knapsack problem.
+
+   .. py:method:: _getModel()
+
+      A method to build pyomo
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+
+.. py:data:: cost
+
+   
+

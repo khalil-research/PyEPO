@@ -37,6 +37,7 @@ Classes
    pyepo.func.negativeIdentity
    pyepo.func.perturbedOpt
    pyepo.func.perturbedFenchelYoung
+   pyepo.func.implicitMLE
    pyepo.func.NCE
    pyepo.func.contrastiveMAP
    pyepo.func.listwiseLTR
@@ -51,13 +52,13 @@ Classes
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
-   which measures the decision error of optimization problem.
+   which measures the decision error of the optimization problem.
 
    For SPO/SPO+ Loss, the objective function is linear and constraints are
-   known and fixed, but the cost vector need to be predicted from contextual
+   known and fixed, but the cost vector needs to be predicted from contextual
    data.
 
-   The SPO+ Loss is convex with subgradient. Thus, allows us to design an
+   The SPO+ Loss is convex with subgradient. Thus, it allows us to design an
    algorithm based on stochastic gradient descent.
 
    Reference: <https://doi.org/10.1287/mnsc.2020.3922>
@@ -73,14 +74,15 @@ Classes
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for differentiable black-box optimizer, which yield
-   optimal a solution and derive a gradient.
+   an optimal solution and derive a gradient.
 
    For differentiable block-box, the objective function is linear and
-   constraints are known and fixed, but the cost vector need to be predicted
+   constraints are known and fixed, but the cost vector needs to be predicted
    from contextual data.
 
-   The block-box approximate gradient of optimizer smoothly. Thus, allows us to
-   design an algorithm based on stochastic gradient descent.
+   The block-box approximates the gradient of the optimizer by interpolating
+   the loss function. Thus, it allows us to design an algorithm based on
+   stochastic gradient descent.
 
    Reference: <https://arxiv.org/abs/1912.02175>
 
@@ -94,15 +96,15 @@ Classes
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   An autograd module for differentiable optimizer, which yield optimal a
-   solution and use negative identity as gradient on the backward pass.
+   An autograd module for the differentiable optimizer, which yields optimal a
+   solution and use negative identity as a gradient on the backward pass.
 
    For negative identity backpropagation, the objective function is linear and
-   constraints are known and fixed, but the cost vector need to be predicted
+   constraints are known and fixed, but the cost vector needs to be predicted
    from contextual data.
 
    If the interpolation hyperparameter λ aligns with an appropriate step size,
-   then the identity update is tantamount to DBB. However, the identity update
+   then the identity update is equivalent to DBB. However, the identity update
    does not require an additional call to the solver during the backward pass
    and tuning an additional hyperparameter λ.
 
@@ -118,14 +120,15 @@ Classes
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   An autograd module for differentiable perturbed optimizer, in which random
-   perturbed costs are sampled to optimize.
+   An autograd module for Fenchel-Young loss using perturbation techniques. The
+   use of the loss improves the algorithmic by the specific expression of the
+   gradients of the loss.
 
-   For the perturbed optimizer, the cost vector need to be predicted from
+   For the perturbed optimizer, the cost vector needs to be predicted from
    contextual data and are perturbed with Gaussian noise.
 
-   The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
-   Thus, allows us to design an algorithm based on stochastic gradient descent.
+   Thus, it allows us to design an algorithm based on stochastic gradient
+   descent.
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
@@ -158,17 +161,40 @@ Classes
 
 
 
+.. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=1, distribution=sumGammaDistribution(kappa=5), solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for Implicit Maximum Likelihood Estimator, which yield
+   an optimal solution in a constrained exponential family distribution via
+   Perturb-and-MAP.
+
+   For I-LME, it works as black-box combinatorial solvers, in which constraints
+   are known and fixed, but the cost vector need to be predicted from
+   contextual data.
+
+   The I-LME approximate gradient of optimizer smoothly. Thus, allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
+
+   .. py:method:: forward(pred_cost)
+
+      Forward pass
+
+
+
 .. py:class:: NCE(optmodel, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for noise contrastive estimation as surrogate loss
-   functions, based on viewing non-optimal solutions as negative examples.
+   functions, based on viewing suboptimal solutions as negative examples.
 
    For the NCE, the cost vector needs to be predicted from contextual data and
    maximizes the separation of the probability of the optimal solution.
 
-   Thus, allows us to design an algorithm based on stochastic gradient descent.
+   Thus allows us to design an algorithm based on stochastic gradient descent.
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
@@ -183,12 +209,12 @@ Classes
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for Maximum A Posterior contrastive estimation as
-   surrogate loss functions, which is a efficient self-contrastive algorithm.
+   surrogate loss functions, which is an efficient self-contrastive algorithm.
 
    For the MAP, the cost vector needs to be predicted from contextual data and
    maximizes the separation of the probability of the optimal solution.
 
-   Thus, allows us to design an algorithm based on stochastic gradient descent.
+   Thus, it allows us to design an algorithm based on stochastic gradient descent.
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
@@ -205,10 +231,11 @@ Classes
    An autograd module for listwise learning to rank, where the goal is to learn
    an objective function that ranks a pool of feasible solutions correctly.
 
-   For the listwise LTR, the cost vector needs to be predicted from contextual
-   data, and the loss measures the scores of the whole ranked lists.
+   For the listwise LTR, the cost vector needs to be predicted from the
+   contextual data and the loss measures the scores of the whole ranked lists.
 
-   Thus, allows us to design an algorithm based on stochastic gradient descent.
+   Thus, it allows us to design an algorithm based on stochastic gradient
+   descent.
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
@@ -225,10 +252,11 @@ Classes
    An autograd module for pairwise learning to rank, where the goal is to learn
    an objective function that ranks a pool of feasible solutions correctly.
 
-   For the pairwise LTR, the cost vector needs to be predicted from contextual
-   data, and the loss learns the relative ordering of pairs of items.
+   For the pairwise LTR, the cost vector needs to be predicted from the
+   contextual data and the loss learns the relative ordering of pairs of items.
 
-   Thus, allows us to design an algorithm based on stochastic gradient descent.
+   Thus, it allows us to design an algorithm based on stochastic gradient
+   descent.
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
@@ -249,7 +277,8 @@ Classes
    For the pointwise LTR, the cost vector needs to be predicted from contextual
    data, and calculates the ranking scores of the items.
 
-   Thus, allows us to design an algorithm based on stochastic gradient descent.
+   Thus, it allows us to design an algorithm based on stochastic gradient
+   descent.
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 

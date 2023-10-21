@@ -15,6 +15,7 @@ Subpackages
    :titlesonly:
    :maxdepth: 3
 
+   copt/index.rst
    grb/index.rst
    omo/index.rst
 

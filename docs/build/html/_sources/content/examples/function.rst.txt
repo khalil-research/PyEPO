@@ -57,6 +57,24 @@ Negative Identity Backpropagation (NID) [#f6]_ treats the solver as a negative i
    nid = pyepo.func.negativeIdentity(optmodel, processes=2)
 
 
+Implicit Maximum Likelihood Estimator (I-MLE)
+=============================================
+
+Implicit Maximum Likelihood Estimator (I-MLE) [#f7]_ use the perturb-and-MAP framework. They sample noise from a Sum-of-Gamma distribution and interpolate the loss function to approximate finite difference.
+
+.. autoclass:: pyepo.func.implicitMLE
+    :noindex:
+    :members:
+
+``pyepo.func.implicitMLE`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores.
+
+.. code-block:: python
+
+   import pyepo
+
+   imle = pyepo.func.implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=2)
+
+
 Differentiable Perturbed Optimizer (DPO)
 ========================================
 
@@ -188,3 +206,4 @@ The figure shows that the increasing of processes reduces the runtime.
 .. [#f4] Mulamba, M., Mandi, J., Diligenti, M., Lombardi, M., Bucarey, V., & Guns, T. (2021). Contrastive losses and solution caching for predict-and-optimize. Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence.
 .. [#f5] Mandi, J., Bucarey, V., Mulamba, M., & Guns, T. (2022). Decision-focused learning: through the lens of learning to rank. Proceedings of the 39th International Conference on Machine Learning.
 .. [#f6] Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.
+.. [#f7] Niepert, M., Minervini, P., & Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.

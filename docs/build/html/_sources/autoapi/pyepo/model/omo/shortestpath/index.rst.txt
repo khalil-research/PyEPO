@@ -22,6 +22,14 @@ Classes
 
 
 
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.omo.shortestpath.cost
+
+
 .. py:class:: shortestPathModel(grid, solver='glpk')
 
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
@@ -65,4 +73,8 @@ Classes
       A method to build pyomo model
 
 
+
+.. py:data:: cost
+
+   
 

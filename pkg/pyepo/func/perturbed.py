@@ -290,7 +290,7 @@ class implicitMLE(optModule):
             sigma (float): noise temperature for the input distribution
             lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
             processes (int): number of processors, 1 for single-core, 0 for all of cores
-            distribution (distribution): noise distribution
+            distribution (RandomState): noise distribution
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """

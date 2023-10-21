@@ -22,6 +22,14 @@ Classes
 
 
 
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.grb.shortestpath.cost
+
+
 .. py:class:: shortestPathModel(grid)
 
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
@@ -62,4 +70,8 @@ Classes
       :rtype: tuple
 
 
+
+.. py:data:: cost
+
+   
 

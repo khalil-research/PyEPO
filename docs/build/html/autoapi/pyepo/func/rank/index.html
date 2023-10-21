@@ -183,9 +183,10 @@
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for listwise learning to rank, where the goal is to learn
 an objective function that ranks a pool of feasible solutions correctly.</p>
-<p>For the listwise LTR, the cost vector needs to be predicted from contextual
-data, and the loss measures the scores of the whole ranked lists.</p>
-<p>Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>For the listwise LTR, the cost vector needs to be predicted from the
+contextual data and the loss measures the scores of the whole ranked lists.</p>
+<p>Thus, it allows us to design an algorithm based on stochastic gradient
+descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.rank.listwiseLTR.forward">
@@ -201,9 +202,10 @@ data, and the loss measures the scores of the whole ranked lists.</p>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for pairwise learning to rank, where the goal is to learn
 an objective function that ranks a pool of feasible solutions correctly.</p>
-<p>For the pairwise LTR, the cost vector needs to be predicted from contextual
-data, and the loss learns the relative ordering of pairs of items.</p>
-<p>Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>For the pairwise LTR, the cost vector needs to be predicted from the
+contextual data and the loss learns the relative ordering of pairs of items.</p>
+<p>Thus, it allows us to design an algorithm based on stochastic gradient
+descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.rank.pairwiseLTR.forward">
@@ -222,7 +224,8 @@ learn an objective function that ranks a pool of feasible solutions
 correctly.</p>
 <p>For the pointwise LTR, the cost vector needs to be predicted from contextual
 data, and calculates the ranking scores of the items.</p>
-<p>Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>Thus, it allows us to design an algorithm based on stochastic gradient
+descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.rank.pointwiseLTR.forward">

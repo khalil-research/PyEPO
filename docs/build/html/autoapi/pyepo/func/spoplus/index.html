@@ -179,11 +179,11 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.spoplus.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.spoplus.SPOPlus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
-which measures the decision error of optimization problem.</p>
+which measures the decision error of the optimization problem.</p>
 <p>For SPO/SPO+ Loss, the objective function is linear and constraints are
-known and fixed, but the cost vector need to be predicted from contextual
+known and fixed, but the cost vector needs to be predicted from contextual
 data.</p>
-<p>The SPO+ Loss is convex with subgradient. Thus, allows us to design an
+<p>The SPO+ Loss is convex with subgradient. Thus, it allows us to design an
 algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://doi.org/10.1287/mnsc.2020.3922">https://doi.org/10.1287/mnsc.2020.3922</a>&gt;</p>
 <dl class="py method">
