@@ -85,3 +85,34 @@ class shortestPathModel(optGrbModel):
                 else:
                     m.addConstr(expr == 0)
         return m, x
+
+
+if __name__ == "__main__":
+    
+    import random
+    # random seed
+    random.seed(42)
+    # set random cost for test
+    cost = [random.random() for _ in range(40)]
+    
+    # solve model
+    optmodel = shortestPathModel(grid=(5,5)) # init model
+    optmodel = optmodel.copy()
+    optmodel.setObj(cost) # set objective function
+    sol, obj = optmodel.solve() # solve
+    # print res
+    print('Obj: {}'.format(obj))
+    for i, e in enumerate(optmodel.arcs):
+        if sol[i] > 1e-3:
+            print(e)
+            
+            
+    # add constraint
+    optmodel = optmodel.addConstr([1]*40, 30)
+    optmodel.setObj(cost) # set objective function
+    sol, obj = optmodel.solve() # solve
+    # print res
+    print('Obj: {}'.format(obj))
+    for i, e in enumerate(optmodel.arcs):
+        if sol[i] > 1e-3:
+            print(e)

@@ -15,13 +15,13 @@ from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 class SPOPlus(optModule):
     """
     An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
-    which measures the decision error of optimization problem.
+    which measures the decision error of the optimization problem.
 
     For SPO/SPO+ Loss, the objective function is linear and constraints are
-    known and fixed, but the cost vector need to be predicted from contextual
+    known and fixed, but the cost vector needs to be predicted from contextual
     data.
 
-    The SPO+ Loss is convex with subgradient. Thus, allows us to design an
+    The SPO+ Loss is convex with subgradient. Thus, it allows us to design an
     algorithm based on stochastic gradient descent.
 
     Reference: <https://doi.org/10.1287/mnsc.2020.3922>
