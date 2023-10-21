@@ -23,6 +23,14 @@ Classes
 
 
 
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.omo.knapsack.cost
+
+
 .. py:class:: knapsackModel(weights, capacity, solver='glpk')
 
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
@@ -86,4 +94,8 @@ Classes
       A forbidden method to relax MIP model
 
 
+
+.. py:data:: cost
+
+   
 

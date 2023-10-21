@@ -23,6 +23,14 @@ Classes
 
 
 
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.grb.knapsack.cost
+
+
 .. py:class:: knapsackModel(weights, capacity)
 
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
@@ -83,4 +91,8 @@ Classes
       A forbidden method to relax MIP model
 
 
+
+.. py:data:: cost
+
+   
 

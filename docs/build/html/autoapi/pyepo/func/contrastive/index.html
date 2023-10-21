@@ -179,10 +179,10 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.contrastive.</span></span><span class="sig-name descname"><span class="pre">NCE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.contrastive.NCE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for noise contrastive estimation as surrogate loss
-functions, based on viewing non-optimal solutions as negative examples.</p>
+functions, based on viewing suboptimal solutions as negative examples.</p>
 <p>For the NCE, the cost vector needs to be predicted from contextual data and
 maximizes the separation of the probability of the optimal solution.</p>
-<p>Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>Thus allows us to design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://www.ijcai.org/proceedings/2021/390">https://www.ijcai.org/proceedings/2021/390</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.contrastive.NCE.forward">
@@ -197,10 +197,10 @@ maximizes the separation of the probability of the optimal solution.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.contrastive.</span></span><span class="sig-name descname"><span class="pre">contrastiveMAP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.contrastive.contrastiveMAP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for Maximum A Posterior contrastive estimation as
-surrogate loss functions, which is a efficient self-contrastive algorithm.</p>
+surrogate loss functions, which is an efficient self-contrastive algorithm.</p>
 <p>For the MAP, the cost vector needs to be predicted from contextual data and
 maximizes the separation of the probability of the optimal solution.</p>
-<p>Thus, allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>Thus, it allows us to design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://www.ijcai.org/proceedings/2021/390">https://www.ijcai.org/proceedings/2021/390</a>&gt;</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.contrastive.contrastiveMAP.forward">

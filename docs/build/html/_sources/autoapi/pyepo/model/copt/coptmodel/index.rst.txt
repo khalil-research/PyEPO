@@ -1,0 +1,79 @@
+:py:mod:`pyepo.model.copt.coptmodel`
+====================================
+
+.. py:module:: pyepo.model.copt.coptmodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model based on Cardinal Optimizer（COPT）
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.copt.coptmodel.optCoptModel
+
+
+
+
+.. py:class:: optCoptModel
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+   This is an abstract class for Cardinal Optimizer optimization model
+
+   .. attribute:: _model
+
+      COPT model
+
+      :type: COPT model
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost of objective function
+      :type c: np.ndarray / list
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+   .. py:method:: copy()
+
+      A method to copy model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: np.ndarray / list
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+

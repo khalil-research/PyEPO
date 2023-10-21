@@ -12,6 +12,14 @@
 Module Contents
 ---------------
 
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.utlis.sumGammaDistribution
+
+
 
 Functions
 ~~~~~~~~~
@@ -53,5 +61,13 @@ Functions
 .. py:function:: _check_sol(c, w, z)
 
    A function to check solution is correct
+
+
+.. py:class:: sumGammaDistribution(kappa, n_iterations=10, seed=135)
+
+   creates a generator of samples for the Sum-of-Gamma distribution
+
+   .. py:method:: sample(size)
+
 
 

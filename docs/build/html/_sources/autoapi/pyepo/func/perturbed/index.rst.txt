@@ -21,6 +21,8 @@ Classes
    pyepo.func.perturbed.perturbedOptFunc
    pyepo.func.perturbed.perturbedFenchelYoung
    pyepo.func.perturbed.perturbedFenchelYoungFunc
+   pyepo.func.perturbed.implicitMLE
+   pyepo.func.perturbed.implicitMLEFunc
 
 
 
@@ -39,14 +41,15 @@ Functions
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   An autograd module for differentiable perturbed optimizer, in which random
-   perturbed costs are sampled to optimize.
+   An autograd module for Fenchel-Young loss using perturbation techniques. The
+   use of the loss improves the algorithmic by the specific expression of the
+   gradients of the loss.
 
-   For the perturbed optimizer, the cost vector need to be predicted from
+   For the perturbed optimizer, the cost vector needs to be predicted from
    contextual data and are perturbed with Gaussian noise.
 
-   The perturbed optimizer differentiable in its inputs with non-zero Jacobian.
-   Thus, allows us to design an algorithm based on stochastic gradient descent.
+   Thus, it allows us to design an algorithm based on stochastic gradient
+   descent.
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
@@ -160,6 +163,72 @@ Functions
       :staticmethod:
 
       Backward pass for perturbed Fenchel-Young loss
+
+
+
+.. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=1, distribution=sumGammaDistribution(kappa=5), solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for Implicit Maximum Likelihood Estimator, which yield
+   an optimal solution in a constrained exponential family distribution via
+   Perturb-and-MAP.
+
+   For I-LME, it works as black-box combinatorial solvers, in which constraints
+   are known and fixed, but the cost vector need to be predicted from
+   contextual data.
+
+   The I-LME approximate gradient of optimizer smoothly. Thus, allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
+
+   .. py:method:: forward(pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: implicitMLEFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+   A autograd function for Implicit Maximum Likelihood Estimator
+
+   .. py:method:: forward(ctx, pred_cost, optmodel, n_samples, sigma, lambd, processes, pool, distribution, solve_ratio, module)
+      :staticmethod:
+
+      Forward pass for IMLE
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+      :param optmodel: an PyEPO optimization model
+      :type optmodel: optModel
+      :param n_samples: number of Monte-Carlo samples
+      :type n_samples: int
+      :param sigma: noise temperature for the input distribution
+      :type sigma: float
+      :param lambd: a hyperparameter for differentiable block-box to control interpolation degree
+      :type lambd: float
+      :param processes: number of processors, 1 for single-core, 0 for all of cores
+      :type processes: int
+      :param pool: process pool object
+      :type pool: ProcessPool
+      :param distribution: noise distribution
+      :type distribution: distribution
+      :param solve_ratio: the ratio of new solutions computed during training
+      :type solve_ratio: float
+      :param module: implicitMLE module
+      :type module: optModule
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+   .. py:method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass for IMLE
 
 
 
