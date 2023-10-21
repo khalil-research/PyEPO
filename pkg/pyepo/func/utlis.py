@@ -89,3 +89,23 @@ def _check_sol(c, w, z):
             raise AssertionError(
                 "Solution {} does not macth the objective value {}.".
                 format(c[i] @ w[i], z[i][0]))
+
+
+class sumGammaDistribution:
+    """
+    creates a generator of samples for the Sum-of-Gamma distribution
+    """
+    def __init__(self, kappa, n_iterations=10, seed=135):
+        self.κ = kappa
+        self.n_iterations = n_iterations
+        self.rnd = np.random.RandomState(seed)
+
+    def sample(self, size):
+        # init samples
+        samples = 0
+        # calculate samples
+        for i in range(1, self.n_iterations+1):
+            samples += self.rnd.gamma(1/self.κ, self.κ/i, size)
+        samples -= np.log(self.n_iterations)
+        samples /= self.κ
+        return samples

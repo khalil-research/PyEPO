@@ -16,14 +16,14 @@ from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 class NCE(optModule):
     """
     An autograd module for noise contrastive estimation as surrogate loss
-    functions, based on viewing non-optimal solutions as negative examples.
+    functions, based on viewing suboptimal solutions as negative examples.
 
     For the NCE, the cost vector needs to be predicted from contextual data and
     maximizes the separation of the probability of the optimal solution.
 
-    Thus, allows us to design an algorithm based on stochastic gradient descent.
+    Thus allows us to design an algorithm based on stochastic gradient descent.
 
-    Reference: <https://www.ijcai.org/proceedings/2021/390> 
+    Reference: <https://www.ijcai.org/proceedings/2021/390>
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
@@ -80,12 +80,12 @@ class NCE(optModule):
 class contrastiveMAP(optModule):
     """
     An autograd module for Maximum A Posterior contrastive estimation as
-    surrogate loss functions, which is a efficient self-contrastive algorithm.
+    surrogate loss functions, which is an efficient self-contrastive algorithm.
 
     For the MAP, the cost vector needs to be predicted from contextual data and
     maximizes the separation of the probability of the optimal solution.
 
-    Thus, allows us to design an algorithm based on stochastic gradient descent.
+    Thus, it allows us to design an algorithm based on stochastic gradient descent.
 
     Reference: <https://www.ijcai.org/proceedings/2021/390>
     """

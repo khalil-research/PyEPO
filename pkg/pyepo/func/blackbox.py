@@ -16,14 +16,15 @@ from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 class blackboxOpt(optModule):
     """
     An autograd module for differentiable black-box optimizer, which yield
-    optimal a solution and derive a gradient.
+    an optimal solution and derive a gradient.
 
     For differentiable block-box, the objective function is linear and
-    constraints are known and fixed, but the cost vector need to be predicted
+    constraints are known and fixed, but the cost vector needs to be predicted
     from contextual data.
 
-    The block-box approximate gradient of optimizer smoothly. Thus, allows us to
-    design an algorithm based on stochastic gradient descent.
+    The block-box approximates the gradient of the optimizer by interpolating
+    the loss function. Thus, it allows us to design an algorithm based on
+    stochastic gradient descent.
 
     Reference: <https://arxiv.org/abs/1912.02175>
     """
@@ -32,7 +33,7 @@ class blackboxOpt(optModule):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
-            lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
+            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
@@ -66,7 +67,7 @@ class blackboxOptFunc(Function):
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
-            lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
+            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             pool (ProcessPool): process pool object
@@ -140,26 +141,23 @@ class blackboxOptFunc(Function):
         else:
             sol, _ = _cache_in_pass(cq, optmodel, module.solpool)
         # get gradient
-        grad = []
-        for i in range(len(sol)):
-            grad.append((sol[i] - wp[i]) / lambd)
+        grad = (np.array(sol) - wp) / lambd
         # convert to tensor
-        grad = np.array(grad)
         grad = torch.FloatTensor(grad).to(device)
         return grad, None, None, None, None, None, None
 
 
 class negativeIdentity(optModule):
     """
-    An autograd module for differentiable optimizer, which yield optimal a
-    solution and use negative identity as gradient on the backward pass.
+    An autograd module for the differentiable optimizer, which yields optimal a
+    solution and use negative identity as a gradient on the backward pass.
 
     For negative identity backpropagation, the objective function is linear and
-    constraints are known and fixed, but the cost vector need to be predicted
+    constraints are known and fixed, but the cost vector needs to be predicted
     from contextual data.
 
     If the interpolation hyperparameter λ aligns with an appropriate step size,
-    then the identity update is tantamount to DBB. However, the identity update
+    then the identity update is equivalent to DBB. However, the identity update
     does not require an additional call to the solver during the backward pass
     and tuning an additional hyperparameter λ.
 
