@@ -4,12 +4,13 @@
 Shortest path problem
 """
 
-from pyomo import environ as pe
+from coptpy import Envr
+from coptpy import COPT
 
-from pyepo.model.omo.omomodel import optOmoModel
+from pyepo.model.copt.coptmodel import optCoptModel
 
 
-class shortestPathModel(optOmoModel):
+class shortestPathModel(optCoptModel):
     """
     This class is optimization model for shortest path problem
 
@@ -20,7 +21,7 @@ class shortestPathModel(optOmoModel):
         arcs (list): list of arcs
     """
 
-    def __init__(self, grid, solver="glpk"):
+    def __init__(self, grid):
         """
         Args:
             grid (tuple of int): size of grid network
@@ -28,7 +29,7 @@ class shortestPathModel(optOmoModel):
         """
         self.grid = grid
         self.arcs = self._getArcs()
-        super().__init__(solver)
+        super().__init__()
 
     def _getArcs(self):
         """
@@ -56,14 +57,12 @@ class shortestPathModel(optOmoModel):
         A method to build pyomo model
         """
         # ceate a model
-        m = pe.ConcreteModel("shortest path")
-        # parameters
-        m.arcs = pe.Set(initialize=self.arcs)
+        m = Envr().createModel("shortest path")
         # varibles
-        x = pe.Var(m.arcs, domain=pe.PositiveReals, bounds=(0,1))
-        m.x = x
+        x = m.addVars(self.arcs, nameprefix='x', vtype=COPT.CONTINUOUS, lb=0, ub=1)
+        # sense
+        m.setObjSense(COPT.MINIMIZE)
         # constraints
-        m.cons = pe.ConstraintList()
         for i in range(self.grid[0]):
             for j in range(self.grid[1]):
                 v = v = i * self.grid[1] + j
@@ -77,26 +76,26 @@ class shortestPathModel(optOmoModel):
                         expr -= x[e]
                 # source
                 if i == 0 and j == 0:
-                    m.cons.add(expr == -1)
+                    m.addConstr(expr == -1)
                 # sink
                 elif i == self.grid[0] - 1 and j == self.grid[0] - 1:
-                    m.cons.add(expr == 1)
+                    m.addConstr(expr == 1)
                 # transition
                 else:
-                    m.cons.add(expr == 0)
+                    m.addConstr(expr == 0)
         return m, x
-    
-    
+
+
 if __name__ == "__main__":
-    
+
     import random
     # random seed
     random.seed(42)
     # set random cost for test
     cost = [random.random() for _ in range(40)]
-    
+
     # solve model
-    optmodel = shortestPathModel(grid=(5,5), solver="gurobi") # init model
+    optmodel = shortestPathModel(grid=(5,5)) # init model
     optmodel = optmodel.copy()
     optmodel.setObj(cost) # set objective function
     sol, obj = optmodel.solve() # solve
@@ -105,8 +104,8 @@ if __name__ == "__main__":
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)
-            
-            
+
+
     # add constraint
     optmodel = optmodel.addConstr([1]*40, 30)
     optmodel.setObj(cost) # set objective function
