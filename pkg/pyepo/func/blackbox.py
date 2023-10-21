@@ -16,14 +16,15 @@ from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
 class blackboxOpt(optModule):
     """
     An autograd module for differentiable black-box optimizer, which yield
-    optimal a solution and derive a gradient.
+    an optimal solution and derive a gradient.
 
     For differentiable block-box, the objective function is linear and
-    constraints are known and fixed, but the cost vector need to be predicted
+    constraints are known and fixed, but the cost vector needs to be predicted
     from contextual data.
 
-    The block-box approximate gradient of optimizer smoothly. Thus, allows us to
-    design an algorithm based on stochastic gradient descent.
+    The block-box approximates the gradient of the optimizer by interpolating
+    the loss function. Thus, it allows us to design an algorithm based on
+    stochastic gradient descent.
 
     Reference: <https://arxiv.org/abs/1912.02175>
     """
@@ -151,15 +152,15 @@ class blackboxOptFunc(Function):
 
 class negativeIdentity(optModule):
     """
-    An autograd module for differentiable optimizer, which yield optimal a
-    solution and use negative identity as gradient on the backward pass.
+    An autograd module for the differentiable optimizer, which yields optimal a
+    solution and use negative identity as a gradient on the backward pass.
 
     For negative identity backpropagation, the objective function is linear and
-    constraints are known and fixed, but the cost vector need to be predicted
+    constraints are known and fixed, but the cost vector needs to be predicted
     from contextual data.
 
     If the interpolation hyperparameter λ aligns with an appropriate step size,
-    then the identity update is tantamount to DBB. However, the identity update
+    then the identity update is equivalent to DBB. However, the identity update
     does not require an additional call to the solver during the backward pass
     and tuning an additional hyperparameter λ.
 
