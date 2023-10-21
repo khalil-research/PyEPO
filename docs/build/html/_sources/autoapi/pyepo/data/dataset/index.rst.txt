@@ -1,0 +1,96 @@
+:py:mod:`pyepo.data.dataset`
+============================
+
+.. py:module:: pyepo.data.dataset
+
+.. autoapi-nested-parse::
+
+   optDataset class based on PyTorch Dataset
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.data.dataset.optDataset
+
+
+
+
+.. py:class:: optDataset(model, feats, costs)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+   This class is Torch Dataset for optimization problems.
+
+   .. attribute:: model
+
+      Optimization models
+
+      :type: optModel
+
+   .. attribute:: feats
+
+      Data features
+
+      :type: np.ndarray
+
+   .. attribute:: costs
+
+      Cost vectors
+
+      :type: np.ndarray
+
+   .. attribute:: sols
+
+      Optimal solutions
+
+      :type: np.ndarray
+
+   .. attribute:: objs
+
+      Optimal objective values
+
+      :type: np.ndarray
+
+   .. py:method:: _getSols()
+
+      A method to get optimal solutions for all cost vectors
+
+
+   .. py:method:: _solve(cost)
+
+      A method to solve optimization problem to get an optimal solution with given cost
+
+      :param cost: cost of objective function
+      :type cost: np.ndarray
+
+      :returns: optimal solution (np.ndarray) and objective value (float)
+      :rtype: tuple
+
+
+   .. py:method:: __len__()
+
+      A method to get data size
+
+      :returns: the number of optimization problems
+      :rtype: int
+
+
+   .. py:method:: __getitem__(index)
+
+      A method to retrieve data
+
+      :param index: data index
+      :type index: int
+
+      :returns: data features (torch.tensor), costs (torch.tensor), optimal solutions (torch.tensor) and objective values (torch.tensor)
+      :rtype: tuple
+
+
+

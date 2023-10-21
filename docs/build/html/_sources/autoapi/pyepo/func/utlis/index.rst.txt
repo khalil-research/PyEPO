@@ -1,0 +1,57 @@
+:py:mod:`pyepo.func.utlis`
+==========================
+
+.. py:module:: pyepo.func.utlis
+
+.. autoapi-nested-parse::
+
+   Utility function
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.utlis._solve_in_pass
+   pyepo.func.utlis._cache_in_pass
+   pyepo.func.utlis._solveWithObj4Par
+   pyepo.func.utlis._check_sol
+
+
+
+.. py:function:: _solve_in_pass(cp, optmodel, processes, pool)
+
+   A function to solve optimization in the forward/backward pass
+
+
+.. py:function:: _cache_in_pass(cp, optmodel, solpool)
+
+   A function to use solution pool in the forward/backward pass
+
+
+.. py:function:: _solveWithObj4Par(cost, args, model_type)
+
+   A function to solve function in parallel processors
+
+   :param cost: cost of objective function
+   :type cost: np.ndarray
+   :param args: optModel args
+   :type args: dict
+   :param model_type: optModel class type
+   :type model_type: ABCMeta
+
+   :returns: optimal solution (list) and objective value (float)
+   :rtype: tuple
+
+
+.. py:function:: _check_sol(c, w, z)
+
+   A function to check solution is correct
+
+

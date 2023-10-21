@@ -1,0 +1,86 @@
+:py:mod:`pyepo.model.grb.knapsack`
+==================================
+
+.. py:module:: pyepo.model.grb.knapsack
+
+.. autoapi-nested-parse::
+
+   Knapsack problem
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.grb.knapsack.knapsackModel
+   pyepo.model.grb.knapsack.knapsackModelRel
+
+
+
+
+.. py:class:: knapsackModel(weights, capacity)
+
+   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
+   This class is optimization model for knapsack problem
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: weights
+
+      Weights of items
+
+      :type: np.ndarray / list
+
+   .. attribute:: capacity
+
+      Total capacity
+
+      :type: np.ndarray / listy
+
+   .. attribute:: items
+
+      List of item index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: knapsackModelRel(weights, capacity)
+
+   Bases: :py:obj:`knapsackModel`
+
+   This class is relaxed optimization model for knapsack problem.
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+

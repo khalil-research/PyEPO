@@ -1,0 +1,374 @@
+:py:mod:`pyepo.model.grb.tsp`
+=============================
+
+.. py:module:: pyepo.model.grb.tsp
+
+.. autoapi-nested-parse::
+
+   Traveling salesman probelm
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.grb.tsp.tspABModel
+   pyepo.model.grb.tsp.tspGGModel
+   pyepo.model.grb.tsp.tspGGModelRel
+   pyepo.model.grb.tsp.tspDFJModel
+   pyepo.model.grb.tsp.tspMTZModel
+   pyepo.model.grb.tsp.tspMTZModelRel
+
+
+
+
+.. py:class:: tspABModel(num_nodes)
+
+   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
+   This abstract class is optimization model for traveling salesman problem.
+   This model is for further implementation of different formulation.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:property:: num_cost
+
+      number of cost to be predicted
+
+   .. py:method:: copy()
+
+      A method to copy model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+   .. py:method:: getTour(sol)
+
+      A method to get a tour from solution
+
+      :param sol: solution
+      :type sol: list
+
+      :returns: a TSP tour
+      :rtype: list
+
+
+
+.. py:class:: tspGGModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+   This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: tspGGModelRel(num_nodes)
+
+   Bases: :py:obj:`tspGGModel`
+
+   This class is relaxation of tspGGModel.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+   .. py:method:: getTour(sol)
+
+      A forbidden method to get a tour from solution
+
+
+
+.. py:class:: tspDFJModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+   This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+   constraint generation.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: _subtourelim(model, where)
+      :staticmethod:
+
+      A static method to add lazy constraints for subtour elimination
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+.. py:class:: tspMTZModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+   This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: tspMTZModelRel(num_nodes)
+
+   Bases: :py:obj:`tspMTZModel`
+
+   This class is relaxation of tspMTZModel.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+   .. py:method:: getTour(sol)
+
+      A forbidden method to get a tour from solution
+
+
+

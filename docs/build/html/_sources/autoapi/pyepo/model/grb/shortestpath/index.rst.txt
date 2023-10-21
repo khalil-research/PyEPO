@@ -1,0 +1,65 @@
+:py:mod:`pyepo.model.grb.shortestpath`
+======================================
+
+.. py:module:: pyepo.model.grb.shortestpath
+
+.. autoapi-nested-parse::
+
+   Shortest path problem
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.grb.shortestpath.shortestPathModel
+
+
+
+
+.. py:class:: shortestPathModel(grid)
+
+   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
+   This class is optimization model for shortest path problem
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: grid
+
+      Size of grid network
+
+      :type: tuple of int
+
+   .. attribute:: arcs
+
+      List of arcs
+
+      :type: list
+
+   .. py:method:: _getArcs()
+
+      A method to get list of arcs for grid network
+
+      :returns: arcs
+      :rtype: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+

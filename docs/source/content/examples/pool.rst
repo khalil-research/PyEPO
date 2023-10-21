@@ -8,7 +8,7 @@ The corresponding algorithm is as follows:
 .. image:: ../../images/pool.png
    :width: 500
 
-The solution pool has already been applied on ``pyepo.func.SPOPlus``, ``pyepo.func.blackboxOpt``, ``pyepo.func.perturbedOpt``, and ``pyepo.func.perturbedFenchelYoung``.
+The solution pool has already been applied on modules of ``pyepo.func``.
 
 ``solve_ratio`` is the ratio of new solutions computed during training, in which the default is 1.0 so the solution pool is not used. When ``solve_ratio`` is less than 1, the solution pool requires training data as ``dataset`` to obtain initial solutions.
 

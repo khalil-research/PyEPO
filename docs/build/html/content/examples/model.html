@@ -1,0 +1,1521 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Model &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Data" href="data.html" />
+    <link rel="prev" title="Tutorial" href="../tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PyTorch-based End-to-End Predict-then-Optimize Tool
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#user-defined-models">User-defined Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#user-defined-gurobipy-models">User-defined GurobiPy Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#user-defined-pyomo-models">User-defined Pyomo Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#user-defined-models-from-scratch">User-defined Models from Scratch</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pre-defined-models">Pre-defined Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shortest-path">Shortest Path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knapsack">Knapsack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#traveling-salesman">Traveling Salesman</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-stage Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyTorch-based End-to-End Predict-then-Optimize Tool</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorial.html">Tutorial</a> &raquo;</li>
+        
+      <li>Model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/content/examples/model.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="model">
+<h1>Model<a class="headerlink" href="#model" title="Permalink to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> is an implementation that aims to support an end-to-end predict-then-optimize with linear objective function and unknown cost coefficients. The core component is the differentiable optimization solver, which is involved in updating the gradient of the cost coefficients with respect to the optimal solution.</p>
+<p><code class="docutils literal notranslate"><span class="pre">optModel</span></code> is a module of PyEPO library. It is not a solver but serves as a container of a solver or an algorithm. This design allows for flexibility in the selection of solvers and algorithms by users. Other modules of <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> can use optModel for tasks such as training and testing.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> contains several pre-defined optimization models with GurobiPy and Pyomo. It includes the shortest path problem (GurobiPy &amp; Pyomo), the knapsack problem (GurobiPy &amp; Pyomo), and the traveling salesman problem (GurobiPy).</p>
+<p>To build optimization models with <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code>, users do <strong>not</strong> need specific costs of objective functions since the cost vector is unknown but will be estimated from data.</p>
+<p>For more information and details about the Optimization Model, please see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb">01 Optimization Model:</a></p>
+<section id="user-defined-models">
+<h2>User-defined Models<a class="headerlink" href="#user-defined-models" title="Permalink to this heading">¶</a></h2>
+<p>User can build optimization problem with linear objective function. Our API is also designed to support users to define their own problems based on GurobiPy and Pyomo. Besides the API of GurobiPy &amp; Pyomo, users can also build problems from scratch with whatever solvers and algorithms they want to use.</p>
+<p><code class="docutils literal notranslate"><span class="pre">optModel</span></code> treats these solvers as black boxes and provides interfaces <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>, <code class="docutils literal notranslate"><span class="pre">setObj</span></code>, and <code class="docutils literal notranslate"><span class="pre">solve</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">_getModel</span></code>: Build and return optimization solver and corresponding decision variables.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setObj</span></code>: Give a cost vector to set the objective function.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">solve</span></code>: Solve optimization problem and return optimal solution and objective value.</p></li>
+</ul>
+<section id="user-defined-gurobipy-models">
+<h3>User-defined GurobiPy Models<a class="headerlink" href="#user-defined-gurobipy-models" title="Permalink to this heading">¶</a></h3>
+<p>User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.optGrbModel</span></code>.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code>, users does not need specify the sense <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> as <code class="docutils literal notranslate"><span class="pre">EPO.MINIMIZE</span></code> or <code class="docutils literal notranslate"><span class="pre">EPO.MINIMIZE</span></code>. Both the minimization and maximization models are correctly recognized and run by <code class="docutils literal notranslate"><span class="pre">pyepo</span></code>.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">optGrbModel</span></span></dt>
+<dd><p>This is an abstract class for Gurobi-based optimization model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>An abstract method to build a model from a optimization solver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A unimplemented method to relax MIP model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>For example, users can build models for the following problem:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\max_{x} &amp; \sum_{i=0}^4 c_i x_i \\
+s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
+&amp; 4 x_0 + 5 x_1 + 2 x_2 + 3 x_3 + 5 x_4 \leq 10 \\
+&amp; 5 x_0 + 4 x_1 + 6 x_2 + 2 x_3 + 3 x_4 \leq 15 \\
+&amp; \forall x_i \in \{0, 1\}
+\end{aligned}\end{split}\]</div>
+<p>In the general case, users only need to implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> method with GurobiPy.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">import</span> <span class="nn">gurobipy</span> <span class="k">as</span> <span class="nn">gp</span>
+<span class="kn">from</span> <span class="nn">gurobipy</span> <span class="kn">import</span> <span class="n">GRB</span>
+
+<span class="kn">from</span> <span class="nn">pyepo.model.grb</span> <span class="kn">import</span> <span class="n">optGrbModel</span>
+
+<span class="k">class</span> <span class="nc">myModel</span><span class="p">(</span><span class="n">optGrbModel</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># create a model</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+        <span class="c1"># variables</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVars</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">)</span>
+        <span class="c1"># model sense</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">MAXIMIZE</span>
+        <span class="c1"># constraints</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="n">x</span>
+
+<span class="n">myoptmodel</span> <span class="o">=</span> <span class="n">myModel</span><span class="p">()</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">myoptmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">myoptmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">myoptmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+</pre></div>
+</div>
+</section>
+<section id="user-defined-pyomo-models">
+<h3>User-defined Pyomo Models<a class="headerlink" href="#user-defined-pyomo-models" title="Permalink to this heading">¶</a></h3>
+<p>User-defined models with Pyomo can be easily defined by the inheritance of the abstract class <code class="docutils literal notranslate"><span class="pre">pyepo.model.omo.optOmoModel</span></code>.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">optOmoModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This is an abstract class for Pyomo-based optimization model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Pyomo model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PyOmo model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solver</span></span></dt>
+<dd><p>optimization solver in the background</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>An abstract method to build a model from a optimization solver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A unimplemented method to relax MIP model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Let’s build models for the problem again with Pyomo:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\max_{x} &amp; \sum_{i=0}^4 c_i x_i \\
+s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
+&amp; 4 x_0 + 5 x_1 + 2 x_2 + 3 x_3 + 5 x_4 \leq 10 \\
+&amp; 5 x_0 + 4 x_1 + 6 x_2 + 2 x_3 + 3 x_4 \leq 15 \\
+&amp; \forall x_i \in \{0, 1\}
+\end{aligned}\end{split}\]</div>
+<p>In the general case, users only need to implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> method with Pyomo.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Unlike the <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code>, the <code class="docutils literal notranslate"><span class="pre">optOmoModel</span></code> need to set <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> in the <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">pyomo</span> <span class="kn">import</span> <span class="n">environ</span> <span class="k">as</span> <span class="n">pe</span>
+
+<span class="kn">from</span> <span class="nn">pyepo.model.omo</span> <span class="kn">import</span> <span class="n">optOmoModel</span>
+<span class="kn">from</span> <span class="nn">pyepo</span> <span class="kn">import</span> <span class="n">EPO</span>
+
+<span class="k">class</span> <span class="nc">myModel</span><span class="p">(</span><span class="n">optOmoModel</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># sense</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">EPO</span><span class="o">.</span><span class="n">MAXIMIZE</span>
+        <span class="c1"># create a model</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">ConcreteModel</span><span class="p">()</span>
+        <span class="c1"># variables</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">Var</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">domain</span><span class="o">=</span><span class="n">pe</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="c1"># constraints</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">cons</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">ConstraintList</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">cons</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">cons</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">cons</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="n">x</span>
+
+<span class="n">myoptmodel</span> <span class="o">=</span> <span class="n">myModel</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;gurobi&quot;</span><span class="p">)</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">myoptmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">myoptmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">myoptmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+</pre></div>
+</div>
+</section>
+<section id="user-defined-models-from-scratch">
+<h3>User-defined Models from Scratch<a class="headerlink" href="#user-defined-models-from-scratch" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>, <code class="docutils literal notranslate"><span class="pre">setObj</span></code>, <code class="docutils literal notranslate"><span class="pre">solve</span></code>,  and <code class="docutils literal notranslate"><span class="pre">num_cost</span></code>, user-defined <code class="docutils literal notranslate"><span class="pre">optModel</span></code> can work for end-to-end training.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">optModel</span></span></dt>
+<dd><p>This is an abstract class for optimization model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>An abstract method to build a model from a optimization solver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>An abstract method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>ndarray</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>An abstract method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> need to set <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> in the <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>. If not set, the default is to minimize.</p>
+</div>
+<p>For example, we can use <code class="docutils literal notranslate"><span class="pre">networkx</span></code> to solve the previous shortest path problem using the Dijkstra algorithm. And <code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> allows users to create a model in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+
+<span class="kn">from</span> <span class="nn">pyepo.model.opt</span> <span class="kn">import</span> <span class="n">optModel</span>
+
+<span class="k">class</span> <span class="nc">myShortestPathModel</span><span class="p">(</span><span class="n">optModel</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            grid (tuple): size of grid network</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arcs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getArcs</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_getArcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A method to get list of arcs for grid network</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: arcs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arcs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="c1"># edges on rows</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span>
+                <span class="n">arcs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="c1"># edges in columns</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span>
+                <span class="n">arcs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">arcs</span>
+
+    <span class="k">def</span> <span class="nf">_getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A method to build model</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: optimization model and variables</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># build graph as optimization model</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+        <span class="c1"># add arcs as variables</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arcs</span><span class="p">,</span> <span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span>
+
+    <span class="k">def</span> <span class="nf">setObj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A method to set objective function</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            c (ndarray): cost of objective function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arcs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="s2">&quot;cost&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A method to solve model</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: optimal solution (list) and objective value (float)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># dijkstra</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;cost&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># convert path into active edges</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="c1"># init sol &amp; obj</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># convert active edges into solution and obj</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arcs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+                <span class="n">sol</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># active edge</span>
+                <span class="n">obj</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="s2">&quot;cost&quot;</span><span class="p">]</span> <span class="c1"># cost of active edge</span>
+        <span class="k">return</span> <span class="n">sol</span><span class="p">,</span> <span class="n">obj</span>
+
+<span class="c1"># solve model</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">myoptmodel</span> <span class="o">=</span> <span class="n">myShortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">myoptmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">myoptmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">sol</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">myoptmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+<span class="c1"># print res</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Obj: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">myoptmodel</span><span class="o">.</span><span class="n">arcs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">sol</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1e-3</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="pre-defined-models">
+<h2>Pre-defined Models<a class="headerlink" href="#pre-defined-models" title="Permalink to this heading">¶</a></h2>
+<p>Pre-defined models are classic optimization problems, including shortest path, multidimensional knapsack, and traveling salesman.</p>
+<section id="shortest-path">
+<h3>Shortest Path<a class="headerlink" href="#shortest-path" title="Permalink to this heading">¶</a></h3>
+<p>It is a (h,w) grid network and the goal is to find the shortest path from northwest to southeast. In our examples, the grid size of network is (5,5).</p>
+<a class="reference internal image-reference" href="../../_images/shortestpath.png"><img alt="Shortest Path on the Grid Graph" src="../../_images/shortestpath.png" style="width: 300px;" /></a>
+<p>In <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code>, the shortest path problem is built as a linear program and formulated as a minimum cost flow problem.</p>
+<section id="shortest-path-gurobipy-model">
+<h4>Shortest Path GurobiPy Model<a class="headerlink" href="#shortest-path-gurobipy-model" title="Permalink to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.shortestPathModel</span></code>, in which API uses GurobiPy to model the shortest path problem.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is optimization model for shortest path problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">grid</span></span></dt>
+<dd><p>Size of grid network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">arcs</span></span></dt>
+<dd><p>List of arcs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>grid</strong> (<em>tuple of int</em>) – size of grid network</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>grid</strong> (<em>tuple of int</em>) – size of grid network</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># network grid</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="c1"># build model</span>
+</pre></div>
+</div>
+<p>Users can use <code class="docutils literal notranslate"><span class="pre">setObj</span></code> to assign a specific cost vector and use <code class="docutils literal notranslate"><span class="pre">solve</span></code> to optimize. However, <code class="docutils literal notranslate"><span class="pre">setObj</span></code> or  <code class="docutils literal notranslate"><span class="pre">solve</span></code> methods do not require manual calls during training.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+</pre></div>
+</div>
+</section>
+<section id="shortest-path-pyomo-model">
+<h4>Shortest Path Pyomo Model<a class="headerlink" href="#shortest-path-pyomo-model" title="Permalink to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.omo.shortestPathModel</span></code>, in which API uses Pyomo to model the shortest path problem.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is optimization model for shortest path problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Pyomo model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PyOmo model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solver</span></span></dt>
+<dd><p>optimization solver in the background</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">grid</span></span></dt>
+<dd><p>size of grid network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">arcs</span></span></dt>
+<dd><p>list of arcs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>tuple of int</em>) – size of grid network</p></li>
+<li><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>tuple of int</em>) – size of grid network</p></li>
+<li><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Pyomo supports a wide variety of solvers in the background (e.g. BARON, CBC, CPLEX, and Gurobi). Thus, <code class="docutils literal notranslate"><span class="pre">pyepo.model.omo.shortestPathModel</span></code> allows users to call different solvers with class parameter <code class="docutils literal notranslate"><span class="pre">solver</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># network grid</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">omo</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;glpk&quot;</span><span class="p">)</span> <span class="c1"># build model with glpk</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">omo</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;gurobi&quot;</span><span class="p">)</span> <span class="c1"># build model with gurobi</span>
+</pre></div>
+</div>
+<p>You can get the current list of supported solvers using the pyomo command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyomo <span class="nb">help</span> --solvers
+</pre></div>
+</div>
+<p>Same as <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.shortestPathModel</span></code>, methods <code class="docutils literal notranslate"><span class="pre">setObj</span></code> and <code class="docutils literal notranslate"><span class="pre">solve</span></code> can specify objective function and solve the problem.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="knapsack">
+<h3>Knapsack<a class="headerlink" href="#knapsack" title="Permalink to this heading">¶</a></h3>
+<p>Multi-dimensional knapsack problem is a maximization problem with multiple resource constraints: Given a set of items, the aim is to find a collection that the total weights in is less than or equal to resource capacities and the total value is as large as possible. Let’s define a 3D knapsack problem as follow:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\max_{x} &amp; \sum_{i=0}^4 c_i x_i \\
+s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
+&amp; 4 x_0 + 5 x_1 + 2 x_2 + 3 x_3 + 5 x_4 \leq 10 \\
+&amp; 5 x_0 + 4 x_1 + 6 x_2 + 2 x_3 + 3 x_4 \leq 15 \\
+&amp; \forall x_i \in \{0, 1\}
+\end{aligned}\end{split}\]</div>
+<p>Constraints coefficients <strong>weights</strong> and constraints rhs <strong>capacities</strong> are required to create models.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The dimension of the knapsack and the number of items are implicitly defined by the shape of <strong>weights</strong> and <strong>capacities</strong>.</p>
+</div>
+<section id="knapsack-gurobipy-model">
+<h4>Knapsack GurobiPy Model<a class="headerlink" href="#knapsack-gurobipy-model" title="Permalink to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.knapsackModel</span></code>, in which API uses GurobiPy to model the knapsack problem.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is optimization model for knapsack problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">weights</span></span></dt>
+<dd><p>Weights of items</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray / list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">capacity</span></span></dt>
+<dd><p>Total capacity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray / listy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">items</span></span></dt>
+<dd><p>List of item index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>np.ndarray / list</em>) – weights of items</p></li>
+<li><p><strong>capacity</strong> (<em>np.ndarray / list</em>) – total capacity</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>np.ndarray / list</em>) – weights of items</p></li>
+<li><p><strong>capacity</strong> (<em>np.ndarray / list</em>) – total capacity</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to get linear relaxation model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+
+<span class="n">weights</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+           <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+           <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span> <span class="c1"># constraints coefficients</span>
+<span class="n">capacities</span> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span> <span class="c1"># constraints rhs</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">knapsackModel</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">capacities</span><span class="p">)</span> <span class="c1"># build model</span>
+</pre></div>
+</div>
+<p>Similarly, users can use <code class="docutils literal notranslate"><span class="pre">setObj</span></code> to assign a specific cost vector and use <code class="docutils literal notranslate"><span class="pre">solve</span></code> to optimize. However, <code class="docutils literal notranslate"><span class="pre">setObj</span></code> or  <code class="docutils literal notranslate"><span class="pre">solve</span></code> methods do not require manual calls during training.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+</pre></div>
+</div>
+<p>In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the problem that arises by removing the integrality constraint of each variable. As an ILP, <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code> allows users to relax ILP with <code class="docutils literal notranslate"><span class="pre">relax</span></code> method to obtain a relaxation <code class="docutils literal notranslate"><span class="pre">optModel</span></code> from the original.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optmodel_rel</span> <span class="o">=</span> <span class="n">optmodel</span><span class="o">.</span><span class="n">relax</span><span class="p">()</span> <span class="c1"># relax</span>
+</pre></div>
+</div>
+</section>
+<section id="knapsack-pyomo-model">
+<h4>Knapsack Pyomo Model<a class="headerlink" href="#knapsack-pyomo-model" title="Permalink to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.omo.knapsackModel</span></code>, in which API uses Pyomo to model the knapsack problem.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is optimization model for knapsack problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Pyomo model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PyOmo model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solver</span></span></dt>
+<dd><p>optimization solver in the background</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">weights</span></span></dt>
+<dd><p>weights of items</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">capacity</span></span></dt>
+<dd><p>total capacity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">items</span></span></dt>
+<dd><p>list of item index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>np.ndarray / list</em>) – weights of items</p></li>
+<li><p><strong>capacity</strong> (<em>np.ndarray / list</em>) – total capacity</p></li>
+<li><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>np.ndarray / list</em>) – weights of items</p></li>
+<li><p><strong>capacity</strong> (<em>np.ndarray / list</em>) – total capacity</p></li>
+<li><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to get linear relaxation model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+
+<span class="n">weights</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+           <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+           <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span> <span class="c1"># constraints coefficients</span>
+<span class="n">capacities</span> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span> <span class="c1"># constraints rhs</span>
+<span class="c1"># build model with GLPK</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">omo</span><span class="o">.</span><span class="n">knapsackModel</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">capacities</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;glpk&quot;</span><span class="p">)</span>
+<span class="c1"># build model with Gurobi</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">omo</span><span class="o">.</span><span class="n">knapsackModel</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">capacities</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;gurobi&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Same as <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.knapsackModel</span></code>,  users can use <code class="docutils literal notranslate"><span class="pre">setObj</span></code>, <code class="docutils literal notranslate"><span class="pre">solve</span></code>, and <code class="docutils literal notranslate"><span class="pre">relax</span></code> methods.</p>
+<p>You can get the current list of supported solvers using the pyomo command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyomo <span class="nb">help</span> --solvers
+</pre></div>
+</div>
+</section>
+</section>
+<section id="traveling-salesman">
+<h3>Traveling Salesman<a class="headerlink" href="#traveling-salesman" title="Permalink to this heading">¶</a></h3>
+<p>The traveling salesman problem (TSP) is the shortest route that visits each city exactly once and returns to the origin city. We consider the symmetric TSP, in which the distance between two cities is the same in each opposite direction. In our examples, the number of nodes is 20.</p>
+<p>The TSP can be formulated as an Integer Linear Programming with several formulations. We implemented Dantzig–Fulkerson–Johnson (DFJ) formulation, Gavish–Graves (GG) formulation, and Miller–Tucker–Zemlin (MTZ) formulation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The implementation of TSP is only based on GurobiPy. Pyomo is not supported.</p>
+</div>
+<section id="dfj-formulation">
+<h4>DFJ formulation<a class="headerlink" href="#dfj-formulation" title="Permalink to this heading">¶</a></h4>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspDFJModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+constraint generation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span></dt>
+<dd><p>Number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">edges</span></span></dt>
+<dd><p>List of edge index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>The number of subtour elimination constraints for DFJ formulation is exponential. Thus, we solved it with column generation. Because of that, the linear relaxation of DFJ is <strong>not</strong> supported in our implementation.</p>
+<p>Same as previous model, the code for traveling salesman problem with DFJ formulation is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="n">num_nodes</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># number of nodes</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">tspDFJModel</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)</span> <span class="c1"># build model</span>
+
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+</pre></div>
+</div>
+</section>
+<section id="gg-formulation">
+<h4>GG formulation<a class="headerlink" href="#gg-formulation" title="Permalink to this heading">¶</a></h4>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspGGModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span></dt>
+<dd><p>Number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">edges</span></span></dt>
+<dd><p>List of edge index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to get linear relaxation model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Same as previous model, the code for traveling salesman problem with GG formulation is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="n">num_nodes</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># number of nodes</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">tspGGModel</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)</span> <span class="c1"># build model</span>
+
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+
+<span class="n">optmodel</span><span class="o">.</span><span class="n">relax</span><span class="p">()</span> <span class="c1"># relax</span>
+</pre></div>
+</div>
+</section>
+<section id="mtz-formulation">
+<h4>MTZ formulation<a class="headerlink" href="#mtz-formulation" title="Permalink to this heading">¶</a></h4>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">tspMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span></dt>
+<dd><p>Number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">edges</span></span></dt>
+<dd><p>List of edge index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to get linear relaxation model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Same as previous model, the code for traveling salesman problem with MTZ formulation is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="n">num_nodes</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># number of nodes</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">tspMTZModel</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)</span> <span class="c1"># build model</span>
+
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+
+<span class="n">optmodel</span><span class="o">.</span><span class="n">relax</span><span class="p">()</span> <span class="c1"># relax</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="data.html" class="btn btn-neutral float-right" title="Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../tutorial.html" class="btn btn-neutral float-left" title="Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Bo Tang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

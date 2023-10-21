@@ -1,0 +1,145 @@
+:py:mod:`pyepo.func.blackbox`
+=============================
+
+.. py:module:: pyepo.func.blackbox
+
+.. autoapi-nested-parse::
+
+   Differentiable Black-box optimization function
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.blackbox.blackboxOpt
+   pyepo.func.blackbox.blackboxOptFunc
+   pyepo.func.blackbox.negativeIdentity
+   pyepo.func.blackbox.negativeIdentityFunc
+
+
+
+
+.. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for differentiable black-box optimizer, which yield
+   optimal a solution and derive a gradient.
+
+   For differentiable block-box, the objective function is linear and
+   constraints are known and fixed, but the cost vector need to be predicted
+   from contextual data.
+
+   The block-box approximate gradient of optimizer smoothly. Thus, allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://arxiv.org/abs/1912.02175>
+
+   .. py:method:: forward(pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: blackboxOptFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+   A autograd function for differentiable black-box optimizer
+
+   .. py:method:: forward(ctx, pred_cost, lambd, optmodel, processes, pool, solve_ratio, module)
+      :staticmethod:
+
+      Forward pass for DBB
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+      :param lambd: a hyperparameter for differentiable block-box to contral interpolation degree
+      :type lambd: float
+      :param optmodel: an PyEPO optimization model
+      :type optmodel: optModel
+      :param processes: number of processors, 1 for single-core, 0 for all of cores
+      :type processes: int
+      :param pool: process pool object
+      :type pool: ProcessPool
+      :param solve_ratio: the ratio of new solutions computed during training
+      :type solve_ratio: float
+      :param module: blackboxOpt module
+      :type module: optModule
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+   .. py:method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass for DBB
+
+
+
+.. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for differentiable optimizer, which yield optimal a
+   solution and use negative identity as gradient on the backward pass.
+
+   For negative identity backpropagation, the objective function is linear and
+   constraints are known and fixed, but the cost vector need to be predicted
+   from contextual data.
+
+   If the interpolation hyperparameter λ aligns with an appropriate step size,
+   then the identity update is tantamount to DBB. However, the identity update
+   does not require an additional call to the solver during the backward pass
+   and tuning an additional hyperparameter λ.
+
+   Reference: <https://arxiv.org/abs/2205.15213>
+
+   .. py:method:: forward(pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: negativeIdentityFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+   A autograd function for differentiable black-box optimizer
+
+   .. py:method:: forward(ctx, pred_cost, optmodel, processes, pool, solve_ratio, module)
+      :staticmethod:
+
+      Forward pass for NID
+
+      :param pred_cost: a batch of predicted values of the cost
+      :type pred_cost: torch.tensor
+      :param optmodel: an PyEPO optimization model
+      :type optmodel: optModel
+      :param processes: number of processors, 1 for single-core, 0 for all of cores
+      :type processes: int
+      :param pool: process pool object
+      :type pool: ProcessPool
+      :param solve_ratio: the ratio of new solutions computed during training
+      :type solve_ratio: float
+      :param module: blackboxOpt module
+      :type module: optModule
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+   .. py:method:: backward(ctx, grad_output)
+      :staticmethod:
+
+      Backward pass for NID
+
+
+
