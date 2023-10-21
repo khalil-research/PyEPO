@@ -1,0 +1,98 @@
+:py:mod:`pyepo.model.opt`
+=========================
+
+.. py:module:: pyepo.model.opt
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.opt.optModel
+
+
+
+
+.. py:class:: optModel
+
+   This is an abstract class for optimization model
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. py:property:: num_cost
+
+      number of cost to be predicted
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: _getModel()
+      :abstractmethod:
+
+      An abstract method to build a model from a optimization solver
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: setObj(c)
+      :abstractmethod:
+
+      An abstract method to set objective function
+
+      :param c: cost of objective function
+      :type c: ndarray
+
+
+   .. py:method:: solve()
+      :abstractmethod:
+
+      An abstract method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+   .. py:method:: copy()
+
+      An abstract method to copy model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+   .. py:method:: addConstr(coefs, rhs)
+      :abstractmethod:
+
+      An abstract method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+   .. py:method:: relax()
+
+      A unimplemented method to relax MIP model
+
+
+

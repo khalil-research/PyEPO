@@ -1,0 +1,38 @@
+:py:mod:`pyepo.func.abcmodule`
+==============================
+
+.. py:module:: pyepo.func.abcmodule
+
+.. autoapi-nested-parse::
+
+   Abstract autograd optimization module
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.func.abcmodule.optModule
+
+
+
+
+.. py:class:: optModule(optmodel, processes=1, solve_ratio=1, dataset=None)
+
+   Bases: :py:obj:`torch.nn.Module`
+
+   An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
+   vector and the true cost vector rank a pool of feasible solutions.
+
+   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+      :abstractmethod:
+
+      Forward pass
+
+
+

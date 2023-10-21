@@ -1,0 +1,375 @@
+:py:mod:`pyepo.model.grb`
+=========================
+
+.. py:module:: pyepo.model.grb
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on GurobiPy
+
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   grbmodel/index.rst
+   knapsack/index.rst
+   shortestpath/index.rst
+   tsp/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.grb.optGrbModel
+   pyepo.model.grb.shortestPathModel
+   pyepo.model.grb.knapsackModel
+   pyepo.model.grb.tspGGModel
+   pyepo.model.grb.tspDFJModel
+   pyepo.model.grb.tspMTZModel
+
+
+
+
+.. py:class:: optGrbModel
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+   This is an abstract class for Gurobi-based optimization model
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. py:method:: __repr__()
+
+      Return repr(self).
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost of objective function
+      :type c: np.ndarray / list
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+   .. py:method:: copy()
+
+      A method to copy model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: np.ndarray / list
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+.. py:class:: shortestPathModel(grid)
+
+   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
+   This class is optimization model for shortest path problem
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: grid
+
+      Size of grid network
+
+      :type: tuple of int
+
+   .. attribute:: arcs
+
+      List of arcs
+
+      :type: list
+
+   .. py:method:: _getArcs()
+
+      A method to get list of arcs for grid network
+
+      :returns: arcs
+      :rtype: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:class:: knapsackModel(weights, capacity)
+
+   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
+   This class is optimization model for knapsack problem
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: weights
+
+      Weights of items
+
+      :type: np.ndarray / list
+
+   .. attribute:: capacity
+
+      Total capacity
+
+      :type: np.ndarray / listy
+
+   .. attribute:: items
+
+      List of item index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: tspGGModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+   This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: tspDFJModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+   This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+   constraint generation.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: _subtourelim(model, where)
+      :staticmethod:
+
+      A static method to add lazy constraints for subtour elimination
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+.. py:class:: tspMTZModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+   This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+

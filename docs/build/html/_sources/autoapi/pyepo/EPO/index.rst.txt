@@ -1,0 +1,23 @@
+:py:mod:`pyepo.EPO`
+===================
+
+.. py:module:: pyepo.EPO
+
+.. autoapi-nested-parse::
+
+   Constants
+
+
+
+Module Contents
+---------------
+
+.. py:data:: MINIMIZE
+   :value: 1
+
+   
+
+.. py:data:: MAXIMIZE
+
+   
+

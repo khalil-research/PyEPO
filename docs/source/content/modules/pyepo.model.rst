@@ -2,12 +2,14 @@
 ===========
 
 .. automodule:: pyepo.model
+    :noindex:
 
 .. rubric:: Modules
 
 .. autosummary::
-   :toctree:
-   :recursive:
+    :noindex:
+    :toctree:
+    :recursive:
 
    pyepo.model.opt
    pyepo.model.grb
