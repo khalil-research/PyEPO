@@ -33,7 +33,7 @@ class blackboxOpt(optModule):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
-            lambd (float): a hyperparameter for differentiable block-box to contral interpolation degree
+            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
