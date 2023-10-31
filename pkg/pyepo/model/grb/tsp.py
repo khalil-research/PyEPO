@@ -382,13 +382,6 @@ class tspMTZModel(tspABModel):
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
-        for i, j in self.edges:
-            x[j, i] = x[i, j]
-        u = m.addVars(self.nodes, name="u")
-        # sense
-        m.modelSense = GRB.MINIMIZE
-        # constraints
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
         u = m.addVars(self.nodes, name="u")
@@ -480,13 +473,6 @@ class tspMTZModelRel(tspMTZModel):
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
-        for i, j in self.edges:
-            x[j, i] = x[i, j]
-        u = m.addVars(self.nodes, name="u")
-        # sense
-        m.modelSense = GRB.MINIMIZE
-        # constraints
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", ub=1)
         u = m.addVars(self.nodes, name="u")
