@@ -39,11 +39,11 @@ class optModule(nn.Module):
                 format(processes, mp.cpu_count()))
         self.processes = mp.cpu_count() if not processes else processes
         # single-core
-        if processes == 1:
+        if self.processes == 1:
             self.pool = None
         # multi-core
         else:
-            self.pool = ProcessingPool(processes)
+            self.pool = ProcessingPool(self.processes)
         print("Num of cores: {}".format(self.processes))
         # solution pool
         self.solve_ratio = solve_ratio
