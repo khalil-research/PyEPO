@@ -15,13 +15,11 @@ This repository is the official implementation of the paper:
 
 Citation:
 ```
-@misc{tang2023cave,
-      title={CaVE: A Cone-Aligned Approach for Fast Predict-then-optimize with Binary Linear Programs}, 
-      author={Bo Tang and Elias B. Khalil},
-      year={2023},
-      eprint={2312.07718},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
+@article{tang2022pyepo,
+  title={PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming},
+  author={Tang, Bo and Khalil, Elias B},
+  journal={arXiv preprint arXiv:2206.14234},
+  year={2022}
 }
 ```
 
