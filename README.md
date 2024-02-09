@@ -57,7 +57,13 @@ To reproduce the experiments in original paper, please use the code and follow t
 
 ## Installation
 
-You can download ``PyEPO`` from our GitHub repository.
+The package is now available on [PyPI](https://pypi.org/project/pyepo/) for installation. You can easily install `PyEPO` using pip by running the following command:
+
+```bash
+pip install pyepo
+```
+
+Or you can download ``PyEPO`` from our GitHub repository.
 
 ```bash
 git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
