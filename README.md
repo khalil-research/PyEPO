@@ -57,11 +57,23 @@ To reproduce the experiments in original paper, please use the code and follow t
 
 ## Installation
 
-The package is now available on [PyPI](https://pypi.org/project/pyepo/) for installation. You can easily install `PyEPO` using pip by running the following command:
+### Conda Install
+
+`PyEPO` is available on [Anaconda Cloud](https://anaconda.org/pyepo/pyepo). If you prefer to use conda for installation, you can install `PyEPO` with the following command:
+
+```bash
+conda install -c pyepo pyepo
+```
+
+### Pip Install
+
+The package is also available on [PyPI](https://pypi.org/project/pyepo/) for installation. You can easily install `PyEPO` using pip by running the following command:
 
 ```bash
 pip install pyepo
 ```
+
+### Clone and Install from this Repo
 
 Or you can download ``PyEPO`` from our GitHub repository.
 
