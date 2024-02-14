@@ -18,14 +18,10 @@ jobs:
         activate-environment: pyepo-build
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
-    - name: Setup Python Version for Conda Build
-      run: |
-        echo "python:" > conda_build_config.yaml
-        echo "  - ${{ matrix.python-version }}.*" >> conda_build_config.yaml
     - name: Install Conda-Build and Anaconda-Client
       run: conda install conda-build anaconda-client
     - name: Build Conda Package
-      run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default
+      run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default --python ${{ matrix.python-version }}
     - name: Find and upload Conda package
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
