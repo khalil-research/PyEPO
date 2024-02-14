@@ -26,4 +26,4 @@ jobs:
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
       run: |
-        find ~/conda-bld/ -name "pyepo-*.tar.bz2" -print0 | xargs -0 -I {} anaconda upload --user pyepo {}
+        find $HOME/conda-bld/ -name "pyepo-*.tar.bz2" -print0 | xargs -0 -I {} anaconda upload --user pyepo {}
