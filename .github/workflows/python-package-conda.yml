@@ -18,14 +18,8 @@ jobs:
         activate-environment: pyepo-build
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
-    - name: Create Conda environment
-      run: |
-        conda create -n pyepo-build python=${{ matrix.python-version }} conda-build anaconda-client -y
-    - name: Activate Conda environment
-      shell: bash -l {0}
-      run: |
-        source $CONDA/etc/profile.d/conda.sh
-        conda activate pyepo-build
+    - name: Install Conda-Build and Anaconda-Client
+      run: conda install python=${{ matrix.python-version }} conda-build anaconda-client
     - name: Build Conda Package
       run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default --python ${{ matrix.python-version }}
     - name: Find and upload Conda package
@@ -34,4 +28,5 @@ jobs:
       run: |
         CONDA_BLD_PATH=$(conda info --json | jq -r '.conda_prefix')/conda-bld
         echo "Conda build path: $CONDA_BLD_PATH"
-        anaconda upload --user pyepo $CONDA_BLD_PATH/*/*.tar.bz2
+        conda install -n pyepo-build anaconda-client --yes
+        conda run -n pyepo-build anaconda upload --user pyepo $CONDA_BLD_PATH/*/*.tar.bz2
