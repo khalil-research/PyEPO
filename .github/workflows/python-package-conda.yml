@@ -28,4 +28,5 @@ jobs:
       run: |
         CONDA_BLD_PATH=$(conda info --json | jq -r '.conda_prefix')/conda-bld
         echo "Conda build path: $CONDA_BLD_PATH"
-        conda run -n pyepo-build anaconda upload --user pyepo $CONDA_BLD_PATHd/*/*.tar.bz2
+        conda install -n pyepo-build anaconda-client --yes
+        conda run -n pyepo-build anaconda upload --user pyepo $CONDA_BLD_PATH/*/*.tar.bz2
