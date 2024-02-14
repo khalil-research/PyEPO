@@ -22,8 +22,10 @@ jobs:
       run: conda install conda-build anaconda-client
     - name: Build Conda Package
       run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default
-    - name: Upload Conda Package
+    - name: Find and upload Conda package
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
       run: |
-        find $HOME/conda-bld/ -name "pyepo-*.tar.bz2" -print0 | xargs -0 -I {} anaconda upload --user pyepo {}
+        CONDA_BLD_PATH=$(conda info --json | jq -r '.conda_prefix')/conda-bld
+        echo "Conda build path: $CONDA_BLD_PATH"
+        find $CONDA_BLD_PATH -name "pyepo-*.tar.bz2" -print0 | xargs -0 -I {} anaconda upload --user pyepo {} {}
