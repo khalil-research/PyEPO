@@ -21,6 +21,10 @@ jobs:
     - name: Create Conda environment
       run: |
         conda create -n pyepo-build python=${{ matrix.python-version }} conda-build anaconda-client -y
+    - name: Activate Conda environment
+      shell: bash -l {0}
+      run: |
+        source $CONDA/etc/profile.d/conda.sh
         conda activate pyepo-build
     - name: Build Conda Package
       run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default --python ${{ matrix.python-version }}
