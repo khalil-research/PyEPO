@@ -21,7 +21,7 @@ jobs:
     - name: Install Conda-Build and Anaconda-Client
       run: conda install conda-build anaconda-client
     - name: Build Conda Package
-      run: conda build ./pkg
+      run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default
     - name: Upload Conda Package
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
