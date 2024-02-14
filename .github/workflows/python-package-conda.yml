@@ -18,6 +18,10 @@ jobs:
         activate-environment: pyepo-build
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
+    - name: Setup Python Version for Conda Build
+      run: |
+        echo "python:" > conda_build_config.yaml
+        echo "  - ${{ matrix.python-version }}.*" >> conda_build_config.yaml
     - name: Install Conda-Build and Anaconda-Client
       run: conda install conda-build anaconda-client
     - name: Build Conda Package
