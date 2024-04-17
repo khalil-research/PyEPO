@@ -349,6 +349,7 @@ class implicitMLEFunc(Function):
         ctx.ptb_sols = ptb_sols
         ctx.lambd = lambd
         ctx.optmodel = optmodel
+        ctx.two_sides = two_sides
         ctx.processes = processes
         ctx.pool = pool
         ctx.solve_ratio = solve_ratio
@@ -365,6 +366,7 @@ class implicitMLEFunc(Function):
         ptb_sols = ctx.ptb_sols
         lambd = ctx.lambd
         optmodel = ctx.optmodel
+        two_sides = ctx.two_sides
         processes = ctx.processes
         pool = ctx.pool
         solve_ratio = ctx.solve_ratio
@@ -374,12 +376,20 @@ class implicitMLEFunc(Function):
         # convert tenstor
         cp = pred_cost.detach().to("cpu").numpy()
         dl = grad_output.detach().to("cpu").numpy()
-        # perturbed costs
-        ptb_c_pos = cp + lambd * dl + noises
+        # positive perturbed costs
+        ptb_cp_pos = cp + lambd * dl + noises
         # solve with perturbation
-        ptb_sols_pos = _solve_or_cache(ptb_c_pos, optmodel, solve_ratio, processes, pool, module)
-        # get gradient
-        grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / lambd
+        ptb_sols_pos = _solve_or_cache(ptb_cp_pos, optmodel, solve_ratio, processes, pool, module)
+        if two_sides:
+            # negative perturbed costs
+            ptb_cp_neg = cp - lambd * dl + noises
+            # solve with perturbation
+            ptb_sols_neg = _solve_or_cache(ptb_cp_neg, optmodel, solve_ratio, processes, pool, module)
+            # get two-side gradient
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(axis=1) / lambd
+        else:
+            # get single side gradient
+            grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / lambd
         # convert to tensor
         grad = torch.FloatTensor(grad).to(device)
         return grad, None, None, None, None, None, None, None, None, None, None
