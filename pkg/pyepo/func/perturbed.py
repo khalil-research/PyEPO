@@ -94,17 +94,7 @@ class perturbedOptFunc(Function):
         noises = rnd.normal(0, 1, size=(n_samples, *cp.shape))
         ptb_c = cp + sigma * noises
         # solve with perturbation
-        rand_sigma = np.random.uniform()
-        if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
-            if solve_ratio < 1:
-                sols = ptb_sols.reshape(-1, cp.shape[1])
-                # add into solpool
-                module.solpool = np.concatenate((module.solpool, sols))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
-        else:
-            ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
+        ptb_sols = _solve_or_cache(ptb_c, optmodel, solve_ratio, processes, pool, module)
         # solution expectation
         e_sol = ptb_sols.mean(axis=1)
         # convert to tensor
@@ -227,17 +217,7 @@ class perturbedFenchelYoungFunc(Function):
         noises = rnd.normal(0, 1, size=(n_samples, *cp.shape))
         ptb_c = cp + sigma * noises
         # solve with perturbation
-        rand_sigma = np.random.uniform()
-        if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
-            if solve_ratio < 1:
-                sols = ptb_sols.reshape(-1, cp.shape[1])
-                # add into solpool
-                module.solpool = np.concatenate((module.solpool, sols))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
-        else:
-            ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
+        ptb_sols = _solve_or_cache(ptb_c, optmodel, solve_ratio, processes, pool, module)
         # solution expectation
         e_sol = ptb_sols.mean(axis=1)
         # difference
@@ -280,17 +260,18 @@ class implicitMLE(optModule):
     Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
     """
 
-    def __init__(self, optmodel, n_samples=10, sigma=1.0, lambd=10, processes=1,
-                 distribution=sumGammaDistribution(kappa=5), solve_ratio=1,
-                 dataset=None):
+    def __init__(self, optmodel, n_samples=10, sigma=1.0, lambd=10,
+                 distribution=sumGammaDistribution(kappa=5), two_sides=False,
+                 processes=1, solve_ratio=1, dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): noise temperature for the input distribution
             lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
             distribution (distribution): noise distribution
+            two_sides (bool): approximate gradient by two-sided perturbation or not
+            processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
@@ -305,6 +286,8 @@ class implicitMLE(optModule):
         self.lambd = lambd
         # noise distribution
         self.distribution = distribution
+        # symmetric perturbation
+        self.two_sides = two_sides
         # build I-LME
         self.ilme = implicitMLEFunc()
 
@@ -313,9 +296,9 @@ class implicitMLE(optModule):
         Forward pass
         """
         sols = self.ilme.apply(pred_cost, self.optmodel, self.n_samples,
-                                self.sigma, self.lambd, self.processes,
-                                self.pool, self.distribution, self.solve_ratio,
-                                self)
+                                self.sigma, self.lambd, self.distribution,
+                                self.two_sides, self.processes,
+                                self.pool, self.solve_ratio, self)
         return sols
 
 
@@ -325,8 +308,8 @@ class implicitMLEFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, optmodel, n_samples, sigma, lambd,
-                processes, pool, distribution, solve_ratio, module):
+    def forward(ctx, pred_cost, optmodel, n_samples, sigma, lambd, distribution,
+                two_sides, processes, pool, solve_ratio, module):
         """
         Forward pass for IMLE
 
@@ -336,9 +319,10 @@ class implicitMLEFunc(Function):
             n_samples (int): number of Monte-Carlo samples
             sigma (float): noise temperature for the input distribution
             lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
+            distribution (distribution): noise distribution
+            two_sides (bool): approximate gradient by two-sided perturbation or not
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             pool (ProcessPool): process pool object
-            distribution (distribution): noise distribution
             solve_ratio (float): the ratio of new solutions computed during training
             module (optModule): implicitMLE module
 
@@ -353,17 +337,7 @@ class implicitMLEFunc(Function):
         noises = distribution.sample(size=(n_samples, *cp.shape))
         ptb_c = cp + sigma * noises
         # solve with perturbation
-        rand_sigma = np.random.uniform()
-        if rand_sigma <= solve_ratio:
-            ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
-            if solve_ratio < 1:
-                sols = ptb_sols.reshape(-1, cp.shape[1])
-                # add into solpool
-                module.solpool = np.concatenate((module.solpool, sols))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
-        else:
-            ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
+        ptb_sols = _solve_or_cache(ptb_c, optmodel, solve_ratio, processes, pool, module)
         # solution average
         e_sol = ptb_sols.mean(axis=1)
         # convert to tensor
@@ -378,9 +352,7 @@ class implicitMLEFunc(Function):
         ctx.processes = processes
         ctx.pool = pool
         ctx.solve_ratio = solve_ratio
-        if solve_ratio < 1:
-            ctx.module = module
-        ctx.rand_sigma = rand_sigma
+        ctx.module = module
         return e_sol
 
     @staticmethod
@@ -396,33 +368,38 @@ class implicitMLEFunc(Function):
         processes = ctx.processes
         pool = ctx.pool
         solve_ratio = ctx.solve_ratio
-        rand_sigma = ctx.rand_sigma
-        if solve_ratio < 1:
-            module = ctx.module
+        module = ctx.module
         # get device
         device = pred_cost.device
         # convert tenstor
         cp = pred_cost.detach().to("cpu").numpy()
         dl = grad_output.detach().to("cpu").numpy()
         # perturbed costs
-        ptb_cq = cp + lambd * dl + noises
+        ptb_c_pos = cp + lambd * dl + noises
         # solve with perturbation
-        rand_sigma = np.random.uniform()
-        if rand_sigma <= solve_ratio:
-            ptb_solsq = _solve_in_pass(ptb_cq, optmodel, processes, pool)
-            if solve_ratio < 1:
-                sols = ptb_solsq.reshape(-1, cp.shape[1])
-                # add into solpool
-                module.solpool = np.concatenate((module.solpool, sols))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
-        else:
-            ptb_solsq = _cache_in_pass(ptb_cq, optmodel, module.solpool)
+        ptb_sols_pos = _solve_or_cache(ptb_c_pos, optmodel, solve_ratio, processes, pool, module)
         # get gradient
-        grad =  (np.array(ptb_solsq) - ptb_sols).mean(axis=1) / lambd
+        grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / lambd
         # convert to tensor
         grad = torch.FloatTensor(grad).to(device)
-        return grad, None, None, None, None, None, None, None, None, None
+        return grad, None, None, None, None, None, None, None, None, None, None
+
+
+def _solve_or_cache(ptb_c, optmodel, solve_ratio, processes, pool, module):
+    rand_sigma = np.random.uniform()
+    # solve optimization
+    if rand_sigma <= solve_ratio:
+        ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
+        if solve_ratio < 1:
+            sols = ptb_sols.reshape(-1, cp.shape[1])
+            # add into solpool
+            module.solpool = np.concatenate((module.solpool, sols))
+            # remove duplicate
+            module.solpool = np.unique(module.solpool, axis=0)
+    # best cached solution
+    else:
+        ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
+    return ptb_sols
 
 
 def _solve_in_pass(ptb_c, optmodel, processes, pool):
