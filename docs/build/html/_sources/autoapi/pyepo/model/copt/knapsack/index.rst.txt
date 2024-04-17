@@ -33,6 +33,7 @@ Attributes
 
 .. py:class:: knapsackModel(weights, capacity)
 
+
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
    This class is optimization model for knapsack problem
@@ -79,6 +80,7 @@ Attributes
 
 
 .. py:class:: knapsackModelRel(weights, capacity)
+
 
    Bases: :py:obj:`knapsackModel`
 

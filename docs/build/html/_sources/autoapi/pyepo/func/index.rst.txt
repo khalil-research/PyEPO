@@ -49,6 +49,7 @@ Classes
 
 .. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
@@ -70,6 +71,7 @@ Classes
 
 
 .. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
+
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -93,6 +95,7 @@ Classes
 
 
 .. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1, dataset=None)
+
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -118,6 +121,7 @@ Classes
 
 .. py:class:: perturbedOpt(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
@@ -139,6 +143,7 @@ Classes
 
 
 .. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
+
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -163,6 +168,7 @@ Classes
 
 .. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=1, distribution=sumGammaDistribution(kappa=5), solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for Implicit Maximum Likelihood Estimator, which yield
@@ -186,6 +192,7 @@ Classes
 
 .. py:class:: NCE(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for noise contrastive estimation as surrogate loss
@@ -206,6 +213,7 @@ Classes
 
 .. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for Maximum A Posterior contrastive estimation as
@@ -225,6 +233,7 @@ Classes
 
 
 .. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -247,6 +256,7 @@ Classes
 
 .. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for pairwise learning to rank, where the goal is to learn
@@ -267,6 +277,7 @@ Classes
 
 
 .. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 

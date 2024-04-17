@@ -33,6 +33,7 @@ Attributes
 
 .. py:class:: knapsackModel(weights, capacity, solver='glpk')
 
+
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
    This class is optimization model for knapsack problem
@@ -79,6 +80,7 @@ Attributes
 
 
 .. py:class:: knapsackModelRel(weights, capacity, solver='glpk')
+
 
    Bases: :py:obj:`knapsackModel`
 

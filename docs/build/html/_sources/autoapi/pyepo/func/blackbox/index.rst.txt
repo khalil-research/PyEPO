@@ -27,6 +27,7 @@ Classes
 
 .. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for differentiable black-box optimizer, which yield
@@ -49,6 +50,7 @@ Classes
 
 
 .. py:class:: blackboxOptFunc(*args, **kwargs)
+
 
    Bases: :py:obj:`torch.autograd.Function`
 
@@ -87,6 +89,7 @@ Classes
 
 .. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for the differentiable optimizer, which yields optimal a
@@ -110,6 +113,7 @@ Classes
 
 
 .. py:class:: negativeIdentityFunc(*args, **kwargs)
+
 
    Bases: :py:obj:`torch.autograd.Function`
 

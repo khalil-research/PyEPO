@@ -39,6 +39,7 @@ Functions
 
 .. py:class:: perturbedOpt(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
@@ -60,6 +61,7 @@ Functions
 
 
 .. py:class:: perturbedOptFunc(*args, **kwargs)
+
 
    Bases: :py:obj:`torch.autograd.Function`
 
@@ -102,6 +104,7 @@ Functions
 
 .. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
@@ -124,6 +127,7 @@ Functions
 
 
 .. py:class:: perturbedFenchelYoungFunc(*args, **kwargs)
+
 
    Bases: :py:obj:`torch.autograd.Function`
 
@@ -168,6 +172,7 @@ Functions
 
 .. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=1, distribution=sumGammaDistribution(kappa=5), solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for Implicit Maximum Likelihood Estimator, which yield
@@ -190,6 +195,7 @@ Functions
 
 
 .. py:class:: implicitMLEFunc(*args, **kwargs)
+
 
    Bases: :py:obj:`torch.autograd.Function`
 

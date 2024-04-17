@@ -24,6 +24,7 @@ Classes
 
 .. py:class:: optModel
 
+
    Bases: :py:obj:`abc.ABC`
 
    This is an abstract class for optimization model

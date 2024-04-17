@@ -25,6 +25,7 @@ Classes
 
 .. py:class:: NCE(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for noise contrastive estimation as surrogate loss
@@ -44,6 +45,7 @@ Classes
 
 
 .. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, dataset=None)
+
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 

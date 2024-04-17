@@ -32,6 +32,7 @@ Functions
 
 .. py:class:: NoPreprocessing(**kwargs)
 
+
    Bases: :py:obj:`autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm`
 
    This is class of NoPreprocessing component for auto-sklearn

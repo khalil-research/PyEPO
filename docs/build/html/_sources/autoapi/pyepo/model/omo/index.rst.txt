@@ -38,6 +38,7 @@ Classes
 
 .. py:class:: optOmoModel(solver='glpk')
 
+
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
    This is an abstract class for Pyomo-based optimization model
@@ -99,6 +100,7 @@ Classes
 
 .. py:class:: shortestPathModel(grid, solver='glpk')
 
+
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
    This class is optimization model for shortest path problem
@@ -142,6 +144,7 @@ Classes
 
 
 .. py:class:: knapsackModel(weights, capacity, solver='glpk')
+
 
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
@@ -189,6 +192,7 @@ Classes
 
 
 .. py:class:: knapsackModelRel(weights, capacity, solver='glpk')
+
 
    Bases: :py:obj:`knapsackModel`
 

@@ -1,4 +1,4 @@
-pyepo.model.grb.tsp
+﻿pyepo.model.grb.tsp
 ===================
 
 .. automodule:: pyepo.model.grb.tsp
@@ -23,6 +23,7 @@ pyepo.model.grb.tsp
       tspGGModelRel
       tspMTZModel
       tspMTZModelRel
+      unionFind
    
    
 

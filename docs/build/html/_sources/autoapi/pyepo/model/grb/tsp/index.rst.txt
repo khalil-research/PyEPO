@@ -29,6 +29,7 @@ Classes
 
 .. py:class:: tspABModel(num_nodes)
 
+
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
    This abstract class is optimization model for traveling salesman problem.
@@ -77,6 +78,7 @@ Classes
 
 
 .. py:class:: tspGGModel(num_nodes)
+
 
    Bases: :py:obj:`tspABModel`
 
@@ -142,6 +144,7 @@ Classes
 
 .. py:class:: tspGGModelRel(num_nodes)
 
+
    Bases: :py:obj:`tspGGModel`
 
    This class is relaxation of tspGGModel.
@@ -192,6 +195,7 @@ Classes
 
 
 .. py:class:: tspDFJModel(num_nodes)
+
 
    Bases: :py:obj:`tspABModel`
 
@@ -259,6 +263,7 @@ Classes
 
 .. py:class:: tspMTZModel(num_nodes)
 
+
    Bases: :py:obj:`tspABModel`
 
    This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
@@ -322,6 +327,7 @@ Classes
 
 
 .. py:class:: tspMTZModelRel(num_nodes)
+
 
    Bases: :py:obj:`tspMTZModel`
 
