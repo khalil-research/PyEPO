@@ -24,6 +24,7 @@ Classes
 
 .. py:class:: optDataset(model, feats, costs)
 
+
    Bases: :py:obj:`torch.utils.data.Dataset`
 
    This class is Torch Dataset for optimization problems.

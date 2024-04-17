@@ -32,6 +32,7 @@ Attributes
 
 .. py:class:: shortestPathModel(grid)
 
+
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
    This class is optimization model for shortest path problem

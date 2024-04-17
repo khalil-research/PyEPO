@@ -41,6 +41,7 @@ Classes
 
 .. py:class:: optGrbModel
 
+
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
    This is an abstract class for Gurobi-based optimization model
@@ -96,6 +97,7 @@ Classes
 
 .. py:class:: shortestPathModel(grid)
 
+
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
    This class is optimization model for shortest path problem
@@ -136,6 +138,7 @@ Classes
 
 
 .. py:class:: knapsackModel(weights, capacity)
+
 
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
@@ -180,6 +183,7 @@ Classes
 
 
 .. py:class:: tspGGModel(num_nodes)
+
 
    Bases: :py:obj:`tspABModel`
 
@@ -244,6 +248,7 @@ Classes
 
 
 .. py:class:: tspDFJModel(num_nodes)
+
 
    Bases: :py:obj:`tspABModel`
 
@@ -310,6 +315,7 @@ Classes
 
 
 .. py:class:: tspMTZModel(num_nodes)
+
 
    Bases: :py:obj:`tspABModel`
 

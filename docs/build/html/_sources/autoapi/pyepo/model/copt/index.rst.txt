@@ -38,6 +38,7 @@ Classes
 
 .. py:class:: optCoptModel
 
+
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
    This is an abstract class for Cardinal Optimizer optimization model
@@ -93,6 +94,7 @@ Classes
 
 .. py:class:: shortestPathModel(grid)
 
+
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
    This class is optimization model for shortest path problem
@@ -136,6 +138,7 @@ Classes
 
 
 .. py:class:: knapsackModel(weights, capacity)
+
 
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
@@ -183,6 +186,7 @@ Classes
 
 
 .. py:class:: knapsackModelRel(weights, capacity)
+
 
    Bases: :py:obj:`knapsackModel`
 

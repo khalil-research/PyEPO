@@ -26,6 +26,7 @@ Classes
 
 .. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for listwise learning to rank, where the goal is to learn
@@ -47,6 +48,7 @@ Classes
 
 .. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for pairwise learning to rank, where the goal is to learn
@@ -67,6 +69,7 @@ Classes
 
 
 .. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 

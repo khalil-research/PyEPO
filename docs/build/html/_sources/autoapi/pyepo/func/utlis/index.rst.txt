@@ -65,6 +65,7 @@ Functions
 
 .. py:class:: sumGammaDistribution(kappa, n_iterations=10, seed=135)
 
+
    creates a generator of samples for the Sum-of-Gamma distribution
 
    .. py:method:: sample(size)

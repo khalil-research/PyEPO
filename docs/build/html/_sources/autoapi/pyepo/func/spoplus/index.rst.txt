@@ -25,6 +25,7 @@ Classes
 
 .. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
 
+
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
    An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
@@ -46,6 +47,7 @@ Classes
 
 
 .. py:class:: SPOPlusFunc(*args, **kwargs)
+
 
    Bases: :py:obj:`torch.autograd.Function`
 

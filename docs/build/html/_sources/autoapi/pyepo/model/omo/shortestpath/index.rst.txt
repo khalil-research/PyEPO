@@ -32,6 +32,7 @@ Attributes
 
 .. py:class:: shortestPathModel(grid, solver='glpk')
 
+
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
    This class is optimization model for shortest path problem
