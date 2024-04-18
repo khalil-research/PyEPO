@@ -250,11 +250,11 @@ class implicitMLE(optModule):
     an optimal solution in a constrained exponential family distribution via
     Perturb-and-MAP.
 
-    For I-LME, it works as black-box combinatorial solvers, in which constraints
+    For I-MLE, it works as black-box combinatorial solvers, in which constraints
     are known and fixed, but the cost vector need to be predicted from
     contextual data.
 
-    The I-LME approximate gradient of optimizer smoothly. Thus, allows us to
+    The I-MLE approximate gradient of optimizer smoothly. Thus, allows us to
     design an algorithm based on stochastic gradient descent.
 
     Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
@@ -289,13 +289,13 @@ class implicitMLE(optModule):
         # symmetric perturbation
         self.two_sides = two_sides
         # build I-LME
-        self.ilme = implicitMLEFunc()
+        self.imle = implicitMLEFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.ilme.apply(pred_cost, self.optmodel, self.n_samples,
+        sols = self.imle.apply(pred_cost, self.optmodel, self.n_samples,
                                self.sigma, self.lambd, self.distribution,
                                self.two_sides, self.processes,
                                self.pool, self.solve_ratio, self)
