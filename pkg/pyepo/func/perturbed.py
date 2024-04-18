@@ -386,7 +386,7 @@ class implicitMLEFunc(Function):
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache(ptb_cp_neg, optmodel, solve_ratio, processes, pool, module)
             # get two-side gradient
-            grad = (ptb_sols_pos - ptb_sols_neg).mean(axis=1) / lambd
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(axis=1) / (2 * lambd)
         else:
             # get single side gradient
             grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / lambd
