@@ -27,32 +27,33 @@ class SPOPlus(optModule):
     Reference: <https://doi.org/10.1287/mnsc.2020.3922>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
+    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
+            reduction (str): the reduction to apply to the output
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # build carterion
         self.spop = SPOPlusFunc()
 
-    def forward(self, pred_cost, true_cost, true_sol, true_obj, reduction="mean"):
+    def forward(self, pred_cost, true_cost, true_sol, true_obj):
         """
         Forward pass
         """
         loss = self.spop.apply(pred_cost, true_cost, true_sol, true_obj, self)
         # reduction
-        if reduction == "mean":
+        if self.reduction == "mean":
             loss = torch.mean(loss)
-        elif reduction == "sum":
+        elif self.reduction == "sum":
             loss = torch.sum(loss)
-        elif reduction == "none":
+        elif self.reduction == "none":
             loss = loss
         else:
-            raise ValueError("No reduction '{}'.".format(reduction))
+            raise ValueError("No reduction '{}'.".format(self.reduction))
         return loss
 
 
