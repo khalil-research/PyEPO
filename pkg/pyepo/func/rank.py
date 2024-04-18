@@ -29,21 +29,22 @@ class listwiseLTR(optModule):
     Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
+    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
+            reduction (str): the reduction to apply to the output
             dataset (optDataset): the training data, usually this is simply the training set
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
         self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
 
-    def forward(self, pred_cost, true_cost, reduction="mean"):
+    def forward(self, pred_cost, true_cost):
         """
         Forward pass
         """
@@ -71,14 +72,14 @@ class listwiseLTR(optModule):
             loss = - (F.log_softmax(- objpool_cp, dim=1) *
                       F.softmax(- objpool_c, dim=1))
         # reduction
-        if reduction == "mean":
+        if self.reduction == "mean":
             loss = torch.mean(loss)
-        elif reduction == "sum":
+        elif self.reduction == "sum":
             loss = torch.sum(loss)
-        elif reduction == "none":
+        elif self.reduction == "none":
             loss = loss
         else:
-            raise ValueError("No reduction '{}'.".format(reduction))
+            raise ValueError("No reduction '{}'.".format(self.reduction))
         return loss
 
 
@@ -96,21 +97,22 @@ class pairwiseLTR(optModule):
     Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
+    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
+            reduction (str): the reduction to apply to the output
             dataset (optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
         self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
 
-    def forward(self, pred_cost, true_cost, reduction="mean"):
+    def forward(self, pred_cost, true_cost):
         """
         Forward pass
         """
@@ -151,14 +153,14 @@ class pairwiseLTR(optModule):
                 loss.append(relu(objpool_cp_rest - objpool_cp_best).mean())
         loss = torch.stack(loss)
         # reduction
-        if reduction == "mean":
+        if self.reduction == "mean":
             loss = torch.mean(loss)
-        elif reduction == "sum":
+        elif self.reduction == "sum":
             loss = torch.sum(loss)
-        elif reduction == "none":
+        elif self.reduction == "none":
             loss = loss
         else:
-            raise ValueError("No reduction '{}'.".format(reduction))
+            raise ValueError("No reduction '{}'.".format(self.reduction))
         return loss
 
 
@@ -177,21 +179,22 @@ class pointwiseLTR(optModule):
     Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
+    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
+            reduction (str): the reduction to apply to the output
             dataset (optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
         self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
 
-    def forward(self, pred_cost, true_cost, reduction="mean"):
+    def forward(self, pred_cost, true_cost):
         """
         Forward pass
         """
@@ -214,12 +217,12 @@ class pointwiseLTR(optModule):
         # squared loss
         loss = (objpool_c - objpool_cp).square().mean(axis=1)
         # reduction
-        if reduction == "mean":
+        if self.reduction == "mean":
             loss = torch.mean(loss)
-        elif reduction == "sum":
+        elif self.reduction == "sum":
             loss = torch.sum(loss)
-        elif reduction == "none":
+        elif self.reduction == "none":
             loss = loss
         else:
-            raise ValueError("No reduction '{}'.".format(reduction))
+            raise ValueError("No reduction '{}'.".format(self.reduction))
         return loss

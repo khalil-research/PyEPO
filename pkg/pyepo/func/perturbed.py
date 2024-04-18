@@ -132,7 +132,7 @@ class perturbedFenchelYoung(optModule):
     """
 
     def __init__(self, optmodel, n_samples=10, sigma=1.0, processes=1,
-                 seed=135, solve_ratio=1, dataset=None):
+                 seed=135, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
@@ -141,9 +141,10 @@ class perturbedFenchelYoung(optModule):
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             seed (int): random state seed
             solve_ratio (float): the ratio of new solutions computed during training
+            reduction (str): the reduction to apply to the output
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # number of samples
         self.n_samples = n_samples
         # perturbation amplitude
@@ -153,20 +154,20 @@ class perturbedFenchelYoung(optModule):
         # build optimizer
         self.pfy = perturbedFenchelYoungFunc()
 
-    def forward(self, pred_cost, true_sol, reduction="mean"):
+    def forward(self, pred_cost, true_sol):
         """
         Forward pass
         """
         loss = self.pfy.apply(pred_cost, true_sol, self)
         # reduction
-        if reduction == "mean":
+        if self.reduction == "mean":
             loss = torch.mean(loss)
-        elif reduction == "sum":
+        elif self.reduction == "sum":
             loss = torch.sum(loss)
-        elif reduction == "none":
+        elif self.reduction == "none":
             loss = loss
         else:
-            raise ValueError("No reduction '{}'.".format(reduction))
+            raise ValueError("No reduction '{}'.".format(self.reduction))
         return loss
 
 
