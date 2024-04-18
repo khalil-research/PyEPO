@@ -50,8 +50,7 @@ class blackboxOpt(optModule):
         """
         Forward pass
         """
-        sols = self.dbb.apply(pred_cost, self.lambd, self.optmodel,
-                              self.processes, self.pool, self.solve_ratio, self)
+        sols = self.dbb.apply(pred_cost, self)
         return sols
 
 
@@ -61,17 +60,12 @@ class blackboxOptFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, lambd, optmodel, processes, pool, solve_ratio, module):
+    def forward(ctx, pred_cost, module):
         """
         Forward pass for DBB
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
-            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
-            optmodel (optModel): an PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            pool (ProcessPool): process pool object
-            solve_ratio (float): the ratio of new solutions computed during training
             module (optModule): blackboxOpt module
 
         Returns:
@@ -83,28 +77,27 @@ class blackboxOptFunc(Function):
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
         rand_sigma = np.random.uniform()
-        if rand_sigma <= solve_ratio:
-            sol, _ = _solve_in_pass(cp, optmodel, processes, pool)
-            if solve_ratio < 1:
+        if rand_sigma <= module.solve_ratio:
+            sol, _ = _solve_in_pass(cp, module.optmodel, module.processes, module.pool)
+            if module.solve_ratio < 1:
                 # add into solpool
                 module.solpool = np.concatenate((module.solpool, sol))
                 # remove duplicate
                 module.solpool = np.unique(module.solpool, axis=0)
         else:
-            sol, _ = _cache_in_pass(cp, optmodel, module.solpool)
+            sol, _ = _cache_in_pass(cp, module.optmodel, module.solpool)
         # convert to tensor
         sol = np.array(sol)
         pred_sol = torch.FloatTensor(sol).to(device)
         # save
         ctx.save_for_backward(pred_cost, pred_sol)
         # add other objects to ctx
-        ctx.lambd = lambd
-        ctx.optmodel = optmodel
-        ctx.processes = processes
-        ctx.pool = pool
-        ctx.solve_ratio = solve_ratio
-        if solve_ratio < 1:
-            ctx.module = module
+        ctx.lambd = module.lambd
+        ctx.optmodel = module.optmodel
+        ctx.processes = module.processes
+        ctx.pool = module.pool
+        ctx.solve_ratio = module.solve_ratio
+        ctx.module = module
         ctx.rand_sigma = rand_sigma
         return pred_sol
 
@@ -120,8 +113,7 @@ class blackboxOptFunc(Function):
         pool = ctx.pool
         solve_ratio = ctx.solve_ratio
         rand_sigma = ctx.rand_sigma
-        if solve_ratio < 1:
-            module = ctx.module
+        module = ctx.module
         # get device
         device = pred_cost.device
         # convert tenstor
@@ -133,7 +125,7 @@ class blackboxOptFunc(Function):
         # solve
         if rand_sigma <= solve_ratio:
             sol, _ = _solve_in_pass(cq, optmodel, processes, pool)
-            if solve_ratio < 1:
+            if module.solve_ratio < 1:
                 # add into solpool
                 module.solpool = np.concatenate((module.solpool, sol))
                 # remove duplicate
@@ -144,7 +136,7 @@ class blackboxOptFunc(Function):
         grad = (np.array(sol) - wp) / lambd
         # convert to tensor
         grad = torch.FloatTensor(grad).to(device)
-        return grad, None, None, None, None, None, None
+        return grad, None
 
 
 class negativeIdentity(optModule):
@@ -180,8 +172,7 @@ class negativeIdentity(optModule):
         """
         Forward pass
         """
-        sols = self.nid.apply(pred_cost, self.optmodel, self.processes,
-                              self.pool, self.solve_ratio, self)
+        sols = self.nid.apply(pred_cost, self)
         return sols
 
 
@@ -191,16 +182,12 @@ class negativeIdentityFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, optmodel, processes, pool, solve_ratio, module):
+    def forward(ctx, pred_cost, module):
         """
         Forward pass for NID
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
-            optmodel (optModel): an PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            pool (ProcessPool): process pool object
-            solve_ratio (float): the ratio of new solutions computed during training
             module (optModule): blackboxOpt module
 
         Returns:
@@ -212,19 +199,19 @@ class negativeIdentityFunc(Function):
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
         rand_sigma = np.random.uniform()
-        if rand_sigma <= solve_ratio:
-            sol, _ = _solve_in_pass(cp, optmodel, processes, pool)
-            if solve_ratio < 1:
+        if rand_sigma <= module.solve_ratio:
+            sol, _ = _solve_in_pass(cp, module.optmodel, module.processes, module.pool)
+            if module.solve_ratio < 1:
                 # add into solpool
                 module.solpool = np.concatenate((module.solpool, sol))
                 # remove duplicate
                 module.solpool = np.unique(module.solpool, axis=0)
         else:
-            sol, _ = _cache_in_pass(cp, optmodel, module.solpool)
+            sol, _ = _cache_in_pass(cp, module.optmodel, module.solpool)
         # convert to tensor
         pred_sol = torch.FloatTensor(np.array(sol)).to(device)
         # add other objects to ctx
-        ctx.optmodel = optmodel
+        ctx.optmodel = module.optmodel
         return pred_sol
 
     @staticmethod
@@ -241,4 +228,4 @@ class negativeIdentityFunc(Function):
             grad = - I
         if optmodel.modelSense == EPO.MAXIMIZE:
             grad = I
-        return grad_output @ grad, None, None, None, None, None
+        return grad_output @ grad, None

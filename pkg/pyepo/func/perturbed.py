@@ -55,9 +55,7 @@ class perturbedOpt(optModule):
         """
         Forward pass
         """
-        sols = self.ptb.apply(pred_cost, self.optmodel, self.n_samples,
-                              self.sigma, self.processes, self.pool, self.rnd,
-                              self.solve_ratio, self)
+        sols = self.ptb.apply(pred_cost, self)
         return sols
 
 
@@ -67,20 +65,12 @@ class perturbedOptFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, optmodel, n_samples, sigma,
-                processes, pool, rnd, solve_ratio, module):
+    def forward(ctx, pred_cost, module):
         """
         Forward pass for perturbed
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
-            optmodel (optModel): an PyEPO optimization model
-            n_samples (int): number of Monte-Carlo samples
-            sigma (float): the amplitude of the perturbation
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            pool (ProcessPool): process pool object
-            rnd (RondomState): numpy random state
-            solve_ratio (float): the ratio of new solutions computed during training
             module (optModule): perturbedOpt module
 
         Returns:
@@ -91,10 +81,10 @@ class perturbedOptFunc(Function):
         # convert tenstor
         cp = pred_cost.detach().to("cpu").numpy()
         # sample perturbations
-        noises = rnd.normal(0, 1, size=(n_samples, *cp.shape))
-        ptb_c = cp + sigma * noises
+        noises = module.rnd.normal(0, 1, size=(module.n_samples, *cp.shape))
+        ptb_c = cp + module.sigma * noises
         # solve with perturbation
-        ptb_sols = _solve_or_cache(ptb_c, optmodel, solve_ratio, processes, pool, module)
+        ptb_sols = _solve_or_cache(ptb_c, module)
         # solution expectation
         e_sol = ptb_sols.mean(axis=1)
         # convert to tensor
@@ -104,9 +94,9 @@ class perturbedOptFunc(Function):
         # save solutions
         ctx.save_for_backward(ptb_sols, noises)
         # add other objects to ctx
-        ctx.optmodel = optmodel
-        ctx.n_samples = n_samples
-        ctx.sigma = sigma
+        ctx.optmodel = module.optmodel
+        ctx.n_samples = module.n_samples
+        ctx.sigma = module.sigma
         return e_sol
 
     @staticmethod
@@ -122,7 +112,7 @@ class perturbedOptFunc(Function):
                             noises,
                             torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
         grad /= n_samples * sigma
-        return grad, None, None, None, None, None, None, None, None
+        return grad, None
 
 
 class perturbedFenchelYoung(optModule):
@@ -167,9 +157,7 @@ class perturbedFenchelYoung(optModule):
         """
         Forward pass
         """
-        loss = self.pfy.apply(pred_cost, true_sol, self.optmodel, self.n_samples,
-                              self.sigma, self.processes, self.pool, self.rnd,
-                              self.solve_ratio, self)
+        loss = self.pfy.apply(pred_cost, true_sol, self)
         # reduction
         if reduction == "mean":
             loss = torch.mean(loss)
@@ -188,21 +176,13 @@ class perturbedFenchelYoungFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, true_sol, optmodel, n_samples, sigma,
-                processes, pool, rnd, solve_ratio, module):
+    def forward(ctx, pred_cost, true_sol, module):
         """
         Forward pass for perturbed Fenchel-Young loss
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
             true_sol (torch.tensor): a batch of true optimal solutions
-            optmodel (optModel): an PyEPO optimization model
-            n_samples (int): number of Monte-Carlo samples
-            sigma (float): the amplitude of the perturbation
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            pool (ProcessPool): process pool object
-            rnd (RondomState): numpy random state
-            solve_ratio (float): the ratio of new solutions computed during training
             module (optModule): perturbedFenchelYoung module
 
         Returns:
@@ -214,16 +194,16 @@ class perturbedFenchelYoungFunc(Function):
         cp = pred_cost.detach().to("cpu").numpy()
         w = true_sol.detach().to("cpu").numpy()
         # sample perturbations
-        noises = rnd.normal(0, 1, size=(n_samples, *cp.shape))
-        ptb_c = cp + sigma * noises
+        noises = module.rnd.normal(0, 1, size=(module.n_samples, *cp.shape))
+        ptb_c = cp + module.sigma * noises
         # solve with perturbation
-        ptb_sols = _solve_or_cache(ptb_c, optmodel, solve_ratio, processes, pool, module)
+        ptb_sols = _solve_or_cache(ptb_c, module)
         # solution expectation
         e_sol = ptb_sols.mean(axis=1)
         # difference
-        if optmodel.modelSense == EPO.MINIMIZE:
+        if module.optmodel.modelSense == EPO.MINIMIZE:
             diff = w - e_sol
-        if optmodel.modelSense == EPO.MAXIMIZE:
+        if module.optmodel.modelSense == EPO.MAXIMIZE:
             diff = e_sol - w
         # loss
         loss = np.sum(diff**2, axis=1)
@@ -241,7 +221,7 @@ class perturbedFenchelYoungFunc(Function):
         """
         grad, = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
-        return grad * grad_output, None, None, None, None, None, None, None, None, None
+        return grad * grad_output, None, None
 
 
 class implicitMLE(optModule):
@@ -295,10 +275,7 @@ class implicitMLE(optModule):
         """
         Forward pass
         """
-        sols = self.imle.apply(pred_cost, self.optmodel, self.n_samples,
-                               self.sigma, self.lambd, self.distribution,
-                               self.two_sides, self.processes,
-                               self.pool, self.solve_ratio, self)
+        sols = self.imle.apply(pred_cost, self)
         return sols
 
 
@@ -308,22 +285,12 @@ class implicitMLEFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, optmodel, n_samples, sigma, lambd, distribution,
-                two_sides, processes, pool, solve_ratio, module):
+    def forward(ctx, pred_cost, module):
         """
         Forward pass for IMLE
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
-            optmodel (optModel): an PyEPO optimization model
-            n_samples (int): number of Monte-Carlo samples
-            sigma (float): noise temperature for the input distribution
-            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
-            distribution (distribution): noise distribution
-            two_sides (bool): approximate gradient by two-sided perturbation or not
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            pool (ProcessPool): process pool object
-            solve_ratio (float): the ratio of new solutions computed during training
             module (optModule): implicitMLE module
 
         Returns:
@@ -334,10 +301,10 @@ class implicitMLEFunc(Function):
         # convert tenstor
         cp = pred_cost.detach().to("cpu").numpy()
         # sample perturbations
-        noises = distribution.sample(size=(n_samples, *cp.shape))
-        ptb_c = cp + sigma * noises
+        noises = module.distribution.sample(size=(module.n_samples, *cp.shape))
+        ptb_c = cp + module.sigma * noises
         # solve with perturbation
-        ptb_sols = _solve_or_cache(ptb_c, optmodel, solve_ratio, processes, pool, module)
+        ptb_sols = _solve_or_cache(ptb_c, module)
         # solution average
         e_sol = ptb_sols.mean(axis=1)
         # convert to tensor
@@ -347,12 +314,12 @@ class implicitMLEFunc(Function):
         # add other objects to ctx
         ctx.noises = noises
         ctx.ptb_sols = ptb_sols
-        ctx.lambd = lambd
-        ctx.optmodel = optmodel
-        ctx.two_sides = two_sides
-        ctx.processes = processes
-        ctx.pool = pool
-        ctx.solve_ratio = solve_ratio
+        ctx.lambd = module.lambd
+        ctx.optmodel = module.optmodel
+        ctx.two_sides = module.two_sides
+        ctx.processes = module.processes
+        ctx.pool = module.pool
+        ctx.solve_ratio = module.solve_ratio
         ctx.module = module
         return e_sol
 
@@ -379,7 +346,7 @@ class implicitMLEFunc(Function):
         # positive perturbed costs
         ptb_cp_pos = cp + lambd * dl + noises
         # solve with perturbation
-        ptb_sols_pos = _solve_or_cache(ptb_cp_pos, optmodel, solve_ratio, processes, pool, module)
+        ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
         if two_sides:
             # negative perturbed costs
             ptb_cp_neg = cp - lambd * dl + noises
@@ -392,15 +359,15 @@ class implicitMLEFunc(Function):
             grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / lambd
         # convert to tensor
         grad = torch.FloatTensor(grad).to(device)
-        return grad, None, None, None, None, None, None, None, None, None, None
+        return grad, None, None
 
 
-def _solve_or_cache(ptb_c, optmodel, solve_ratio, processes, pool, module):
+def _solve_or_cache(ptb_c, module):
     rand_sigma = np.random.uniform()
     # solve optimization
-    if rand_sigma <= solve_ratio:
-        ptb_sols = _solve_in_pass(ptb_c, optmodel, processes, pool)
-        if solve_ratio < 1:
+    if rand_sigma <= module.solve_ratio:
+        ptb_sols = _solve_in_pass(ptb_c, module.optmodel, module.processes, module.pool)
+        if module.solve_ratio < 1:
             sols = ptb_sols.reshape(-1, cp.shape[1])
             # add into solpool
             module.solpool = np.concatenate((module.solpool, sols))
