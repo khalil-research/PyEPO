@@ -296,9 +296,9 @@ class implicitMLE(optModule):
         Forward pass
         """
         sols = self.ilme.apply(pred_cost, self.optmodel, self.n_samples,
-                                self.sigma, self.lambd, self.distribution,
-                                self.two_sides, self.processes,
-                                self.pool, self.solve_ratio, self)
+                               self.sigma, self.lambd, self.distribution,
+                               self.two_sides, self.processes,
+                               self.pool, self.solve_ratio, self)
         return sols
 
 
