@@ -56,9 +56,7 @@ class listwiseLTR(optModule):
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
-            self.solpool = np.concatenate((self.solpool, sol))
-            # remove duplicate
-            self.solpool = np.unique(self.solpool, axis=0)
+            module._update_solution_pool(sol)
         # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # obj for solpool
@@ -124,9 +122,7 @@ class pairwiseLTR(optModule):
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
-            self.solpool = np.concatenate((self.solpool, sol))
-            # remove duplicate
-            self.solpool = np.unique(self.solpool, axis=0)
+            module._update_solution_pool(sol)
         # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # obj for solpool
@@ -206,9 +202,7 @@ class pointwiseLTR(optModule):
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
-            self.solpool = np.concatenate((self.solpool, sol))
-            # remove duplicate
-            self.solpool = np.unique(self.solpool, axis=0)
+            module._update_solution_pool(sol)
         # convert tensor
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # obj for solpool as score

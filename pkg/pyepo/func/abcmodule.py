@@ -66,3 +66,12 @@ class optModule(nn.Module):
         """
         # convert tensor
         pass
+
+    def _update_solution_pool(self, sol):
+        """
+        Add new solutions to solution pool
+        """
+        # add into solpool
+        self.solpool = np.concatenate((self.solpool, sol))
+        # remove duplicate
+        self.solpool = np.unique(self.solpool, axis=0)
