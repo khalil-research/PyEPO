@@ -20,6 +20,8 @@ jobs:
         auto-activate-base: false
     - name: Install Conda-Build and Anaconda-Client
       run: conda install conda-build anaconda-client
+    - name: Purge Conda Build Cache
+      run: conda build purge
     - name: Build Conda Package
       run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default
     - name: Extract package version
