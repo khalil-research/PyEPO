@@ -28,7 +28,7 @@ jobs:
       run: |
         PACKAGE_VERSION=$(conda search --json -c local pyepo | jq -r '.pyepo[-1].version')
         echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
-    - name: Find and upload Conda package
+    - name: Find and Upload Conda Package
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
       run: |
