@@ -124,7 +124,7 @@ class blackboxOptFunc(Function):
         else:
             sol, _ = _cache_in_pass(cq, module.optmodel, module.solpool)
         # get gradient
-        grad = (np.array(sol) - wp) / module.lambd
+        grad = (sol - wp) / module.lambd
         # convert to tensor
         grad = torch.FloatTensor(grad).to(device)
         return grad, None
