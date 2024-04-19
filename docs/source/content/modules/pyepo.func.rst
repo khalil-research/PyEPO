@@ -1,4 +1,4 @@
-pyepo.func
+﻿pyepo.func
 ==========
 
 .. automodule:: pyepo.func
