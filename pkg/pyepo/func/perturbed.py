@@ -351,6 +351,107 @@ class implicitMLEFunc(Function):
         return grad, None, None
 
 
+class adaptiveImplicitMLE(optModule):
+    """
+    An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
+    adaptively choose hyperparameter λ and yield an optimal solution in a
+    constrained exponential family distribution via Perturb-and-MAP.
+
+    For AI-MLE, it works as black-box combinatorial solvers, in which constraints
+    are known and fixed, but the cost vector need to be predicted from
+    contextual data.
+
+    The AI-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+    design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
+    """
+
+    def __init__(self, optmodel, n_samples=10, sigma=1.0,
+                 distribution=sumGammaDistribution(kappa=5), two_sides=False,
+                 processes=1, solve_ratio=1, dataset=None):
+        """
+        Args:
+            optmodel (optModel): an PyEPO optimization model
+            n_samples (int): number of Monte-Carlo samples
+            sigma (float): noise temperature for the input distribution
+            distribution (distribution): noise distribution
+            two_sides (bool): approximate gradient by two-sided perturbation or not
+            processes (int): number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio (float): the ratio of new solutions computed during training
+            dataset (None/optDataset): the training data
+        """
+        super().__init__(optmodel, processes, solve_ratio, dataset)
+        # number of samples
+        self.n_samples = n_samples
+        # noise temperature
+        self.sigma = sigma
+        # noise distribution
+        self.distribution = distribution
+        # symmetric perturbation
+        self.two_sides = two_sides
+        # init adaptive params
+        self.alpha = 0 # adaptive magnitude α
+        self.grad_norm_avg = 1 # gradient norm estimate
+        self.step = 1e-3 # update step for α
+        # build I-LME
+        self.aimle = adaptiveImplicitMLEFunc()
+
+    def forward(self, pred_cost):
+        """
+        Forward pass
+        """
+        sols = self.aimle.apply(pred_cost, self)
+        return sols
+
+
+class adaptiveImplicitMLEFunc(implicitMLEFunc):
+    """
+    A autograd function for Adaptive Implicit Maximum Likelihood Estimator
+    """
+    @staticmethod
+    def backward(ctx, grad_output):
+        """
+        Backward pass for IMLE
+        """
+        pred_cost, = ctx.saved_tensors
+        noises = ctx.noises
+        ptb_sols = ctx.ptb_sols
+        module = ctx.module
+        # get device
+        device = pred_cost.device
+        # convert tenstor
+        cp = pred_cost.detach().to("cpu").numpy()
+        dl = grad_output.detach().to("cpu").numpy()
+        # calculate λ
+        lambd = module.alpha * np.linalg.norm(cp) / np.linalg.norm(dl)
+        # positive perturbed costs
+        ptb_cp_pos = cp + lambd * dl + noises
+        # solve with perturbation
+        ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
+        if module.two_sides:
+            # negative perturbed costs
+            ptb_cp_neg = cp - lambd * dl + noises
+            # solve with perturbation
+            ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
+            # get two-side gradient
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(axis=1) / (2 * lambd + 1e-7)
+        else:
+            # get single side gradient
+            grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / (lambd + 1e-7)
+        # convert to tensor
+        grad = torch.FloatTensor(grad).to(device)
+        # moving average of the gradient norm
+        grad_norm = (grad.abs() > 1e-7).float().mean()
+        module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm
+        # update α to make grad_norm closer to 1
+        if module.grad_norm_avg < 1:
+            module.alpha += module.step
+        else:
+            module.alpha -= module.step
+        return grad, None, None
+
+
 def _solve_or_cache(ptb_c, module):
     rand_sigma = np.random.uniform()
     # solve optimization
