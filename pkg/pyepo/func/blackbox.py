@@ -10,7 +10,7 @@ from torch.autograd import Function
 
 from pyepo.func.abcmodule import optModule
 from pyepo import EPO
-from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
+from pyepo.func.utlis import _solve_or_cache
 
 
 class blackboxOpt(optModule):
@@ -73,26 +73,18 @@ class blackboxOptFunc(Function):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
-        rand_sigma = np.random.uniform()
-        if rand_sigma <= module.solve_ratio:
-            sol, _ = _solve_in_pass(cp, module.optmodel, module.processes, module.pool)
-            if module.solve_ratio < 1:
-                # add into solpool
-                module._update_solution_pool(sol)
-        else:
-            sol, _ = _cache_in_pass(cp, module.optmodel, module.solpool)
+        sol, _ = _solve_or_cache(cp, module)
         # convert to tensor
-        sol = np.array(sol)
-        pred_sol = torch.FloatTensor(sol).to(device)
+        sol = torch.FloatTensor(sol).to(device)
         # save
-        ctx.save_for_backward(pred_cost, pred_sol)
+        ctx.save_for_backward(pred_cost, sol)
         # add other objects to ctx
         ctx.lambd = module.lambd
         ctx.module = module
-        return pred_sol
+        return sol
 
     @staticmethod
     def backward(ctx, grad_output):
@@ -111,14 +103,7 @@ class blackboxOptFunc(Function):
         # perturbed costs
         cq = cp + lambd * dl
         # solve
-        rand_sigma = np.random.uniform()
-        if rand_sigma <= module.solve_ratio:
-            sol, _ = _solve_in_pass(cq, module.optmodel, module.processes, module.pool)
-            if module.solve_ratio < 1:
-                # add into solpool
-                module._update_solution_pool(sol)
-        else:
-            sol, _ = _cache_in_pass(cq, module.optmodel, module.solpool)
+        sol, _ = _solve_or_cache(cq, module)
         # get gradient
         grad = (sol - wp) / module.lambd
         # convert to tensor
@@ -185,19 +170,12 @@ class negativeIdentityFunc(Function):
         # convert tenstor
         cp = pred_cost.detach().to("cpu").numpy()
         # solve
-        rand_sigma = np.random.uniform()
-        if rand_sigma <= module.solve_ratio:
-            sol, _ = _solve_in_pass(cp, module.optmodel, module.processes, module.pool)
-            if module.solve_ratio < 1:
-                # add into solpool
-                module._update_solution_pool(sol)
-        else:
-            sol, _ = _cache_in_pass(cp, module.optmodel, module.solpool)
+        sol, _ = _solve_or_cache(cp, module)
         # convert to tensor
-        pred_sol = torch.FloatTensor(np.array(sol)).to(device)
+        sol = torch.FloatTensor(sol).to(device)
         # add other objects to ctx
         ctx.optmodel = module.optmodel
-        return pred_sol
+        return sol
 
     @staticmethod
     def backward(ctx, grad_output):
