@@ -23,6 +23,7 @@ pyepo.model.grb.tsp
       tspGGModelRel
       tspMTZModel
       tspMTZModelRel
+      unionFind
    
    
 

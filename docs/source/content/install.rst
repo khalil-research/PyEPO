@@ -5,7 +5,7 @@ You can download ``PyEPO`` from our `GitHub repository <https://github.com/khali
 
 .. code-block:: console
 
-   git clone https://github.com/khalil-research/PyEPO.git
+   git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
 
 And install it.
 
