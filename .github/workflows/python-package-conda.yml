@@ -1,0 +1,32 @@
+name: Python Package using Conda
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: pyepo-build
+        python-version: 3.9
+        auto-activate-base: false
+    - name: Install Conda-Build and Anaconda-Client
+      run: conda install conda-build anaconda-client
+    - name: Build Conda Package
+      run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default
+    - name: Find and upload Conda package
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+      run: |
+        CONDA_BLD_PATH=$(conda info --json | jq -r '.conda_prefix')/conda-bld
+        echo "Conda build path: $CONDA_BLD_PATH"
+        conda install -n pyepo-build anaconda-client --yes
+        conda run -n pyepo-build anaconda upload --user pyepo $CONDA_BLD_PATH/*/*.tar.bz2

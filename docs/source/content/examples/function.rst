@@ -57,23 +57,6 @@ Negative Identity Backpropagation (NID) [#f6]_ treats the solver as a negative i
    nid = pyepo.func.negativeIdentity(optmodel, processes=2)
 
 
-Implicit Maximum Likelihood Estimator (I-MLE)
-=============================================
-
-Implicit Maximum Likelihood Estimator (I-MLE) [#f7]_ use the perturb-and-MAP framework. They sample noise from a Sum-of-Gamma distribution and interpolate the loss function to approximate finite difference.
-
-.. autoclass:: pyepo.func.implicitMLE
-    :noindex:
-    :members:
-
-``pyepo.func.implicitMLE`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores.
-
-.. code-block:: python
-
-   import pyepo
-
-   imle = pyepo.func.implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=2)
-
 
 Differentiable Perturbed Optimizer (DPO)
 ========================================
@@ -114,6 +97,45 @@ Perturbed Fenchel-Young loss (PYFL) function [#f3]_ uses perturbation techniques
    pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
 
 
+
+Implicit Maximum Likelihood Estimator (I-MLE)
+=============================================
+
+Implicit Maximum Likelihood Estimator (I-MLE) [#f7]_ use the perturb-and-MAP framework. They sample noise from a Sum-of-Gamma distribution and interpolate the loss function to approximate finite difference.
+
+.. autoclass:: pyepo.func.implicitMLE
+    :noindex:
+    :members:
+
+``pyepo.func.implicitMLE`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores.
+
+.. code-block:: python
+
+   import pyepo
+
+   imle = pyepo.func.implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=2)
+
+
+
+Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)
+=======================================================
+
+Adaptive Implicit Maximum Likelihood Estimator (AI-MLE) [#f8]_ use the adaptive interpolation step and the perturb-and-MAP framework. They sample noise from a Sum-of-Gamma distribution and interpolate the loss function to approximate finite difference.
+
+.. autoclass:: pyepo.func.adaptiveImplicitMLE
+    :noindex:
+    :members:
+
+``pyepo.func.adaptiveImplicitMLE`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, 0 for using all available cores.
+
+.. code-block:: python
+
+   import pyepo
+
+   aimle = pyepo.func.implicitMLE(optmodel, n_samples=10, sigma=1.0, processes=2)
+
+
+
 Noise Contrastive Estimation (NCE)
 ==================================
 
@@ -132,6 +154,7 @@ Noise Contrastive Estimation (NCE) [#f4]_ serve as surrogate loss function based
    nce = pyepo.func.NCE(optmodel, processes=2, solve_ratio=0.05, dataset=dataset_train)
 
 
+
 Contrastive Maximum A Posterior Estimation (CMAP)
 =================================================
 
@@ -148,6 +171,7 @@ Contrastive Maximum A Posteriori (CMAP) Loss function [#f4]_ is a special case o
    import pyepo
 
    cmap = pyepo.func.contrastiveMAP(optmodel, processes=2, solve_ratio=0.05, dataset=dataset_train)
+
 
 
 Learning to Rank (LTR)
@@ -207,3 +231,4 @@ The figure shows that the increasing of processes reduces the runtime.
 .. [#f5] Mandi, J., Bucarey, V., Mulamba, M., & Guns, T. (2022). Decision-focused learning: through the lens of learning to rank. Proceedings of the 39th International Conference on Machine Learning.
 .. [#f6] Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.
 .. [#f7] Niepert, M., Minervini, P., & Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.
+.. [#f8] Minervini, P., Franceschi, L., & Niepert, M. (2023, June). Adaptive perturbation-based gradient estimation for discrete latent variable models. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 8, pp. 9200-9208).

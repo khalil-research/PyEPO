@@ -13,6 +13,24 @@ from gurobipy import GRB
 
 from pyepo.model.grb.grbmodel import optGrbModel
 
+class unionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+
+    def find(self, i):
+        if self.parent[i] != i:
+            self.parent[i] = self.find(self.parent[i])
+        return self.parent[i]
+
+    def union(self, i, j):
+        root_i = self.find(i)
+        root_j = self.find(j)
+        if root_i != root_j:
+            self.parent[root_j] = root_i
+            return True
+        return False
+
+
 class tspABModel(optGrbModel):
     """
     This abstract class is optimization model for traveling salesman problem.
@@ -279,41 +297,22 @@ class tspDFJModel(tspABModel):
         """
         A static method to add lazy constraints for subtour elimination
         """
-        def subtour(selected, n):
-            """
-            find shortest cycle
-            """
-            unvisited = list(range(n))
-            # init dummy longest cycle
-            cycle = range(n + 1)
-            while unvisited:
-                thiscycle = []
-                neighbors = unvisited
-                while neighbors:
-                    current = neighbors[0]
-                    thiscycle.append(current)
-                    unvisited.remove(current)
-                    neighbors = [
-                        j for i, j in selected.select(current, "*")
-                        if j in unvisited
-                    ]
-                if len(cycle) > len(thiscycle):
-                    cycle = thiscycle
-            return cycle
-
         if where == GRB.Callback.MIPSOL:
             # selected edges
             xvals = model.cbGetSolution(model._x)
             selected = gp.tuplelist(
                 (i, j) for i, j in model._x.keys() if xvals[i, j] > 1e-2)
-            # shortest cycle
-            tour = subtour(selected, model._n)
-            # add cuts
-            if len(tour) < model._n:
-                model.cbLazy(
-                    gp.quicksum(
-                        model._x[i, j]
-                        for i, j in combinations(tour, 2)) <= len(tour) - 1)
+            # check subcycle with unionfind
+            uf = unionFind(model._n)
+            for i, j in selected:
+                if not uf.union(i, j):
+                    # find subcycle
+                    cycle = [k for k in range(model._n) if uf.find(k) == uf.find(i)]
+                    if len(cycle) < model._n:
+                        constr = gp.quicksum(model._x[i, j]
+                                     for i, j in combinations(cycle, 2)) <= len(cycle) - 1
+                        model.cbLazy(constr)
+                    break
 
     def setObj(self, c):
         """
@@ -382,13 +381,6 @@ class tspMTZModel(tspABModel):
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
-        for i, j in self.edges:
-            x[j, i] = x[i, j]
-        u = m.addVars(self.nodes, name="u")
-        # sense
-        m.modelSense = GRB.MINIMIZE
-        # constraints
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
         u = m.addVars(self.nodes, name="u")
@@ -480,13 +472,6 @@ class tspMTZModelRel(tspMTZModel):
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
-        for i, j in self.edges:
-            x[j, i] = x[i, j]
-        u = m.addVars(self.nodes, name="u")
-        # sense
-        m.modelSense = GRB.MINIMIZE
-        # constraints
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", ub=1)
         u = m.addVars(self.nodes, name="u")

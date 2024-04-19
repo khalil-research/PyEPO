@@ -20,12 +20,13 @@ class optModule(nn.Module):
         An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
         vector and the true cost vector rank a pool of feasible solutions.
     """
-    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
+    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
+            reduction (str): the reduction to apply to the output
             dataset (None/optDataset): the training data
         """
         super().__init__()
@@ -39,11 +40,11 @@ class optModule(nn.Module):
                 format(processes, mp.cpu_count()))
         self.processes = mp.cpu_count() if not processes else processes
         # single-core
-        if processes == 1:
+        if self.processes == 1:
             self.pool = None
         # multi-core
         else:
-            self.pool = ProcessingPool(processes)
+            self.pool = ProcessingPool(self.processes)
         print("Num of cores: {}".format(self.processes))
         # solution pool
         self.solve_ratio = solve_ratio
@@ -55,9 +56,11 @@ class optModule(nn.Module):
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
             self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
+        # reduction
+        self.reduction = reduction
 
     @abstractmethod
-    def forward(self, pred_cost, true_cost, reduction="mean"):
+    def forward(self, pred_cost, true_cost):
         """
         Forward pass
         """
