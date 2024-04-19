@@ -91,9 +91,7 @@ class SPOPlusFunc(Function):
             sol, obj = _solve_in_pass(2*cp-c, module.optmodel, module.processes, module.pool)
             if module.solve_ratio < 1:
                 # add into solpool
-                module.solpool = np.concatenate((module.solpool, sol))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
+                module._update_solution_pool(sol)
         else:
             sol, obj = _cache_in_pass(2*cp-c, module.optmodel, module.solpool)
         # calculate loss

@@ -81,9 +81,7 @@ class blackboxOptFunc(Function):
             sol, _ = _solve_in_pass(cp, module.optmodel, module.processes, module.pool)
             if module.solve_ratio < 1:
                 # add into solpool
-                module.solpool = np.concatenate((module.solpool, sol))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
+                module._update_solution_pool(sol)
         else:
             sol, _ = _cache_in_pass(cp, module.optmodel, module.solpool)
         # convert to tensor
@@ -118,9 +116,7 @@ class blackboxOptFunc(Function):
             sol, _ = _solve_in_pass(cq, module.optmodel, module.processes, module.pool)
             if module.solve_ratio < 1:
                 # add into solpool
-                module.solpool = np.concatenate((module.solpool, sol))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
+                module._update_solution_pool(sol)
         else:
             sol, _ = _cache_in_pass(cq, module.optmodel, module.solpool)
         # get gradient
@@ -194,9 +190,7 @@ class negativeIdentityFunc(Function):
             sol, _ = _solve_in_pass(cp, module.optmodel, module.processes, module.pool)
             if module.solve_ratio < 1:
                 # add into solpool
-                module.solpool = np.concatenate((module.solpool, sol))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
+                module._update_solution_pool(sol)
         else:
             sol, _ = _cache_in_pass(cp, module.optmodel, module.solpool)
         # convert to tensor
