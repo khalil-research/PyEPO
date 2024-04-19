@@ -9,6 +9,8 @@ Model
 
 To build optimization models with ``PyEPO``, users do **not** need specific costs of objective functions since the cost vector is unknown but will be estimated from data.
 
+For more information and details about the Optimization Model, please see the `01 Optimization Model: <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_
+
 
 User-defined Models
 ===================
@@ -32,7 +34,8 @@ User-defined models with GurobiPy can be easily defined by the inheritance of th
 For ``optGrbModel``, users does not need specify the sense ``modelSense`` as ``EPO.MINIMIZE`` or ``EPO.MINIMIZE``. Both the minimization and maximization models are correctly recognized and run by ``pyepo``.
 
 .. autoclass:: pyepo.model.grb.optGrbModel
-   :members: __init__, _getModel, setObj, solve, num_cost, relax
+    :noindex:
+    :members: __init__, _getModel, setObj, solve, num_cost, relax
 
 
 For example, users can build models for the following problem:
@@ -84,7 +87,8 @@ User-defined Pyomo Models
 User-defined models with Pyomo can be easily defined by the inheritance of the abstract class ``pyepo.model.omo.optOmoModel``.
 
 .. autoclass:: pyepo.model.omo.optOmoModel
-   :members: __init__, _getModel, setObj, solve, num_cost, relax
+    :noindex:
+    :members: __init__, _getModel, setObj, solve, num_cost, relax
 
 
 Let's build models for the problem again with Pyomo:
@@ -140,7 +144,8 @@ User-defined Models from Scratch
 ``pyepo.model.opt.optModel`` provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding ``_getModel``, ``setObj``, ``solve``,  and ``num_cost``, user-defined ``optModel`` can work for end-to-end training.
 
 .. autoclass:: pyepo.model.opt.optModel
-   :members: __init__, _getModel, setObj, solve, num_cost
+    :noindex:
+    :members: __init__, _getModel, setObj, solve, num_cost
 
 .. warning::  The ``optModel`` need to set ``modelSense`` in the ``_getModel``. If not set, the default is to minimize.
 
@@ -271,7 +276,8 @@ Shortest Path GurobiPy Model
 The ``optModel`` is built from ``pyepo.model.grb.shortestPathModel``, in which API uses GurobiPy to model the shortest path problem.
 
 .. autoclass:: pyepo.model.grb.shortestPathModel
-   :members: __init__, setObj, solve, num_cost
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
 
 .. code-block:: python
 
@@ -295,7 +301,8 @@ Shortest Path Pyomo Model
 The ``optModel`` is built from ``pyepo.model.omo.shortestPathModel``, in which API uses Pyomo to model the shortest path problem.
 
 .. autoclass:: pyepo.model.omo.shortestPathModel
-   :members: __init__, setObj, solve, num_cost
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
 
 Pyomo supports a wide variety of solvers in the background (e.g. BARON, CBC, CPLEX, and Gurobi). Thus, ``pyepo.model.omo.shortestPathModel`` allows users to call different solvers with class parameter ``solver``.
 
@@ -347,7 +354,8 @@ Knapsack GurobiPy Model
 The ``optModel`` is built from ``pyepo.model.grb.knapsackModel``, in which API uses GurobiPy to model the knapsack problem.
 
 .. autoclass:: pyepo.model.grb.knapsackModel
-   :members: __init__, setObj, solve, num_cost, relax
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
 
 .. code-block:: python
 
@@ -380,7 +388,8 @@ Knapsack Pyomo Model
 The ``optModel`` is built from ``pyepo.model.omo.knapsackModel``, in which API uses Pyomo to model the knapsack problem.
 
 .. autoclass:: pyepo.model.omo.knapsackModel
-   :members: __init__, setObj, solve, num_cost, relax
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
 
 .. code-block:: python
 
@@ -417,7 +426,8 @@ DFJ formulation
 ^^^^^^^^^^^^^^^
 
 .. autoclass:: pyepo.model.grb.tspDFJModel
-   :members: __init__, setObj, solve, num_cost
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
 
 The number of subtour elimination constraints for DFJ formulation is exponential. Thus, we solved it with column generation. Because of that, the linear relaxation of DFJ is **not** supported in our implementation.
 
@@ -440,7 +450,8 @@ GG formulation
 ^^^^^^^^^^^^^^
 
 .. autoclass:: pyepo.model.grb.tspGGModel
-   :members: __init__, setObj, solve, num_cost, relax
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
 
 Same as previous model, the code for traveling salesman problem with GG formulation is as follows:
 
@@ -463,7 +474,8 @@ MTZ formulation
 ^^^^^^^^^^^^^^^
 
 .. autoclass:: pyepo.model.grb.tspMTZModel
-   :members: __init__, setObj, solve, num_cost, relax
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
 
 Same as previous model, the code for traveling salesman problem with MTZ formulation is as follows:
 
