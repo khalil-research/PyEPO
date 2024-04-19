@@ -23,7 +23,7 @@ jobs:
       run: conda install conda-build anaconda-client
     - name: Build Conda Package
       run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default
-    - name: Extract package version
+    - name: Extract Package Version
       run: |
         PACKAGE_VERSION=$(conda search --json -c local pyepo | jq -r '.pyepo[-1].version')
         echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
