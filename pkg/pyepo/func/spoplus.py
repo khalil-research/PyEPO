@@ -27,34 +27,33 @@ class SPOPlus(optModule):
     Reference: <https://doi.org/10.1287/mnsc.2020.3922>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
+    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
             optmodel (optModel): an PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
+            reduction (str): the reduction to apply to the output
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # build carterion
         self.spop = SPOPlusFunc()
 
-    def forward(self, pred_cost, true_cost, true_sol, true_obj, reduction="mean"):
+    def forward(self, pred_cost, true_cost, true_sol, true_obj):
         """
         Forward pass
         """
-        loss = self.spop.apply(pred_cost, true_cost, true_sol, true_obj,
-                               self.optmodel, self.processes, self.pool,
-                               self.solve_ratio, self)
+        loss = self.spop.apply(pred_cost, true_cost, true_sol, true_obj, self)
         # reduction
-        if reduction == "mean":
+        if self.reduction == "mean":
             loss = torch.mean(loss)
-        elif reduction == "sum":
+        elif self.reduction == "sum":
             loss = torch.sum(loss)
-        elif reduction == "none":
+        elif self.reduction == "none":
             loss = loss
         else:
-            raise ValueError("No reduction '{}'.".format(reduction))
+            raise ValueError("No reduction '{}'.".format(self.reduction))
         return loss
 
 
@@ -64,8 +63,7 @@ class SPOPlusFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, true_cost, true_sol, true_obj,
-                optmodel, processes, pool, solve_ratio, module):
+    def forward(ctx, pred_cost, true_cost, true_sol, true_obj, module):
         """
         Forward pass for SPO+
 
@@ -74,10 +72,6 @@ class SPOPlusFunc(Function):
             true_cost (torch.tensor): a batch of true values of the cost
             true_sol (torch.tensor): a batch of true optimal solutions
             true_obj (torch.tensor): a batch of true optimal objective values
-            optmodel (optModel): an PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            pool (ProcessPool): process pool object
-            solve_ratio (float): the ratio of new solutions computed during training
             module (optModule): SPOPlus modeul
 
         Returns:
@@ -93,23 +87,23 @@ class SPOPlusFunc(Function):
         # check sol
         #_check_sol(c, w, z)
         # solve
-        if np.random.uniform() <= solve_ratio:
-            sol, obj = _solve_in_pass(2*cp-c, optmodel, processes, pool)
-            if solve_ratio < 1:
+        if np.random.uniform() <= module.solve_ratio:
+            sol, obj = _solve_in_pass(2*cp-c, module.optmodel, module.processes, module.pool)
+            if module.solve_ratio < 1:
                 # add into solpool
                 module.solpool = np.concatenate((module.solpool, sol))
                 # remove duplicate
                 module.solpool = np.unique(module.solpool, axis=0)
         else:
-            sol, obj = _cache_in_pass(2*cp-c, optmodel, module.solpool)
+            sol, obj = _cache_in_pass(2*cp-c, module.optmodel, module.solpool)
         # calculate loss
         loss = []
         for i in range(len(cp)):
             loss.append(- obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
         # sense
-        if optmodel.modelSense == EPO.MINIMIZE:
+        if module.optmodel.modelSense == EPO.MINIMIZE:
             loss = np.array(loss)
-        if optmodel.modelSense == EPO.MAXIMIZE:
+        if module.optmodel.modelSense == EPO.MAXIMIZE:
             loss = - np.array(loss)
         # convert to tensor
         loss = torch.FloatTensor(loss).to(device)
@@ -118,7 +112,7 @@ class SPOPlusFunc(Function):
         # save solutions
         ctx.save_for_backward(true_sol, sol)
         # add other objects to ctx
-        ctx.optmodel = optmodel
+        ctx.optmodel = module.optmodel
         return loss
 
     @staticmethod
@@ -132,4 +126,4 @@ class SPOPlusFunc(Function):
             grad = 2 * (w - wq)
         if optmodel.modelSense == EPO.MAXIMIZE:
             grad = 2 * (wq - w)
-        return grad_output * grad, None, None, None, None, None, None, None, None
+        return grad_output * grad, None, None, None, None
