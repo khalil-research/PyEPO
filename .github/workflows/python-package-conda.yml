@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: pyepo-build
         python-version: 3.9
