@@ -315,12 +315,6 @@ class implicitMLEFunc(Function):
         # add other objects to ctx
         ctx.noises = noises
         ctx.ptb_sols = ptb_sols
-        ctx.lambd = module.lambd
-        ctx.optmodel = module.optmodel
-        ctx.two_sides = module.two_sides
-        ctx.processes = module.processes
-        ctx.pool = module.pool
-        ctx.solve_ratio = module.solve_ratio
         ctx.module = module
         return e_sol
 
@@ -332,12 +326,6 @@ class implicitMLEFunc(Function):
         pred_cost, = ctx.saved_tensors
         noises = ctx.noises
         ptb_sols = ctx.ptb_sols
-        lambd = ctx.lambd
-        optmodel = ctx.optmodel
-        two_sides = ctx.two_sides
-        processes = ctx.processes
-        pool = ctx.pool
-        solve_ratio = ctx.solve_ratio
         module = ctx.module
         # get device
         device = pred_cost.device
@@ -345,19 +333,19 @@ class implicitMLEFunc(Function):
         cp = pred_cost.detach().to("cpu").numpy()
         dl = grad_output.detach().to("cpu").numpy()
         # positive perturbed costs
-        ptb_cp_pos = cp + lambd * dl + noises
+        ptb_cp_pos = cp + module.lambd * dl + noises
         # solve with perturbation
         ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
-        if two_sides:
+        if module.two_sides:
             # negative perturbed costs
-            ptb_cp_neg = cp - lambd * dl + noises
+            ptb_cp_neg = cp - module.lambd * dl + noises
             # solve with perturbation
-            ptb_sols_neg = _solve_or_cache(ptb_cp_neg, optmodel, solve_ratio, processes, pool, module)
+            ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
             # get two-side gradient
-            grad = (ptb_sols_pos - ptb_sols_neg).mean(axis=1) / (2 * lambd)
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(axis=1) / (2 * module.lambd)
         else:
             # get single side gradient
-            grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / lambd
+            grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / module.lambd
         # convert to tensor
         grad = torch.FloatTensor(grad).to(device)
         return grad, None, None

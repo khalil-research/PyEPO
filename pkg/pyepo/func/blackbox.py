@@ -93,12 +93,7 @@ class blackboxOptFunc(Function):
         ctx.save_for_backward(pred_cost, pred_sol)
         # add other objects to ctx
         ctx.lambd = module.lambd
-        ctx.optmodel = module.optmodel
-        ctx.processes = module.processes
-        ctx.pool = module.pool
-        ctx.solve_ratio = module.solve_ratio
         ctx.module = module
-        ctx.rand_sigma = rand_sigma
         return pred_sol
 
     @staticmethod
@@ -108,11 +103,6 @@ class blackboxOptFunc(Function):
         """
         pred_cost, pred_sol = ctx.saved_tensors
         lambd = ctx.lambd
-        optmodel = ctx.optmodel
-        processes = ctx.processes
-        pool = ctx.pool
-        solve_ratio = ctx.solve_ratio
-        rand_sigma = ctx.rand_sigma
         module = ctx.module
         # get device
         device = pred_cost.device
@@ -123,17 +113,18 @@ class blackboxOptFunc(Function):
         # perturbed costs
         cq = cp + lambd * dl
         # solve
-        if rand_sigma <= solve_ratio:
-            sol, _ = _solve_in_pass(cq, optmodel, processes, pool)
+        rand_sigma = np.random.uniform()
+        if rand_sigma <= module.solve_ratio:
+            sol, _ = _solve_in_pass(cq, module.optmodel, module.processes, module.pool)
             if module.solve_ratio < 1:
                 # add into solpool
                 module.solpool = np.concatenate((module.solpool, sol))
                 # remove duplicate
                 module.solpool = np.unique(module.solpool, axis=0)
         else:
-            sol, _ = _cache_in_pass(cq, optmodel, module.solpool)
+            sol, _ = _cache_in_pass(cq, module.optmodel, module.solpool)
         # get gradient
-        grad = (np.array(sol) - wp) / lambd
+        grad = (np.array(sol) - wp) / module.lambd
         # convert to tensor
         grad = torch.FloatTensor(grad).to(device)
         return grad, None
