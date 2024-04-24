@@ -10,7 +10,7 @@ from torch.autograd import Function
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
-from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
+from pyepo.func.utlis import _solve_or_cache
 
 class SPOPlus(optModule):
     """
@@ -87,15 +87,7 @@ class SPOPlusFunc(Function):
         # check sol
         #_check_sol(c, w, z)
         # solve
-        if np.random.uniform() <= module.solve_ratio:
-            sol, obj = _solve_in_pass(2*cp-c, module.optmodel, module.processes, module.pool)
-            if module.solve_ratio < 1:
-                # add into solpool
-                module.solpool = np.concatenate((module.solpool, sol))
-                # remove duplicate
-                module.solpool = np.unique(module.solpool, axis=0)
-        else:
-            sol, obj = _cache_in_pass(2*cp-c, module.optmodel, module.solpool)
+        sol, obj = _solve_or_cache(2 * cp - c, module)
         # calculate loss
         loss = []
         for i in range(len(cp)):
@@ -107,7 +99,6 @@ class SPOPlusFunc(Function):
             loss = - np.array(loss)
         # convert to tensor
         loss = torch.FloatTensor(loss).to(device)
-        sol = np.array(sol)
         sol = torch.FloatTensor(sol).to(device)
         # save solutions
         ctx.save_for_backward(true_sol, sol)

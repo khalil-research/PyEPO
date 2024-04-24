@@ -453,16 +453,13 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
 
 
 def _solve_or_cache(ptb_c, module):
-    rand_sigma = np.random.uniform()
     # solve optimization
-    if rand_sigma <= module.solve_ratio:
+    if np.random.uniform() <= module.solve_ratio:
         ptb_sols = _solve_in_pass(ptb_c, module.optmodel, module.processes, module.pool)
         if module.solve_ratio < 1:
             sols = ptb_sols.reshape(-1, cp.shape[1])
             # add into solpool
-            module.solpool = np.concatenate((module.solpool, sols))
-            # remove duplicate
-            module.solpool = np.unique(module.solpool, axis=0)
+            module._update_solution_pool(sol)
     # best cached solution
     else:
         ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)

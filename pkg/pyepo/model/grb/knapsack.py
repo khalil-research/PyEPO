@@ -30,7 +30,7 @@ class knapsackModel(optGrbModel):
         """
         self.weights = np.array(weights)
         self.capacity = np.array(capacity)
-        self.items = list(range(self.weights.shape[1]))
+        self.items = self.weights.shape[1]
         super().__init__()
 
     def _getModel(self):
@@ -43,13 +43,11 @@ class knapsackModel(optGrbModel):
         # ceate a model
         m = gp.Model("knapsack")
         # varibles
-        x = m.addVars(self.items, name="x", vtype=GRB.BINARY)
+        x = m.addMVar(self.items, name="x", vtype=GRB.BINARY)
         # sense
         m.modelSense = GRB.MAXIMIZE
         # constraints
-        for i in range(len(self.capacity)):
-            m.addConstr(gp.quicksum(self.weights[i,j] * x[j]
-                        for j in self.items) <= self.capacity[i])
+        m.addConstr(self.weights @ x <= self.capacity)
         return m, x
 
     def relax(self):
@@ -75,13 +73,11 @@ class knapsackModelRel(knapsackModel):
         # turn off output
         m.Params.outputFlag = 0
         # varibles
-        x = m.addVars(self.items, name="x", ub=1)
+        x = m.addMVar(self.items, name="x", ub=1)
         # sense
         m.modelSense = GRB.MAXIMIZE
         # constraints
-        for i in range(len(self.capacity)):
-            m.addConstr(gp.quicksum(self.weights[i,j] * x[j]
-                        for j in self.items) <= self.capacity[i])
+        m.addConstr(self.weights @ x <= self.capacity)
         return m, x
 
     def relax(self):
@@ -89,18 +85,17 @@ class knapsackModelRel(knapsackModel):
         A forbidden method to relax MIP model
         """
         raise RuntimeError("Model has already been relaxed.")
-        
-        
+
+
 if __name__ == "__main__":
-    
-    import random
+
     # random seed
-    random.seed(42)
+    np.random.seed(42)
     # set random cost for test
-    cost = [random.random() for _ in range(16)]
+    cost = np.random.random(16)
     weights = np.random.choice(range(300, 800), size=(2,16)) / 100
     capacity = [20, 20]
-    
+
     # solve model
     optmodel = knapsackModel(weights=weights, capacity=capacity) # init model
     optmodel = optmodel.copy()
@@ -111,7 +106,7 @@ if __name__ == "__main__":
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
-            
+
     # relax
     optmodel = optmodel.relax()
     optmodel.setObj(cost) # set objective function
@@ -121,7 +116,7 @@ if __name__ == "__main__":
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
-            
+
     # add constraint
     optmodel = optmodel.addConstr([weights[0,i] for i in range(16)], 10)
     optmodel.setObj(cost) # set objective function
