@@ -1,0 +1,84 @@
+:py:mod:`pyepo.model.grb.portfolio`
+===================================
+
+.. py:module:: pyepo.model.grb.portfolio
+
+.. autoapi-nested-parse::
+
+   Portfolio problem
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.grb.portfolio.portfolioModel
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   pyepo.model.grb.portfolio.optmodel
+
+
+.. py:class:: portfolioModel(num_assets, covariance, gamma=2.25)
+
+
+   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
+   This class is optimization model for portfolio problem
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_assets
+
+      number of assets
+
+      :type: int
+
+   .. attribute:: cov
+
+      covariance matrix of the returns
+
+      :type: numpy.ndarray
+
+   .. attribute:: risk_level
+
+      risk level
+
+      :type: float
+
+   .. py:method:: _getRiskLevel(gamma)
+
+      A method to calculate risk level
+
+      :returns: risk level
+      :rtype: float
+
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:data:: optmodel
+
+   
+
