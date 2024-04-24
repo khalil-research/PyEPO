@@ -54,6 +54,3 @@ def genData(num_data, num_features, num_assets, deg=1, noise_level=1, seed=135):
     # covariance matrix of the returns
     cov = L @ L.T + (1e-2 * noise_level) * np.eye(num_assets)
     return x, r, cov
-
-if __name__ == "__main__":
-    genData(num_data=100, num_features=4, num_assets=50, deg=2)
