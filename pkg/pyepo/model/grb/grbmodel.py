@@ -52,7 +52,7 @@ class optGrbModel(optModel):
             raise ValueError("Size of cost vector cannot match vars.")
         # mvar
         if isinstance(self.x, gp.MVar):
-            obj = c @ self.x
+            obj = np.array(c) @ self.x
         # vars
         else:
             obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
