@@ -10,6 +10,22 @@ from pyepo import EPO
 from pyepo.utlis import getArgs
 
 
+def _solve_or_cache(cp, module):
+    """
+    A function to get optimization solution in the forward/backward pass
+    """
+    # solve optimization
+    if np.random.uniform() <= module.solve_ratio:
+        sol, obj = _solve_in_pass(cp, module.optmodel, module.processes, module.pool)
+        if module.solve_ratio < 1:
+            # add into solpool
+            module._update_solution_pool(sol)
+    # best cached solution
+    else:
+        sol, obj = _cache_in_pass(cp, module.optmodel, module.solpool)
+    return sol, obj
+
+
 def _solve_in_pass(cp, optmodel, processes, pool):
     """
     A function to solve optimization in the forward/backward pass
@@ -26,6 +42,9 @@ def _solve_in_pass(cp, optmodel, processes, pool):
             solp, objp = optmodel.solve()
             sol.append(solp)
             obj.append(objp)
+        # to numpy
+        sol = np.array(sol)
+        obj = np.array(obj)
     # multi-core
     else:
         # get class

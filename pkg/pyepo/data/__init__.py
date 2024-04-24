@@ -4,4 +4,4 @@
 Synthetic data generation
 """
 
-from pyepo.data import dataset, shortestpath, knapsack, tsp
+from pyepo.data import dataset, shortestpath, knapsack, tsp, portfolio

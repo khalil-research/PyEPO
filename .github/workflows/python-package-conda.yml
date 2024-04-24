@@ -3,6 +3,7 @@ name: Python Package using Conda
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   build-linux:
@@ -13,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: pyepo-build
         python-version: 3.9
@@ -22,11 +23,15 @@ jobs:
       run: conda install conda-build anaconda-client
     - name: Build Conda Package
       run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default
-    - name: Find and upload Conda package
+    - name: Extract Package Version
+      run: |
+        PACKAGE_VERSION=$(conda search --json -c local pyepo | jq -r '.pyepo[-1].version')
+        echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+    - name: Find and Upload Conda Package
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
       run: |
         CONDA_BLD_PATH=$(conda info --json | jq -r '.conda_prefix')/conda-bld
         echo "Conda build path: $CONDA_BLD_PATH"
         conda install -n pyepo-build anaconda-client --yes
-        conda run -n pyepo-build anaconda upload --user pyepo $CONDA_BLD_PATH/*/*.tar.bz2
+        conda run -n pyepo-build anaconda upload --user pyepo $CONDA_BLD_PATH/noarch/pyepo-${{ env.PACKAGE_VERSION }}-py_0.tar.bz2

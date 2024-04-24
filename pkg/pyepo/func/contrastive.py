@@ -10,7 +10,7 @@ import torch
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.data.dataset import optDataset
-from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass, _cache_in_pass
+from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass
 
 
 class NCE(optModule):
@@ -53,9 +53,7 @@ class NCE(optModule):
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
-            self.solpool = np.concatenate((self.solpool, sol))
-            # remove duplicate
-            self.solpool = np.unique(self.solpool, axis=0)
+            self._update_solution_pool(sol)
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
@@ -118,9 +116,7 @@ class contrastiveMAP(optModule):
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
-            self.solpool = np.concatenate((self.solpool, sol))
-            # remove duplicate
-            self.solpool = np.unique(self.solpool, axis=0)
+            self._update_solution_pool(sol)
         solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
