@@ -9,7 +9,7 @@ For more information and details about the Dataset, please see the `02 Optimizat
 Data Generator
 ==============
 
-``pyepo.data`` includes synthetic datasets for three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, and the traveling salesperson problem.
+``pyepo.data`` includes synthetic datasets for three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, the traveling salesperson problem, and portfolio optimization.
 
 The synthetic datasets include features :math:`\mathbf{x}` and cost coefficients :math:`\mathbf{c}`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the corresponding cost :math:`\mathbf{c}_i \in \mathbb{R}^d` comes from a polynomial function :math:`f(\mathbf{x}_i)` multiplicated with a random noise :math:`\mathbf{\epsilon}_i \sim  U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
 In general, there are several parameters that users can control:
@@ -84,6 +84,27 @@ The following code is to generate data for the Traveling salesperson:
    num_feat = 5 # size of feature
    num_node = 20 # number of nodes
    x, c = pyepo.data.tsp.genData(num_data, num_feat, num_node, deg=4, noise_width=0, seed=135)
+
+
+Portfolio
+---------
+
+Let :math:`\bar{r}_{ij} = (\frac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}})^{deg}`. In the context of portfolio optimization, the expected return of the assets :math:`\mathbf{r}_i` is defined as :math:`\bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \mathbf{\epsilon}` and the covariance matrix :math:`\mathbf{\Sigma}` is expressed :math:`\mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}`, where :math:`\mathcal{B}` follows Bernoulli distribution, :math:`\mathbf{L}` follows uniform distribution between :math:`-0.0025 \tau` and :math:`0.0025 \tau`, and :math:`\mathbf{f}` and :math:`\mathbf{\epsilon}` follow  standard normal distribution.
+
+.. autofunction:: pyepo.data.portfolio.genData
+    :noindex:
+
+The following code is to generate data for the portfolio:
+
+.. code-block:: python
+
+   import pyepo
+
+   num_data = 1000 # number of data
+   num_feat = 4 # size of feature
+   num_assets = 50 # number of assets
+   cov, x, r = pyepo.data.portfolio.genData(num_data, num_feat, num_assets, deg=4, noise_level=1, seed=135)
+
 
 
 optDataset

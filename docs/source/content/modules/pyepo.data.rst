@@ -15,3 +15,4 @@
    pyepo.data.shortestpath
    pyepo.data.knapsack
    pyepo.data.tsp
+   pyepo.data.portfolio
