@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # random seed
     random.seed(42)
     # set random cost for test
-    _, revenue, cov = genData(num_data=100, num_features=4, num_assets=50, deg=2)
+    cov, _, revenue = genData(num_data=100, num_features=4, num_assets=50, deg=2)
 
     # solve model
     optmodel = portfolioModel(num_assets=50, covariance=cov) # init model
