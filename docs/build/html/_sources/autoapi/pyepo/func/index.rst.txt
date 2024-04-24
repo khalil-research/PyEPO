@@ -38,6 +38,7 @@ Classes
    pyepo.func.perturbedOpt
    pyepo.func.perturbedFenchelYoung
    pyepo.func.implicitMLE
+   pyepo.func.adaptiveImplicitMLE
    pyepo.func.NCE
    pyepo.func.contrastiveMAP
    pyepo.func.listwiseLTR
@@ -47,7 +48,7 @@ Classes
 
 
 
-.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -64,7 +65,7 @@ Classes
 
    Reference: <https://doi.org/10.1287/mnsc.2020.3922>
 
-   .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj, reduction='mean')
+   .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj)
 
       Forward pass
 
@@ -142,7 +143,7 @@ Classes
 
 
 
-.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
+.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -160,13 +161,13 @@ Classes
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
-   .. py:method:: forward(pred_cost, true_sol, reduction='mean')
+   .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
 
 
 
-.. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=1, distribution=sumGammaDistribution(kappa=5), solve_ratio=1, dataset=None)
+.. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -175,11 +176,11 @@ Classes
    an optimal solution in a constrained exponential family distribution via
    Perturb-and-MAP.
 
-   For I-LME, it works as black-box combinatorial solvers, in which constraints
+   For I-MLE, it works as black-box combinatorial solvers, in which constraints
    are known and fixed, but the cost vector need to be predicted from
    contextual data.
 
-   The I-LME approximate gradient of optimizer smoothly. Thus, allows us to
+   The I-MLE approximate gradient of optimizer smoothly. Thus, allows us to
    design an algorithm based on stochastic gradient descent.
 
    Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
@@ -190,7 +191,31 @@ Classes
 
 
 
-.. py:class:: NCE(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: adaptiveImplicitMLE(optmodel, n_samples=10, sigma=1.0, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
+
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
+   adaptively choose hyperparameter λ and yield an optimal solution in a
+   constrained exponential family distribution via Perturb-and-MAP.
+
+   For AI-MLE, it works as black-box combinatorial solvers, in which constraints
+   are known and fixed, but the cost vector need to be predicted from
+   contextual data.
+
+   The AI-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
+
+   .. py:method:: forward(pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: NCE(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -205,13 +230,13 @@ Classes
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
-   .. py:method:: forward(pred_cost, true_sol, reduction='mean')
+   .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
 
 
 
-.. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -226,13 +251,13 @@ Classes
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
-   .. py:method:: forward(pred_cost, true_sol, reduction='mean')
+   .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
 
 
 
-.. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -248,13 +273,13 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
-   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+   .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
 
 
 
-.. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -270,13 +295,13 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
-   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+   .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
 
 
 
-.. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -293,7 +318,7 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
-   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+   .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
 

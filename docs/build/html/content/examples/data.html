@@ -58,6 +58,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#shortest-path">Shortest Path</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#knapsack">Knapsack</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#traveling-salesperson">Traveling Salesperson</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#portfolio">Portfolio</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#optdataset">optDataset</a></li>
@@ -106,7 +107,7 @@
 <p>For more information and details about the Dataset, please see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">02 Optimization Dataset</a></p>
 <section id="data-generator">
 <h2>Data Generator<a class="headerlink" href="#data-generator" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> includes synthetic datasets for three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, and the traveling salesperson problem.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> includes synthetic datasets for three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, the traveling salesperson problem, and portfolio optimization.</p>
 <p>The synthetic datasets include features <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> and cost coefficients <span class="math notranslate nohighlight">\(\mathbf{c}\)</span>. The feature vector <span class="math notranslate nohighlight">\(\mathbf{x}_i \in \mathbb{R}^p\)</span> follows a standard multivariate Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>, and the corresponding cost <span class="math notranslate nohighlight">\(\mathbf{c}_i \in \mathbb{R}^d\)</span> comes from a polynomial function <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span> multiplicated with a random noise <span class="math notranslate nohighlight">\(\mathbf{\epsilon}_i \sim  U(1-\bar{\epsilon}, 1+\bar{\epsilon})\)</span>.
 In general, there are several parameters that users can control:</p>
 <ul class="simple">
@@ -226,6 +227,43 @@ In general, there are several parameters that users can control:</p>
 <span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
 <span class="n">num_node</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># number of nodes</span>
 <span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tsp</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">num_node</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="portfolio">
+<h3>Portfolio<a class="headerlink" href="#portfolio" title="Link to this heading"></a></h3>
+<p>Let <span class="math notranslate nohighlight">\(\bar{r}_{ij} = (\frac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}})^{deg}\)</span>. In the context of portfolio optimization, the expected return of the assets <span class="math notranslate nohighlight">\(\mathbf{r}_i\)</span> is defined as <span class="math notranslate nohighlight">\(\bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \mathbf{\epsilon}\)</span> and the covariance matrix <span class="math notranslate nohighlight">\(\mathbf{\Sigma}\)</span> is expressed <span class="math notranslate nohighlight">\(\mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> follows Bernoulli distribution, <span class="math notranslate nohighlight">\(\mathbf{L}\)</span> follows uniform distribution between <span class="math notranslate nohighlight">\(-0.0025 \tau\)</span> and <span class="math notranslate nohighlight">\(0.0025 \tau\)</span>, and <span class="math notranslate nohighlight">\(\mathbf{f}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{\epsilon}\)</span> follow  standard normal distribution.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.portfolio.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A function to generate synthetic data and features for travelling salesman</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_data</strong> (<em>int</em>) – number of data points</p></li>
+<li><p><strong>num_features</strong> (<em>int</em>) – dimension of features</p></li>
+<li><p><strong>num_assets</strong> (<em>int</em>) – number of assets</p></li>
+<li><p><strong>deg</strong> (<em>int</em>) – data polynomial degree</p></li>
+<li><p><strong>noise_level</strong> (<em>float</em>) – level of data random noise</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – random seed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data features (np.ndarray), costs (np.ndarray)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The following code is to generate data for the portfolio:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># size of feature</span>
+<span class="n">num_assets</span> <span class="o">=</span> <span class="mi">50</span> <span class="c1"># number of assets</span>
+<span class="n">cov</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">num_assets</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

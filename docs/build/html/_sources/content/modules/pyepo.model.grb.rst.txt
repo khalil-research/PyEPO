@@ -29,6 +29,7 @@
 
    pyepo.model.grb.grbmodel
    pyepo.model.grb.knapsack
+   pyepo.model.grb.portfolio
    pyepo.model.grb.shortestpath
    pyepo.model.grb.tsp
    pyepo.model.grb.vrp

@@ -24,7 +24,7 @@ Classes
 
 
 
-.. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -40,13 +40,13 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
-   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+   .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
 
 
 
-.. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -62,13 +62,13 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
-   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+   .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
 
 
 
-.. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -85,7 +85,7 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
-   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+   .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
 

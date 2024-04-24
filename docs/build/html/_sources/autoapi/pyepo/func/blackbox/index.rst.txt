@@ -56,23 +56,13 @@ Classes
 
    A autograd function for differentiable black-box optimizer
 
-   .. py:method:: forward(ctx, pred_cost, lambd, optmodel, processes, pool, solve_ratio, module)
+   .. py:method:: forward(ctx, pred_cost, module)
       :staticmethod:
 
       Forward pass for DBB
 
       :param pred_cost: a batch of predicted values of the cost
       :type pred_cost: torch.tensor
-      :param lambd: a hyperparameter for differentiable block-box to control interpolation degree
-      :type lambd: float
-      :param optmodel: an PyEPO optimization model
-      :type optmodel: optModel
-      :param processes: number of processors, 1 for single-core, 0 for all of cores
-      :type processes: int
-      :param pool: process pool object
-      :type pool: ProcessPool
-      :param solve_ratio: the ratio of new solutions computed during training
-      :type solve_ratio: float
       :param module: blackboxOpt module
       :type module: optModule
 
@@ -119,21 +109,13 @@ Classes
 
    A autograd function for differentiable black-box optimizer
 
-   .. py:method:: forward(ctx, pred_cost, optmodel, processes, pool, solve_ratio, module)
+   .. py:method:: forward(ctx, pred_cost, module)
       :staticmethod:
 
       Forward pass for NID
 
       :param pred_cost: a batch of predicted values of the cost
       :type pred_cost: torch.tensor
-      :param optmodel: an PyEPO optimization model
-      :type optmodel: optModel
-      :param processes: number of processors, 1 for single-core, 0 for all of cores
-      :type processes: int
-      :param pool: process pool object
-      :type pool: ProcessPool
-      :param solve_ratio: the ratio of new solutions computed during training
-      :type solve_ratio: float
       :param module: blackboxOpt module
       :type module: optModule
 

@@ -23,7 +23,7 @@ Classes
 
 
 
-.. py:class:: NCE(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: NCE(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -38,13 +38,13 @@ Classes
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
-   .. py:method:: forward(pred_cost, true_sol, reduction='mean')
+   .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
 
 
 
-.. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
@@ -59,7 +59,7 @@ Classes
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
-   .. py:method:: forward(pred_cost, true_sol, reduction='mean')
+   .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
 

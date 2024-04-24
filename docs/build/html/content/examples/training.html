@@ -61,6 +61,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#training-with-dbb">Training with DBB</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#training-with-dpo">Training with DPO</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#training-with-pfyl">Training with PFYL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#training-with-i-mle">Training with I-MLE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#training-with-ai-mle">Training with AI-MLE</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#training-with-nce">Training with NCE</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#training-with-ltr">Training with LTR</a></li>
 </ul>
@@ -337,6 +339,130 @@
         <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="c1"># Fenchel-Young loss</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">pfy</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+        <span class="c1"># backward pass</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="training-with-i-mle">
+<h2>Training with I-MLE<a class="headerlink" href="#training-with-i-mle" title="Link to this heading"></a></h2>
+<p>The example to learn shortest path with linear model is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="c1"># model for shortest path</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+
+<span class="c1"># generate data</span>
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
+<span class="n">deg</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># polynomial degree</span>
+<span class="n">noise_width</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># noise width</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">noise_width</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+
+<span class="c1"># build dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDataset</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+<span class="c1"># get data loader</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># build linear model</span>
+<span class="k">class</span> <span class="nc">LinearRegression</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LinearRegression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+<span class="c1"># init</span>
+<span class="n">predmodel</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="c1"># set optimizer</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">predmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+<span class="c1"># init perturbed optimizer</span>
+<span class="n">imle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">implicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># init loss</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
+
+<span class="c1"># training</span>
+<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="c1"># forward pass</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># perturbed optimizer</span>
+        <span class="n">we</span> <span class="o">=</span> <span class="n">imle</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+        <span class="c1"># MSE loss</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+        <span class="c1"># backward pass</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="training-with-ai-mle">
+<h2>Training with AI-MLE<a class="headerlink" href="#training-with-ai-mle" title="Link to this heading"></a></h2>
+<p>The example to learn shortest path with linear model is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="c1"># model for shortest path</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+
+<span class="c1"># generate data</span>
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
+<span class="n">deg</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># polynomial degree</span>
+<span class="n">noise_width</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># noise width</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">noise_width</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+
+<span class="c1"># build dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDataset</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+<span class="c1"># get data loader</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># build linear model</span>
+<span class="k">class</span> <span class="nc">LinearRegression</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LinearRegression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+<span class="c1"># init</span>
+<span class="n">predmodel</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="c1"># set optimizer</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">predmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+<span class="c1"># init perturbed optimizer</span>
+<span class="n">aimle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">adaptiveImplicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># init loss</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
+
+<span class="c1"># training</span>
+<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="c1"># forward pass</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># perturbed optimizer</span>
+        <span class="n">we</span> <span class="o">=</span> <span class="n">aimle</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+        <span class="c1"># MSE loss</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
         <span class="c1"># backward pass</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>

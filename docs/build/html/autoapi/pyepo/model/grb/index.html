@@ -108,6 +108,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="grbmodel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="knapsack/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.knapsack</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="portfolio/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.portfolio</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="shortestpath/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.shortestpath</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="tsp/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp</span></code></a></li>
 </ul>
@@ -137,6 +138,9 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tspMTZModel" title="pyepo.model.grb.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p></td>
 <td><p>This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.portfolioModel" title="pyepo.model.grb.portfolioModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">portfolioModel</span></code></a></p></td>
+<td><p>This class is optimization model for portfolio problem</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py class">
@@ -153,6 +157,12 @@
 <dd class="field-odd"><p>GurobiPy model</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyepo.model.grb.optGrbModel.num_cost">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.optGrbModel.num_cost" title="Link to this definition"></a></dt>
+<dd><p>number of cost to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
@@ -649,6 +659,85 @@ constraint generation.</p>
 <dt class="sig sig-object py" id="pyepo.model.grb.tspMTZModel.relax">
 <span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tspMTZModel.relax" title="Link to this definition"></a></dt>
 <dd><p>A method to get linear relaxation model</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.grb.portfolioModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">portfolioModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.25</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.portfolioModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel.optGrbModel</span></code></a></p>
+<p>This class is optimization model for portfolio problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.grb.portfolioModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.portfolioModel._model" title="Link to this definition"></a></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.grb.portfolioModel.num_assets">
+<span class="sig-name descname"><span class="pre">num_assets</span></span><a class="headerlink" href="#pyepo.model.grb.portfolioModel.num_assets" title="Link to this definition"></a></dt>
+<dd><p>number of assets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.grb.portfolioModel.cov">
+<span class="sig-name descname"><span class="pre">cov</span></span><a class="headerlink" href="#pyepo.model.grb.portfolioModel.cov" title="Link to this definition"></a></dt>
+<dd><p>covariance matrix of the returns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.grb.portfolioModel.risk_level">
+<span class="sig-name descname"><span class="pre">risk_level</span></span><a class="headerlink" href="#pyepo.model.grb.portfolioModel.risk_level" title="Link to this definition"></a></dt>
+<dd><p>risk level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.grb.portfolioModel._getRiskLevel">
+<span class="sig-name descname"><span class="pre">_getRiskLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.portfolioModel._getRiskLevel" title="Link to this definition"></a></dt>
+<dd><p>A method to calculate risk level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>risk level</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.grb.portfolioModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.portfolioModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

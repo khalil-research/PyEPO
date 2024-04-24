@@ -63,6 +63,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#shortest-path">Shortest Path</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#knapsack">Knapsack</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#traveling-salesman">Traveling Salesman</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#portfolio">Portfolio</a></li>
 </ul>
 </li>
 </ul>
@@ -1382,6 +1383,138 @@ constraint generation.</p>
 <span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
 
 <span class="n">optmodel</span><span class="o">.</span><span class="n">relax</span><span class="p">()</span> <span class="c1"># relax</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="portfolio">
+<h3>Portfolio<a class="headerlink" href="#portfolio" title="Link to this heading"></a></h3>
+<p>Portfolio optimization is a crucial concept in financial management and investment theory, primarily concerned with the process of selecting the best portfolio (asset distribution) out of the set of all portfolios being considered according to some objective. Our model seeks highest expected return for a given level of risk.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\max_{x} &amp; \sum_{i} r_i x_i \\
+s.t. \quad &amp; \sum_{i} x_i = 1 \\
+&amp; \mathbf{x}^{\intercal} \mathbf{\Sigma} \mathbf{x} \leq \gamma \bar{\Sigma}\\
+&amp; \forall x_i \geq 0
+\end{aligned}\end{split}\]</div>
+<section id="portfolio-gurobipy-model">
+<h4>Portfolio GurobiPy Model<a class="headerlink" href="#portfolio-gurobipy-model" title="Link to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">optModel</span></code> is built from <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.portfolioModel</span></code>, in which API uses GurobiPy to model the portfolio optimization.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.</span></span><span class="sig-name descname"><span class="pre">portfolioModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.25</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is optimization model for portfolio problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>Gurobi model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>GurobiPy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">num_assets</span></span></dt>
+<dd><p>number of assets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">cov</span></span></dt>
+<dd><p>covariance matrix of the returns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">risk_level</span></span></dt>
+<dd><p>risk level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_assets</strong> (<em>int</em>) – number of assets</p></li>
+<li><p><strong>covariance</strong> (<em>numpy.ndarray</em>) – covariance matrix of the returns</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – risk level parameter</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.25</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_assets</strong> (<em>int</em>) – number of assets</p></li>
+<li><p><strong>covariance</strong> (<em>numpy.ndarray</em>) – covariance matrix of the returns</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – risk level parameter</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mi">50</span> <span class="c1"># number of assets</span>
+<span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># covariance matrix</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">portfolioModel</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">cov</span><span class="p">)</span> <span class="c1"># build model</span>
+</pre></div>
+</div>
+<p>Similarly, users can use <code class="docutils literal notranslate"><span class="pre">setObj</span></code> to assign a specific cost vector and use <code class="docutils literal notranslate"><span class="pre">solve</span></code> to optimize. However, <code class="docutils literal notranslate"><span class="pre">setObj</span></code> or  <code class="docutils literal notranslate"><span class="pre">solve</span></code> methods do not require manual calls during training.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="n">revenue</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">revenue</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
 </pre></div>
 </div>
 </section>

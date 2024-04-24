@@ -35,6 +35,10 @@ Classes
 
       :type: GurobiPy model
 
+   .. py:property:: num_cost
+
+      number of cost to be predicted
+
    .. py:method:: __repr__()
 
       Return repr(self).
