@@ -492,3 +492,44 @@ Same as previous model, the code for traveling salesman problem with MTZ formula
    optmodel.solve() # solve
 
    optmodel.relax() # relax
+
+
+
+Portfolio
+---------
+
+Portfolio optimization is a crucial concept in financial management and investment theory, primarily concerned with the process of selecting the best portfolio (asset distribution) out of the set of all portfolios being considered according to some objective. Our model seeks highest expected return for a given level of risk.
+
+.. math::
+  \begin{aligned}
+  \max_{x} & \sum_{i} r_i x_i \\
+  s.t. \quad & \sum_{i} x_i = 1 \\
+  & \mathbf{x}^{\intercal} \mathbf{\Sigma} \mathbf{x} \leq \gamma \bar{\Sigma}\\
+  & \forall x_i \geq 0
+  \end{aligned}
+
+
+Portfolio GurobiPy Model
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``optModel`` is built from ``pyepo.model.grb.portfolioModel``, in which API uses GurobiPy to model the portfolio optimization.
+
+.. autoclass:: pyepo.model.grb.portfolioModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+   m = 50 # number of assets
+   cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
+   optmodel = pyepo.model.grb.portfolioModel(m, cov) # build model
+
+Similarly, users can use ``setObj`` to assign a specific cost vector and use ``solve`` to optimize. However, ``setObj`` or  ``solve`` methods do not require manual calls during training.
+
+.. code-block:: python
+
+   import random
+   revenue = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(revenue) # set objective function
+   optmodel.solve() # solve
