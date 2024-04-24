@@ -42,6 +42,9 @@ def _solve_in_pass(cp, optmodel, processes, pool):
             solp, objp = optmodel.solve()
             sol.append(solp)
             obj.append(objp)
+        # to numpy
+        sol = np.array(sol)
+        obj = np.array(obj)
     # multi-core
     else:
         # get class
