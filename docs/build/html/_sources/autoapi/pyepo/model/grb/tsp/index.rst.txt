@@ -17,6 +17,7 @@ Classes
 
 .. autoapisummary::
 
+   pyepo.model.grb.tsp.unionFind
    pyepo.model.grb.tsp.tspABModel
    pyepo.model.grb.tsp.tspGGModel
    pyepo.model.grb.tsp.tspGGModelRel
@@ -24,6 +25,16 @@ Classes
    pyepo.model.grb.tsp.tspMTZModel
    pyepo.model.grb.tsp.tspMTZModelRel
 
+
+
+
+.. py:class:: unionFind(n)
+
+
+   .. py:method:: find(i)
+
+
+   .. py:method:: union(i, j)
 
 
 

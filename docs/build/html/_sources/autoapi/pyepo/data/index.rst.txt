@@ -17,6 +17,7 @@ Submodules
 
    dataset/index.rst
    knapsack/index.rst
+   portfolio/index.rst
    shortestpath/index.rst
    tsp/index.rst
 

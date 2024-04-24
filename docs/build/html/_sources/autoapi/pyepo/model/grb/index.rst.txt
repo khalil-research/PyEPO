@@ -17,6 +17,7 @@ Submodules
 
    grbmodel/index.rst
    knapsack/index.rst
+   portfolio/index.rst
    shortestpath/index.rst
    tsp/index.rst
 
@@ -35,6 +36,7 @@ Classes
    pyepo.model.grb.tspGGModel
    pyepo.model.grb.tspDFJModel
    pyepo.model.grb.tspMTZModel
+   pyepo.model.grb.portfolioModel
 
 
 
@@ -51,6 +53,10 @@ Classes
       Gurobi model
 
       :type: GurobiPy model
+
+   .. py:property:: num_cost
+
+      number of cost to be predicted
 
    .. py:method:: __repr__()
 
@@ -376,6 +382,54 @@ Classes
    .. py:method:: relax()
 
       A method to get linear relaxation model
+
+
+
+.. py:class:: portfolioModel(num_assets, covariance, gamma=2.25)
+
+
+   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
+   This class is optimization model for portfolio problem
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: num_assets
+
+      number of assets
+
+      :type: int
+
+   .. attribute:: cov
+
+      covariance matrix of the returns
+
+      :type: numpy.ndarray
+
+   .. attribute:: risk_level
+
+      risk level
+
+      :type: float
+
+   .. py:method:: _getRiskLevel(gamma)
+
+      A method to calculate risk level
+
+      :returns: risk level
+      :rtype: float
+
+
+   .. py:method:: _getModel()
+
+      A method to build Gurobi model
+
+      :returns: optimization model and variables
+      :rtype: tuple
 
 
 

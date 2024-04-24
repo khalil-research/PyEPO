@@ -22,7 +22,7 @@ Classes
 
 
 
-.. py:class:: optModule(optmodel, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: optModule(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
 
    Bases: :py:obj:`torch.nn.Module`
@@ -30,10 +30,15 @@ Classes
    An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
    vector and the true cost vector rank a pool of feasible solutions.
 
-   .. py:method:: forward(pred_cost, true_cost, reduction='mean')
+   .. py:method:: forward(pred_cost, true_cost)
       :abstractmethod:
 
       Forward pass
+
+
+   .. py:method:: _update_solution_pool(sol)
+
+      Add new solutions to solution pool
 
 
 
