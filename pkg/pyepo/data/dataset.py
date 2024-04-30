@@ -13,6 +13,8 @@ from tqdm import tqdm
 
 from pyepo.model.opt import optModel
 
+import random
+from scipy.spatial import distance
 
 class optDataset(Dataset):
     """
@@ -102,3 +104,81 @@ class optDataset(Dataset):
             torch.FloatTensor(self.sols[index]),
             torch.FloatTensor(self.objs[index]),
         )
+
+class optDatasetKNN(optDataset):
+    """
+    This class is Torch Dataset for optimization problems, when using the robust kNN-loss.
+
+    Reference: <https://arxiv.org/abs/2310.04328>
+
+    Attributes:
+        model (optModel): Optimization models
+        k (int): number of nearest neighbours selected
+        weight (float): weight of kNN-loss
+        feats (np.ndarray): Data features
+        costs (np.ndarray): Cost vectors
+        sols (np.ndarray): Optimal solutions
+        objs (np.ndarray): Optimal objective values
+    """
+    def __init__(self, model, feats, costs, k, weight):
+        """
+        A method to create a optDataset from optModel
+
+        Args:
+            model (optModel): an instance of optModel
+            feats (np.ndarray): data features
+            costs (np.ndarray): costs of objective function
+            k (int): number of nearest neighbours selected
+            weight (float): weight of kNN-loss
+        """
+        if not isinstance(model, optModel):
+            raise TypeError("arg model is not an optModel")
+        self.model = model
+        # kNN loss parameters
+        self.k = k
+        self.weight = weight
+        # data
+        self.feats = feats
+        self.costs = costs
+        # find optimal solutions
+        self.sols, self.objs = self._getSols()
+
+    def _getSols(self):
+        """
+        A method to get optimal solutions for all cost vectors
+        """
+        sols = []
+        objs = []
+        print("Optimizing for optDataset...")
+        time.sleep(1)
+
+        costs_knn = np.zeros((*self.costs.shape, self.k))
+        distances = distance.cdist(self.feats, self.feats, 'euclidean')
+        indexes = distances.argpartition(self.k)[:, :self.k]
+        for i in range(self.feats.shape[0]):
+            knns = indexes[i, :]
+            random.shuffle(knns)
+            costs_knn[i, :, :] = self.weight * self.costs[i, :].reshape((-1, 1)) + \
+                                   (1 - self.weight) * self.costs[knns, :].T
+
+        for c_knn in tqdm(costs_knn):
+            sol_knn = np.zeros((self.costs.shape[1], self.k))
+            obj_knn = 0
+            for i, c in enumerate(c_knn.T):
+                try:
+                    sol_i, obj_i = self._solve(c)
+                except:
+                    raise ValueError(
+                        "For optModel, the method 'solve' should return solution vector and objective value."
+                    )
+                sol_knn[:, i] = sol_i
+                obj_knn += obj_i
+            sol = sol_knn.mean(1)
+            obj = obj_knn / self.k
+            sols.append(sol)
+            objs.append([obj])
+
+        self.costs = costs_knn.mean(axis=2)
+        return np.array(sols), np.array(objs)
+
+
