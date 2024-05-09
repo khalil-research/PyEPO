@@ -52,5 +52,5 @@ def genData(num_data, num_features, num_assets, deg=1, noise_level=1, seed=135):
         eps = rnd.randn(num_assets)
         r[i] += L @ f + 0.01 * noise_level * eps
     # covariance matrix of the returns
-    cov = L @ L.T + (1e-2 * noise_level) * np.eye(num_assets)
+    cov = L @ L.T + (1e-2 * noise_level) ** 2 * np.eye(num_assets)
     return cov, x, r
