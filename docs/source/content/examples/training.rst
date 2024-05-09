@@ -178,7 +178,7 @@ The example to learn shortest path with linear model is as follows:
    # set optimizer
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
    # init perturbed optimizer
-   ptb = pyepo.func.perturbedOpt(optmodel, n_samples=10, epsilon=0.5, processes=2)
+   ptb = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
    # init loss
    criterion = nn.MSELoss()
 
@@ -243,7 +243,7 @@ The example to learn shortest path with linear model is as follows:
    # set optimizer
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
    # init PFY loss
-   pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, epsilon=0.5, processes=2)
+   pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
 
    # training
    num_epochs = 20
