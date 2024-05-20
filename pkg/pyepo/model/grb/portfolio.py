@@ -13,12 +13,12 @@ from pyepo.model.grb.grbmodel import optGrbModel
 
 class portfolioModel(optGrbModel):
     """
-    This class is optimization model for portfolio problem
+    This class is an optimization model for portfolio problem
 
     Attributes:
         _model (GurobiPy model): Gurobi model
         num_assets (int): number of assets
-        cov (numpy.ndarray): covariance matrix of the returns
+        covariance (numpy.ndarray): covariance matrix of the returns
         risk_level (float): risk level
     """
 
@@ -30,13 +30,13 @@ class portfolioModel(optGrbModel):
             gamma (float): risk level parameter
         """
         self.num_assets = num_assets
-        self.cov = covariance
+        self.covariance = covariance
         self.risk_level = self._getRiskLevel(gamma)
         super().__init__()
 
     def _getRiskLevel(self, gamma):
         """
-        A method to calculate risk level
+        A method to calculate the risk level
 
         Returns:
             float: risk level
@@ -59,7 +59,7 @@ class portfolioModel(optGrbModel):
         m.modelSense = GRB.MAXIMIZE
         # constraints
         m.addConstr(x.sum() == 1, "budget")
-        m.addConstr(x.T @ self.cov @ x <= self.risk_level, "risk_limit")
+        m.addConstr(x.T @ self.covariance @ x <= self.risk_level, "risk_limit")
         return m, x
 
 
@@ -70,10 +70,10 @@ if __name__ == "__main__":
     # random seed
     random.seed(42)
     # set random cost for test
-    cov, _, revenue = genData(num_data=100, num_features=4, num_assets=50, deg=2)
+    covariance, _, revenue = genData(num_data=100, num_features=4, num_assets=50, deg=2)
 
     # solve model
-    optmodel = portfolioModel(num_assets=50, covariance=cov) # init model
+    optmodel = portfolioModel(num_assets=50, covariance=covariance) # init model
     optmodel = optmodel.copy()
     optmodel.setObj(revenue[0]) # set objective function
     sol, obj = optmodel.solve() # solve
