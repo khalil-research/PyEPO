@@ -17,7 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     # version
-    version = "0.3.8",
+    version = "0.3.8a",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
