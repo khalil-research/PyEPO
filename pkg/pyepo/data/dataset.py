@@ -152,7 +152,7 @@ class optDatasetKNN(optDataset):
         objs = []
         print("Optimizing for optDataset...")
         time.sleep(1)
-        # get knn costs
+        # get kNN costs
         costs_knn = self._getKNN()
         # solve optimization
         for c_knn in tqdm(costs_knn):
@@ -172,13 +172,13 @@ class optDatasetKNN(optDataset):
             obj = obj_knn.mean()
             sols.append(sol)
             objs.append([obj])
-        # update cost as average KNN
+        # update cost as average kNN
         self.costs = costs_knn.mean(axis=2)
         return np.array(sols), np.array(objs)
 
     def _getKNN(self):
         """
-        A method to get KNN costs
+        A method to get kNN costs
         """
         # init costs
         costs_knn = np.zeros((*self.costs.shape, self.k))
