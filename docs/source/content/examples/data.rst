@@ -140,3 +140,38 @@ As the following example, ``optDataset`` and Pytorch ``DataLoader`` wrap the dat
 
    # get data loader
    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+
+optDatasetKNN
+=============
+
+``pyepo.data.optDatasetKNN`` is a PyTorch Dataset designed for implementing k-nearest neighbors (kNN) robust loss [#f1]_ in decision-focused learning. It stores the features and their corresponding costs of the objective function and solves optimization problems to get **mean kNN solutions and optimal objective values**.
+
+.. autoclass:: pyepo.data.dataset.optDatasetKNN
+    :noindex:
+
+As the following example, ``optDatasetKNN`` and Pytorch ``DataLoader`` wrap the data samples, which can make the model training cleaner and more organized.
+
+.. code-block:: python
+
+  import pyepo
+  from torch.utils.data import DataLoader
+
+  # model for shortest path
+  grid = (5,5) # grid size
+  model = pyepo.model.grb.shortestPathModel(grid)
+
+  # generate data
+  num_data = 1000 # number of data
+  num_feat = 5 # size of feature
+  deg = 4 # polynomial degree
+  noise_width = 0 # noise width
+  x, c = pyepo.data.shortestpath.genData(num_data, num_feat, grid, deg, noise_width, seed=135)
+
+  # build dataset
+  dataset = pyepo.data.dataset.optDatasetKNN(model, x, c, k=10, weight=0.5)
+
+  # get data loader
+  dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+.. [#f1] Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.
