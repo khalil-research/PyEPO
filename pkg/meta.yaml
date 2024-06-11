@@ -3,7 +3,7 @@
 
 package:
   name: pyepo
-  version: 0.3.8a
+  version: 0.3.9
 
 source:
   path: ./
