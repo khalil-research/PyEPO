@@ -18,6 +18,7 @@
    .. autosummary::
    
       optDataset
+      optDatasetKNN
    
    
 
