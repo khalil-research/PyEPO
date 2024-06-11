@@ -121,7 +121,7 @@ class optDatasetKNN(optDataset):
         sols (np.ndarray): Optimal solutions
         objs (np.ndarray): Optimal objective values
     """
-    def __init__(self, model, feats, costs, k, weight):
+    def __init__(self, model, feats, costs, k=10, weight=0.5):
         """
         A method to create a optDataset from optModel
 
