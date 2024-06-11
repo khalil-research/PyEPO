@@ -105,6 +105,7 @@ class optDataset(Dataset):
             torch.FloatTensor(self.objs[index]),
         )
 
+
 class optDatasetKNN(optDataset):
     """
     This class is Torch Dataset for optimization problems, when using the robust kNN-loss.
@@ -151,19 +152,12 @@ class optDatasetKNN(optDataset):
         objs = []
         print("Optimizing for optDataset...")
         time.sleep(1)
-
-        costs_knn = np.zeros((*self.costs.shape, self.k))
-        distances = distance.cdist(self.feats, self.feats, 'euclidean')
-        indexes = distances.argpartition(self.k)[:, :self.k]
-        for i in range(self.feats.shape[0]):
-            knns = indexes[i, :]
-            random.shuffle(knns)
-            costs_knn[i, :, :] = self.weight * self.costs[i, :].reshape((-1, 1)) + \
-                                   (1 - self.weight) * self.costs[knns, :].T
-
+        # get knn costs
+        costs_knn = self._getKNN()
+        # solve optimization
         for c_knn in tqdm(costs_knn):
             sol_knn = np.zeros((self.costs.shape[1], self.k))
-            obj_knn = 0
+            obj_knn = np.zeros(self.k)
             for i, c in enumerate(c_knn.T):
                 try:
                     sol_i, obj_i = self._solve(c)
@@ -172,13 +166,28 @@ class optDatasetKNN(optDataset):
                         "For optModel, the method 'solve' should return solution vector and objective value."
                     )
                 sol_knn[:, i] = sol_i
-                obj_knn += obj_i
-            sol = sol_knn.mean(1)
-            obj = obj_knn / self.k
+                obj_knn[i] = obj_i
+            # get average
+            sol = sol_knn.mean(axis=1)
+            obj = obj_knn.mean()
             sols.append(sol)
             objs.append([obj])
-
+        # update cost as average KNN
         self.costs = costs_knn.mean(axis=2)
         return np.array(sols), np.array(objs)
 
-
+    def _getKNN(self):
+        """
+        A method to get KNN costs
+        """
+        # init costs
+        costs_knn = np.zeros((*self.costs.shape, self.k))
+        # calculate distances between features
+        distances = distance.cdist(self.feats, self.feats, "euclidean")
+        indexes = np.argpartition(distances, self.k, axis=1)[:, :self.k]
+        # get neighbours costs
+        for i, knns in enumerate(indexes):
+            # interpolation weight
+            costs_knn[i] = self.weight * self.costs[i].reshape((-1, 1)) \
+                         + (1 - self.weight) * self.costs[knns].T
+        return costs_knn
