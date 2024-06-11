@@ -35,7 +35,7 @@ Attributes
 
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
-   This class is optimization model for portfolio problem
+   This class is an optimization model for portfolio problem
 
    .. attribute:: _model
 
@@ -49,7 +49,7 @@ Attributes
 
       :type: int
 
-   .. attribute:: cov
+   .. attribute:: covariance
 
       covariance matrix of the returns
 
@@ -63,7 +63,7 @@ Attributes
 
    .. py:method:: _getRiskLevel(gamma)
 
-      A method to calculate risk level
+      A method to calculate the risk level
 
       :returns: risk level
       :rtype: float

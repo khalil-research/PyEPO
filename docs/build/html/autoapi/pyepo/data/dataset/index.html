@@ -111,6 +111,9 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p></td>
 <td><p>This class is Torch Dataset for optimization problems.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDatasetKNN" title="pyepo.data.dataset.optDatasetKNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDatasetKNN</span></code></a></p></td>
+<td><p>This class is Torch Dataset for optimization problems, when using the robust kNN-loss.</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py class">
@@ -225,6 +228,103 @@
 <dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetKNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p>
+<p>This class is Torch Dataset for optimization problems, when using the robust kNN-loss.</p>
+<p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2310.04328">https://arxiv.org/abs/2310.04328</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.model" title="Link to this definition"></a></dt>
+<dd><p>Optimization models</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.k" title="Link to this definition"></a></dt>
+<dd><p>number of nearest neighbours selected</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN.weight">
+<span class="sig-name descname"><span class="pre">weight</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.weight" title="Link to this definition"></a></dt>
+<dd><p>weight of kNN-loss</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN.feats">
+<span class="sig-name descname"><span class="pre">feats</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.feats" title="Link to this definition"></a></dt>
+<dd><p>Data features</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN.costs">
+<span class="sig-name descname"><span class="pre">costs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.costs" title="Link to this definition"></a></dt>
+<dd><p>Cost vectors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN.sols">
+<span class="sig-name descname"><span class="pre">sols</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.sols" title="Link to this definition"></a></dt>
+<dd><p>Optimal solutions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN.objs">
+<span class="sig-name descname"><span class="pre">objs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.objs" title="Link to this definition"></a></dt>
+<dd><p>Optimal objective values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN._getSols">
+<span class="sig-name descname"><span class="pre">_getSols</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN._getSols" title="Link to this definition"></a></dt>
+<dd><p>A method to get optimal solutions for all cost vectors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN._getKNN">
+<span class="sig-name descname"><span class="pre">_getKNN</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN._getKNN" title="Link to this definition"></a></dt>
+<dd><p>A method to get kNN costs</p>
 </dd></dl>
 
 </dd></dl>
