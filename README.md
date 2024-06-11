@@ -41,11 +41,12 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb)**03 Training and Testing:** Train and test different approaches
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%202D%20knapsack%20Solution%20Visualization.ipynb)**04 2D knapsack Solution Visualization:** Visualize solutions for knapsack problem
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb)**05 Warcraft Shortest Path:** Use the Warcraft terrains dateset to train shortest path
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20kNN%20Robust%20Losses.ipynb)**06 kNN Robust Losses:** Use the optDatasetKNN for robust losses
 
 
 ## Experiments
 
-To reproduce the experiments in original paper, please use the code and follow the instruction in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
+To reproduce the experiments in the original paper, please use the code and follow the instructions in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
 
 
 ## Features
@@ -54,6 +55,7 @@ To reproduce the experiments in original paper, please use the code and follow t
 - Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), and [Pyomo](http://www.pyomo.org/) API
 - Support Parallel computing for optimization solver
 - Support solution caching [[5]](https://www.ijcai.org/proceedings/2021/390) to speed up training
+- Support kNN robust loss [[10]](https://arxiv.org/abs/2310.04328) to improve decision quality
 
 ## Installation
 
@@ -203,3 +205,4 @@ if __name__ == "__main__":
 * [7] [Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.](https://arxiv.org/abs/2205.15213)
 * [8] [Niepert, M., Minervini, P., & Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html)
 * [9] [Minervini, P., Franceschi, L., & Niepert, M. (2023, June). Adaptive perturbation-based gradient estimation for discrete latent variable models. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 8, pp. 9200-9208).](https://ojs.aaai.org/index.php/AAAI/article/view/26103)
+* [10] [Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.](https://arxiv.org/abs/2310.04328)
