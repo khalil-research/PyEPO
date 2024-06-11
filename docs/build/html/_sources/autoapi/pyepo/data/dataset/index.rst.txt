@@ -18,6 +18,7 @@ Classes
 .. autoapisummary::
 
    pyepo.data.dataset.optDataset
+   pyepo.data.dataset.optDatasetKNN
 
 
 
@@ -92,6 +93,68 @@ Classes
 
       :returns: data features (torch.tensor), costs (torch.tensor), optimal solutions (torch.tensor) and objective values (torch.tensor)
       :rtype: tuple
+
+
+
+.. py:class:: optDatasetKNN(model, feats, costs, k=10, weight=0.5)
+
+
+   Bases: :py:obj:`optDataset`
+
+   This class is Torch Dataset for optimization problems, when using the robust kNN-loss.
+
+   Reference: <https://arxiv.org/abs/2310.04328>
+
+   .. attribute:: model
+
+      Optimization models
+
+      :type: optModel
+
+   .. attribute:: k
+
+      number of nearest neighbours selected
+
+      :type: int
+
+   .. attribute:: weight
+
+      weight of kNN-loss
+
+      :type: float
+
+   .. attribute:: feats
+
+      Data features
+
+      :type: np.ndarray
+
+   .. attribute:: costs
+
+      Cost vectors
+
+      :type: np.ndarray
+
+   .. attribute:: sols
+
+      Optimal solutions
+
+      :type: np.ndarray
+
+   .. attribute:: objs
+
+      Optimal objective values
+
+      :type: np.ndarray
+
+   .. py:method:: _getSols()
+
+      A method to get optimal solutions for all cost vectors
+
+
+   .. py:method:: _getKNN()
+
+      A method to get kNN costs
 
 
 
