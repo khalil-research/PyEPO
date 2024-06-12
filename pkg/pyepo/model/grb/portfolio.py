@@ -41,7 +41,7 @@ class portfolioModel(optGrbModel):
         Returns:
             float: risk level
         """
-        risk_level = gamma * np.mean(self.cov)
+        risk_level = gamma * np.mean(self.covariance)
         return risk_level
 
     def _getModel(self):
