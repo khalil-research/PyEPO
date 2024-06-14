@@ -132,7 +132,7 @@ Adaptive Implicit Maximum Likelihood Estimator (AI-MLE) [#f8]_ use the adaptive 
 
    import pyepo
 
-   aimle = pyepo.func.implicitMLE(optmodel, n_samples=10, sigma=1.0, processes=2)
+   aimle = pyepo.func.adaptiveImplicitMLE(optmodel, n_samples=10, sigma=1.0, processes=2)
 
 
 
