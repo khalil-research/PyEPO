@@ -1,5 +1,14 @@
 # PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Tool
 
+[![Codecov Coverage](https://codecov.io/gh/khalil-research/PyEPO/branch/main/graph/badge.svg)](https://codecov.io/gh/khalil-research/PyEPO)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub Release](https://img.shields.io/github/v/release/khalil-research/PyEPO)
+![GitHub last commit](https://img.shields.io/github/last-commit/khalil-research/PyEPO)
+[![PyPI version](https://badge.fury.io/py/pyepo.svg)](https://badge.fury.io/py/pyepo)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/pyepo)
+![Conda Version](https://img.shields.io/conda/v/pyepo/pyepo)
+![Conda Downloads](https://img.shields.io/conda/dn/pyepo/pyepo)
+
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
 
 
