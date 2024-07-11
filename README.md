@@ -40,6 +40,9 @@ Citation:
 
 The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
 
+## Slides
+
+There is a our recent tutotial at the ACC 2024 conference. You can view the slides of the talk [here](https://github.com/khalil-research/PyEPO/blob/main/slides/PyEPO.pdf).
 
 ## Tutorial
 
