@@ -18,15 +18,19 @@
 ## Publication
 
 This repository is the official implementation of the paper:
-[PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming](https://doi.org/10.1007/s12532-024-00255-x) (Accepted to Mathematical Programming Computation (MPC))
+[PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming](https://link.springer.com/article/10.1007/s12532-024-00255-x) (Accepted to Mathematical Programming Computation (MPC))
 
 Citation:
 ```
-@article{tang2022pyepo,
-  title={PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming},
+@article{tang2024,
+  title={PyEPO: a PyTorch-based end-to-end predict-then-optimize library for linear and integer programming},
   author={Tang, Bo and Khalil, Elias B},
-  journal={arXiv preprint arXiv:2206.14234},
-  year={2022}
+  journal={Mathematical Programming Computation},
+  issn={1867-2957},
+  doi={10.1007/s12532-024-00255-x},
+  year={2024},
+  month={July},
+  publisher={Springer}
 }
 ```
 
