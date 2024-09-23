@@ -117,4 +117,5 @@ class SPOPlusFunc(Function):
             grad = 2 * (w - wq)
         if optmodel.modelSense == EPO.MAXIMIZE:
             grad = 2 * (wq - w)
+        grad_output = grad_output.unsqueeze(-1).expand(grad.shape)
         return grad_output * grad, None, None, None, None
