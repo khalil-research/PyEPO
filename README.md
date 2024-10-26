@@ -18,19 +18,15 @@
 ## Publication
 
 This repository is the official implementation of the paper:
-[PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming](https://link.springer.com/article/10.1007/s12532-024-00255-x) (Accepted to Mathematical Programming Computation (MPC))
+[Learning to Optimize for Mixed-Integer Non-linear Programming](https://arxiv.org/abs/2410.11061)
 
 Citation:
 ```
-@article{tang2024,
-  title={PyEPO: a PyTorch-based end-to-end predict-then-optimize library for linear and integer programming},
-  author={Tang, Bo and Khalil, Elias B},
-  journal={Mathematical Programming Computation},
-  issn={1867-2957},
-  doi={10.1007/s12532-024-00255-x},
-  year={2024},
-  month={July},
-  publisher={Springer}
+@article{tang2024learning,
+  title={Learning to Optimize for Mixed-Integer Non-linear Programming},
+  author={Tang, Bo and Khalil, Elias B and Drgo{\v{n}}a, J{\'a}n},
+  journal={arXiv preprint arXiv:2410.11061},
+  year={2024}
 }
 ```
 
@@ -46,7 +42,7 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 
 ## Slides
 
-There is a our recent tutotial at the ACC 2024 conference. You can view the slides of the talk [here](https://github.com/khalil-research/PyEPO/blob/main/slides/PyEPO.pdf).
+Our recent tutorial was at the ACC 2024 conference. You can view the talk slides [here](https://github.com/khalil-research/PyEPO/blob/main/slides/PyEPO.pdf).
 
 ## Tutorial
 
@@ -90,7 +86,7 @@ pip install PyEPO/pkg/.
 
 ### Pip Install
 
-The package is now available on [PyPI](https://pypi.org/project/pyepo/) for installation. You can easily install `PyEPO` using pip by running the following command:
+The package is now available for installation on [PyPI](https://pypi.org/project/pyepo/). You can easily install `PyEPO` using pip by running the following command:
 
 ```bash
 pip install pyepo
