@@ -18,15 +18,19 @@
 ## Publication
 
 This repository is the official implementation of the paper:
-[Learning to Optimize for Mixed-Integer Non-linear Programming](https://arxiv.org/abs/2410.11061)
+[PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming](https://link.springer.com/article/10.1007/s12532-024-00255-x) (Accepted to Mathematical Programming Computation (MPC))
 
 Citation:
 ```
-@article{tang2024learning,
-  title={Learning to Optimize for Mixed-Integer Non-linear Programming},
-  author={Tang, Bo and Khalil, Elias B and Drgo{\v{n}}a, J{\'a}n},
-  journal={arXiv preprint arXiv:2410.11061},
-  year={2024}
+@article{tang2024,
+  title={PyEPO: a PyTorch-based end-to-end predict-then-optimize library for linear and integer programming},
+  author={Tang, Bo and Khalil, Elias B},
+  journal={Mathematical Programming Computation},
+  issn={1867-2957},
+  doi={10.1007/s12532-024-00255-x},
+  year={2024},
+  month={July},
+  publisher={Springer}
 }
 ```
 
