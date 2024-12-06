@@ -17,15 +17,13 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     # version
-    version = "0.3.9b",
+    version = "0.3.9",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
     author = "Bo Tang",
     # mail address
     author_email = "bolucas.tang@mail.utoronto.ca",
-    # python version
-    python_requires='>=3.7, <=3.11'
     # dependencies
     install_requires = [
         "numpy",
