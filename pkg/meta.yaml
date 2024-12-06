@@ -3,7 +3,7 @@
 
 package:
   name: pyepo
-  version: 0.3.9b
+  version: 0.3.9
 
 source:
   path: ./
@@ -21,7 +21,7 @@ channels:
 
 requirements:
   host:
-    - python >=3.7,<=3.11
+    - python >=3.9
     - pip
     - numpy >=1.22
     - scipy
