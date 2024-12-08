@@ -24,6 +24,8 @@ setuptools.setup(
     author = "Bo Tang",
     # mail address
     author_email = "bolucas.tang@mail.utoronto.ca",
+    # restrict Python version
+    python_requires="<3.12"
     # dependencies
     install_requires = [
         "numpy",
