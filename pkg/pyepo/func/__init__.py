@@ -4,7 +4,7 @@
 Pytorch autograd function for end-to-end training
 """
 
-from pyepo.func.surrogate import SPOPlus
+from pyepo.func.surrogate import SPOPlus, perturbationGradient
 from pyepo.func.blackbox import blackboxOpt, negativeIdentity
 from pyepo.func.perturbed import perturbedOpt, perturbedFenchelYoung, implicitMLE, adaptiveImplicitMLE
 from pyepo.func.contrastive import NCE, contrastiveMAP
