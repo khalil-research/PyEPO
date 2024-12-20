@@ -62,8 +62,10 @@ class NCE(optModule):
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = (obj_cp - objpool_cp).mean(axis=1)
-        if self.optmodel.modelSense == EPO.MAXIMIZE:
+        elif self.optmodel.modelSense == EPO.MAXIMIZE:
             loss = (objpool_cp - obj_cp).mean(axis=1)
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)
@@ -125,8 +127,10 @@ class contrastiveMAP(optModule):
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss, _ = (obj_cp - objpool_cp).max(axis=1)
-        if self.optmodel.modelSense == EPO.MAXIMIZE:
+        elif self.optmodel.modelSense == EPO.MAXIMIZE:
             loss, _ = (objpool_cp - obj_cp).max(axis=1)
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)
