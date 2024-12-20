@@ -95,11 +95,13 @@ class SPOPlusFunc(Function):
         # sense
         if module.optmodel.modelSense == EPO.MINIMIZE:
             loss = np.array(loss)
-        if module.optmodel.modelSense == EPO.MAXIMIZE:
+        elif module.optmodel.modelSense == EPO.MAXIMIZE:
             loss = - np.array(loss)
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # convert to tensor
-        loss = torch.FloatTensor(loss).to(device)
-        sol = torch.FloatTensor(sol).to(device)
+        loss = torch.tensor(loss, dtype=torch.float, device=device)
+        sol = torch.tensor(sol, dtype=torch.float, device=device)
         # save solutions
         ctx.save_for_backward(true_sol, sol)
         # add other objects to ctx
@@ -115,8 +117,10 @@ class SPOPlusFunc(Function):
         optmodel = ctx.optmodel
         if optmodel.modelSense == EPO.MINIMIZE:
             grad = 2 * (w - wq)
-        if optmodel.modelSense == EPO.MAXIMIZE:
+        elif optmodel.modelSense == EPO.MAXIMIZE:
             grad = 2 * (wq - w)
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         return grad_output * grad, None, None, None, None
 
 
@@ -153,7 +157,7 @@ class perturbationGradient(optModule):
         # symmetric perturbation
         self.two_sides = two_sides
 
-    def forward(self, pred_cost, true_cost, true_sol):
+    def forward(self, pred_cost, true_cost):
         """
         Forward pass
         """
@@ -167,13 +171,51 @@ class perturbationGradient(optModule):
             loss = loss
         else:
             raise ValueError("No reduction '{}'.".format(self.reduction))
-        # sense
-        if module.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = - loss
         return loss
 
     def _finiteDifference(self, pred_cost, true_cost):
         """
         Zeroth order approximations for surrogate objective value
         """
-        pass
+        # get device
+        device = pred_cost.device
+        # convert tenstor
+        cp = pred_cost.detach().to("cpu").numpy()
+        c = true_cost.detach().to("cpu").numpy()
+        # central differencing
+        if self.two_sides:
+            # solve
+            wp, _ = _solve_or_cache(cp + self.sigma * c, self)
+            wm, _ = _solve_or_cache(cp - self.sigma * c, self)
+            # convert numpy
+            sol_plus = torch.tensor(wp, dtype=torch.float, device=device)
+            sol_minus = torch.tensor(wm, dtype=torch.float, device=device)
+            # differentiable objective value
+            obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * true_cost, sol_plus)
+            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
+            # loss
+            if self.optmodel.modelSense == EPO.MINIMIZE:
+                loss = (obj_plus - obj_minus) / (2 * self.sigma)
+            elif self.optmodel.modelSense == EPO.MAXIMIZE:
+                loss = (obj_minus - obj_plus) / (2 * self.sigma)
+            else:
+                raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+        # back differencing
+        else:
+            # solve
+            w, _ = _solve_or_cache(cp, self)
+            wm, _ = _solve_or_cache(cp - self.sigma * c, self)
+            # convert numpy
+            sol = torch.tensor(w, dtype=torch.float, device=device)
+            sol_minus = torch.tensor(wm, dtype=torch.float, device=device)
+            # differentiable objective value
+            obj = torch.einsum("bi,bi->b", pred_cost, sol)
+            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
+            # loss
+            if self.optmodel.modelSense == EPO.MINIMIZE:
+                loss = (obj - obj_minus) / self.sigma
+            elif self.optmodel.modelSense == EPO.MAXIMIZE:
+                loss = (obj_minus - obj) / self.sigma
+            else:
+                raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+        return loss
