@@ -66,9 +66,11 @@ class listwiseLTR(optModule):
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = - (F.log_softmax(objpool_cp, dim=1) *
                       F.softmax(objpool_c, dim=1))
-        if self.optmodel.modelSense == EPO.MAXIMIZE:
+        elif self.optmodel.modelSense == EPO.MAXIMIZE:
             loss = - (F.log_softmax(- objpool_cp, dim=1) *
                       F.softmax(- objpool_c, dim=1))
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)
@@ -136,8 +138,10 @@ class pairwiseLTR(optModule):
             # best sol
             if self.optmodel.modelSense == EPO.MINIMIZE:
                 best_ind = torch.argmin(objpool_c[i])
-            if self.optmodel.modelSense == EPO.MAXIMIZE:
+            elif self.optmodel.modelSense == EPO.MAXIMIZE:
                 best_ind = torch.argmax(objpool_c[i])
+            else:
+                raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
             objpool_cp_best = objpool_cp[i, best_ind]
             # rest sol
             rest_ind = [j for j in range(len(objpool_cp[i])) if j != best_ind]
@@ -145,8 +149,10 @@ class pairwiseLTR(optModule):
             # best vs rest loss
             if self.optmodel.modelSense == EPO.MINIMIZE:
                 loss.append(relu(objpool_cp_best - objpool_cp_rest).mean())
-            if self.optmodel.modelSense == EPO.MAXIMIZE:
+            elif self.optmodel.modelSense == EPO.MAXIMIZE:
                 loss.append(relu(objpool_cp_rest - objpool_cp_best).mean())
+            else:
+                raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         loss = torch.stack(loss)
         # reduction
         if self.reduction == "mean":

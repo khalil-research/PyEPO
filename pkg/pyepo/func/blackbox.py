@@ -78,7 +78,7 @@ class blackboxOptFunc(Function):
         # solve
         sol, _ = _solve_or_cache(cp, module)
         # convert to tensor
-        sol = torch.FloatTensor(sol).to(device)
+        sol = torch.tensor(sol, dtype=torch.float, device=device)
         # save
         ctx.save_for_backward(pred_cost, sol)
         # add other objects to ctx
@@ -107,7 +107,7 @@ class blackboxOptFunc(Function):
         # get gradient
         grad = (sol - wp) / module.lambd
         # convert to tensor
-        grad = torch.FloatTensor(grad).to(device)
+        grad = torch.tensor(grad, dtype=torch.float, device=device)
         return grad, None
 
 
@@ -172,7 +172,7 @@ class negativeIdentityFunc(Function):
         # solve
         sol, _ = _solve_or_cache(cp, module)
         # convert to tensor
-        sol = torch.FloatTensor(sol).to(device)
+        sol = torch.tensor(sol, dtype=torch.float, device=device)
         # add other objects to ctx
         ctx.optmodel = module.optmodel
         return sol
@@ -189,6 +189,8 @@ class negativeIdentityFunc(Function):
         I = torch.eye(grad_output.shape[1]).to(device)
         if optmodel.modelSense == EPO.MINIMIZE:
             grad = - I
-        if optmodel.modelSense == EPO.MAXIMIZE:
+        elif optmodel.modelSense == EPO.MAXIMIZE:
             grad = I
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         return grad_output @ grad, None
