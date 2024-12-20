@@ -1,5 +1,12 @@
 # PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Tool
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub Release](https://img.shields.io/github/v/release/khalil-research/PyEPO)
+[![PyPI version](https://badge.fury.io/py/pyepo.svg)](https://badge.fury.io/py/pyepo)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/pyepo)
+![Conda Version](https://img.shields.io/conda/v/pyepo/pyepo)
+![Conda Downloads](https://img.shields.io/conda/dn/pyepo/pyepo)
+
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
 
 
@@ -11,15 +18,19 @@
 ## Publication
 
 This repository is the official implementation of the paper:
-[PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming](https://arxiv.org/abs/2206.14234) (Accepted to Mathematical Programming Computation (MPC))
+[PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming](https://link.springer.com/article/10.1007/s12532-024-00255-x) (Accepted to Mathematical Programming Computation (MPC))
 
 Citation:
 ```
-@article{tang2022pyepo,
-  title={PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming},
+@article{tang2024,
+  title={PyEPO: a PyTorch-based end-to-end predict-then-optimize library for linear and integer programming},
   author={Tang, Bo and Khalil, Elias B},
-  journal={arXiv preprint arXiv:2206.14234},
-  year={2022}
+  journal={Mathematical Programming Computation},
+  issn={1867-2957},
+  doi={10.1007/s12532-024-00255-x},
+  year={2024},
+  month={July},
+  publisher={Springer}
 }
 ```
 
@@ -33,6 +44,9 @@ Citation:
 
 The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
 
+## Slides
+
+Our recent tutorial was at the ACC 2024 conference. You can view the talk slides [here](https://github.com/khalil-research/PyEPO/blob/main/slides/PyEPO.pdf).
 
 ## Tutorial
 
@@ -52,7 +66,7 @@ To reproduce the experiments in the original paper, please use the code and foll
 
 ## Features
 
-- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[7]](https://arxiv.org/abs/2205.15213), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **PFYL** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **NCE** [[5]](https://www.ijcai.org/proceedings/2021/390) and **LTR** [[6]](https://proceedings.mlr.press/v162/mandi22a.htm), **I-MLE** [[8]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), and **AI-MLE** [[9]](https://ojs.aaai.org/index.php/AAAI/article/view/26103).
+- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[7]](https://arxiv.org/abs/2205.15213), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **PFY** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **NCE** [[5]](https://www.ijcai.org/proceedings/2021/390) and **LTR** [[6]](https://proceedings.mlr.press/v162/mandi22a.htm), **I-MLE** [[8]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[9]](https://ojs.aaai.org/index.php/AAAI/article/view/26103), and **PG** [[11]](https://arxiv.org/abs/2402.03256).
 - Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), and [Pyomo](http://www.pyomo.org/) API
 - Support Parallel computing for optimization solver
 - Support solution caching [[5]](https://www.ijcai.org/proceedings/2021/390) to speed up training
@@ -76,7 +90,7 @@ pip install PyEPO/pkg/.
 
 ### Pip Install
 
-The package is now available on [PyPI](https://pypi.org/project/pyepo/) for installation. You can easily install `PyEPO` using pip by running the following command:
+The package is now available for installation on [PyPI](https://pypi.org/project/pyepo/). You can easily install `PyEPO` using pip by running the following command:
 
 ```bash
 pip install pyepo
@@ -207,3 +221,4 @@ if __name__ == "__main__":
 * [8] [Niepert, M., Minervini, P., & Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html)
 * [9] [Minervini, P., Franceschi, L., & Niepert, M. (2023, June). Adaptive perturbation-based gradient estimation for discrete latent variable models. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 8, pp. 9200-9208).](https://ojs.aaai.org/index.php/AAAI/article/view/26103)
 * [10] [Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.](https://arxiv.org/abs/2310.04328)
+* [11] [Gupta, V., & Huang, M. (2024). Decision-Focused Learning with Directional Gradients. Training, 50(100), 150.](https://arxiv.org/abs/2402.03256)
