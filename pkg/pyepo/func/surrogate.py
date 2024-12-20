@@ -174,6 +174,6 @@ class perturbationGradient(optModule):
 
     def _finiteDifference(self, pred_cost, true_cost):
         """
-        Zeroh order approximations for surrogate objective value
+        Zeroth order approximations for surrogate objective value
         """
         pass
