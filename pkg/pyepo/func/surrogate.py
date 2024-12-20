@@ -14,8 +14,8 @@ from pyepo.func.utlis import _solve_or_cache
 
 class SPOPlus(optModule):
     """
-    An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
-    which measures the decision error of the optimization problem.
+    An autograd module for SPO+ Loss, as a surrogate loss function of SPO
+    (regret) Loss, which measures the decision error of the optimization problem.
 
     For SPO/SPO+ Loss, the objective function is linear and constraints are
     known and fixed, but the cost vector needs to be predicted from contextual
@@ -118,3 +118,62 @@ class SPOPlusFunc(Function):
         if optmodel.modelSense == EPO.MAXIMIZE:
             grad = 2 * (wq - w)
         return grad_output * grad, None, None, None, None
+
+
+class perturbationGradient(optModule):
+    """
+    An autograd module for PG Loss, as a surrogate loss function of objective
+    value, which measures the decision quality of the optimization problem.
+
+    For PG Loss, the objective function is linear, and constraints are
+    known and fixed, but the cost vector needs to be predicted from contextual
+    data.
+
+    According to Danskin’s Theorem, the PG Loss is derived from different zeroth
+    order approximations and has the informative gradient. Thus, it allows us to
+    design an algorithm based on stochastic gradient descent.
+
+    Reference: <https://arxiv.org/abs/2402.03256>
+    """
+    def __init__(self, optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1,
+                 reduction="mean", dataset=None):
+        """
+        Args:
+            optmodel (optModel): an PyEPO optimization model
+            sigma (float): the amplitude of the finite difference width used for loss approximation
+            two_sides (bool): approximate gradient by two-sided perturbation or not
+            processes (int): number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio (float): the ratio of new solutions computed during training
+            reduction (str): the reduction to apply to the output
+            dataset (None/optDataset): the training data
+        """
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
+        # finite difference width
+        self.sigma = sigma
+        # symmetric perturbation
+        self.two_sides = two_sides
+
+    def forward(self, pred_cost, true_cost, true_sol):
+        """
+        Forward pass
+        """
+        loss = self._finiteDifference(pred_cost, true_cost)
+        # reduction
+        if self.reduction == "mean":
+            loss = torch.mean(loss)
+        elif self.reduction == "sum":
+            loss = torch.sum(loss)
+        elif self.reduction == "none":
+            loss = loss
+        else:
+            raise ValueError("No reduction '{}'.".format(self.reduction))
+        # sense
+        if module.optmodel.modelSense == EPO.MAXIMIZE:
+            loss = - loss
+        return loss
+
+    def _finiteDifference(self, pred_cost, true_cost):
+        """
+        Zeroh order approximations for surrogate objective value
+        """
+        pass
