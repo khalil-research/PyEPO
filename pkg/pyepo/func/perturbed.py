@@ -88,9 +88,9 @@ class perturbedOptFunc(Function):
         # solution expectation
         e_sol = ptb_sols.mean(axis=1)
         # convert to tensor
-        noises = torch.FloatTensor(noises).to(device)
-        ptb_sols = torch.FloatTensor(ptb_sols).to(device)
-        e_sol = torch.FloatTensor(e_sol).to(device)
+        noises = torch.tensor(noises, dtype=torch.float, device=device)
+        ptb_sols = torch.tensor(ptb_sols, dtype=torch.float, device=device)
+        e_sol = torch.tensor(e_sol, dtype=torch.float, device=device)
         # save solutions
         ctx.save_for_backward(ptb_sols, noises)
         # add other objects to ctx
@@ -204,13 +204,15 @@ class perturbedFenchelYoungFunc(Function):
         # difference
         if module.optmodel.modelSense == EPO.MINIMIZE:
             diff = w - e_sol
-        if module.optmodel.modelSense == EPO.MAXIMIZE:
+        elif module.optmodel.modelSense == EPO.MAXIMIZE:
             diff = e_sol - w
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # loss
         loss = np.sum(diff**2, axis=1)
         # convert to tensor
-        diff = torch.FloatTensor(diff).to(device)
-        loss = torch.FloatTensor(loss).to(device)
+        diff = torch.tensor(diff, dtype=torch.float, device=device)
+        loss = torch.tensor(loss, dtype=torch.float, device=device)
         # save solutions
         ctx.save_for_backward(diff)
         return loss
@@ -309,7 +311,7 @@ class implicitMLEFunc(Function):
         # solution average
         e_sol = ptb_sols.mean(axis=1)
         # convert to tensor
-        e_sol = torch.FloatTensor(e_sol).to(device)
+        e_sol = torch.tensor(e_sol, dtype=torch.float, device=device)
         # save
         ctx.save_for_backward(pred_cost)
         # add other objects to ctx
@@ -347,7 +349,7 @@ class implicitMLEFunc(Function):
             # get single side gradient
             grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / module.lambd
         # convert to tensor
-        grad = torch.FloatTensor(grad).to(device)
+        grad = torch.tensor(grad, dtype=torch.float, device=device)
         return grad, None, None
 
 
@@ -440,7 +442,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             # get single side gradient
             grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / (lambd + 1e-7)
         # convert to tensor
-        grad = torch.FloatTensor(grad).to(device)
+        grad = torch.tensor(grad, dtype=torch.float, device=device)
         # moving average of the gradient norm
         grad_norm = (grad.abs() > 1e-7).float().mean()
         module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm
@@ -509,8 +511,10 @@ def _cache_in_pass(ptb_c, optmodel, solpool):
         solpool_obj = ptb_c[j] @ solpool.T
         if optmodel.modelSense == EPO.MINIMIZE:
             ind = np.argmin(solpool_obj, axis=1)
-        if optmodel.modelSense == EPO.MAXIMIZE:
+        elif optmodel.modelSense == EPO.MAXIMIZE:
             ind = np.argmax(solpool_obj, axis=1)
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         ptb_sols.append(solpool[ind])
     return np.array(ptb_sols).transpose(1,0,2)
 
