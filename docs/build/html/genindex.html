@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Index &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
 
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
@@ -17,7 +17,7 @@
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=34cd777e"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
@@ -132,6 +132,12 @@
       </ul></li>
       <li><a href="autoapi/pyepo/func/utlis/index.html#pyepo.func.utlis._check_sol">_check_sol() (in module pyepo.func.utlis)</a>
 </li>
+      <li><a href="autoapi/pyepo/func/index.html#pyepo.func.perturbationGradient._finiteDifference">_finiteDifference() (pyepo.func.perturbationGradient method)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.perturbationGradient._finiteDifference">(pyepo.func.surrogate.perturbationGradient method)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/pyepo/model/copt/shortestpath/index.html#pyepo.model.copt.shortestpath.shortestPathModel._getArcs">_getArcs() (pyepo.model.copt.shortestpath.shortestPathModel method)</a>
 
       <ul>
@@ -389,7 +395,7 @@
 </li>
         <li><a href="autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.perturbedOptFunc.backward">(pyepo.func.perturbed.perturbedOptFunc static method)</a>
 </li>
-        <li><a href="autoapi/pyepo/func/spoplus/index.html#pyepo.func.spoplus.SPOPlusFunc.backward">(pyepo.func.spoplus.SPOPlusFunc static method)</a>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.SPOPlusFunc.backward">(pyepo.func.surrogate.SPOPlusFunc static method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -559,6 +565,8 @@
 </li>
         <li><a href="autoapi/pyepo/func/index.html#pyepo.func.pairwiseLTR.forward">(pyepo.func.pairwiseLTR method)</a>
 </li>
+        <li><a href="autoapi/pyepo/func/index.html#pyepo.func.perturbationGradient.forward">(pyepo.func.perturbationGradient method)</a>
+</li>
         <li><a href="autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.adaptiveImplicitMLE.forward">(pyepo.func.perturbed.adaptiveImplicitMLE method)</a>
 </li>
         <li><a href="autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.implicitMLE.forward">(pyepo.func.perturbed.implicitMLE method)</a>
@@ -587,9 +595,11 @@
 </li>
         <li><a href="autoapi/pyepo/func/index.html#pyepo.func.SPOPlus.forward">(pyepo.func.SPOPlus method)</a>
 </li>
-        <li><a href="autoapi/pyepo/func/spoplus/index.html#pyepo.func.spoplus.SPOPlus.forward">(pyepo.func.spoplus.SPOPlus method)</a>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.perturbationGradient.forward">(pyepo.func.surrogate.perturbationGradient method)</a>
 </li>
-        <li><a href="autoapi/pyepo/func/spoplus/index.html#pyepo.func.spoplus.SPOPlusFunc.forward">(pyepo.func.spoplus.SPOPlusFunc static method)</a>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.SPOPlus.forward">(pyepo.func.surrogate.SPOPlus method)</a>
+</li>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.SPOPlusFunc.forward">(pyepo.func.surrogate.SPOPlusFunc static method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -776,7 +786,7 @@
 </li>
         <li><a href="autoapi/pyepo/func/rank/index.html#module-pyepo.func.rank">pyepo.func.rank</a>
 </li>
-        <li><a href="autoapi/pyepo/func/spoplus/index.html#module-pyepo.func.spoplus">pyepo.func.spoplus</a>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#module-pyepo.func.surrogate">pyepo.func.surrogate</a>
 </li>
         <li><a href="autoapi/pyepo/func/utlis/index.html#module-pyepo.func.utlis">pyepo.func.utlis</a>
 </li>
@@ -955,6 +965,12 @@
         <li><a href="autoapi/pyepo/func/rank/index.html#pyepo.func.rank.pairwiseLTR">(class in pyepo.func.rank)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/pyepo/func/index.html#pyepo.func.perturbationGradient">perturbationGradient (class in pyepo.func)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.perturbationGradient">(class in pyepo.func.surrogate)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/pyepo/func/index.html#pyepo.func.perturbedFenchelYoung">perturbedFenchelYoung (class in pyepo.func)</a>
 
       <ul>
@@ -1082,10 +1098,10 @@
 </li>
       </ul></li>
       <li>
-    pyepo.func.spoplus
+    pyepo.func.surrogate
 
       <ul>
-        <li><a href="autoapi/pyepo/func/spoplus/index.html#module-pyepo.func.spoplus">module</a>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#module-pyepo.func.surrogate">module</a>
 </li>
       </ul></li>
       <li>
@@ -1464,10 +1480,10 @@
       <li><a href="autoapi/pyepo/func/index.html#pyepo.func.SPOPlus">SPOPlus (class in pyepo.func)</a>
 
       <ul>
-        <li><a href="autoapi/pyepo/func/spoplus/index.html#pyepo.func.spoplus.SPOPlus">(class in pyepo.func.spoplus)</a>
+        <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.SPOPlus">(class in pyepo.func.surrogate)</a>
 </li>
       </ul></li>
-      <li><a href="autoapi/pyepo/func/spoplus/index.html#pyepo.func.spoplus.SPOPlusFunc">SPOPlusFunc (class in pyepo.func.spoplus)</a>
+      <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.SPOPlusFunc">SPOPlusFunc (class in pyepo.func.surrogate)</a>
 </li>
       <li><a href="autoapi/pyepo/func/utlis/index.html#pyepo.func.utlis.sumGammaDistribution">sumGammaDistribution (class in pyepo.func.utlis)</a>
 </li>

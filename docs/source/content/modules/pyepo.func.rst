@@ -4,12 +4,24 @@
 .. automodule:: pyepo.func
     :noindex:
 
+
+Surrogate Loss
+--------------
+
 Smart Predict-then-Optimize Loss+ (SPO+)
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 SPO+ Loss function [#f1]_ is a surrogate loss function of SPO Loss (Regret), which measures the decision error of optimization problem. For SPO/SPO+ Loss, the objective function is linear and constraints are known and fixed, but the cost vector need to be predicted from contextual data. The SPO+ Loss is convex with non-zero subgradient.
 
 .. autoclass:: pyepo.func.SPOPlus
+    :noindex:
+    :members:
+
+Perturbation Gradient Loss (PG)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PG Loss function [#f9]_  a surrogate loss function of objective value, which measures the decision quality of the optimization problem. For PG Loss, the objective function is linear, and constraints are known and fixed, but the cost vector needs to be predicted from contextual data. According to Danskin’s Theorem, the PG Loss is derived from different zeroth order approximations and has the informative gradient. Thus, it allows us to design an algorithm based on stochastic gradient descent.
+
+.. autoclass:: pyepo.func.perturbationGradient
     :noindex:
     :members:
 
@@ -140,3 +152,4 @@ Listwise loss measures the scores of the whole ranked lists.
 .. [#f6] Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.
 .. [#f7] Niepert, M., Minervini, P., & Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.
 .. [#f8] Minervini, P., Franceschi, L., & Niepert, M. (2023, June). Adaptive perturbation-based gradient estimation for discrete latent variable models. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 8, pp. 9200-9208).
+.. [#f9] Gupta, V., & Huang, M. (2024). Decision-Focused Learning with Directional Gradients. Training, 50(100), 150.

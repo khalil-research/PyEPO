@@ -20,7 +20,7 @@ Submodules
    contrastive/index.rst
    perturbed/index.rst
    rank/index.rst
-   spoplus/index.rst
+   surrogate/index.rst
    utlis/index.rst
 
 
@@ -33,6 +33,7 @@ Classes
 .. autoapisummary::
 
    pyepo.func.SPOPlus
+   pyepo.func.perturbationGradient
    pyepo.func.blackboxOpt
    pyepo.func.negativeIdentity
    pyepo.func.perturbedOpt
@@ -53,8 +54,8 @@ Classes
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
-   An autograd module for SPO+ Loss, as a surrogate loss function of SPO Loss,
-   which measures the decision error of the optimization problem.
+   An autograd module for SPO+ Loss, as a surrogate loss function of SPO
+   (regret) Loss, which measures the decision error of the optimization problem.
 
    For SPO/SPO+ Loss, the objective function is linear and constraints are
    known and fixed, but the cost vector needs to be predicted from contextual
@@ -68,6 +69,35 @@ Classes
    .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj)
 
       Forward pass
+
+
+
+.. py:class:: perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1, reduction='mean', dataset=None)
+
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+   An autograd module for PG Loss, as a surrogate loss function of objective
+   value, which measures the decision quality of the optimization problem.
+
+   For PG Loss, the objective function is linear, and constraints are
+   known and fixed, but the cost vector needs to be predicted from contextual
+   data.
+
+   According to Danskin’s Theorem, the PG Loss is derived from different zeroth
+   order approximations and has the informative gradient. Thus, it allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://arxiv.org/abs/2402.03256>
+
+   .. py:method:: forward(pred_cost, true_cost)
+
+      Forward pass
+
+
+   .. py:method:: _finiteDifference(pred_cost, true_cost)
+
+      Zeroth order approximations for surrogate objective value
 
 
 
