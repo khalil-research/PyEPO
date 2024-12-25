@@ -1,5 +1,5 @@
-# conda build . -c conda-forge -c pytorch -c gurobi -c default
-# anaconda upload -u pyepo $USER/anaconda3/conda-bld/win-64pyepo-0.3.5-py312_0.tar.bz2
+# conda build . -c conda-forge -c default -c pytorch -c gurobi 
+# anaconda upload -u pyepo $USER/anaconda3/conda-bld/win-64pyepo-0.4.3-py312_0.tar.bz2
 
 package:
   name: pyepo
