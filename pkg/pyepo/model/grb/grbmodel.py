@@ -7,8 +7,12 @@ Abstract optimization model based on GurobiPy
 from copy import copy
 
 import numpy as np
-import gurobipy as gp
-from gurobipy import GRB
+try:
+    import gurobipy as gp
+    from gurobipy import GRB
+    _HAS_GUROBI = True
+except ImportError:
+    _HAS_GUROBI = False
 
 from pyepo import EPO
 from pyepo.model.opt import optModel
@@ -24,6 +28,9 @@ class optGrbModel(optModel):
 
     def __init__(self):
         super().__init__()
+        # error
+        if not _HAS_GUROBI:
+            raise ImportError("Gurobi is not installed. Please install gurobipy to use this feature.")
         # model sense
         self._model.update()
         if self._model.modelSense == GRB.MINIMIZE:
