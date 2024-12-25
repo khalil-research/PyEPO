@@ -16,9 +16,9 @@ build:
 
 channels:
   - conda-forge
-  - defaults
   - pytorch
   - gurobi
+  - defaults
 
 requirements:
   host:
