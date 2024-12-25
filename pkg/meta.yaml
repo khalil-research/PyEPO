@@ -1,4 +1,4 @@
-# conda build . -c conda-forge -c default -c pytorch -c gurobi 
+# conda build . -c conda-forge -c default -c pytorch -c gurobi
 # anaconda upload -u pyepo $USER/anaconda3/conda-bld/win-64pyepo-0.4.3-py312_0.tar.bz2
 
 package:
@@ -21,12 +21,12 @@ channels:
 
 requirements:
   host:
-    - python >=3.7,<=3.12
+    - python >=3.7
     - pip
     - numpy
     - tqdm
   run:
-    - python >=3.7,<=3.12
+    - python >=3.7
     - numpy
     - scipy
     - pathos
