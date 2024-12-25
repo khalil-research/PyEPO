@@ -3,7 +3,7 @@
 
 package:
   name: pyepo
-  version: 0.4.1
+  version: 0.4.2
 
 source:
   path: ./
@@ -15,32 +15,29 @@ build:
 
 channels:
   - conda-forge
+  - defaults
   - pytorch
   - gurobi
-  - defaults
 
 requirements:
   host:
-    - python >=3.7
+    - python >=3.7,<=3.12
     - pip
-    - numpy >=1.22
-    - scipy
-    - pathos
+    - numpy
     - tqdm
-    - pyomo >=6.1.2
-    - gurobi >=9.1.2
-    - scikit-learn
-    - pytorch >=1.13.1
   run:
-    - python >=3.7
-    - numpy >=1.22
+    - python >=3.7,<=3.12
+    - numpy
     - scipy
     - pathos
     - tqdm
-    - pyomo >=6.1.2
-    - gurobi >=9.1.2
     - scikit-learn
-    - pytorch >=1.13.1
+    - pytorch >=1.13
+
+extra:
+  optional-dependencies:
+    - gurobi >=9.1.2
+    - pyomo >=6.1.2
 
 about:
   home: https://github.com/khalil-research/PyEPO

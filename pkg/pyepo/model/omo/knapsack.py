@@ -5,10 +5,14 @@ Knapsack problem
 """
 
 import numpy as np
-from pyomo import environ as pe
 
-from pyepo import EPO
-from pyepo.model.omo.omomodel import optOmoModel
+try:
+    from pyomo import environ as pe
+    from pyepo import EPO
+    from pyepo.model.omo.omomodel import optOmoModel
+    _HAS_PYOMO = True
+except ImportError:
+    _HAS_PYOMO = False
 
 
 class knapsackModel(optOmoModel):
@@ -98,7 +102,7 @@ class knapsackModelRel(knapsackModel):
 
 
 if __name__ == "__main__":
-    
+
     import random
     # random seed
     random.seed(42)
@@ -106,7 +110,7 @@ if __name__ == "__main__":
     cost = [random.random() for _ in range(16)]
     weights = np.random.choice(range(300, 800), size=(2,16)) / 100
     capacity = [20, 20]
-    
+
     # solve model
     optmodel = knapsackModel(weights=weights, capacity=capacity, solver="gurobi") # init model
     optmodel = optmodel.copy()
@@ -117,7 +121,7 @@ if __name__ == "__main__":
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
-            
+
     # relax
     optmodel = optmodel.relax()
     optmodel.setObj(cost) # set objective function
@@ -127,7 +131,7 @@ if __name__ == "__main__":
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
-            
+
     # add constraint
     optmodel = optmodel.addConstr([weights[0,i] for i in range(16)], 10)
     optmodel.setObj(cost) # set objective function

@@ -17,7 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     # version
-    version = "0.4.1",
+    version = "0.4.2",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
@@ -32,10 +32,13 @@ setuptools.setup(
         "scipy",
         "pathos",
         "tqdm",
-        "Pyomo>=6.1.2",
-        "gurobipy>=9.1.2",
         "scikit_learn",
         "torch>=1.13.1"],
+    extras_require={
+        "pyomo": ["pyomo>=6.1.2"],
+        "gurobi": ["gurobipy>=9.1.2"],
+        "all": ["pyomo>=6.1.2", "gurobipy>=9.1.2"],
+    },
    # classifiers
     classifiers = [
         "Programming Language :: Python :: 3",

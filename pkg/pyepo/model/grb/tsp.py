@@ -7,9 +7,13 @@ Traveling salesman probelm
 from collections import defaultdict
 from itertools import combinations
 
-import gurobipy as gp
 import numpy as np
-from gurobipy import GRB
+try:
+    import gurobipy as gp
+    from gurobipy import GRB
+    _HAS_GUROBI = True
+except ImportError:
+    _HAS_GUROBI = False
 
 from pyepo.model.grb.grbmodel import optGrbModel
 

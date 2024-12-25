@@ -5,12 +5,17 @@ Two-stage model with Scikit-learn predictor
 """
 
 import numpy as np
-from autosklearn.regression import AutoSklearnRegressor
-from autosklearn.metrics import mean_squared_error
-from autosklearn.pipeline.components import data_preprocessing
+try:
+    from autosklearn.regression import AutoSklearnRegressor
+    from autosklearn.metrics import mean_squared_error
+    from autosklearn.pipeline.components import data_preprocessing
+    from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
+    from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
+    _HAS_AUTO = True
+except ImportError:
+    _HAS_AUTO = False
 from ConfigSpace.configuration_space import ConfigurationSpace
-from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
-from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
+
 
 from pyepo.metric import makeAutoSkScorer
 
@@ -62,6 +67,9 @@ def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
     Returns:
         AutoSklearnRegressor: Auto-SKlearn multi-output regression model
     """
+    # error
+    if not _HAS_AUTO:
+        raise ImportError("Autosklearn is not installed. Please install autosklearn to use this feature.")
     # add NoPreprocessing component to auto-sklearn.
     data_preprocessing.add_preprocessor(NoPreprocessing)
     # get metrics
