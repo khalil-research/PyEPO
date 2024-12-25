@@ -19,44 +19,6 @@ from ConfigSpace.configuration_space import ConfigurationSpace
 
 from pyepo.metric import makeAutoSkScorer
 
-class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
-    """
-    This is class of NoPreprocessing component for auto-sklearn
-    """
-    def __init__(self, **kwargs):
-        """
-        This preprocessors does not change the data
-        """
-        # Some internal checks makes sure parameters are set
-        for key, val in kwargs.items():
-            setattr(self, key, val)
-
-    def fit(self, X, Y=None):
-        return self
-
-    def transform(self, X):
-        return X
-
-    @staticmethod
-    def get_properties(dataset_properties=None):
-        return {
-            "shortname": "NoPreprocessing",
-            "name": "NoPreprocessing",
-            "handles_regression": True,
-            "handles_classification": True,
-            "handles_multiclass": True,
-            "handles_multilabel": True,
-            "handles_multioutput": True,
-            "is_deterministic": True,
-            "input": (SPARSE, DENSE, UNSIGNED_DATA),
-            "output": (INPUT,)
-        }
-
-    @staticmethod
-    def get_hyperparameter_search_space(dataset_properties=None):
-        return ConfigurationSpace()  # Return an empty configuration as there is None
-
-
 def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
     """
     Two-stage prediction and optimization with auto-sklearn.
@@ -70,6 +32,42 @@ def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
     # error
     if not _HAS_AUTO:
         raise ImportError("Autosklearn is not installed. Please install autosklearn to use this feature.")
+    class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
+        """
+        This is class of NoPreprocessing component for auto-sklearn
+        """
+        def __init__(self, **kwargs):
+            """
+            This preprocessors does not change the data
+            """
+            # Some internal checks makes sure parameters are set
+            for key, val in kwargs.items():
+                setattr(self, key, val)
+
+        def fit(self, X, Y=None):
+            return self
+
+        def transform(self, X):
+            return X
+
+        @staticmethod
+        def get_properties(dataset_properties=None):
+            return {
+                "shortname": "NoPreprocessing",
+                "name": "NoPreprocessing",
+                "handles_regression": True,
+                "handles_classification": True,
+                "handles_multiclass": True,
+                "handles_multilabel": True,
+                "handles_multioutput": True,
+                "is_deterministic": True,
+                "input": (SPARSE, DENSE, UNSIGNED_DATA),
+                "output": (INPUT,)
+            }
+
+        @staticmethod
+        def get_hyperparameter_search_space(dataset_properties=None):
+            return ConfigurationSpace()  # Return an empty configuration as there is None
     # add NoPreprocessing component to auto-sklearn.
     data_preprocessing.add_preprocessor(NoPreprocessing)
     # get metrics
