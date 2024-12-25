@@ -17,7 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     # version
-    version = "0.4.0",
+    version = "0.4.1",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
@@ -25,7 +25,7 @@ setuptools.setup(
     # mail address
     author_email = "bolucas.tang@mail.utoronto.ca",
     # restrict Python version
-    python_requires="<3.12",
+    python_requires=">=3.7",
     # dependencies
     install_requires = [
         "numpy",
