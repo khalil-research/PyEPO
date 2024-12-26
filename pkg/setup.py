@@ -17,7 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     # version
-    version = "0.4.4",
+    version = "0.4.5",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
@@ -32,6 +32,7 @@ setuptools.setup(
         "scipy",
         "pathos",
         "tqdm",
+        "configspace",
         "scikit_learn",
         "torch>=1.13.1"],
     extras_require={
