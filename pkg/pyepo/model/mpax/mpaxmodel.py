@@ -143,6 +143,12 @@ class optMpaxModel(optModel):
         obj = jnp.dot(self.c, sol).item()
         # convert to torch
         sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol))
+        if self.modelSense == EPO.MINIMIZE:
+            obj = obj
+        elif self.modelSense == EPO.MAXIMIZE:
+            obj = - obj
+        else:
+            raise ValueError("Invalid modelSense.")
         return sol, obj
 
     def copy(self):
