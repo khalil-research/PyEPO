@@ -5,9 +5,11 @@ Abstract optimization model based on MPAX
 """
 
 from copy import deepcopy
+import torch
 
 try:
-    import jax.numpy as jnp
+    import jax
+    from jax import numpy as jnp
     from mpax import create_lp, r2HPDHG
     _HAS_MPAX = True
 except ImportError:
@@ -70,6 +72,8 @@ class optMpaxModel(optModel):
         self.use_sparse_matrix = use_sparse_matrix
         # model sense
         self.modelSense = EPO.MINIMIZE if minimize else EPO.MAXIMIZE
+        # init device
+        self.device = None
 
     def __repr__(self):
         return "optMpaxModel " + self.__class__.__name__
@@ -90,10 +94,35 @@ class optMpaxModel(optModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
-        if self.modelSense == EPO.MINIMIZE:
+        # check if c is a PyTorch tensor
+        if isinstance(c, torch.Tensor):
+            device = c.device  # get tensor device
+            # check JAX supports CUDA
+            if not any(device.platform == "gpu" for device in jax.devices()):
+                # move to cpu
+                c = c.cpu().detach()
+            else:
+                # stay in gpu
+                c = c.detach()
+            # convert PyTorch tensor to JAX array using DLPack
+            self.c = jax.dlpack.from_dlpack(c)
+            # move constraints and bounds to device
+            if self.device != self.c.device:
+                self.device = self.c.device
+                self.A = jax.device_put(self.A, self.device)
+                self.b = jax.device_put(self.b, self.device)
+                self.G = jax.device_put(self.G, self.device)
+                self.h = jax.device_put(self.h, self.device)
+                self.l = jax.device_put(self.l, self.device)
+                self.u = jax.device_put(self.u, self.device)
+        # c is already a NumPy array
+        else:
             self.c = jnp.array(c, dtype=jnp.float32)
+        # change sign for model sense
+        if self.modelSense == EPO.MINIMIZE:
+            self.c = self.c
         elif self.modelSense == EPO.MAXIMIZE:
-            self.c = - jnp.array(c, dtype=jnp.float32)
+            self.c = - self.c
         else:
             raise ValueError("Invalid modelSense.")
 
@@ -112,6 +141,8 @@ class optMpaxModel(optModel):
         result = solver.optimize(lp)
         sol = result.primal_solution
         obj = jnp.dot(self.c, sol).item()
+        # convert to torch
+        sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol))
         return sol, obj
 
     def copy(self):
@@ -121,7 +152,15 @@ class optMpaxModel(optModel):
         Returns:
             optModel: new copied model
         """
-        return deepcopy(self)
+        # remove device to avoid error
+        device = self.device
+        self.device = None
+        # copy new model
+        new_model = deepcopy(self)
+        # restore device
+        self.device = device
+        new_model.device = device
+        return new_model
 
     def addConstr(self, coefs, rhs):
         """
@@ -155,9 +194,11 @@ class optMpaxModel(optModel):
         """
         return None, None
 
+
 if __name__ == "__main__":
-    import numpy as np
     import random
+    import numpy as np
+    import torch
     # random seed for reproducibility
     random.seed(42)
     np.random.seed(42)
@@ -176,6 +217,24 @@ if __name__ == "__main__":
     cost = np.random.rand(num_vars)
     # solve the model
     optmodel.setObj(cost)
+    sol, obj = optmodel.solve()
+    # print results
+    print(f"Objective Value: {obj}")
+    print(f"Solution: {sol}")
+
+    # cpu tensor
+    cost_cpu = torch.tensor(cost, dtype=torch.float32, device="cpu")
+    # solve the model
+    optmodel.setObj(cost_cpu)
+    sol, obj = optmodel.solve()
+    # print results
+    print(f"Objective Value: {obj}")
+    print(f"Solution: {sol}")
+
+    # gpu tensor
+    cost_gpu = torch.tensor(cost, dtype=torch.float32, device="cuda")
+    # solve the model
+    optmodel.setObj(cost_gpu)
     sol, obj = optmodel.solve()
     # print results
     print(f"Objective Value: {obj}")
