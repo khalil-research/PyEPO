@@ -7,6 +7,8 @@ Abstract optimization model based on GurobiPy
 from copy import copy
 
 import numpy as np
+import torch
+
 try:
     import gurobipy as gp
     from gurobipy import GRB
@@ -59,6 +61,11 @@ class optGrbModel(optModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
+        # check if c is a PyTorch tensor
+        if isinstance(c, torch.Tensor):
+            c = c.detach().cpu().numpy()
+        else:
+            c = np.asarray(c, dtype=np.float32)
         # mvar
         if isinstance(self.x, gp.MVar):
             obj = np.array(c) @ self.x
