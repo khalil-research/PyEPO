@@ -478,11 +478,12 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
     if isinstance(optmodel, optMpaxModel):
         # get params
         optmodel.setObj(ptb_c)
-        ptb_c = optmodel.c.permute(1, 0, 2)
+        ptb_c = optmodel.c
         # batch solving
         ptb_sols, _ = optmodel.batch_optimize(cp)
         # convert to torch
-        ptb_sols = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(ptb_sols)).to(device)
+        ptb_sols = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(ptb_sols))
+        ptb_sols = ptb_sols.permute(1, 0, 2).to(device)
     # single-core
     elif processes == 1:
         ptb_sols = torch.zeros((ins_num, n_samples, num_vars), dtype=torch.float32, device=device)
