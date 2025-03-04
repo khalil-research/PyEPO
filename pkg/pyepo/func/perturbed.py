@@ -479,9 +479,10 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
         optmodel.setObj(ptb_c)
         ptb_c = optmodel.c.permute(1, 0, 2)
         A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
+        use_sparse_matrix = optmodel.use_sparse_matrix
         # batch solving
         def single_optimize(c):
-            lp = create_lp(c, A, b, G, h, l, u)
+            lp = create_lp(c, A, b, G, h, l, u, use_sparse_matrix=use_sparse_matrix)
             solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
             result = solver.optimize(lp)
             return result.primal_solution
