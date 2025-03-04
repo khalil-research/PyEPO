@@ -11,7 +11,7 @@ import torch
 try:
     import jax
     from jax import numpy as jnp
-    from mpax import create_lp, r2HPDHG
+    from mpax import create_lp, raPDHG
     _HAS_MPAX = True
 except ImportError:
     _HAS_MPAX = False
@@ -162,7 +162,7 @@ class optMpaxModel(optModel):
         A static method for JIT complile
         """
         lp = create_lp(c, A, b, G, h, l, u, use_sparse_matrix=use_sparse_matrix)
-        solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
+        solver = raPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
         result = solver.optimize(lp)
         obj = jnp.dot(c, result.primal_solution)
         return result.primal_solution, obj
