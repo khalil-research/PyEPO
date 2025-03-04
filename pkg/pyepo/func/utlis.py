@@ -51,13 +51,7 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
         use_sparse_matrix = optmodel.use_sparse_matrix
         # batch solving
-        def single_optimize(c):
-            lp = create_lp(c, A, b, G, h, l, u, use_sparse_matrix=use_sparse_matrix)
-            solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
-            result = solver.optimize(lp)
-            obj = jnp.dot(c, result.primal_solution)
-            return result.primal_solution, obj
-        batch_optimize = jax.jit(jax.vmap(single_optimize))
+        batch_optimize = jax.vmap(optmodel.jitted_solve)
         sol, obj = batch_optimize(cp)
         # convert to torch
         sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)

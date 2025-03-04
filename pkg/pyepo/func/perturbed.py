@@ -481,15 +481,10 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
         A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
         use_sparse_matrix = optmodel.use_sparse_matrix
         # batch solving
-        def single_optimize(c):
-            lp = create_lp(c, A, b, G, h, l, u, use_sparse_matrix=use_sparse_matrix)
-            solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
-            result = solver.optimize(lp)
-            return result.primal_solution
-        batch_optimize = jax.jit(jax.vmap(single_optimize))
-        sol = batch_optimize(ptb_c)
+        batch_optimize = jax.vmap(optmodel.jitted_solve)
+        ptb_sols, _ = batch_optimize(cp)
         # convert to torch
-        sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
+        ptb_sols = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(ptb_sols)).to(device)
     # single-core
     elif processes == 1:
         ptb_sols = torch.zeros((ins_num, n_samples, num_vars), dtype=torch.float32, device=device)
