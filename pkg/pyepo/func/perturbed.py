@@ -10,6 +10,7 @@ from torch.autograd import Function
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
+from pyepo.model.mpax import optMpaxModel
 from pyepo.utlis import getArgs
 from pyepo.func.utlis import sumGammaDistribution
 
