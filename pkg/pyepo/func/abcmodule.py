@@ -14,6 +14,7 @@ from torch import nn
 
 from pyepo.data.dataset import optDataset
 from pyepo.model.opt import optModel
+from pyepo.model.mpax import optMpaxModel
 
 
 class optModule(nn.Module):
