@@ -35,6 +35,10 @@ class optModule(nn.Module):
         if not isinstance(optmodel, optModel):
             raise TypeError("arg model is not an optModel")
         self.optmodel = optmodel
+        # force processes to 1 for MPAX
+        if isinstance(optmodel, optMpaxModel):
+            print("MPAX does not support multiprocessing. Setting `processes = 1`.")
+            processes = 1
         # number of processes
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
