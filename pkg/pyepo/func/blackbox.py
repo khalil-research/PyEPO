@@ -38,7 +38,7 @@ class blackboxOpt(optModule):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # smoothing parameter
         if lambd <= 0:
             raise ValueError("lambda is not positive.")
@@ -134,7 +134,7 @@ class negativeIdentity(optModule):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # build blackbox optimizer
         self.nid = negativeIdentityFunc()
 
