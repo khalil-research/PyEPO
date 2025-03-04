@@ -478,8 +478,6 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
         # get params
         optmodel.setObj(ptb_c)
         ptb_c = optmodel.c.permute(1, 0, 2)
-        A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
-        use_sparse_matrix = optmodel.use_sparse_matrix
         # batch solving
         ptb_sols, _ = optmodel.batch_optimize(cp)
         # convert to torch

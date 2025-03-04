@@ -48,8 +48,6 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         # get params
         optmodel.setObj(cp)
         cp = optmodel.c
-        A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
-        use_sparse_matrix = optmodel.use_sparse_matrix
         # batch solving
         sol, obj = optmodel.batch_optimize(cp)
         # convert to torch
