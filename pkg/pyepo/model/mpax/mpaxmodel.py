@@ -92,7 +92,7 @@ class optMpaxModel(optModel):
         Args:
             c (np.ndarray / list): cost of objective function
         """
-        if len(c) != self.num_cost:
+        if c.shape[-1] != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):

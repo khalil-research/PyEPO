@@ -9,6 +9,14 @@ import torch
 
 from pyepo import EPO
 from pyepo.utlis import getArgs
+from pyepo.model.mpax import optMpaxModel
+
+try:
+    import jax
+    from jax import numpy as jnp
+    from mpax import create_lp, r2HPDHG
+except ImportError:
+    pass
 
 
 def _solve_or_cache(cp, module):
@@ -35,8 +43,33 @@ def _solve_in_pass(cp, optmodel, processes, pool):
     device = cp.device
     # number of instance
     ins_num = len(cp)
+    # MPAX batch solving
+    if isinstance(optmodel, optMpaxModel):
+        # get params
+        optmodel.setObj(cp)
+        cp = optmodel.c
+        A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
+        # batch solving
+        def single_optimize(c):
+            lp = create_lp(c, A, b, G, h, l, u)
+            solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
+            result = solver.optimize(lp)
+            obj = jnp.dot(c, result.primal_solution)
+            return result.primal_solution, obj
+        batch_optimize = jax.vmap(single_optimize)
+        sol, obj = batch_optimize(cp)
+        # convert to torch
+        sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
+        obj = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(obj)).to(device)
+        # obj sense
+        if optmodel.modelSense == EPO.MINIMIZE:
+            obj = obj
+        elif optmodel.modelSense == EPO.MAXIMIZE:
+            obj = - obj
+        else:
+            raise ValueError("Invalid modelSense.")
     # single-core
-    if processes == 1:
+    elif processes == 1:
         sol = []
         obj = []
         for i in range(ins_num):
