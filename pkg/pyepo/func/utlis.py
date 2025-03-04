@@ -51,8 +51,7 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
         use_sparse_matrix = optmodel.use_sparse_matrix
         # batch solving
-        batch_optimize = jax.vmap(optmodel.jitted_solve)
-        sol, obj = batch_optimize(cp)
+        sol, obj = optmodel.batch_optimize(cp)
         # convert to torch
         sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
         obj = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(obj)).to(device)
