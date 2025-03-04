@@ -13,6 +13,13 @@ from pyepo.func.abcmodule import optModule
 from pyepo.utlis import getArgs
 from pyepo.func.utlis import sumGammaDistribution
 
+try:
+    import jax
+    from jax import numpy as jnp
+    from mpax import create_lp, r2HPDHG
+except ImportError:
+    pass
+
 
 class perturbedOpt(optModule):
     """
@@ -466,8 +473,24 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
     device = ptb_c.device
     # number and size of instance
     n_samples, ins_num, num_vars = ptb_c.shape
+    # MPAX batch solving
+    if isinstance(optmodel, optMpaxModel):
+        # get params
+        optmodel.setObj(ptb_c)
+        ptb_c = optmodel.c.permute(1, 0, 2)
+        A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
+        # batch solving
+        def single_optimize(c):
+            lp = create_lp(c, A, b, G, h, l, u)
+            solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
+            result = solver.optimize(lp)
+            return result.primal_solution
+        batch_optimize = jax.vmap(single_optimize)
+        sol = batch_optimize(ptb_c)
+        # convert to torch
+        sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
     # single-core
-    if processes == 1:
+    elif processes == 1:
         ptb_sols = torch.zeros((ins_num, n_samples, num_vars), dtype=torch.float32, device=device)
         for i in range(ins_num):
             # per sample
