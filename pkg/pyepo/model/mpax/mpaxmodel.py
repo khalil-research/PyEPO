@@ -5,6 +5,7 @@ Abstract optimization model based on MPAX
 """
 
 from copy import deepcopy
+from functools import partial
 import torch
 
 try:
@@ -74,6 +75,11 @@ class optMpaxModel(optModel):
         self.modelSense = EPO.MINIMIZE if minimize else EPO.MAXIMIZE
         # init device
         self.device = None
+        # jit pre complile
+        self.jitted_solve = jax.jit(partial(self._jitted_solve,
+                                            A=self.A, b=self.b, G=self.G,
+                                            h=self.h, l=self.l, u=self.u,
+                                            use_sparse_matrix=self.use_sparse_matrix))
 
     def __repr__(self):
         return "optMpaxModel " + self.__class__.__name__
@@ -115,6 +121,11 @@ class optMpaxModel(optModel):
                 self.h = jax.device_put(self.h, self.device)
                 self.l = jax.device_put(self.l, self.device)
                 self.u = jax.device_put(self.u, self.device)
+                # jit pre complile
+                self.jitted_solve = jax.jit(partial(self._jitted_solve,
+                                                    A=self.A, b=self.b, G=self.G,
+                                                    h=self.h, l=self.l, u=self.u,
+                                                    use_sparse_matrix=self.use_sparse_matrix))
         # c is already a NumPy array
         else:
             self.c = jnp.array(c, dtype=jnp.float32)
@@ -134,22 +145,27 @@ class optMpaxModel(optModel):
             tuple: optimal solution (list) and objective value (jnp.float32)
         """
         # create lp model
-        lp = create_lp(self.c, self.A, self.b, self.G, self.h, self.l, self.u, use_sparse_matrix=self.use_sparse_matrix)
-        # solver
-        solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
-        # optimize
-        result = solver.optimize(lp)
-        sol = result.primal_solution
-        obj = jnp.dot(self.c, sol).item()
+        sol, obj = self.jitted_solve(self.c)
         # convert to torch
         sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol))
         if self.modelSense == EPO.MINIMIZE:
-            obj = obj
+            obj = obj.item()
         elif self.modelSense == EPO.MAXIMIZE:
-            obj = - obj
+            obj = - obj.item()
         else:
             raise ValueError("Invalid modelSense.")
         return sol, obj
+
+    @staticmethod
+    def _jitted_solve(c, A, b, G, h, l, u, use_sparse_matrix):
+        """
+        A static method for JIT complile
+        """
+        lp = create_lp(c, A, b, G, h, l, u, use_sparse_matrix=use_sparse_matrix)
+        solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
+        result = solver.optimize(lp)
+        obj = jnp.dot(c, result.primal_solution)
+        return result.primal_solution, obj
 
     def copy(self):
         """
