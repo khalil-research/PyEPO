@@ -481,8 +481,7 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
         A, b, G, h, l, u = optmodel.A, optmodel.b, optmodel.G, optmodel.h, optmodel.l, optmodel.u
         use_sparse_matrix = optmodel.use_sparse_matrix
         # batch solving
-        batch_optimize = jax.vmap(optmodel.jitted_solve)
-        ptb_sols, _ = batch_optimize(cp)
+        ptb_sols, _ = optmodel.batch_optimize(cp)
         # convert to torch
         ptb_sols = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(ptb_sols)).to(device)
     # single-core
