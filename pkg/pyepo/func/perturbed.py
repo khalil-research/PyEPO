@@ -79,18 +79,15 @@ class perturbedOptFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # sample perturbations
         noises = module.rnd.normal(0, 1, size=(module.n_samples, *cp.shape))
+        noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache(ptb_c, module)
         # solution expectation
-        e_sol = ptb_sols.mean(axis=1)
-        # convert to tensor
-        noises = torch.tensor(noises, dtype=torch.float, device=device)
-        ptb_sols = torch.tensor(ptb_sols, dtype=torch.float, device=device)
-        e_sol = torch.tensor(e_sol, dtype=torch.float, device=device)
+        e_sol = ptb_sols.mean(dim=1)
         # save solutions
         ctx.save_for_backward(ptb_sols, noises)
         # add other objects to ctx
@@ -192,15 +189,16 @@ class perturbedFenchelYoungFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
-        w = true_sol.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
+        w = true_sol.detach()
         # sample perturbations
         noises = module.rnd.normal(0, 1, size=(module.n_samples, *cp.shape))
+        noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache(ptb_c, module)
         # solution expectation
-        e_sol = ptb_sols.mean(axis=1)
+        e_sol = ptb_sols.mean(dim=1)
         # difference
         if module.optmodel.modelSense == EPO.MINIMIZE:
             diff = w - e_sol
@@ -209,10 +207,7 @@ class perturbedFenchelYoungFunc(Function):
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # loss
-        loss = np.sum(diff**2, axis=1)
-        # convert to tensor
-        diff = torch.tensor(diff, dtype=torch.float, device=device)
-        loss = torch.tensor(loss, dtype=torch.float, device=device)
+        loss = torch.sum(diff**2, dim=1)
         # save solutions
         ctx.save_for_backward(diff)
         return loss
@@ -302,16 +297,15 @@ class implicitMLEFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # sample perturbations
         noises = module.distribution.sample(size=(module.n_samples, *cp.shape))
+        noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache(ptb_c, module)
         # solution average
-        e_sol = ptb_sols.mean(axis=1)
-        # convert to tensor
-        e_sol = torch.tensor(e_sol, dtype=torch.float, device=device)
+        e_sol = ptb_sols.mean(dim=1)
         # save
         ctx.save_for_backward(pred_cost)
         # add other objects to ctx
@@ -332,8 +326,8 @@ class implicitMLEFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
-        dl = grad_output.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
+        dl = grad_output.detach()
         # positive perturbed costs
         ptb_cp_pos = cp + module.lambd * dl + noises
         # solve with perturbation
@@ -344,12 +338,10 @@ class implicitMLEFunc(Function):
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
             # get two-side gradient
-            grad = (ptb_sols_pos - ptb_sols_neg).mean(axis=1) / (2 * module.lambd)
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd)
         else:
             # get single side gradient
-            grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / module.lambd
-        # convert to tensor
-        grad = torch.tensor(grad, dtype=torch.float, device=device)
+            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / module.lambd
         return grad, None, None
 
 
@@ -423,10 +415,10 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
-        dl = grad_output.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
+        dl = grad_output.detach()
         # calculate λ
-        lambd = module.alpha * np.linalg.norm(cp) / np.linalg.norm(dl)
+        lambd = module.alpha * torch.norm(cp) / torch.norm(dl)
         # positive perturbed costs
         ptb_cp_pos = cp + lambd * dl + noises
         # solve with perturbation
@@ -437,12 +429,10 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
             # get two-side gradient
-            grad = (ptb_sols_pos - ptb_sols_neg).mean(axis=1) / (2 * lambd + 1e-7)
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + 1e-7)
         else:
             # get single side gradient
-            grad = (ptb_sols_pos - ptb_sols).mean(axis=1) / (lambd + 1e-7)
-        # convert to tensor
-        grad = torch.tensor(grad, dtype=torch.float, device=device)
+            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + 1e-7)
         # moving average of the gradient norm
         grad_norm = (grad.abs() > 1e-7).float().mean()
         module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm
@@ -459,12 +449,12 @@ def _solve_or_cache(ptb_c, module):
     if np.random.uniform() <= module.solve_ratio:
         ptb_sols = _solve_in_pass(ptb_c, module.optmodel, module.processes, module.pool)
         if module.solve_ratio < 1:
-            sols = ptb_sols.reshape(-1, cp.shape[1])
+            sols = ptb_sols.view(-1, ptb_sols.shape[2])
             # add into solpool
-            module._update_solution_pool(sol)
+            module._update_solution_pool(sols)
     # best cached solution
     else:
-        ptb_sols = _cache_in_pass(ptb_c, optmodel, module.solpool)
+        ptb_sols = _cache_in_pass(ptb_c, module.optmodel, module.solpool)
     return ptb_sols
 
 
@@ -472,20 +462,20 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
     """
     A function to solve optimization in the forward pass
     """
-    # number of instance
-    n_samples, ins_num = ptb_c.shape[0], ptb_c.shape[1]
+    # get device
+    device = ptb_c.device
+    # number and size of instance
+    n_samples, ins_num, num_vars = ptb_c.shape
     # single-core
     if processes == 1:
-        ptb_sols = []
+        ptb_sols = torch.zeros((n_samples, ins_num, num_vars), dtype=torch.float32, device=device)
         for i in range(ins_num):
-            sols = []
             # per sample
             for j in range(n_samples):
                 # solve
                 optmodel.setObj(ptb_c[j,i])
                 sol, _ = optmodel.solve()
-                sols.append(sol)
-            ptb_sols.append(sols)
+                ptb_sols[j,i] = torch.as_tensor(sol, dtype=torch.float32, device=device)
     # multi-core
     else:
         # get class
@@ -493,30 +483,33 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
         # get args
         args = getArgs(optmodel)
         # parallel computing
-        ptb_sols = pool.amap(_solveWithObj4Par, ptb_c.transpose(1,0,2),
-                             [args] * ins_num, [model_type] * ins_num).get()
-    return np.array(ptb_sols)
+        res = pool.amap(_solveWithObj4Par, ptb_c.permute(1, 0, 2),
+                        [args] * ins_num, [model_type] * ins_num).get()
+        # get solution
+        ptb_sols = torch.stack(res, dim=0).to(device)
+    return ptb_sols
 
 
 def _cache_in_pass(ptb_c, optmodel, solpool):
     """
     A function to use solution pool in the forward/backward pass
     """
-    # number of samples & instance
-    n_samples, ins_num, _ = ptb_c.shape
-    # init sols
-    ptb_sols = []
-    for j in range(n_samples):
-        # best solution in pool
-        solpool_obj = ptb_c[j] @ solpool.T
-        if optmodel.modelSense == EPO.MINIMIZE:
-            ind = np.argmin(solpool_obj, axis=1)
-        elif optmodel.modelSense == EPO.MAXIMIZE:
-            ind = np.argmax(solpool_obj, axis=1)
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        ptb_sols.append(solpool[ind])
-    return np.array(ptb_sols).transpose(1,0,2)
+    # get device
+    device = ptb_c.device
+    # solpool is on the same device
+    if solpool.device != device:
+        solpool = solpool.to(device)
+    # compute objective values for all perturbations
+    solpool_obj = torch.einsum("bnd,nd->bn", ptb_c, solpool.T)
+    # best solution in pool
+    if optmodel.modelSense == EPO.MINIMIZE:
+        best_inds = torch.argmin(solpool_obj, dim=1)
+    elif optmodel.modelSense == EPO.MAXIMIZE:
+        best_inds = torch.argmax(solpool_obj, dim=1)
+    else:
+        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+    ptb_sols = solpool[best_inds]
+    return ptb_sols
 
 
 def _solveWithObj4Par(perturbed_costs, args, model_type):
@@ -541,4 +534,6 @@ def _solveWithObj4Par(perturbed_costs, args, model_type):
         # solve
         sol, _ = optmodel.solve()
         sols.append(sol)
+    # to tensor
+    sols = torch.tensor(sols, dtype=torch.float32)
     return sols
