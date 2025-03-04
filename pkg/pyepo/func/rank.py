@@ -42,7 +42,10 @@ class listwiseLTR(optModule):
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
-        self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
+        # convert to tensor
+        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        # remove duplicate
+        self.solpool = torch.unique(self.solpool, dim=0)
 
     def forward(self, pred_cost, true_cost):
         """
@@ -50,25 +53,23 @@ class listwiseLTR(optModule):
         """
         # get device
         device = pred_cost.device
+        # to device
+        self.solpool = self.solpool.to(device)
         # convert tensor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
             self._update_solution_pool(sol)
-        # convert tensor
-        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # obj for solpool
-        objpool_c = true_cost @ solpool.T # true cost
-        objpool_cp = pred_cost @ solpool.T # pred cost
+        objpool_c = true_cost @ self.solpool.T # true cost
+        objpool_cp = pred_cost @ self.solpool.T # pred cost
         # cross entropy loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
-            loss = - (F.log_softmax(objpool_cp, dim=1) *
-                      F.softmax(objpool_c, dim=1))
+            loss = - (F.log_softmax(objpool_cp, dim=1) * F.softmax(objpool_c, dim=1))
         elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = - (F.log_softmax(- objpool_cp, dim=1) *
-                      F.softmax(- objpool_c, dim=1))
+            loss = - (F.log_softmax(- objpool_cp, dim=1) * F.softmax(- objpool_c, dim=1))
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # reduction
@@ -110,7 +111,12 @@ class pairwiseLTR(optModule):
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
-        self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
+        # function
+        self.relu = nn.ReLU()
+        # convert to tensor
+        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        # remove duplicate
+        self.solpool = torch.unique(self.solpool, dim=0)
 
     def forward(self, pred_cost, true_cost):
         """
@@ -118,42 +124,39 @@ class pairwiseLTR(optModule):
         """
         # get device
         device = pred_cost.device
+        # to device
+        self.solpool = self.solpool.to(device)
         # convert tensor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
             self._update_solution_pool(sol)
-        # convert tensor
-        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # obj for solpool
-        objpool_c = torch.einsum("bd,nd->bn", true_cost, solpool) # true cost
-        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool) # pred cost
-        # init relu as max(0,x)
-        relu = nn.ReLU()
-        # init loss
-        loss = []
-        for i in range(len(pred_cost)):
-            # best sol
-            if self.optmodel.modelSense == EPO.MINIMIZE:
-                best_ind = torch.argmin(objpool_c[i])
-            elif self.optmodel.modelSense == EPO.MAXIMIZE:
-                best_ind = torch.argmax(objpool_c[i])
-            else:
-                raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-            objpool_cp_best = objpool_cp[i, best_ind]
-            # rest sol
-            rest_ind = [j for j in range(len(objpool_cp[i])) if j != best_ind]
-            objpool_cp_rest = objpool_cp[i, rest_ind]
-            # best vs rest loss
-            if self.optmodel.modelSense == EPO.MINIMIZE:
-                loss.append(relu(objpool_cp_best - objpool_cp_rest).mean())
-            elif self.optmodel.modelSense == EPO.MAXIMIZE:
-                loss.append(relu(objpool_cp_rest - objpool_cp_best).mean())
-            else:
-                raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        loss = torch.stack(loss)
+        objpool_c = torch.einsum("bd,nd->bn", true_cost, self.solpool) # true cost
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool) # pred cost
+        # best solutions for each instance
+        if self.optmodel.modelSense == EPO.MINIMIZE:
+            best_inds = torch.argmin(objpool_c, dim=1)  # Best solution indices
+        elif self.optmodel.modelSense == EPO.MAXIMIZE:
+            best_inds = torch.argmax(objpool_c, dim=1)  # Best solution indices
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+        objpool_cp_best = objpool_cp.gather(1, best_inds.unsqueeze(1)).squeeze(1)
+        # mask out best solution index
+        batch_size, solpool_size = objpool_cp.shape
+        mask = torch.ones((batch_size, solpool_size), dtype=torch.bool, device=device)
+        mask.scatter_(1, best_inds.unsqueeze(1), False)
+        # select the rest of the solutions
+        objpool_cp_rest = objpool_cp[mask].view(batch_size, solpool_size - 1)
+        # ranking loss: best v.s. rest
+        if self.optmodel.modelSense == EPO.MINIMIZE:
+            loss = self.relu(objpool_cp_best.unsqueeze(1) - objpool_cp_rest).mean(dim=1)
+        elif self.optmodel.modelSense == EPO.MAXIMIZE:
+            loss = self.relu(objpool_cp_rest - objpool_cp_best.unsqueeze(1)).mean(dim=1)
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)
@@ -194,7 +197,10 @@ class pointwiseLTR(optModule):
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
-        self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
+        # convert to tensor
+        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        # remove duplicate
+        self.solpool = torch.unique(self.solpool, dim=0)
 
     def forward(self, pred_cost, true_cost):
         """
@@ -202,18 +208,18 @@ class pointwiseLTR(optModule):
         """
         # get device
         device = pred_cost.device
+        # to device
+        self.solpool = self.solpool.to(device)
         # convert tensor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
             self._update_solution_pool(sol)
-        # convert tensor
-        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # obj for solpool as score
-        objpool_c = true_cost @ solpool.T # true cost
-        objpool_cp = pred_cost @ solpool.T # pred cost
+        objpool_c = true_cost @ self.solpool.T # true cost
+        objpool_cp = pred_cost @ self.solpool.T # pred cost
         # squared loss
         loss = (objpool_c - objpool_cp).square().mean(axis=1)
         # reduction
