@@ -9,6 +9,7 @@ import multiprocessing as mp
 from pathos.multiprocessing import ProcessingPool
 
 import numpy as np
+import torch
 from torch import nn
 
 from pyepo.data.dataset import optDataset
@@ -55,7 +56,10 @@ class optModule(nn.Module):
         if self.solve_ratio < 1: # init solution pool
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
-            self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
+            # convert to tensor
+            self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+            # remove duplicate
+            self.solpool = torch.unique(self.solpool, dim=0)
         # reduction
         self.reduction = reduction
 
@@ -71,7 +75,12 @@ class optModule(nn.Module):
         """
         Add new solutions to solution pool
         """
+        if self.solpool is None:
+            self.solpool = sol.clone()
+            return
+        # to tenstor
+        sol = torch.as_tensor(sol)
         # add into solpool
-        self.solpool = np.concatenate((self.solpool, sol))
+        self.solpool = torch.cat((self.solpool, sol), dim=0)
         # remove duplicate
-        self.solpool = np.unique(self.solpool, axis=0)
+        self.solpool = torch.unique(self.solpool, dim=0)

@@ -80,28 +80,21 @@ class SPOPlusFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
-        c = true_cost.detach().to("cpu").numpy()
-        w = true_sol.detach().to("cpu").numpy()
-        z = true_obj.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
+        c = true_cost.detach()
+        w = true_sol.detach()
+        z = true_obj.detach()
         # check sol
         #_check_sol(c, w, z)
         # solve
         sol, obj = _solve_or_cache(2 * cp - c, module)
         # calculate loss
-        loss = []
-        for i in range(len(cp)):
-            loss.append(- obj[i] + 2 * np.dot(cp[i], w[i]) - z[i])
-        # sense
         if module.optmodel.modelSense == EPO.MINIMIZE:
-            loss = np.array(loss)
+            loss = - obj + 2 * torch.einsum("bi,bi->b", cp, w) - z.squeeze(dim=-1)
         elif module.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = - np.array(loss)
+            loss = obj - 2 * torch.einsum("bi,bi->b", cp, w) + z.squeeze(dim=-1)
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        # convert to tensor
-        loss = torch.tensor(loss, dtype=torch.float, device=device)
-        sol = torch.tensor(sol, dtype=torch.float, device=device)
         # save solutions
         ctx.save_for_backward(true_sol, sol)
         # add other objects to ctx
@@ -121,7 +114,7 @@ class SPOPlusFunc(Function):
             grad = 2 * (wq - w)
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        return grad_output * grad, None, None, None, None
+        return grad_output.unsqueeze(1) * grad, None, None, None, None
 
 
 class perturbationGradient(optModule):
@@ -180,16 +173,16 @@ class perturbationGradient(optModule):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
-        c = true_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
+        c = true_cost.detach()
         # central differencing
         if self.two_sides:
             # solve
             wp, _ = _solve_or_cache(cp + self.sigma * c, self)
             wm, _ = _solve_or_cache(cp - self.sigma * c, self)
             # convert numpy
-            sol_plus = torch.tensor(wp, dtype=torch.float, device=device)
-            sol_minus = torch.tensor(wm, dtype=torch.float, device=device)
+            sol_plus = torch.as_tensor(wp, dtype=torch.float, device=device)
+            sol_minus = torch.as_tensor(wm, dtype=torch.float, device=device)
             # differentiable objective value
             obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * true_cost, sol_plus)
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
@@ -206,8 +199,8 @@ class perturbationGradient(optModule):
             w, _ = _solve_or_cache(cp, self)
             wm, _ = _solve_or_cache(cp - self.sigma * c, self)
             # convert numpy
-            sol = torch.tensor(w, dtype=torch.float, device=device)
-            sol_minus = torch.tensor(wm, dtype=torch.float, device=device)
+            sol = torch.as_tensor(w, dtype=torch.float, device=device)
+            sol_minus = torch.as_tensor(wm, dtype=torch.float, device=device)
             # differentiable objective value
             obj = torch.einsum("bi,bi->b", pred_cost, sol)
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
