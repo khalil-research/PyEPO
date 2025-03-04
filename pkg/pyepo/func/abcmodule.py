@@ -79,7 +79,7 @@ class optModule(nn.Module):
             self.solpool = sol.clone()
             return
         # to tenstor
-        sol = torch.as_tensor(sol)
+        sol = torch.as_tensor(sol).to(self.solpool.device)
         # add into solpool
         self.solpool = torch.cat((self.solpool, sol), dim=0)
         # remove duplicate
