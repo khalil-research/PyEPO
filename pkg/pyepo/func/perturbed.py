@@ -41,7 +41,7 @@ class perturbedOpt(optModule):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
         self.n_samples = n_samples
         # perturbation amplitude
@@ -253,7 +253,7 @@ class implicitMLE(optModule):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
         self.n_samples = n_samples
         # noise temperature
@@ -375,7 +375,7 @@ class adaptiveImplicitMLE(optModule):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
         self.n_samples = n_samples
         # noise temperature
@@ -468,14 +468,14 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
     n_samples, ins_num, num_vars = ptb_c.shape
     # single-core
     if processes == 1:
-        ptb_sols = torch.zeros((n_samples, ins_num, num_vars), dtype=torch.float32, device=device)
+        ptb_sols = torch.zeros((ins_num, n_samples, num_vars), dtype=torch.float32, device=device)
         for i in range(ins_num):
             # per sample
             for j in range(n_samples):
                 # solve
                 optmodel.setObj(ptb_c[j,i])
                 sol, _ = optmodel.solve()
-                ptb_sols[j,i] = torch.as_tensor(sol, dtype=torch.float32, device=device)
+                ptb_sols[i,j] = torch.as_tensor(sol, dtype=torch.float32, device=device)
     # multi-core
     else:
         # get class
@@ -500,12 +500,12 @@ def _cache_in_pass(ptb_c, optmodel, solpool):
     if solpool.device != device:
         solpool = solpool.to(device)
     # compute objective values for all perturbations
-    solpool_obj = torch.einsum("bnd,nd->bn", ptb_c, solpool.T)
+    solpool_obj = torch.einsum("nbd,sd->bns", ptb_c, solpool)
     # best solution in pool
     if optmodel.modelSense == EPO.MINIMIZE:
-        best_inds = torch.argmin(solpool_obj, dim=1)
+        best_inds = torch.argmin(solpool_obj, dim=2)
     elif optmodel.modelSense == EPO.MAXIMIZE:
-        best_inds = torch.argmax(solpool_obj, dim=1)
+        best_inds = torch.argmax(solpool_obj, dim=2)
     else:
         raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     ptb_sols = solpool[best_inds]
