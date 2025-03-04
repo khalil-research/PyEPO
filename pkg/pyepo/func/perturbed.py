@@ -486,7 +486,7 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
             solver = r2HPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
             result = solver.optimize(lp)
             return result.primal_solution
-        batch_optimize = jax.vmap(single_optimize)
+        batch_optimize = jax.jit(jax.vmap(single_optimize))
         sol = batch_optimize(ptb_c)
         # convert to torch
         sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)

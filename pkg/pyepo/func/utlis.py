@@ -57,7 +57,7 @@ def _solve_in_pass(cp, optmodel, processes, pool):
             result = solver.optimize(lp)
             obj = jnp.dot(c, result.primal_solution)
             return result.primal_solution, obj
-        batch_optimize = jax.vmap(single_optimize)
+        batch_optimize = jax.jit(jax.vmap(single_optimize))
         sol, obj = batch_optimize(cp)
         # convert to torch
         sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
