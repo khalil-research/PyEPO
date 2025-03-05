@@ -57,6 +57,7 @@ Our recent tutorial was at the ACC 2024 conference. You can view the talk slides
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb)**05 Warcraft Shortest Path:** Use the Warcraft terrains dateset to train shortest path
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Real-World%20Energy%20Scheduling.ipynb)**06 Real-World Energy Scheduling:** Apply PyEPO to real energy data
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20kNN%20Robust%20Losses.ipynb)**07 kNN Robust Losses:** Use the optDatasetKNN for robust losses
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20Solving%20on%20MPAX%20with%20PDHG.ipynb)**08 Solving on MPAX with PDHG:** Use the MPAX for GPU batch solving
 
 
 ## Experiments
