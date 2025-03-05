@@ -80,7 +80,7 @@ class optMpaxModel(optModel):
                                             A=self.A, b=self.b, G=self.G,
                                             h=self.h, l=self.l, u=self.u,
                                             use_sparse_matrix=self.use_sparse_matrix))
-        self.batch_optimize = jax.vmap(self.jitted_solve, in_axes=-2)
+        self.batch_optimize = jax.vmap(self.jitted_solve)
 
     def __repr__(self):
         return "optMpaxModel " + self.__class__.__name__
@@ -127,7 +127,7 @@ class optMpaxModel(optModel):
                                                     A=self.A, b=self.b, G=self.G,
                                                     h=self.h, l=self.l, u=self.u,
                                                     use_sparse_matrix=self.use_sparse_matrix))
-                self.batch_optimize = jax.vmap(self.jitted_solve, in_axes=-2)
+                self.batch_optimize = jax.vmap(self.jitted_solve)
         # c is already a NumPy array
         else:
             self.c = jnp.array(c, dtype=jnp.float32)
