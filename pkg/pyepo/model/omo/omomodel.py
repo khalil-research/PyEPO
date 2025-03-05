@@ -59,6 +59,11 @@ class optOmoModel(optModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
+        # check if c is a PyTorch tensor
+        if isinstance(c, torch.Tensor):
+            c = c.detach().cpu().numpy()
+        else:
+            c = np.asarray(c, dtype=np.float32)
         # delete previous component
         self._model.del_component(self._model.obj)
         # set obj

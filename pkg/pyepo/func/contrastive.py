@@ -39,7 +39,10 @@ class NCE(optModule):
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
-        self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
+        # convert to tensor
+        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        # remove duplicate
+        self.solpool = torch.unique(self.solpool, dim=0)
 
     def forward(self, pred_cost, true_sol):
         """
@@ -47,18 +50,19 @@ class NCE(optModule):
         """
         # get device
         device = pred_cost.device
+        # to device
+        self.solpool = self.solpool.to(device)
         # convert tensor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
             self._update_solution_pool(sol)
-        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
         # get obj for solpool
-        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool)
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = (obj_cp - objpool_cp).mean(axis=1)
@@ -104,7 +108,10 @@ class contrastiveMAP(optModule):
         # solution pool
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
-        self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
+        # convert to tensor
+        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        # remove duplicate
+        self.solpool = torch.unique(self.solpool, dim=0)
 
     def forward(self, pred_cost, true_sol):
         """
@@ -112,18 +119,19 @@ class contrastiveMAP(optModule):
         """
         # get device
         device = pred_cost.device
+        # to device
+        self.solpool = self.solpool.to(device)
         # convert tensor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # solve
         if np.random.uniform() <= self.solve_ratio:
             sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
             # add into solpool
             self._update_solution_pool(sol)
-        solpool = torch.from_numpy(self.solpool.astype(np.float32)).to(device)
         # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
         # get obj for solpool
-        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool)
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss, _ = (obj_cp - objpool_cp).max(axis=1)
