@@ -31,8 +31,8 @@ class knapsackModel(optMpaxModel):
             weights (np.ndarray / list): weights of items
             capacity (np.ndarray / list): total capacity
         """
-        self.weights = np.array(weights)
-        self.capacity = np.array(capacity)
+        self.weights = weights
+        self.capacity = capacity
         self.items = self.weights.shape[1]
         G, h, u = self._constructMatrix()
         super().__init__(G=G, h=h, u=u, use_sparse_matrix=False, minimize=False)
