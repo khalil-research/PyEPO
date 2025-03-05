@@ -57,6 +57,9 @@ class optDataset(Dataset):
         for c in tqdm(self.costs):
             try:
                 sol, obj = self._solve(c)
+                # to numpy
+                if isinstance(sol, torch.Tensor):
+                    sol = sol.detach().cpu().numpy()
             except:
                 raise ValueError(
                     "For optModel, the method 'solve' should return solution vector and objective value."
