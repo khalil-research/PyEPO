@@ -476,14 +476,17 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool):
     n_samples, ins_num, num_vars = ptb_c.shape
     # MPAX batch solving
     if isinstance(optmodel, optMpaxModel):
+        # flat
+        ptb_c = ptb_c.reshape(-1, num_vars)
         # get params
         optmodel.setObj(ptb_c)
         ptb_c = optmodel.c
         # batch solving
         ptb_sols, _ = optmodel.batch_optimize(ptb_c)
         # convert to torch
-        ptb_sols = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(ptb_sols))
-        ptb_sols = ptb_sols.permute(1, 0, 2).to(device)
+        ptb_sols = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(ptb_sols)).to(device)
+        # reshape
+        ptb_sols = ptb_sols.view(n_samples, ins_num, num_vars).permute(1, 0, 2)
     # single-core
     elif processes == 1:
         ptb_sols = torch.zeros((ins_num, n_samples, num_vars), dtype=torch.float32, device=device)
