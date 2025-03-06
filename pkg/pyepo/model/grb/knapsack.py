@@ -32,8 +32,8 @@ class knapsackModel(optGrbModel):
             weights (np.ndarray / list): weights of items
             capacity (np.ndarray / list): total capacity
         """
-        self.weights = np.array(weights)
-        self.capacity = np.array(capacity)
+        self.weights = np.asarray(weights)
+        self.capacity = np.asarray(capacity)
         self.items = self.weights.shape[1]
         super().__init__()
 
