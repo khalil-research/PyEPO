@@ -62,7 +62,7 @@ Our recent tutorial was at the ACC 2024 conference. You can view the talk slides
 
 ## Experiments
 
-To reproduce the experiments in the original paper, please use the code and follow the instructions in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
+To reproduce the experiments in the original paper, please use the code and follow the instructions in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC). Please note that this branch is a very early version.
 
 
 ## Features
