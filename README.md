@@ -68,7 +68,7 @@ To reproduce the experiments in the original paper, please use the code and foll
 ## Features
 
 - Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[7]](https://arxiv.org/abs/2205.15213), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **PFY** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **NCE** [[5]](https://www.ijcai.org/proceedings/2021/390) and **LTR** [[6]](https://proceedings.mlr.press/v162/mandi22a.htm), **I-MLE** [[8]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[9]](https://ojs.aaai.org/index.php/AAAI/article/view/26103), and **PG** [[11]](https://arxiv.org/abs/2402.03256).
-- Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), and [Pyomo](http://www.pyomo.org/) API
+- Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/) and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
 - Support Parallel computing for optimization solver
 - Support solution caching [[5]](https://www.ijcai.org/proceedings/2021/390) to speed up training
 - Support kNN robust loss [[10]](https://arxiv.org/abs/2310.04328) to improve decision quality
