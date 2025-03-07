@@ -54,9 +54,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#user-defined-models">User-defined Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#user-defined-gurobipy-models">User-defined GurobiPy Models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#user-defined-pyomo-models">User-defined Pyomo Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#user-defined-coptpy-models">User-defined COPTPy Models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#user-defined-models-from-scratch">User-defined Models from Scratch</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#mpax-models">MPAX Models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pre-defined-models">Pre-defined Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#shortest-path">Shortest Path</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#knapsack">Knapsack</a></li>
@@ -378,6 +380,134 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </pre></div>
 </div>
 </section>
+<section id="user-defined-coptpy-models">
+<h3>User-defined COPTPy Models<a class="headerlink" href="#user-defined-coptpy-models" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>User-defined models withCOPTPy can be easily defined by the inheritance of the abstract class <code class="docutils literal notranslate"><span class="pre">pyepo.model.copt.optCoptModel</span></code>.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">optCoptModel</span></code>, users does not need specify the sense <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> as <code class="docutils literal notranslate"><span class="pre">EPO.MINIMIZE</span></code> or <code class="docutils literal notranslate"><span class="pre">EPO.MINIMIZE</span></code>. Both the minimization and maximization models are correctly recognized and run by <code class="docutils literal notranslate"><span class="pre">pyepo</span></code>.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.</span></span><span class="sig-name descname"><span class="pre">optCoptModel</span></span></dt>
+<dd><p>This is an abstract class for Cardinal Optimizer optimization model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_model</span></span></dt>
+<dd><p>COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COPT model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>solver</strong> (<em>str</em>) – optimization solver in the background</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>An abstract method to build a model from a optimization solver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A unimplemented method to relax MIP model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>For example, users can build models for the following problem:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\max_{x} &amp; \sum_{i=0}^4 c_i x_i \\
+s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
+&amp; 4 x_0 + 5 x_1 + 2 x_2 + 3 x_3 + 5 x_4 \leq 10 \\
+&amp; 5 x_0 + 4 x_1 + 6 x_2 + 2 x_3 + 3 x_4 \leq 15 \\
+&amp; \forall x_i \in \{0, 1\}
+\end{aligned}\end{split}\]</div>
+<p>In the general case, users only need to implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> method with GurobiPy.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">coptpy</span> <span class="kn">import</span> <span class="n">COPT</span>
+<span class="kn">from</span> <span class="nn">coptpy</span> <span class="kn">import</span> <span class="n">Envr</span>
+
+<span class="kn">from</span> <span class="nn">pyepo.model.copt</span> <span class="kn">import</span> <span class="n">optCoptModel</span>
+
+<span class="k">class</span> <span class="nc">myModel</span><span class="p">(</span><span class="n">optGrbModel</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># create a model</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">Envr</span><span class="p">()</span><span class="o">.</span><span class="n">createModel</span><span class="p">()</span>
+        <span class="c1"># variables</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVars</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">nameprefix</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">vtype</span><span class="o">=</span><span class="n">COPT</span><span class="o">.</span><span class="n">BINARY</span><span class="p">)</span>
+        <span class="c1"># model sense</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">setObjSense</span><span class="p">(</span><span class="n">COPT</span><span class="o">.</span><span class="n">MAXIMIZE</span><span class="p">)</span>
+        <span class="c1"># constraints</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="n">x</span>
+
+<span class="n">myoptmodel</span> <span class="o">=</span> <span class="n">myModel</span><span class="p">()</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">myoptmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)]</span> <span class="c1"># random cost vector</span>
+<span class="n">myoptmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">myoptmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
 <section id="user-defined-models-from-scratch">
 <h3>User-defined Models from Scratch<a class="headerlink" href="#user-defined-models-from-scratch" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>, <code class="docutils literal notranslate"><span class="pre">setObj</span></code>, <code class="docutils literal notranslate"><span class="pre">solve</span></code>,  and <code class="docutils literal notranslate"><span class="pre">num_cost</span></code>, user-defined <code class="docutils literal notranslate"><span class="pre">optModel</span></code> can work for end-to-end training.</p>
@@ -554,6 +684,181 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </pre></div>
 </div>
 </section>
+</section>
+<section id="mpax-models">
+<h2>MPAX Models<a class="headerlink" href="#mpax-models" title="Link to this heading"></a></h2>
+<p>MPAX (Mathematical Programming in JAX) is a highly efficient mathematical programming framework that is hardware-accelerated, batchable, and distributable, designed to integrate with modern computational and deep learning workflows. At its core, MPAX leverages PDHG (Primal-Dual Hybrid Gradient), a powerful first-order optimization algorithm particularly efficient for large-scale problems</p>
+<p><code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code> is a PyEPO optimization model that leverages MPAX for solving LP problems (not ILP) using the PDHG algorithm.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.</span></span><span class="sig-name descname"><span class="pre">optMpaxModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sparse_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This is an abstract class for MPAX-based optimization model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">A</span></span></dt>
+<dd><p>The matrix of equality constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray, BCOO or BCSR</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">b</span></span></dt>
+<dd><p>The right hand side of equality constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">G</span></span></dt>
+<dd><p>The matrix for inequality constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray, BCOO or BCSR</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">h</span></span></dt>
+<dd><p>The right hand side of inequality constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">l</span></span></dt>
+<dd><p>The lower bound of the variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">u</span></span></dt>
+<dd><p>The upper bound of the variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">use_sparse_matrix</span></span></dt>
+<dd><p>Whether to use sparse matrix format, by default True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">minimize</span></span></dt>
+<dd><p>Whether to minimize objective, by default True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sparse_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Placeholder method for MPAX. MPAX does not require an explicit model creation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A unimplemented method to relax MIP model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (jnp.float32)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>It only accepts model coefficients in matrix and vector form. This means:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Constraints must be explicitly provided as matrices and vectors (no symbolic constraints).</p></li>
+<li><p>No direct support for constraints in Python functions (e.g., defining Ax = b in a callable function).</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are not provided, it means <strong>there are no equality constraints</strong> in the problem.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">G</span></code> and <code class="docutils literal notranslate"><span class="pre">h</span></code> are not provided, it means <strong>there are no inequality constraints</strong> in the problem.</p></li>
+<li><p>The default value for <code class="docutils literal notranslate"><span class="pre">l</span></code> (lower bound) is 0, meaning all variables are <strong>non-negative</strong> unless specified otherwise.</p></li>
+<li><p>The default value for <code class="docutils literal notranslate"><span class="pre">u</span></code> (upper bound) is infinity, meaning variables are <strong>unbounded</strong> unless explicitly set.</p></li>
+</ul>
+</div></blockquote>
+<p>In addition to model parameters, we also have two additional settings:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">use_sparse_matrix</span></code> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>) – Stores constraint matrices in a sparse format or not. Choosing the right matrix type is crucial for optimization efficiency.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">minimize</span></code> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>) – Defines whether to minimize the objective function.</p></li>
+</ul>
+</div></blockquote>
+<p>Now, we create an optMpaxModel instance with the defined constraints.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyepo.model.mpax</span> <span class="kn">import</span> <span class="n">optMpaxModel</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">optMpaxModel</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">G</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">use_sparse_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Same as <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.shortestPathModel</span></code>, methods <code class="docutils literal notranslate"><span class="pre">setObj</span></code> and <code class="docutils literal notranslate"><span class="pre">solve</span></code> can specify objective function and solve the problem.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optmodel</span><span class="o">.</span><span class="n">setObj</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span> <span class="c1"># set objective function</span>
+<span class="n">optmodel</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span> <span class="c1"># solve</span>
+</pre></div>
+</div>
 </section>
 <section id="pre-defined-models">
 <h2>Pre-defined Models<a class="headerlink" href="#pre-defined-models" title="Link to this heading"></a></h2>
