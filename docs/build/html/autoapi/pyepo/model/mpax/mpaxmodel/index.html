@@ -1,0 +1,384 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyepo.model.mpax.mpaxmodel &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.ico"/>
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=34cd777e"></script>
+      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="pyepo.model.mpax.shortestpath" href="../shortestpath/index.html" />
+    <link rel="prev" title="pyepo.model.mpax.knapsack" href="../knapsack/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            PyTorch-based End-to-End Predict-then-Optimize Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/api.html">Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/ref.html">Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html">pyepo</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../data/index.html">pyepo.data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../func/index.html">pyepo.func</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../metric/index.html">pyepo.metric</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">pyepo.model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../twostage/index.html">pyepo.twostage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../utlis/index.html">pyepo.utlis</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">PyTorch-based End-to-End Predict-then-Optimize Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">pyepo</a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">pyepo.model</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">pyepo.model.mpax</a></li>
+      <li class="breadcrumb-item active">pyepo.model.mpax.mpaxmodel</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../../_sources/autoapi/pyepo/model/mpax/mpaxmodel/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyepo.model.mpax.mpaxmodel">
+<span id="pyepo-model-mpax-mpaxmodel"></span><h1>pyepo.model.mpax.mpaxmodel<a class="headerlink" href="#module-pyepo.model.mpax.mpaxmodel" title="Link to this heading"></a></h1>
+<p>Abstract optimization model based on MPAX</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel._HAS_MPAX" title="pyepo.model.mpax.mpaxmodel._HAS_MPAX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_HAS_MPAX</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.num_vars" title="pyepo.model.mpax.mpaxmodel.num_vars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_vars</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="pyepo.model.mpax.mpaxmodel.optMpaxModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optMpaxModel</span></code></a></p></td>
+<td><p>This is an abstract class for MPAX-based optimization model</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel._HAS_MPAX">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.mpaxmodel.</span></span><span class="sig-name descname"><span class="pre">_HAS_MPAX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel._HAS_MPAX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.mpaxmodel.</span></span><span class="sig-name descname"><span class="pre">optMpaxModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sparse_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
+<p>This is an abstract class for MPAX-based optimization model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.A" title="Link to this definition"></a></dt>
+<dd><p>The matrix of equality constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray, BCOO or BCSR</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.b">
+<span class="sig-name descname"><span class="pre">b</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.b" title="Link to this definition"></a></dt>
+<dd><p>The right hand side of equality constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.G">
+<span class="sig-name descname"><span class="pre">G</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.G" title="Link to this definition"></a></dt>
+<dd><p>The matrix for inequality constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray, BCOO or BCSR</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.h">
+<span class="sig-name descname"><span class="pre">h</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.h" title="Link to this definition"></a></dt>
+<dd><p>The right hand side of inequality constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.l">
+<span class="sig-name descname"><span class="pre">l</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.l" title="Link to this definition"></a></dt>
+<dd><p>The lower bound of the variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.u">
+<span class="sig-name descname"><span class="pre">u</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.u" title="Link to this definition"></a></dt>
+<dd><p>The upper bound of the variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>jnp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.use_sparse_matrix">
+<span class="sig-name descname"><span class="pre">use_sparse_matrix</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.use_sparse_matrix" title="Link to this definition"></a></dt>
+<dd><p>Whether to use sparse matrix format, by default True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.minimize">
+<span class="sig-name descname"><span class="pre">minimize</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.minimize" title="Link to this definition"></a></dt>
+<dd><p>Whether to minimize objective, by default True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">l</span></span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">u</span></span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">use_sparse_matrix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.modelSense">
+<span class="sig-name descname"><span class="pre">modelSense</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.modelSense" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.device">
+<span class="sig-name descname"><span class="pre">device</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.device" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.jitted_solve">
+<span class="sig-name descname"><span class="pre">jitted_solve</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.jitted_solve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.batch_optimize">
+<span class="sig-name descname"><span class="pre">batch_optimize</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.batch_optimize" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.__repr__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.num_cost">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.num_cost" title="Link to this definition"></a></dt>
+<dd><p>number of cost to be predicted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.setObj">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.setObj" title="Link to this definition"></a></dt>
+<dd><p>A method to set objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.solve" title="Link to this definition"></a></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (jnp.float32)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel._jitted_solve">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_jitted_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sparse_matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel._jitted_solve" title="Link to this definition"></a></dt>
+<dd><p>A static method for JIT complile</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.copy" title="Link to this definition"></a></dt>
+<dd><p>A method to copy model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new copied model</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.addConstr">
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.addConstr" title="Link to this definition"></a></dt>
+<dd><p>A method to add new constraint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coefs</strong> (<em>np.ndarray / list</em>) – coeffcients of new constraint</p></li>
+<li><p><strong>rhs</strong> (<em>jnp.float32</em>) – right-hand side of new constraint</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new model with the added constraint</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>Placeholder method for MPAX. MPAX does not require an explicit model creation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.num_vars">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.mpaxmodel.</span></span><span class="sig-name descname"><span class="pre">num_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.num_vars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../knapsack/index.html" class="btn btn-neutral float-left" title="pyepo.model.mpax.knapsack" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../shortestpath/index.html" class="btn btn-neutral float-right" title="pyepo.model.mpax.shortestpath" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Bo Tang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

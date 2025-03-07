@@ -14,3 +14,5 @@
    pyepo.model.opt
    pyepo.model.grb
    pyepo.model.omo
+   pyepo.model.copt
+   pyepo.model.mpax

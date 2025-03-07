@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data.portfolio`
-==============================
+pyepo.data.portfolio
+====================
 
 .. py:module:: pyepo.data.portfolio
 
@@ -9,18 +9,16 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    pyepo.data.portfolio.genData
 
 
+Module Contents
+---------------
 
 .. py:function:: genData(num_data, num_features, num_assets, deg=1, noise_level=1, seed=135)
 

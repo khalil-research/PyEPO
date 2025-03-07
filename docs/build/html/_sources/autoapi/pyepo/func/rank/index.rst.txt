@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func.rank`
-=========================
+pyepo.func.rank
+===============
 
 .. py:module:: pyepo.func.rank
 
@@ -9,11 +9,8 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -22,12 +19,13 @@ Classes
    pyepo.func.rank.pointwiseLTR
 
 
-
+Module Contents
+---------------
 
 .. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for listwise learning to rank, where the goal is to learn
    an objective function that ranks a pool of feasible solutions correctly.
@@ -40,6 +38,10 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
+
+   .. py:attribute:: solpool
+
+
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
@@ -48,8 +50,8 @@ Classes
 
 .. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for pairwise learning to rank, where the goal is to learn
    an objective function that ranks a pool of feasible solutions correctly.
@@ -62,6 +64,13 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
+
+   .. py:attribute:: relu
+
+
+   .. py:attribute:: solpool
+
+
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
@@ -70,8 +79,8 @@ Classes
 
 .. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for pointwise learning to rank, where the goal is to
    learn an objective function that ranks a pool of feasible solutions
@@ -84,6 +93,10 @@ Classes
    descent.
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
+
+
+   .. py:attribute:: solpool
+
 
    .. py:method:: forward(pred_cost, true_cost)
 

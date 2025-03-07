@@ -1,25 +1,23 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyepo.func.blackbox &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
 
   
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../_static/documentation_options.js?v=34cd777e"></script>
-        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=34cd777e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -54,18 +52,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../index.html#id1"><p>Duplicate implicit target name: “pyepo”.</p>
-</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="../../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data</span></code></a></li>
-<li class="toctree-l4 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../metric/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../model/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../twostage/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage</span></code></a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">pyepo</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../data/index.html">pyepo.data</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">pyepo.func</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../metric/index.html">pyepo.metric</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../model/index.html">pyepo.model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../twostage/index.html">pyepo.twostage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utlis/index.html">pyepo.utlis</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../index.html#submodules">Submodules</a></li>
 </ul>
 </li>
 </ul>
@@ -87,9 +84,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../index.html">API Reference</a></li>
-          <li class="breadcrumb-item"><a href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a></li>
-          <li class="breadcrumb-item"><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a></li>
-      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.blackbox</span></code></li>
+          <li class="breadcrumb-item"><a href="../../index.html">pyepo</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">pyepo.func</a></li>
+      <li class="breadcrumb-item active">pyepo.func.blackbox</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/autoapi/pyepo/func/blackbox/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -100,12 +97,10 @@
            <div itemprop="articleBody">
              
   <section id="module-pyepo.func.blackbox">
-<span id="pyepo-func-blackbox"></span><h1><a class="reference internal" href="#module-pyepo.func.blackbox" title="pyepo.func.blackbox"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.blackbox</span></code></a><a class="headerlink" href="#module-pyepo.func.blackbox" title="Link to this heading"></a></h1>
+<span id="pyepo-func-blackbox"></span><h1>pyepo.func.blackbox<a class="headerlink" href="#module-pyepo.func.blackbox" title="Link to this heading"></a></h1>
 <p>Differentiable Black-box optimization function</p>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h3>
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox.blackboxOpt" title="pyepo.func.blackbox.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
@@ -122,6 +117,9 @@
 </tr>
 </tbody>
 </table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt" title="Link to this definition"></a></dt>
@@ -135,6 +133,16 @@ from contextual data.</p>
 the loss function. Thus, it allows us to design an algorithm based on
 stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/1912.02175">https://arxiv.org/abs/1912.02175</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.lambd">
+<span class="sig-name descname"><span class="pre">lambd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.lambd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.dbb">
+<span class="sig-name descname"><span class="pre">dbb</span></span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.dbb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.forward" title="Link to this definition"></a></dt>
@@ -190,6 +198,11 @@ then the identity update is equivalent to DBB. However, the identity update
 does not require an additional call to the solver during the backward pass
 and tuning an additional hyperparameter λ.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentity.nid">
+<span class="sig-name descname"><span class="pre">nid</span></span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentity.nid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentity.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentity.forward" title="Link to this definition"></a></dt>
@@ -231,7 +244,6 @@ and tuning an additional hyperparameter λ.</p>
 
 </dd></dl>
 
-</section>
 </section>
 </section>
 

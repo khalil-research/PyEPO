@@ -1,25 +1,23 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyepo.func &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
 
   
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=34cd777e"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=34cd777e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -54,18 +52,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../index.html#id1"><p>Duplicate implicit target name: “pyepo”.</p>
-</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../index.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data</span></code></a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../metric/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../model/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../twostage/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage</span></code></a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">pyepo</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../data/index.html">pyepo.data</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pyepo.func</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metric/index.html">pyepo.metric</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../model/index.html">pyepo.model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../twostage/index.html">pyepo.twostage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utlis/index.html">pyepo.utlis</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#submodules">Submodules</a></li>
 </ul>
 </li>
 </ul>
@@ -87,8 +84,8 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">API Reference</a></li>
-          <li class="breadcrumb-item"><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a></li>
-      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></li>
+          <li class="breadcrumb-item"><a href="../index.html">pyepo</a></li>
+      <li class="breadcrumb-item active">pyepo.func</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/autoapi/pyepo/func/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -99,26 +96,24 @@
            <div itemprop="articleBody">
              
   <section id="module-pyepo.func">
-<span id="pyepo-func"></span><h1><a class="reference internal" href="#module-pyepo.func" title="pyepo.func"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a><a class="headerlink" href="#module-pyepo.func" title="Link to this heading"></a></h1>
+<span id="pyepo-func"></span><h1>pyepo.func<a class="headerlink" href="#module-pyepo.func" title="Link to this heading"></a></h1>
 <p>Pytorch autograd function for end-to-end training</p>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="abcmodule/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.abcmodule</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="blackbox/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.blackbox</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="contrastive/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.contrastive</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="perturbed/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.perturbed</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="rank/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.rank</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="surrogate/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.surrogate</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="utlis/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.utlis</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="abcmodule/index.html">pyepo.func.abcmodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blackbox/index.html">pyepo.func.blackbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contrastive/index.html">pyepo.func.contrastive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perturbed/index.html">pyepo.func.perturbed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rank/index.html">pyepo.func.rank</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surrogate/index.html">pyepo.func.surrogate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utlis/index.html">pyepo.func.utlis</a></li>
 </ul>
 </div>
 </section>
-<section id="package-contents">
-<h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading"></a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h3>
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.SPOPlus" title="pyepo.func.SPOPlus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SPOPlus</span></code></a></p></td>
@@ -162,6 +157,9 @@
 </tr>
 </tbody>
 </table>
+</section>
+<section id="package-contents">
+<h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus" title="Link to this definition"></a></dt>
@@ -174,6 +172,11 @@ data.</p>
 <p>The SPO+ Loss is convex with subgradient. Thus, it allows us to design an
 algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://doi.org/10.1287/mnsc.2020.3922">https://doi.org/10.1287/mnsc.2020.3922</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.SPOPlus.spop">
+<span class="sig-name descname"><span class="pre">spop</span></span><a class="headerlink" href="#pyepo.func.SPOPlus.spop" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Link to this definition"></a></dt>
@@ -195,6 +198,16 @@ data.</p>
 order approximations and has the informative gradient. Thus, it allows us to
 design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2402.03256">https://arxiv.org/abs/2402.03256</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbationGradient.sigma">
+<span class="sig-name descname"><span class="pre">sigma</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#pyepo.func.perturbationGradient.sigma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbationGradient.two_sides">
+<span class="sig-name descname"><span class="pre">two_sides</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#pyepo.func.perturbationGradient.two_sides" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.perturbationGradient.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbationGradient.forward" title="Link to this definition"></a></dt>
@@ -222,6 +235,16 @@ from contextual data.</p>
 the loss function. Thus, it allows us to design an algorithm based on
 stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/1912.02175">https://arxiv.org/abs/1912.02175</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.blackboxOpt.lambd">
+<span class="sig-name descname"><span class="pre">lambd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.blackboxOpt.lambd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.blackboxOpt.dbb">
+<span class="sig-name descname"><span class="pre">dbb</span></span><a class="headerlink" href="#pyepo.func.blackboxOpt.dbb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt.forward" title="Link to this definition"></a></dt>
@@ -244,6 +267,11 @@ then the identity update is equivalent to DBB. However, the identity update
 does not require an additional call to the solver during the backward pass
 and tuning an additional hyperparameter λ.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.negativeIdentity.nid">
+<span class="sig-name descname"><span class="pre">nid</span></span><a class="headerlink" href="#pyepo.func.negativeIdentity.nid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.negativeIdentity.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.negativeIdentity.forward" title="Link to this definition"></a></dt>
@@ -264,6 +292,26 @@ contextual data and are perturbed with Gaussian noise.</p>
 <p>Thus, it allows us to design an algorithm based on stochastic gradient
 descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbedOpt.n_samples">
+<span class="sig-name descname"><span class="pre">n_samples</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.perturbedOpt.n_samples" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbedOpt.sigma">
+<span class="sig-name descname"><span class="pre">sigma</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#pyepo.func.perturbedOpt.sigma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbedOpt.rnd">
+<span class="sig-name descname"><span class="pre">rnd</span></span><a class="headerlink" href="#pyepo.func.perturbedOpt.rnd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbedOpt.ptb">
+<span class="sig-name descname"><span class="pre">ptb</span></span><a class="headerlink" href="#pyepo.func.perturbedOpt.ptb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.perturbedOpt.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedOpt.forward" title="Link to this definition"></a></dt>
@@ -285,6 +333,26 @@ contextual data and are perturbed with Gaussian noise.</p>
 and solutions with less computation. Thus, allows us to design an algorithm
 based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung.n_samples">
+<span class="sig-name descname"><span class="pre">n_samples</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.n_samples" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung.sigma">
+<span class="sig-name descname"><span class="pre">sigma</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.sigma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung.rnd">
+<span class="sig-name descname"><span class="pre">rnd</span></span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.rnd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung.pfy">
+<span class="sig-name descname"><span class="pre">pfy</span></span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.pfy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.forward" title="Link to this definition"></a></dt>
@@ -306,6 +374,36 @@ contextual data.</p>
 <p>The I-MLE approximate gradient of optimizer smoothly. Thus, allows us to
 design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.implicitMLE.n_samples">
+<span class="sig-name descname"><span class="pre">n_samples</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.implicitMLE.n_samples" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.implicitMLE.sigma">
+<span class="sig-name descname"><span class="pre">sigma</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#pyepo.func.implicitMLE.sigma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.implicitMLE.lambd">
+<span class="sig-name descname"><span class="pre">lambd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.implicitMLE.lambd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.implicitMLE.distribution">
+<span class="sig-name descname"><span class="pre">distribution</span></span><a class="headerlink" href="#pyepo.func.implicitMLE.distribution" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.implicitMLE.two_sides">
+<span class="sig-name descname"><span class="pre">two_sides</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#pyepo.func.implicitMLE.two_sides" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.implicitMLE.imle">
+<span class="sig-name descname"><span class="pre">imle</span></span><a class="headerlink" href="#pyepo.func.implicitMLE.imle" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.implicitMLE.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.implicitMLE.forward" title="Link to this definition"></a></dt>
@@ -327,6 +425,46 @@ contextual data.</p>
 <p>The AI-MLE approximate gradient of optimizer smoothly. Thus, allows us to
 design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://ojs.aaai.org/index.php/AAAI/article/view/26103">https://ojs.aaai.org/index.php/AAAI/article/view/26103</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.n_samples">
+<span class="sig-name descname"><span class="pre">n_samples</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.n_samples" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.sigma">
+<span class="sig-name descname"><span class="pre">sigma</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.sigma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.distribution">
+<span class="sig-name descname"><span class="pre">distribution</span></span><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.distribution" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.two_sides">
+<span class="sig-name descname"><span class="pre">two_sides</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.two_sides" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.alpha" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.grad_norm_avg">
+<span class="sig-name descname"><span class="pre">grad_norm_avg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.grad_norm_avg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.step">
+<span class="sig-name descname"><span class="pre">step</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></em><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.step" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.aimle">
+<span class="sig-name descname"><span class="pre">aimle</span></span><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.aimle" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.forward" title="Link to this definition"></a></dt>
@@ -345,6 +483,11 @@ functions, based on viewing suboptimal solutions as negative examples.</p>
 maximizes the separation of the probability of the optimal solution.</p>
 <p>Thus allows us to design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://www.ijcai.org/proceedings/2021/390">https://www.ijcai.org/proceedings/2021/390</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.NCE.solpool">
+<span class="sig-name descname"><span class="pre">solpool</span></span><a class="headerlink" href="#pyepo.func.NCE.solpool" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.NCE.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.NCE.forward" title="Link to this definition"></a></dt>
@@ -363,6 +506,11 @@ surrogate loss functions, which is an efficient self-contrastive algorithm.</p>
 maximizes the separation of the probability of the optimal solution.</p>
 <p>Thus, it allows us to design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://www.ijcai.org/proceedings/2021/390">https://www.ijcai.org/proceedings/2021/390</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.contrastiveMAP.solpool">
+<span class="sig-name descname"><span class="pre">solpool</span></span><a class="headerlink" href="#pyepo.func.contrastiveMAP.solpool" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.contrastiveMAP.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.contrastiveMAP.forward" title="Link to this definition"></a></dt>
@@ -382,6 +530,11 @@ contextual data and the loss measures the scores of the whole ranked lists.</p>
 <p>Thus, it allows us to design an algorithm based on stochastic gradient
 descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.listwiseLTR.solpool">
+<span class="sig-name descname"><span class="pre">solpool</span></span><a class="headerlink" href="#pyepo.func.listwiseLTR.solpool" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.listwiseLTR.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.listwiseLTR.forward" title="Link to this definition"></a></dt>
@@ -401,6 +554,16 @@ contextual data and the loss learns the relative ordering of pairs of items.</p>
 <p>Thus, it allows us to design an algorithm based on stochastic gradient
 descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.pairwiseLTR.relu">
+<span class="sig-name descname"><span class="pre">relu</span></span><a class="headerlink" href="#pyepo.func.pairwiseLTR.relu" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.pairwiseLTR.solpool">
+<span class="sig-name descname"><span class="pre">solpool</span></span><a class="headerlink" href="#pyepo.func.pairwiseLTR.solpool" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.pairwiseLTR.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.pairwiseLTR.forward" title="Link to this definition"></a></dt>
@@ -421,6 +584,11 @@ data, and calculates the ranking scores of the items.</p>
 <p>Thus, it allows us to design an algorithm based on stochastic gradient
 descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://proceedings.mlr.press/v162/mandi22a.html">https://proceedings.mlr.press/v162/mandi22a.html</a>&gt;</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.pointwiseLTR.solpool">
+<span class="sig-name descname"><span class="pre">solpool</span></span><a class="headerlink" href="#pyepo.func.pointwiseLTR.solpool" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.pointwiseLTR.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.pointwiseLTR.forward" title="Link to this definition"></a></dt>
@@ -429,7 +597,6 @@ descent.</p>
 
 </dd></dl>
 
-</section>
 </section>
 </section>
 

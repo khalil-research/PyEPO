@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.grb.shortestpath`
-======================================
+pyepo.model.grb.shortestpath
+============================
 
 .. py:module:: pyepo.model.grb.shortestpath
 
@@ -9,31 +9,34 @@
 
 
 
-Module Contents
----------------
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.grb.shortestpath._HAS_GUROBI
+   pyepo.model.grb.shortestpath.cost
+
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    pyepo.model.grb.shortestpath.shortestPathModel
 
 
+Module Contents
+---------------
 
-
-Attributes
-~~~~~~~~~~
-
-.. autoapisummary::
-
-   pyepo.model.grb.shortestpath.cost
+.. py:data:: _HAS_GUROBI
+   :value: True
 
 
 .. py:class:: shortestPathModel(grid)
 
-
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
 
    This class is optimization model for shortest path problem
 
@@ -55,12 +58,22 @@ Attributes
 
       :type: list
 
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
    .. py:method:: _getArcs()
 
       A method to get list of arcs for grid network
 
       :returns: arcs
       :rtype: list
+
 
 
    .. py:method:: _getModel()
@@ -73,6 +86,4 @@ Attributes
 
 
 .. py:data:: cost
-
-   
 

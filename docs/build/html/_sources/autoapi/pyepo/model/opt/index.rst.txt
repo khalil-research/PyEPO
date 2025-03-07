@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.opt`
-=========================
+pyepo.model.opt
+===============
 
 .. py:module:: pyepo.model.opt
 
@@ -9,23 +9,21 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    pyepo.model.opt.optModel
 
 
-
+Module Contents
+---------------
 
 .. py:class:: optModel
 
-
    Bases: :py:obj:`abc.ABC`
+
 
    This is an abstract class for optimization model
 
@@ -35,17 +33,18 @@ Classes
 
       :type: GurobiPy model
 
+
+   .. py:method:: __repr__()
+
+
    .. py:property:: num_cost
 
       number of cost to be predicted
 
-   .. py:method:: __repr__()
-
-      Return repr(self).
-
 
    .. py:method:: _getModel()
       :abstractmethod:
+
 
       An abstract method to build a model from a optimization solver
 
@@ -53,8 +52,10 @@ Classes
       :rtype: tuple
 
 
+
    .. py:method:: setObj(c)
       :abstractmethod:
+
 
       An abstract method to set objective function
 
@@ -62,13 +63,16 @@ Classes
       :type c: ndarray
 
 
+
    .. py:method:: solve()
       :abstractmethod:
+
 
       An abstract method to solve model
 
       :returns: optimal solution (list) and objective value (float)
       :rtype: tuple
+
 
 
    .. py:method:: copy()
@@ -79,8 +83,10 @@ Classes
       :rtype: optModel
 
 
+
    .. py:method:: addConstr(coefs, rhs)
       :abstractmethod:
+
 
       An abstract method to add new constraint
 
@@ -91,6 +97,7 @@ Classes
 
       :returns: new model with the added constraint
       :rtype: optModel
+
 
 
    .. py:method:: relax()

@@ -1,5 +1,5 @@
-:py:mod:`pyepo.metric.regret`
-=============================
+pyepo.metric.regret
+===================
 
 .. py:module:: pyepo.metric.regret
 
@@ -9,12 +9,8 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -22,6 +18,8 @@ Functions
    pyepo.metric.regret.calRegret
 
 
+Module Contents
+---------------
 
 .. py:function:: regret(predmodel, optmodel, dataloader)
 

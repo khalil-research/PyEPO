@@ -1,5 +1,5 @@
-:py:mod:`pyepo.metric`
-======================
+pyepo.metric
+============
 
 .. py:module:: pyepo.metric
 
@@ -11,22 +11,18 @@
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   metrics/index.rst
-   mse/index.rst
-   regret/index.rst
-   unambregret/index.rst
-
-
-Package Contents
-----------------
+   /autoapi/pyepo/metric/metrics/index
+   /autoapi/pyepo/metric/mse/index
+   /autoapi/pyepo/metric/regret/index
+   /autoapi/pyepo/metric/unambregret/index
 
 
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -40,6 +36,8 @@ Functions
    pyepo.metric.makeAutoSkScorer
 
 
+Package Contents
+----------------
 
 .. py:function:: MSE(predmodel, dataloader)
 

@@ -1,0 +1,187 @@
+pyepo.model.mpax.mpaxmodel
+==========================
+
+.. py:module:: pyepo.model.mpax.mpaxmodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model based on MPAX
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.mpaxmodel._HAS_MPAX
+   pyepo.model.mpax.mpaxmodel.num_vars
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.mpaxmodel.optMpaxModel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_MPAX
+   :value: True
+
+
+.. py:class:: optMpaxModel(A=None, b=None, G=None, h=None, l=None, u=None, use_sparse_matrix=True, minimize=True)
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for MPAX-based optimization model
+
+   .. attribute:: A
+
+      The matrix of equality constraints.
+
+      :type: jnp.ndarray, BCOO or BCSR
+
+   .. attribute:: b
+
+      The right hand side of equality constraints.
+
+      :type: jnp.ndarray
+
+   .. attribute:: G
+
+      The matrix for inequality constraints.
+
+      :type: jnp.ndarray, BCOO or BCSR
+
+   .. attribute:: h
+
+      The right hand side of inequality constraints.
+
+      :type: jnp.ndarray
+
+   .. attribute:: l
+
+      The lower bound of the variables.
+
+      :type: jnp.ndarray
+
+   .. attribute:: u
+
+      The upper bound of the variables.
+
+      :type: jnp.ndarray
+
+   .. attribute:: use_sparse_matrix
+
+      Whether to use sparse matrix format, by default True.
+
+      :type: bool
+
+   .. attribute:: minimize
+
+      Whether to minimize objective, by default True.
+
+      :type: bool
+
+
+   .. py:attribute:: l
+
+
+   .. py:attribute:: u
+
+
+   .. py:attribute:: use_sparse_matrix
+      :value: True
+
+
+
+   .. py:attribute:: modelSense
+      :value: 1
+
+
+
+   .. py:attribute:: device
+      :value: None
+
+
+
+   .. py:attribute:: jitted_solve
+      :value: None
+
+
+
+   .. py:attribute:: batch_optimize
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:property:: num_cost
+
+      number of cost to be predicted
+
+
+   .. py:method:: setObj(c)
+
+      A method to set objective function
+
+      :param c: cost of objective function
+      :type c: np.ndarray / list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (jnp.float32)
+      :rtype: tuple
+
+
+
+   .. py:method:: _jitted_solve(c, A, b, G, h, l, u, use_sparse_matrix)
+      :staticmethod:
+
+
+      A static method for JIT complile
+
+
+
+   .. py:method:: copy()
+
+      A method to copy model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coeffcients of new constraint
+      :type coefs: np.ndarray / list
+      :param rhs: right-hand side of new constraint
+      :type rhs: jnp.float32
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: _getModel()
+
+      Placeholder method for MPAX. MPAX does not require an explicit model creation.
+
+
+
+.. py:data:: num_vars
+   :value: 10
+
+

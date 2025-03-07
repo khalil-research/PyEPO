@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.grb.portfolio`
-===================================
+pyepo.model.grb.portfolio
+=========================
 
 .. py:module:: pyepo.model.grb.portfolio
 
@@ -9,31 +9,34 @@
 
 
 
-Module Contents
----------------
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.grb.portfolio._HAS_GUROBI
+   pyepo.model.grb.portfolio.optmodel
+
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    pyepo.model.grb.portfolio.portfolioModel
 
 
+Module Contents
+---------------
 
-
-Attributes
-~~~~~~~~~~
-
-.. autoapisummary::
-
-   pyepo.model.grb.portfolio.optmodel
+.. py:data:: _HAS_GUROBI
+   :value: True
 
 
 .. py:class:: portfolioModel(num_assets, covariance, gamma=2.25)
 
-
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
 
    This class is an optimization model for portfolio problem
 
@@ -61,12 +64,23 @@ Attributes
 
       :type: float
 
+
+   .. py:attribute:: num_assets
+
+
+   .. py:attribute:: covariance
+
+
+   .. py:attribute:: risk_level
+
+
    .. py:method:: _getRiskLevel(gamma)
 
       A method to calculate the risk level
 
       :returns: risk level
       :rtype: float
+
 
 
    .. py:method:: _getModel()
@@ -79,6 +93,4 @@ Attributes
 
 
 .. py:data:: optmodel
-
-   
 

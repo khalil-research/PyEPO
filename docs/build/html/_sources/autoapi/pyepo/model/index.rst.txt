@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model`
-=====================
+pyepo.model
+===========
 
 .. py:module:: pyepo.model
 
@@ -9,23 +9,16 @@
 
 
 
-Subpackages
------------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 3
-
-   copt/index.rst
-   grb/index.rst
-   omo/index.rst
-
-
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   opt/index.rst
+   /autoapi/pyepo/model/copt/index
+   /autoapi/pyepo/model/grb/index
+   /autoapi/pyepo/model/mpax/index
+   /autoapi/pyepo/model/omo/index
+   /autoapi/pyepo/model/opt/index
 
 

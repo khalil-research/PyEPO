@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.copt.coptmodel`
-====================================
+pyepo.model.copt.coptmodel
+==========================
 
 .. py:module:: pyepo.model.copt.coptmodel
 
@@ -9,23 +9,21 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    pyepo.model.copt.coptmodel.optCoptModel
 
 
-
+Module Contents
+---------------
 
 .. py:class:: optCoptModel
 
-
    Bases: :py:obj:`pyepo.model.opt.optModel`
+
 
    This is an abstract class for Cardinal Optimizer optimization model
 
@@ -35,9 +33,8 @@ Classes
 
       :type: COPT model
 
-   .. py:method:: __repr__()
 
-      Return repr(self).
+   .. py:method:: __repr__()
 
 
    .. py:method:: setObj(c)
@@ -48,6 +45,7 @@ Classes
       :type c: np.ndarray / list
 
 
+
    .. py:method:: solve()
 
       A method to solve model
@@ -56,12 +54,14 @@ Classes
       :rtype: tuple
 
 
+
    .. py:method:: copy()
 
       A method to copy model
 
       :returns: new copied model
       :rtype: optModel
+
 
 
    .. py:method:: addConstr(coefs, rhs)

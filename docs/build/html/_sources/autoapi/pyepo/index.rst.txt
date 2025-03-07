@@ -1,5 +1,5 @@
-:py:mod:`pyepo`
-===============
+pyepo
+=====
 
 .. py:module:: pyepo
 
@@ -11,26 +11,18 @@
 
 
 
-Subpackages
------------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 3
-
-   data/index.rst
-   func/index.rst
-   metric/index.rst
-   model/index.rst
-   twostage/index.rst
-
-
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   EPO/index.rst
-   utlis/index.rst
+   /autoapi/pyepo/EPO/index
+   /autoapi/pyepo/data/index
+   /autoapi/pyepo/func/index
+   /autoapi/pyepo/metric/index
+   /autoapi/pyepo/model/index
+   /autoapi/pyepo/twostage/index
+   /autoapi/pyepo/utlis/index
 
 

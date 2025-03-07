@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func.surrogate`
-==============================
+pyepo.func.surrogate
+====================
 
 .. py:module:: pyepo.func.surrogate
 
@@ -9,11 +9,8 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -22,12 +19,13 @@ Classes
    pyepo.func.surrogate.perturbationGradient
 
 
-
+Module Contents
+---------------
 
 .. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for SPO+ Loss, as a surrogate loss function of SPO
    (regret) Loss, which measures the decision error of the optimization problem.
@@ -41,6 +39,10 @@ Classes
 
    Reference: <https://doi.org/10.1287/mnsc.2020.3922>
 
+
+   .. py:attribute:: spop
+
+
    .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj)
 
       Forward pass
@@ -49,13 +51,15 @@ Classes
 
 .. py:class:: SPOPlusFunc(*args, **kwargs)
 
-
    Bases: :py:obj:`torch.autograd.Function`
+
 
    A autograd function for SPO+ Loss
 
+
    .. py:method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj, module)
       :staticmethod:
+
 
       Forward pass for SPO+
 
@@ -74,8 +78,10 @@ Classes
       :rtype: torch.tensor
 
 
+
    .. py:method:: backward(ctx, grad_output)
       :staticmethod:
+
 
       Backward pass for SPO+
 
@@ -83,8 +89,8 @@ Classes
 
 .. py:class:: perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for PG Loss, as a surrogate loss function of objective
    value, which measures the decision quality of the optimization problem.
@@ -99,9 +105,21 @@ Classes
 
    Reference: <https://arxiv.org/abs/2402.03256>
 
+
+   .. py:attribute:: sigma
+      :value: 0.1
+
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
+
 
 
    .. py:method:: _finiteDifference(pred_cost, true_cost)

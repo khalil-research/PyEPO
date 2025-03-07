@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.grb.knapsack`
-==================================
+pyepo.model.grb.knapsack
+========================
 
 .. py:module:: pyepo.model.grb.knapsack
 
@@ -9,11 +9,17 @@
 
 
 
-Module Contents
----------------
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.grb.knapsack._HAS_GUROBI
+   pyepo.model.grb.knapsack.cost
+
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -21,20 +27,17 @@ Classes
    pyepo.model.grb.knapsack.knapsackModelRel
 
 
+Module Contents
+---------------
 
-
-Attributes
-~~~~~~~~~~
-
-.. autoapisummary::
-
-   pyepo.model.grb.knapsack.cost
+.. py:data:: _HAS_GUROBI
+   :value: True
 
 
 .. py:class:: knapsackModel(weights, capacity)
 
-
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+
 
    This class is optimization model for knapsack problem
 
@@ -62,12 +65,23 @@ Attributes
 
       :type: list
 
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
    .. py:method:: _getModel()
 
       A method to build Gurobi model
 
       :returns: optimization model and variables
       :rtype: tuple
+
 
 
    .. py:method:: relax()
@@ -78,14 +92,16 @@ Attributes
 
 .. py:class:: knapsackModelRel(weights, capacity)
 
-
    Bases: :py:obj:`knapsackModel`
 
+
    This class is relaxed optimization model for knapsack problem.
+
 
    .. py:method:: _getModel()
 
       A method to build Gurobi
+
 
 
    .. py:method:: relax()
@@ -95,6 +111,4 @@ Attributes
 
 
 .. py:data:: cost
-
-   
 

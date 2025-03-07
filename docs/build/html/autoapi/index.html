@@ -1,25 +1,23 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API Reference &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=34cd777e"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=34cd777e"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -54,7 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pyepo/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyepo/index.html">pyepo</a></li>
 </ul>
 </li>
 </ul>
@@ -88,69 +86,75 @@
 <p>This page contains auto-generated API reference documentation <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pyepo/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pyepo/data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/data/dataset/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data.dataset</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/data/knapsack/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data.knapsack</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/data/portfolio/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data.portfolio</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/data/shortestpath/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data.shortestpath</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/data/tsp/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data.tsp</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyepo/index.html">pyepo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyepo/EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyepo/data/index.html">pyepo.data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/data/dataset/index.html">pyepo.data.dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/data/knapsack/index.html">pyepo.data.knapsack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/data/portfolio/index.html">pyepo.data.portfolio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/data/shortestpath/index.html">pyepo.data.shortestpath</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/data/tsp/index.html">pyepo.data.tsp</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pyepo/func/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/func/abcmodule/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.abcmodule</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/func/blackbox/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.blackbox</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/func/contrastive/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.contrastive</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/func/perturbed/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.perturbed</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/func/rank/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.rank</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/func/surrogate/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.surrogate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/func/utlis/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func.utlis</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyepo/func/index.html">pyepo.func</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/func/abcmodule/index.html">pyepo.func.abcmodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/func/blackbox/index.html">pyepo.func.blackbox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/func/contrastive/index.html">pyepo.func.contrastive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/func/perturbed/index.html">pyepo.func.perturbed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/func/rank/index.html">pyepo.func.rank</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/func/surrogate/index.html">pyepo.func.surrogate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/func/utlis/index.html">pyepo.func.utlis</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pyepo/metric/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/metric/metrics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric.metrics</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/metric/mse/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric.mse</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/metric/regret/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric.regret</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/metric/unambregret/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric.unambregret</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyepo/metric/index.html">pyepo.metric</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/metric/metrics/index.html">pyepo.metric.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/metric/mse/index.html">pyepo.metric.mse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/metric/regret/index.html">pyepo.metric.regret</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/metric/unambregret/index.html">pyepo.metric.unambregret</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pyepo/model/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/model/copt/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.copt</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/copt/coptmodel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.copt.coptmodel</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/copt/knapsack/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.copt.knapsack</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/copt/shortestpath/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.copt.shortestpath</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyepo/model/index.html">pyepo.model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/model/copt/index.html">pyepo.model.copt</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/copt/coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/copt/knapsack/index.html">pyepo.model.copt.knapsack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/copt/shortestpath/index.html">pyepo.model.copt.shortestpath</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/model/grb/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/grbmodel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/knapsack/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.knapsack</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/portfolio/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.portfolio</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/shortestpath/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.shortestpath</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/tsp/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/model/grb/index.html">pyepo.model.grb</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/grbmodel/index.html">pyepo.model.grb.grbmodel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/knapsack/index.html">pyepo.model.grb.knapsack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/portfolio/index.html">pyepo.model.grb.portfolio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/shortestpath/index.html">pyepo.model.grb.shortestpath</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/grb/tsp/index.html">pyepo.model.grb.tsp</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/model/omo/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/omo/knapsack/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo.knapsack</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/omo/omomodel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pyepo/model/omo/shortestpath/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo.shortestpath</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/model/mpax/index.html">pyepo.model.mpax</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/mpax/knapsack/index.html">pyepo.model.mpax.knapsack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/mpax/mpaxmodel/index.html">pyepo.model.mpax.mpaxmodel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/mpax/shortestpath/index.html">pyepo.model.mpax.shortestpath</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/model/opt/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.opt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/model/omo/index.html">pyepo.model.omo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/omo/knapsack/index.html">pyepo.model.omo.knapsack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/omo/omomodel/index.html">pyepo.model.omo.omomodel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyepo/model/omo/shortestpath/index.html">pyepo.model.omo.shortestpath</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pyepo/twostage/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/twostage/autosklearnpred/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage.autosklearnpred</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyepo/twostage/sklearnpred/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage.sklearnpred</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/model/opt/index.html">pyepo.model.opt</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pyepo/EPO/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.EPO</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyepo/utlis/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.utlis</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyepo/twostage/index.html">pyepo.twostage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/twostage/autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyepo/twostage/sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyepo/utlis/index.html">pyepo.utlis</a></li>
 </ul>
 </li>
 </ul>
 </div>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="f1" role="doc-footnote">
+<aside class="footnote brackets" id="f1" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Created with <a class="reference external" href="https://github.com/readthedocs/sphinx-autoapi">sphinx-autoapi</a></p>
 </aside>

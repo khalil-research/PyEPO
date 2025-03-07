@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.omo.shortestpath`
-======================================
+pyepo.model.omo.shortestpath
+============================
 
 .. py:module:: pyepo.model.omo.shortestpath
 
@@ -9,31 +9,34 @@
 
 
 
-Module Contents
----------------
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.omo.shortestpath._HAS_PYOMO
+   pyepo.model.omo.shortestpath.cost
+
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    pyepo.model.omo.shortestpath.shortestPathModel
 
 
+Module Contents
+---------------
 
-
-Attributes
-~~~~~~~~~~
-
-.. autoapisummary::
-
-   pyepo.model.omo.shortestpath.cost
+.. py:data:: _HAS_PYOMO
+   :value: True
 
 
 .. py:class:: shortestPathModel(grid, solver='glpk')
 
-
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+
 
    This class is optimization model for shortest path problem
 
@@ -61,12 +64,22 @@ Attributes
 
       :type: list
 
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
    .. py:method:: _getArcs()
 
       A method to get list of arcs for grid network
 
       :returns: arcs
       :rtype: list
+
 
 
    .. py:method:: _getModel()
@@ -76,6 +89,4 @@ Attributes
 
 
 .. py:data:: cost
-
-   
 

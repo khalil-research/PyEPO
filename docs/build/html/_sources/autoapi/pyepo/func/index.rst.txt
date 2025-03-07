@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func`
-====================
+pyepo.func
+==========
 
 .. py:module:: pyepo.func
 
@@ -11,24 +11,21 @@
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   abcmodule/index.rst
-   blackbox/index.rst
-   contrastive/index.rst
-   perturbed/index.rst
-   rank/index.rst
-   surrogate/index.rst
-   utlis/index.rst
+   /autoapi/pyepo/func/abcmodule/index
+   /autoapi/pyepo/func/blackbox/index
+   /autoapi/pyepo/func/contrastive/index
+   /autoapi/pyepo/func/perturbed/index
+   /autoapi/pyepo/func/rank/index
+   /autoapi/pyepo/func/surrogate/index
+   /autoapi/pyepo/func/utlis/index
 
-
-Package Contents
-----------------
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -47,12 +44,13 @@ Classes
    pyepo.func.pointwiseLTR
 
 
-
+Package Contents
+----------------
 
 .. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for SPO+ Loss, as a surrogate loss function of SPO
    (regret) Loss, which measures the decision error of the optimization problem.
@@ -66,6 +64,10 @@ Classes
 
    Reference: <https://doi.org/10.1287/mnsc.2020.3922>
 
+
+   .. py:attribute:: spop
+
+
    .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj)
 
       Forward pass
@@ -74,8 +76,8 @@ Classes
 
 .. py:class:: perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for PG Loss, as a surrogate loss function of objective
    value, which measures the decision quality of the optimization problem.
@@ -90,9 +92,21 @@ Classes
 
    Reference: <https://arxiv.org/abs/2402.03256>
 
+
+   .. py:attribute:: sigma
+      :value: 0.1
+
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
+
 
 
    .. py:method:: _finiteDifference(pred_cost, true_cost)
@@ -103,8 +117,8 @@ Classes
 
 .. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for differentiable black-box optimizer, which yield
    an optimal solution and derive a gradient.
@@ -119,6 +133,15 @@ Classes
 
    Reference: <https://arxiv.org/abs/1912.02175>
 
+
+   .. py:attribute:: lambd
+      :value: 10
+
+
+
+   .. py:attribute:: dbb
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -127,8 +150,8 @@ Classes
 
 .. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for the differentiable optimizer, which yields optimal a
    solution and use negative identity as a gradient on the backward pass.
@@ -144,6 +167,10 @@ Classes
 
    Reference: <https://arxiv.org/abs/2205.15213>
 
+
+   .. py:attribute:: nid
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -152,8 +179,8 @@ Classes
 
 .. py:class:: perturbedOpt(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
    use of the loss improves the algorithmic by the specific expression of the
@@ -167,6 +194,23 @@ Classes
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: rnd
+
+
+   .. py:attribute:: ptb
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -175,8 +219,8 @@ Classes
 
 .. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
    use of the loss improves the algorithmic by the specific expression of the
@@ -191,6 +235,23 @@ Classes
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: rnd
+
+
+   .. py:attribute:: pfy
+
+
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
@@ -199,8 +260,8 @@ Classes
 
 .. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Implicit Maximum Likelihood Estimator, which yield
    an optimal solution in a constrained exponential family distribution via
@@ -215,6 +276,33 @@ Classes
 
    Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
 
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: lambd
+      :value: 10
+
+
+
+   .. py:attribute:: distribution
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
+   .. py:attribute:: imle
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -223,8 +311,8 @@ Classes
 
 .. py:class:: adaptiveImplicitMLE(optmodel, n_samples=10, sigma=1.0, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
    adaptively choose hyperparameter λ and yield an optimal solution in a
@@ -239,6 +327,43 @@ Classes
 
    Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
 
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: distribution
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
+   .. py:attribute:: alpha
+      :value: 0
+
+
+
+   .. py:attribute:: grad_norm_avg
+      :value: 1
+
+
+
+   .. py:attribute:: step
+      :value: 0.001
+
+
+
+   .. py:attribute:: aimle
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -247,8 +372,8 @@ Classes
 
 .. py:class:: NCE(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for noise contrastive estimation as surrogate loss
    functions, based on viewing suboptimal solutions as negative examples.
@@ -260,6 +385,10 @@ Classes
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
+
+   .. py:attribute:: solpool
+
+
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
@@ -268,8 +397,8 @@ Classes
 
 .. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Maximum A Posterior contrastive estimation as
    surrogate loss functions, which is an efficient self-contrastive algorithm.
@@ -281,6 +410,10 @@ Classes
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
+
+   .. py:attribute:: solpool
+
+
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
@@ -289,8 +422,8 @@ Classes
 
 .. py:class:: listwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for listwise learning to rank, where the goal is to learn
    an objective function that ranks a pool of feasible solutions correctly.
@@ -303,6 +436,10 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
+
+   .. py:attribute:: solpool
+
+
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
@@ -311,8 +448,8 @@ Classes
 
 .. py:class:: pairwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for pairwise learning to rank, where the goal is to learn
    an objective function that ranks a pool of feasible solutions correctly.
@@ -325,6 +462,13 @@ Classes
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
+
+   .. py:attribute:: relu
+
+
+   .. py:attribute:: solpool
+
+
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
@@ -333,8 +477,8 @@ Classes
 
 .. py:class:: pointwiseLTR(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for pointwise learning to rank, where the goal is to
    learn an objective function that ranks a pool of feasible solutions
@@ -347,6 +491,10 @@ Classes
    descent.
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
+
+
+   .. py:attribute:: solpool
+
 
    .. py:method:: forward(pred_cost, true_cost)
 

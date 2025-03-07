@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.copt.knapsack`
-===================================
+pyepo.model.copt.knapsack
+=========================
 
 .. py:module:: pyepo.model.copt.knapsack
 
@@ -9,11 +9,16 @@
 
 
 
-Module Contents
----------------
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.copt.knapsack.cost
+
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -21,20 +26,13 @@ Classes
    pyepo.model.copt.knapsack.knapsackModelRel
 
 
-
-
-Attributes
-~~~~~~~~~~
-
-.. autoapisummary::
-
-   pyepo.model.copt.knapsack.cost
-
+Module Contents
+---------------
 
 .. py:class:: knapsackModel(weights, capacity)
 
-
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
+
 
    This class is optimization model for knapsack problem
 
@@ -68,9 +66,20 @@ Attributes
 
       :type: list
 
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
    .. py:method:: _getModel()
 
       A method to build pyomo model
+
 
 
    .. py:method:: relax()
@@ -81,14 +90,16 @@ Attributes
 
 .. py:class:: knapsackModelRel(weights, capacity)
 
-
    Bases: :py:obj:`knapsackModel`
 
+
    This class is relaxed optimization model for knapsack problem.
+
 
    .. py:method:: _getModel()
 
       A method to build pyomo
+
 
 
    .. py:method:: relax()
@@ -98,6 +109,4 @@ Attributes
 
 
 .. py:data:: cost
-
-   
 

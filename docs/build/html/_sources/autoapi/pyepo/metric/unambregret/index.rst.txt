@@ -1,5 +1,5 @@
-:py:mod:`pyepo.metric.unambregret`
-==================================
+pyepo.metric.unambregret
+========================
 
 .. py:module:: pyepo.metric.unambregret
 
@@ -9,12 +9,8 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -22,6 +18,8 @@ Functions
    pyepo.metric.unambregret.calUnambRegret
 
 
+Module Contents
+---------------
 
 .. py:function:: unambRegret(predmodel, optmodel, dataloader, tolerance=1e-05)
 

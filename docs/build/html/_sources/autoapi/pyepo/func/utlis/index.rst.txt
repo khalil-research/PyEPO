@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func.utlis`
-==========================
+pyepo.func.utlis
+================
 
 .. py:module:: pyepo.func.utlis
 
@@ -9,20 +9,16 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    pyepo.func.utlis.sumGammaDistribution
 
 
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -33,6 +29,8 @@ Functions
    pyepo.func.utlis._check_sol
 
 
+Module Contents
+---------------
 
 .. py:function:: _solve_or_cache(cp, module)
 
@@ -71,10 +69,20 @@ Functions
 
 .. py:class:: sumGammaDistribution(kappa, n_iterations=10, seed=135)
 
-
    creates a generator of samples for the Sum-of-Gamma distribution
 
-   .. py:method:: sample(size)
 
+   .. py:attribute:: κ
+
+
+   .. py:attribute:: n_iterations
+      :value: 10
+
+
+
+   .. py:attribute:: rnd
+
+
+   .. py:method:: sample(size)
 
 
