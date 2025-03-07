@@ -5,21 +5,23 @@ Shortest path problem
 """
 
 try:
-    import gurobipy as gp
-    from gurobipy import GRB
-    _HAS_GUROBI = True
+    import jax.numpy as jnp
+    from mpax import create_lp, r2HPDHG
+    _HAS_MPAX = True
 except ImportError:
-    _HAS_GUROBI = False
+    _HAS_MPAX = False
 
-from pyepo.model.grb.grbmodel import optGrbModel
+from pyepo import EPO
+from pyepo.model.opt import optModel
+
+from pyepo.model.mpax.mpaxmodel import optMpaxModel
 
 
-class shortestPathModel(optGrbModel):
+class shortestPathModel(optMpaxModel):
     """
     This class is optimization model for shortest path problem
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
         grid (tuple of int): Size of grid network
         arcs (list): List of arcs
     """
@@ -31,7 +33,8 @@ class shortestPathModel(optGrbModel):
         """
         self.grid = grid
         self.arcs = self._getArcs()
-        super().__init__()
+        A, b, u = self._constructMatrix()
+        super().__init__(A=A, b=b, u=u, use_sparse_matrix=True, minimize=True)
 
     def _getArcs(self):
         """
@@ -54,41 +57,31 @@ class shortestPathModel(optGrbModel):
                 arcs.append((v, v + self.grid[1]))
         return arcs
 
-    def _getModel(self):
+    def _constructMatrix(self):
         """
-        A method to build Gurobi model
+        Constructs the incidence matrix A, supply/demand vector b, and upper bound u
+        for the shortest path problem.
 
         Returns:
-            tuple: optimization model and variables
+            A (jnp.ndarray): Incidence matrix for flow conservation
+            b (jnp.ndarray): Supply/demand vector
+            u (jnp.ndarray): Upper bound for flow variables
         """
-        # ceate a model
-        m = gp.Model("shortest path")
-        # varibles
-        x = m.addVars(self.arcs, name="x")
-        # sense
-        m.modelSense = GRB.MINIMIZE
-        # constraints
-        for i in range(self.grid[0]):
-            for j in range(self.grid[1]):
-                v = i * self.grid[1] + j
-                expr = 0
-                for e in self.arcs:
-                    # flow in
-                    if v == e[1]:
-                        expr += x[e]
-                    # flow out
-                    elif v == e[0]:
-                        expr -= x[e]
-                # source
-                if i == 0 and j == 0:
-                    m.addConstr(expr == -1)
-                # sink
-                elif i == self.grid[0] - 1 and j == self.grid[1] - 1:
-                    m.addConstr(expr == 1)
-                # transition
-                else:
-                    m.addConstr(expr == 0)
-        return m, x
+        # number of nodes and arcs
+        num_nodes = self.grid[0] * self.grid[1]
+        num_arcs = len(self.arcs)
+        # construct incidence matrix A for flow conservation
+        A = jnp.zeros((num_nodes, num_arcs), dtype=jnp.float32)
+        for arc_idx, (start, end) in enumerate(self.arcs):
+            A = A.at[start, arc_idx].set(1)
+            A = A.at[end, arc_idx].set(-1)
+        # construct supply/demand vector b
+        b = jnp.zeros(num_nodes, dtype=jnp.float32)
+        b = b.at[0].set(1)                  # source node (top-left) sends one unit
+        b = b.at[num_nodes-1].set(-1)       # sink node (bottom-right) receives one unit
+        # upper bound
+        u = jnp.ones(len(self.arcs), dtype=jnp.float32)
+        return A, b, u
 
 
 if __name__ == "__main__":
@@ -109,7 +102,6 @@ if __name__ == "__main__":
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)
-
 
     # add constraint
     optmodel = optmodel.addConstr([1]*40, 30)

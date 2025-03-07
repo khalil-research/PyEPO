@@ -5,11 +5,15 @@ Abstract optimization model based on Pyomo
 """
 
 from copy import copy
-from pyomo import opt as po
-from pyomo import environ as pe
 
-from pyepo import EPO
-from pyepo.model.opt import optModel
+try:
+    from pyomo import opt as po
+    from pyomo import environ as pe
+    from pyepo import EPO
+    from pyepo.model.opt import optModel
+    _HAS_PYOMO = True
+except ImportError:
+    _HAS_PYOMO = False
 
 
 class optOmoModel(optModel):
@@ -27,6 +31,9 @@ class optOmoModel(optModel):
             solver (str): optimization solver in the background
         """
         super().__init__()
+        # error
+        if not _HAS_PYOMO:
+            raise ImportError("Pyomo is not installed. Please install pyomo to use this feature.")
         # init obj
         if self.modelSense == EPO.MINIMIZE:
             self._model.obj = pe.Objective(sense=pe.minimize, expr=0)
@@ -52,6 +59,11 @@ class optOmoModel(optModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
+        # check if c is a PyTorch tensor
+        if isinstance(c, torch.Tensor):
+            c = c.detach().cpu().numpy()
+        else:
+            c = np.asarray(c, dtype=np.float32)
         # delete previous component
         self._model.del_component(self._model.obj)
         # set obj

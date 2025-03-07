@@ -5,9 +5,18 @@ Utility function
 """
 
 import numpy as np
+import torch
 
 from pyepo import EPO
 from pyepo.utlis import getArgs
+from pyepo.model.mpax import optMpaxModel
+
+try:
+    import jax
+    from jax import numpy as jnp
+    from mpax import create_lp, r2HPDHG
+except ImportError:
+    pass
 
 
 def _solve_or_cache(cp, module):
@@ -30,21 +39,40 @@ def _solve_in_pass(cp, optmodel, processes, pool):
     """
     A function to solve optimization in the forward/backward pass
     """
+    # get device
+    device = cp.device
     # number of instance
     ins_num = len(cp)
+    # MPAX batch solving
+    if isinstance(optmodel, optMpaxModel):
+        # get params
+        optmodel.setObj(cp)
+        cp = optmodel.c
+        # batch solving
+        sol, obj = optmodel.batch_optimize(cp)
+        # convert to torch
+        sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
+        obj = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(obj)).to(device)
+        # obj sense
+        if optmodel.modelSense == EPO.MINIMIZE:
+            obj = obj
+        elif optmodel.modelSense == EPO.MAXIMIZE:
+            obj = - obj
+        else:
+            raise ValueError("Invalid modelSense.")
     # single-core
-    if processes == 1:
+    elif processes == 1:
         sol = []
         obj = []
         for i in range(ins_num):
             # solve
             optmodel.setObj(cp[i])
             solp, objp = optmodel.solve()
-            sol.append(solp)
+            sol.append(torch.as_tensor(solp))
             obj.append(objp)
-        # to numpy
-        sol = np.array(sol)
-        obj = np.array(obj)
+        # to tensor
+        sol = torch.stack(sol, dim=0).to(device)
+        obj = torch.tensor(obj, dtype=torch.float32, device=device)
     # multi-core
     else:
         # get class
@@ -55,8 +83,8 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         res = pool.amap(_solveWithObj4Par, cp, [args] * ins_num,
                         [model_type] * ins_num).get()
         # get res
-        sol = np.array(list(map(lambda x: x[0], res)))
-        obj = np.array(list(map(lambda x: x[1], res)))
+        sol = torch.stack([r[0] for r in res], dim=0).to(device)
+        obj = torch.tensor([r[1] for r in res], dtype=torch.float32, device=device)
     return sol, obj
 
 
@@ -64,15 +92,18 @@ def _cache_in_pass(cp, optmodel, solpool):
     """
     A function to use solution pool in the forward/backward pass
     """
-    # number of instance
-    ins_num = len(cp)
+    # get device
+    device = cp.device
+    # solpool is on the same device
+    if solpool.device != device:
+        solpool = solpool.to(device)
     # best solution in pool
-    solpool_obj = cp @ solpool.T
+    solpool_obj = torch.matmul(cp, solpool.T)
     if optmodel.modelSense == EPO.MINIMIZE:
-        ind = np.argmin(solpool_obj, axis=1)
+        ind = torch.argmin(solpool_obj, dim=1)
     if optmodel.modelSense == EPO.MAXIMIZE:
-        ind = np.argmax(solpool_obj, axis=1)
-    obj = np.take_along_axis(solpool_obj, ind.reshape(-1,1), axis=1).reshape(-1)
+        ind = torch.argmax(solpool_obj, dim=1)
+    obj = solpool_obj.gather(1, ind.view(-1, 1)).squeeze(1)
     sol = solpool[ind]
     return sol, obj
 
@@ -95,6 +126,8 @@ def _solveWithObj4Par(cost, args, model_type):
     optmodel.setObj(cost)
     # solve
     sol, obj = optmodel.solve()
+    # to tensor
+    sol = torch.tensor(sol, dtype=torch.float32)
     return sol, obj
 
 
@@ -102,12 +135,9 @@ def _check_sol(c, w, z):
     """
     A function to check solution is correct
     """
-    ins_num = len(z)
-    for i in range(ins_num):
-        if abs(z[i] - c[i] @ w[i]) / (abs(z[i]) + 1e-3) >= 1e-3:
-            raise AssertionError(
-                "Solution {} does not macth the objective value {}.".
-                format(c[i] @ w[i], z[i][0]))
+    error = torch.abs(z - torch.einsum("bi,bi->b", c, w)) / (torch.abs(z) + 1e-3)
+    if torch.any(error >= 1e-3):
+        raise AssertionError("Some solutions do not match the objective value.")
 
 
 class sumGammaDistribution:

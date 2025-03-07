@@ -38,7 +38,7 @@ class blackboxOpt(optModule):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # smoothing parameter
         if lambd <= 0:
             raise ValueError("lambda is not positive.")
@@ -74,11 +74,9 @@ class blackboxOptFunc(Function):
         # get device
         device = pred_cost.device
         # convert tensor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # solve
         sol, _ = _solve_or_cache(cp, module)
-        # convert to tensor
-        sol = torch.tensor(sol, dtype=torch.float, device=device)
         # save
         ctx.save_for_backward(pred_cost, sol)
         # add other objects to ctx
@@ -97,9 +95,9 @@ class blackboxOptFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
-        wp = pred_sol.detach().to("cpu").numpy()
-        dl = grad_output.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
+        wp = pred_sol.detach()
+        dl = grad_output.detach()
         # perturbed costs
         cq = cp + lambd * dl
         # solve
@@ -107,7 +105,7 @@ class blackboxOptFunc(Function):
         # get gradient
         grad = (sol - wp) / module.lambd
         # convert to tensor
-        grad = torch.tensor(grad, dtype=torch.float, device=device)
+        grad = torch.as_tensor(grad, dtype=torch.float, device=device)
         return grad, None
 
 
@@ -136,7 +134,7 @@ class negativeIdentity(optModule):
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset)
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # build blackbox optimizer
         self.nid = negativeIdentityFunc()
 
@@ -168,11 +166,9 @@ class negativeIdentityFunc(Function):
         # get device
         device = pred_cost.device
         # convert tenstor
-        cp = pred_cost.detach().to("cpu").numpy()
+        cp = pred_cost.detach()
         # solve
         sol, _ = _solve_or_cache(cp, module)
-        # convert to tensor
-        sol = torch.tensor(sol, dtype=torch.float, device=device)
         # add other objects to ctx
         ctx.optmodel = module.optmodel
         return sol

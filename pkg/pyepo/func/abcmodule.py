@@ -9,10 +9,12 @@ import multiprocessing as mp
 from pathos.multiprocessing import ProcessingPool
 
 import numpy as np
+import torch
 from torch import nn
 
 from pyepo.data.dataset import optDataset
 from pyepo.model.opt import optModel
+from pyepo.model.mpax import optMpaxModel
 
 
 class optModule(nn.Module):
@@ -34,6 +36,10 @@ class optModule(nn.Module):
         if not isinstance(optmodel, optModel):
             raise TypeError("arg model is not an optModel")
         self.optmodel = optmodel
+        # force processes to 1 for MPAX
+        if isinstance(optmodel, optMpaxModel) and processes > 1:
+            print("MPAX does not support multiprocessing. Setting `processes = 1`.")
+            processes = 1
         # number of processes
         if processes not in range(mp.cpu_count()+1):
             raise ValueError("Invalid processors number {}, only {} cores.".
@@ -55,7 +61,10 @@ class optModule(nn.Module):
         if self.solve_ratio < 1: # init solution pool
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
-            self.solpool = np.unique(dataset.sols.copy(), axis=0) # remove duplicate
+            # convert to tensor
+            self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+            # remove duplicate
+            self.solpool = torch.unique(self.solpool, dim=0)
         # reduction
         self.reduction = reduction
 
@@ -71,7 +80,12 @@ class optModule(nn.Module):
         """
         Add new solutions to solution pool
         """
+        if self.solpool is None:
+            self.solpool = sol.clone()
+            return
+        # to tenstor
+        sol = torch.as_tensor(sol).to(self.solpool.device)
         # add into solpool
-        self.solpool = np.concatenate((self.solpool, sol))
+        self.solpool = torch.cat((self.solpool, sol), dim=0)
         # remove duplicate
-        self.solpool = np.unique(self.solpool, axis=0)
+        self.solpool = torch.unique(self.solpool, dim=0)

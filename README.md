@@ -37,7 +37,7 @@ Citation:
 
 ## Introduction
 
-``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules.
+``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), [MPAX](https://github.com/MIT-Lu-Lab/MPAX) or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules.
 
 
 ## Documentation
@@ -57,17 +57,18 @@ Our recent tutorial was at the ACC 2024 conference. You can view the talk slides
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb)**05 Warcraft Shortest Path:** Use the Warcraft terrains dateset to train shortest path
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Real-World%20Energy%20Scheduling.ipynb)**06 Real-World Energy Scheduling:** Apply PyEPO to real energy data
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20kNN%20Robust%20Losses.ipynb)**07 kNN Robust Losses:** Use the optDatasetKNN for robust losses
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20Solving%20on%20MPAX%20with%20PDHG.ipynb)**08 Solving on MPAX with PDHG:** Use the MPAX for GPU batch solving
 
 
 ## Experiments
 
-To reproduce the experiments in the original paper, please use the code and follow the instructions in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC).
+To **reproduce the experiments** in the original paper, please use the code and follow the instructions in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC). Please note that this branch is a very early version.
 
 
 ## Features
 
 - Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[7]](https://arxiv.org/abs/2205.15213), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **PFY** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **NCE** [[5]](https://www.ijcai.org/proceedings/2021/390) and **LTR** [[6]](https://proceedings.mlr.press/v162/mandi22a.htm), **I-MLE** [[8]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[9]](https://ojs.aaai.org/index.php/AAAI/article/view/26103), and **PG** [[11]](https://arxiv.org/abs/2402.03256).
-- Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), and [Pyomo](http://www.pyomo.org/) API
+- Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/) and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
 - Support Parallel computing for optimization solver
 - Support solution caching [[5]](https://www.ijcai.org/proceedings/2021/390) to speed up training
 - Support kNN robust loss [[10]](https://arxiv.org/abs/2310.04328) to improve decision quality
