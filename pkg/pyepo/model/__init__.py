@@ -17,3 +17,7 @@ try:
     from pyepo.model import omo
 except:
     pass
+try:
+    from pyepo.model import mpax
+except:
+    pass

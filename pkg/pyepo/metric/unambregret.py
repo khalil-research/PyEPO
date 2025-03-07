@@ -67,7 +67,9 @@ def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
     # opt sol for pred cost
     optmodel.setObj(cp)
     sol, objp = optmodel.solve()
-    sol = np.array(sol)
+    # to numpy
+    if isinstance(sol, torch.Tensor):
+        sol = sol.detach().cpu().numpy()
     objp = np.ceil(np.dot(cp, sol.T))
     # opt for pred cost
     if optmodel.modelSense == EPO.MINIMIZE:

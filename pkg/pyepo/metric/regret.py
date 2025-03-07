@@ -62,6 +62,9 @@ def calRegret(optmodel, pred_cost, true_cost, true_obj):
     # opt sol for pred cost
     optmodel.setObj(pred_cost)
     sol, _ = optmodel.solve()
+    # to numpy
+    if isinstance(sol, torch.Tensor):
+        sol = sol.detach().cpu().numpy()
     # obj with true cost
     obj = np.dot(sol, true_cost)
     # loss

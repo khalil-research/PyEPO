@@ -7,8 +7,14 @@ Abstract optimization model based on GurobiPy
 from copy import copy
 
 import numpy as np
-import gurobipy as gp
-from gurobipy import GRB
+import torch
+
+try:
+    import gurobipy as gp
+    from gurobipy import GRB
+    _HAS_GUROBI = True
+except ImportError:
+    _HAS_GUROBI = False
 
 from pyepo import EPO
 from pyepo.model.opt import optModel
@@ -24,6 +30,9 @@ class optGrbModel(optModel):
 
     def __init__(self):
         super().__init__()
+        # error
+        if not _HAS_GUROBI:
+            raise ImportError("Gurobi is not installed. Please install gurobipy to use this feature.")
         # model sense
         self._model.update()
         if self._model.modelSense == GRB.MINIMIZE:
@@ -52,9 +61,14 @@ class optGrbModel(optModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector cannot match vars.")
+        # check if c is a PyTorch tensor
+        if isinstance(c, torch.Tensor):
+            c = c.detach().cpu().numpy()
+        else:
+            c = np.asarray(c, dtype=np.float32)
         # mvar
         if isinstance(self.x, gp.MVar):
-            obj = np.array(c) @ self.x
+            obj = c @ self.x
         # vars
         else:
             obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
