@@ -34,8 +34,8 @@ class knapsackModel(optOmoModel):
             capacity (np.ndarray / list): total capacity
             solver (str): optimization solver in the background
         """
-        self.weights = np.array(weights)
-        self.capacity = np.array(capacity)
+        self.weights = np.asarray(weights)
+        self.capacity = np.asarray(capacity)
         self.items = list(range(self.weights.shape[1]))
         super().__init__(solver)
 

@@ -68,7 +68,7 @@ class optGrbModel(optModel):
             c = np.asarray(c, dtype=np.float32)
         # mvar
         if isinstance(self.x, gp.MVar):
-            obj = np.array(c) @ self.x
+            obj = c @ self.x
         # vars
         else:
             obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
