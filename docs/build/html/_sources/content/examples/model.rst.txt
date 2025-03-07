@@ -138,6 +138,61 @@ In the general case, users only need to implement ``_getModel`` method with Pyom
    myoptmodel.solve() # solve
 
 
+User-defined COPTPy Models
+----------------------------
+
+   User-defined models withCOPTPy can be easily defined by the inheritance of the abstract class ``pyepo.model.copt.optCoptModel``.
+
+   For ``optCoptModel``, users does not need specify the sense ``modelSense`` as ``EPO.MINIMIZE`` or ``EPO.MINIMIZE``. Both the minimization and maximization models are correctly recognized and run by ``pyepo``.
+
+   .. autoclass:: pyepo.model.copt.optCoptModel
+       :noindex:
+       :members: __init__, _getModel, setObj, solve, num_cost, relax
+
+
+   For example, users can build models for the following problem:
+
+   .. math::
+     \begin{aligned}
+     \max_{x} & \sum_{i=0}^4 c_i x_i \\
+     s.t. \quad & 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
+     & 4 x_0 + 5 x_1 + 2 x_2 + 3 x_3 + 5 x_4 \leq 10 \\
+     & 5 x_0 + 4 x_1 + 6 x_2 + 2 x_3 + 3 x_4 \leq 15 \\
+     & \forall x_i \in \{0, 1\}
+     \end{aligned}
+
+   In the general case, users only need to implement ``_getModel`` method with GurobiPy.
+
+   .. code-block:: python
+
+      import random
+
+      from coptpy import COPT
+      from coptpy import Envr
+
+      from pyepo.model.copt import optCoptModel
+
+      class myModel(optGrbModel):
+
+          def _getModel(self):
+              # create a model
+              m = Envr().createModel()
+              # variables
+              x = m.addVars(5, nameprefix='x', vtype=COPT.BINARY)
+              # model sense
+              m.setObjSense(COPT.MAXIMIZE)
+              # constraints
+              m.addConstr(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
+              m.addConstr(4 * x[0] + 5 * x[1] + 2 * x[2] + 3 * x[3] + 5 * x[4] <= 10)
+              m.addConstr(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
+              return m, x
+
+      myoptmodel = myModel()
+      cost = [random.random() for _ in range(myoptmodel.num_cost)] # random cost vector
+      myoptmodel.setObj(cost) # set objective function
+      myoptmodel.solve() # solve
+
+
 User-defined Models from Scratch
 --------------------------------
 
@@ -251,6 +306,46 @@ For example, we can use ``networkx`` to solve the previous shortest path problem
    for i, e in enumerate(myoptmodel.arcs):
        if sol[i] > 1e-3:
            print(e)
+
+
+MPAX Models
+===========
+
+MPAX (Mathematical Programming in JAX) is a highly efficient mathematical programming framework that is hardware-accelerated, batchable, and distributable, designed to integrate with modern computational and deep learning workflows. At its core, MPAX leverages PDHG (Primal-Dual Hybrid Gradient), a powerful first-order optimization algorithm particularly efficient for large-scale problems
+
+``optMpaxModel`` is a PyEPO optimization model that leverages MPAX for solving LP problems (not ILP) using the PDHG algorithm. 
+
+.. autoclass:: pyepo.model.mpax.optMpaxModel
+  :noindex:
+  :members: __init__, _getModel, setObj, solve, num_cost, relax
+
+It only accepts model coefficients in matrix and vector form. This means:
+
+   - Constraints must be explicitly provided as matrices and vectors (no symbolic constraints).
+   - No direct support for constraints in Python functions (e.g., defining Ax = b in a callable function).
+   - If ``A`` and ``b`` are not provided, it means **there are no equality constraints** in the problem.
+   - If ``G`` and ``h`` are not provided, it means **there are no inequality constraints** in the problem.
+   - The default value for ``l`` (lower bound) is 0, meaning all variables are **non-negative** unless specified otherwise.
+   - The default value for ``u`` (upper bound) is infinity, meaning variables are **unbounded** unless explicitly set.
+
+In addition to model parameters, we also have two additional settings:
+
+   - ``use_sparse_matrix`` (``bool``, default: ``True``) – Stores constraint matrices in a sparse format or not. Choosing the right matrix type is crucial for optimization efficiency.
+   - ``minimize`` (``bool``, default: ``True``) – Defines whether to minimize the objective function.
+
+Now, we create an optMpaxModel instance with the defined constraints.
+
+.. code-block:: python
+
+   from pyepo.model.mpax import optMpaxModel
+   optmodel = optMpaxModel(A=A, b=b, G=G, h=h, use_sparse_matrix=False, minimize=True)
+
+Same as ``pyepo.model.grb.shortestPathModel``, methods ``setObj`` and ``solve`` can specify objective function and solve the problem.
+
+.. code-block:: python
+
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
 
 
 Pre-defined Models
