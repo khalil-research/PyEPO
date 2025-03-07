@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func.abcmodule`
-==============================
+pyepo.func.abcmodule
+====================
 
 .. py:module:: pyepo.func.abcmodule
 
@@ -9,31 +9,55 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    pyepo.func.abcmodule.optModule
 
 
-
+Module Contents
+---------------
 
 .. py:class:: optModule(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`torch.nn.Module`
+
 
    An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
    vector and the true cost vector rank a pool of feasible solutions.
 
+
+   .. py:attribute:: optmodel
+
+
+   .. py:attribute:: processes
+      :value: 1
+
+
+
+   .. py:attribute:: solve_ratio
+      :value: 1
+
+
+
+   .. py:attribute:: solpool
+      :value: None
+
+
+
+   .. py:attribute:: reduction
+      :value: 'mean'
+
+
+
    .. py:method:: forward(pred_cost, true_cost)
       :abstractmethod:
 
+
       Forward pass
+
 
 
    .. py:method:: _update_solution_pool(sol)

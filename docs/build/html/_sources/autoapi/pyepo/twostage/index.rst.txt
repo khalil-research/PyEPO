@@ -1,5 +1,5 @@
-:py:mod:`pyepo.twostage`
-========================
+pyepo.twostage
+==============
 
 .. py:module:: pyepo.twostage
 
@@ -11,26 +11,25 @@
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   autosklearnpred/index.rst
-   sklearnpred/index.rst
-
-
-Package Contents
-----------------
+   /autoapi/pyepo/twostage/autosklearnpred/index
+   /autoapi/pyepo/twostage/sklearnpred/index
 
 
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    pyepo.twostage.sklearnPred
+   pyepo.twostage.autoSklearnPred
 
 
+Package Contents
+----------------
 
 .. py:function:: sklearnPred(pmodel)
 
@@ -41,5 +40,16 @@ Functions
 
    :returns: scikit-learn multi-output regression model
    :rtype: MultiOutputRegressor
+
+
+.. py:function:: autoSklearnPred(optmodel, seed, timelimit, metric='mse')
+
+   Two-stage prediction and optimization with auto-sklearn.
+
+   :param optmodel: optimization model
+   :type optmodel: optModel
+
+   :returns: Auto-SKlearn multi-output regression model
+   :rtype: AutoSklearnRegressor
 
 

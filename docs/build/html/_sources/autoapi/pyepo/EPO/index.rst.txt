@@ -1,5 +1,5 @@
-:py:mod:`pyepo.EPO`
-===================
+pyepo.EPO
+=========
 
 .. py:module:: pyepo.EPO
 
@@ -9,15 +9,23 @@
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.EPO.MINIMIZE
+   pyepo.EPO.MAXIMIZE
+
+
 Module Contents
 ---------------
 
 .. py:data:: MINIMIZE
    :value: 1
 
-   
 
 .. py:data:: MAXIMIZE
+   :value: -1
 
-   
 

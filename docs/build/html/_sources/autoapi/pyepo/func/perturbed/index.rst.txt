@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func.perturbed`
-==============================
+pyepo.func.perturbed
+====================
 
 .. py:module:: pyepo.func.perturbed
 
@@ -9,11 +9,8 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -27,9 +24,8 @@ Classes
    pyepo.func.perturbed.adaptiveImplicitMLEFunc
 
 
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -39,11 +35,13 @@ Functions
    pyepo.func.perturbed._solveWithObj4Par
 
 
+Module Contents
+---------------
 
 .. py:class:: perturbedOpt(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
    use of the loss improves the algorithmic by the specific expression of the
@@ -57,6 +55,23 @@ Functions
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: rnd
+
+
+   .. py:attribute:: ptb
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -65,13 +80,15 @@ Functions
 
 .. py:class:: perturbedOptFunc(*args, **kwargs)
 
-
    Bases: :py:obj:`torch.autograd.Function`
+
 
    A autograd function for perturbed optimizer
 
+
    .. py:method:: forward(ctx, pred_cost, module)
       :staticmethod:
+
 
       Forward pass for perturbed
 
@@ -84,8 +101,10 @@ Functions
       :rtype: torch.tensor
 
 
+
    .. py:method:: backward(ctx, grad_output)
       :staticmethod:
+
 
       Backward pass for perturbed
 
@@ -93,8 +112,8 @@ Functions
 
 .. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
    use of the loss improves the algorithmic by the specific expression of the
@@ -109,6 +128,23 @@ Functions
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: rnd
+
+
+   .. py:attribute:: pfy
+
+
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
@@ -117,13 +153,15 @@ Functions
 
 .. py:class:: perturbedFenchelYoungFunc(*args, **kwargs)
 
-
    Bases: :py:obj:`torch.autograd.Function`
+
 
    A autograd function for Fenchel-Young loss using perturbation techniques.
 
+
    .. py:method:: forward(ctx, pred_cost, true_sol, module)
       :staticmethod:
+
 
       Forward pass for perturbed Fenchel-Young loss
 
@@ -138,8 +176,10 @@ Functions
       :rtype: torch.tensor
 
 
+
    .. py:method:: backward(ctx, grad_output)
       :staticmethod:
+
 
       Backward pass for perturbed Fenchel-Young loss
 
@@ -147,8 +187,8 @@ Functions
 
 .. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Implicit Maximum Likelihood Estimator, which yield
    an optimal solution in a constrained exponential family distribution via
@@ -163,6 +203,33 @@ Functions
 
    Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
 
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: lambd
+      :value: 10
+
+
+
+   .. py:attribute:: distribution
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
+   .. py:attribute:: imle
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -171,13 +238,15 @@ Functions
 
 .. py:class:: implicitMLEFunc(*args, **kwargs)
 
-
    Bases: :py:obj:`torch.autograd.Function`
+
 
    A autograd function for Implicit Maximum Likelihood Estimator
 
+
    .. py:method:: forward(ctx, pred_cost, module)
       :staticmethod:
+
 
       Forward pass for IMLE
 
@@ -190,8 +259,10 @@ Functions
       :rtype: torch.tensor
 
 
+
    .. py:method:: backward(ctx, grad_output)
       :staticmethod:
+
 
       Backward pass for IMLE
 
@@ -199,8 +270,8 @@ Functions
 
 .. py:class:: adaptiveImplicitMLE(optmodel, n_samples=10, sigma=1.0, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
    adaptively choose hyperparameter λ and yield an optimal solution in a
@@ -215,6 +286,43 @@ Functions
 
    Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
 
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: distribution
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
+   .. py:attribute:: alpha
+      :value: 0
+
+
+
+   .. py:attribute:: grad_norm_avg
+      :value: 1
+
+
+
+   .. py:attribute:: step
+      :value: 0.001
+
+
+
+   .. py:attribute:: aimle
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -223,20 +331,21 @@ Functions
 
 .. py:class:: adaptiveImplicitMLEFunc(*args, **kwargs)
 
-
    Bases: :py:obj:`implicitMLEFunc`
+
 
    A autograd function for Adaptive Implicit Maximum Likelihood Estimator
 
+
    .. py:method:: backward(ctx, grad_output)
       :staticmethod:
+
 
       Backward pass for IMLE
 
 
 
 .. py:function:: _solve_or_cache(ptb_c, module)
-
 
 .. py:function:: _solve_in_pass(ptb_c, optmodel, processes, pool)
 

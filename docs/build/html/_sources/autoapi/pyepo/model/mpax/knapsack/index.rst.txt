@@ -1,0 +1,90 @@
+pyepo.model.mpax.knapsack
+=========================
+
+.. py:module:: pyepo.model.mpax.knapsack
+
+.. autoapi-nested-parse::
+
+   Knapsack problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.knapsack._HAS_MPAX
+   pyepo.model.mpax.knapsack.cost
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.knapsack.knapsackModel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_MPAX
+   :value: True
+
+
+.. py:class:: knapsackModel(weights, capacity)
+
+   Bases: :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
+
+
+   This class is optimization model for relexed knapsack problem
+
+   .. attribute:: _model
+
+      Gurobi model
+
+      :type: GurobiPy model
+
+   .. attribute:: weights
+
+      Weights of items
+
+      :type: np.ndarray / list
+
+   .. attribute:: capacity
+
+      Total capacity
+
+      :type: np.ndarray / listy
+
+   .. attribute:: items
+
+      List of item index
+
+      :type: list
+
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
+   .. py:method:: _constructMatrix()
+
+      Constructs the inequality constraint matrix G, right-hand side h, and
+      upper bound u for the knapsack problem.
+
+      :returns: Weights of items
+                h (jnp.ndarray): Total capacity
+                u (jnp.ndarray): Upper bound for item selection
+      :rtype: G (jnp.ndarray)
+
+
+
+.. py:data:: cost
+

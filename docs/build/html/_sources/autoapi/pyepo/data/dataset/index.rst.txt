@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data.dataset`
-============================
+pyepo.data.dataset
+==================
 
 .. py:module:: pyepo.data.dataset
 
@@ -9,11 +9,8 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -21,12 +18,13 @@ Classes
    pyepo.data.dataset.optDatasetKNN
 
 
-
+Module Contents
+---------------
 
 .. py:class:: optDataset(model, feats, costs)
 
-
    Bases: :py:obj:`torch.utils.data.Dataset`
+
 
    This class is Torch Dataset for optimization problems.
 
@@ -60,9 +58,20 @@ Classes
 
       :type: np.ndarray
 
+
+   .. py:attribute:: model
+
+
+   .. py:attribute:: feats
+
+
+   .. py:attribute:: costs
+
+
    .. py:method:: _getSols()
 
       A method to get optimal solutions for all cost vectors
+
 
 
    .. py:method:: _solve(cost)
@@ -76,12 +85,14 @@ Classes
       :rtype: tuple
 
 
+
    .. py:method:: __len__()
 
       A method to get data size
 
       :returns: the number of optimization problems
       :rtype: int
+
 
 
    .. py:method:: __getitem__(index)
@@ -98,8 +109,8 @@ Classes
 
 .. py:class:: optDatasetKNN(model, feats, costs, k=10, weight=0.5)
 
-
    Bases: :py:obj:`optDataset`
+
 
    This class is Torch Dataset for optimization problems, when using the robust kNN-loss.
 
@@ -147,9 +158,30 @@ Classes
 
       :type: np.ndarray
 
+
+   .. py:attribute:: model
+
+
+   .. py:attribute:: k
+      :value: 10
+
+
+
+   .. py:attribute:: weight
+      :value: 0.5
+
+
+
+   .. py:attribute:: feats
+
+
+   .. py:attribute:: costs
+
+
    .. py:method:: _getSols()
 
       A method to get optimal solutions for all cost vectors
+
 
 
    .. py:method:: _getKNN()

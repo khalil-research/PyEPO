@@ -1,5 +1,5 @@
-:py:mod:`pyepo.twostage.sklearnpred`
-====================================
+pyepo.twostage.sklearnpred
+==========================
 
 .. py:module:: pyepo.twostage.sklearnpred
 
@@ -9,18 +9,16 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    pyepo.twostage.sklearnpred.sklearnPred
 
 
+Module Contents
+---------------
 
 .. py:function:: sklearnPred(pmodel)
 

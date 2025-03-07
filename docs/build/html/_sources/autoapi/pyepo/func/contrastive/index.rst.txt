@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func.contrastive`
-================================
+pyepo.func.contrastive
+======================
 
 .. py:module:: pyepo.func.contrastive
 
@@ -9,11 +9,8 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -21,12 +18,13 @@ Classes
    pyepo.func.contrastive.contrastiveMAP
 
 
-
+Module Contents
+---------------
 
 .. py:class:: NCE(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for noise contrastive estimation as surrogate loss
    functions, based on viewing suboptimal solutions as negative examples.
@@ -38,6 +36,10 @@ Classes
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
+
+   .. py:attribute:: solpool
+
+
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
@@ -46,8 +48,8 @@ Classes
 
 .. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1, reduction='mean', dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for Maximum A Posterior contrastive estimation as
    surrogate loss functions, which is an efficient self-contrastive algorithm.
@@ -58,6 +60,10 @@ Classes
    Thus, it allows us to design an algorithm based on stochastic gradient descent.
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
+
+
+   .. py:attribute:: solpool
+
 
    .. py:method:: forward(pred_cost, true_sol)
 

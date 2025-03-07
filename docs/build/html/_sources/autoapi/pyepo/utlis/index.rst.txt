@@ -1,5 +1,5 @@
-:py:mod:`pyepo.utlis`
-=====================
+pyepo.utlis
+===========
 
 .. py:module:: pyepo.utlis
 
@@ -9,18 +9,16 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    pyepo.utlis.getArgs
 
 
+Module Contents
+---------------
 
 .. py:function:: getArgs(model)
 

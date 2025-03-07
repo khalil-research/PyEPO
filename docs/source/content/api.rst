@@ -2,7 +2,7 @@ Module
 ++++++
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    modules/pyepo.data
    modules/pyepo.model

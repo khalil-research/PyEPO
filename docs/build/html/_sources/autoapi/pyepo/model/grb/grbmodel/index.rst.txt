@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.grb.grbmodel`
-==================================
+pyepo.model.grb.grbmodel
+========================
 
 .. py:module:: pyepo.model.grb.grbmodel
 
@@ -9,23 +9,33 @@
 
 
 
-Module Contents
----------------
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.grb.grbmodel._HAS_GUROBI
+
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    pyepo.model.grb.grbmodel.optGrbModel
 
 
+Module Contents
+---------------
+
+.. py:data:: _HAS_GUROBI
+   :value: True
 
 
 .. py:class:: optGrbModel
 
-
    Bases: :py:obj:`pyepo.model.opt.optModel`
+
 
    This is an abstract class for Gurobi-based optimization model
 
@@ -35,13 +45,13 @@ Classes
 
       :type: GurobiPy model
 
-   .. py:property:: num_cost
-
-      number of cost to be predicted
 
    .. py:method:: __repr__()
 
-      Return repr(self).
+
+   .. py:property:: num_cost
+
+      number of cost to be predicted
 
 
    .. py:method:: setObj(c)
@@ -52,6 +62,7 @@ Classes
       :type c: np.ndarray / list
 
 
+
    .. py:method:: solve()
 
       A method to solve model
@@ -60,12 +71,14 @@ Classes
       :rtype: tuple
 
 
+
    .. py:method:: copy()
 
       A method to copy model
 
       :returns: new copied model
       :rtype: optModel
+
 
 
    .. py:method:: addConstr(coefs, rhs)

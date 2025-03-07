@@ -1,5 +1,5 @@
-:py:mod:`pyepo.metric.metrics`
-==============================
+pyepo.metric.metrics
+====================
 
 .. py:module:: pyepo.metric.metrics
 
@@ -9,12 +9,8 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -25,6 +21,8 @@ Functions
    pyepo.metric.metrics.makeTestMSEScorer
 
 
+Module Contents
+---------------
 
 .. py:function:: SPOError(pred_cost, true_cost, model_type, args)
 

@@ -1,5 +1,5 @@
-:py:mod:`pyepo.metric.mse`
-==========================
+pyepo.metric.mse
+================
 
 .. py:module:: pyepo.metric.mse
 
@@ -9,18 +9,16 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    pyepo.metric.mse.MSE
 
 
+Module Contents
+---------------
 
 .. py:function:: MSE(predmodel, dataloader)
 

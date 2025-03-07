@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Optimization Model based on GurobiPy
+Optimization Model based on MPAX
 """
 
 from pyepo.model.mpax.mpaxmodel import optMpaxModel

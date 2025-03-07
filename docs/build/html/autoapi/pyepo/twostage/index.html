@@ -1,25 +1,23 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyepo.twostage &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
 
   
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=34cd777e"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=34cd777e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -54,18 +52,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../index.html#id1"><p>Duplicate implicit target name: “pyepo”.</p>
-</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../index.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../func/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../metric/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../model/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model</span></code></a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage</span></code></a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">pyepo</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../data/index.html">pyepo.data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../func/index.html">pyepo.func</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metric/index.html">pyepo.metric</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../model/index.html">pyepo.model</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pyepo.twostage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utlis/index.html">pyepo.utlis</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#submodules">Submodules</a></li>
 </ul>
 </li>
 </ul>
@@ -87,8 +84,8 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">API Reference</a></li>
-          <li class="breadcrumb-item"><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a></li>
-      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage</span></code></li>
+          <li class="breadcrumb-item"><a href="../index.html">pyepo</a></li>
+      <li class="breadcrumb-item active">pyepo.twostage</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/autoapi/pyepo/twostage/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -99,28 +96,32 @@
            <div itemprop="articleBody">
              
   <section id="module-pyepo.twostage">
-<span id="pyepo-twostage"></span><h1><a class="reference internal" href="#module-pyepo.twostage" title="pyepo.twostage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage</span></code></a><a class="headerlink" href="#module-pyepo.twostage" title="Link to this heading"></a></h1>
+<span id="pyepo-twostage"></span><h1>pyepo.twostage<a class="headerlink" href="#module-pyepo.twostage" title="Link to this heading"></a></h1>
 <p>Two-stage predict then optimize model</p>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="autosklearnpred/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage.autosklearnpred</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="sklearnpred/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage.sklearnpred</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
 </ul>
 </div>
 </section>
-<section id="package-contents">
-<h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading"></a></h2>
 <section id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.twostage.sklearnPred" title="pyepo.twostage.sklearnPred"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearnPred</span></code></a>(pmodel)</p></td>
 <td><p>Two-stage prediction and optimization with scikit-learn.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.twostage.autoSklearnPred" title="pyepo.twostage.autoSklearnPred"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autoSklearnPred</span></code></a>(optmodel, seed, timelimit[, metric])</p></td>
+<td><p>Two-stage prediction and optimization with auto-sklearn.</p></td>
+</tr>
 </tbody>
 </table>
+</section>
+<section id="package-contents">
+<h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.twostage.sklearnPred">
 <span class="sig-prename descclassname"><span class="pre">pyepo.twostage.</span></span><span class="sig-name descname"><span class="pre">sklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmodel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.twostage.sklearnPred" title="Link to this definition"></a></dt>
@@ -138,7 +139,23 @@
 </dl>
 </dd></dl>
 
-</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.twostage.autoSklearnPred">
+<span class="sig-prename descclassname"><span class="pre">pyepo.twostage.</span></span><span class="sig-name descname"><span class="pre">autoSklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timelimit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.twostage.autoSklearnPred" title="Link to this definition"></a></dt>
+<dd><p>Two-stage prediction and optimization with auto-sklearn.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>optmodel</strong> (<a class="reference internal" href="../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – optimization model</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Auto-SKlearn multi-output regression model</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AutoSklearnRegressor</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 

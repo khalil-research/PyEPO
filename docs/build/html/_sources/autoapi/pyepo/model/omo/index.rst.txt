@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.omo`
-=========================
+pyepo.model.omo
+===============
 
 .. py:module:: pyepo.model.omo
 
@@ -11,20 +11,17 @@
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   knapsack/index.rst
-   omomodel/index.rst
-   shortestpath/index.rst
+   /autoapi/pyepo/model/omo/knapsack/index
+   /autoapi/pyepo/model/omo/omomodel/index
+   /autoapi/pyepo/model/omo/shortestpath/index
 
-
-Package Contents
-----------------
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -34,12 +31,13 @@ Classes
    pyepo.model.omo.knapsackModelRel
 
 
-
+Package Contents
+----------------
 
 .. py:class:: optOmoModel(solver='glpk')
 
-
    Bases: :py:obj:`pyepo.model.opt.optModel`
+
 
    This is an abstract class for Pyomo-based optimization model
 
@@ -55,9 +53,13 @@ Classes
 
       :type: str
 
-   .. py:method:: __repr__()
 
-      Return repr(self).
+   .. py:attribute:: solver
+      :value: 'glpk'
+
+
+
+   .. py:method:: __repr__()
 
 
    .. py:method:: setObj(c)
@@ -68,6 +70,7 @@ Classes
       :type c: np.ndarray / list
 
 
+
    .. py:method:: solve()
 
       A method to solve model
@@ -76,12 +79,14 @@ Classes
       :rtype: tuple
 
 
+
    .. py:method:: copy()
 
       A method to copy model
 
       :returns: new copied model
       :rtype: optModel
+
 
 
    .. py:method:: addConstr(coefs, rhs)
@@ -100,8 +105,8 @@ Classes
 
 .. py:class:: shortestPathModel(grid, solver='glpk')
 
-
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+
 
    This class is optimization model for shortest path problem
 
@@ -129,12 +134,22 @@ Classes
 
       :type: list
 
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
    .. py:method:: _getArcs()
 
       A method to get list of arcs for grid network
 
       :returns: arcs
       :rtype: list
+
 
 
    .. py:method:: _getModel()
@@ -145,8 +160,8 @@ Classes
 
 .. py:class:: knapsackModel(weights, capacity, solver='glpk')
 
-
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+
 
    This class is optimization model for knapsack problem
 
@@ -180,9 +195,20 @@ Classes
 
       :type: list
 
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
    .. py:method:: _getModel()
 
       A method to build pyomo model
+
 
 
    .. py:method:: relax()
@@ -193,14 +219,16 @@ Classes
 
 .. py:class:: knapsackModelRel(weights, capacity, solver='glpk')
 
-
    Bases: :py:obj:`knapsackModel`
 
+
    This class is relaxed optimization model for knapsack problem.
+
 
    .. py:method:: _getModel()
 
       A method to build pyomo
+
 
 
    .. py:method:: relax()

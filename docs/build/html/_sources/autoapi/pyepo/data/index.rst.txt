@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data`
-====================
+pyepo.data
+==========
 
 .. py:module:: pyepo.data
 
@@ -11,14 +11,14 @@
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   dataset/index.rst
-   knapsack/index.rst
-   portfolio/index.rst
-   shortestpath/index.rst
-   tsp/index.rst
+   /autoapi/pyepo/data/dataset/index
+   /autoapi/pyepo/data/knapsack/index
+   /autoapi/pyepo/data/portfolio/index
+   /autoapi/pyepo/data/shortestpath/index
+   /autoapi/pyepo/data/tsp/index
 
 

@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data.shortestpath`
-=================================
+pyepo.data.shortestpath
+=======================
 
 .. py:module:: pyepo.data.shortestpath
 
@@ -9,18 +9,16 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    pyepo.data.shortestpath.genData
 
 
+Module Contents
+---------------
 
 .. py:function:: genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135)
 

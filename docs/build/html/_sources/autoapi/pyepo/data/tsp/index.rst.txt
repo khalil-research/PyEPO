@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data.tsp`
-========================
+pyepo.data.tsp
+==============
 
 .. py:module:: pyepo.data.tsp
 
@@ -9,18 +9,16 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    pyepo.data.tsp.genData
 
 
+Module Contents
+---------------
 
 .. py:function:: genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135)
 

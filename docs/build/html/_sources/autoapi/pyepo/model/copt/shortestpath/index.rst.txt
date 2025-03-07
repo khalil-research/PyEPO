@@ -1,5 +1,5 @@
-:py:mod:`pyepo.model.copt.shortestpath`
-=======================================
+pyepo.model.copt.shortestpath
+=============================
 
 .. py:module:: pyepo.model.copt.shortestpath
 
@@ -9,31 +9,29 @@
 
 
 
-Module Contents
----------------
-
-Classes
-~~~~~~~
-
-.. autoapisummary::
-
-   pyepo.model.copt.shortestpath.shortestPathModel
-
-
-
-
 Attributes
-~~~~~~~~~~
+----------
 
 .. autoapisummary::
 
    pyepo.model.copt.shortestpath.cost
 
 
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.copt.shortestpath.shortestPathModel
+
+
+Module Contents
+---------------
+
 .. py:class:: shortestPathModel(grid)
 
-
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
+
 
    This class is optimization model for shortest path problem
 
@@ -61,12 +59,22 @@ Attributes
 
       :type: list
 
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
    .. py:method:: _getArcs()
 
       A method to get list of arcs for grid network
 
       :returns: arcs
       :rtype: list
+
 
 
    .. py:method:: _getModel()
@@ -76,6 +84,4 @@ Attributes
 
 
 .. py:data:: cost
-
-   
 

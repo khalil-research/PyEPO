@@ -1,5 +1,5 @@
-:py:mod:`pyepo.func.blackbox`
-=============================
+pyepo.func.blackbox
+===================
 
 .. py:module:: pyepo.func.blackbox
 
@@ -9,11 +9,8 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -23,12 +20,13 @@ Classes
    pyepo.func.blackbox.negativeIdentityFunc
 
 
-
+Module Contents
+---------------
 
 .. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for differentiable black-box optimizer, which yield
    an optimal solution and derive a gradient.
@@ -43,6 +41,15 @@ Classes
 
    Reference: <https://arxiv.org/abs/1912.02175>
 
+
+   .. py:attribute:: lambd
+      :value: 10
+
+
+
+   .. py:attribute:: dbb
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -51,13 +58,15 @@ Classes
 
 .. py:class:: blackboxOptFunc(*args, **kwargs)
 
-
    Bases: :py:obj:`torch.autograd.Function`
+
 
    A autograd function for differentiable black-box optimizer
 
+
    .. py:method:: forward(ctx, pred_cost, module)
       :staticmethod:
+
 
       Forward pass for DBB
 
@@ -70,8 +79,10 @@ Classes
       :rtype: torch.tensor
 
 
+
    .. py:method:: backward(ctx, grad_output)
       :staticmethod:
+
 
       Backward pass for DBB
 
@@ -79,8 +90,8 @@ Classes
 
 .. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1, dataset=None)
 
-
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
 
    An autograd module for the differentiable optimizer, which yields optimal a
    solution and use negative identity as a gradient on the backward pass.
@@ -96,6 +107,10 @@ Classes
 
    Reference: <https://arxiv.org/abs/2205.15213>
 
+
+   .. py:attribute:: nid
+
+
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -104,13 +119,15 @@ Classes
 
 .. py:class:: negativeIdentityFunc(*args, **kwargs)
 
-
    Bases: :py:obj:`torch.autograd.Function`
+
 
    A autograd function for differentiable black-box optimizer
 
+
    .. py:method:: forward(ctx, pred_cost, module)
       :staticmethod:
+
 
       Forward pass for NID
 
@@ -123,8 +140,10 @@ Classes
       :rtype: torch.tensor
 
 
+
    .. py:method:: backward(ctx, grad_output)
       :staticmethod:
+
 
       Backward pass for NID
 

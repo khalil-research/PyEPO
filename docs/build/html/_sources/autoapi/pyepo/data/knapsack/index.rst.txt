@@ -1,5 +1,5 @@
-:py:mod:`pyepo.data.knapsack`
-=============================
+pyepo.data.knapsack
+===================
 
 .. py:module:: pyepo.data.knapsack
 
@@ -9,18 +9,16 @@
 
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    pyepo.data.knapsack.genData
 
 
+Module Contents
+---------------
 
 .. py:function:: genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed=135)
 

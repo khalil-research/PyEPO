@@ -1,0 +1,86 @@
+pyepo.model.mpax.shortestpath
+=============================
+
+.. py:module:: pyepo.model.mpax.shortestpath
+
+.. autoapi-nested-parse::
+
+   Shortest path problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.shortestpath._HAS_MPAX
+   pyepo.model.mpax.shortestpath.cost
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.shortestpath.shortestPathModel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_MPAX
+   :value: True
+
+
+.. py:class:: shortestPathModel(grid)
+
+   Bases: :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
+
+
+   This class is optimization model for shortest path problem
+
+   .. attribute:: grid
+
+      Size of grid network
+
+      :type: tuple of int
+
+   .. attribute:: arcs
+
+      List of arcs
+
+      :type: list
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
+   .. py:method:: _getArcs()
+
+      A method to get list of arcs for grid network
+
+      :returns: arcs
+      :rtype: list
+
+
+
+   .. py:method:: _constructMatrix()
+
+      Constructs the incidence matrix A, supply/demand vector b, and upper bound u
+      for the shortest path problem.
+
+      :returns: Incidence matrix for flow conservation
+                b (jnp.ndarray): Supply/demand vector
+                u (jnp.ndarray): Upper bound for flow variables
+      :rtype: A (jnp.ndarray)
+
+
+
+.. py:data:: cost
+

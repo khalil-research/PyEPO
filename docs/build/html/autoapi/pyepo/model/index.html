@@ -1,25 +1,23 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyepo.model &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
 
   
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=34cd777e"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=34cd777e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -54,18 +52,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../index.html#id1"><p>Duplicate implicit target name: “pyepo”.</p>
-</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../index.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.data</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../func/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.func</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../metric/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.metric</span></code></a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../twostage/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.twostage</span></code></a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">pyepo</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../data/index.html">pyepo.data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../func/index.html">pyepo.func</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../metric/index.html">pyepo.metric</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pyepo.model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../twostage/index.html">pyepo.twostage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utlis/index.html">pyepo.utlis</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#submodules">Submodules</a></li>
 </ul>
 </li>
 </ul>
@@ -87,8 +84,8 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">API Reference</a></li>
-          <li class="breadcrumb-item"><a href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo</span></code></a></li>
-      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model</span></code></li>
+          <li class="breadcrumb-item"><a href="../index.html">pyepo</a></li>
+      <li class="breadcrumb-item active">pyepo.model</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/autoapi/pyepo/model/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -99,40 +96,17 @@
            <div itemprop="articleBody">
              
   <section id="module-pyepo.model">
-<span id="pyepo-model"></span><h1><a class="reference internal" href="#module-pyepo.model" title="pyepo.model"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model</span></code></a><a class="headerlink" href="#module-pyepo.model" title="Link to this heading"></a></h1>
+<span id="pyepo-model"></span><h1>pyepo.model<a class="headerlink" href="#module-pyepo.model" title="Link to this heading"></a></h1>
 <p>Optimization Model based on solvers</p>
-<section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="copt/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.copt</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="copt/coptmodel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.copt.coptmodel</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="copt/knapsack/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.copt.knapsack</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="copt/shortestpath/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.copt.shortestpath</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="grb/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="grb/grbmodel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="grb/knapsack/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.knapsack</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="grb/portfolio/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.portfolio</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="grb/shortestpath/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.shortestpath</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="grb/tsp/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.grb.tsp</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="omo/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="omo/knapsack/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo.knapsack</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="omo/omomodel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="omo/shortestpath/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.omo.shortestpath</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="opt/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyepo.model.opt</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="copt/index.html">pyepo.model.copt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grb/index.html">pyepo.model.grb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mpax/index.html">pyepo.model.mpax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="omo/index.html">pyepo.model.omo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt/index.html">pyepo.model.opt</a></li>
 </ul>
 </div>
 </section>
