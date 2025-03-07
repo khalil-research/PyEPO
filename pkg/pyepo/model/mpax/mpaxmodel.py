@@ -99,8 +99,6 @@ class optMpaxModel(optModel):
         Args:
             c (np.ndarray / list): cost of objective function
         """
-        if c.shape[-1] != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):
             device = c.device  # get tensor device
@@ -131,6 +129,8 @@ class optMpaxModel(optModel):
         # c is already a NumPy array
         else:
             self.c = jnp.array(c, dtype=jnp.float32)
+        if c.shape[-1] != self.num_cost:
+            raise ValueError("Size of cost vector cannot match vars.")
         # change sign for model sense
         if self.modelSense == EPO.MINIMIZE:
             self.c = self.c
