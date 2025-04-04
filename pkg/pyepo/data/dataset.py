@@ -52,8 +52,7 @@ class optDataset(Dataset):
         """
         sols = []
         objs = []
-        print("Optimizing for optDataset...")
-        time.sleep(1)
+        print("Optimizing for optDataset...", flush=True)
         for c in tqdm(self.costs):
             try:
                 sol, obj = self._solve(c)
@@ -153,8 +152,7 @@ class optDatasetKNN(optDataset):
         """
         sols = []
         objs = []
-        print("Optimizing for optDataset...")
-        time.sleep(1)
+        print("Optimizing for optDataset...", flush=True)
         # get kNN costs
         costs_knn = self._getKNN()
         # solve optimization
