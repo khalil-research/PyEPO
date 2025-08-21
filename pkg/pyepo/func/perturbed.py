@@ -337,12 +337,12 @@ class implicitMLEFunc(Function):
         cp = pred_cost.detach()
         dl = grad_output.detach()
         # positive perturbed costs
-        ptb_cp_pos = cp + module.lambd * dl + noises
+        ptb_cp_pos = cp + module.lambd * dl + module.sigma * noises
         # solve with perturbation
         ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
         if module.two_sides:
             # negative perturbed costs
-            ptb_cp_neg = cp - module.lambd * dl + noises
+            ptb_cp_neg = cp - module.lambd * dl + module.sigma * noises
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
             # get two-side gradient
@@ -428,12 +428,12 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         # calculate λ
         lambd = module.alpha * torch.norm(cp) / torch.norm(dl)
         # positive perturbed costs
-        ptb_cp_pos = cp + lambd * dl + noises
+        ptb_cp_pos = cp + lambd * dl + module.sigma * noises
         # solve with perturbation
         ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
         if module.two_sides:
             # negative perturbed costs
-            ptb_cp_neg = cp - lambd * dl + noises
+            ptb_cp_neg = cp - lambd * dl + module.sigma * noises
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
             # get two-side gradient
