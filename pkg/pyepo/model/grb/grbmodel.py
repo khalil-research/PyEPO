@@ -74,6 +74,35 @@ class optGrbModel(optModel):
             obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)
 
+    def cal_obj(self, c, x):
+        """"
+        An abstract method to calculate the objective value
+
+        Args:
+            c (ndarray): cost of objective
+            x (ndarray): the decision variables
+        """
+        if len(c) != self.num_cost:
+            raise ValueError("Size of cost vector cannot match vars.")
+
+        # check if c is a PyTorch tensor
+        if isinstance(c, torch.Tensor):
+            c = c.detach().cpu().numpy()
+        else:
+            c = np.asarray(c, dtype=np.float32)
+
+        # check if c is a PyTorch tensor
+        if isinstance(x, torch.Tensor):
+            x = x.detach().cpu().numpy()
+        else:
+            x = np.asarray(x, dtype=np.float32)
+
+        obj = c @ x
+
+        return obj
+
+            
+
     def solve(self):
         """
         A method to solve model

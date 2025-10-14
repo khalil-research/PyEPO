@@ -52,6 +52,17 @@ class optModel(ABC):
             c (ndarray): cost of objective function
         """
         raise NotImplementedError
+    
+    @abstractmethod
+    def cal_obj(self, c, x):
+        """"
+        An abstract method to calculate the objective value
+
+        Args:
+            c (ndarray): cost of objective
+            x (ndarray): the decision variables
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def solve(self):
