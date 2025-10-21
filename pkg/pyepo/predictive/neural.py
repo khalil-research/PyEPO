@@ -11,10 +11,11 @@ import copy
 
 class NeuralPrediction(PredictivePrescription):
 
-    def __init__(self, feats, costs, weight_model, model):
+    def __init__(self, feats, costs, weight_model, model, verbose = False):
         self.features = feats
         self.costs = costs
         self.weight_model: nn.Module = weight_model
+        self.verbose = verbose
         super().__init__(model)
 
     def _get_weights(self, x, features=None):
@@ -96,10 +97,12 @@ class NeuralPrediction(PredictivePrescription):
                     val_loss += loss_fn(preds, c, w, z).item() * len(x)
 
                 val_loss /= len(val_loader.dataset)
-            print(f"Epoch {epoch+1:03d}: train={train_loss:.4f}, val={val_loss:.4f}")
+            if self.verbose:
+                print(f"Epoch {epoch+1:03d}: train={train_loss:.4f}, val={val_loss:.4f}")
             
             if early_stopper.step(val_loss, self.weight_model):
-                print(f"Early stopping at epoch {epoch+1}. Restored best weights.")
+                if self.verbose:
+                    print(f"Early stopping at epoch {epoch+1}. Restored best weights.")
                 break
 
 class EarlyStopper:
