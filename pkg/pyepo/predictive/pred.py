@@ -39,11 +39,9 @@ class PredictivePrescription(ABC):
                 weights = weights.squeeze(0)
 
             weights = weights.numpy()
-            
-        cost = np.dot(weights, self.costs) #TODO: make this more abstract, so if optimization is not linear
-        
+                    
         # Optimize
-        self.model.setObj(cost)
+        self.model.setWeightObj(weights, self.costs)
         sol, obj = self.model.solve()
 
         if isinstance(sol, torch.Tensor):

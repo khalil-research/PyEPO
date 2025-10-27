@@ -52,6 +52,21 @@ class optGrbModel(optModel):
         """
         return self.x.size if isinstance(self.x, gp.MVar) else len(self.x)
 
+    def _objective_fun(self, c):
+        """
+        Default objective function f(x, c) = cᵀx.
+        Can be overridden in subclasses for nonlinear objectives.
+
+        Args:
+            c (np.ndarray): cost vector for one sample
+
+        Returns:
+            Gurobi linear expression representing f(z, c)
+        """
+        if isinstance(self.x, gp.MVar):
+            return c @ self.x
+        return gp.quicksum(c[j] * self.x[j] for j in range(len(c)))
+
     def setObj(self, c):
         """
         A method to set objective function
@@ -66,12 +81,29 @@ class optGrbModel(optModel):
             c = c.detach().cpu().numpy()
         else:
             c = np.asarray(c, dtype=np.float32)
-        # mvar
-        if isinstance(self.x, gp.MVar):
-            obj = c @ self.x
-        # vars
-        else:
-            obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
+        self._model.setObjective(self._objective_fun(c))
+
+    def setWeightObj(self, w, c):
+        """
+        Set a weighted objective for predictive prescriptions.
+
+        Args:
+            w (np.ndarray): shape (N,), weights for each sample
+            c (np.ndarray): shape (N, C), cost vectors for each sample
+        """
+        if c.shape[1] != self.num_cost:
+            raise ValueError("Cost vector dimension mismatch.")
+        if c.shape[0] != len(w):
+            raise ValueError("Weights and costs must have same first dimension.")
+        
+        # Check if PyTorch tensor inputs
+        if isinstance(w, torch.Tensor):
+            w = w.detach().cpu().numpy()
+        if isinstance(c, torch.Tensor):
+            c = c.detach().cpu().numpy()
+
+        obj = gp.quicksum(w[i] * self._objective_fun(c[i]) for i in range(len(w)))
+
         self._model.setObjective(obj)
 
     def cal_obj(self, c, x):
