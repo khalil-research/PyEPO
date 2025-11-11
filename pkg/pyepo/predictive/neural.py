@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from pyepo.func.surrogate import SPOPlus
+from pyepo.func.surrogate import SPOPlus, StochasticSmoothingLoss
 from pyepo.model.opt import optModel
 from tqdm import tqdm
 import numpy as np
@@ -45,7 +45,10 @@ class NeuralPrediction(PredictivePrescription):
         )
 
         optimizer = optim.Adam(self.weight_model.parameters(), lr=lr)
-        loss_fn = SPOPlus(self.model, processes=1)
+
+        print(0.5*len(self.features))
+        # loss_fn = SPOPlus(self.model, processes=1)
+        loss_fn = StochasticSmoothingLoss(self.model, processes=1, S = int(0.5*len(self.features)))
 
         train_loader = torch.utils.data.DataLoader(
             LeaveOneOutDataset(self.model, X_train, y_train),
@@ -62,14 +65,28 @@ class NeuralPrediction(PredictivePrescription):
             self.weight_model.train()
             train_loss = 0.0
             for i, data in enumerate(train_loader):
-                x, c, feats_batch, costs_batch, w, z = data  
+                x, c, feats_batch, costs_batch, w, z, sol_costs = data  
 
                 if torch.cuda.is_available():
-                    x, c, feats_batch, costs_batch, w, z = x.cuda(), c.cuda(), feats_batch.cuda(), costs_batch.cuda(), w.cuda(), z.cuda()
+                    x, c, feats_batch, costs_batch, w, z, sol_costs = x.cuda(), c.cuda(), feats_batch.cuda(), costs_batch.cuda(), w.cuda(), z.cuda(), sol_costs.cuda()
 
                 weights = self._get_weights(x, feats_batch)             # [B, N]
-                preds = (weights.unsqueeze(-1) * costs_batch).sum(dim=1)  # [B, C] # TODO: make this more abstract and let it work with multiple obj function
-                loss = loss_fn(preds, c, w, z)
+                # preds = (weights.unsqueeze(-1) * costs_batch).sum(dim=1)  # [B, C] # TODO: make this more abstract and let it work with multiple obj function
+
+                preds = []
+                for i, (weight, costs) in enumerate(zip(weights, costs_batch)):
+                    self.model.setWeightObj(weight, costs)
+                    sol, obj = self.model.solve()
+                    if isinstance(sol, torch.Tensor):
+                        sol = sol.detach().cpu().numpy()
+                    else:
+                        sol = np.array(sol)
+                    preds.append(sol)
+                
+                preds = torch.FloatTensor(np.array(preds)).to(c.device)
+
+                # loss = loss_fn(preds, c, w, z)
+                loss = loss_fn(weights, costs_batch, preds, c, z, sol_costs)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -82,10 +99,10 @@ class NeuralPrediction(PredictivePrescription):
             with torch.no_grad():
                 val_loss = 0.0
                 for i, data in enumerate(val_loader):
-                    x, c, feats_batch, costs_batch, w, z = data  
+                    x, c, feats_batch, costs_batch, w, z, sol_costs = data  
 
                     if torch.cuda.is_available():
-                        x, c, feats_batch, costs_batch, w, z = x.cuda(), c.cuda(), feats_batch.cuda(), costs_batch.cuda(), w.cuda(), z.cuda()
+                        x, c, feats_batch, costs_batch, w, z, sol_costs = x.cuda(), c.cuda(), feats_batch.cuda(), costs_batch.cuda(), w.cuda(), z.cuda(), sol_costs.cuda()
 
                     feats_batch = torch.FloatTensor(X_train).cuda()
                     y_batch = torch.FloatTensor(y_train).cuda()
@@ -93,8 +110,20 @@ class NeuralPrediction(PredictivePrescription):
                     y_batch = y_batch.unsqueeze(0).expand(len(costs_batch), -1, -1).contiguous()
                     weights = self._get_weights(x, feats_batch)
 
-                    preds = (weights.unsqueeze(-1) * y_batch).sum(dim=1) 
-                    val_loss += loss_fn(preds, c, w, z).item() * len(x)
+                    # preds = (weights.unsqueeze(-1) * y_batch).sum(dim=1) 
+
+                    preds = []
+                    for i, (weight, costs) in enumerate(zip(weights, costs_batch)):
+                        self.model.setWeightObj(weight, costs)
+                        sol, obj = self.model.solve()
+                        if isinstance(sol, torch.Tensor):
+                            sol = sol.detach().cpu().numpy()
+                        else:
+                            sol = np.array(sol)
+                        preds.append(sol)
+                
+                    preds = torch.FloatTensor(np.array(preds)).to(c.device)
+                    val_loss += loss_fn(weights, costs_batch, preds, c, z, sol_costs).item() * len(x)
 
                 val_loss /= len(val_loader.dataset)
             if self.verbose:
@@ -229,4 +258,5 @@ class LeaveOneOutDataset(torch.utils.data.Dataset):
             torch.FloatTensor(C_rest),
             torch.FloatTensor(self.sols[index]),
             torch.FloatTensor(self.objs[index]),
+            torch.FloatTensor(self.sols[mask])
         )
