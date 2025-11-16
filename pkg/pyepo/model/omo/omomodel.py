@@ -44,6 +44,7 @@ class optOmoModel(optModel):
         # set solver
         self.solver = solver
         print("Solver in the background: {}".format(self.solver))
+        self._objective_cache = {}
         if self.solver == "gurobi":
             self._solverfac = po.SolverFactory(self.solver, solver_io="python")
         else:
@@ -92,6 +93,10 @@ class optOmoModel(optModel):
         if self.modelSense == EPO.MAXIMIZE:
             self._model.obj = pe.Objective(sense=pe.maximize, expr=obj)
 
+    def _hash_cost(self, c):
+        # Convert to a tuple for hashing
+        return tuple(np.round(c, decimals=10))  # rounding avoids float precision mismatch
+
     def setWeightObj(self, w, c):
         """
         Set a weighted objective for predictive prescriptions.
@@ -110,8 +115,19 @@ class optOmoModel(optModel):
             w = w.detach().cpu().numpy()
         if isinstance(c, torch.Tensor):
             c = c.detach().cpu().numpy()
+        
+        # Build or retrieve objective terms from cache
+        obj_terms = []
+        for i in range(len(w)):
+            key = self._hash_cost(c[i])
+            if key not in self._objective_cache:
+                self._objective_cache[key] = self._objective_fun(c[i])
+                # print("Caching objective for cost:", c[i])
+            obj_terms.append(w[i] * self._objective_cache[key])
 
-        obj = pe.quicksum(w[i] * self._objective_fun(c[i]) for i in range(len(w)))
+        obj = pe.quicksum(obj_terms)
+
+        # obj = pe.quicksum(w[i] * self._objective_fun(c[i]) for i in range(len(w)))
         
         if hasattr(self._model, "obj"):
             self._model.del_component("obj")

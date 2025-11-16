@@ -6,7 +6,10 @@ import torch.optim as optim
 from pyepo.func.surrogate import SPOPlus, StochasticSmoothingLoss
 from pyepo.model.opt import optModel
 from tqdm import tqdm
+from pyepo.utlis import getArgs
 import numpy as np
+from pathos.multiprocessing import ProcessingPool
+import time as time
 import copy
 
 class NeuralPrediction(PredictivePrescription):
@@ -59,34 +62,40 @@ class NeuralPrediction(PredictivePrescription):
             batch_size=batch_size, shuffle=False
         )
 
-        early_stopper = EarlyStopper(5, 0.05)
+        early_stopper = EarlyStopper(5, 0)
+
 
         for epoch in range(epochs):
             self.weight_model.train()
             train_loss = 0.0
             for i, data in enumerate(train_loader):
-                x, c, feats_batch, costs_batch, w, z, sol_costs = data  
+                x, c, feats_batch, costs_batch, w, z, data_sols, data_objs = data
 
                 if torch.cuda.is_available():
-                    x, c, feats_batch, costs_batch, w, z, sol_costs = x.cuda(), c.cuda(), feats_batch.cuda(), costs_batch.cuda(), w.cuda(), z.cuda(), sol_costs.cuda()
+                    x, c, feats_batch, costs_batch, w, z, data_sols, data_objs = x.cuda(), c.cuda(), feats_batch.cuda(), costs_batch.cuda(), w.cuda(), z.cuda(), data_sols.cuda(), data_objs.cuda()
 
                 weights = self._get_weights(x, feats_batch)             # [B, N]
-                # preds = (weights.unsqueeze(-1) * costs_batch).sum(dim=1)  # [B, C] # TODO: make this more abstract and let it work with multiple obj function
+                # preds = (weights.unsqueeze(-1) * costs_batch).sum(dim=1)  # [B, C] 
 
-                preds = []
-                for i, (weight, costs) in enumerate(zip(weights, costs_batch)):
-                    self.model.setWeightObj(weight, costs)
-                    sol, obj = self.model.solve()
-                    if isinstance(sol, torch.Tensor):
-                        sol = sol.detach().cpu().numpy()
-                    else:
-                        sol = np.array(sol)
-                    preds.append(sol)
-                
-                preds = torch.FloatTensor(np.array(preds)).to(c.device)
+                # preds = []
+                # start_time = time.time()
+                # for i, (weight, costs) in enumerate(zip(weights, costs_batch)):
+                #     self.model.setWeightObj(weight, costs)
+                #     sol, obj = self.model.solve()
+                #     if isinstance(sol, torch.Tensor):
+                #         sol = sol.detach().cpu().numpy()
+                #     else:
+                #         sol = np.array(sol)
+                #     preds.append(sol)
+                # print("Solving time per batch: {:.4f} seconds".format(time.time() - start_time))
+                # weights = weights.detach()
+                # costs_batch = costs_batch.detach()
+                # preds = _solveInParallel(weights, costs_batch, self.model)[0]
+                # print(preds.shape)
 
+                # preds = torch.FloatTensor(np.array(preds)).to(c.device)
                 # loss = loss_fn(preds, c, w, z)
-                loss = loss_fn(weights, costs_batch, preds, c, z, sol_costs)
+                loss = loss_fn(weights, c, z, data_sols, data_objs)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -99,31 +108,44 @@ class NeuralPrediction(PredictivePrescription):
             with torch.no_grad():
                 val_loss = 0.0
                 for i, data in enumerate(val_loader):
-                    x, c, feats_batch, costs_batch, w, z, sol_costs = data  
+                    x, c, feats_batch, costs_batch, w, z, data_sols, data_objs = data
 
+                    feats_batch = torch.FloatTensor(X_train)
+                    y_batch = torch.FloatTensor(y_train)
+                    sols = torch.FloatTensor(train_loader.dataset.get_sols()[0])
+                    objs = torch.FloatTensor(train_loader.dataset.get_sols()[1])
+                    
                     if torch.cuda.is_available():
-                        x, c, feats_batch, costs_batch, w, z, sol_costs = x.cuda(), c.cuda(), feats_batch.cuda(), costs_batch.cuda(), w.cuda(), z.cuda(), sol_costs.cuda()
+                        x, c, feats_batch, costs_batch, w, z, data_sols, data_objs = x.cuda(), c.cuda(), feats_batch.cuda(), costs_batch.cuda(), w.cuda(), z.cuda(), data_sols.cuda(), data_objs.cuda()
+                        feats_batch = feats_batch.cuda()
+                        y_batch = y_batch.cuda()
+                        sols = sols.cuda()
+                        objs = objs.cuda()
 
-                    feats_batch = torch.FloatTensor(X_train).cuda()
-                    y_batch = torch.FloatTensor(y_train).cuda()
+
+
                     feats_batch = feats_batch.unsqueeze(0).expand(len(x), -1, -1).contiguous()  # [B, N, D]
                     y_batch = y_batch.unsqueeze(0).expand(len(costs_batch), -1, -1).contiguous()
+                    sols = sols.unsqueeze(0).expand(len(x), -1, -1).contiguous()
+                    objs = objs.unsqueeze(0).expand(len(x), -1, -1).contiguous()
                     weights = self._get_weights(x, feats_batch)
 
                     # preds = (weights.unsqueeze(-1) * y_batch).sum(dim=1) 
 
-                    preds = []
-                    for i, (weight, costs) in enumerate(zip(weights, costs_batch)):
-                        self.model.setWeightObj(weight, costs)
-                        sol, obj = self.model.solve()
-                        if isinstance(sol, torch.Tensor):
-                            sol = sol.detach().cpu().numpy()
-                        else:
-                            sol = np.array(sol)
-                        preds.append(sol)
+                    # preds = []
+                    # for i, (weight, costs) in enumerate(zip(weights, costs_batch)):
+                    #     self.model.setWeightObj(weight, costs)
+                    #     sol, obj = self.model.solve()
+                    #     if isinstance(sol, torch.Tensor):
+                    #         sol = sol.detach().cpu().numpy()
+                    #     else:
+                    #         sol = np.array(sol)
+                    #     preds.append(sol)
                 
-                    preds = torch.FloatTensor(np.array(preds)).to(c.device)
-                    val_loss += loss_fn(weights, costs_batch, preds, c, z, sol_costs).item() * len(x)
+                    # preds = torch.FloatTensor(np.array(preds)).to(c.device)
+                    # val_loss += loss_fn(weights, costs_batch, c, z, sols, objs).item() * len(x)
+                    val_loss += loss_fn(weights, c, z, sols, objs).item() * len(x)
+
 
                 val_loss /= len(val_loader.dataset)
             if self.verbose:
@@ -133,6 +155,48 @@ class NeuralPrediction(PredictivePrescription):
                 if self.verbose:
                     print(f"Early stopping at epoch {epoch+1}. Restored best weights.")
                 break
+
+def _solveInParallel(weights, costs, model):
+    ins_num = len(weights)
+    device = costs.device
+    print(device)
+    pool = ProcessingPool(5)
+    # get class
+    model_type = type(model)
+    # get args
+    args = getArgs(model)
+    # parallel computing
+    res = pool.amap(_solveWithObj4Par, weights, costs, [args] * ins_num,
+                    [model_type] * ins_num).get()
+    # get res
+    sol = torch.stack([r[0] for r in res], dim=0)
+    obj = torch.tensor([r[1] for r in res], dtype=torch.float32)
+
+    return sol, obj
+
+
+def _solveWithObj4Par(weights, cost, args, model_type):
+    """
+    A function to solve function in parallel processors
+
+    Args:
+        cost (np.ndarray): cost of objective function
+        args (dict): optModel args
+        model_type (ABCMeta): optModel class type
+
+    Returns:
+        tuple: optimal solution (list) and objective value (float)
+    """
+    # rebuild model
+    optmodel: optModel = model_type(**args)
+    # set obj
+    optmodel.setWeightObj(weights, cost)
+    # solve
+    sol, obj = optmodel.solve()
+    # to tensor
+    sol = torch.tensor(sol, dtype=torch.float32)
+    return sol, obj
+
 
 class EarlyStopper:
     def __init__(self, patience=1, min_delta=0):
@@ -208,6 +272,15 @@ class LeaveOneOutDataset(torch.utils.data.Dataset):
             sols.append(sol)
             objs.append([obj])
         return np.array(sols), np.array(objs)
+    
+    def get_sols(self):
+        """
+        A method to get optimal solutions
+
+        Returns:
+            np.ndarray: optimal solutions
+        """
+        return self.sols, self.objs
 
     def _solve(self, cost):
         """
@@ -258,5 +331,6 @@ class LeaveOneOutDataset(torch.utils.data.Dataset):
             torch.FloatTensor(C_rest),
             torch.FloatTensor(self.sols[index]),
             torch.FloatTensor(self.objs[index]),
-            torch.FloatTensor(self.sols[mask])
+            torch.FloatTensor(self.sols[mask]),
+            torch.FloatTensor(self.objs[mask]),
         )

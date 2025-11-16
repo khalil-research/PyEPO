@@ -229,8 +229,8 @@ class StochasticSmoothingLoss(optModule):
         self.ssl = StochasticSmoothingLossFun()
 
 
-    def forward(self, weights, y_hat, pred_sol, true_cost, true_obj, sol_costs):
-        loss = self.ssl.apply(weights, y_hat, pred_sol, true_cost, true_obj, sol_costs, self)
+    def forward(self, weights, true_cost, true_obj, data_sols, data_objs):
+        loss = self.ssl.apply(weights, true_cost, true_obj, data_sols, data_objs, self)
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)
@@ -245,36 +245,45 @@ class StochasticSmoothingLoss(optModule):
 
 class StochasticSmoothingLossFun(Function):
     @staticmethod
-    def forward(ctx, weights, y_hat, pred_sol, true_cost, true_obj, sol_costs, module: optModule):
+    def forward(ctx, weights, true_cost, true_obj, data_sols, data_objs, module: optModule):
         ctx.weights = weights
         ctx.true_cost= true_cost
         ctx.true_obj = true_obj
-        ctx.y_hat = y_hat
         ctx.module = module   
-        ctx.sol_costs = sol_costs   
+        ctx.data_sols = data_sols   
+        ctx.data_objs = data_objs
+        device = weights.device   
 
-        realised_obj = module.optmodel.cal_obj(true_cost, pred_sol)
+        B, N = weights.shape  # N = number of candidates
+        S = module.S
+
+        indices = torch.multinomial(weights, S, replacement=True).to(device)  # (B, S)
+        batch_idx = torch.arange(B, device=weights.device).unsqueeze(1).expand(B, S)  # (B, S)
+        sampled_sols = data_sols[batch_idx, indices]  # (B, S, num_vars)
+        sampled_obj = data_objs[batch_idx, indices].squeeze(-1)  # (B, S)
+
+        realised_obj = module.optmodel.cal_obj(true_cost, sampled_sols)
         realised_obj = torch.tensor(realised_obj, dtype=torch.float32).to(true_cost.device)
 
         if module.optmodel.modelSense == EPO.MINIMIZE:
-            loss =  realised_obj - true_obj
+            loss =  torch.mean(realised_obj - sampled_obj)
         else:
-            loss = true_obj - realised_obj
+            loss = torch.mean(true_obj - sampled_obj)
 
         return loss
 
     @staticmethod
     def backward(ctx, grad_output):
         weights = ctx.weights
-        B, N, C = ctx.y_hat.shape  # N = number of candidates
+        B, N = ctx.weights.shape  # N = number of candidates
         S = ctx.module.S
         device = weights.device
         # sample indices
         indices = torch.multinomial(weights, S, replacement=True).to(device)  # (B, S)
         batch_idx = torch.arange(B, device=weights.device).unsqueeze(1).expand(B, S)  # (B, S)
 
-        sampled_sols = ctx.sol_costs[batch_idx, indices]  # (B, S, num_vars)
-
+        sampled_sols = ctx.data_sols[batch_idx, indices]  # (B, S, num_vars)
+    
         L_i = ctx.module.optmodel.cal_obj(ctx.true_cost, sampled_sols)
         L_i = torch.tensor(L_i, dtype=torch.float32).to(device)
         assert L_i.shape == (B, S)
@@ -295,7 +304,7 @@ class StochasticSmoothingLossFun(Function):
 
         gradients /= ctx.module.S
 
-        print("Gradients:", gradients.shape)
+        # print("Gradients:", gradients.shape)
 
         # multiply with incoming grad_output scalar
         # gradients *= grad_output
