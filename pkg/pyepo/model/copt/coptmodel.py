@@ -25,8 +25,10 @@ class optCoptModel(optModel):
         # model sense
         if self._model.ObjSense == COPT.MINIMIZE:
             self.modelSense = EPO.MINIMIZE
-        if self._model.ObjSense == COPT.MAXIMIZE:
+        elif self._model.ObjSense == COPT.MAXIMIZE:
             self.modelSense = EPO.MAXIMIZE
+        else:
+            raise ValueError("Invalid modelSense.")
         # turn off output
         self._model.setParam("Logging", 0)
 
