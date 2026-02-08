@@ -108,6 +108,10 @@ def _cache_in_pass(cp, optmodel, solpool):
     return sol, obj
 
 
+# worker-local model cache (persists across calls in pathos worker processes)
+_worker_model = None
+_worker_model_key = None
+
 def _solveWithObj4Par(cost, args, model_type):
     """
     A function to solve function in parallel processors
@@ -120,8 +124,13 @@ def _solveWithObj4Par(cost, args, model_type):
     Returns:
         tuple: optimal solution (list) and objective value (float)
     """
-    # rebuild model
-    optmodel = model_type(**args)
+    global _worker_model, _worker_model_key
+    # reuse cached model if same type; rebuild only on first call or type change
+    key = model_type.__qualname__
+    if _worker_model_key != key:
+        _worker_model = model_type(**args)
+        _worker_model_key = key
+    optmodel = _worker_model
     # set obj
     optmodel.setObj(cost)
     # solve

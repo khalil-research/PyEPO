@@ -535,6 +535,10 @@ def _cache_in_pass(ptb_c, optmodel, solpool):
     return ptb_sols
 
 
+# worker-local model cache (persists across calls in pathos worker processes)
+_worker_model = None
+_worker_model_key = None
+
 def _solveWithObj4Par(perturbed_costs, args, model_type):
     """
     A global function to solve function in parallel processors
@@ -547,8 +551,13 @@ def _solveWithObj4Par(perturbed_costs, args, model_type):
     Returns:
         list: optimal solution
     """
-    # rebuild model
-    optmodel = model_type(**args)
+    global _worker_model, _worker_model_key
+    # reuse cached model if same type; rebuild only on first call or type change
+    key = model_type.__qualname__
+    if _worker_model_key != key:
+        _worker_model = model_type(**args)
+        _worker_model_key = key
+    optmodel = _worker_model
     # per sample
     sols = []
     for cost in perturbed_costs:
