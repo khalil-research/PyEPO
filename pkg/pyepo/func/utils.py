@@ -54,11 +54,9 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
         obj = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(obj)).to(device)
         # obj sense
-        if optmodel.modelSense == EPO.MINIMIZE:
-            obj = obj
-        elif optmodel.modelSense == EPO.MAXIMIZE:
+        if optmodel.modelSense == EPO.MAXIMIZE:
             obj = - obj
-        else:
+        elif optmodel.modelSense != EPO.MINIMIZE:
             raise ValueError("Invalid modelSense.")
     # single-core
     elif processes == 1:
@@ -68,7 +66,7 @@ def _solve_in_pass(cp, optmodel, processes, pool):
             # solve
             optmodel.setObj(cp[i])
             solp, objp = optmodel.solve()
-            sol.append(torch.as_tensor(solp))
+            sol.append(torch.as_tensor(solp, dtype=torch.float32))
             obj.append(objp)
         # to tensor
         sol = torch.stack(sol, dim=0).to(device)
