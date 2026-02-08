@@ -187,14 +187,11 @@ class optDatasetKNN(optDataset):
         """
         A method to get kNN costs
         """
-        # init costs
-        costs_knn = np.zeros((*self.costs.shape, self.k))
         # calculate distances between features
         distances = distance.cdist(self.feats, self.feats, "euclidean")
         indexes = np.argpartition(distances, self.k, axis=1)[:, :self.k]
-        # get neighbours costs
-        for i, knns in enumerate(indexes):
-            # interpolation weight
-            costs_knn[i] = self.weight * self.costs[i].reshape((-1, 1)) \
-                         + (1 - self.weight) * self.costs[knns].T
+        # vectorized interpolation: (n, num_cost, 1) + (n, num_cost, k)
+        neighbours = self.costs[indexes]  # (n, k, num_cost)
+        costs_knn = self.weight * self.costs[:, :, np.newaxis] \
+                  + (1 - self.weight) * neighbours.transpose(0, 2, 1)
         return costs_knn
