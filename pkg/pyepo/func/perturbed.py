@@ -16,8 +16,6 @@ from pyepo.func.utils import sumGammaDistribution
 
 try:
     import jax
-    from jax import numpy as jnp
-    from mpax import create_lp, r2HPDHG
 except ImportError:
     pass
 
@@ -466,6 +464,9 @@ def _solve_or_cache(ptb_c, module):
             module._update_solution_pool(sols)
     # best cached solution
     else:
+        # move solpool to the correct device
+        if module.solpool.device != ptb_c.device:
+            module.solpool = module.solpool.to(ptb_c.device)
         ptb_sols = _cache_in_pass(ptb_c, module.optmodel, module.solpool)
     return ptb_sols
 
@@ -521,9 +522,6 @@ def _cache_in_pass(ptb_c, optmodel, solpool):
     """
     # get device
     device = ptb_c.device
-    # solpool is on the same device
-    if solpool.device != device:
-        solpool = solpool.to(device)
     # compute objective values for all perturbations
     solpool_obj = torch.einsum("nbd,sd->bns", ptb_c, solpool)
     # best solution in pool

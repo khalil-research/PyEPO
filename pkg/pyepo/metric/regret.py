@@ -56,7 +56,7 @@ def calRegret(optmodel, pred_cost, true_cost, true_obj):
         true_cost (torch.tensor): true costs
         true_obj (torch.tensor): true optimal objective values
 
-    Returns:predmodel
+    Returns:
         float: true regret losses
     """
     # opt sol for pred cost
@@ -70,6 +70,8 @@ def calRegret(optmodel, pred_cost, true_cost, true_obj):
     # loss
     if optmodel.modelSense == EPO.MINIMIZE:
         loss = obj - true_obj
-    if optmodel.modelSense == EPO.MAXIMIZE:
+    elif optmodel.modelSense == EPO.MAXIMIZE:
         loss = true_obj - obj
+    else:
+        raise ValueError("Invalid modelSense.")
     return loss

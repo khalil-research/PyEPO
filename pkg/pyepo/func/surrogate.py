@@ -183,8 +183,8 @@ class perturbationGradient(optModule):
             wp, _ = _solve_or_cache(cp + self.sigma * c, self)
             wm, _ = _solve_or_cache(cp - self.sigma * c, self)
             # convert numpy
-            sol_plus = torch.as_tensor(wp, dtype=torch.float, device=device)
-            sol_minus = torch.as_tensor(wm, dtype=torch.float, device=device)
+            sol_plus = torch.as_tensor(wp, dtype=torch.float32, device=device)
+            sol_minus = torch.as_tensor(wm, dtype=torch.float32, device=device)
             # differentiable objective value
             obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * true_cost, sol_plus)
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
@@ -201,8 +201,8 @@ class perturbationGradient(optModule):
             w, _ = _solve_or_cache(cp, self)
             wm, _ = _solve_or_cache(cp - self.sigma * c, self)
             # convert numpy
-            sol = torch.as_tensor(w, dtype=torch.float, device=device)
-            sol_minus = torch.as_tensor(wm, dtype=torch.float, device=device)
+            sol = torch.as_tensor(w, dtype=torch.float32, device=device)
+            sol_minus = torch.as_tensor(wm, dtype=torch.float32, device=device)
             # differentiable objective value
             obj = torch.einsum("bi,bi->b", pred_cost, sol)
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)

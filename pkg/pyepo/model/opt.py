@@ -29,7 +29,7 @@ class optModel(ABC):
     @property
     def num_cost(self):
         """
-        number of cost to be predicted
+        number of costs to be predicted
         """
         return len(self.x)
 
@@ -46,7 +46,7 @@ class optModel(ABC):
     @abstractmethod
     def setObj(self, c):
         """
-        An abstract method to setthe  objective function
+        An abstract method to set the objective function
 
         Args:
             c (ndarray): cost of objective function
@@ -65,7 +65,7 @@ class optModel(ABC):
 
     def copy(self):
         """
-        An abstract method to copy the model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -78,7 +78,7 @@ class optModel(ABC):
         An abstract method to add a new constraint
 
         Args:
-            coefs (ndarray): coefficients ofthe  new constraint
+            coefs (ndarray): coefficients of the new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:

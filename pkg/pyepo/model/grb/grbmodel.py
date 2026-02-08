@@ -29,16 +29,18 @@ class optGrbModel(optModel):
     """
 
     def __init__(self):
-        super().__init__()
         # error
         if not _HAS_GUROBI:
             raise ImportError("Gurobi is not installed. Please install gurobipy to use this feature.")
+        super().__init__()
         # model sense
         self._model.update()
         if self._model.modelSense == GRB.MINIMIZE:
             self.modelSense = EPO.MINIMIZE
-        if self._model.modelSense == GRB.MAXIMIZE:
+        elif self._model.modelSense == GRB.MAXIMIZE:
             self.modelSense = EPO.MAXIMIZE
+        else:
+            raise ValueError("Invalid modelSense.")
         # turn off output
         self._model.Params.outputFlag = 0
 
@@ -48,7 +50,7 @@ class optGrbModel(optModel):
     @property
     def num_cost(self):
         """
-        number of cost to be predicted
+        number of costs to be predicted
         """
         return self.x.size if isinstance(self.x, gp.MVar) else len(self.x)
 
@@ -114,14 +116,14 @@ class optGrbModel(optModel):
         A method to add new constraint
 
         Args:
-            coefs (np.ndarray / list): coeffcients of new constraint
+            coefs (np.ndarray / list): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint

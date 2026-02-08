@@ -22,7 +22,7 @@ class knapsackModel(optGrbModel):
     Attributes:
         _model (GurobiPy model): Gurobi model
         weights (np.ndarray / list): Weights of items
-        capacity (np.ndarray / listy): Total capacity
+        capacity (np.ndarray / list): Total capacity
         items (list): List of item index
     """
 
@@ -44,9 +44,9 @@ class knapsackModel(optGrbModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("knapsack")
-        # varibles
+        # variables
         x = m.addMVar(self.items, name="x", vtype=GRB.BINARY)
         # sense
         m.modelSense = GRB.MAXIMIZE
@@ -72,11 +72,11 @@ class knapsackModelRel(knapsackModel):
         """
         A method to build Gurobi
         """
-        # ceate a model
+        # create a model
         m = gp.Model("knapsack")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         x = m.addMVar(self.items, name="x", ub=1)
         # sense
         m.modelSense = GRB.MAXIMIZE

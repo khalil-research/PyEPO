@@ -17,7 +17,7 @@ def genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed
         num_items (int): number of items
         dim (int): dimension of multi-dimensional knapsack
         deg (int): data polynomial degree
-        noise_width (float): half witdth of data random noise
+        noise_width (float): half width of data random noise
         seed (int): random state seed
 
     Returns:
@@ -53,11 +53,11 @@ def genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed
         values *= 5
         values /= 3.5 ** deg
         # noise
-        epislon = rnd.uniform(1 - noise_width, 1 + noise_width, m)
-        values *= epislon
+        epsilon = rnd.uniform(1 - noise_width, 1 + noise_width, m)
+        values *= epsilon
         # convert into int
         values = np.ceil(values)
         c[i, :] = values
-        # float
-        c = c.astype(np.float64)
+    # float
+    c = c.astype(np.float64)
     return weights, x, c

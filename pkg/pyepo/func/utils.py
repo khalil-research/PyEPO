@@ -13,8 +13,6 @@ from pyepo.model.mpax import optMpaxModel
 
 try:
     import jax
-    from jax import numpy as jnp
-    from mpax import create_lp, r2HPDHG
 except ImportError:
     pass
 
@@ -31,6 +29,9 @@ def _solve_or_cache(cp, module):
             module._update_solution_pool(sol)
     # best cached solution
     else:
+        # move solpool to the correct device
+        if module.solpool.device != cp.device:
+            module.solpool = module.solpool.to(cp.device)
         sol, obj = _cache_in_pass(cp, module.optmodel, module.solpool)
     return sol, obj
 
@@ -54,10 +55,12 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
         obj = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(obj)).to(device)
         # obj sense
-        if optmodel.modelSense == EPO.MAXIMIZE:
+        if optmodel.modelSense == EPO.MINIMIZE:
+            pass
+        elif optmodel.modelSense == EPO.MAXIMIZE:
             obj = - obj
-        elif optmodel.modelSense != EPO.MINIMIZE:
-            raise ValueError("Invalid modelSense.")
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     # single-core
     elif processes == 1:
         sol = []
@@ -92,9 +95,6 @@ def _cache_in_pass(cp, optmodel, solpool):
     """
     # get device
     device = cp.device
-    # solpool is on the same device
-    if solpool.device != device:
-        solpool = solpool.to(device)
     # best solution in pool
     solpool_obj = torch.matmul(cp, solpool.T)
     if optmodel.modelSense == EPO.MINIMIZE:

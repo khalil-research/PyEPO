@@ -221,7 +221,7 @@ class pointwiseLTR(optModule):
         objpool_c = true_cost @ self.solpool.T # true cost
         objpool_cp = pred_cost @ self.solpool.T # pred cost
         # squared loss
-        loss = (objpool_c - objpool_cp).square().mean(axis=1)
+        loss = (objpool_c - objpool_cp).square().mean(dim=1)
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)

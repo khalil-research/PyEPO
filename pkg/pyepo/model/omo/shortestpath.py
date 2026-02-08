@@ -58,18 +58,18 @@ class shortestPathModel(optOmoModel):
         """
         A method to build pyomo model
         """
-        # ceate a model
+        # create a model
         m = pe.ConcreteModel("shortest path")
         # parameters
         m.arcs = pe.Set(initialize=self.arcs)
-        # varibles
+        # variables
         x = pe.Var(m.arcs, domain=pe.PositiveReals, bounds=(0,1))
         m.x = x
         # constraints
         m.cons = pe.ConstraintList()
         for i in range(self.grid[0]):
             for j in range(self.grid[1]):
-                v = v = i * self.grid[1] + j
+                v = i * self.grid[1] + j
                 expr = 0
                 for e in self.arcs:
                     # flow in

@@ -65,9 +65,9 @@ class NCE(optModule):
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool)
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
-            loss = (obj_cp - objpool_cp).mean(axis=1)
+            loss = (obj_cp - objpool_cp).mean(dim=1)
         elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = (objpool_cp - obj_cp).mean(axis=1)
+            loss = (objpool_cp - obj_cp).mean(dim=1)
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # reduction
@@ -134,9 +134,9 @@ class contrastiveMAP(optModule):
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool)
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
-            loss, _ = (obj_cp - objpool_cp).max(axis=1)
+            loss, _ = (obj_cp - objpool_cp).max(dim=1)
         elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            loss, _ = (objpool_cp - obj_cp).max(axis=1)
+            loss, _ = (objpool_cp - obj_cp).max(dim=1)
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # reduction

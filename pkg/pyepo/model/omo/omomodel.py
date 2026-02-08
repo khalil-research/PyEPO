@@ -6,11 +6,15 @@ Abstract optimization model based on Pyomo
 
 from copy import copy
 
+import numpy as np
+import torch
+
+from pyepo import EPO
+from pyepo.model.opt import optModel
+
 try:
     from pyomo import opt as po
     from pyomo import environ as pe
-    from pyepo import EPO
-    from pyepo.model.opt import optModel
     _HAS_PYOMO = True
 except ImportError:
     _HAS_PYOMO = False
@@ -30,18 +34,19 @@ class optOmoModel(optModel):
         Args:
             solver (str): optimization solver in the background
         """
-        super().__init__()
         # error
         if not _HAS_PYOMO:
             raise ImportError("Pyomo is not installed. Please install pyomo to use this feature.")
+        super().__init__()
         # init obj
         if self.modelSense == EPO.MINIMIZE:
             self._model.obj = pe.Objective(sense=pe.minimize, expr=0)
-        if self.modelSense == EPO.MAXIMIZE:
+        elif self.modelSense == EPO.MAXIMIZE:
             self._model.obj = pe.Objective(sense=pe.maximize, expr=0)
+        else:
+            raise ValueError("Invalid modelSense.")
         # set solver
         self.solver = solver
-        print("Solver in the background: {}".format(self.solver))
         if self.solver == "gurobi":
             self._solverfac = po.SolverFactory(self.solver, solver_io="python")
         else:
@@ -70,8 +75,10 @@ class optOmoModel(optModel):
         obj = sum(c[i] * self.x[k] for i, k in enumerate(self.x))
         if self.modelSense == EPO.MINIMIZE:
             self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
-        if self.modelSense == EPO.MAXIMIZE:
+        elif self.modelSense == EPO.MAXIMIZE:
             self._model.obj = pe.Objective(sense=pe.maximize, expr=obj)
+        else:
+            raise ValueError("Invalid modelSense.")
 
     def solve(self):
         """
@@ -103,14 +110,14 @@ class optOmoModel(optModel):
         A method to add new constraint
 
         Args:
-            coefs (np.ndarray / list): coeffcients of new constraint
+            coefs (np.ndarray / list): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint

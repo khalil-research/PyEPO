@@ -6,7 +6,6 @@ Knapsack problem
 
 try:
     import jax.numpy as jnp
-    from mpax import create_lp, r2HPDHG
     _HAS_MPAX = True
 except ImportError:
     _HAS_MPAX = False
@@ -16,12 +15,12 @@ from pyepo.model.mpax.mpaxmodel import optMpaxModel
 
 class knapsackModel(optMpaxModel):
     """
-    This class is optimization model for relexed knapsack problem
+    This class is optimization model for relaxed knapsack problem
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model: MPAX model
         weights (np.ndarray / list): Weights of items
-        capacity (np.ndarray / listy): Total capacity
+        capacity (np.ndarray / list): Total capacity
         items (list): List of item index
     """
 

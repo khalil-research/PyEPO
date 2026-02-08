@@ -6,13 +6,9 @@ Shortest path problem
 
 try:
     import jax.numpy as jnp
-    from mpax import create_lp, r2HPDHG
     _HAS_MPAX = True
 except ImportError:
     _HAS_MPAX = False
-
-from pyepo import EPO
-from pyepo.model.opt import optModel
 
 from pyepo.model.mpax.mpaxmodel import optMpaxModel
 

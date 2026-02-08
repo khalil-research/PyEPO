@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Traveling salesman probelm
+Traveling salesman problem
 """
 
 from collections import defaultdict
@@ -119,9 +119,9 @@ class tspGGModel(tspABModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
-        # varibles
+        # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
         y = m.addVars(directed_edges, name="y")
@@ -169,14 +169,14 @@ class tspGGModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coeffcients of new constraint
+            coefs (ndarray): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint
@@ -211,11 +211,11 @@ class tspGGModelRel(tspGGModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", ub=1)
         y = m.addVars(directed_edges, name="y")
@@ -278,11 +278,11 @@ class tspDFJModel(tspABModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:
             x[j, i] = x[i, j]
@@ -347,14 +347,14 @@ class tspDFJModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coeffcients of new constraint
+            coefs (ndarray): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint
@@ -380,11 +380,11 @@ class tspMTZModel(tspABModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
         u = m.addVars(self.nodes, name="u")
@@ -429,14 +429,14 @@ class tspMTZModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coeffcients of new constraint
+            coefs (ndarray): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint
@@ -471,11 +471,11 @@ class tspMTZModelRel(tspMTZModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", ub=1)
         u = m.addVars(self.nodes, name="u")
