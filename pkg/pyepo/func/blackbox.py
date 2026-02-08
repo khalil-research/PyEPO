@@ -4,25 +4,24 @@
 Differentiable Black-box optimization function
 """
 
-import numpy as np
 import torch
 from torch.autograd import Function
 
 from pyepo.func.abcmodule import optModule
 from pyepo import EPO
-from pyepo.func.utlis import _solve_or_cache
+from pyepo.func.utils import _solve_or_cache
 
 
 class blackboxOpt(optModule):
     """
-    An autograd module for differentiable black-box optimizer, which yield
+    An autograd module for differentiable black-box optimizer, which yields
     an optimal solution and derive a gradient.
 
-    For differentiable block-box, the objective function is linear and
+    For differentiable black-box, the objective function is linear and
     constraints are known and fixed, but the cost vector needs to be predicted
     from contextual data.
 
-    The block-box approximates the gradient of the optimizer by interpolating
+    The black-box approximates the gradient of the optimizer by interpolating
     the loss function. Thus, it allows us to design an algorithm based on
     stochastic gradient descent.
 
@@ -32,8 +31,8 @@ class blackboxOpt(optModule):
     def __init__(self, optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
-            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
+            optmodel (optModel): a PyEPO optimization model
+            lambd (float): a hyperparameter for differentiable black-box to control interpolation degree
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
@@ -56,7 +55,7 @@ class blackboxOpt(optModule):
 
 class blackboxOptFunc(Function):
     """
-    A autograd function for differentiable black-box optimizer
+    An autograd function for differentiable black-box optimizer
     """
 
     @staticmethod
@@ -94,7 +93,7 @@ class blackboxOptFunc(Function):
         module = ctx.module
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         wp = pred_sol.detach()
         dl = grad_output.detach()
@@ -103,7 +102,7 @@ class blackboxOptFunc(Function):
         # solve
         sol, _ = _solve_or_cache(cq, module)
         # get gradient
-        grad = (sol - wp) / module.lambd
+        grad = (sol - wp) / lambd
         # convert to tensor
         grad = torch.as_tensor(grad, dtype=torch.float, device=device)
         return grad, None
@@ -111,8 +110,8 @@ class blackboxOptFunc(Function):
 
 class negativeIdentity(optModule):
     """
-    An autograd module for the differentiable optimizer, which yields optimal a
-    solution and use negative identity as a gradient on the backward pass.
+    An autograd module for the differentiable optimizer, which yields an optimal
+    solution and uses negative identity as a gradient on the backward pass.
 
     For negative identity backpropagation, the objective function is linear and
     constraints are known and fixed, but the cost vector needs to be predicted
@@ -129,13 +128,13 @@ class negativeIdentity(optModule):
     def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             dataset (None/optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
-        # build blackbox optimizer
+        # build negative identity optimizer
         self.nid = negativeIdentityFunc()
 
     def forward(self, pred_cost):
@@ -148,7 +147,7 @@ class negativeIdentity(optModule):
 
 class negativeIdentityFunc(Function):
     """
-    A autograd function for differentiable black-box optimizer
+    An autograd function for negative identity optimizer
     """
 
     @staticmethod
@@ -165,7 +164,7 @@ class negativeIdentityFunc(Function):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         # solve
         sol, _ = _solve_or_cache(cp, module)

@@ -11,8 +11,8 @@ from torch.autograd import Function
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.model.mpax import optMpaxModel
-from pyepo.utlis import getArgs
-from pyepo.func.utlis import sumGammaDistribution
+from pyepo.utils import getArgs
+from pyepo.func.utils import sumGammaDistribution
 
 try:
     import jax
@@ -41,7 +41,7 @@ class perturbedOpt(optModule):
                  seed=135, solve_ratio=1, dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
@@ -69,7 +69,7 @@ class perturbedOpt(optModule):
 
 class perturbedOptFunc(Function):
     """
-    A autograd function for perturbed optimizer
+    An autograd function for perturbed optimizer
     """
 
     @staticmethod
@@ -86,7 +86,7 @@ class perturbedOptFunc(Function):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         # sample perturbations
         noises = module.rnd.normal(0, 1, size=(module.n_samples, *cp.shape))
@@ -140,7 +140,7 @@ class perturbedFenchelYoung(optModule):
                  seed=135, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
@@ -178,7 +178,7 @@ class perturbedFenchelYoung(optModule):
 
 class perturbedFenchelYoungFunc(Function):
     """
-    A autograd function for Fenchel-Young loss using perturbation techniques.
+    An autograd function for Fenchel-Young loss using perturbation techniques.
     """
 
     @staticmethod
@@ -196,7 +196,7 @@ class perturbedFenchelYoungFunc(Function):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         w = true_sol.detach()
         # sample perturbations
@@ -251,10 +251,10 @@ class implicitMLE(optModule):
                  processes=1, solve_ratio=1, dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): noise temperature for the input distribution
-            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
+            lambd (float): a hyperparameter for differentiable black-box to control interpolation degree
             distribution (distribution): noise distribution
             two_sides (bool): approximate gradient by two-sided perturbation or not
             processes (int): number of processors, 1 for single-core, 0 for all of cores
@@ -274,7 +274,7 @@ class implicitMLE(optModule):
         self.distribution = distribution
         # symmetric perturbation
         self.two_sides = two_sides
-        # build I-LME
+        # build I-MLE
         self.imle = implicitMLEFunc()
 
     def forward(self, pred_cost):
@@ -287,7 +287,7 @@ class implicitMLE(optModule):
 
 class implicitMLEFunc(Function):
     """
-    A autograd function for Implicit Maximum Likelihood Estimator
+    An autograd function for Implicit Maximum Likelihood Estimator
     """
 
     @staticmethod
@@ -304,7 +304,7 @@ class implicitMLEFunc(Function):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         # sample perturbations
         noises = module.distribution.sample(size=(module.n_samples, *cp.shape))
@@ -333,7 +333,7 @@ class implicitMLEFunc(Function):
         module = ctx.module
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         dl = grad_output.detach()
         # positive perturbed costs
@@ -374,7 +374,7 @@ class adaptiveImplicitMLE(optModule):
                  processes=1, solve_ratio=1, dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): noise temperature for the input distribution
             distribution (distribution): noise distribution
@@ -396,7 +396,7 @@ class adaptiveImplicitMLE(optModule):
         self.alpha = 0 # adaptive magnitude α
         self.grad_norm_avg = 1 # gradient norm estimate
         self.step = 1e-3 # update step for α
-        # build I-LME
+        # build I-MLE
         self.aimle = adaptiveImplicitMLEFunc()
 
     def forward(self, pred_cost):
@@ -409,7 +409,7 @@ class adaptiveImplicitMLE(optModule):
 
 class adaptiveImplicitMLEFunc(implicitMLEFunc):
     """
-    A autograd function for Adaptive Implicit Maximum Likelihood Estimator
+    An autograd function for Adaptive Implicit Maximum Likelihood Estimator
     """
     @staticmethod
     def backward(ctx, grad_output):
@@ -422,7 +422,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         module = ctx.module
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         dl = grad_output.detach()
         # calculate λ
@@ -538,7 +538,7 @@ def _solveWithObj4Par(perturbed_costs, args, model_type):
     A global function to solve function in parallel processors
 
     Args:
-        perturbed_costs (np.ndarray): costsof objective function with perturbation
+        perturbed_costs (np.ndarray): costs of objective function with perturbation
         args (dict): optModel args
         model_type (ABCMeta): optModel class type
 

@@ -10,7 +10,8 @@ from torch.autograd import Function
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
-from pyepo.func.utlis import _solve_or_cache
+from pyepo.func.utils import _solve_or_cache
+
 
 class SPOPlus(optModule):
     """
@@ -30,14 +31,14 @@ class SPOPlus(optModule):
     def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             reduction (str): the reduction to apply to the output
             dataset (None/optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
-        # build carterion
+        # build criterion
         self.spop = SPOPlusFunc()
 
     def forward(self, pred_cost, true_cost, true_sol, true_obj):
@@ -59,7 +60,7 @@ class SPOPlus(optModule):
 
 class SPOPlusFunc(Function):
     """
-    A autograd function for SPO+ Loss
+    An autograd function for SPO+ Loss
     """
 
     @staticmethod
@@ -72,14 +73,14 @@ class SPOPlusFunc(Function):
             true_cost (torch.tensor): a batch of true values of the cost
             true_sol (torch.tensor): a batch of true optimal solutions
             true_obj (torch.tensor): a batch of true optimal objective values
-            module (optModule): SPOPlus modeul
+            module (optModule): SPOPlus module
 
         Returns:
             torch.tensor: SPO+ loss
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
         w = true_sol.detach()
@@ -136,7 +137,7 @@ class perturbationGradient(optModule):
                  reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             sigma (float): the amplitude of the finite difference width used for loss approximation
             two_sides (bool): approximate gradient by two-sided perturbation or not
             processes (int): number of processors, 1 for single-core, 0 for all of cores
@@ -172,7 +173,7 @@ class perturbationGradient(optModule):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
         # central differencing
