@@ -21,16 +21,16 @@ def MSE(predmodel, dataloader):
     # evaluate
     predmodel.eval()
     loss = 0
+    # get device
+    device = next(predmodel.parameters()).device
     # load data
     with torch.no_grad():
         for data in dataloader:
             x, c, w, z = data
-            # cuda
-            if next(predmodel.parameters()).is_cuda:
-                x, c, w, z = x.cuda(), c.cuda(), w.cuda(), z.cuda()
+            x, c = x.to(device), c.to(device)
             # predict
             cp = predmodel(x)
-            loss += ((cp - c) ** 2).mean(dim=1).sum().data.to("cpu").numpy()
+            loss += ((cp - c) ** 2).mean(dim=1).sum().item()
     # restore training mode
     predmodel.train()
     return loss / len(dataloader.dataset)
