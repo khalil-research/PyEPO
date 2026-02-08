@@ -147,7 +147,7 @@ class tspGGModel(tspABModel):
             c (list): cost vector
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
                           for k, (i,j) in enumerate(self.edges))
         self._model.setObjective(obj)
@@ -326,7 +326,7 @@ class tspDFJModel(tspABModel):
             c (list): cost vector
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.edges))
         self._model.setObjective(obj)
 
@@ -407,7 +407,7 @@ class tspMTZModel(tspABModel):
             c (list): cost vector
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
                           for k, (i,j) in enumerate(self.edges))
         self._model.setObjective(obj)

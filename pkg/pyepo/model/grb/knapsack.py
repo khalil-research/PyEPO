@@ -70,7 +70,7 @@ class knapsackModelRel(knapsackModel):
 
     def _getModel(self):
         """
-        A method to build Gurobi
+        A method to build Gurobi model
         """
         # create a model
         m = gp.Model("knapsack")
