@@ -101,8 +101,10 @@ def _cache_in_pass(cp, optmodel, solpool):
     solpool_obj = torch.matmul(cp, solpool.T)
     if optmodel.modelSense == EPO.MINIMIZE:
         ind = torch.argmin(solpool_obj, dim=1)
-    if optmodel.modelSense == EPO.MAXIMIZE:
+    elif optmodel.modelSense == EPO.MAXIMIZE:
         ind = torch.argmax(solpool_obj, dim=1)
+    else:
+        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     obj = solpool_obj.gather(1, ind.view(-1, 1)).squeeze(1)
     sol = solpool[ind]
     return sol, obj

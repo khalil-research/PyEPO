@@ -133,6 +133,7 @@ class perturbationGradient(optModule):
 
     Reference: <https://arxiv.org/abs/2402.03256>
     """
+
     def __init__(self, optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1,
                  reduction="mean", dataset=None):
         """
