@@ -51,7 +51,8 @@ class NCE(optModule):
         # get device
         device = pred_cost.device
         # to device
-        self.solpool = self.solpool.to(device)
+        if self.solpool.device != device:
+            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
         # solve
@@ -120,7 +121,8 @@ class contrastiveMAP(optModule):
         # get device
         device = pred_cost.device
         # to device
-        self.solpool = self.solpool.to(device)
+        if self.solpool.device != device:
+            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
         # solve
