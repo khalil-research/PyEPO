@@ -10,7 +10,7 @@ import torch
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.data.dataset import optDataset
-from pyepo.func.utils import _solveWithObj4Par, _solve_in_pass
+from pyepo.func.utils import _solve_in_pass
 
 
 class NCE(optModule):

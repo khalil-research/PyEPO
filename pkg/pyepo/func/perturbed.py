@@ -247,7 +247,7 @@ class implicitMLE(optModule):
     """
 
     def __init__(self, optmodel, n_samples=10, sigma=1.0, lambd=10,
-                 distribution=sumGammaDistribution(kappa=5), two_sides=False,
+                 distribution=None, two_sides=False,
                  processes=1, solve_ratio=1, dataset=None):
         """
         Args:
@@ -271,6 +271,8 @@ class implicitMLE(optModule):
             raise ValueError("lambda is not positive.")
         self.lambd = lambd
         # noise distribution
+        if distribution is None:
+            distribution = sumGammaDistribution(kappa=5)
         self.distribution = distribution
         # symmetric perturbation
         self.two_sides = two_sides
@@ -370,7 +372,7 @@ class adaptiveImplicitMLE(optModule):
     """
 
     def __init__(self, optmodel, n_samples=10, sigma=1.0,
-                 distribution=sumGammaDistribution(kappa=5), two_sides=False,
+                 distribution=None, two_sides=False,
                  processes=1, solve_ratio=1, dataset=None):
         """
         Args:
@@ -389,6 +391,8 @@ class adaptiveImplicitMLE(optModule):
         # noise temperature
         self.sigma = sigma
         # noise distribution
+        if distribution is None:
+            distribution = sumGammaDistribution(kappa=5)
         self.distribution = distribution
         # symmetric perturbation
         self.two_sides = two_sides

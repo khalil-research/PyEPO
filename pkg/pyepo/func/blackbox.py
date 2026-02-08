@@ -178,14 +178,10 @@ class negativeIdentityFunc(Function):
         Backward pass for NID
         """
         optmodel = ctx.optmodel
-        # get device
-        device = grad_output.device
-        # identity matrix
-        I = torch.eye(grad_output.shape[1]).to(device)
+        # negative identity gradient
         if optmodel.modelSense == EPO.MINIMIZE:
-            grad = - I
+            return -grad_output, None
         elif optmodel.modelSense == EPO.MAXIMIZE:
-            grad = I
+            return grad_output, None
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        return grad_output @ grad, None
