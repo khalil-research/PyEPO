@@ -19,11 +19,11 @@ class myModel(optGrbModel):
         super().__init__()
 
     def _getModel(self):
-        # ceate a model
+        # create a model
         m = gp.Model()
-        # varibles
+        # variables
         x = m.addVars(self.num_item, name="x", vtype=GRB.BINARY)
-        # sense (must be minimize)
+        # sense
         m.modelSense = GRB.MAXIMIZE
         # constraints
         m.addConstr(gp.quicksum([self.weights[0,i] * x[i] for i in range(self.num_item)]) <= 7)
@@ -35,8 +35,8 @@ class myModel(optGrbModel):
 # prediction model
 class LinearRegression(nn.Module):
 
-    def __init__(self):
-        super(LinearRegression, self).__init__()
+    def __init__(self, num_feat, num_item):
+        super().__init__()
         self.linear = nn.Linear(num_feat, num_item)
 
     def forward(self, x):
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     optmodel = myModel(weights)
 
     # init prediction model
-    predmodel = LinearRegression()
+    predmodel = LinearRegression(num_feat, num_item)
     # set optimizer
     optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-2)
     # init SPO+ loss
@@ -74,7 +74,7 @@ if __name__ == "__main__":
             x, c, w, z = data
             # forward pass
             cp = predmodel(x)
-            loss = spo.apply(cp, c, w, z).mean()
+            loss = spo(cp, c, w, z)
             # backward pass
             optimizer.zero_grad()
             loss.backward()
