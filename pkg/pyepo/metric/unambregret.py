@@ -18,6 +18,7 @@ def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
         predmodel (nn): a regression neural network for cost prediction
         optmodel (optModel): a PyEPO optimization model
         dataloader (DataLoader): Torch dataloader from optDataSet
+        tolerance (float): tolerance for optimization
 
     Returns:
         float: unambiguous regret loss

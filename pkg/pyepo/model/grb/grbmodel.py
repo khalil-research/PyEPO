@@ -62,7 +62,7 @@ class optGrbModel(optModel):
             c (np.ndarray / list): cost of objective function
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):
             c = c.detach().cpu().numpy()

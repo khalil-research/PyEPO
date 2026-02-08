@@ -42,6 +42,9 @@ class portfolioModel(optGrbModel):
         """
         A method to calculate the risk level
 
+        Args:
+            gamma (float): risk level parameter
+
         Returns:
             float: risk level
         """

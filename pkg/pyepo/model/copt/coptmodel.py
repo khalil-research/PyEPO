@@ -43,7 +43,7 @@ class optCoptModel(optModel):
             c (np.ndarray / list): cost of objective function
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         # set obj
         obj = sum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)

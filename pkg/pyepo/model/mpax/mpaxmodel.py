@@ -130,7 +130,7 @@ class optMpaxModel(optModel):
         else:
             self.c = jnp.array(c, dtype=jnp.float32)
         if c.shape[-1] != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         # change sign for model sense
         if self.modelSense == EPO.MINIMIZE:
             pass
