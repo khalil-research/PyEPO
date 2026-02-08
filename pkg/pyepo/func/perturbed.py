@@ -25,11 +25,11 @@ except ImportError:
 class perturbedOpt(optModule):
     """
     An autograd module for Fenchel-Young loss using perturbation techniques. The
-    use of the loss improves the algorithmic by the specific expression of the
+    use of the loss improves the algorithm by the specific expression of the
     gradients of the loss.
 
     For the perturbed optimizer, the cost vector needs to be predicted from
-    contextual data and are perturbed with Gaussian noise.
+    contextual data and is perturbed with Gaussian noise.
 
     Thus, it allows us to design an algorithm based on stochastic gradient
     descent.
@@ -123,14 +123,14 @@ class perturbedOptFunc(Function):
 class perturbedFenchelYoung(optModule):
     """
     An autograd module for Fenchel-Young loss using perturbation techniques. The
-    use of the loss improves the algorithmic by the specific expression of the
+    use of the loss improves the algorithm by the specific expression of the
     gradients of the loss.
 
-    For the perturbed optimizer, the cost vector need to be predicted from
-    contextual data and are perturbed with Gaussian noise.
+    For the perturbed optimizer, the cost vector needs to be predicted from
+    contextual data and is perturbed with Gaussian noise.
 
-    The Fenchel-Young loss allows to directly optimize a loss between the features
-    and solutions with less computation. Thus, allows us to design an algorithm
+    The Fenchel-Young loss allows directly optimizing a loss between the features
+    and solutions with less computation. Thus, it allows us to design an algorithm
     based on stochastic gradient descent.
 
     Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
@@ -232,15 +232,15 @@ class perturbedFenchelYoungFunc(Function):
 
 class implicitMLE(optModule):
     """
-    An autograd module for Implicit Maximum Likelihood Estimator, which yield
+    An autograd module for Implicit Maximum Likelihood Estimator, which yields
     an optimal solution in a constrained exponential family distribution via
     Perturb-and-MAP.
 
     For I-MLE, it works as black-box combinatorial solvers, in which constraints
-    are known and fixed, but the cost vector need to be predicted from
+    are known and fixed, but the cost vector needs to be predicted from
     contextual data.
 
-    The I-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+    The I-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
     design an algorithm based on stochastic gradient descent.
 
     Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
@@ -350,20 +350,20 @@ class implicitMLEFunc(Function):
         else:
             # get single side gradient
             grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / module.lambd
-        return grad, None, None
+        return grad, None
 
 
 class adaptiveImplicitMLE(optModule):
     """
     An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
-    adaptively choose hyperparameter λ and yield an optimal solution in a
+    adaptively chooses hyperparameter λ and yields an optimal solution in a
     constrained exponential family distribution via Perturb-and-MAP.
 
     For AI-MLE, it works as black-box combinatorial solvers, in which constraints
-    are known and fixed, but the cost vector need to be predicted from
+    are known and fixed, but the cost vector needs to be predicted from
     contextual data.
 
-    The AI-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+    The AI-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
     design an algorithm based on stochastic gradient descent.
 
     Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
@@ -449,7 +449,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             module.alpha += module.step
         else:
             module.alpha -= module.step
-        return grad, None, None
+        return grad, None
 
 
 def _solve_or_cache(ptb_c, module):
