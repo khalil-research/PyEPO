@@ -40,7 +40,12 @@ class optDataset(Dataset):
         self.feats = feats
         self.costs = costs
         # find optimal solutions
-        self.sols, self.objs = self._getSols()
+        sols, objs = self._getSols()
+        # pre-convert to tensors (on CPU) to avoid repeated numpy→tensor copies
+        self.feats = torch.as_tensor(feats, dtype=torch.float32)
+        self.costs = torch.as_tensor(costs, dtype=torch.float32)
+        self.sols = torch.as_tensor(sols, dtype=torch.float32)
+        self.objs = torch.as_tensor(objs, dtype=torch.float32)
 
     def _getSols(self):
         """
@@ -97,10 +102,10 @@ class optDataset(Dataset):
             tuple: data features (torch.tensor), costs (torch.tensor), optimal solutions (torch.tensor) and objective values (torch.tensor)
         """
         return (
-            torch.FloatTensor(self.feats[index]),
-            torch.FloatTensor(self.costs[index]),
-            torch.FloatTensor(self.sols[index]),
-            torch.FloatTensor(self.objs[index]),
+            self.feats[index],
+            self.costs[index],
+            self.sols[index],
+            self.objs[index],
         )
 
 
@@ -140,7 +145,12 @@ class optDatasetKNN(optDataset):
         self.feats = feats
         self.costs = costs
         # find optimal solutions
-        self.sols, self.objs = self._getSols()
+        sols, objs = self._getSols()
+        # pre-convert to tensors (on CPU) to avoid repeated numpy→tensor copies
+        self.feats = torch.as_tensor(self.feats, dtype=torch.float32)
+        self.costs = torch.as_tensor(self.costs, dtype=torch.float32)
+        self.sols = torch.as_tensor(sols, dtype=torch.float32)
+        self.objs = torch.as_tensor(objs, dtype=torch.float32)
 
     def _getSols(self):
         """
