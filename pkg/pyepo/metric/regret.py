@@ -15,7 +15,7 @@ def regret(predmodel, optmodel, dataloader):
 
     Args:
         predmodel (nn): a regression neural network for cost prediction
-        optmodel (optModel): an PyEPO optimization model
+        optmodel (optModel): a PyEPO optimization model
         dataloader (DataLoader): Torch dataloader from optDataSet
 
     Returns:

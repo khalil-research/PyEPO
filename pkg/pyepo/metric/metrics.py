@@ -6,7 +6,7 @@ Metrics for SKlearn model
 
 import numpy as np
 
-from pyepo.utlis import getArgs
+from pyepo.utils import getArgs
 from pyepo import EPO
 
 def SPOError(pred_cost, true_cost, model_type, args):

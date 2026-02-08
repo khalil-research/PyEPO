@@ -25,7 +25,7 @@ class optModule(nn.Module):
     def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             reduction (str): the reduction to apply to the output
@@ -83,7 +83,7 @@ class optModule(nn.Module):
         if self.solpool is None:
             self.solpool = sol.clone()
             return
-        # to tenstor
+        # to tensor
         sol = torch.as_tensor(sol).to(self.solpool.device)
         # add into solpool
         self.solpool = torch.cat((self.solpool, sol), dim=0)

@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.utlis import getArgs
+from pyepo.utils import getArgs
 from pyepo.model.mpax import optMpaxModel
 
 try:
