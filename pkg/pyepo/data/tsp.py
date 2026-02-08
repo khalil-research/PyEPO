@@ -10,7 +10,7 @@ from scipy.spatial import distance
 
 def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
     """
-    A function to generate synthetic data and features for travelling salesman
+    A function to generate synthetic data and features for traveling salesman
 
     Args:
         num_data (int): number of data points
@@ -24,7 +24,7 @@ def genData(num_data, num_features, num_nodes, deg=1, noise_width=0, seed=135):
         tuple: data features (np.ndarray), costs (np.ndarray)
     """
     # positive integer parameter
-    if type(deg) is not int:
+    if not isinstance(deg, int):
         raise ValueError("deg = {} should be int.".format(deg))
     if deg <= 0:
         raise ValueError("deg = {} should be positive.".format(deg))

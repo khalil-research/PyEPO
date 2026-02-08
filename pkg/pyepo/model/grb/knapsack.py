@@ -17,7 +17,7 @@ from pyepo.model.grb.grbmodel import optGrbModel
 
 class knapsackModel(optGrbModel):
     """
-    This class is optimization model for knapsack problem
+    This class is an optimization model for the knapsack problem
 
     Attributes:
         _model (GurobiPy model): Gurobi model

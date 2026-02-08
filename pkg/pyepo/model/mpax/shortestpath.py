@@ -15,7 +15,7 @@ from pyepo.model.mpax.mpaxmodel import optMpaxModel
 
 class shortestPathModel(optMpaxModel):
     """
-    This class is optimization model for shortest path problem
+    This class is an optimization model for the shortest path problem
 
     Attributes:
         grid (tuple of int): Size of grid network
@@ -41,11 +41,11 @@ class shortestPathModel(optMpaxModel):
         """
         arcs = []
         for i in range(self.grid[0]):
-            # edges on rows
+            # edges along rows
             for j in range(self.grid[1] - 1):
                 v = i * self.grid[1] + j
                 arcs.append((v, v + 1))
-            # edges in columns
+            # edges along columns
             if i == self.grid[0] - 1:
                 continue
             for j in range(self.grid[1]):

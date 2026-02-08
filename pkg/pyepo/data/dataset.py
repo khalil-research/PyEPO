@@ -14,10 +14,10 @@ from scipy.spatial import distance
 
 class optDataset(Dataset):
     """
-    This class is Torch Dataset for optimization problems.
+    This class is a Torch Dataset for optimization problems.
 
     Attributes:
-        model (optModel): Optimization models
+        model (optModel): Optimization model
         feats (np.ndarray): Data features
         costs (np.ndarray): Cost vectors
         sols (np.ndarray): Optimal solutions
@@ -106,12 +106,12 @@ class optDataset(Dataset):
 
 class optDatasetKNN(optDataset):
     """
-    This class is Torch Dataset for optimization problems, when using the robust kNN-loss.
+    This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.
 
     Reference: <https://arxiv.org/abs/2310.04328>
 
     Attributes:
-        model (optModel): Optimization models
+        model (optModel): Optimization model
         k (int): number of nearest neighbours selected
         weight (float): weight of kNN-loss
         feats (np.ndarray): Data features

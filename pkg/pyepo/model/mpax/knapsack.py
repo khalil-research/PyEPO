@@ -15,7 +15,7 @@ from pyepo.model.mpax.mpaxmodel import optMpaxModel
 
 class knapsackModel(optMpaxModel):
     """
-    This class is optimization model for relaxed knapsack problem
+    This class is an optimization model for the relaxed knapsack problem
 
     Attributes:
         _model: MPAX model

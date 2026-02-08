@@ -21,7 +21,7 @@ class NCE(optModule):
     For the NCE, the cost vector needs to be predicted from contextual data and
     maximizes the separation of the probability of the optimal solution.
 
-    Thus allows us to design an algorithm based on stochastic gradient descent.
+    This allows us to design an algorithm based on stochastic gradient descent.
 
     Reference: <https://www.ijcai.org/proceedings/2021/390>
     """

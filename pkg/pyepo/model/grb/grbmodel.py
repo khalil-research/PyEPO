@@ -22,7 +22,7 @@ from pyepo.model.opt import optModel
 
 class optGrbModel(optModel):
     """
-    This is an abstract class for Gurobi-based optimization model
+    This is an abstract class for a Gurobi-based optimization model
 
     Attributes:
         _model (GurobiPy model): Gurobi model
@@ -56,7 +56,7 @@ class optGrbModel(optModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (np.ndarray / list): cost of objective function
@@ -78,7 +78,7 @@ class optGrbModel(optModel):
 
     def solve(self):
         """
-        A method to solve model
+        A method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (float)
@@ -96,7 +96,7 @@ class optGrbModel(optModel):
 
     def copy(self):
         """
-        A method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -113,7 +113,7 @@ class optGrbModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        A method to add new constraint
+        A method to add a new constraint
 
         Args:
             coefs (np.ndarray / list): coefficients of new constraint
