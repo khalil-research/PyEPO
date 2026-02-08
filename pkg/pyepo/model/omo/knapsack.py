@@ -45,11 +45,11 @@ class knapsackModel(optOmoModel):
         """
         # sense
         self.modelSense = EPO.MAXIMIZE
-        # ceate a model
+        # create a model
         m = pe.ConcreteModel("knapsack")
         # parameters
         m.its = pe.Set(initialize=self.items)
-        # varibles
+        # variables
         x = pe.Var(m.its, domain=pe.Binary)
         m.x = x
         # constraints
@@ -80,11 +80,11 @@ class knapsackModelRel(knapsackModel):
         """
         # sense
         self.modelSense = EPO.MAXIMIZE
-        # ceate a model
+        # create a model
         m = pe.ConcreteModel("knapsack")
         # parameters
         m.its = pe.Set(initialize=self.items)
-        # varibles
+        # variables
         x = pe.Var(m.its, domain=pe.PositiveReals, bounds=(0,1))
         m.x = x
         # constraints

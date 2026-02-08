@@ -4,16 +4,12 @@
 optDataset class based on PyTorch Dataset
 """
 
-import time
-
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
 from pyepo.model.opt import optModel
-
-import random
 from scipy.spatial import distance
 
 class optDataset(Dataset):
@@ -30,7 +26,7 @@ class optDataset(Dataset):
 
     def __init__(self, model, feats, costs):
         """
-        A method to create a optDataset from optModel
+        A method to create an optDataset from optModel
 
         Args:
             model (optModel): an instance of optModel
@@ -59,7 +55,7 @@ class optDataset(Dataset):
                 # to numpy
                 if isinstance(sol, torch.Tensor):
                     sol = sol.detach().cpu().numpy()
-            except:
+            except Exception:
                 raise ValueError(
                     "For optModel, the method 'solve' should return solution vector and objective value."
                 )
@@ -125,7 +121,7 @@ class optDatasetKNN(optDataset):
     """
     def __init__(self, model, feats, costs, k=10, weight=0.5):
         """
-        A method to create a optDataset from optModel
+        A method to create an optDataset from optModel
 
         Args:
             model (optModel): an instance of optModel
@@ -162,7 +158,7 @@ class optDatasetKNN(optDataset):
             for i, c in enumerate(c_knn.T):
                 try:
                     sol_i, obj_i = self._solve(c)
-                except:
+                except Exception:
                     raise ValueError(
                         "For optModel, the method 'solve' should return solution vector and objective value."
                     )

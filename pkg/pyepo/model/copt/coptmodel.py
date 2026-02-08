@@ -21,10 +21,6 @@ class optCoptModel(optModel):
     """
 
     def __init__(self):
-        """
-        Args:
-            solver (str): optimization solver in the background
-        """
         super().__init__()
         # model sense
         if self._model.ObjSense == COPT.MINIMIZE:
@@ -81,14 +77,14 @@ class optCoptModel(optModel):
         A method to add new constraint
 
         Args:
-            coefs (np.ndarray / list): coeffcients of new constraint
+            coefs (np.ndarray / list): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint

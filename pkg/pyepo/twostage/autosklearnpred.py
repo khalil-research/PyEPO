@@ -1,20 +1,19 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Two-stage model with Scikit-learn predictor
+Two-stage model with auto-sklearn predictor
 """
 
-import numpy as np
 try:
     from autosklearn.regression import AutoSklearnRegressor
     from autosklearn.metrics import mean_squared_error
     from autosklearn.pipeline.components import data_preprocessing
     from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
     from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
+    from ConfigSpace.configuration_space import ConfigurationSpace
     _HAS_AUTO = True
 except ImportError:
     _HAS_AUTO = False
-from ConfigSpace.configuration_space import ConfigurationSpace
 
 
 from pyepo.metric import makeAutoSkScorer
@@ -27,7 +26,7 @@ def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
         optmodel (optModel): optimization model
 
     Returns:
-        AutoSklearnRegressor: Auto-SKlearn multi-output regression model
+        AutoSklearnRegressor: Auto-sklearn multi-output regression model
     """
     # error
     if not _HAS_AUTO:

@@ -7,17 +7,17 @@ Optimization Model based on solvers
 from pyepo.model import opt
 try:
     from pyepo.model import grb
-except:
+except ImportError:
     pass
 try:
     from pyepo.model import copt
-except:
+except ImportError:
     pass
 try:
     from pyepo.model import omo
-except:
+except ImportError:
     pass
 try:
     from pyepo.model import mpax
-except:
+except ImportError:
     pass

@@ -16,7 +16,7 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
         num_features (int): dimension of features
         grid (int, int): size of grid network
         deg (int): data polynomial degree
-        noise_width (float): half witdth of data random noise
+        noise_width (float): half width of data random noise
         seed (int): random seed
 
     Returns:
@@ -29,7 +29,7 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
         raise ValueError("deg = {} should be positive.".format(deg))
     # set seed
     rnd = np.random.RandomState(seed)
-    # numbrnda points
+    # number of data points
     n = num_data
     # dimension of features
     p = num_features
@@ -47,8 +47,8 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
         # rescale
         ci /= 3.5 ** deg
         # noise
-        epislon = rnd.uniform(1 - noise_width, 1 + noise_width, d)
-        ci *= epislon
+        epsilon = rnd.uniform(1 - noise_width, 1 + noise_width, d)
+        ci *= epsilon
         c[i, :] = ci
 
     return x, c

@@ -4,7 +4,6 @@
 Two-stage model with Scikit-learn predictor
 """
 
-import numpy as np
 from sklearn.multioutput import MultiOutputRegressor
 
 

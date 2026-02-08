@@ -55,9 +55,9 @@ class portfolioModel(optGrbModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("portfolio")
-        # varibles
+        # variables
         x = m.addMVar(self.num_assets, ub=1, name="x")
         # sense
         m.modelSense = GRB.MAXIMIZE

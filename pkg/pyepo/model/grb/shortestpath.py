@@ -61,9 +61,9 @@ class shortestPathModel(optGrbModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("shortest path")
-        # varibles
+        # variables
         x = m.addVars(self.arcs, name="x")
         # sense
         m.modelSense = GRB.MINIMIZE
