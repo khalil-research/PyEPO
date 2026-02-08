@@ -27,19 +27,21 @@ def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
     predmodel.eval()
     loss = 0
     optsum = 0
+    # get device
+    device = next(predmodel.parameters()).device
     # load data
     for data in dataloader:
         x, c, w, z = data
-        # cuda
-        if next(predmodel.parameters()).is_cuda:
-            x, c, w, z = x.cuda(), c.cuda(), w.cuda(), z.cuda()
+        x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
         # pred cost
-        with torch.no_grad(): # no grad
-            cp = predmodel(x).to("cpu").detach().numpy()
+        with torch.no_grad():
+            cp = predmodel(x).cpu().numpy()
+        # batch convert to numpy
+        c_np = c.cpu().numpy()
         # solve
         for j in range(cp.shape[0]):
             # accumulate loss
-            loss += calUnambRegret(optmodel, cp[j], c[j].to("cpu").detach().numpy(),
+            loss += calUnambRegret(optmodel, cp[j], c_np[j],
                                 z[j].item(), tolerance, max_iter=10)
         optsum += abs(z).sum().item()
     # turn back train mode
