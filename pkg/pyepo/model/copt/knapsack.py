@@ -14,7 +14,7 @@ from pyepo.model.copt.coptmodel import optCoptModel
 
 class knapsackModel(optCoptModel):
     """
-    This class is optimization model for knapsack problem
+    This class is an optimization model for the knapsack problem
 
     Attributes:
         _model (COPT model): COPT model

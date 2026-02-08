@@ -22,10 +22,10 @@ except ImportError:
 
 class optOmoModel(optModel):
     """
-    This is an abstract class for Pyomo-based optimization model
+    This is an abstract class for a Pyomo-based optimization model
 
     Attributes:
-        _model (PyOmo model): Pyomo model
+        _model (Pyomo model): Pyomo model
         solver (str): optimization solver in the background
     """
 
@@ -57,7 +57,7 @@ class optOmoModel(optModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (np.ndarray / list): cost of objective function
@@ -82,7 +82,7 @@ class optOmoModel(optModel):
 
     def solve(self):
         """
-        A method to solve model
+        A method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (float)
@@ -93,7 +93,7 @@ class optOmoModel(optModel):
 
     def copy(self):
         """
-        A method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -107,7 +107,7 @@ class optOmoModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        A method to add new constraint
+        A method to add a new constraint
 
         Args:
             coefs (np.ndarray / list): coefficients of new constraint

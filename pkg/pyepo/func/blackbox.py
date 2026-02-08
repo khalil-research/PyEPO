@@ -157,7 +157,7 @@ class negativeIdentityFunc(Function):
 
         Args:
             pred_cost (torch.tensor): a batch of predicted values of the cost
-            module (optModule): blackboxOpt module
+            module (optModule): negativeIdentity module
 
         Returns:
             torch.tensor: predicted solutions

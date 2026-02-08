@@ -17,10 +17,10 @@ except ImportError:
 
 class knapsackModel(optOmoModel):
     """
-    This class is optimization model for knapsack problem
+    This class is an optimization model for the knapsack problem
 
     Attributes:
-        _model (PyOmo model): Pyomo model
+        _model (Pyomo model): Pyomo model
         solver (str): optimization solver in the background
         weights (np.ndarray): weights of items
         capacity (np.ndarray): total capacity
@@ -41,7 +41,7 @@ class knapsackModel(optOmoModel):
 
     def _getModel(self):
         """
-        A method to build pyomo model
+        A method to build Pyomo model
         """
         # sense
         self.modelSense = EPO.MAXIMIZE
@@ -76,7 +76,7 @@ class knapsackModelRel(knapsackModel):
 
     def _getModel(self):
         """
-        A method to build pyomo
+        A method to build Pyomo model
         """
         # sense
         self.modelSense = EPO.MAXIMIZE

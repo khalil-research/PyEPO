@@ -22,7 +22,7 @@ from pyepo.model.opt import optModel
 
 class optMpaxModel(optModel):
     """
-    This is an abstract class for MPAX-based optimization model
+    This is an abstract class for an MPAX-based optimization model
 
     Attributes:
         A (jnp.ndarray, BCOO or BCSR): The matrix of equality constraints.
@@ -75,7 +75,7 @@ class optMpaxModel(optModel):
         self.modelSense = EPO.MINIMIZE if minimize else EPO.MAXIMIZE
         # init device
         self.device = None
-        # jit pre compile
+        # JIT pre-compile
         self.jitted_solve = jax.jit(partial(self._jitted_solve,
                                             A=self.A, b=self.b, G=self.G,
                                             h=self.h, l=self.l, u=self.u,
@@ -94,7 +94,7 @@ class optMpaxModel(optModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (np.ndarray / list): cost of objective function
@@ -120,7 +120,7 @@ class optMpaxModel(optModel):
                 self.h = jax.device_put(self.h, self.device)
                 self.l = jax.device_put(self.l, self.device)
                 self.u = jax.device_put(self.u, self.device)
-                # jit pre compile
+                # JIT pre-compile
                 self.jitted_solve = jax.jit(partial(self._jitted_solve,
                                                     A=self.A, b=self.b, G=self.G,
                                                     h=self.h, l=self.l, u=self.u,
@@ -141,7 +141,7 @@ class optMpaxModel(optModel):
 
     def solve(self):
         """
-        A method to solve model
+        A method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (jnp.float32)
@@ -171,7 +171,7 @@ class optMpaxModel(optModel):
 
     def copy(self):
         """
-        A method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -188,7 +188,7 @@ class optMpaxModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        A method to add new constraint
+        A method to add a new constraint
 
         Args:
             coefs (np.ndarray / list): coefficients of new constraint

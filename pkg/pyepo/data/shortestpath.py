@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Synthetic data for Shortest path problem
+Synthetic data for shortest path problem
 """
 
 import numpy as np
@@ -23,7 +23,7 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
        tuple: data features (np.ndarray), costs (np.ndarray)
     """
     # positive integer parameter
-    if type(deg) is not int:
+    if not isinstance(deg, int):
         raise ValueError("deg = {} should be int.".format(deg))
     if deg <= 0:
         raise ValueError("deg = {} should be positive.".format(deg))

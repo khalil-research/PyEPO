@@ -16,7 +16,7 @@ from pyepo.model.grb.grbmodel import optGrbModel
 
 class shortestPathModel(optGrbModel):
     """
-    This class is optimization model for shortest path problem
+    This class is an optimization model for the shortest path problem
 
     Attributes:
         _model (GurobiPy model): Gurobi model
@@ -42,11 +42,11 @@ class shortestPathModel(optGrbModel):
         """
         arcs = []
         for i in range(self.grid[0]):
-            # edges on rows
+            # edges along rows
             for j in range(self.grid[1] - 1):
                 v = i * self.grid[1] + j
                 arcs.append((v, v + 1))
-            # edges in columns
+            # edges along columns
             if i == self.grid[0] - 1:
                 continue
             for j in range(self.grid[1]):

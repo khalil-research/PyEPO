@@ -37,7 +37,7 @@ def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
         """
         def __init__(self, **kwargs):
             """
-            This preprocessors does not change the data
+            This preprocessor does not change the data
             """
             # Some internal checks makes sure parameters are set
             for key, val in kwargs.items():

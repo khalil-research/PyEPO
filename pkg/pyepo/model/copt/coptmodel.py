@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Abstract optimization model based on Cardinal Optimizer（COPT）
+Abstract optimization model based on Cardinal Optimizer (COPT)
 """
 
 from copy import copy
@@ -14,7 +14,7 @@ from pyepo.model.opt import optModel
 
 class optCoptModel(optModel):
     """
-    This is an abstract class for Cardinal Optimizer optimization model
+    This is an abstract class for a Cardinal Optimizer optimization model
 
     Attributes:
         _model (COPT model): COPT model
@@ -37,7 +37,7 @@ class optCoptModel(optModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (np.ndarray / list): cost of objective function
@@ -50,7 +50,7 @@ class optCoptModel(optModel):
 
     def solve(self):
         """
-        A method to solve model
+        A method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (float)
@@ -61,7 +61,7 @@ class optCoptModel(optModel):
 
     def copy(self):
         """
-        A method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -76,7 +76,7 @@ class optCoptModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        A method to add new constraint
+        A method to add a new constraint
 
         Args:
             coefs (np.ndarray / list): coefficients of new constraint

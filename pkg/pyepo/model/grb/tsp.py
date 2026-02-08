@@ -37,7 +37,7 @@ class unionFind:
 
 class tspABModel(optGrbModel):
     """
-    This abstract class is optimization model for traveling salesman problem.
+    This abstract class is an optimization model for the traveling salesman problem.
     This model is for further implementation of different formulation.
 
     Attributes:
@@ -104,7 +104,7 @@ class tspABModel(optGrbModel):
 
 class tspGGModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.
+    This class is an optimization model for the traveling salesman problem based on Gavish–Graves (GG) formulation.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
@@ -141,7 +141,7 @@ class tspGGModel(tspABModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (list): cost vector
@@ -262,7 +262,7 @@ class tspGGModelRel(tspGGModel):
 
 class tspDFJModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+    This class is an optimization model for the traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
     constraint generation.
 
     Attributes:
@@ -320,7 +320,7 @@ class tspDFJModel(tspABModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (list): cost vector
@@ -366,7 +366,7 @@ class tspDFJModel(tspABModel):
 
 class tspMTZModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
+    This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
@@ -401,7 +401,7 @@ class tspMTZModel(tspABModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (list): cost vector

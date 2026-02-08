@@ -17,7 +17,7 @@ from pyepo.model.grb.grbmodel import optGrbModel
 
 class portfolioModel(optGrbModel):
     """
-    This class is an optimization model for portfolio problem
+    This class is an optimization model for the portfolio problem
 
     Attributes:
         _model (GurobiPy model): Gurobi model

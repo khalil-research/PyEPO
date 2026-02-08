@@ -11,7 +11,7 @@ from pyepo import EPO
 
 class optModel(ABC):
     """
-    This is an abstract class for optimization model
+    This is an abstract class for an optimization model
 
     Attributes:
         _model (optimization model): underlying solver model object
