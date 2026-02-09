@@ -4,14 +4,14 @@
 Introduction
 ++++++++++++
 
-The ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is an open-source software implemented in Python that facilitates the modeling and resolution of predict-then-optimize problems characterized by linear objective functions.
+``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python library for modeling and solving predict-then-optimize problems with linear objective functions.
 
-The primary function of ``PyEPO`` is to construct optimization models utilizing `GurobiPy <https://www.gurobi.com/>`_, `Pyomo <http://www.pyomo.org/>`_, or other solvers and algorithms, and then integrating the optimization model within an artificial neural network for end-to-end training. To achieve this, PyEPO incorporates the SPO+ loss, differentiable black-box optimizer, differentiable perturbed optimizers, and Fenchel-Young loss with Perturbation as `PyTorch <https://pytorch.org/>`_ autograd modules.
+``PyEPO`` allows users to build optimization models with `GurobiPy <https://www.gurobi.com/>`_, `Pyomo <http://www.pyomo.org/>`_, or any custom solver, and embed them into neural networks for end-to-end training. It provides a collection of decision-focused learning methods -- including SPO+ loss, differentiable black-box optimizers, perturbed optimizers, Fenchel-Young loss, contrastive losses, and learning-to-rank losses -- implemented as `PyTorch <https://pytorch.org/>`_ autograd modules.
 
 End-to-End Predict-then-Optimize Framework
 ------------------------------------------
 
-A labeled dataset :math:`\mathcal{D}` comprising of feature-cost pairs :math:`(x,c)` or feature-solution pairs :math:`(x,w)` is utilized to train a machine learning model, specifically a deep neural network, which directly minimizes the decision error.
+Given a labeled dataset :math:`\mathcal{D}` of feature-cost pairs :math:`(x,c)` or feature-solution pairs :math:`(x,w)`, a neural network is trained to directly minimize the decision error, rather than the prediction error of cost coefficients.
 
 .. image:: ../images/e2e.png
    :width: 900

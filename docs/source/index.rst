@@ -8,7 +8,7 @@
 
 Welcome to PyEPO's documentation!
 =================================
-This is the documentation of ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Library Tool), which aims to provide end-to-end methods for predict-then-optimize tasks.
+This is the documentation of ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool), which aims to provide end-to-end methods for predict-then-optimize tasks.
 
 
 Sample Code
@@ -18,6 +18,7 @@ Sample Code
 
    import random
 
+   import pyepo
    import gurobipy as gp
    from gurobipy import GRB
 
@@ -51,7 +52,6 @@ Sample Code
    content/intro
    content/install
    content/tutorial
-   content/api
    content/ref
 
 
