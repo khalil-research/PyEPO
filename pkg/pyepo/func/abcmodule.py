@@ -59,7 +59,7 @@ class optModule(nn.Module):
             raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
                 format(self.solve_ratio))
         self.solpool = None
-        self._sol_set = set()
+        self._solset = set()
         if self.solve_ratio < 1 or require_solpool: # init solution pool
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
@@ -68,7 +68,7 @@ class optModule(nn.Module):
             sols = torch.unique(sols, dim=0)
             self.solpool = sols
             # build hash set for O(1) dedup
-            self._sol_set = {tuple(s.tolist()) for s in sols}
+            self._solset = {s.numpy().tobytes() for s in sols.cpu()}
         # reduction
         self.reduction = reduction
 
@@ -93,28 +93,4 @@ class optModule(nn.Module):
         else:
             raise ValueError("No reduction '{}'.".format(self.reduction))
 
-    def _update_solution_pool(self, sol):
-        """
-        Add new solutions to solution pool
-        """
-        sol = torch.as_tensor(sol, dtype=torch.float32)
-        # move to CPU once for hashing (avoids per-row GPU→CPU sync)
-        sol_cpu = sol.cpu()
-        if self.solpool is None:
-            self.solpool = sol.clone()
-            self._sol_set = {tuple(s.tolist()) for s in sol_cpu}
-            return
-        # filter to only genuinely new solutions
-        new_mask = []
-        for s in sol_cpu:
-            key = tuple(s.tolist())
-            if key not in self._sol_set:
-                self._sol_set.add(key)
-                new_mask.append(True)
-            else:
-                new_mask.append(False)
-        # append new solutions
-        if any(new_mask):
-            new_sols = sol[torch.tensor(new_mask)].to(self.solpool.device)
-            self.solpool = torch.cat((self.solpool, new_sols), dim=0)
 

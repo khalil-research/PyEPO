@@ -43,18 +43,15 @@ class listwiseLTR(optModule):
         """
         Forward pass
         """
-        # get device
-        device = pred_cost.device
-        # to device
-        if self.solpool.device != device:
-            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
-        # solve
+        # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
-            # add into solpool
-            self._update_solution_pool(sol)
+            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
+                                                self.pool, self.solpool, self._solset)
+        # to device
+        if self.solpool.device != cp.device:
+            self.solpool = self.solpool.to(cp.device)
         # obj for solpool
         objpool_c = true_cost @ self.solpool.T # true cost
         objpool_cp = pred_cost @ self.solpool.T # pred cost
@@ -99,18 +96,17 @@ class pairwiseLTR(optModule):
         """
         Forward pass
         """
-        # get device
-        device = pred_cost.device
-        # to device
-        if self.solpool.device != device:
-            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
-        # solve
+        # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
-            # add into solpool
-            self._update_solution_pool(sol)
+            _, _, self.solpool = _solve_in_pass(
+                cp, self.optmodel, self.processes, self.pool,
+                self.solpool, self._solset
+            )
+        # to device
+        if self.solpool.device != cp.device:
+            self.solpool = self.solpool.to(cp.device)
         # obj for solpool
         objpool_c = torch.einsum("bd,nd->bn", true_cost, self.solpool) # true cost
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool) # pred cost
@@ -124,7 +120,7 @@ class pairwiseLTR(optModule):
         objpool_cp_best = objpool_cp.gather(1, best_inds.unsqueeze(1)).squeeze(1)
         # mask out best solution index
         batch_size, solpool_size = objpool_cp.shape
-        mask = torch.ones((batch_size, solpool_size), dtype=torch.bool, device=device)
+        mask = torch.ones((batch_size, solpool_size), dtype=torch.bool, device=cp.device)
         mask.scatter_(1, best_inds.unsqueeze(1), False)
         # select the rest of the solutions
         objpool_cp_rest = objpool_cp[mask].view(batch_size, solpool_size - 1)
@@ -168,18 +164,15 @@ class pointwiseLTR(optModule):
         """
         Forward pass
         """
-        # get device
-        device = pred_cost.device
-        # to device
-        if self.solpool.device != device:
-            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
-        # solve
+        # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
-            # add into solpool
-            self._update_solution_pool(sol)
+            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
+                                                self.pool, self.solpool, self._solset)
+        # to device
+        if self.solpool.device != cp.device:
+            self.solpool = self.solpool.to(cp.device)
         # obj for solpool as score
         objpool_c = true_cost @ self.solpool.T # true cost
         objpool_cp = pred_cost @ self.solpool.T # pred cost
