@@ -38,14 +38,12 @@ class SPOPlus(optModule):
             dataset (None/optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
-        # build criterion
-        self.spop = SPOPlusFunc()
 
     def forward(self, pred_cost, true_cost, true_sol, true_obj):
         """
         Forward pass
         """
-        loss = self.spop.apply(pred_cost, true_cost, true_sol, true_obj, self)
+        loss = SPOPlusFunc.apply(pred_cost, true_cost, true_sol, true_obj, self)
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)

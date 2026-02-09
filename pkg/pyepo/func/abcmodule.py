@@ -63,7 +63,7 @@ class optModule(nn.Module):
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
             # convert to tensor and deduplicate
-            sols = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+            sols = dataset.sols.clone()
             sols = torch.unique(sols, dim=0)
             self.solpool = sols
             # build hash set for O(1) dedup

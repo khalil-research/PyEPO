@@ -54,14 +54,12 @@ class perturbedOpt(optModule):
         self.sigma = sigma
         # random state
         self.rnd = np.random.RandomState(seed)
-        # build optimizer
-        self.ptb = perturbedOptFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.ptb.apply(pred_cost, self)
+        sols = perturbedOptFunc.apply(pred_cost, self)
         return sols
 
 
@@ -154,14 +152,12 @@ class perturbedFenchelYoung(optModule):
         self.sigma = sigma
         # random state
         self.rnd = np.random.RandomState(seed)
-        # build optimizer
-        self.pfy = perturbedFenchelYoungFunc()
 
     def forward(self, pred_cost, true_sol):
         """
         Forward pass
         """
-        loss = self.pfy.apply(pred_cost, true_sol, self)
+        loss = perturbedFenchelYoungFunc.apply(pred_cost, true_sol, self)
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)
@@ -274,14 +270,12 @@ class implicitMLE(optModule):
         self.distribution = distribution
         # symmetric perturbation
         self.two_sides = two_sides
-        # build I-MLE
-        self.imle = implicitMLEFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.imle.apply(pred_cost, self)
+        sols = implicitMLEFunc.apply(pred_cost, self)
         return sols
 
 
@@ -398,14 +392,12 @@ class adaptiveImplicitMLE(optModule):
         self.alpha = 0 # adaptive magnitude α
         self.grad_norm_avg = 1 # gradient norm estimate
         self.step = 1e-3 # update step for α
-        # build I-MLE
-        self.aimle = adaptiveImplicitMLEFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.aimle.apply(pred_cost, self)
+        sols = adaptiveImplicitMLEFunc.apply(pred_cost, self)
         return sols
 
 
