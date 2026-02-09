@@ -312,8 +312,6 @@ class implicitMLEFunc(Function):
         noises = ctx.noises
         ptb_sols = ctx.ptb_sols
         module = ctx.module
-        # get device
-        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
         dl = grad_output.detach()
@@ -401,8 +399,6 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         noises = ctx.noises
         ptb_sols = ctx.ptb_sols
         module = ctx.module
-        # get device
-        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
         dl = grad_output.detach()
