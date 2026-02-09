@@ -38,7 +38,8 @@ setuptools.setup(
     extras_require = {
         "pyomo": ["pyomo>=6.1.2"],
         "gurobi": ["gurobipy>=9.1.2"],
-        "all": ["pyomo>=6.1.2", "gurobipy>=9.1.2"],
+        "mpax": ["mpax", "jax>=0.4.1", "jaxlib>=0.4.1"],
+        "all": ["pyomo>=6.1.2", "gurobipy>=9.1.2", "mpax", "jax>=0.4.1", "jaxlib>=0.4.1"],
     },
     # classifiers
     classifiers = [

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nCompatibility: replace removed jax.dlpack API with standard DLPack protocol\n\njax.dlpack.to_dlpack/from_dlpack were removed in JAX v0.7.0. Use\ntorch.from_dlpack and jnp.from_dlpack which rely on the standard\n__dlpack__ protocol. Also add mpax/jax to extras_require.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}

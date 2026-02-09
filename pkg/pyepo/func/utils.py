@@ -11,11 +11,6 @@ from pyepo import EPO
 from pyepo.utils import getArgs
 from pyepo.model.mpax import optMpaxModel
 
-try:
-    import jax
-except ImportError:
-    pass
-
 
 def _solve_or_cache(cp, module):
     """
@@ -63,8 +58,8 @@ def _solve_batch(cp, optmodel, processes, pool):
         # batch solving
         sol, obj = optmodel.batch_optimize(cp)
         # convert to torch
-        sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
-        obj = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(obj)).to(device)
+        sol = torch.from_dlpack(sol).to(device)
+        obj = torch.from_dlpack(obj).to(device)
         # obj sense
         if optmodel.modelSense == EPO.MINIMIZE:
             pass
