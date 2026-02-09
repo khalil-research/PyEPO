@@ -40,18 +40,15 @@ class NCE(optModule):
         """
         Forward pass
         """
-        # get device
-        device = pred_cost.device
-        # to device
-        if self.solpool.device != device:
-            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
-        # solve
+        # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
-            # add into solpool
-            self._update_solution_pool(sol)
+            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
+                                                self.pool, self.solpool, self._solset)
+        # to device
+        if self.solpool.device != cp.device:
+            self.solpool = self.solpool.to(cp.device)
         # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
         # get obj for solpool
@@ -94,18 +91,15 @@ class contrastiveMAP(optModule):
         """
         Forward pass
         """
-        # get device
-        device = pred_cost.device
-        # to device
-        if self.solpool.device != device:
-            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
-        # solve
+        # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
-            # add into solpool
-            self._update_solution_pool(sol)
+            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
+                                                self.pool, self.solpool, self._solset)
+        # to device
+        if self.solpool.device != cp.device:
+            self.solpool = self.solpool.to(cp.device)
         # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
         # get obj for solpool
