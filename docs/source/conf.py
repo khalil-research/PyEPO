@@ -29,17 +29,19 @@ copyright = "2021, Bo Tang"
 author = "Bo Tang"
 
 # The full version, including alpha/beta/rc tags
-release = "v0.1"
+release = "v1.0.4"
 
 
 # -- General configuration ---------------------------------------------------
+
+# Mock modules that may not be installed locally
+autodoc_mock_imports = ["coptpy", "mpax", "jax", "jaxlib", "gurobipy", "pyomo"]
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
 extensions = ["sphinx.ext.autodoc",
               "autoapi.extension",
-              "sphinx.ext.autosummary",
               "sphinx.ext.doctest",
               "sphinx.ext.intersphinx",
               "sphinx.ext.todo",
@@ -48,20 +50,20 @@ extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.napoleon"
               ]
 
-# To document __init__()
-autoclass_content = "both"
-
 # Add any path that contain packages here, relative to this directory.
 autoapi_dirs = ["../../pkg/pyepo"]
 
-# Turn on autosummary
-autosummary_generate = True
+# Only document class docstring, not __init__ (avoids duplicate attribute warnings)
+autoapi_python_class_content = "class"
 
-# Add defualt programming language
-hightlight_language = "python"
+# Suppress autoapi internal warnings
+suppress_warnings = ["autoapi.python_import_resolution"]
+
+# Add default programming language
+highlight_language = "python"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_build", "_templates"]
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
