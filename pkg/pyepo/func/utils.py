@@ -95,8 +95,6 @@ def _cache_in_pass(cp, optmodel, solpool):
     """
     A function to use solution pool in the forward/backward pass
     """
-    # get device
-    device = cp.device
     # best solution in pool
     solpool_obj = torch.matmul(cp, solpool.T)
     if optmodel.modelSense == EPO.MINIMIZE:

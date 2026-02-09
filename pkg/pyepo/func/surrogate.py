@@ -67,8 +67,6 @@ class SPOPlusFunc(Function):
         Returns:
             torch.tensor: SPO+ loss
         """
-        # get device
-        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
@@ -152,8 +150,6 @@ class perturbationGradient(optModule):
         """
         Zeroth order approximations for surrogate objective value
         """
-        # get device
-        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
