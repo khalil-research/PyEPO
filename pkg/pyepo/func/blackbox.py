@@ -42,14 +42,12 @@ class blackboxOpt(optModule):
         if lambd <= 0:
             raise ValueError("lambda is not positive.")
         self.lambd = lambd
-        # build blackbox optimizer
-        self.dbb = blackboxOptFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.dbb.apply(pred_cost, self)
+        sols = blackboxOptFunc.apply(pred_cost, self)
         return sols
 
 
@@ -134,14 +132,12 @@ class negativeIdentity(optModule):
             dataset (None/optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
-        # build negative identity optimizer
-        self.nid = negativeIdentityFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.nid.apply(pred_cost, self)
+        sols = negativeIdentityFunc.apply(pred_cost, self)
         return sols
 
 

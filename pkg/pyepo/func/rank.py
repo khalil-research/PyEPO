@@ -43,7 +43,7 @@ class listwiseLTR(optModule):
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
         # convert to tensor
-        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        self.solpool = dataset.sols.clone()
         # remove duplicate
         self.solpool = torch.unique(self.solpool, dim=0)
 
@@ -115,7 +115,7 @@ class pairwiseLTR(optModule):
         # function
         self.relu = nn.ReLU()
         # convert to tensor
-        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        self.solpool = dataset.sols.clone()
         # remove duplicate
         self.solpool = torch.unique(self.solpool, dim=0)
 
@@ -200,7 +200,7 @@ class pointwiseLTR(optModule):
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
         # convert to tensor
-        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        self.solpool = dataset.sols.clone()
         # remove duplicate
         self.solpool = torch.unique(self.solpool, dim=0)
 
