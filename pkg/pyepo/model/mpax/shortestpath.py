@@ -11,6 +11,7 @@ except ImportError:
     _HAS_MPAX = False
 
 from pyepo.model.mpax.mpaxmodel import optMpaxModel
+from pyepo.model.opt import _get_grid_arcs
 
 
 class shortestPathModel(optMpaxModel):
@@ -28,30 +29,9 @@ class shortestPathModel(optMpaxModel):
             grid (tuple of int): size of grid network
         """
         self.grid = grid
-        self.arcs = self._getArcs()
+        self.arcs = _get_grid_arcs(grid)
         A, b, u = self._constructMatrix()
         super().__init__(A=A, b=b, u=u, use_sparse_matrix=True, minimize=True)
-
-    def _getArcs(self):
-        """
-        A method to get list of arcs for grid network
-
-        Returns:
-            list: arcs
-        """
-        arcs = []
-        for i in range(self.grid[0]):
-            # edges along rows
-            for j in range(self.grid[1] - 1):
-                v = i * self.grid[1] + j
-                arcs.append((v, v + 1))
-            # edges along columns
-            if i == self.grid[0] - 1:
-                continue
-            for j in range(self.grid[1]):
-                v = i * self.grid[1] + j
-                arcs.append((v, v + self.grid[1]))
-        return arcs
 
     def _constructMatrix(self):
         """

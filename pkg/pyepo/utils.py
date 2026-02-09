@@ -17,11 +17,5 @@ def getArgs(model):
     Returns:
         dict: model args
     """
-    for mem in inspect.getmembers(model):
-        if mem[0] == "__dict__":
-            attrs = mem[1]
-            args = {}
-            for name in attrs:
-                if name in inspect.signature(model.__init__).parameters:
-                    args[name] = attrs[name]
-            return args
+    params = inspect.signature(model.__init__).parameters
+    return {name: getattr(model, name) for name in params if hasattr(model, name)}

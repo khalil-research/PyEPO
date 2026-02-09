@@ -101,8 +101,6 @@ class blackboxOptFunc(Function):
         sol, _ = _solve_or_cache(cq, module)
         # get gradient
         grad = (sol - wp) / lambd
-        # convert to tensor
-        grad = torch.as_tensor(grad, dtype=torch.float32, device=device)
         return grad, None
 
 

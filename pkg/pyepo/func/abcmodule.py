@@ -22,7 +22,7 @@ class optModule(nn.Module):
         An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
         vector and the true cost vector rank a pool of feasible solutions.
     """
-    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
+    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None, require_solpool=False):
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -30,6 +30,7 @@ class optModule(nn.Module):
             solve_ratio (float): the ratio of new solutions computed during training
             reduction (str): the reduction to apply to the output
             dataset (None/optDataset): the training data
+            require_solpool (bool): if True, always initialize solution pool from dataset
         """
         super().__init__()
         # optimization model
@@ -59,7 +60,7 @@ class optModule(nn.Module):
                 format(self.solve_ratio))
         self.solpool = None
         self._sol_set = set()
-        if self.solve_ratio < 1: # init solution pool
+        if self.solve_ratio < 1 or require_solpool: # init solution pool
             if not isinstance(dataset, optDataset): # type checking
                 raise TypeError("dataset is not an optDataset")
             # convert to tensor and deduplicate
@@ -79,23 +80,41 @@ class optModule(nn.Module):
         # convert tensor
         pass
 
+    def _reduce(self, loss):
+        """
+        Apply reduction to loss tensor
+        """
+        if self.reduction == "mean":
+            return torch.mean(loss)
+        elif self.reduction == "sum":
+            return torch.sum(loss)
+        elif self.reduction == "none":
+            return loss
+        else:
+            raise ValueError("No reduction '{}'.".format(self.reduction))
+
     def _update_solution_pool(self, sol):
         """
         Add new solutions to solution pool
         """
         sol = torch.as_tensor(sol, dtype=torch.float32)
+        # move to CPU once for hashing (avoids per-row GPU→CPU sync)
+        sol_cpu = sol.cpu()
         if self.solpool is None:
             self.solpool = sol.clone()
-            self._sol_set = {tuple(s.tolist()) for s in sol}
+            self._sol_set = {tuple(s.tolist()) for s in sol_cpu}
             return
         # filter to only genuinely new solutions
-        new_sols = []
-        for s in sol:
+        new_mask = []
+        for s in sol_cpu:
             key = tuple(s.tolist())
             if key not in self._sol_set:
                 self._sol_set.add(key)
-                new_sols.append(s)
+                new_mask.append(True)
+            else:
+                new_mask.append(False)
         # append new solutions
-        if new_sols:
-            new_sols = torch.stack(new_sols).to(self.solpool.device)
+        if any(new_mask):
+            new_sols = sol[torch.tensor(new_mask)].to(self.solpool.device)
             self.solpool = torch.cat((self.solpool, new_sols), dim=0)
+

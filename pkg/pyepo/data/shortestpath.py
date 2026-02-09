@@ -39,16 +39,12 @@ def genData(num_data, num_features, grid, deg=1, noise_width=0, seed=135):
     B = rnd.binomial(1, 0.5, (d, p))
     # feature vectors
     x = rnd.normal(0, 1, (n, p))
-    # cost vectors
-    c = np.zeros((n, d))
-    for i in range(n):
-        # cost without noise
-        ci = (np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 3) ** deg + 1
-        # rescale
-        ci /= 3.5 ** deg
-        # noise
-        epsilon = rnd.uniform(1 - noise_width, 1 + noise_width, d)
-        ci *= epsilon
-        c[i, :] = ci
+    # cost vectors (vectorized)
+    c = (x @ B.T / np.sqrt(p) + 3) ** deg + 1
+    # rescale
+    c /= 3.5 ** deg
+    # noise
+    epsilon = rnd.uniform(1 - noise_width, 1 + noise_width, (n, d))
+    c *= epsilon
 
     return x, c

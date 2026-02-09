@@ -10,14 +10,10 @@ from torch.autograd import Function
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
-from pyepo.model.mpax import optMpaxModel
-from pyepo.utils import getArgs
-from pyepo.func.utils import sumGammaDistribution
-
-try:
-    import jax
-except ImportError:
-    pass
+from pyepo.func.utils import (
+    _solve_in_pass as _solve_in_pass_2d,
+    sumGammaDistribution,
+)
 
 
 class perturbedOpt(optModule):
@@ -158,16 +154,7 @@ class perturbedFenchelYoung(optModule):
         Forward pass
         """
         loss = perturbedFenchelYoungFunc.apply(pred_cost, true_sol, self)
-        # reduction
-        if self.reduction == "mean":
-            loss = torch.mean(loss)
-        elif self.reduction == "sum":
-            loss = torch.sum(loss)
-        elif self.reduction == "none":
-            loss = loss
-        else:
-            raise ValueError("No reduction '{}'.".format(self.reduction))
-        return loss
+        return self._reduce(loss)
 
 
 class perturbedFenchelYoungFunc(Function):
@@ -447,16 +434,16 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
 
 
 def _solve_or_cache(ptb_c, module):
-    # solve optimization
+    """
+    Solve or use cached solutions for perturbed costs (3D: n_samples × batch × vars).
+    Delegates to the shared 2D functions in utils after flattening.
+    """
     if np.random.uniform() <= module.solve_ratio:
         ptb_sols = _solve_in_pass(ptb_c, module.optmodel, module.processes, module.pool)
         if module.solve_ratio < 1:
-            sols = ptb_sols.view(-1, ptb_sols.shape[2])
-            # add into solpool
+            sols = ptb_sols.reshape(-1, ptb_sols.shape[2])
             module._update_solution_pool(sols)
-    # best cached solution
     else:
-        # move solpool to the correct device
         if module.solpool.device != ptb_c.device:
             module.solpool = module.solpool.to(ptb_c.device)
         ptb_sols = _cache_in_pass(ptb_c, module.optmodel, module.solpool)
@@ -465,56 +452,31 @@ def _solve_or_cache(ptb_c, module):
 
 def _solve_in_pass(ptb_c, optmodel, processes, pool):
     """
-    A function to solve optimization in the forward pass
+    Solve optimization for perturbed 3D costs by flattening to 2D and
+    reusing the shared _solve_in_pass_2d from utils.
+
+    Args:
+        ptb_c (torch.tensor): perturbed costs, shape (n_samples, batch, vars)
+
+    Returns:
+        torch.tensor: solutions, shape (batch, n_samples, vars)
     """
-    # get device
-    device = ptb_c.device
-    # number and size of instance
     n_samples, ins_num, num_vars = ptb_c.shape
-    # MPAX batch solving
-    if isinstance(optmodel, optMpaxModel):
-        # flat
-        ptb_c = ptb_c.reshape(-1, num_vars)
-        # get params
-        optmodel.setObj(ptb_c)
-        ptb_c = optmodel.c
-        # batch solving
-        ptb_sols, _ = optmodel.batch_optimize(ptb_c)
-        # convert to torch
-        ptb_sols = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(ptb_sols)).to(device)
-        # reshape
-        ptb_sols = ptb_sols.view(n_samples, ins_num, num_vars).permute(1, 0, 2)
-    # single-core
-    elif processes == 1:
-        ptb_sols = torch.zeros((ins_num, n_samples, num_vars), dtype=torch.float32, device=device)
-        for i in range(ins_num):
-            # per sample
-            for j in range(n_samples):
-                # solve
-                optmodel.setObj(ptb_c[j,i])
-                sol, _ = optmodel.solve()
-                ptb_sols[i,j] = torch.as_tensor(sol, dtype=torch.float32, device=device)
-    # multi-core
-    else:
-        # get class
-        model_type = type(optmodel)
-        # get args
-        args = getArgs(optmodel)
-        # parallel computing
-        res = pool.amap(_solveWithObj4Par, ptb_c.permute(1, 0, 2),
-                        [args] * ins_num, [model_type] * ins_num).get()
-        # get solution
-        ptb_sols = torch.stack(res, dim=0).to(device)
+    # flatten (n_samples, batch, vars) → (n_samples * batch, vars)
+    flat_c = ptb_c.reshape(-1, num_vars)
+    # solve using shared 2D function
+    flat_sols, _ = _solve_in_pass_2d(flat_c, optmodel, processes, pool)
+    # reshape (n_samples * batch, vars) → (batch, n_samples, vars)
+    ptb_sols = flat_sols.reshape(n_samples, ins_num, num_vars).permute(1, 0, 2)
     return ptb_sols
 
 
 def _cache_in_pass(ptb_c, optmodel, solpool):
     """
-    A function to use solution pool in the forward/backward pass
+    Use solution pool for perturbed 3D costs (n_samples × batch × vars).
+    Unlike the 2D version in utils, this handles the extra sample dimension.
     """
-    # get device
-    device = ptb_c.device
-    # compute objective values for all perturbations
+    # compute objective values: (batch, n_samples, pool_size)
     solpool_obj = torch.einsum("nbd,sd->bns", ptb_c, solpool)
     # best solution in pool
     if optmodel.modelSense == EPO.MINIMIZE:
@@ -525,39 +487,3 @@ def _cache_in_pass(ptb_c, optmodel, solpool):
         raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     ptb_sols = solpool[best_inds]
     return ptb_sols
-
-
-# worker-local model cache (persists across calls in pathos worker processes)
-_worker_model = None
-_worker_model_key = None
-
-def _solveWithObj4Par(perturbed_costs, args, model_type):
-    """
-    A global function to solve function in parallel processors
-
-    Args:
-        perturbed_costs (np.ndarray): costs of objective function with perturbation
-        args (dict): optModel args
-        model_type (ABCMeta): optModel class type
-
-    Returns:
-        list: optimal solution
-    """
-    global _worker_model, _worker_model_key
-    # reuse cached model if same type; rebuild only on first call or type change
-    key = model_type.__qualname__
-    if _worker_model_key != key:
-        _worker_model = model_type(**args)
-        _worker_model_key = key
-    optmodel = _worker_model
-    # per sample
-    sols = []
-    for cost in perturbed_costs:
-        # set obj
-        optmodel.setObj(cost)
-        # solve
-        sol, _ = optmodel.solve()
-        sols.append(sol)
-    # to tensor
-    sols = torch.tensor(sols, dtype=torch.float32)
-    return sols
