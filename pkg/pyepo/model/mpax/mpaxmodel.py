@@ -117,7 +117,7 @@ class optMpaxModel(optModel):
             else:
                 c = c.detach()
             # convert PyTorch tensor to JAX array using DLPack
-            self.c = jax.dlpack.from_dlpack(c)
+            self.c = jnp.from_dlpack(c)
             # move constraints and bounds to device
             if self.device != self.c.device:
                 self.device = self.c.device
@@ -146,7 +146,7 @@ class optMpaxModel(optModel):
         # create lp model
         sol, obj = self.jitted_solve(self.c)
         # convert to torch
-        sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol))
+        sol = torch.from_dlpack(sol)
         if self.modelSense == EPO.MINIMIZE:
             obj = obj.item()
         elif self.modelSense == EPO.MAXIMIZE:
