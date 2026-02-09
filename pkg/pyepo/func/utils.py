@@ -8,13 +8,11 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.utlis import getArgs
+from pyepo.utils import getArgs
 from pyepo.model.mpax import optMpaxModel
 
 try:
     import jax
-    from jax import numpy as jnp
-    from mpax import create_lp, r2HPDHG
 except ImportError:
     pass
 
@@ -31,6 +29,9 @@ def _solve_or_cache(cp, module):
             module._update_solution_pool(sol)
     # best cached solution
     else:
+        # move solpool to the correct device
+        if module.solpool.device != cp.device:
+            module.solpool = module.solpool.to(cp.device)
         sol, obj = _cache_in_pass(cp, module.optmodel, module.solpool)
     return sol, obj
 
@@ -55,11 +56,11 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         obj = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(obj)).to(device)
         # obj sense
         if optmodel.modelSense == EPO.MINIMIZE:
-            obj = obj
+            pass
         elif optmodel.modelSense == EPO.MAXIMIZE:
             obj = - obj
         else:
-            raise ValueError("Invalid modelSense.")
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     # single-core
     elif processes == 1:
         sol = []
@@ -68,7 +69,7 @@ def _solve_in_pass(cp, optmodel, processes, pool):
             # solve
             optmodel.setObj(cp[i])
             solp, objp = optmodel.solve()
-            sol.append(torch.as_tensor(solp))
+            sol.append(torch.as_tensor(solp, dtype=torch.float32))
             obj.append(objp)
         # to tensor
         sol = torch.stack(sol, dim=0).to(device)
@@ -94,19 +95,22 @@ def _cache_in_pass(cp, optmodel, solpool):
     """
     # get device
     device = cp.device
-    # solpool is on the same device
-    if solpool.device != device:
-        solpool = solpool.to(device)
     # best solution in pool
     solpool_obj = torch.matmul(cp, solpool.T)
     if optmodel.modelSense == EPO.MINIMIZE:
         ind = torch.argmin(solpool_obj, dim=1)
-    if optmodel.modelSense == EPO.MAXIMIZE:
+    elif optmodel.modelSense == EPO.MAXIMIZE:
         ind = torch.argmax(solpool_obj, dim=1)
+    else:
+        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     obj = solpool_obj.gather(1, ind.view(-1, 1)).squeeze(1)
     sol = solpool[ind]
     return sol, obj
 
+
+# worker-local model cache (persists across calls in pathos worker processes)
+_worker_model = None
+_worker_model_key = None
 
 def _solveWithObj4Par(cost, args, model_type):
     """
@@ -120,8 +124,13 @@ def _solveWithObj4Par(cost, args, model_type):
     Returns:
         tuple: optimal solution (list) and objective value (float)
     """
-    # rebuild model
-    optmodel = model_type(**args)
+    global _worker_model, _worker_model_key
+    # reuse cached model if same type; rebuild only on first call or type change
+    key = model_type.__qualname__
+    if _worker_model_key != key:
+        _worker_model = model_type(**args)
+        _worker_model_key = key
+    optmodel = _worker_model
     # set obj
     optmodel.setObj(cost)
     # solve

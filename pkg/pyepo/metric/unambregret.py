@@ -4,8 +4,6 @@
 Unambiguous regret loss
 """
 
-import copy
-
 import numpy as np
 import torch
 
@@ -18,8 +16,9 @@ def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
 
     Args:
         predmodel (nn): a regression neural network for cost prediction
-        optmodel (optModel): an PyEPO optimization model
+        optmodel (optModel): a PyEPO optimization model
         dataloader (DataLoader): Torch dataloader from optDataSet
+        tolerance (float): tolerance for optimization
 
     Returns:
         float: unambiguous regret loss
@@ -28,20 +27,22 @@ def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
     predmodel.eval()
     loss = 0
     optsum = 0
+    # get device
+    device = next(predmodel.parameters()).device
     # load data
     for data in dataloader:
         x, c, w, z = data
-        # cuda
-        if next(predmodel.parameters()).is_cuda:
-            x, c, w, z = x.cuda(), c.cuda(), w.cuda(), z.cuda()
+        x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
         # pred cost
-        with torch.no_grad(): # no grad
-            cp = predmodel(x).to("cpu").detach().numpy()
+        with torch.no_grad():
+            cp = predmodel(x).cpu().numpy()
+        # batch convert to numpy
+        c_np = c.cpu().numpy()
         # solve
         for j in range(cp.shape[0]):
             # accumulate loss
-            loss += calUnambRegret(optmodel, cp[j], c[j].to("cpu").detach().numpy(),
-                                z[j].item(), tolerance)
+            loss += calUnambRegret(optmodel, cp[j], c_np[j],
+                                z[j].item(), tolerance, max_iter=10)
         optsum += abs(z).sum().item()
     # turn back train mode
     predmodel.train()
@@ -49,7 +50,7 @@ def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
     return loss / (optsum + 1e-7)
 
 
-def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
+def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5, max_iter=10):
     """
     A function to calculate normalized unambiguous regret for a batch
 
@@ -58,10 +59,14 @@ def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
         pred_cost (torch.tensor): predicted costs
         true_cost (torch.tensor): true costs
         true_obj (torch.tensor): true optimal objective values
+        tolerance (float): tolerance for precision
+        max_iter (int): maximum number of recursive retries
 
     Returns:
         float: unambiguous regret losses
     """
+    if max_iter <= 0:
+        raise RuntimeError("Max iterations reached in calUnambRegret.")
     # change precision
     cp = np.around(pred_cost / tolerance).astype(int)
     # opt sol for pred cost
@@ -74,19 +79,24 @@ def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5):
     # opt for pred cost
     if optmodel.modelSense == EPO.MINIMIZE:
         wst_optmodel = optmodel.addConstr(cp, objp+1e-2)
-    if optmodel.modelSense == EPO.MAXIMIZE:
+    elif optmodel.modelSense == EPO.MAXIMIZE:
         wst_optmodel = optmodel.addConstr(-cp, -objp+1e-2)
+    else:
+        raise ValueError("Invalid modelSense.")
     # opt model to find worst case
     try:
         wst_optmodel.setObj(-true_cost)
         _, obj = wst_optmodel.solve()
-    except:
+    except Exception:
         tolerance *= 10
-        return calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=tolerance)
+        return calUnambRegret(optmodel, pred_cost, true_cost, true_obj,
+                              tolerance=tolerance, max_iter=max_iter-1)
     obj = -obj
     # loss
     if optmodel.modelSense == EPO.MINIMIZE:
         loss = obj - true_obj
-    if optmodel.modelSense == EPO.MAXIMIZE:
+    elif optmodel.modelSense == EPO.MAXIMIZE:
         loss = true_obj - obj
+    else:
+        raise ValueError("Invalid modelSense.")
     return loss

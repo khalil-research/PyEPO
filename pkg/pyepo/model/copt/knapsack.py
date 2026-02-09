@@ -14,11 +14,10 @@ from pyepo.model.copt.coptmodel import optCoptModel
 
 class knapsackModel(optCoptModel):
     """
-    This class is optimization model for knapsack problem
+    This class is an optimization model for the knapsack problem
 
     Attributes:
-        _model (PyOmo model): Pyomo model
-        solver (str): optimization solver in the background
+        _model (COPT model): COPT model
         weights (np.ndarray): weights of items
         capacity (np.ndarray): total capacity
         items (list): list of item index
@@ -29,7 +28,6 @@ class knapsackModel(optCoptModel):
         Args:
             weights (np.ndarray / list): weights of items
             capacity (np.ndarray / list): total capacity
-            solver (str): optimization solver in the background
         """
         self.weights = np.array(weights)
         self.capacity = np.array(capacity)
@@ -38,11 +36,11 @@ class knapsackModel(optCoptModel):
 
     def _getModel(self):
         """
-        A method to build pyomo model
+        A method to build COPT model
         """
-        # ceate a model
+        # create a model
         m = Envr().createModel("knapsack")
-        # varibles
+        # variables
         x = m.addVars(self.items, vtype=COPT.BINARY)
         # sense
         m.setObjSense(COPT.MAXIMIZE)
@@ -68,11 +66,11 @@ class knapsackModelRel(knapsackModel):
 
     def _getModel(self):
         """
-        A method to build pyomo
+        A method to build COPT model
         """
-        # ceate a model
+        # create a model
         m = Envr().createModel("knapsack")
-        # varibles
+        # variables
         x = m.addVars(self.items, nameprefix='x', vtype=COPT.CONTINUOUS, lb=0, ub=1)
         # sense
         m.setObjSense(COPT.MAXIMIZE)

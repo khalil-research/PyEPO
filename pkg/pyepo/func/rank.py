@@ -12,7 +12,7 @@ from torch import nn
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.data.dataset import optDataset
-from pyepo.func.utlis import _solveWithObj4Par, _solve_in_pass
+from pyepo.func.utils import _solve_in_pass
 
 
 class listwiseLTR(optModule):
@@ -32,7 +32,7 @@ class listwiseLTR(optModule):
     def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             reduction (str): the reduction to apply to the output
@@ -43,7 +43,7 @@ class listwiseLTR(optModule):
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
         # convert to tensor
-        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        self.solpool = dataset.sols.clone()
         # remove duplicate
         self.solpool = torch.unique(self.solpool, dim=0)
 
@@ -54,7 +54,8 @@ class listwiseLTR(optModule):
         # get device
         device = pred_cost.device
         # to device
-        self.solpool = self.solpool.to(device)
+        if self.solpool.device != device:
+            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
         # solve
@@ -101,7 +102,7 @@ class pairwiseLTR(optModule):
     def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             reduction (str): the reduction to apply to the output
@@ -114,7 +115,7 @@ class pairwiseLTR(optModule):
         # function
         self.relu = nn.ReLU()
         # convert to tensor
-        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        self.solpool = dataset.sols.clone()
         # remove duplicate
         self.solpool = torch.unique(self.solpool, dim=0)
 
@@ -125,7 +126,8 @@ class pairwiseLTR(optModule):
         # get device
         device = pred_cost.device
         # to device
-        self.solpool = self.solpool.to(device)
+        if self.solpool.device != device:
+            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
         # solve
@@ -187,7 +189,7 @@ class pointwiseLTR(optModule):
     def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             reduction (str): the reduction to apply to the output
@@ -198,7 +200,7 @@ class pointwiseLTR(optModule):
         if not isinstance(dataset, optDataset): # type checking
             raise TypeError("dataset is not an optDataset")
         # convert to tensor
-        self.solpool = torch.tensor(dataset.sols.copy(), dtype=torch.float32)
+        self.solpool = dataset.sols.clone()
         # remove duplicate
         self.solpool = torch.unique(self.solpool, dim=0)
 
@@ -209,7 +211,8 @@ class pointwiseLTR(optModule):
         # get device
         device = pred_cost.device
         # to device
-        self.solpool = self.solpool.to(device)
+        if self.solpool.device != device:
+            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
         # solve
@@ -221,7 +224,7 @@ class pointwiseLTR(optModule):
         objpool_c = true_cost @ self.solpool.T # true cost
         objpool_cp = pred_cost @ self.solpool.T # pred cost
         # squared loss
-        loss = (objpool_c - objpool_cp).square().mean(axis=1)
+        loss = (objpool_c - objpool_cp).square().mean(dim=1)
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)

@@ -6,7 +6,7 @@ Metrics for SKlearn model
 
 import numpy as np
 
-from pyepo.utlis import getArgs
+from pyepo.utils import getArgs
 from pyepo import EPO
 
 def SPOError(pred_cost, true_cost, model_type, args):
@@ -43,8 +43,10 @@ def SPOError(pred_cost, true_cost, model_type, args):
         # calculate regret
         if optmodel.modelSense == EPO.MINIMIZE:
             regret = obj - optobj
-        if optmodel.modelSense == EPO.MAXIMIZE:
+        elif optmodel.modelSense == EPO.MAXIMIZE:
             regret = optobj - obj
+        else:
+            raise ValueError("Invalid modelSense.")
         regret_sum += regret
         optobj_sum += np.abs(optobj)
     # normalized regret
@@ -116,14 +118,6 @@ def testMSE(pred_cost, true_cost, model_type, args):
     true_cost = np.array(true_cost)
     assert pred_cost.shape == true_cost.shape, \
     "Shape of true and predicted value does not match."
-    # rebuild model
-    optmodel = model_type(**args)
-    # init sum
-    regret_sum = 0
-    optobj_sum = 0
-    for i in range(pred_cost.shape[0]):
-        # opt sol for pred cost
-        print(pred_cost.shape[0])
     return np.square(pred_cost - true_cost).mean()
 
 

@@ -12,11 +12,10 @@ from pyepo.model.copt.coptmodel import optCoptModel
 
 class shortestPathModel(optCoptModel):
     """
-    This class is optimization model for shortest path problem
+    This class is an optimization model for the shortest path problem
 
     Attributes:
-        _model (PyOmo model): Pyomo model
-        solver (str): optimization solver in the background
+        _model (COPT model): COPT model
         grid (tuple of int): size of grid network
         arcs (list): list of arcs
     """
@@ -25,7 +24,6 @@ class shortestPathModel(optCoptModel):
         """
         Args:
             grid (tuple of int): size of grid network
-            solver (str): optimization solver in the background
         """
         self.grid = grid
         self.arcs = self._getArcs()
@@ -40,11 +38,11 @@ class shortestPathModel(optCoptModel):
         """
         arcs = []
         for i in range(self.grid[0]):
-            # edges on rows
+            # edges along rows
             for j in range(self.grid[1] - 1):
                 v = i * self.grid[1] + j
                 arcs.append((v, v + 1))
-            # edges in columns
+            # edges along columns
             if i == self.grid[0] - 1:
                 continue
             for j in range(self.grid[1]):
@@ -54,18 +52,18 @@ class shortestPathModel(optCoptModel):
 
     def _getModel(self):
         """
-        A method to build pyomo model
+        A method to build COPT model
         """
-        # ceate a model
+        # create a model
         m = Envr().createModel("shortest path")
-        # varibles
+        # variables
         x = m.addVars(self.arcs, nameprefix='x', vtype=COPT.CONTINUOUS, lb=0, ub=1)
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # constraints
         for i in range(self.grid[0]):
             for j in range(self.grid[1]):
-                v = v = i * self.grid[1] + j
+                v = i * self.grid[1] + j
                 expr = 0
                 for e in self.arcs:
                     # flow in
@@ -78,7 +76,7 @@ class shortestPathModel(optCoptModel):
                 if i == 0 and j == 0:
                     m.addConstr(expr == -1)
                 # sink
-                elif i == self.grid[0] - 1 and j == self.grid[0] - 1:
+                elif i == self.grid[0] - 1 and j == self.grid[1] - 1:
                     m.addConstr(expr == 1)
                 # transition
                 else:

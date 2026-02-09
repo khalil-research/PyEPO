@@ -22,7 +22,7 @@ from pyepo.model.opt import optModel
 
 class optMpaxModel(optModel):
     """
-    This is an abstract class for MPAX-based optimization model
+    This is an abstract class for an MPAX-based optimization model
 
     Attributes:
         A (jnp.ndarray, BCOO or BCSR): The matrix of equality constraints.
@@ -40,7 +40,7 @@ class optMpaxModel(optModel):
         # error
         if not _HAS_MPAX:
             raise ImportError("MPAX is not installed. Please install MPAX to use this feature.")
-         # at least one of A or G must be provided
+        # at least one of A or G must be provided
         if A is None and G is None:
             raise ValueError("At least one of A (equality constraints) or G (inequality constraints) must be provided.")
         # rhs is provided
@@ -75,7 +75,7 @@ class optMpaxModel(optModel):
         self.modelSense = EPO.MINIMIZE if minimize else EPO.MAXIMIZE
         # init device
         self.device = None
-        # jit pre complile
+        # JIT pre-compile
         self.jitted_solve = jax.jit(partial(self._jitted_solve,
                                             A=self.A, b=self.b, G=self.G,
                                             h=self.h, l=self.l, u=self.u,
@@ -88,13 +88,13 @@ class optMpaxModel(optModel):
     @property
     def num_cost(self):
         """
-        number of cost to be predicted
+        number of costs to be predicted
         """
         return self.A.shape[1]
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (np.ndarray / list): cost of objective function
@@ -120,7 +120,7 @@ class optMpaxModel(optModel):
                 self.h = jax.device_put(self.h, self.device)
                 self.l = jax.device_put(self.l, self.device)
                 self.u = jax.device_put(self.u, self.device)
-                # jit pre complile
+                # JIT pre-compile
                 self.jitted_solve = jax.jit(partial(self._jitted_solve,
                                                     A=self.A, b=self.b, G=self.G,
                                                     h=self.h, l=self.l, u=self.u,
@@ -130,10 +130,10 @@ class optMpaxModel(optModel):
         else:
             self.c = jnp.array(c, dtype=jnp.float32)
         if c.shape[-1] != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         # change sign for model sense
         if self.modelSense == EPO.MINIMIZE:
-            self.c = self.c
+            pass
         elif self.modelSense == EPO.MAXIMIZE:
             self.c = - self.c
         else:
@@ -141,7 +141,7 @@ class optMpaxModel(optModel):
 
     def solve(self):
         """
-        A method to solve model
+        A method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (jnp.float32)
@@ -161,7 +161,7 @@ class optMpaxModel(optModel):
     @staticmethod
     def _jitted_solve(c, A, b, G, h, l, u, use_sparse_matrix):
         """
-        A static method for JIT complile
+        A static method for JIT compile
         """
         lp = create_lp(c, A, b, G, h, l, u, use_sparse_matrix=use_sparse_matrix)
         solver = raPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
@@ -171,7 +171,7 @@ class optMpaxModel(optModel):
 
     def copy(self):
         """
-        A method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -188,17 +188,17 @@ class optMpaxModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        A method to add new constraint
+        A method to add a new constraint
 
         Args:
-            coefs (np.ndarray / list): coeffcients of new constraint
+            coefs (np.ndarray / list): coefficients of new constraint
             rhs (jnp.float32): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # convert coefs to jnp
         coefs = jnp.array(coefs, dtype=jnp.float32).reshape(1, -1)
         # copy

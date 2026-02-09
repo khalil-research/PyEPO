@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Abstract optimization model based on Cardinal Optimizer（COPT）
+Abstract optimization model based on Cardinal Optimizer (COPT)
 """
 
 from copy import copy
@@ -14,23 +14,21 @@ from pyepo.model.opt import optModel
 
 class optCoptModel(optModel):
     """
-    This is an abstract class for Cardinal Optimizer optimization model
+    This is an abstract class for a Cardinal Optimizer optimization model
 
     Attributes:
         _model (COPT model): COPT model
     """
 
     def __init__(self):
-        """
-        Args:
-            solver (str): optimization solver in the background
-        """
         super().__init__()
         # model sense
         if self._model.ObjSense == COPT.MINIMIZE:
             self.modelSense = EPO.MINIMIZE
-        if self._model.ObjSense == COPT.MAXIMIZE:
+        elif self._model.ObjSense == COPT.MAXIMIZE:
             self.modelSense = EPO.MAXIMIZE
+        else:
+            raise ValueError("Invalid modelSense.")
         # turn off output
         self._model.setParam("Logging", 0)
 
@@ -39,20 +37,20 @@ class optCoptModel(optModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (np.ndarray / list): cost of objective function
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         # set obj
         obj = sum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)
 
     def solve(self):
         """
-        A method to solve model
+        A method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (float)
@@ -63,7 +61,7 @@ class optCoptModel(optModel):
 
     def copy(self):
         """
-        A method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -78,17 +76,17 @@ class optCoptModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        A method to add new constraint
+        A method to add a new constraint
 
         Args:
-            coefs (np.ndarray / list): coeffcients of new constraint
+            coefs (np.ndarray / list): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint

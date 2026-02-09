@@ -17,12 +17,12 @@ from pyepo.model.grb.grbmodel import optGrbModel
 
 class knapsackModel(optGrbModel):
     """
-    This class is optimization model for knapsack problem
+    This class is an optimization model for the knapsack problem
 
     Attributes:
         _model (GurobiPy model): Gurobi model
         weights (np.ndarray / list): Weights of items
-        capacity (np.ndarray / listy): Total capacity
+        capacity (np.ndarray / list): Total capacity
         items (list): List of item index
     """
 
@@ -44,9 +44,9 @@ class knapsackModel(optGrbModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("knapsack")
-        # varibles
+        # variables
         x = m.addMVar(self.items, name="x", vtype=GRB.BINARY)
         # sense
         m.modelSense = GRB.MAXIMIZE
@@ -70,13 +70,13 @@ class knapsackModelRel(knapsackModel):
 
     def _getModel(self):
         """
-        A method to build Gurobi
+        A method to build Gurobi model
         """
-        # ceate a model
+        # create a model
         m = gp.Model("knapsack")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         x = m.addMVar(self.items, name="x", ub=1)
         # sense
         m.modelSense = GRB.MAXIMIZE

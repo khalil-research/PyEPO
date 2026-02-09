@@ -11,10 +11,10 @@ from pyepo import EPO
 
 class optModel(ABC):
     """
-    This is an abstract class for optimization model
+    This is an abstract class for an optimization model
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model (optimization model): underlying solver model object
     """
 
     def __init__(self):
@@ -29,14 +29,14 @@ class optModel(ABC):
     @property
     def num_cost(self):
         """
-        number of cost to be predicted
+        number of costs to be predicted
         """
         return len(self.x)
 
     @abstractmethod
     def _getModel(self):
         """
-        An abstract method to build a model from a optimization solver
+        An abstract method to build a model from an optimization solver
 
         Returns:
             tuple: optimization model and variables
@@ -46,7 +46,7 @@ class optModel(ABC):
     @abstractmethod
     def setObj(self, c):
         """
-        An abstract method to set objective function
+        An abstract method to set the objective function
 
         Args:
             c (ndarray): cost of objective function
@@ -56,7 +56,7 @@ class optModel(ABC):
     @abstractmethod
     def solve(self):
         """
-        An abstract method to solve model
+        An abstract method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (float)
@@ -65,7 +65,7 @@ class optModel(ABC):
 
     def copy(self):
         """
-        An abstract method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -75,10 +75,10 @@ class optModel(ABC):
 
     def addConstr(self, coefs, rhs):
         """
-        An abstract method to add new constraint
+        An abstract method to add a new constraint
 
         Args:
-            coefs (ndarray): coeffcients of new constraint
+            coefs (ndarray): coefficients of the new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
@@ -88,6 +88,6 @@ class optModel(ABC):
 
     def relax(self):
         """
-        A unimplemented method to relax MIP model
+        An unimplemented method to relax the MIP model
         """
         raise RuntimeError("Method 'relax' is not implemented.")
