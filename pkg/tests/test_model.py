@@ -19,10 +19,21 @@ try:
     from pyepo.model.grb.knapsack import knapsackModel, knapsackModelRel
     from pyepo.model.grb.shortestpath import shortestPathModel
     _HAS_GUROBI = True
-except ImportError:
+except (ImportError, NameError):
     _HAS_GUROBI = False
 
+try:
+    from pyepo.model.omo.shortestpath import shortestPathModel as omoShortestPathModel
+    from pyepo.model.omo.knapsack import knapsackModel as omoKnapsackModel
+    _HAS_PYOMO = True
+except (ImportError, NameError):
+    _HAS_PYOMO = False
+
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
+requires_pyomo = pytest.mark.skipif(
+    not (_HAS_PYOMO and _HAS_GUROBI),
+    reason="Pyomo or Gurobi not installed"
+)
 
 
 # ============================================================
@@ -183,3 +194,71 @@ class TestKnapsackModel:
         sol, obj = model.solve()
         sol = np.array(sol)
         assert np.all(weights @ sol <= capacity + 1e-6)
+
+
+# ============================================================
+# Pyomo: Shortest path model
+# ============================================================
+
+@requires_pyomo
+class TestOmoShortestPathModel:
+
+    @pytest.fixture
+    def model(self):
+        return omoShortestPathModel(grid=(3, 3), solver="gurobi")
+
+    def test_init(self, model):
+        assert model.grid == (3, 3)
+        assert model.modelSense == EPO.MINIMIZE
+
+    def test_num_cost(self, model):
+        assert model.num_cost == 12
+
+    def test_setObj_and_solve(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model.setObj(cost)
+        sol, obj = model.solve()
+        assert len(sol) == model.num_cost
+        assert isinstance(obj, float)
+        assert obj > 0
+
+    def test_copy(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model_copy = model.copy()
+        model_copy.setObj(cost)
+        sol, obj = model_copy.solve()
+        assert isinstance(obj, float)
+
+
+# ============================================================
+# Pyomo: Knapsack model
+# ============================================================
+
+@requires_pyomo
+class TestOmoKnapsackModel:
+
+    @pytest.fixture
+    def model(self):
+        weights = np.array([[3.0, 4.0, 5.0, 6.0]])
+        capacity = np.array([10.0])
+        return omoKnapsackModel(weights=weights, capacity=capacity, solver="gurobi")
+
+    def test_init(self, model):
+        assert model.modelSense == EPO.MAXIMIZE
+
+    def test_num_cost(self, model):
+        assert model.num_cost == 4
+
+    def test_solve(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_objective_value(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        np.testing.assert_allclose(obj, np.dot(cost, sol), atol=1e-6)

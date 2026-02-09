@@ -4,9 +4,10 @@
 Shortest path problem
 """
 
+from pyepo.model.omo.omomodel import optOmoModel
+
 try:
     from pyomo import environ as pe
-    from pyepo.model.omo.omomodel import optOmoModel
     _HAS_PYOMO = True
 except ImportError:
     _HAS_PYOMO = False
