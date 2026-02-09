@@ -75,15 +75,21 @@ class optMpaxModel(optModel):
         self.modelSense = EPO.MINIMIZE if minimize else EPO.MAXIMIZE
         # init device
         self.device = None
+        # cache GPU availability
+        self._has_jax_gpu = any(d.platform == "gpu" for d in jax.devices())
         # JIT pre-compile
+        self._rebuild_jit()
+
+    def __repr__(self):
+        return "optMpaxModel " + self.__class__.__name__
+
+    def _rebuild_jit(self):
+        """Rebuild JIT-compiled solve functions with current constraints."""
         self.jitted_solve = jax.jit(partial(self._jitted_solve,
                                             A=self.A, b=self.b, G=self.G,
                                             h=self.h, l=self.l, u=self.u,
                                             use_sparse_matrix=self.use_sparse_matrix))
         self.batch_optimize = jax.vmap(self.jitted_solve)
-
-    def __repr__(self):
-        return "optMpaxModel " + self.__class__.__name__
 
     @property
     def num_cost(self):
@@ -105,13 +111,10 @@ class optMpaxModel(optModel):
             raise ValueError("Size of cost vector does not match number of cost variables.")
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):
-            device = c.device  # get tensor device
-            # check JAX supports CUDA
-            if not any(device.platform == "gpu" for device in jax.devices()):
-                # move to cpu
+            # move to cpu if JAX has no GPU support
+            if not self._has_jax_gpu:
                 c = c.cpu().detach()
             else:
-                # stay in gpu
                 c = c.detach()
             # convert PyTorch tensor to JAX array using DLPack
             self.c = jax.dlpack.from_dlpack(c)
@@ -124,22 +127,14 @@ class optMpaxModel(optModel):
                 self.h = jax.device_put(self.h, self.device)
                 self.l = jax.device_put(self.l, self.device)
                 self.u = jax.device_put(self.u, self.device)
-                # JIT pre-compile
-                self.jitted_solve = jax.jit(partial(self._jitted_solve,
-                                                    A=self.A, b=self.b, G=self.G,
-                                                    h=self.h, l=self.l, u=self.u,
-                                                    use_sparse_matrix=self.use_sparse_matrix))
-                self.batch_optimize = jax.vmap(self.jitted_solve)
+                # rebuild JIT for new device
+                self._rebuild_jit()
         # c is already a NumPy array
         else:
             self.c = jnp.array(c, dtype=jnp.float32)
-        # change sign for model sense
-        if self.modelSense == EPO.MINIMIZE:
-            pass
-        elif self.modelSense == EPO.MAXIMIZE:
+        # change sign for maximization
+        if self.modelSense == EPO.MAXIMIZE:
             self.c = - self.c
-        else:
-            raise ValueError("Invalid modelSense.")
 
     def solve(self):
         """
@@ -207,11 +202,13 @@ class optMpaxModel(optModel):
         new_model = self.copy()
         # add constraint
         if new_model.G.shape[0] == 0:
-            new_model.G = coefs.reshape(1, -1)
+            new_model.G = coefs
             new_model.h = jnp.array([rhs])
         else:
             new_model.G = jnp.vstack([new_model.G, coefs])
             new_model.h = jnp.append(new_model.h, rhs)
+        # rebuild JIT with updated constraints
+        new_model._rebuild_jit()
         return new_model
 
     def _getModel(self):
