@@ -35,7 +35,9 @@ Citation:
 
 ## Introduction
 
-``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), [MPAX](https://github.com/MIT-Lu-Lab/MPAX) or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules.
+``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with linear objective functions. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [MPAX](https://github.com/MIT-Lu-Lab/MPAX) or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules.
+
+In particular, ``PyEPO`` integrates [MPAX](https://github.com/MIT-Lu-Lab/MPAX), a JAX-based mathematical programming solver using the PDHG (Primal-Dual Hybrid Gradient) algorithm for GPU-accelerated optimization. MPAX brings three key advantages for end-to-end training: (1) **GPU-native solving** — the first-order PDHG method is inherently parallelizable and runs efficiently on GPU; (2) **batch solving** — an entire mini-batch of optimization instances can be solved simultaneously on GPU via vectorization; and (3) **no GPU–CPU data transfer overhead** — traditional solvers (e.g., Gurobi) run on CPU, requiring costly data transfers between GPU and CPU at every training iteration, whereas MPAX keeps both the neural network and the solver on GPU, eliminating this bottleneck.
 
 
 ## Documentation
@@ -48,14 +50,14 @@ Our recent tutorial was at the ACC 2024 conference. You can view the talk slides
 
 ## Tutorial
 
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb)**01 Optimization Model:** Build up optimization solver
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb)**01 Optimization Model:** Build an optimization solver
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb)**02 Optimization Dataset:** Generate synthetic data and use optDataset
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb)**03 Training and Testing:** Train and test different approaches
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%202D%20knapsack%20Solution%20Visualization.ipynb)**04 2D knapsack Solution Visualization:** Visualize solutions for knapsack problem
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb)**05 Warcraft Shortest Path:** Use the Warcraft terrains dateset to train shortest path
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%202D%20knapsack%20Solution%20Visualization.ipynb)**04 2D knapsack Solution Visualization:** Visualize solutions for the knapsack problem
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%20Warcraft%20Shortest%20Path.ipynb)**05 Warcraft Shortest Path:** Train shortest path models on the Warcraft terrains dataset
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Real-World%20Energy%20Scheduling.ipynb)**06 Real-World Energy Scheduling:** Apply PyEPO to real energy data
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20kNN%20Robust%20Losses.ipynb)**07 kNN Robust Losses:** Use the optDatasetKNN for robust losses
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20Solving%20on%20MPAX%20with%20PDHG.ipynb)**08 Solving on MPAX with PDHG:** Use the MPAX for GPU batch solving
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20kNN%20Robust%20Losses.ipynb)**07 kNN Robust Losses:** Use optDatasetKNN for robust losses
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20Solving%20on%20MPAX%20with%20PDHG.ipynb)**08 Solving on MPAX with PDHG:** Use MPAX for GPU-accelerated batch solving
 
 
 ## Experiments
@@ -65,9 +67,9 @@ To **reproduce the experiments** in the original paper, please use the code and 
 
 ## Features
 
-- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[7]](https://arxiv.org/abs/2205.15213), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **PFY** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **NCE** [[5]](https://www.ijcai.org/proceedings/2021/390) and **LTR** [[6]](https://proceedings.mlr.press/v162/mandi22a.htm), **I-MLE** [[8]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[9]](https://ojs.aaai.org/index.php/AAAI/article/view/26103), and **PG** [[11]](https://arxiv.org/abs/2402.03256).
+- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[7]](https://arxiv.org/abs/2205.15213), **DPO** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **PFYL** [[4]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html), **NCE** [[5]](https://www.ijcai.org/proceedings/2021/390) and **LTR** [[6]](https://proceedings.mlr.press/v162/mandi22a.htm), **I-MLE** [[8]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[9]](https://ojs.aaai.org/index.php/AAAI/article/view/26103), and **PG** [[11]](https://arxiv.org/abs/2402.03256).
 - Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/) and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
-- Support Parallel computing for optimization solver
+- Support parallel computing for optimization solvers
 - Support solution caching [[5]](https://www.ijcai.org/proceedings/2021/390) to speed up training
 - Support kNN robust loss [[10]](https://arxiv.org/abs/2310.04328) to improve decision quality
 
@@ -95,7 +97,7 @@ The package is now available for installation on [PyPI](https://pypi.org/project
 pip install pyepo
 ```
 
-### Conda Install （**Archived**）
+### Conda Install
 
 `PyEPO` is also available on [Anaconda Cloud](https://anaconda.org/pyepo/pyepo). If you prefer to use conda for installation, you can install `PyEPO` with the following command:
 
@@ -140,9 +142,9 @@ class myModel(optGrbModel):
         super().__init__()
 
     def _getModel(self):
-        # ceate a model
+        # create a model
         m = gp.Model()
-        # varibles
+        # variables
         x = m.addVars(self.num_item, name="x", vtype=GRB.BINARY)
         # model sense
         m.modelSense = GRB.MAXIMIZE
