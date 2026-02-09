@@ -1,17 +1,8 @@
-pyepo.model.mpax.mpaxmodel
+﻿pyepo.model.mpax.mpaxmodel
 ==========================
 
 .. automodule:: pyepo.model.mpax.mpaxmodel
 
-   
-   
-   
-
-   
-   
-   
-
-   
    
    .. rubric:: Classes
 
@@ -19,11 +10,3 @@ pyepo.model.mpax.mpaxmodel
    
       optMpaxModel
    
-   
-
-   
-   
-   
-
-
-

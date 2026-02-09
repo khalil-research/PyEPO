@@ -1,7 +1,7 @@
-pyepo.func.utlis
+pyepo.func.utils
 ================
 
-.. py:module:: pyepo.func.utlis
+.. py:module:: pyepo.func.utils
 
 .. autoapi-nested-parse::
 
@@ -9,12 +9,21 @@ pyepo.func.utlis
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.utils._worker_model
+   pyepo.func.utils._worker_model_key
+
+
 Classes
 -------
 
 .. autoapisummary::
 
-   pyepo.func.utlis.sumGammaDistribution
+   pyepo.func.utils.sumGammaDistribution
 
 
 Functions
@@ -22,11 +31,11 @@ Functions
 
 .. autoapisummary::
 
-   pyepo.func.utlis._solve_or_cache
-   pyepo.func.utlis._solve_in_pass
-   pyepo.func.utlis._cache_in_pass
-   pyepo.func.utlis._solveWithObj4Par
-   pyepo.func.utlis._check_sol
+   pyepo.func.utils._solve_or_cache
+   pyepo.func.utils._solve_in_pass
+   pyepo.func.utils._cache_in_pass
+   pyepo.func.utils._solveWithObj4Par
+   pyepo.func.utils._check_sol
 
 
 Module Contents
@@ -45,6 +54,14 @@ Module Contents
 .. py:function:: _cache_in_pass(cp, optmodel, solpool)
 
    A function to use solution pool in the forward/backward pass
+
+
+.. py:data:: _worker_model
+   :value: None
+
+
+.. py:data:: _worker_model_key
+   :value: None
 
 
 .. py:function:: _solveWithObj4Par(cost, args, model_type)

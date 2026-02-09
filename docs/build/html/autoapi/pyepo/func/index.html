@@ -3,20 +3,20 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyepo.func &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+  <title>pyepo.func &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -49,7 +49,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../content/intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../content/install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../content/tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html">pyepo</a><ul class="current">
@@ -60,7 +59,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../metric/index.html">pyepo.metric</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../model/index.html">pyepo.model</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../twostage/index.html">pyepo.twostage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../utlis/index.html">pyepo.utlis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/index.html">pyepo.utils</a></li>
 </ul>
 </li>
 </ul>
@@ -108,7 +107,7 @@
 <li class="toctree-l1"><a class="reference internal" href="perturbed/index.html">pyepo.func.perturbed</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rank/index.html">pyepo.func.rank</a></li>
 <li class="toctree-l1"><a class="reference internal" href="surrogate/index.html">pyepo.func.surrogate</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utlis/index.html">pyepo.func.utlis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils/index.html">pyepo.func.utils</a></li>
 </ul>
 </div>
 </section>
@@ -123,10 +122,10 @@
 <td><p>An autograd module for PG Loss, as a surrogate loss function of objective</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackboxOpt" title="pyepo.func.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
-<td><p>An autograd module for differentiable black-box optimizer, which yield</p></td>
+<td><p>An autograd module for differentiable black-box optimizer, which yields</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.negativeIdentity" title="pyepo.func.negativeIdentity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a></p></td>
-<td><p>An autograd module for the differentiable optimizer, which yields optimal a</p></td>
+<td><p>An autograd module for the differentiable optimizer, which yields an optimal</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbedOpt" title="pyepo.func.perturbedOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a></p></td>
 <td><p>An autograd module for Fenchel-Young loss using perturbation techniques. The</p></td>
@@ -135,7 +134,7 @@
 <td><p>An autograd module for Fenchel-Young loss using perturbation techniques. The</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.implicitMLE" title="pyepo.func.implicitMLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">implicitMLE</span></code></a></p></td>
-<td><p>An autograd module for Implicit Maximum Likelihood Estimator, which yield</p></td>
+<td><p>An autograd module for Implicit Maximum Likelihood Estimator, which yields</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.adaptiveImplicitMLE" title="pyepo.func.adaptiveImplicitMLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adaptiveImplicitMLE</span></code></a></p></td>
 <td><p>An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which</p></td>
@@ -172,11 +171,6 @@ data.</p>
 <p>The SPO+ Loss is convex with subgradient. Thus, it allows us to design an
 algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://doi.org/10.1287/mnsc.2020.3922">https://doi.org/10.1287/mnsc.2020.3922</a>&gt;</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.SPOPlus.spop">
-<span class="sig-name descname"><span class="pre">spop</span></span><a class="headerlink" href="#pyepo.func.SPOPlus.spop" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.SPOPlus.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.SPOPlus.forward" title="Link to this definition"></a></dt>
@@ -226,23 +220,18 @@ design an algorithm based on stochastic gradient descent.</p>
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackboxOpt" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for differentiable black-box optimizer, which yield
+<p>An autograd module for differentiable black-box optimizer, which yields
 an optimal solution and derive a gradient.</p>
-<p>For differentiable block-box, the objective function is linear and
+<p>For differentiable black-box, the objective function is linear and
 constraints are known and fixed, but the cost vector needs to be predicted
 from contextual data.</p>
-<p>The block-box approximates the gradient of the optimizer by interpolating
+<p>The black-box approximates the gradient of the optimizer by interpolating
 the loss function. Thus, it allows us to design an algorithm based on
 stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/1912.02175">https://arxiv.org/abs/1912.02175</a>&gt;</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.blackboxOpt.lambd">
 <span class="sig-name descname"><span class="pre">lambd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.blackboxOpt.lambd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.blackboxOpt.dbb">
-<span class="sig-name descname"><span class="pre">dbb</span></span><a class="headerlink" href="#pyepo.func.blackboxOpt.dbb" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -257,8 +246,8 @@ stochastic gradient descent.</p>
 <dt class="sig sig-object py" id="pyepo.func.negativeIdentity">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">negativeIdentity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.negativeIdentity" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for the differentiable optimizer, which yields optimal a
-solution and use negative identity as a gradient on the backward pass.</p>
+<p>An autograd module for the differentiable optimizer, which yields an optimal
+solution and uses negative identity as a gradient on the backward pass.</p>
 <p>For negative identity backpropagation, the objective function is linear and
 constraints are known and fixed, but the cost vector needs to be predicted
 from contextual data.</p>
@@ -267,11 +256,6 @@ then the identity update is equivalent to DBB. However, the identity update
 does not require an additional call to the solver during the backward pass
 and tuning an additional hyperparameter λ.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a>&gt;</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.negativeIdentity.nid">
-<span class="sig-name descname"><span class="pre">nid</span></span><a class="headerlink" href="#pyepo.func.negativeIdentity.nid" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.negativeIdentity.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.negativeIdentity.forward" title="Link to this definition"></a></dt>
@@ -285,10 +269,10 @@ and tuning an additional hyperparameter λ.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedOpt" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for Fenchel-Young loss using perturbation techniques. The
-use of the loss improves the algorithmic by the specific expression of the
+use of the loss improves the algorithm by the specific expression of the
 gradients of the loss.</p>
 <p>For the perturbed optimizer, the cost vector needs to be predicted from
-contextual data and are perturbed with Gaussian noise.</p>
+contextual data and is perturbed with Gaussian noise.</p>
 <p>Thus, it allows us to design an algorithm based on stochastic gradient
 descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a>&gt;</p>
@@ -307,11 +291,6 @@ descent.</p>
 <span class="sig-name descname"><span class="pre">rnd</span></span><a class="headerlink" href="#pyepo.func.perturbedOpt.rnd" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.perturbedOpt.ptb">
-<span class="sig-name descname"><span class="pre">ptb</span></span><a class="headerlink" href="#pyepo.func.perturbedOpt.ptb" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.perturbedOpt.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedOpt.forward" title="Link to this definition"></a></dt>
@@ -325,12 +304,12 @@ descent.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for Fenchel-Young loss using perturbation techniques. The
-use of the loss improves the algorithmic by the specific expression of the
+use of the loss improves the algorithm by the specific expression of the
 gradients of the loss.</p>
-<p>For the perturbed optimizer, the cost vector need to be predicted from
-contextual data and are perturbed with Gaussian noise.</p>
-<p>The Fenchel-Young loss allows to directly optimize a loss between the features
-and solutions with less computation. Thus, allows us to design an algorithm
+<p>For the perturbed optimizer, the cost vector needs to be predicted from
+contextual data and is perturbed with Gaussian noise.</p>
+<p>The Fenchel-Young loss allows directly optimizing a loss between the features
+and solutions with less computation. Thus, it allows us to design an algorithm
 based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a>&gt;</p>
 <dl class="py attribute">
@@ -348,11 +327,6 @@ based on stochastic gradient descent.</p>
 <span class="sig-name descname"><span class="pre">rnd</span></span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.rnd" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung.pfy">
-<span class="sig-name descname"><span class="pre">pfy</span></span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.pfy" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.perturbedFenchelYoung.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbedFenchelYoung.forward" title="Link to this definition"></a></dt>
@@ -363,15 +337,15 @@ based on stochastic gradient descent.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.implicitMLE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">implicitMLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">sumGammaDistribution(kappa=5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_sides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.implicitMLE" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">implicitMLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_sides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.implicitMLE" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for Implicit Maximum Likelihood Estimator, which yield
+<p>An autograd module for Implicit Maximum Likelihood Estimator, which yields
 an optimal solution in a constrained exponential family distribution via
 Perturb-and-MAP.</p>
 <p>For I-MLE, it works as black-box combinatorial solvers, in which constraints
-are known and fixed, but the cost vector need to be predicted from
+are known and fixed, but the cost vector needs to be predicted from
 contextual data.</p>
-<p>The I-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+<p>The I-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
 design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html</a>&gt;</p>
 <dl class="py attribute">
@@ -391,17 +365,12 @@ design an algorithm based on stochastic gradient descent.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.implicitMLE.distribution">
-<span class="sig-name descname"><span class="pre">distribution</span></span><a class="headerlink" href="#pyepo.func.implicitMLE.distribution" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">distribution</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyepo.func.implicitMLE.distribution" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.implicitMLE.two_sides">
 <span class="sig-name descname"><span class="pre">two_sides</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#pyepo.func.implicitMLE.two_sides" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.implicitMLE.imle">
-<span class="sig-name descname"><span class="pre">imle</span></span><a class="headerlink" href="#pyepo.func.implicitMLE.imle" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -414,15 +383,15 @@ design an algorithm based on stochastic gradient descent.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">adaptiveImplicitMLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">sumGammaDistribution(kappa=5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_sides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">adaptiveImplicitMLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_sides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
-adaptively choose hyperparameter λ and yield an optimal solution in a
+adaptively chooses hyperparameter λ and yields an optimal solution in a
 constrained exponential family distribution via Perturb-and-MAP.</p>
 <p>For AI-MLE, it works as black-box combinatorial solvers, in which constraints
-are known and fixed, but the cost vector need to be predicted from
+are known and fixed, but the cost vector needs to be predicted from
 contextual data.</p>
-<p>The AI-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+<p>The AI-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
 design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://ojs.aaai.org/index.php/AAAI/article/view/26103">https://ojs.aaai.org/index.php/AAAI/article/view/26103</a>&gt;</p>
 <dl class="py attribute">
@@ -437,7 +406,7 @@ design an algorithm based on stochastic gradient descent.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.distribution">
-<span class="sig-name descname"><span class="pre">distribution</span></span><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.distribution" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">distribution</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.distribution" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -460,11 +429,6 @@ design an algorithm based on stochastic gradient descent.</p>
 <span class="sig-name descname"><span class="pre">step</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></em><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.step" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.aimle">
-<span class="sig-name descname"><span class="pre">aimle</span></span><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.aimle" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.adaptiveImplicitMLE.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.adaptiveImplicitMLE.forward" title="Link to this definition"></a></dt>
@@ -481,7 +445,7 @@ design an algorithm based on stochastic gradient descent.</p>
 functions, based on viewing suboptimal solutions as negative examples.</p>
 <p>For the NCE, the cost vector needs to be predicted from contextual data and
 maximizes the separation of the probability of the optimal solution.</p>
-<p>Thus allows us to design an algorithm based on stochastic gradient descent.</p>
+<p>This allows us to design an algorithm based on stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://www.ijcai.org/proceedings/2021/390">https://www.ijcai.org/proceedings/2021/390</a>&gt;</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.NCE.solpool">

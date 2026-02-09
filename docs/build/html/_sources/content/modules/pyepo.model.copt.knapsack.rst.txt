@@ -1,17 +1,8 @@
-pyepo.model.copt.knapsack
+﻿pyepo.model.copt.knapsack
 =========================
 
 .. automodule:: pyepo.model.copt.knapsack
 
-   
-   
-   
-
-   
-   
-   
-
-   
    
    .. rubric:: Classes
 
@@ -20,11 +11,3 @@ pyepo.model.copt.knapsack
       knapsackModel
       knapsackModelRel
    
-   
-
-   
-   
-   
-
-
-

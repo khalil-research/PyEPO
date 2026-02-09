@@ -34,19 +34,13 @@ Module Contents
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
 
-   This class is optimization model for knapsack problem
+   This class is an optimization model for the knapsack problem
 
    .. attribute:: _model
 
-      Pyomo model
+      COPT model
 
-      :type: PyOmo model
-
-   .. attribute:: solver
-
-      optimization solver in the background
-
-      :type: str
+      :type: COPT model
 
    .. attribute:: weights
 
@@ -78,7 +72,7 @@ Module Contents
 
    .. py:method:: _getModel()
 
-      A method to build pyomo model
+      A method to build COPT model
 
 
 
@@ -98,7 +92,7 @@ Module Contents
 
    .. py:method:: _getModel()
 
-      A method to build pyomo
+      A method to build COPT model
 
 
 

@@ -38,13 +38,11 @@ Module Contents
    Bases: :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
 
 
-   This class is optimization model for relexed knapsack problem
+   This class is an optimization model for the relaxed knapsack problem
 
    .. attribute:: _model
 
-      Gurobi model
-
-      :type: GurobiPy model
+      MPAX model
 
    .. attribute:: weights
 
@@ -56,7 +54,7 @@ Module Contents
 
       Total capacity
 
-      :type: np.ndarray / listy
+      :type: np.ndarray / list
 
    .. attribute:: items
 

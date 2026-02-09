@@ -3,20 +3,20 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Solution Pool &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+  <title>Solution Pool &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -51,14 +51,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-stage Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
@@ -90,19 +89,20 @@
              
   <section id="solution-pool">
 <h1>Solution Pool<a class="headerlink" href="#solution-pool" title="Link to this heading"></a></h1>
-<p>There is repeated solving during the training of end-to-end predict-then-optimize tasks. Therefore, the solution pool <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> as an inner approximation of the feasible region is able to reduce computation. With a record of previous solutions, we can argmin over the current solution pool instead of the linear/integer programs.</p>
-<p>The corresponding algorithm is as follows:</p>
-<a class="reference internal image-reference" href="../../_images/pool.png"><img alt="../../_images/pool.png" src="../../_images/pool.png" style="width: 500px;" /></a>
-<p>The solution pool has already been applied on modules of <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> is the ratio of new solutions computed during training, in which the default is 1.0 so the solution pool is not used. When <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> is less than 1, the solution pool requires training data as <code class="docutils literal notranslate"><span class="pre">dataset</span></code> to obtain initial solutions.</p>
-<p>Here is an example for SPO+, and other functions are the same.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<p>End-to-end predict-then-optimize training involves repeated solving of optimization problems. A solution pool <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> serves as an inner approximation of the feasible region, reducing computation by reusing previously computed solutions. Instead of solving the full linear/integer program, the method selects the best solution from the cached pool.</p>
+<p>The algorithm is illustrated below:</p>
+<a class="reference internal image-reference" href="../../_images/pool.png"><img alt="../../_images/pool.png" src="../../_images/pool.png" style="width: 500px;" />
+</a>
+<p>The solution pool is integrated into all <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules.</p>
+<p><code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls the fraction of instances solved exactly during training. The default is 1.0 (no caching). When <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> is less than 1, the pool requires training data via the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> parameter to obtain initial solutions.</p>
+<p>Example with SPO+ (other functions work the same way):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
-<span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset_train</span><span class="p">)</span>
+<span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 </pre></div>
 </div>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="f1" role="note">
+<aside class="footnote brackets" id="f1" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Mulamba, M., Mandi, J., Diligenti, M., Lombardi, M., Bucarey, V., &amp; Guns, T. (2020). Contrastive losses and solution caching for predict-and-optimize. arXiv preprint arXiv:2011.05354.</p>
 </aside>

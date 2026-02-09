@@ -38,7 +38,7 @@ Module Contents
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
 
-   This class is an optimization model for portfolio problem
+   This class is an optimization model for the portfolio problem
 
    .. attribute:: _model
 
@@ -77,6 +77,9 @@ Module Contents
    .. py:method:: _getRiskLevel(gamma)
 
       A method to calculate the risk level
+
+      :param gamma: risk level parameter
+      :type gamma: float
 
       :returns: risk level
       :rtype: float

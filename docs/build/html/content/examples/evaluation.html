@@ -3,26 +3,26 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Evaluation &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+  <title>Evaluation &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Module" href="../api.html" />
+    <link rel="next" title="Reference" href="../ref.html" />
     <link rel="prev" title="Training" href="training.html" /> 
 </head>
 
@@ -52,7 +52,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-stage Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
@@ -63,7 +63,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
@@ -97,7 +96,7 @@
 <h1>Evaluation<a class="headerlink" href="#evaluation" title="Link to this heading"></a></h1>
 <section id="regret">
 <h2>Regret<a class="headerlink" href="#regret" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.metric</span></code> is to evaluate model performance. Regret <span class="math notranslate nohighlight">\(l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^T \mathbf{w}^*(\hat{\mathbf{c}}) - z^*(\mathbf{c})\)</span> aims to measure the error in decision-making. It evaluates the distance between the objective value of the solution from predicted cost <span class="math notranslate nohighlight">\(\hat{c}\)</span> and the true optimal objective value <span class="math notranslate nohighlight">\(z^*(c)\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.metric.regret</span></code> evaluates the decision quality of a prediction model. Regret is defined as <span class="math notranslate nohighlight">\(l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^T \mathbf{w}^*(\hat{\mathbf{c}}) - z^*(\mathbf{c})\)</span>, which measures the gap between the objective value achieved by the predicted solution and the true optimum.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.metric.</span></span><span class="sig-name descname"><span class="pre">regret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em><span class="sig-paren">)</span></dt>
@@ -106,7 +105,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>predmodel</strong> (<em>nn</em>) – a regression neural network for cost prediction</p></li>
-<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – a PyEPO optimization model</p></li>
 <li><p><strong>dataloader</strong> (<em>DataLoader</em>) – Torch dataloader from optDataSet</p></li>
 </ul>
 </dd>
@@ -119,7 +118,7 @@
 </dl>
 </dd></dl>
 
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
 <span class="n">regret</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">regret</span><span class="p">(</span><span class="n">predmodel</span><span class="p">,</span> <span class="n">optmodel</span><span class="p">,</span> <span class="n">testloader</span><span class="p">)</span>
 </pre></div>
@@ -127,9 +126,10 @@
 </section>
 <section id="unambiguous-regret">
 <h2>Unambiguous Regret<a class="headerlink" href="#unambiguous-regret" title="Link to this heading"></a></h2>
-<p>Given a cost vector <span class="math notranslate nohighlight">\(\hat{c}\)</span>, there may be multiple optimal solutions of <span class="math notranslate nohighlight">\(\underset{\mathbf{w} \in S}{\min}\;\hat{\mathbf{c}}^T \mathbf{w}\)</span>. Unambiguous Regret Loss <span class="math notranslate nohighlight">\(l_{URegret}(\hat{\mathbf{c}}, \mathbf{c}) = \underset{\mathbf{w} \in W^*(\mathbf{c})}{\max} \mathbf{w}^T \mathbf{c} - z^*(\mathbf{c})\)</span> considers the worst cases.</p>
-<a class="reference internal image-reference" href="../../_images/regret.png"><img alt="learning curves" src="../../_images/regret.png" style="width: 650px;" /></a>
-<p>However, as figure shows, the regret and the unambiguous regret are almost same in all training procedures. Therefore, although the unambiguous regret is more theoretically rigorous, it is not necessary to consider it in practice.</p>
+<p>When a predicted cost vector <span class="math notranslate nohighlight">\(\hat{c}\)</span> yields multiple optimal solutions for <span class="math notranslate nohighlight">\(\underset{\mathbf{w} \in S}{\min}\;\hat{\mathbf{c}}^T \mathbf{w}\)</span>, the unambiguous regret considers the worst case: <span class="math notranslate nohighlight">\(l_{URegret}(\hat{\mathbf{c}}, \mathbf{c}) = \underset{\mathbf{w} \in W^*(\mathbf{c})}{\max} \mathbf{w}^T \mathbf{c} - z^*(\mathbf{c})\)</span>.</p>
+<a class="reference internal image-reference" href="../../_images/regret.png"><img alt="learning curves" src="../../_images/regret.png" style="width: 650px;" />
+</a>
+<p>As the figure shows, regret and unambiguous regret are nearly identical across all training procedures. While the unambiguous regret is more theoretically rigorous, using it in practice is generally unnecessary.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.metric.</span></span><span class="sig-name descname"><span class="pre">unambRegret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span></dt>
@@ -138,8 +138,9 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>predmodel</strong> (<em>nn</em>) – a regression neural network for cost prediction</p></li>
-<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an PyEPO optimization model</p></li>
+<li><p><strong>optmodel</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – a PyEPO optimization model</p></li>
 <li><p><strong>dataloader</strong> (<em>DataLoader</em>) – Torch dataloader from optDataSet</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em>) – tolerance for optimization</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -151,7 +152,7 @@
 </dl>
 </dd></dl>
 
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
 <span class="n">regret</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">unambRegret</span><span class="p">(</span><span class="n">predmodel</span><span class="p">,</span> <span class="n">optmodel</span><span class="p">,</span> <span class="n">testloader</span><span class="p">)</span>
 </pre></div>
@@ -164,7 +165,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="training.html" class="btn btn-neutral float-left" title="Training" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../api.html" class="btn btn-neutral float-right" title="Module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../ref.html" class="btn btn-neutral float-right" title="Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

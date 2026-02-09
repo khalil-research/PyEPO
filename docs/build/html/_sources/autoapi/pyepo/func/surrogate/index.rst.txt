@@ -40,9 +40,6 @@ Module Contents
    Reference: <https://doi.org/10.1287/mnsc.2020.3922>
 
 
-   .. py:attribute:: spop
-
-
    .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj)
 
       Forward pass
@@ -54,7 +51,7 @@ Module Contents
    Bases: :py:obj:`torch.autograd.Function`
 
 
-   A autograd function for SPO+ Loss
+   An autograd function for SPO+ Loss
 
 
    .. py:method:: forward(ctx, pred_cost, true_cost, true_sol, true_obj, module)
@@ -71,7 +68,7 @@ Module Contents
       :type true_sol: torch.tensor
       :param true_obj: a batch of true optimal objective values
       :type true_obj: torch.tensor
-      :param module: SPOPlus modeul
+      :param module: SPOPlus module
       :type module: optModule
 
       :returns: SPO+ loss

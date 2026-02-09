@@ -3,20 +3,20 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyepo.func.blackbox &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
+  <title>pyepo.func.blackbox &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -49,7 +49,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../../index.html">pyepo</a><ul class="current">
@@ -60,7 +59,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../metric/index.html">pyepo.metric</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../model/index.html">pyepo.model</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../twostage/index.html">pyepo.twostage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../utlis/index.html">pyepo.utlis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/index.html">pyepo.utils</a></li>
 </ul>
 </li>
 </ul>
@@ -104,16 +103,16 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox.blackboxOpt" title="pyepo.func.blackbox.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
-<td><p>An autograd module for differentiable black-box optimizer, which yield</p></td>
+<td><p>An autograd module for differentiable black-box optimizer, which yields</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.blackbox.blackboxOptFunc" title="pyepo.func.blackbox.blackboxOptFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOptFunc</span></code></a></p></td>
-<td><p>A autograd function for differentiable black-box optimizer</p></td>
+<td><p>An autograd function for differentiable black-box optimizer</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox.negativeIdentity" title="pyepo.func.blackbox.negativeIdentity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a></p></td>
-<td><p>An autograd module for the differentiable optimizer, which yields optimal a</p></td>
+<td><p>An autograd module for the differentiable optimizer, which yields an optimal</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.blackbox.negativeIdentityFunc" title="pyepo.func.blackbox.negativeIdentityFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negativeIdentityFunc</span></code></a></p></td>
-<td><p>A autograd function for differentiable black-box optimizer</p></td>
+<td><p>An autograd function for negative identity optimizer</p></td>
 </tr>
 </tbody>
 </table>
@@ -124,23 +123,18 @@
 <dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for differentiable black-box optimizer, which yield
+<p>An autograd module for differentiable black-box optimizer, which yields
 an optimal solution and derive a gradient.</p>
-<p>For differentiable block-box, the objective function is linear and
+<p>For differentiable black-box, the objective function is linear and
 constraints are known and fixed, but the cost vector needs to be predicted
 from contextual data.</p>
-<p>The block-box approximates the gradient of the optimizer by interpolating
+<p>The black-box approximates the gradient of the optimizer by interpolating
 the loss function. Thus, it allows us to design an algorithm based on
 stochastic gradient descent.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/1912.02175">https://arxiv.org/abs/1912.02175</a>&gt;</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.lambd">
 <span class="sig-name descname"><span class="pre">lambd</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.lambd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.dbb">
-<span class="sig-name descname"><span class="pre">dbb</span></span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.dbb" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -155,7 +149,7 @@ stochastic gradient descent.</p>
 <dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOptFunc">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">blackboxOptFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOptFunc" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></p>
-<p>A autograd function for differentiable black-box optimizer</p>
+<p>An autograd function for differentiable black-box optimizer</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOptFunc.forward">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOptFunc.forward" title="Link to this definition"></a></dt>
@@ -188,8 +182,8 @@ stochastic gradient descent.</p>
 <dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentity">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">negativeIdentity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentity" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for the differentiable optimizer, which yields optimal a
-solution and use negative identity as a gradient on the backward pass.</p>
+<p>An autograd module for the differentiable optimizer, which yields an optimal
+solution and uses negative identity as a gradient on the backward pass.</p>
 <p>For negative identity backpropagation, the objective function is linear and
 constraints are known and fixed, but the cost vector needs to be predicted
 from contextual data.</p>
@@ -198,11 +192,6 @@ then the identity update is equivalent to DBB. However, the identity update
 does not require an additional call to the solver during the backward pass
 and tuning an additional hyperparameter λ.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a>&gt;</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentity.nid">
-<span class="sig-name descname"><span class="pre">nid</span></span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentity.nid" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentity.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentity.forward" title="Link to this definition"></a></dt>
@@ -215,7 +204,7 @@ and tuning an additional hyperparameter λ.</p>
 <dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentityFunc">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">negativeIdentityFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentityFunc" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></p>
-<p>A autograd function for differentiable black-box optimizer</p>
+<p>An autograd function for negative identity optimizer</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentityFunc.forward">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentityFunc.forward" title="Link to this definition"></a></dt>
@@ -224,7 +213,7 @@ and tuning an additional hyperparameter λ.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pred_cost</strong> (<em>torch.tensor</em>) – a batch of predicted values of the cost</p></li>
-<li><p><strong>module</strong> (<a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><em>optModule</em></a>) – blackboxOpt module</p></li>
+<li><p><strong>module</strong> (<a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><em>optModule</em></a>) – negativeIdentity module</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

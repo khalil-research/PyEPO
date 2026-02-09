@@ -1,17 +1,8 @@
-pyepo.model.mpax.knapsack
+﻿pyepo.model.mpax.knapsack
 =========================
 
 .. automodule:: pyepo.model.mpax.knapsack
 
-   
-   
-   
-
-   
-   
-   
-
-   
    
    .. rubric:: Classes
 
@@ -19,11 +10,3 @@ pyepo.model.mpax.knapsack
    
       knapsackModel
    
-   
-
-   
-   
-   
-
-
-

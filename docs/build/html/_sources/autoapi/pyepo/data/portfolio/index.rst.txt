@@ -22,7 +22,7 @@ Module Contents
 
 .. py:function:: genData(num_data, num_features, num_assets, deg=1, noise_level=1, seed=135)
 
-   A function to generate synthetic data and features for travelling salesman
+   A function to generate synthetic data and features for portfolio
 
    :param num_data: number of data points
    :type num_data: int

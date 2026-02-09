@@ -5,7 +5,7 @@ pyepo.data.shortestpath
 
 .. autoapi-nested-parse::
 
-   Synthetic data for Shortest path problem
+   Synthetic data for shortest path problem
 
 
 
@@ -32,7 +32,7 @@ Module Contents
    :type grid: int, int
    :param deg: data polynomial degree
    :type deg: int
-   :param noise_width: half witdth of data random noise
+   :param noise_width: half width of data random noise
    :type noise_width: float
    :param seed: random seed
    :type seed: int

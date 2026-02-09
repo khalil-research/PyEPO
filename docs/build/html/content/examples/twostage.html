@@ -3,20 +3,20 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Two-stage Method &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+  <title>Two-Stage Method &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -52,14 +52,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Two-stage Method</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Two-Stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
@@ -79,7 +78,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../tutorial.html">Tutorial</a></li>
-      <li class="breadcrumb-item active">Two-stage Method</li>
+      <li class="breadcrumb-item active">Two-Stage Method</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/content/examples/twostage.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -90,8 +89,8 @@
            <div itemprop="articleBody">
              
   <section id="two-stage-method">
-<h1>Two-stage Method<a class="headerlink" href="#two-stage-method" title="Link to this heading"></a></h1>
-<p>Two-stage approach trains a regression model <span class="math notranslate nohighlight">\(\hat{c} = g(\mathbf{x}; \mathbf{\theta})\)</span> by minimizing a prediction error <span class="math notranslate nohighlight">\(l(\hat{\mathbf{c}}, \mathbf{c})\)</span> such as mean square error <span class="math notranslate nohighlight">\(l_{MSE}(\hat{\mathbf{c}}, \mathbf{c}) = \frac{1}{n} \sum_i^n \| \hat{\mathbf{c}}_i - \mathbf{c}_i \| ^ 2\)</span>. Then in an inference process, the machine learning model predicts <span class="math notranslate nohighlight">\(\hat{c} = g(\mathbf{x}; \mathbf{\theta})\)</span> first. After that, the predicted value <span class="math notranslate nohighlight">\(\hat{c}\)</span> is used for solving the optimization problem.</p>
+<h1>Two-Stage Method<a class="headerlink" href="#two-stage-method" title="Link to this heading"></a></h1>
+<p>The two-stage approach trains a regression model <span class="math notranslate nohighlight">\(\hat{c} = g(\mathbf{x}; \mathbf{\theta})\)</span> by minimizing a prediction error such as mean squared error <span class="math notranslate nohighlight">\(l_{MSE}(\hat{\mathbf{c}}, \mathbf{c}) = \frac{1}{n} \sum_i^n \| \hat{\mathbf{c}}_i - \mathbf{c}_i \| ^ 2\)</span>. At inference time, the model first predicts <span class="math notranslate nohighlight">\(\hat{c} = g(\mathbf{x}; \mathbf{\theta})\)</span>, then the predicted costs are used to solve the optimization problem.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.twostage.</span></span><span class="sig-name descname"><span class="pre">sklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmodel</span></span></em><span class="sig-paren">)</span></dt>
@@ -109,8 +108,8 @@
 </dl>
 </dd></dl>
 
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.twostage.sklearnPred</span></code> is a helper function to build multi-output regressor with scikit-learn.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.twostage.sklearnPred</span></code> is a helper function that wraps a scikit-learn estimator into a multi-output regressor.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
 <span class="c1"># model for shortest path</span>
 <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
@@ -124,7 +123,7 @@
 <span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">noise_width</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
 
 <span class="c1"># sklearn regressor</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearRegression</span>
 <span class="n">reg</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span> <span class="c1"># linear regression</span>
 
 <span class="c1"># build model</span>

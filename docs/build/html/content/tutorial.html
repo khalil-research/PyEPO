@@ -3,20 +3,20 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+  <title>Tutorial &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -52,14 +52,13 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/data.html">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/twostage.html">Two-stage Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/twostage.html">Two-Stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html">Auto Grad Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/training.html">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/evaluation.html">Evaluation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
 </ul>
@@ -105,17 +104,17 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/data.html#optdatasetknn">optDatasetKNN</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="examples/twostage.html">Two-stage Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/twostage.html">Two-Stage Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/function.html">Auto Grad Functions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#smart-predict-then-optimize-loss-spo">Smart Predict-then-Optimize+ Loss (SPO+)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#smart-predict-then-optimize-loss-spo">Smart Predict-then-Optimize Loss+ (SPO+)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#differentiable-black-box-optimizer-dbb">Differentiable Black-box Optimizer (DBB)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#negative-identity-backpropagation-nid">Negative Identity Backpropagation (NID)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#differentiable-perturbed-optimizer-dpo">Differentiable Perturbed Optimizer (DPO)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#perturbed-fenchel-young-loss-pyfl">Perturbed Fenchel-Young Loss (PYFL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#perturbed-fenchel-young-loss-pfyl">Perturbed Fenchel-Young Loss (PFYL)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#implicit-maximum-likelihood-estimator-i-mle">Implicit Maximum Likelihood Estimator (I-MLE)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#adaptive-implicit-maximum-likelihood-estimator-ai-mle">Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#noise-contrastive-estimation-nce">Noise Contrastive Estimation (NCE)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#contrastive-maximum-a-posterior-estimation-cmap">Contrastive Maximum A Posterior Estimation (CMAP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#contrastive-maximum-a-posteriori-estimation-cmap">Contrastive Maximum A Posteriori Estimation (CMAP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#learning-to-rank-ltr">Learning to Rank (LTR)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#perturbation-gradient-loss-pg">Perturbation Gradient Loss (PG)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#parallel-computation">Parallel Computation</a></li>
@@ -123,6 +122,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/pool.html">Solution Pool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/training.html">Training</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#common-setup">Common Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-spo">Training with SPO+</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-dbb">Training with DBB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-nid">Training with NID</a></li>

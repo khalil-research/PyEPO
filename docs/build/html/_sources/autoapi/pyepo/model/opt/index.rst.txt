@@ -25,13 +25,13 @@ Module Contents
    Bases: :py:obj:`abc.ABC`
 
 
-   This is an abstract class for optimization model
+   This is an abstract class for an optimization model
 
    .. attribute:: _model
 
-      Gurobi model
+      underlying solver model object
 
-      :type: GurobiPy model
+      :type: optimization model
 
 
    .. py:method:: __repr__()
@@ -39,14 +39,14 @@ Module Contents
 
    .. py:property:: num_cost
 
-      number of cost to be predicted
+      number of costs to be predicted
 
 
    .. py:method:: _getModel()
       :abstractmethod:
 
 
-      An abstract method to build a model from a optimization solver
+      An abstract method to build a model from an optimization solver
 
       :returns: optimization model and variables
       :rtype: tuple
@@ -57,7 +57,7 @@ Module Contents
       :abstractmethod:
 
 
-      An abstract method to set objective function
+      An abstract method to set the objective function
 
       :param c: cost of objective function
       :type c: ndarray
@@ -68,7 +68,7 @@ Module Contents
       :abstractmethod:
 
 
-      An abstract method to solve model
+      An abstract method to solve the model
 
       :returns: optimal solution (list) and objective value (float)
       :rtype: tuple
@@ -77,7 +77,7 @@ Module Contents
 
    .. py:method:: copy()
 
-      An abstract method to copy model
+      A method to copy the model
 
       :returns: new copied model
       :rtype: optModel
@@ -88,9 +88,9 @@ Module Contents
       :abstractmethod:
 
 
-      An abstract method to add new constraint
+      An abstract method to add a new constraint
 
-      :param coefs: coeffcients of new constraint
+      :param coefs: coefficients of the new constraint
       :type coefs: ndarray
       :param rhs: right-hand side of new constraint
       :type rhs: float
@@ -102,7 +102,7 @@ Module Contents
 
    .. py:method:: relax()
 
-      A unimplemented method to relax MIP model
+      An unimplemented method to relax the MIP model
 
 
 

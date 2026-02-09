@@ -9,6 +9,15 @@ pyepo.func.perturbed
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.perturbed._worker_model
+   pyepo.func.perturbed._worker_model_key
+
+
 Classes
 -------
 
@@ -44,11 +53,11 @@ Module Contents
 
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
-   use of the loss improves the algorithmic by the specific expression of the
+   use of the loss improves the algorithm by the specific expression of the
    gradients of the loss.
 
    For the perturbed optimizer, the cost vector needs to be predicted from
-   contextual data and are perturbed with Gaussian noise.
+   contextual data and is perturbed with Gaussian noise.
 
    Thus, it allows us to design an algorithm based on stochastic gradient
    descent.
@@ -69,9 +78,6 @@ Module Contents
    .. py:attribute:: rnd
 
 
-   .. py:attribute:: ptb
-
-
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -83,7 +89,7 @@ Module Contents
    Bases: :py:obj:`torch.autograd.Function`
 
 
-   A autograd function for perturbed optimizer
+   An autograd function for perturbed optimizer
 
 
    .. py:method:: forward(ctx, pred_cost, module)
@@ -116,14 +122,14 @@ Module Contents
 
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
-   use of the loss improves the algorithmic by the specific expression of the
+   use of the loss improves the algorithm by the specific expression of the
    gradients of the loss.
 
-   For the perturbed optimizer, the cost vector need to be predicted from
-   contextual data and are perturbed with Gaussian noise.
+   For the perturbed optimizer, the cost vector needs to be predicted from
+   contextual data and is perturbed with Gaussian noise.
 
-   The Fenchel-Young loss allows to directly optimize a loss between the features
-   and solutions with less computation. Thus, allows us to design an algorithm
+   The Fenchel-Young loss allows directly optimizing a loss between the features
+   and solutions with less computation. Thus, it allows us to design an algorithm
    based on stochastic gradient descent.
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
@@ -142,9 +148,6 @@ Module Contents
    .. py:attribute:: rnd
 
 
-   .. py:attribute:: pfy
-
-
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
@@ -156,7 +159,7 @@ Module Contents
    Bases: :py:obj:`torch.autograd.Function`
 
 
-   A autograd function for Fenchel-Young loss using perturbation techniques.
+   An autograd function for Fenchel-Young loss using perturbation techniques.
 
 
    .. py:method:: forward(ctx, pred_cost, true_sol, module)
@@ -185,20 +188,20 @@ Module Contents
 
 
 
-.. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, distribution=None, two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for Implicit Maximum Likelihood Estimator, which yield
+   An autograd module for Implicit Maximum Likelihood Estimator, which yields
    an optimal solution in a constrained exponential family distribution via
    Perturb-and-MAP.
 
    For I-MLE, it works as black-box combinatorial solvers, in which constraints
-   are known and fixed, but the cost vector need to be predicted from
+   are known and fixed, but the cost vector needs to be predicted from
    contextual data.
 
-   The I-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+   The I-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
    design an algorithm based on stochastic gradient descent.
 
    Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
@@ -220,14 +223,13 @@ Module Contents
 
 
    .. py:attribute:: distribution
+      :value: None
+
 
 
    .. py:attribute:: two_sides
       :value: False
 
-
-
-   .. py:attribute:: imle
 
 
    .. py:method:: forward(pred_cost)
@@ -241,7 +243,7 @@ Module Contents
    Bases: :py:obj:`torch.autograd.Function`
 
 
-   A autograd function for Implicit Maximum Likelihood Estimator
+   An autograd function for Implicit Maximum Likelihood Estimator
 
 
    .. py:method:: forward(ctx, pred_cost, module)
@@ -268,20 +270,20 @@ Module Contents
 
 
 
-.. py:class:: adaptiveImplicitMLE(optmodel, n_samples=10, sigma=1.0, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: adaptiveImplicitMLE(optmodel, n_samples=10, sigma=1.0, distribution=None, two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
    An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
-   adaptively choose hyperparameter λ and yield an optimal solution in a
+   adaptively chooses hyperparameter λ and yields an optimal solution in a
    constrained exponential family distribution via Perturb-and-MAP.
 
    For AI-MLE, it works as black-box combinatorial solvers, in which constraints
-   are known and fixed, but the cost vector need to be predicted from
+   are known and fixed, but the cost vector needs to be predicted from
    contextual data.
 
-   The AI-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+   The AI-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
    design an algorithm based on stochastic gradient descent.
 
    Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
@@ -298,6 +300,8 @@ Module Contents
 
 
    .. py:attribute:: distribution
+      :value: None
+
 
 
    .. py:attribute:: two_sides
@@ -320,9 +324,6 @@ Module Contents
 
 
 
-   .. py:attribute:: aimle
-
-
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -334,7 +335,7 @@ Module Contents
    Bases: :py:obj:`implicitMLEFunc`
 
 
-   A autograd function for Adaptive Implicit Maximum Likelihood Estimator
+   An autograd function for Adaptive Implicit Maximum Likelihood Estimator
 
 
    .. py:method:: backward(ctx, grad_output)
@@ -357,11 +358,19 @@ Module Contents
    A function to use solution pool in the forward/backward pass
 
 
+.. py:data:: _worker_model
+   :value: None
+
+
+.. py:data:: _worker_model_key
+   :value: None
+
+
 .. py:function:: _solveWithObj4Par(perturbed_costs, args, model_type)
 
    A global function to solve function in parallel processors
 
-   :param perturbed_costs: costsof objective function with perturbation
+   :param perturbed_costs: costs of objective function with perturbation
    :type perturbed_costs: np.ndarray
    :param args: optModel args
    :type args: dict

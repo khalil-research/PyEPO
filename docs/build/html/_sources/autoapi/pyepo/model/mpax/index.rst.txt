@@ -38,7 +38,7 @@ Package Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for MPAX-based optimization model
+   This is an abstract class for an MPAX-based optimization model
 
    .. attribute:: A
 
@@ -111,8 +111,6 @@ Package Contents
 
 
    .. py:attribute:: jitted_solve
-      :value: None
-
 
 
    .. py:attribute:: batch_optimize
@@ -123,12 +121,12 @@ Package Contents
 
    .. py:property:: num_cost
 
-      number of cost to be predicted
+      number of costs to be predicted
 
 
    .. py:method:: setObj(c)
 
-      A method to set objective function
+      A method to set the objective function
 
       :param c: cost of objective function
       :type c: np.ndarray / list
@@ -137,7 +135,7 @@ Package Contents
 
    .. py:method:: solve()
 
-      A method to solve model
+      A method to solve the model
 
       :returns: optimal solution (list) and objective value (jnp.float32)
       :rtype: tuple
@@ -148,13 +146,13 @@ Package Contents
       :staticmethod:
 
 
-      A static method for JIT complile
+      A static method for JIT compile
 
 
 
    .. py:method:: copy()
 
-      A method to copy model
+      A method to copy the model
 
       :returns: new copied model
       :rtype: optModel
@@ -163,9 +161,9 @@ Package Contents
 
    .. py:method:: addConstr(coefs, rhs)
 
-      A method to add new constraint
+      A method to add a new constraint
 
-      :param coefs: coeffcients of new constraint
+      :param coefs: coefficients of new constraint
       :type coefs: np.ndarray / list
       :param rhs: right-hand side of new constraint
       :type rhs: jnp.float32
@@ -186,7 +184,7 @@ Package Contents
    Bases: :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
 
 
-   This class is optimization model for shortest path problem
+   This class is an optimization model for the shortest path problem
 
    .. attribute:: grid
 
@@ -235,13 +233,11 @@ Package Contents
    Bases: :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
 
 
-   This class is optimization model for relexed knapsack problem
+   This class is an optimization model for the relaxed knapsack problem
 
    .. attribute:: _model
 
-      Gurobi model
-
-      :type: GurobiPy model
+      MPAX model
 
    .. attribute:: weights
 
@@ -253,7 +249,7 @@ Package Contents
 
       Total capacity
 
-      :type: np.ndarray / listy
+      :type: np.ndarray / list
 
    .. attribute:: items
 

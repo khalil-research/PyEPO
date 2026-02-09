@@ -27,7 +27,7 @@ Module Contents
 
    :param predmodel: a regression neural network for cost prediction
    :type predmodel: nn
-   :param optmodel: an PyEPO optimization model
+   :param optmodel: a PyEPO optimization model
    :type optmodel: optModel
    :param dataloader: Torch dataloader from optDataSet
    :type dataloader: DataLoader
@@ -49,7 +49,7 @@ Module Contents
    :param true_obj: true optimal objective values
    :type true_obj: torch.tensor
 
-   Returns:predmodel
-       float: true regret losses
+   :returns: true regret losses
+   :rtype: float
 
 
