@@ -63,7 +63,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#noise-contrastive-estimation-nce">Noise Contrastive Estimation (NCE)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contrastive-maximum-a-posteriori-estimation-cmap">Contrastive Maximum A Posteriori Estimation (CMAP)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#learning-to-rank-ltr">Learning to Rank (LTR)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#perturbation-gradient-loss-pg">Perturbation Gradient Loss (PG)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#perturbation-gradient-pg">Perturbation Gradient (PG)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#parallel-computation">Parallel Computation</a></li>
 </ul>
 </li>
@@ -439,9 +439,9 @@ descent.</p>
 </pre></div>
 </div>
 </section>
-<section id="perturbation-gradient-loss-pg">
-<h2>Perturbation Gradient Loss (PG)<a class="headerlink" href="#perturbation-gradient-loss-pg" title="Link to this heading"></a></h2>
-<p>PG Loss function <a class="footnote-reference brackets" href="#f9" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>  a surrogate loss function of objective value, which measures the decision quality of the optimization problem. For PG Loss, the objective function is linear, and constraints are known and fixed, but the cost vector needs to be predicted from contextual data. According to Danskin’s Theorem, the PG Loss is derived from different zeroth order approximations and has the informative gradient. Thus, it allows us to design an algorithm based on stochastic gradient descent.</p>
+<section id="perturbation-gradient-pg">
+<h2>Perturbation Gradient (PG)<a class="headerlink" href="#perturbation-gradient-pg" title="Link to this heading"></a></h2>
+<p>PG <a class="footnote-reference brackets" href="#f9" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> is a surrogate loss based on zeroth-order gradient approximation via Danskin’s Theorem. It uses finite differences along the true cost direction to estimate informative gradients through the optimization solver.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">perturbationGradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_sides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
@@ -462,7 +462,7 @@ design an algorithm based on stochastic gradient descent.</p>
 
 </dd></dl>
 
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.func.perturbationGradient</span></code> supports to solve optimization problems in parallel, parameter <code class="docutils literal notranslate"><span class="pre">processes</span></code> is the number of processors, <strong>0 for using all available cores</strong>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.func.perturbationGradient</span></code> supports parallel computation (<strong>0 uses all available cores</strong>). <code class="docutils literal notranslate"><span class="pre">sigma</span></code> controls the finite difference width. <code class="docutils literal notranslate"><span class="pre">two_sides</span></code> enables central differencing for more accurate gradient estimates.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
 <span class="n">pg</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbationGradient</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -513,7 +513,7 @@ design an algorithm based on stochastic gradient descent.</p>
 </aside>
 <aside class="footnote brackets" id="f9" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">9</a><span class="fn-bracket">]</span></span>
-<p>Gupta, V., &amp; Huang, M. (2024). Decision-Focused Learning with Directional Gradients. Training, 50(100), 150.</p>
+<p>Gupta, V., &amp; Huang, M. (2024). Decision-Focused Learning with Directional Gradients. arXiv preprint arXiv:2402.03256.</p>
 </aside>
 </aside>
 </section>
