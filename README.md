@@ -4,8 +4,6 @@
 ![GitHub Release](https://img.shields.io/github/v/release/khalil-research/PyEPO)
 [![PyPI version](https://badge.fury.io/py/pyepo.svg)](https://badge.fury.io/py/pyepo)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/pyepo)
-![Conda Version](https://img.shields.io/conda/v/pyepo/pyepo)
-![Conda Downloads](https://img.shields.io/conda/dn/pyepo/pyepo)
 
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
 
@@ -97,7 +95,7 @@ The package is now available for installation on [PyPI](https://pypi.org/project
 pip install pyepo
 ```
 
-### Conda Install
+### Conda Install （**Archived**）
 
 `PyEPO` is also available on [Anaconda Cloud](https://anaconda.org/pyepo/pyepo). If you prefer to use conda for installation, you can install `PyEPO` with the following command:
 

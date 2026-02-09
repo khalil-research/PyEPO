@@ -17,7 +17,7 @@ from pyepo.model.grb.grbmodel import optGrbModel
 
 class portfolioModel(optGrbModel):
     """
-    This class is an optimization model for portfolio problem
+    This class is an optimization model for the portfolio problem
 
     Attributes:
         _model (GurobiPy model): Gurobi model
@@ -42,6 +42,9 @@ class portfolioModel(optGrbModel):
         """
         A method to calculate the risk level
 
+        Args:
+            gamma (float): risk level parameter
+
         Returns:
             float: risk level
         """
@@ -55,9 +58,9 @@ class portfolioModel(optGrbModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("portfolio")
-        # varibles
+        # variables
         x = m.addMVar(self.num_assets, ub=1, name="x")
         # sense
         m.modelSense = GRB.MAXIMIZE

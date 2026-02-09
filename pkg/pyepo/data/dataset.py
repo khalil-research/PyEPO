@@ -4,24 +4,20 @@
 optDataset class based on PyTorch Dataset
 """
 
-import time
-
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
 from pyepo.model.opt import optModel
-
-import random
 from scipy.spatial import distance
 
 class optDataset(Dataset):
     """
-    This class is Torch Dataset for optimization problems.
+    This class is a Torch Dataset for optimization problems.
 
     Attributes:
-        model (optModel): Optimization models
+        model (optModel): Optimization model
         feats (np.ndarray): Data features
         costs (np.ndarray): Cost vectors
         sols (np.ndarray): Optimal solutions
@@ -30,7 +26,7 @@ class optDataset(Dataset):
 
     def __init__(self, model, feats, costs):
         """
-        A method to create a optDataset from optModel
+        A method to create an optDataset from optModel
 
         Args:
             model (optModel): an instance of optModel
@@ -44,7 +40,12 @@ class optDataset(Dataset):
         self.feats = feats
         self.costs = costs
         # find optimal solutions
-        self.sols, self.objs = self._getSols()
+        sols, objs = self._getSols()
+        # pre-convert to tensors (on CPU) to avoid repeated numpy→tensor copies
+        self.feats = torch.as_tensor(feats, dtype=torch.float32)
+        self.costs = torch.as_tensor(costs, dtype=torch.float32)
+        self.sols = torch.as_tensor(sols, dtype=torch.float32)
+        self.objs = torch.as_tensor(objs, dtype=torch.float32)
 
     def _getSols(self):
         """
@@ -52,15 +53,14 @@ class optDataset(Dataset):
         """
         sols = []
         objs = []
-        print("Optimizing for optDataset...")
-        time.sleep(1)
+        print("\nOptimizing for optDataset...", flush=True)
         for c in tqdm(self.costs):
             try:
                 sol, obj = self._solve(c)
                 # to numpy
                 if isinstance(sol, torch.Tensor):
                     sol = sol.detach().cpu().numpy()
-            except:
+            except Exception:
                 raise ValueError(
                     "For optModel, the method 'solve' should return solution vector and objective value."
                 )
@@ -102,21 +102,21 @@ class optDataset(Dataset):
             tuple: data features (torch.tensor), costs (torch.tensor), optimal solutions (torch.tensor) and objective values (torch.tensor)
         """
         return (
-            torch.FloatTensor(self.feats[index]),
-            torch.FloatTensor(self.costs[index]),
-            torch.FloatTensor(self.sols[index]),
-            torch.FloatTensor(self.objs[index]),
+            self.feats[index],
+            self.costs[index],
+            self.sols[index],
+            self.objs[index],
         )
 
 
 class optDatasetKNN(optDataset):
     """
-    This class is Torch Dataset for optimization problems, when using the robust kNN-loss.
+    This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.
 
     Reference: <https://arxiv.org/abs/2310.04328>
 
     Attributes:
-        model (optModel): Optimization models
+        model (optModel): Optimization model
         k (int): number of nearest neighbours selected
         weight (float): weight of kNN-loss
         feats (np.ndarray): Data features
@@ -126,7 +126,7 @@ class optDatasetKNN(optDataset):
     """
     def __init__(self, model, feats, costs, k=10, weight=0.5):
         """
-        A method to create a optDataset from optModel
+        A method to create an optDataset from optModel
 
         Args:
             model (optModel): an instance of optModel
@@ -145,7 +145,12 @@ class optDatasetKNN(optDataset):
         self.feats = feats
         self.costs = costs
         # find optimal solutions
-        self.sols, self.objs = self._getSols()
+        sols, objs = self._getSols()
+        # pre-convert to tensors (on CPU) to avoid repeated numpy→tensor copies
+        self.feats = torch.as_tensor(self.feats, dtype=torch.float32)
+        self.costs = torch.as_tensor(self.costs, dtype=torch.float32)
+        self.sols = torch.as_tensor(sols, dtype=torch.float32)
+        self.objs = torch.as_tensor(objs, dtype=torch.float32)
 
     def _getSols(self):
         """
@@ -153,8 +158,7 @@ class optDatasetKNN(optDataset):
         """
         sols = []
         objs = []
-        print("Optimizing for optDataset...")
-        time.sleep(1)
+        print("\nOptimizing for optDataset...", flush=True)
         # get kNN costs
         costs_knn = self._getKNN()
         # solve optimization
@@ -164,7 +168,7 @@ class optDatasetKNN(optDataset):
             for i, c in enumerate(c_knn.T):
                 try:
                     sol_i, obj_i = self._solve(c)
-                except:
+                except Exception:
                     raise ValueError(
                         "For optModel, the method 'solve' should return solution vector and objective value."
                     )
@@ -183,14 +187,11 @@ class optDatasetKNN(optDataset):
         """
         A method to get kNN costs
         """
-        # init costs
-        costs_knn = np.zeros((*self.costs.shape, self.k))
         # calculate distances between features
         distances = distance.cdist(self.feats, self.feats, "euclidean")
         indexes = np.argpartition(distances, self.k, axis=1)[:, :self.k]
-        # get neighbours costs
-        for i, knns in enumerate(indexes):
-            # interpolation weight
-            costs_knn[i] = self.weight * self.costs[i].reshape((-1, 1)) \
-                         + (1 - self.weight) * self.costs[knns].T
+        # vectorized interpolation: (n, num_cost, 1) + (n, num_cost, k)
+        neighbours = self.costs[indexes]  # (n, k, num_cost)
+        costs_knn = self.weight * self.costs[:, :, np.newaxis] \
+                  + (1 - self.weight) * neighbours.transpose(0, 2, 1)
         return costs_knn

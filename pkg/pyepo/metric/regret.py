@@ -15,7 +15,7 @@ def regret(predmodel, optmodel, dataloader):
 
     Args:
         predmodel (nn): a regression neural network for cost prediction
-        optmodel (optModel): an PyEPO optimization model
+        optmodel (optModel): a PyEPO optimization model
         dataloader (DataLoader): Torch dataloader from optDataSet
 
     Returns:
@@ -25,20 +25,21 @@ def regret(predmodel, optmodel, dataloader):
     predmodel.eval()
     loss = 0
     optsum = 0
+    # get device
+    device = next(predmodel.parameters()).device
     # load data
     for data in dataloader:
         x, c, w, z = data
-        # cuda
-        if next(predmodel.parameters()).is_cuda:
-            x, c, w, z = x.cuda(), c.cuda(), w.cuda(), z.cuda()
+        x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
         # predict
-        with torch.no_grad(): # no grad
-            cp = predmodel(x).to("cpu").detach().numpy()
+        with torch.no_grad():
+            cp = predmodel(x).cpu().numpy()
+        # batch convert to numpy
+        c_np = c.cpu().numpy()
         # solve
         for j in range(cp.shape[0]):
             # accumulate loss
-            loss += calRegret(optmodel, cp[j], c[j].to("cpu").detach().numpy(),
-                              z[j].item())
+            loss += calRegret(optmodel, cp[j], c_np[j], z[j].item())
         optsum += abs(z).sum().item()
     # turn back train mode
     predmodel.train()
@@ -56,7 +57,7 @@ def calRegret(optmodel, pred_cost, true_cost, true_obj):
         true_cost (torch.tensor): true costs
         true_obj (torch.tensor): true optimal objective values
 
-    Returns:predmodel
+    Returns:
         float: true regret losses
     """
     # opt sol for pred cost
@@ -70,6 +71,8 @@ def calRegret(optmodel, pred_cost, true_cost, true_obj):
     # loss
     if optmodel.modelSense == EPO.MINIMIZE:
         loss = obj - true_obj
-    if optmodel.modelSense == EPO.MAXIMIZE:
+    elif optmodel.modelSense == EPO.MAXIMIZE:
         loss = true_obj - obj
+    else:
+        raise ValueError("Invalid modelSense.")
     return loss

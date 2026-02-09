@@ -7,17 +7,17 @@ long_description = "``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize To
 
 setuptools.setup(
     # includes all other files
-    include_package_data=True,
+    include_package_data = True,
     # package name
     name = "pyepo",
     # project dir
     packages = setuptools.find_packages(),
     # description
     description = "PyTorch-based End-to-End Predict-then-Optimize Tool",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description = long_description,
+    long_description_content_type = "text/markdown",
     # version
-    version = "1.0.0",
+    version = "1.0.4",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
@@ -25,7 +25,7 @@ setuptools.setup(
     # mail address
     author_email = "bolucas.tang@mail.utoronto.ca",
     # restrict Python version
-    python_requires=">=3.7",
+    python_requires = ">=3.7",
     # dependencies
     install_requires = [
         "numpy",
@@ -35,12 +35,12 @@ setuptools.setup(
         "configspace",
         "scikit_learn",
         "torch>=1.13.1"],
-    extras_require={
+    extras_require = {
         "pyomo": ["pyomo>=6.1.2"],
         "gurobi": ["gurobipy>=9.1.2"],
         "all": ["pyomo>=6.1.2", "gurobipy>=9.1.2"],
     },
-   # classifiers
+    # classifiers
     classifiers = [
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent"]

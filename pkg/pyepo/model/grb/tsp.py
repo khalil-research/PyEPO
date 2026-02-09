@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Traveling salesman probelm
+Traveling salesman problem
 """
 
 from collections import defaultdict
@@ -37,7 +37,7 @@ class unionFind:
 
 class tspABModel(optGrbModel):
     """
-    This abstract class is optimization model for traveling salesman problem.
+    This abstract class is an optimization model for the traveling salesman problem.
     This model is for further implementation of different formulation.
 
     Attributes:
@@ -104,7 +104,7 @@ class tspABModel(optGrbModel):
 
 class tspGGModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.
+    This class is an optimization model for the traveling salesman problem based on Gavish–Graves (GG) formulation.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
@@ -119,9 +119,9 @@ class tspGGModel(tspABModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
-        # varibles
+        # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
         y = m.addVars(directed_edges, name="y")
@@ -141,13 +141,13 @@ class tspGGModel(tspABModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (list): cost vector
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
                           for k, (i,j) in enumerate(self.edges))
         self._model.setObjective(obj)
@@ -169,14 +169,14 @@ class tspGGModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coeffcients of new constraint
+            coefs (ndarray): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint
@@ -211,11 +211,11 @@ class tspGGModelRel(tspGGModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", ub=1)
         y = m.addVars(directed_edges, name="y")
@@ -262,7 +262,7 @@ class tspGGModelRel(tspGGModel):
 
 class tspDFJModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+    This class is an optimization model for the traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
     constraint generation.
 
     Attributes:
@@ -278,11 +278,11 @@ class tspDFJModel(tspABModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:
             x[j, i] = x[i, j]
@@ -320,13 +320,13 @@ class tspDFJModel(tspABModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (list): cost vector
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.edges))
         self._model.setObjective(obj)
 
@@ -347,14 +347,14 @@ class tspDFJModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coeffcients of new constraint
+            coefs (ndarray): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint
@@ -366,7 +366,7 @@ class tspDFJModel(tspABModel):
 
 class tspMTZModel(tspABModel):
     """
-    This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
+    This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
@@ -380,11 +380,11 @@ class tspMTZModel(tspABModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
         u = m.addVars(self.nodes, name="u")
@@ -401,13 +401,13 @@ class tspMTZModel(tspABModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (list): cost vector
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
                           for k, (i,j) in enumerate(self.edges))
         self._model.setObjective(obj)
@@ -429,14 +429,14 @@ class tspMTZModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coeffcients of new constraint
+            coefs (ndarray): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint
@@ -471,11 +471,11 @@ class tspMTZModelRel(tspMTZModel):
         Returns:
             tuple: optimization model and variables
         """
-        # ceate a model
+        # create a model
         m = gp.Model("tsp")
         # turn off output
         m.Params.outputFlag = 0
-        # varibles
+        # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", ub=1)
         u = m.addVars(self.nodes, name="u")

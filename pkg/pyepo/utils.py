@@ -14,7 +14,7 @@ def getArgs(model):
     Args:
         model (optModel): optimization model
 
-    Return:
+    Returns:
         dict: model args
     """
     for mem in inspect.getmembers(model):

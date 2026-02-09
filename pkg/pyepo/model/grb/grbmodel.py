@@ -22,23 +22,25 @@ from pyepo.model.opt import optModel
 
 class optGrbModel(optModel):
     """
-    This is an abstract class for Gurobi-based optimization model
+    This is an abstract class for a Gurobi-based optimization model
 
     Attributes:
         _model (GurobiPy model): Gurobi model
     """
 
     def __init__(self):
-        super().__init__()
         # error
         if not _HAS_GUROBI:
             raise ImportError("Gurobi is not installed. Please install gurobipy to use this feature.")
+        super().__init__()
         # model sense
         self._model.update()
         if self._model.modelSense == GRB.MINIMIZE:
             self.modelSense = EPO.MINIMIZE
-        if self._model.modelSense == GRB.MAXIMIZE:
+        elif self._model.modelSense == GRB.MAXIMIZE:
             self.modelSense = EPO.MAXIMIZE
+        else:
+            raise ValueError("Invalid modelSense.")
         # turn off output
         self._model.Params.outputFlag = 0
 
@@ -48,19 +50,19 @@ class optGrbModel(optModel):
     @property
     def num_cost(self):
         """
-        number of cost to be predicted
+        number of costs to be predicted
         """
         return self.x.size if isinstance(self.x, gp.MVar) else len(self.x)
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (np.ndarray / list): cost of objective function
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):
             c = c.detach().cpu().numpy()
@@ -76,7 +78,7 @@ class optGrbModel(optModel):
 
     def solve(self):
         """
-        A method to solve model
+        A method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (float)
@@ -94,7 +96,7 @@ class optGrbModel(optModel):
 
     def copy(self):
         """
-        A method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -111,17 +113,17 @@ class optGrbModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        A method to add new constraint
+        A method to add a new constraint
 
         Args:
-            coefs (np.ndarray / list): coeffcients of new constraint
+            coefs (np.ndarray / list): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint

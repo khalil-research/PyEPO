@@ -6,11 +6,15 @@ Abstract optimization model based on Pyomo
 
 from copy import copy
 
+import numpy as np
+import torch
+
+from pyepo import EPO
+from pyepo.model.opt import optModel
+
 try:
     from pyomo import opt as po
     from pyomo import environ as pe
-    from pyepo import EPO
-    from pyepo.model.opt import optModel
     _HAS_PYOMO = True
 except ImportError:
     _HAS_PYOMO = False
@@ -18,10 +22,10 @@ except ImportError:
 
 class optOmoModel(optModel):
     """
-    This is an abstract class for Pyomo-based optimization model
+    This is an abstract class for a Pyomo-based optimization model
 
     Attributes:
-        _model (PyOmo model): Pyomo model
+        _model (Pyomo model): Pyomo model
         solver (str): optimization solver in the background
     """
 
@@ -30,18 +34,19 @@ class optOmoModel(optModel):
         Args:
             solver (str): optimization solver in the background
         """
-        super().__init__()
         # error
         if not _HAS_PYOMO:
             raise ImportError("Pyomo is not installed. Please install pyomo to use this feature.")
+        super().__init__()
         # init obj
         if self.modelSense == EPO.MINIMIZE:
             self._model.obj = pe.Objective(sense=pe.minimize, expr=0)
-        if self.modelSense == EPO.MAXIMIZE:
+        elif self.modelSense == EPO.MAXIMIZE:
             self._model.obj = pe.Objective(sense=pe.maximize, expr=0)
+        else:
+            raise ValueError("Invalid modelSense.")
         # set solver
         self.solver = solver
-        print("Solver in the background: {}".format(self.solver))
         if self.solver == "gurobi":
             self._solverfac = po.SolverFactory(self.solver, solver_io="python")
         else:
@@ -52,13 +57,13 @@ class optOmoModel(optModel):
 
     def setObj(self, c):
         """
-        A method to set objective function
+        A method to set the objective function
 
         Args:
             c (np.ndarray / list): cost of objective function
         """
         if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector cannot match vars.")
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):
             c = c.detach().cpu().numpy()
@@ -70,12 +75,14 @@ class optOmoModel(optModel):
         obj = sum(c[i] * self.x[k] for i, k in enumerate(self.x))
         if self.modelSense == EPO.MINIMIZE:
             self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
-        if self.modelSense == EPO.MAXIMIZE:
+        elif self.modelSense == EPO.MAXIMIZE:
             self._model.obj = pe.Objective(sense=pe.maximize, expr=obj)
+        else:
+            raise ValueError("Invalid modelSense.")
 
     def solve(self):
         """
-        A method to solve model
+        A method to solve the model
 
         Returns:
             tuple: optimal solution (list) and objective value (float)
@@ -86,7 +93,7 @@ class optOmoModel(optModel):
 
     def copy(self):
         """
-        A method to copy model
+        A method to copy the model
 
         Returns:
             optModel: new copied model
@@ -100,17 +107,17 @@ class optOmoModel(optModel):
 
     def addConstr(self, coefs, rhs):
         """
-        A method to add new constraint
+        A method to add a new constraint
 
         Args:
-            coefs (np.ndarray / list): coeffcients of new constraint
+            coefs (np.ndarray / list): coefficients of new constraint
             rhs (float): right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
         """
         if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector cannot cost.")
+            raise ValueError("Size of coef vector does not match number of cost variables.")
         # copy
         new_model = self.copy()
         # add constraint

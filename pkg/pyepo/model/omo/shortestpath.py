@@ -4,9 +4,10 @@
 Shortest path problem
 """
 
+from pyepo.model.omo.omomodel import optOmoModel
+
 try:
     from pyomo import environ as pe
-    from pyepo.model.omo.omomodel import optOmoModel
     _HAS_PYOMO = True
 except ImportError:
     _HAS_PYOMO = False
@@ -14,10 +15,10 @@ except ImportError:
 
 class shortestPathModel(optOmoModel):
     """
-    This class is optimization model for shortest path problem
+    This class is an optimization model for the shortest path problem
 
     Attributes:
-        _model (PyOmo model): Pyomo model
+        _model (Pyomo model): Pyomo model
         solver (str): optimization solver in the background
         grid (tuple of int): size of grid network
         arcs (list): list of arcs
@@ -42,11 +43,11 @@ class shortestPathModel(optOmoModel):
         """
         arcs = []
         for i in range(self.grid[0]):
-            # edges on rows
+            # edges along rows
             for j in range(self.grid[1] - 1):
                 v = i * self.grid[1] + j
                 arcs.append((v, v + 1))
-            # edges in columns
+            # edges along columns
             if i == self.grid[0] - 1:
                 continue
             for j in range(self.grid[1]):
@@ -56,20 +57,20 @@ class shortestPathModel(optOmoModel):
 
     def _getModel(self):
         """
-        A method to build pyomo model
+        A method to build Pyomo model
         """
-        # ceate a model
+        # create a model
         m = pe.ConcreteModel("shortest path")
         # parameters
         m.arcs = pe.Set(initialize=self.arcs)
-        # varibles
+        # variables
         x = pe.Var(m.arcs, domain=pe.PositiveReals, bounds=(0,1))
         m.x = x
         # constraints
         m.cons = pe.ConstraintList()
         for i in range(self.grid[0]):
             for j in range(self.grid[1]):
-                v = v = i * self.grid[1] + j
+                v = i * self.grid[1] + j
                 expr = 0
                 for e in self.arcs:
                     # flow in

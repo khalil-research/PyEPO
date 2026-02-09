@@ -11,13 +11,11 @@ from torch.autograd import Function
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.model.mpax import optMpaxModel
-from pyepo.utlis import getArgs
-from pyepo.func.utlis import sumGammaDistribution
+from pyepo.utils import getArgs
+from pyepo.func.utils import sumGammaDistribution
 
 try:
     import jax
-    from jax import numpy as jnp
-    from mpax import create_lp, r2HPDHG
 except ImportError:
     pass
 
@@ -25,11 +23,11 @@ except ImportError:
 class perturbedOpt(optModule):
     """
     An autograd module for Fenchel-Young loss using perturbation techniques. The
-    use of the loss improves the algorithmic by the specific expression of the
+    use of the loss improves the algorithm by the specific expression of the
     gradients of the loss.
 
     For the perturbed optimizer, the cost vector needs to be predicted from
-    contextual data and are perturbed with Gaussian noise.
+    contextual data and is perturbed with Gaussian noise.
 
     Thus, it allows us to design an algorithm based on stochastic gradient
     descent.
@@ -41,7 +39,7 @@ class perturbedOpt(optModule):
                  seed=135, solve_ratio=1, dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
@@ -56,20 +54,18 @@ class perturbedOpt(optModule):
         self.sigma = sigma
         # random state
         self.rnd = np.random.RandomState(seed)
-        # build optimizer
-        self.ptb = perturbedOptFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.ptb.apply(pred_cost, self)
+        sols = perturbedOptFunc.apply(pred_cost, self)
         return sols
 
 
 class perturbedOptFunc(Function):
     """
-    A autograd function for perturbed optimizer
+    An autograd function for perturbed optimizer
     """
 
     @staticmethod
@@ -86,7 +82,7 @@ class perturbedOptFunc(Function):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         # sample perturbations
         noises = module.rnd.normal(0, 1, size=(module.n_samples, *cp.shape))
@@ -123,14 +119,14 @@ class perturbedOptFunc(Function):
 class perturbedFenchelYoung(optModule):
     """
     An autograd module for Fenchel-Young loss using perturbation techniques. The
-    use of the loss improves the algorithmic by the specific expression of the
+    use of the loss improves the algorithm by the specific expression of the
     gradients of the loss.
 
-    For the perturbed optimizer, the cost vector need to be predicted from
-    contextual data and are perturbed with Gaussian noise.
+    For the perturbed optimizer, the cost vector needs to be predicted from
+    contextual data and is perturbed with Gaussian noise.
 
-    The Fenchel-Young loss allows to directly optimize a loss between the features
-    and solutions with less computation. Thus, allows us to design an algorithm
+    The Fenchel-Young loss allows directly optimizing a loss between the features
+    and solutions with less computation. Thus, it allows us to design an algorithm
     based on stochastic gradient descent.
 
     Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
@@ -140,7 +136,7 @@ class perturbedFenchelYoung(optModule):
                  seed=135, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): the amplitude of the perturbation
             processes (int): number of processors, 1 for single-core, 0 for all of cores
@@ -156,14 +152,12 @@ class perturbedFenchelYoung(optModule):
         self.sigma = sigma
         # random state
         self.rnd = np.random.RandomState(seed)
-        # build optimizer
-        self.pfy = perturbedFenchelYoungFunc()
 
     def forward(self, pred_cost, true_sol):
         """
         Forward pass
         """
-        loss = self.pfy.apply(pred_cost, true_sol, self)
+        loss = perturbedFenchelYoungFunc.apply(pred_cost, true_sol, self)
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)
@@ -178,7 +172,7 @@ class perturbedFenchelYoung(optModule):
 
 class perturbedFenchelYoungFunc(Function):
     """
-    A autograd function for Fenchel-Young loss using perturbation techniques.
+    An autograd function for Fenchel-Young loss using perturbation techniques.
     """
 
     @staticmethod
@@ -196,7 +190,7 @@ class perturbedFenchelYoungFunc(Function):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         w = true_sol.detach()
         # sample perturbations
@@ -232,29 +226,29 @@ class perturbedFenchelYoungFunc(Function):
 
 class implicitMLE(optModule):
     """
-    An autograd module for Implicit Maximum Likelihood Estimator, which yield
+    An autograd module for Implicit Maximum Likelihood Estimator, which yields
     an optimal solution in a constrained exponential family distribution via
     Perturb-and-MAP.
 
     For I-MLE, it works as black-box combinatorial solvers, in which constraints
-    are known and fixed, but the cost vector need to be predicted from
+    are known and fixed, but the cost vector needs to be predicted from
     contextual data.
 
-    The I-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+    The I-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
     design an algorithm based on stochastic gradient descent.
 
     Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
     """
 
     def __init__(self, optmodel, n_samples=10, sigma=1.0, lambd=10,
-                 distribution=sumGammaDistribution(kappa=5), two_sides=False,
+                 distribution=None, two_sides=False,
                  processes=1, solve_ratio=1, dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): noise temperature for the input distribution
-            lambd (float): a hyperparameter for differentiable block-box to control interpolation degree
+            lambd (float): a hyperparameter for differentiable black-box to control interpolation degree
             distribution (distribution): noise distribution
             two_sides (bool): approximate gradient by two-sided perturbation or not
             processes (int): number of processors, 1 for single-core, 0 for all of cores
@@ -271,23 +265,23 @@ class implicitMLE(optModule):
             raise ValueError("lambda is not positive.")
         self.lambd = lambd
         # noise distribution
+        if distribution is None:
+            distribution = sumGammaDistribution(kappa=5)
         self.distribution = distribution
         # symmetric perturbation
         self.two_sides = two_sides
-        # build I-LME
-        self.imle = implicitMLEFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.imle.apply(pred_cost, self)
+        sols = implicitMLEFunc.apply(pred_cost, self)
         return sols
 
 
 class implicitMLEFunc(Function):
     """
-    A autograd function for Implicit Maximum Likelihood Estimator
+    An autograd function for Implicit Maximum Likelihood Estimator
     """
 
     @staticmethod
@@ -304,7 +298,7 @@ class implicitMLEFunc(Function):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         # sample perturbations
         noises = module.distribution.sample(size=(module.n_samples, *cp.shape))
@@ -333,16 +327,16 @@ class implicitMLEFunc(Function):
         module = ctx.module
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         dl = grad_output.detach()
         # positive perturbed costs
-        ptb_cp_pos = cp + module.lambd * dl + noises
+        ptb_cp_pos = cp + module.lambd * dl + module.sigma * noises
         # solve with perturbation
         ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
         if module.two_sides:
             # negative perturbed costs
-            ptb_cp_neg = cp - module.lambd * dl + noises
+            ptb_cp_neg = cp - module.lambd * dl + module.sigma * noises
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
             # get two-side gradient
@@ -350,31 +344,31 @@ class implicitMLEFunc(Function):
         else:
             # get single side gradient
             grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / module.lambd
-        return grad, None, None
+        return grad, None
 
 
 class adaptiveImplicitMLE(optModule):
     """
     An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
-    adaptively choose hyperparameter λ and yield an optimal solution in a
+    adaptively chooses hyperparameter λ and yields an optimal solution in a
     constrained exponential family distribution via Perturb-and-MAP.
 
     For AI-MLE, it works as black-box combinatorial solvers, in which constraints
-    are known and fixed, but the cost vector need to be predicted from
+    are known and fixed, but the cost vector needs to be predicted from
     contextual data.
 
-    The AI-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+    The AI-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
     design an algorithm based on stochastic gradient descent.
 
     Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
     """
 
     def __init__(self, optmodel, n_samples=10, sigma=1.0,
-                 distribution=sumGammaDistribution(kappa=5), two_sides=False,
+                 distribution=None, two_sides=False,
                  processes=1, solve_ratio=1, dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             n_samples (int): number of Monte-Carlo samples
             sigma (float): noise temperature for the input distribution
             distribution (distribution): noise distribution
@@ -389,6 +383,8 @@ class adaptiveImplicitMLE(optModule):
         # noise temperature
         self.sigma = sigma
         # noise distribution
+        if distribution is None:
+            distribution = sumGammaDistribution(kappa=5)
         self.distribution = distribution
         # symmetric perturbation
         self.two_sides = two_sides
@@ -396,20 +392,18 @@ class adaptiveImplicitMLE(optModule):
         self.alpha = 0 # adaptive magnitude α
         self.grad_norm_avg = 1 # gradient norm estimate
         self.step = 1e-3 # update step for α
-        # build I-LME
-        self.aimle = adaptiveImplicitMLEFunc()
 
     def forward(self, pred_cost):
         """
         Forward pass
         """
-        sols = self.aimle.apply(pred_cost, self)
+        sols = adaptiveImplicitMLEFunc.apply(pred_cost, self)
         return sols
 
 
 class adaptiveImplicitMLEFunc(implicitMLEFunc):
     """
-    A autograd function for Adaptive Implicit Maximum Likelihood Estimator
+    An autograd function for Adaptive Implicit Maximum Likelihood Estimator
     """
     @staticmethod
     def backward(ctx, grad_output):
@@ -422,18 +416,18 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         module = ctx.module
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         dl = grad_output.detach()
         # calculate λ
         lambd = module.alpha * torch.norm(cp) / torch.norm(dl)
         # positive perturbed costs
-        ptb_cp_pos = cp + lambd * dl + noises
+        ptb_cp_pos = cp + lambd * dl + module.sigma * noises
         # solve with perturbation
         ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
         if module.two_sides:
             # negative perturbed costs
-            ptb_cp_neg = cp - lambd * dl + noises
+            ptb_cp_neg = cp - lambd * dl + module.sigma * noises
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
             # get two-side gradient
@@ -449,7 +443,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             module.alpha += module.step
         else:
             module.alpha -= module.step
-        return grad, None, None
+        return grad, None
 
 
 def _solve_or_cache(ptb_c, module):
@@ -462,6 +456,9 @@ def _solve_or_cache(ptb_c, module):
             module._update_solution_pool(sols)
     # best cached solution
     else:
+        # move solpool to the correct device
+        if module.solpool.device != ptb_c.device:
+            module.solpool = module.solpool.to(ptb_c.device)
         ptb_sols = _cache_in_pass(ptb_c, module.optmodel, module.solpool)
     return ptb_sols
 
@@ -517,9 +514,6 @@ def _cache_in_pass(ptb_c, optmodel, solpool):
     """
     # get device
     device = ptb_c.device
-    # solpool is on the same device
-    if solpool.device != device:
-        solpool = solpool.to(device)
     # compute objective values for all perturbations
     solpool_obj = torch.einsum("nbd,sd->bns", ptb_c, solpool)
     # best solution in pool
@@ -533,20 +527,29 @@ def _cache_in_pass(ptb_c, optmodel, solpool):
     return ptb_sols
 
 
+# worker-local model cache (persists across calls in pathos worker processes)
+_worker_model = None
+_worker_model_key = None
+
 def _solveWithObj4Par(perturbed_costs, args, model_type):
     """
     A global function to solve function in parallel processors
 
     Args:
-        perturbed_costs (np.ndarray): costsof objective function with perturbation
+        perturbed_costs (np.ndarray): costs of objective function with perturbation
         args (dict): optModel args
         model_type (ABCMeta): optModel class type
 
     Returns:
         list: optimal solution
     """
-    # rebuild model
-    optmodel = model_type(**args)
+    global _worker_model, _worker_model_key
+    # reuse cached model if same type; rebuild only on first call or type change
+    key = model_type.__qualname__
+    if _worker_model_key != key:
+        _worker_model = model_type(**args)
+        _worker_model_key = key
+    optmodel = _worker_model
     # per sample
     sols = []
     for cost in perturbed_costs:

@@ -10,7 +10,8 @@ from torch.autograd import Function
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
-from pyepo.func.utlis import _solve_or_cache
+from pyepo.func.utils import _solve_or_cache
+
 
 class SPOPlus(optModule):
     """
@@ -30,21 +31,19 @@ class SPOPlus(optModule):
     def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             processes (int): number of processors, 1 for single-core, 0 for all of cores
             solve_ratio (float): the ratio of new solutions computed during training
             reduction (str): the reduction to apply to the output
             dataset (None/optDataset): the training data
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
-        # build carterion
-        self.spop = SPOPlusFunc()
 
     def forward(self, pred_cost, true_cost, true_sol, true_obj):
         """
         Forward pass
         """
-        loss = self.spop.apply(pred_cost, true_cost, true_sol, true_obj, self)
+        loss = SPOPlusFunc.apply(pred_cost, true_cost, true_sol, true_obj, self)
         # reduction
         if self.reduction == "mean":
             loss = torch.mean(loss)
@@ -59,7 +58,7 @@ class SPOPlus(optModule):
 
 class SPOPlusFunc(Function):
     """
-    A autograd function for SPO+ Loss
+    An autograd function for SPO+ Loss
     """
 
     @staticmethod
@@ -72,14 +71,14 @@ class SPOPlusFunc(Function):
             true_cost (torch.tensor): a batch of true values of the cost
             true_sol (torch.tensor): a batch of true optimal solutions
             true_obj (torch.tensor): a batch of true optimal objective values
-            module (optModule): SPOPlus modeul
+            module (optModule): SPOPlus module
 
         Returns:
             torch.tensor: SPO+ loss
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
         w = true_sol.detach()
@@ -132,11 +131,12 @@ class perturbationGradient(optModule):
 
     Reference: <https://arxiv.org/abs/2402.03256>
     """
+
     def __init__(self, optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1,
                  reduction="mean", dataset=None):
         """
         Args:
-            optmodel (optModel): an PyEPO optimization model
+            optmodel (optModel): a PyEPO optimization model
             sigma (float): the amplitude of the finite difference width used for loss approximation
             two_sides (bool): approximate gradient by two-sided perturbation or not
             processes (int): number of processors, 1 for single-core, 0 for all of cores
@@ -172,7 +172,7 @@ class perturbationGradient(optModule):
         """
         # get device
         device = pred_cost.device
-        # convert tenstor
+        # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
         # central differencing
@@ -181,8 +181,8 @@ class perturbationGradient(optModule):
             wp, _ = _solve_or_cache(cp + self.sigma * c, self)
             wm, _ = _solve_or_cache(cp - self.sigma * c, self)
             # convert numpy
-            sol_plus = torch.as_tensor(wp, dtype=torch.float, device=device)
-            sol_minus = torch.as_tensor(wm, dtype=torch.float, device=device)
+            sol_plus = torch.as_tensor(wp, dtype=torch.float32, device=device)
+            sol_minus = torch.as_tensor(wm, dtype=torch.float32, device=device)
             # differentiable objective value
             obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * true_cost, sol_plus)
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
@@ -199,8 +199,8 @@ class perturbationGradient(optModule):
             w, _ = _solve_or_cache(cp, self)
             wm, _ = _solve_or_cache(cp - self.sigma * c, self)
             # convert numpy
-            sol = torch.as_tensor(w, dtype=torch.float, device=device)
-            sol_minus = torch.as_tensor(wm, dtype=torch.float, device=device)
+            sol = torch.as_tensor(w, dtype=torch.float32, device=device)
+            sol_minus = torch.as_tensor(wm, dtype=torch.float32, device=device)
             # differentiable objective value
             obj = torch.einsum("bi,bi->b", pred_cost, sol)
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
