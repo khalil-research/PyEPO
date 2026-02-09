@@ -3,20 +3,20 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyepo.model.grb.tsp &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
+  <title>pyepo.model.grb.tsp &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../../../../../_static/favicon.ico"/>
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -49,7 +49,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../content/intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../content/install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../content/tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../../../index.html">pyepo</a><ul class="current">
@@ -60,7 +59,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../metric/index.html">pyepo.metric</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="../../index.html">pyepo.model</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../twostage/index.html">pyepo.twostage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../utlis/index.html">pyepo.utlis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../utils/index.html">pyepo.utils</a></li>
 </ul>
 </li>
 </ul>
@@ -99,7 +98,7 @@
              
   <section id="module-pyepo.model.grb.tsp">
 <span id="pyepo-model-grb-tsp"></span><h1>pyepo.model.grb.tsp<a class="headerlink" href="#module-pyepo.model.grb.tsp" title="Link to this heading"></a></h1>
-<p>Traveling salesman probelm</p>
+<p>Traveling salesman problem</p>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -118,19 +117,19 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p></td>
-<td><p>This abstract class is optimization model for traveling salesman problem.</p></td>
+<td><p>This abstract class is an optimization model for the traveling salesman problem.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspGGModel" title="pyepo.model.grb.tsp.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p></td>
-<td><p>This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.</p></td>
+<td><p>This class is an optimization model for the traveling salesman problem based on Gavish–Graves (GG) formulation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspGGModelRel" title="pyepo.model.grb.tsp.tspGGModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModelRel</span></code></a></p></td>
 <td><p>This class is relaxation of tspGGModel.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspDFJModel" title="pyepo.model.grb.tsp.tspDFJModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspDFJModel</span></code></a></p></td>
-<td><p>This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and</p></td>
+<td><p>This class is an optimization model for the traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspMTZModel" title="pyepo.model.grb.tsp.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p></td>
-<td><p>This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p></td>
+<td><p>This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspMTZModelRel" title="pyepo.model.grb.tsp.tspMTZModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModelRel</span></code></a></p></td>
 <td><p>This class is relaxation of tspMTZModel.</p></td>
@@ -169,7 +168,7 @@
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspABModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspABModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="../grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel.optGrbModel</span></code></a></p>
-<p>This abstract class is optimization model for traveling salesman problem.
+<p>This abstract class is an optimization model for the traveling salesman problem.
 This model is for further implementation of different formulation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspABModel._model">
@@ -222,7 +221,7 @@ This model is for further implementation of different formulation.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspABModel.num_cost">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cost</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspABModel.num_cost" title="Link to this definition"></a></dt>
-<dd><p>number of cost to be predicted</p>
+<dd><p>number of costs to be predicted</p>
 </dd></dl>
 
 <dl class="py method">
@@ -262,7 +261,7 @@ This model is for further implementation of different formulation.</p>
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspGGModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
-<p>This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.</p>
+<p>This class is an optimization model for the traveling salesman problem based on Gavish–Graves (GG) formulation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel._model">
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel._model" title="Link to this definition"></a></dt>
@@ -313,7 +312,7 @@ This model is for further implementation of different formulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspGGModel.setObj">
 <span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspGGModel.setObj" title="Link to this definition"></a></dt>
-<dd><p>A method to set objective function</p>
+<dd><p>A method to set the objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
@@ -334,7 +333,7 @@ This model is for further implementation of different formulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>coefs</strong> (<em>ndarray</em>) – coeffcients of new constraint</p></li>
+<li><p><strong>coefs</strong> (<em>ndarray</em>) – coefficients of new constraint</p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
 </ul>
 </dd>
@@ -439,7 +438,7 @@ This model is for further implementation of different formulation.</p>
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspDFJModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspDFJModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
-<p>This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+<p>This class is an optimization model for the traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
 constraint generation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspDFJModel._model">
@@ -497,7 +496,7 @@ constraint generation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspDFJModel.setObj">
 <span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspDFJModel.setObj" title="Link to this definition"></a></dt>
-<dd><p>A method to set objective function</p>
+<dd><p>A method to set the objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
@@ -518,7 +517,7 @@ constraint generation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>coefs</strong> (<em>ndarray</em>) – coeffcients of new constraint</p></li>
+<li><p><strong>coefs</strong> (<em>ndarray</em>) – coefficients of new constraint</p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
 </ul>
 </dd>
@@ -537,7 +536,7 @@ constraint generation.</p>
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">tspMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
-<p>This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p>
+<p>This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel._model">
 <span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel._model" title="Link to this definition"></a></dt>
@@ -588,7 +587,7 @@ constraint generation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspMTZModel.setObj">
 <span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.tspMTZModel.setObj" title="Link to this definition"></a></dt>
-<dd><p>A method to set objective function</p>
+<dd><p>A method to set the objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
@@ -609,7 +608,7 @@ constraint generation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>coefs</strong> (<em>ndarray</em>) – coeffcients of new constraint</p></li>
+<li><p><strong>coefs</strong> (<em>ndarray</em>) – coefficients of new constraint</p></li>
 <li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
 </ul>
 </dd>

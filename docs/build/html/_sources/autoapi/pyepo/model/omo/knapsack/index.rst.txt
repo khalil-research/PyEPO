@@ -39,13 +39,13 @@ Module Contents
    Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
 
-   This class is optimization model for knapsack problem
+   This class is an optimization model for the knapsack problem
 
    .. attribute:: _model
 
       Pyomo model
 
-      :type: PyOmo model
+      :type: Pyomo model
 
    .. attribute:: solver
 
@@ -83,7 +83,7 @@ Module Contents
 
    .. py:method:: _getModel()
 
-      A method to build pyomo model
+      A method to build Pyomo model
 
 
 
@@ -103,7 +103,7 @@ Module Contents
 
    .. py:method:: _getModel()
 
-      A method to build pyomo
+      A method to build Pyomo model
 
 
 

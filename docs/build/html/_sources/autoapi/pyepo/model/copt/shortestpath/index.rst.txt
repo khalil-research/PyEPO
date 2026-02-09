@@ -33,19 +33,13 @@ Module Contents
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
 
-   This class is optimization model for shortest path problem
+   This class is an optimization model for the shortest path problem
 
    .. attribute:: _model
 
-      Pyomo model
+      COPT model
 
-      :type: PyOmo model
-
-   .. attribute:: solver
-
-      optimization solver in the background
-
-      :type: str
+      :type: COPT model
 
    .. attribute:: grid
 
@@ -79,7 +73,7 @@ Module Contents
 
    .. py:method:: _getModel()
 
-      A method to build pyomo model
+      A method to build COPT model
 
 
 

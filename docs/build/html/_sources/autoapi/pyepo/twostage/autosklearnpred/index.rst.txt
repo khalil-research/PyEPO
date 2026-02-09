@@ -5,7 +5,7 @@ pyepo.twostage.autosklearnpred
 
 .. autoapi-nested-parse::
 
-   Two-stage model with Scikit-learn predictor
+   Two-stage model with auto-sklearn predictor
 
 
 
@@ -39,7 +39,7 @@ Module Contents
    :param optmodel: optimization model
    :type optmodel: optModel
 
-   :returns: Auto-SKlearn multi-output regression model
+   :returns: Auto-sklearn multi-output regression model
    :rtype: AutoSklearnRegressor
 
 

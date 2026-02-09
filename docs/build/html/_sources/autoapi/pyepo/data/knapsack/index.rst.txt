@@ -34,7 +34,7 @@ Module Contents
    :type dim: int
    :param deg: data polynomial degree
    :type deg: int
-   :param noise_width: half witdth of data random noise
+   :param noise_width: half width of data random noise
    :type noise_width: float
    :param seed: random state seed
    :type seed: int

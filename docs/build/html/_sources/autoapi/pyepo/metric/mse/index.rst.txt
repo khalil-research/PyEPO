@@ -5,7 +5,7 @@ pyepo.metric.mse
 
 .. autoapi-nested-parse::
 
-   True regret loss
+   Mean Squared Error
 
 
 

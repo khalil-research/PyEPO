@@ -23,6 +23,6 @@ Submodules
    /autoapi/pyepo/metric/index
    /autoapi/pyepo/model/index
    /autoapi/pyepo/twostage/index
-   /autoapi/pyepo/utlis/index
+   /autoapi/pyepo/utils/index
 
 

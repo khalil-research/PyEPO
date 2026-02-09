@@ -3,20 +3,20 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyepo.data.dataset &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
+  <title>pyepo.data.dataset &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -49,7 +49,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../content/api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../content/ref.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../../index.html">pyepo</a><ul class="current">
@@ -60,7 +59,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../metric/index.html">pyepo.metric</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../model/index.html">pyepo.model</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../twostage/index.html">pyepo.twostage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../utlis/index.html">pyepo.utlis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/index.html">pyepo.utils</a></li>
 </ul>
 </li>
 </ul>
@@ -104,10 +103,10 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p></td>
-<td><p>This class is Torch Dataset for optimization problems.</p></td>
+<td><p>This class is a Torch Dataset for optimization problems.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDatasetKNN" title="pyepo.data.dataset.optDatasetKNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDatasetKNN</span></code></a></p></td>
-<td><p>This class is Torch Dataset for optimization problems, when using the robust kNN-loss.</p></td>
+<td><p>This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.</p></td>
 </tr>
 </tbody>
 </table>
@@ -118,11 +117,11 @@
 <dt class="sig sig-object py" id="pyepo.data.dataset.optDataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDataset" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></p>
-<p>This class is Torch Dataset for optimization problems.</p>
+<p>This class is a Torch Dataset for optimization problems.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.data.dataset.optDataset.model">
 <span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#pyepo.data.dataset.optDataset.model" title="Link to this definition"></a></dt>
-<dd><p>Optimization models</p>
+<dd><p>Optimization model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
@@ -189,6 +188,16 @@
 <span class="sig-name descname"><span class="pre">costs</span></span><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">sols</span></span><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">objs</span></span><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.data.dataset.optDataset._getSols">
 <span class="sig-name descname"><span class="pre">_getSols</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDataset._getSols" title="Link to this definition"></a></dt>
@@ -249,12 +258,12 @@
 <dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetKNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p>
-<p>This class is Torch Dataset for optimization problems, when using the robust kNN-loss.</p>
+<p>This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2310.04328">https://arxiv.org/abs/2310.04328</a>&gt;</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN.model">
 <span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.model" title="Link to this definition"></a></dt>
-<dd><p>Optimization models</p>
+<dd><p>Optimization model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
@@ -329,28 +338,38 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">k</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">weight</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">feats</span></span><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">k</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">costs</span></span><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">weight</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">feats</span></span><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">costs</span></span><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">sols</span></span><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">objs</span></span><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

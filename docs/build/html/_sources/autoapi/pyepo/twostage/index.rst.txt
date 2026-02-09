@@ -49,7 +49,7 @@ Package Contents
    :param optmodel: optimization model
    :type optmodel: optModel
 
-   :returns: Auto-SKlearn multi-output regression model
+   :returns: Auto-sklearn multi-output regression model
    :rtype: AutoSklearnRegressor
 
 

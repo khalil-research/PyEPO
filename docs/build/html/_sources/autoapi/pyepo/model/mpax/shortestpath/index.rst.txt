@@ -38,7 +38,7 @@ Module Contents
    Bases: :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
 
 
-   This class is optimization model for shortest path problem
+   This class is an optimization model for the shortest path problem
 
    .. attribute:: grid
 

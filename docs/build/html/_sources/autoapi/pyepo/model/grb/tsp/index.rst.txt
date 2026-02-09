@@ -5,7 +5,7 @@ pyepo.model.grb.tsp
 
 .. autoapi-nested-parse::
 
-   Traveling salesman probelm
+   Traveling salesman problem
 
 
 
@@ -54,7 +54,7 @@ Module Contents
    Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
 
-   This abstract class is optimization model for traveling salesman problem.
+   This abstract class is an optimization model for the traveling salesman problem.
    This model is for further implementation of different formulation.
 
    .. attribute:: _model
@@ -87,7 +87,7 @@ Module Contents
 
    .. py:property:: num_cost
 
-      number of cost to be predicted
+      number of costs to be predicted
 
 
    .. py:method:: copy()
@@ -116,7 +116,7 @@ Module Contents
    Bases: :py:obj:`tspABModel`
 
 
-   This class is optimization model for traveling salesman problem based on Gavish–Graves (GG) formulation.
+   This class is an optimization model for the traveling salesman problem based on Gavish–Graves (GG) formulation.
 
    .. attribute:: _model
 
@@ -148,7 +148,7 @@ Module Contents
 
    .. py:method:: setObj(c)
 
-      A method to set objective function
+      A method to set the objective function
 
       :param c: cost vector
       :type c: list
@@ -165,7 +165,7 @@ Module Contents
 
       A method to add new constraint
 
-      :param coefs: coeffcients of new constraint
+      :param coefs: coefficients of new constraint
       :type coefs: ndarray
       :param rhs: right-hand side of new constraint
       :type rhs: float
@@ -242,7 +242,7 @@ Module Contents
    Bases: :py:obj:`tspABModel`
 
 
-   This class is optimization model for traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+   This class is an optimization model for the traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
    constraint generation.
 
    .. attribute:: _model
@@ -283,7 +283,7 @@ Module Contents
 
    .. py:method:: setObj(c)
 
-      A method to set objective function
+      A method to set the objective function
 
       :param c: cost vector
       :type c: list
@@ -300,7 +300,7 @@ Module Contents
 
       A method to add new constraint
 
-      :param coefs: coeffcients of new constraint
+      :param coefs: coefficients of new constraint
       :type coefs: ndarray
       :param rhs: right-hand side of new constraint
       :type rhs: float
@@ -315,7 +315,7 @@ Module Contents
    Bases: :py:obj:`tspABModel`
 
 
-   This class is optimization model for traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
+   This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
 
    .. attribute:: _model
 
@@ -347,7 +347,7 @@ Module Contents
 
    .. py:method:: setObj(c)
 
-      A method to set objective function
+      A method to set the objective function
 
       :param c: cost vector
       :type c: list
@@ -364,7 +364,7 @@ Module Contents
 
       A method to add new constraint
 
-      :param coefs: coeffcients of new constraint
+      :param coefs: coefficients of new constraint
       :type coefs: ndarray
       :param rhs: right-hand side of new constraint
       :type rhs: float

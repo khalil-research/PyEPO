@@ -39,7 +39,7 @@ Package Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for Cardinal Optimizer optimization model
+   This is an abstract class for a Cardinal Optimizer optimization model
 
    .. attribute:: _model
 
@@ -53,7 +53,7 @@ Package Contents
 
    .. py:method:: setObj(c)
 
-      A method to set objective function
+      A method to set the objective function
 
       :param c: cost of objective function
       :type c: np.ndarray / list
@@ -62,7 +62,7 @@ Package Contents
 
    .. py:method:: solve()
 
-      A method to solve model
+      A method to solve the model
 
       :returns: optimal solution (list) and objective value (float)
       :rtype: tuple
@@ -71,7 +71,7 @@ Package Contents
 
    .. py:method:: copy()
 
-      A method to copy model
+      A method to copy the model
 
       :returns: new copied model
       :rtype: optModel
@@ -80,9 +80,9 @@ Package Contents
 
    .. py:method:: addConstr(coefs, rhs)
 
-      A method to add new constraint
+      A method to add a new constraint
 
-      :param coefs: coeffcients of new constraint
+      :param coefs: coefficients of new constraint
       :type coefs: np.ndarray / list
       :param rhs: right-hand side of new constraint
       :type rhs: float
@@ -97,19 +97,13 @@ Package Contents
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
 
-   This class is optimization model for shortest path problem
+   This class is an optimization model for the shortest path problem
 
    .. attribute:: _model
 
-      Pyomo model
+      COPT model
 
-      :type: PyOmo model
-
-   .. attribute:: solver
-
-      optimization solver in the background
-
-      :type: str
+      :type: COPT model
 
    .. attribute:: grid
 
@@ -143,7 +137,7 @@ Package Contents
 
    .. py:method:: _getModel()
 
-      A method to build pyomo model
+      A method to build COPT model
 
 
 
@@ -152,19 +146,13 @@ Package Contents
    Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
 
-   This class is optimization model for knapsack problem
+   This class is an optimization model for the knapsack problem
 
    .. attribute:: _model
 
-      Pyomo model
+      COPT model
 
-      :type: PyOmo model
-
-   .. attribute:: solver
-
-      optimization solver in the background
-
-      :type: str
+      :type: COPT model
 
    .. attribute:: weights
 
@@ -196,7 +184,7 @@ Package Contents
 
    .. py:method:: _getModel()
 
-      A method to build pyomo model
+      A method to build COPT model
 
 
 
@@ -216,7 +204,7 @@ Package Contents
 
    .. py:method:: _getModel()
 
-      A method to build pyomo
+      A method to build COPT model
 
 
 

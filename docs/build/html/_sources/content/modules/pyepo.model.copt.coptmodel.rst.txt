@@ -1,17 +1,8 @@
-pyepo.model.copt.coptmodel
+﻿pyepo.model.copt.coptmodel
 ==========================
 
 .. automodule:: pyepo.model.copt.coptmodel
 
-   
-   
-   
-
-   
-   
-   
-
-   
    
    .. rubric:: Classes
 
@@ -19,11 +10,3 @@ pyepo.model.copt.coptmodel
    
       optCoptModel
    
-   
-
-   
-   
-   
-
-
-

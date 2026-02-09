@@ -1,7 +1,7 @@
-pyepo.utlis
+pyepo.utils
 ===========
 
-.. py:module:: pyepo.utlis
+.. py:module:: pyepo.utils
 
 .. autoapi-nested-parse::
 
@@ -14,7 +14,7 @@ Functions
 
 .. autoapisummary::
 
-   pyepo.utlis.getArgs
+   pyepo.utils.getArgs
 
 
 Module Contents

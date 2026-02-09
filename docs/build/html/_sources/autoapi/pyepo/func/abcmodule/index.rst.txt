@@ -47,6 +47,9 @@ Module Contents
 
 
 
+   .. py:attribute:: _sol_set
+
+
    .. py:attribute:: reduction
       :value: 'mean'
 

@@ -21,7 +21,7 @@ Submodules
    /autoapi/pyepo/func/perturbed/index
    /autoapi/pyepo/func/rank/index
    /autoapi/pyepo/func/surrogate/index
-   /autoapi/pyepo/func/utlis/index
+   /autoapi/pyepo/func/utils/index
 
 
 Classes
@@ -63,9 +63,6 @@ Package Contents
    algorithm based on stochastic gradient descent.
 
    Reference: <https://doi.org/10.1287/mnsc.2020.3922>
-
-
-   .. py:attribute:: spop
 
 
    .. py:method:: forward(pred_cost, true_cost, true_sol, true_obj)
@@ -120,14 +117,14 @@ Package Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for differentiable black-box optimizer, which yield
+   An autograd module for differentiable black-box optimizer, which yields
    an optimal solution and derive a gradient.
 
-   For differentiable block-box, the objective function is linear and
+   For differentiable black-box, the objective function is linear and
    constraints are known and fixed, but the cost vector needs to be predicted
    from contextual data.
 
-   The block-box approximates the gradient of the optimizer by interpolating
+   The black-box approximates the gradient of the optimizer by interpolating
    the loss function. Thus, it allows us to design an algorithm based on
    stochastic gradient descent.
 
@@ -137,9 +134,6 @@ Package Contents
    .. py:attribute:: lambd
       :value: 10
 
-
-
-   .. py:attribute:: dbb
 
 
    .. py:method:: forward(pred_cost)
@@ -153,8 +147,8 @@ Package Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for the differentiable optimizer, which yields optimal a
-   solution and use negative identity as a gradient on the backward pass.
+   An autograd module for the differentiable optimizer, which yields an optimal
+   solution and uses negative identity as a gradient on the backward pass.
 
    For negative identity backpropagation, the objective function is linear and
    constraints are known and fixed, but the cost vector needs to be predicted
@@ -166,9 +160,6 @@ Package Contents
    and tuning an additional hyperparameter λ.
 
    Reference: <https://arxiv.org/abs/2205.15213>
-
-
-   .. py:attribute:: nid
 
 
    .. py:method:: forward(pred_cost)
@@ -183,11 +174,11 @@ Package Contents
 
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
-   use of the loss improves the algorithmic by the specific expression of the
+   use of the loss improves the algorithm by the specific expression of the
    gradients of the loss.
 
    For the perturbed optimizer, the cost vector needs to be predicted from
-   contextual data and are perturbed with Gaussian noise.
+   contextual data and is perturbed with Gaussian noise.
 
    Thus, it allows us to design an algorithm based on stochastic gradient
    descent.
@@ -208,9 +199,6 @@ Package Contents
    .. py:attribute:: rnd
 
 
-   .. py:attribute:: ptb
-
-
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -223,14 +211,14 @@ Package Contents
 
 
    An autograd module for Fenchel-Young loss using perturbation techniques. The
-   use of the loss improves the algorithmic by the specific expression of the
+   use of the loss improves the algorithm by the specific expression of the
    gradients of the loss.
 
-   For the perturbed optimizer, the cost vector need to be predicted from
-   contextual data and are perturbed with Gaussian noise.
+   For the perturbed optimizer, the cost vector needs to be predicted from
+   contextual data and is perturbed with Gaussian noise.
 
-   The Fenchel-Young loss allows to directly optimize a loss between the features
-   and solutions with less computation. Thus, allows us to design an algorithm
+   The Fenchel-Young loss allows directly optimizing a loss between the features
+   and solutions with less computation. Thus, it allows us to design an algorithm
    based on stochastic gradient descent.
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
@@ -249,29 +237,26 @@ Package Contents
    .. py:attribute:: rnd
 
 
-   .. py:attribute:: pfy
-
-
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
 
 
 
-.. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, distribution=None, two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for Implicit Maximum Likelihood Estimator, which yield
+   An autograd module for Implicit Maximum Likelihood Estimator, which yields
    an optimal solution in a constrained exponential family distribution via
    Perturb-and-MAP.
 
    For I-MLE, it works as black-box combinatorial solvers, in which constraints
-   are known and fixed, but the cost vector need to be predicted from
+   are known and fixed, but the cost vector needs to be predicted from
    contextual data.
 
-   The I-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+   The I-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
    design an algorithm based on stochastic gradient descent.
 
    Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
@@ -293,14 +278,13 @@ Package Contents
 
 
    .. py:attribute:: distribution
+      :value: None
+
 
 
    .. py:attribute:: two_sides
       :value: False
 
-
-
-   .. py:attribute:: imle
 
 
    .. py:method:: forward(pred_cost)
@@ -309,20 +293,20 @@ Package Contents
 
 
 
-.. py:class:: adaptiveImplicitMLE(optmodel, n_samples=10, sigma=1.0, distribution=sumGammaDistribution(kappa=5), two_sides=False, processes=1, solve_ratio=1, dataset=None)
+.. py:class:: adaptiveImplicitMLE(optmodel, n_samples=10, sigma=1.0, distribution=None, two_sides=False, processes=1, solve_ratio=1, dataset=None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
    An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
-   adaptively choose hyperparameter λ and yield an optimal solution in a
+   adaptively chooses hyperparameter λ and yields an optimal solution in a
    constrained exponential family distribution via Perturb-and-MAP.
 
    For AI-MLE, it works as black-box combinatorial solvers, in which constraints
-   are known and fixed, but the cost vector need to be predicted from
+   are known and fixed, but the cost vector needs to be predicted from
    contextual data.
 
-   The AI-MLE approximate gradient of optimizer smoothly. Thus, allows us to
+   The AI-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
    design an algorithm based on stochastic gradient descent.
 
    Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
@@ -339,6 +323,8 @@ Package Contents
 
 
    .. py:attribute:: distribution
+      :value: None
+
 
 
    .. py:attribute:: two_sides
@@ -361,9 +347,6 @@ Package Contents
 
 
 
-   .. py:attribute:: aimle
-
-
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -381,7 +364,7 @@ Package Contents
    For the NCE, the cost vector needs to be predicted from contextual data and
    maximizes the separation of the probability of the optimal solution.
 
-   Thus allows us to design an algorithm based on stochastic gradient descent.
+   This allows us to design an algorithm based on stochastic gradient descent.
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 

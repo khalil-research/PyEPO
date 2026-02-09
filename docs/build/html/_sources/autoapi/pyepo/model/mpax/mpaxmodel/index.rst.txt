@@ -38,7 +38,7 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for MPAX-based optimization model
+   This is an abstract class for an MPAX-based optimization model
 
    .. attribute:: A
 
@@ -111,8 +111,6 @@ Module Contents
 
 
    .. py:attribute:: jitted_solve
-      :value: None
-
 
 
    .. py:attribute:: batch_optimize
@@ -123,12 +121,12 @@ Module Contents
 
    .. py:property:: num_cost
 
-      number of cost to be predicted
+      number of costs to be predicted
 
 
    .. py:method:: setObj(c)
 
-      A method to set objective function
+      A method to set the objective function
 
       :param c: cost of objective function
       :type c: np.ndarray / list
@@ -137,7 +135,7 @@ Module Contents
 
    .. py:method:: solve()
 
-      A method to solve model
+      A method to solve the model
 
       :returns: optimal solution (list) and objective value (jnp.float32)
       :rtype: tuple
@@ -148,13 +146,13 @@ Module Contents
       :staticmethod:
 
 
-      A static method for JIT complile
+      A static method for JIT compile
 
 
 
    .. py:method:: copy()
 
-      A method to copy model
+      A method to copy the model
 
       :returns: new copied model
       :rtype: optModel
@@ -163,9 +161,9 @@ Module Contents
 
    .. py:method:: addConstr(coefs, rhs)
 
-      A method to add new constraint
+      A method to add a new constraint
 
-      :param coefs: coeffcients of new constraint
+      :param coefs: coefficients of new constraint
       :type coefs: np.ndarray / list
       :param rhs: right-hand side of new constraint
       :type rhs: jnp.float32

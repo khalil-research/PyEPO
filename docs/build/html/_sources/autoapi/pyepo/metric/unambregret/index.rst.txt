@@ -27,16 +27,18 @@ Module Contents
 
    :param predmodel: a regression neural network for cost prediction
    :type predmodel: nn
-   :param optmodel: an PyEPO optimization model
+   :param optmodel: a PyEPO optimization model
    :type optmodel: optModel
    :param dataloader: Torch dataloader from optDataSet
    :type dataloader: DataLoader
+   :param tolerance: tolerance for optimization
+   :type tolerance: float
 
    :returns: unambiguous regret loss
    :rtype: float
 
 
-.. py:function:: calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-05)
+.. py:function:: calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-05, max_iter=10)
 
    A function to calculate normalized unambiguous regret for a batch
 
@@ -48,6 +50,10 @@ Module Contents
    :type true_cost: torch.tensor
    :param true_obj: true optimal objective values
    :type true_obj: torch.tensor
+   :param tolerance: tolerance for precision
+   :type tolerance: float
+   :param max_iter: maximum number of recursive retries
+   :type max_iter: int
 
    :returns: unambiguous regret losses
    :rtype: float

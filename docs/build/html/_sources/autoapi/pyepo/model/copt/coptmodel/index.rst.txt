@@ -5,7 +5,7 @@ pyepo.model.copt.coptmodel
 
 .. autoapi-nested-parse::
 
-   Abstract optimization model based on Cardinal Optimizer（COPT）
+   Abstract optimization model based on Cardinal Optimizer (COPT)
 
 
 
@@ -25,7 +25,7 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for Cardinal Optimizer optimization model
+   This is an abstract class for a Cardinal Optimizer optimization model
 
    .. attribute:: _model
 
@@ -39,7 +39,7 @@ Module Contents
 
    .. py:method:: setObj(c)
 
-      A method to set objective function
+      A method to set the objective function
 
       :param c: cost of objective function
       :type c: np.ndarray / list
@@ -48,7 +48,7 @@ Module Contents
 
    .. py:method:: solve()
 
-      A method to solve model
+      A method to solve the model
 
       :returns: optimal solution (list) and objective value (float)
       :rtype: tuple
@@ -57,7 +57,7 @@ Module Contents
 
    .. py:method:: copy()
 
-      A method to copy model
+      A method to copy the model
 
       :returns: new copied model
       :rtype: optModel
@@ -66,9 +66,9 @@ Module Contents
 
    .. py:method:: addConstr(coefs, rhs)
 
-      A method to add new constraint
+      A method to add a new constraint
 
-      :param coefs: coeffcients of new constraint
+      :param coefs: coefficients of new constraint
       :type coefs: np.ndarray / list
       :param rhs: right-hand side of new constraint
       :type rhs: float

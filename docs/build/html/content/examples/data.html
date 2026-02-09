@@ -3,26 +3,26 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+  <title>Data &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=34cd777e"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Two-stage Method" href="twostage.html" />
+    <link rel="next" title="Two-Stage Method" href="twostage.html" />
     <link rel="prev" title="Model" href="model.html" /> 
 </head>
 
@@ -63,14 +63,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#optdatasetknn">optDatasetKNN</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-stage Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
@@ -102,23 +101,23 @@
              
   <section id="data">
 <h1>Data<a class="headerlink" href="#data" title="Link to this heading"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> contains synthetic data generator and a dataset class <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> to wrap data samples.</p>
-<p>For more information and details about the Dataset, please see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">02 Optimization Dataset</a></p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> provides synthetic data generators and the <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> class for wrapping data samples.</p>
+<p>For more details, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb">02 Optimization Dataset</a> notebook.</p>
 <section id="data-generator">
 <h2>Data Generator<a class="headerlink" href="#data-generator" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> includes synthetic datasets for three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, the traveling salesperson problem, and portfolio optimization.</p>
-<p>The synthetic datasets include features <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> and cost coefficients <span class="math notranslate nohighlight">\(\mathbf{c}\)</span>. The feature vector <span class="math notranslate nohighlight">\(\mathbf{x}_i \in \mathbb{R}^p\)</span> follows a standard multivariate Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>, and the corresponding cost <span class="math notranslate nohighlight">\(\mathbf{c}_i \in \mathbb{R}^d\)</span> comes from a polynomial function <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span> multiplicated with a random noise <span class="math notranslate nohighlight">\(\mathbf{\epsilon}_i \sim  U(1-\bar{\epsilon}, 1+\bar{\epsilon})\)</span>.
-In general, there are several parameters that users can control:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> includes synthetic data generators for four optimization problems: shortest path, multi-dimensional knapsack, traveling salesperson, and portfolio optimization.</p>
+<p>Each generator produces feature-cost pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{c})\)</span>. The feature vector <span class="math notranslate nohighlight">\(\mathbf{x}_i \in \mathbb{R}^p\)</span> follows a standard multivariate Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>, and the cost <span class="math notranslate nohighlight">\(\mathbf{c}_i \in \mathbb{R}^d\)</span> is computed from a polynomial function <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span> multiplied by random noise <span class="math notranslate nohighlight">\(\mathbf{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})\)</span>.</p>
+<p>Common parameters across all generators:</p>
 <ul class="simple">
-<li><p><strong>num_data</strong> (<span class="math notranslate nohighlight">\(n\)</span>): data size</p></li>
-<li><p><strong>num_features</strong> (<span class="math notranslate nohighlight">\(p\)</span>): feature dimension of costs <span class="math notranslate nohighlight">\(\mathbf{c}\)</span></p></li>
-<li><p><strong>deg</strong> (<span class="math notranslate nohighlight">\(deg\)</span>): polynomial degree of function <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span></p></li>
-<li><p><strong>noise_width</strong> (<span class="math notranslate nohighlight">\(\bar{\epsilon}\)</span>):  noise half-width of <span class="math notranslate nohighlight">\(\mathbf{\epsilon}\)</span></p></li>
-<li><p><strong>seed</strong>: random state seed to generate data</p></li>
+<li><p><strong>num_data</strong> (<span class="math notranslate nohighlight">\(n\)</span>): number of data samples</p></li>
+<li><p><strong>num_features</strong> (<span class="math notranslate nohighlight">\(p\)</span>): feature dimension</p></li>
+<li><p><strong>deg</strong> (<span class="math notranslate nohighlight">\(deg\)</span>): polynomial degree of the mapping <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span></p></li>
+<li><p><strong>noise_width</strong> (<span class="math notranslate nohighlight">\(\bar{\epsilon}\)</span>): noise half-width</p></li>
+<li><p><strong>seed</strong>: random seed for reproducibility</p></li>
 </ul>
 <section id="shortest-path">
 <h3>Shortest Path<a class="headerlink" href="#shortest-path" title="Link to this heading"></a></h3>
-<p>For the shortest path, a random matrix <span class="math notranslate nohighlight">\(\mathcal{B} \in \mathbb{R}^{d \times p}\)</span> which follows Bernoulli distribution with probability <span class="math notranslate nohighlight">\(0.5\)</span>, encode the features <span class="math notranslate nohighlight">\(x_i\)</span>. The cost of objective function <span class="math notranslate nohighlight">\(c_{ij}\)</span> is generated from <span class="math notranslate nohighlight">\(c_i^j = [\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j\)</span>.</p>
+<p>A random matrix <span class="math notranslate nohighlight">\(\mathcal{B} \in \mathbb{R}^{d \times p}\)</span> with Bernoulli(0.5) entries encodes the features. The cost coefficients are generated as <span class="math notranslate nohighlight">\(c_i^j = [\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j\)</span>.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.data.shortestpath.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span></dt>
@@ -130,7 +129,7 @@ In general, there are several parameters that users can control:</p>
 <li><p><strong>num_features</strong> (<em>int</em>) – dimension of features</p></li>
 <li><p><strong>grid</strong> (<em>int</em><em>, </em><em>int</em>) – size of grid network</p></li>
 <li><p><strong>deg</strong> (<em>int</em>) – data polynomial degree</p></li>
-<li><p><strong>noise_width</strong> (<em>float</em>) – half witdth of data random noise</p></li>
+<li><p><strong>noise_width</strong> (<em>float</em>) – half width of data random noise</p></li>
 <li><p><strong>seed</strong> (<em>int</em>) – random seed</p></li>
 </ul>
 </dd>
@@ -143,8 +142,7 @@ In general, there are several parameters that users can control:</p>
 </dl>
 </dd></dl>
 
-<p>The following code is to generate data for the shortest path on the grid network:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
 <span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
 <span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
@@ -155,7 +153,7 @@ In general, there are several parameters that users can control:</p>
 </section>
 <section id="knapsack">
 <h3>Knapsack<a class="headerlink" href="#knapsack" title="Link to this heading"></a></h3>
-<p>Because we assume that the uncertain coefficients exist only on the objective function, the weights of items are fixed throughout the data. We define the number of items as <span class="math notranslate nohighlight">\(m\)</span> and the dimension of resources is <span class="math notranslate nohighlight">\(k\)</span>. The weights <span class="math notranslate nohighlight">\(\mathcal{W} \in \mathbb{R}^{k \times m}\)</span> are sampled from <span class="math notranslate nohighlight">\(3\)</span> to <span class="math notranslate nohighlight">\(8\)</span> with a precision of <span class="math notranslate nohighlight">\(1\)</span> decimal place. With the same <span class="math notranslate nohighlight">\(\mathcal{B}\)</span>, cost <span class="math notranslate nohighlight">\(c_{ij}\)</span> is calculated from <span class="math notranslate nohighlight">\(c_i^j = \lceil [\frac{5}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil\)</span>.</p>
+<p>Since uncertain coefficients appear only in the objective function, item weights are fixed. Let <span class="math notranslate nohighlight">\(m\)</span> be the number of items and <span class="math notranslate nohighlight">\(k\)</span> the number of resource dimensions. The weights <span class="math notranslate nohighlight">\(\mathcal{W} \in \mathbb{R}^{k \times m}\)</span> are sampled from 3 to 8 with one decimal place of precision. The cost coefficients are <span class="math notranslate nohighlight">\(c_i^j = \lceil [\frac{5}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil\)</span>.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.data.knapsack.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span></dt>
@@ -168,7 +166,7 @@ In general, there are several parameters that users can control:</p>
 <li><p><strong>num_items</strong> (<em>int</em>) – number of items</p></li>
 <li><p><strong>dim</strong> (<em>int</em>) – dimension of multi-dimensional knapsack</p></li>
 <li><p><strong>deg</strong> (<em>int</em>) – data polynomial degree</p></li>
-<li><p><strong>noise_width</strong> (<em>float</em>) – half witdth of data random noise</p></li>
+<li><p><strong>noise_width</strong> (<em>float</em>) – half width of data random noise</p></li>
 <li><p><strong>seed</strong> (<em>int</em>) – random state seed</p></li>
 </ul>
 </dd>
@@ -181,8 +179,7 @@ In general, there are several parameters that users can control:</p>
 </dl>
 </dd></dl>
 
-<p>The following code is to generate data for the 3d-knapsack:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
 <span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
 <span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
@@ -194,11 +191,11 @@ In general, there are several parameters that users can control:</p>
 </section>
 <section id="traveling-salesperson">
 <h3>Traveling Salesperson<a class="headerlink" href="#traveling-salesperson" title="Link to this heading"></a></h3>
-<p>The distance consists of two parts: one comes from Euclidean distance, the other derived from feature encoding. For Euclidean distance, we create coordinates from the mixture of Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, I)\)</span> and uniform distribution <span class="math notranslate nohighlight">\(\textbf{U}(-2, 2)\)</span>. For feature encoding, it is <span class="math notranslate nohighlight">\(\frac{1}{{3}^{deg - 1}} (\frac{1}{\sqrt{p}} (\mathcal{B} x_i)_j + 3)^{deg} \cdot \epsilon_i\)</span>, where the elements of <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> come from the multiplication of Bernoulli <span class="math notranslate nohighlight">\(\textbf{B}(0.5)\)</span> and uniform <span class="math notranslate nohighlight">\(\textbf{U}(-2, 2)\)</span>.</p>
+<p>The distance matrix has two components: a Euclidean distance term and a feature-encoded term. Coordinates are drawn from a mixture of Gaussian <span class="math notranslate nohighlight">\(\mathcal{N}(0, I)\)</span> and uniform <span class="math notranslate nohighlight">\(\textbf{U}(-2, 2)\)</span> distributions. The feature-encoded component is <span class="math notranslate nohighlight">\(\frac{1}{{3}^{deg - 1}} (\frac{1}{\sqrt{p}} (\mathcal{B} x_i)_j + 3)^{deg} \cdot \epsilon_i\)</span>, where the elements of <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> are products of Bernoulli <span class="math notranslate nohighlight">\(\textbf{B}(0.5)\)</span> and uniform <span class="math notranslate nohighlight">\(\textbf{U}(-2, 2)\)</span> samples.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.data.tsp.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>A function to generate synthetic data and features for travelling salesman</p>
+<dd><p>A function to generate synthetic data and features for traveling salesman</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -206,7 +203,7 @@ In general, there are several parameters that users can control:</p>
 <li><p><strong>num_features</strong> (<em>int</em>) – dimension of features</p></li>
 <li><p><strong>num_nodes</strong> (<em>int</em>) – number of nodes</p></li>
 <li><p><strong>deg</strong> (<em>int</em>) – data polynomial degree</p></li>
-<li><p><strong>noise_width</strong> (<em>float</em>) – half witdth of data random noise</p></li>
+<li><p><strong>noise_width</strong> (<em>float</em>) – half width of data random noise</p></li>
 <li><p><strong>seed</strong> (<em>int</em>) – random seed</p></li>
 </ul>
 </dd>
@@ -219,8 +216,7 @@ In general, there are several parameters that users can control:</p>
 </dl>
 </dd></dl>
 
-<p>The following code is to generate data for the Traveling salesperson:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
 <span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
 <span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
@@ -231,11 +227,11 @@ In general, there are several parameters that users can control:</p>
 </section>
 <section id="portfolio">
 <h3>Portfolio<a class="headerlink" href="#portfolio" title="Link to this heading"></a></h3>
-<p>Let <span class="math notranslate nohighlight">\(\bar{r}_{ij} = (\frac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}})^{deg}\)</span>. In the context of portfolio optimization, the expected return of the assets <span class="math notranslate nohighlight">\(\mathbf{r}_i\)</span> is defined as <span class="math notranslate nohighlight">\(\bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \mathbf{\epsilon}\)</span> and the covariance matrix <span class="math notranslate nohighlight">\(\mathbf{\Sigma}\)</span> is expressed <span class="math notranslate nohighlight">\(\mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> follows Bernoulli distribution, <span class="math notranslate nohighlight">\(\mathbf{L}\)</span> follows uniform distribution between <span class="math notranslate nohighlight">\(-0.0025 \tau\)</span> and <span class="math notranslate nohighlight">\(0.0025 \tau\)</span>, and <span class="math notranslate nohighlight">\(\mathbf{f}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{\epsilon}\)</span> follow  standard normal distribution.</p>
+<p>Let <span class="math notranslate nohighlight">\(\bar{r}_{ij} = (\frac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}})^{deg}\)</span>. The expected return is <span class="math notranslate nohighlight">\(\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \mathbf{\epsilon}\)</span>, and the covariance matrix is <span class="math notranslate nohighlight">\(\mathbf{\Sigma} = \mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> follows a Bernoulli distribution, <span class="math notranslate nohighlight">\(\mathbf{L} \sim \textbf{U}(-0.0025\tau, 0.0025\tau)\)</span>, and <span class="math notranslate nohighlight">\(\mathbf{f}, \mathbf{\epsilon} \sim \mathcal{N}(0, \mathbf{I})\)</span>.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.data.portfolio.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>A function to generate synthetic data and features for travelling salesman</p>
+<dd><p>A function to generate synthetic data and features for portfolio</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -256,8 +252,7 @@ In general, there are several parameters that users can control:</p>
 </dl>
 </dd></dl>
 
-<p>The following code is to generate data for the portfolio:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
 <span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
 <span class="n">num_feat</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># size of feature</span>
@@ -269,16 +264,16 @@ In general, there are several parameters that users can control:</p>
 </section>
 <section id="optdataset">
 <h2>optDataset<a class="headerlink" href="#optdataset" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDataset</span></code> is PyTorch Dataset, which stores the features and their corresponding costs of the objective function, and <strong>solves optimization problems to get optimal solutions and optimal objective values</strong>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">optDataset</span></code> is <strong>not</strong> necessary for training with PyEPO, but it can be easier to obtain optimal solutions and objective values when they are not available in the original data.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDataset</span></code> is a PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> that stores features and cost coefficients, and <strong>solves the optimization problem to obtain optimal solutions and objective values</strong>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">optDataset</span></code> is <strong>not</strong> required for training with PyEPO, but it provides a convenient way to precompute optimal solutions and objective values when they are not available in the original data.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>This class is Torch Dataset for optimization problems.</p>
+<dd><p>This class is a Torch Dataset for optimization problems.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">model</span></span></dt>
-<dd><p>Optimization models</p>
+<dd><p>Optimization model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
@@ -330,21 +325,11 @@ In general, there are several parameters that users can control:</p>
 </dl>
 </dd></dl>
 
-<p>A method to create a optDataset from optModel</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an instance of optModel</p></li>
-<li><p><strong>feats</strong> (<em>np.ndarray</em>) – data features</p></li>
-<li><p><strong>costs</strong> (<em>np.ndarray</em>) – costs of objective function</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
-<p>As the following example, <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> and Pytorch <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> wrap the data samples, which can make the model training cleaner and more organized.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<p>The following example shows how to use <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> with a PyTorch <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="c1"># model for shortest path</span>
 <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
@@ -367,16 +352,16 @@ In general, there are several parameters that users can control:</p>
 </section>
 <section id="optdatasetknn">
 <h2>optDatasetKNN<a class="headerlink" href="#optdatasetknn" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDatasetKNN</span></code> is a PyTorch Dataset designed for implementing k-nearest neighbors (kNN) robust loss <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> in decision-focused learning. It stores the features and their corresponding costs of the objective function and solves optimization problems to get <strong>mean kNN solutions and optimal objective values</strong>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDatasetKNN</span></code> is a PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for k-nearest neighbors (kNN) robust loss <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> in decision-focused learning. It stores features and cost coefficients, and computes <strong>mean kNN solutions and optimal objective values</strong>.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetKNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>This class is Torch Dataset for optimization problems, when using the robust kNN-loss.</p>
+<dd><p>This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.</p>
 <p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2310.04328">https://arxiv.org/abs/2310.04328</a>&gt;</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">model</span></span></dt>
-<dd><p>Optimization models</p>
+<dd><p>Optimization model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
@@ -450,23 +435,10 @@ In general, there are several parameters that users can control:</p>
 </dl>
 </dd></dl>
 
-<p>A method to create a optDataset from optModel</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – an instance of optModel</p></li>
-<li><p><strong>feats</strong> (<em>np.ndarray</em>) – data features</p></li>
-<li><p><strong>costs</strong> (<em>np.ndarray</em>) – costs of objective function</p></li>
-<li><p><strong>k</strong> (<em>int</em>) – number of nearest neighbours selected</p></li>
-<li><p><strong>weight</strong> (<em>float</em>) – weight of kNN-loss</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
-<p>As the following example, <code class="docutils literal notranslate"><span class="pre">optDatasetKNN</span></code> and Pytorch <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> wrap the data samples, which can make the model training cleaner and more organized.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyepo</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="c1"># model for shortest path</span>
 <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
@@ -487,7 +459,7 @@ In general, there are several parameters that users can control:</p>
 </pre></div>
 </div>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="f1" role="note">
+<aside class="footnote brackets" id="f1" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Schutte, N., Postek, K., &amp; Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.</p>
 </aside>
@@ -500,7 +472,7 @@ In general, there are several parameters that users can control:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="model.html" class="btn btn-neutral float-left" title="Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="twostage.html" class="btn btn-neutral float-right" title="Two-stage Method" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="twostage.html" class="btn btn-neutral float-right" title="Two-Stage Method" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

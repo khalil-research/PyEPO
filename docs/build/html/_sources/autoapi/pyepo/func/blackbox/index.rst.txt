@@ -28,14 +28,14 @@ Module Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for differentiable black-box optimizer, which yield
+   An autograd module for differentiable black-box optimizer, which yields
    an optimal solution and derive a gradient.
 
-   For differentiable block-box, the objective function is linear and
+   For differentiable black-box, the objective function is linear and
    constraints are known and fixed, but the cost vector needs to be predicted
    from contextual data.
 
-   The block-box approximates the gradient of the optimizer by interpolating
+   The black-box approximates the gradient of the optimizer by interpolating
    the loss function. Thus, it allows us to design an algorithm based on
    stochastic gradient descent.
 
@@ -45,9 +45,6 @@ Module Contents
    .. py:attribute:: lambd
       :value: 10
 
-
-
-   .. py:attribute:: dbb
 
 
    .. py:method:: forward(pred_cost)
@@ -61,7 +58,7 @@ Module Contents
    Bases: :py:obj:`torch.autograd.Function`
 
 
-   A autograd function for differentiable black-box optimizer
+   An autograd function for differentiable black-box optimizer
 
 
    .. py:method:: forward(ctx, pred_cost, module)
@@ -93,8 +90,8 @@ Module Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for the differentiable optimizer, which yields optimal a
-   solution and use negative identity as a gradient on the backward pass.
+   An autograd module for the differentiable optimizer, which yields an optimal
+   solution and uses negative identity as a gradient on the backward pass.
 
    For negative identity backpropagation, the objective function is linear and
    constraints are known and fixed, but the cost vector needs to be predicted
@@ -108,9 +105,6 @@ Module Contents
    Reference: <https://arxiv.org/abs/2205.15213>
 
 
-   .. py:attribute:: nid
-
-
    .. py:method:: forward(pred_cost)
 
       Forward pass
@@ -122,7 +116,7 @@ Module Contents
    Bases: :py:obj:`torch.autograd.Function`
 
 
-   A autograd function for differentiable black-box optimizer
+   An autograd function for negative identity optimizer
 
 
    .. py:method:: forward(ctx, pred_cost, module)
@@ -133,7 +127,7 @@ Module Contents
 
       :param pred_cost: a batch of predicted values of the cost
       :type pred_cost: torch.tensor
-      :param module: blackboxOpt module
+      :param module: negativeIdentity module
       :type module: optModule
 
       :returns: predicted solutions
