@@ -1,39 +1,38 @@
 Data
 ++++
 
-``pyepo.data`` contains synthetic data generator and a dataset class ``optDataset`` to wrap data samples.
+``pyepo.data`` provides synthetic data generators and the ``optDataset`` class for wrapping data samples.
 
-For more information and details about the Dataset, please see the `02 Optimization Dataset <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_
+For more details, see the `02 Optimization Dataset <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb>`_ notebook.
 
 
 Data Generator
 ==============
 
-``pyepo.data`` includes synthetic datasets for three of the most classic optimization problems: the shortest path problem, the multi-dimensional knapsack problem, the traveling salesperson problem, and portfolio optimization.
+``pyepo.data`` includes synthetic data generators for four optimization problems: shortest path, multi-dimensional knapsack, traveling salesperson, and portfolio optimization.
 
-The synthetic datasets include features :math:`\mathbf{x}` and cost coefficients :math:`\mathbf{c}`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the corresponding cost :math:`\mathbf{c}_i \in \mathbb{R}^d` comes from a polynomial function :math:`f(\mathbf{x}_i)` multiplicated with a random noise :math:`\mathbf{\epsilon}_i \sim  U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
-In general, there are several parameters that users can control:
+Each generator produces feature-cost pairs :math:`(\mathbf{x}, \mathbf{c})`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the cost :math:`\mathbf{c}_i \in \mathbb{R}^d` is computed from a polynomial function :math:`f(\mathbf{x}_i)` multiplied by random noise :math:`\mathbf{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
 
-* **num_data** (:math:`n`): data size
+Common parameters across all generators:
 
-* **num_features** (:math:`p`): feature dimension of costs :math:`\mathbf{c}`
+* **num_data** (:math:`n`): number of data samples
 
-* **deg** (:math:`deg`): polynomial degree of function :math:`f(\mathbf{x}_i)`
+* **num_features** (:math:`p`): feature dimension
 
-* **noise_width** (:math:`\bar{\epsilon}`):  noise half-width of :math:`\mathbf{\epsilon}`
+* **deg** (:math:`deg`): polynomial degree of the mapping :math:`f(\mathbf{x}_i)`
 
-* **seed**: random state seed to generate data
+* **noise_width** (:math:`\bar{\epsilon}`): noise half-width
+
+* **seed**: random seed for reproducibility
 
 
 Shortest Path
 -------------
 
-For the shortest path, a random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` which follows Bernoulli distribution with probability :math:`0.5`, encode the features :math:`x_i`. The cost of objective function :math:`c_{ij}` is generated from :math:`c_i^j = [\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
+A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0.5) entries encodes the features. The cost coefficients are generated as :math:`c_i^j = [\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
 
 .. autofunction:: pyepo.data.shortestpath.genData
     :noindex:
-
-The following code is to generate data for the shortest path on the grid network:
 
 .. code-block:: python
 
@@ -48,12 +47,10 @@ The following code is to generate data for the shortest path on the grid network
 Knapsack
 --------
 
-Because we assume that the uncertain coefficients exist only on the objective function, the weights of items are fixed throughout the data. We define the number of items as :math:`m` and the dimension of resources is :math:`k`. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are sampled from :math:`3` to :math:`8` with a precision of :math:`1` decimal place. With the same :math:`\mathcal{B}`, cost :math:`c_{ij}` is calculated from :math:`c_i^j = \lceil [\frac{5}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil`.
+Since uncertain coefficients appear only in the objective function, item weights are fixed. Let :math:`m` be the number of items and :math:`k` the number of resource dimensions. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are sampled from 3 to 8 with one decimal place of precision. The cost coefficients are :math:`c_i^j = \lceil [\frac{5}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil`.
 
 .. autofunction:: pyepo.data.knapsack.genData
     :noindex:
-
-The following code is to generate data for the 3d-knapsack:
 
 .. code-block:: python
 
@@ -69,12 +66,10 @@ The following code is to generate data for the 3d-knapsack:
 Traveling Salesperson
 ---------------------
 
-The distance consists of two parts: one comes from Euclidean distance, the other derived from feature encoding. For Euclidean distance, we create coordinates from the mixture of Gaussian distribution :math:`\mathcal{N}(0, I)` and uniform distribution :math:`\textbf{U}(-2, 2)`. For feature encoding, it is :math:`\frac{1}{{3}^{deg - 1}} (\frac{1}{\sqrt{p}} (\mathcal{B} x_i)_j + 3)^{deg} \cdot \epsilon_i`, where the elements of :math:`\mathcal{B}` come from the multiplication of Bernoulli :math:`\textbf{B}(0.5)` and uniform :math:`\textbf{U}(-2, 2)`.
+The distance matrix has two components: a Euclidean distance term and a feature-encoded term. Coordinates are drawn from a mixture of Gaussian :math:`\mathcal{N}(0, I)` and uniform :math:`\textbf{U}(-2, 2)` distributions. The feature-encoded component is :math:`\frac{1}{{3}^{deg - 1}} (\frac{1}{\sqrt{p}} (\mathcal{B} x_i)_j + 3)^{deg} \cdot \epsilon_i`, where the elements of :math:`\mathcal{B}` are products of Bernoulli :math:`\textbf{B}(0.5)` and uniform :math:`\textbf{U}(-2, 2)` samples.
 
 .. autofunction:: pyepo.data.tsp.genData
     :noindex:
-
-The following code is to generate data for the Traveling salesperson:
 
 .. code-block:: python
 
@@ -89,12 +84,10 @@ The following code is to generate data for the Traveling salesperson:
 Portfolio
 ---------
 
-Let :math:`\bar{r}_{ij} = (\frac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}})^{deg}`. In the context of portfolio optimization, the expected return of the assets :math:`\mathbf{r}_i` is defined as :math:`\bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \mathbf{\epsilon}` and the covariance matrix :math:`\mathbf{\Sigma}` is expressed :math:`\mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}`, where :math:`\mathcal{B}` follows Bernoulli distribution, :math:`\mathbf{L}` follows uniform distribution between :math:`-0.0025 \tau` and :math:`0.0025 \tau`, and :math:`\mathbf{f}` and :math:`\mathbf{\epsilon}` follow  standard normal distribution.
+Let :math:`\bar{r}_{ij} = (\frac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}})^{deg}`. The expected return is :math:`\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \mathbf{\epsilon}`, and the covariance matrix is :math:`\mathbf{\Sigma} = \mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}`, where :math:`\mathcal{B}` follows a Bernoulli distribution, :math:`\mathbf{L} \sim \textbf{U}(-0.0025\tau, 0.0025\tau)`, and :math:`\mathbf{f}, \mathbf{\epsilon} \sim \mathcal{N}(0, \mathbf{I})`.
 
 .. autofunction:: pyepo.data.portfolio.genData
     :noindex:
-
-The following code is to generate data for the portfolio:
 
 .. code-block:: python
 
@@ -110,14 +103,14 @@ The following code is to generate data for the portfolio:
 optDataset
 ==========
 
-``pyepo.data.optDataset`` is PyTorch Dataset, which stores the features and their corresponding costs of the objective function, and **solves optimization problems to get optimal solutions and optimal objective values**.
+``pyepo.data.optDataset`` is a PyTorch ``Dataset`` that stores features and cost coefficients, and **solves the optimization problem to obtain optimal solutions and objective values**.
 
-``optDataset`` is **not** necessary for training with PyEPO, but it can be easier to obtain optimal solutions and objective values when they are not available in the original data.
+``optDataset`` is **not** required for training with PyEPO, but it provides a convenient way to precompute optimal solutions and objective values when they are not available in the original data.
 
 .. autoclass:: pyepo.data.dataset.optDataset
     :noindex:
 
-As the following example, ``optDataset`` and Pytorch ``DataLoader`` wrap the data samples, which can make the model training cleaner and more organized.
+The following example shows how to use ``optDataset`` with a PyTorch ``DataLoader``:
 
 .. code-block:: python
 
@@ -145,12 +138,10 @@ As the following example, ``optDataset`` and Pytorch ``DataLoader`` wrap the dat
 optDatasetKNN
 =============
 
-``pyepo.data.optDatasetKNN`` is a PyTorch Dataset designed for implementing k-nearest neighbors (kNN) robust loss [#f1]_ in decision-focused learning. It stores the features and their corresponding costs of the objective function and solves optimization problems to get **mean kNN solutions and optimal objective values**.
+``pyepo.data.optDatasetKNN`` is a PyTorch ``Dataset`` for k-nearest neighbors (kNN) robust loss [#f1]_ in decision-focused learning. It stores features and cost coefficients, and computes **mean kNN solutions and optimal objective values**.
 
 .. autoclass:: pyepo.data.dataset.optDatasetKNN
     :noindex:
-
-As the following example, ``optDatasetKNN`` and Pytorch ``DataLoader`` wrap the data samples, which can make the model training cleaner and more organized.
 
 .. code-block:: python
 

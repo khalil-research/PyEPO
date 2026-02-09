@@ -1,44 +1,47 @@
 Model
 +++++
 
-``PyEPO`` is an implementation that aims to support an end-to-end predict-then-optimize with linear objective function and unknown cost coefficients. The core component is the differentiable optimization solver, which is involved in updating the gradient of the cost coefficients with respect to the optimal solution.
+``PyEPO`` supports end-to-end predict-then-optimize with linear objective functions and unknown cost coefficients. At its core is the differentiable optimization solver, which computes gradients of the cost coefficients with respect to the optimal solution.
 
-``optModel`` is a module of PyEPO library. It is not a solver but serves as a container of a solver or an algorithm. This design allows for flexibility in the selection of solvers and algorithms by users. Other modules of ``PyEPO`` can use optModel for tasks such as training and testing.
+``optModel`` is the base abstraction in ``PyEPO``. It wraps an optimization solver or algorithm as a container, providing a unified interface for training and evaluation. ``PyEPO`` provides several pre-defined models using GurobiPy, Pyomo, COPT, and MPAX:
 
-``PyEPO`` contains several pre-defined optimization models with GurobiPy and Pyomo. It includes the shortest path problem (GurobiPy & Pyomo), the knapsack problem (GurobiPy & Pyomo), and the traveling salesman problem (GurobiPy).
+* **Shortest path** (GurobiPy, Pyomo, COPT & MPAX)
+* **Knapsack** (GurobiPy, Pyomo, COPT & MPAX)
+* **Traveling salesman** (GurobiPy)
+* **Portfolio optimization** (GurobiPy)
 
-To build optimization models with ``PyEPO``, users do **not** need specific costs of objective functions since the cost vector is unknown but will be estimated from data.
+When building models with ``PyEPO``, users do **not** need to specify the cost coefficients, since they are unknown and will be predicted from data.
 
-For more information and details about the Optimization Model, please see the `01 Optimization Model: <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_
+For more details, see the `01 Optimization Model <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_ notebook.
 
 
 User-defined Models
 ===================
 
-User can build optimization problem with linear objective function. Our API is also designed to support users to define their own problems based on GurobiPy and Pyomo. Besides the API of GurobiPy & Pyomo, users can also build problems from scratch with whatever solvers and algorithms they want to use.
+Users can define custom optimization problems with linear objective functions. ``PyEPO`` provides three ways to do this:
 
-``optModel`` treats these solvers as black boxes and provides interfaces ``_getModel``, ``setObj``, and ``solve``.
+1. **GurobiPy-based**: Inherit from ``optGrbModel`` and implement ``_getModel``.
+2. **Pyomo-based**: Inherit from ``optOmoModel`` and implement ``_getModel``.
+3. **From scratch**: Inherit from ``optModel`` and implement ``_getModel``, ``setObj``, ``solve``, and ``num_cost``.
 
-* ``_getModel``: Build and return optimization solver and corresponding decision variables.
+The ``optModel`` interface consists of:
 
-* ``setObj``: Give a cost vector to set the objective function.
-
-* ``solve``: Solve optimization problem and return optimal solution and objective value.
+* ``_getModel``: Build and return the optimization model and decision variables.
+* ``setObj``: Set the objective function with a given cost vector.
+* ``solve``: Solve the problem and return the optimal solution and objective value.
 
 
 User-defined GurobiPy Models
 ----------------------------
 
-User-defined models with GurobiPy can be easily defined by the inheritance of the abstract class ``pyepo.model.grb.optGrbModel``.
-
-For ``optGrbModel``, users does not need specify the sense ``modelSense`` as ``EPO.MINIMIZE`` or ``EPO.MINIMIZE``. Both the minimization and maximization models are correctly recognized and run by ``pyepo``.
+To define a GurobiPy model, inherit from ``pyepo.model.grb.optGrbModel`` and implement the ``_getModel`` method. The model sense (minimize/maximize) is automatically detected from the GurobiPy model.
 
 .. autoclass:: pyepo.model.grb.optGrbModel
     :noindex:
     :members: __init__, _getModel, setObj, solve, num_cost, relax
 
 
-For example, users can build models for the following problem:
+For example, consider the following binary optimization problem:
 
 .. math::
   \begin{aligned}
@@ -49,7 +52,7 @@ For example, users can build models for the following problem:
   & \forall x_i \in \{0, 1\}
   \end{aligned}
 
-In the general case, users only need to implement ``_getModel`` method with GurobiPy.
+Users only need to implement the ``_getModel`` method:
 
 .. code-block:: python
 
@@ -84,27 +87,15 @@ In the general case, users only need to implement ``_getModel`` method with Guro
 User-defined Pyomo Models
 -------------------------
 
-User-defined models with Pyomo can be easily defined by the inheritance of the abstract class ``pyepo.model.omo.optOmoModel``.
+To define a Pyomo model, inherit from ``pyepo.model.omo.optOmoModel`` and implement the ``_getModel`` method.
 
 .. autoclass:: pyepo.model.omo.optOmoModel
     :noindex:
     :members: __init__, _getModel, setObj, solve, num_cost, relax
 
+.. warning::  Unlike ``optGrbModel``, ``optOmoModel`` requires explicitly setting ``modelSense`` in ``_getModel``.
 
-Let's build models for the problem again with Pyomo:
-
-.. math::
-  \begin{aligned}
-  \max_{x} & \sum_{i=0}^4 c_i x_i \\
-  s.t. \quad & 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
-  & 4 x_0 + 5 x_1 + 2 x_2 + 3 x_3 + 5 x_4 \leq 10 \\
-  & 5 x_0 + 4 x_1 + 6 x_2 + 2 x_3 + 3 x_4 \leq 15 \\
-  & \forall x_i \in \{0, 1\}
-  \end{aligned}
-
-In the general case, users only need to implement ``_getModel`` method with Pyomo.
-
-.. warning::  Unlike the ``optGrbModel``, the ``optOmoModel`` need to set ``modelSense`` in the ``_getModel``.
+Here is the same problem implemented with Pyomo:
 
 .. code-block:: python
 
@@ -141,15 +132,15 @@ In the general case, users only need to implement ``_getModel`` method with Pyom
 User-defined Models from Scratch
 --------------------------------
 
-``pyepo.model.opt.optModel`` provides an abstract class for users to create an optimization model with any solvers or algorithms. By overriding ``_getModel``, ``setObj``, ``solve``,  and ``num_cost``, user-defined ``optModel`` can work for end-to-end training.
+For complete flexibility, ``pyepo.model.opt.optModel`` allows users to build models with any solver or algorithm. Override ``_getModel``, ``setObj``, ``solve``, and ``num_cost`` to integrate a custom solver.
 
 .. autoclass:: pyepo.model.opt.optModel
     :noindex:
     :members: __init__, _getModel, setObj, solve, num_cost
 
-.. warning::  The ``optModel`` need to set ``modelSense`` in the ``_getModel``. If not set, the default is to minimize.
+.. warning::  ``optModel`` requires setting ``modelSense`` in ``_getModel``. If not set, the default is minimization.
 
-For example, we can use ``networkx`` to solve the previous shortest path problem using the Dijkstra algorithm. And ``pyepo.model.opt.optModel`` allows users to create a model in the following way:
+The following example uses ``networkx`` with the Dijkstra algorithm to solve a shortest path problem:
 
 .. code-block:: python
 
@@ -253,27 +244,52 @@ For example, we can use ``networkx`` to solve the previous shortest path problem
            print(e)
 
 
+MPAX Models
+===========
+
+MPAX (Mathematical Programming in JAX) is a hardware-accelerated mathematical programming framework based on the PDHG (Primal-Dual Hybrid Gradient) algorithm, designed for large-scale LP problems.
+
+``optMpaxModel`` is a ``PyEPO`` model that uses MPAX to solve LP relaxations via PDHG. It accepts constraints in matrix/vector form:
+
+   - ``A``, ``b``: Equality constraints :math:`Ax = b`. Omit if there are no equality constraints.
+   - ``G``, ``h``: Inequality constraints :math:`Gx \leq h`. Omit if there are no inequality constraints.
+   - ``l``: Lower bounds (default: 0, i.e., non-negative variables).
+   - ``u``: Upper bounds (default: infinity, i.e., unbounded).
+   - ``use_sparse_matrix`` (default: ``True``): Whether to use sparse matrix storage.
+   - ``minimize`` (default: ``True``): Whether to minimize the objective.
+
+.. autoclass:: pyepo.model.mpax.optMpaxModel
+  :noindex:
+  :members: __init__, _getModel, setObj, solve, num_cost, relax
+
+.. code-block:: python
+
+   from pyepo.model.mpax import optMpaxModel
+   optmodel = optMpaxModel(A=A, b=b, G=G, h=h, use_sparse_matrix=False, minimize=True)
+
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
+
+
 Pre-defined Models
 ==================
 
-Pre-defined models are classic optimization problems, including shortest path, multidimensional knapsack, and traveling salesman.
+``PyEPO`` includes pre-defined models for several classic optimization problems.
 
 
 Shortest Path
 -------------
 
-It is a (h,w) grid network and the goal is to find the shortest path from northwest to southeast. In our examples, the grid size of network is (5,5).
+The shortest path problem finds the minimum-cost path from the northwest corner to the southeast corner of an (h, w) grid network. The default grid size is (5, 5).
 
 .. image:: ../../images/shortestpath.png
   :width: 300
   :alt: Shortest Path on the Grid Graph
 
-In ``PyEPO``, the shortest path problem is built as a linear program and formulated as a minimum cost flow problem.
+The problem is formulated as a minimum cost flow linear program.
 
 Shortest Path GurobiPy Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The ``optModel`` is built from ``pyepo.model.grb.shortestPathModel``, in which API uses GurobiPy to model the shortest path problem.
 
 .. autoclass:: pyepo.model.grb.shortestPathModel
     :noindex:
@@ -286,7 +302,7 @@ The ``optModel`` is built from ``pyepo.model.grb.shortestPathModel``, in which A
    grid = (5,5) # network grid
    optmodel = pyepo.model.grb.shortestPathModel(grid) # build model
 
-Users can use ``setObj`` to assign a specific cost vector and use ``solve`` to optimize. However, ``setObj`` or  ``solve`` methods do not require manual calls during training.
+The ``setObj`` and ``solve`` methods can be called manually, but they are invoked automatically during training.
 
 .. code-block:: python
 
@@ -298,42 +314,31 @@ Users can use ``setObj`` to assign a specific cost vector and use ``solve`` to o
 Shortest Path Pyomo Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``optModel`` is built from ``pyepo.model.omo.shortestPathModel``, in which API uses Pyomo to model the shortest path problem.
-
 .. autoclass:: pyepo.model.omo.shortestPathModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-Pyomo supports a wide variety of solvers in the background (e.g. BARON, CBC, CPLEX, and Gurobi). Thus, ``pyepo.model.omo.shortestPathModel`` allows users to call different solvers with class parameter ``solver``.
+Pyomo supports multiple backend solvers (e.g., BARON, CBC, CPLEX, Gurobi). Specify the solver via the ``solver`` parameter:
 
 .. code-block:: python
 
    import pyepo
 
    grid = (5,5) # network grid
-   optmodel = pyepo.model.omo.shortestPathModel(grid, solver="glpk") # build model with glpk
-   optmodel = pyepo.model.omo.shortestPathModel(grid, solver="gurobi") # build model with gurobi
+   optmodel = pyepo.model.omo.shortestPathModel(grid, solver="glpk") # build model with GLPK
+   optmodel = pyepo.model.omo.shortestPathModel(grid, solver="gurobi") # build model with Gurobi
 
-You can get the current list of supported solvers using the pyomo command:
+To list available solvers:
 
 .. code-block:: bash
 
    pyomo help --solvers
 
-Same as ``pyepo.model.grb.shortestPathModel``, methods ``setObj`` and ``solve`` can specify objective function and solve the problem.
-
-.. code-block:: python
-
-   import random
-   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
-
 
 Knapsack
 --------
 
-Multi-dimensional knapsack problem is a maximization problem with multiple resource constraints: Given a set of items, the aim is to find a collection that the total weights in is less than or equal to resource capacities and the total value is as large as possible. Let's define a 3D knapsack problem as follow:
+The multi-dimensional knapsack problem is a maximization problem: select a subset of items such that total weight does not exceed resource capacities and total value is maximized. Consider a 3-dimensional example:
 
 .. math::
   \begin{aligned}
@@ -344,14 +349,12 @@ Multi-dimensional knapsack problem is a maximization problem with multiple resou
   & \forall x_i \in \{0, 1\}
   \end{aligned}
 
-Constraints coefficients **weights** and constraints rhs **capacities** are required to create models.
+The constraint coefficients **weights** and right-hand sides **capacities** define the problem.
 
-.. note:: The dimension of the knapsack and the number of items are implicitly defined by the shape of **weights** and **capacities**.
+.. note:: The number of dimensions and items are determined by the shape of **weights** and **capacities**.
 
 Knapsack GurobiPy Model
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-The ``optModel`` is built from ``pyepo.model.grb.knapsackModel``, in which API uses GurobiPy to model the knapsack problem.
 
 .. autoclass:: pyepo.model.grb.knapsackModel
     :noindex:
@@ -367,8 +370,6 @@ The ``optModel`` is built from ``pyepo.model.grb.knapsackModel``, in which API u
    capacities = [12, 10, 15] # constraints rhs
    optmodel = pyepo.model.grb.knapsackModel(weights, capacities) # build model
 
-Similarly, users can use ``setObj`` to assign a specific cost vector and use ``solve`` to optimize. However, ``setObj`` or  ``solve`` methods do not require manual calls during training.
-
 .. code-block:: python
 
    import random
@@ -376,7 +377,7 @@ Similarly, users can use ``setObj`` to assign a specific cost vector and use ``s
    optmodel.setObj(cost) # set objective function
    optmodel.solve() # solve
 
-In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the problem that arises by removing the integrality constraint of each variable. As an ILP, ``optGrbModel`` allows users to relax ILP with ``relax`` method to obtain a relaxation ``optModel`` from the original.
+The ``relax`` method returns an LP relaxation by removing integrality constraints:
 
 .. code-block:: python
 
@@ -384,8 +385,6 @@ In mathematics, the relaxation of a (Mixed) Integer Linear Programming is the pr
 
 Knapsack Pyomo Model
 ^^^^^^^^^^^^^^^^^^^^
-
-The ``optModel`` is built from ``pyepo.model.omo.knapsackModel``, in which API uses Pyomo to model the knapsack problem.
 
 .. autoclass:: pyepo.model.omo.knapsackModel
     :noindex:
@@ -404,23 +403,15 @@ The ``optModel`` is built from ``pyepo.model.omo.knapsackModel``, in which API u
    # build model with Gurobi
    optmodel = pyepo.model.omo.knapsackModel(weights, capacities, solver="gurobi")
 
-Same as ``pyepo.model.grb.knapsackModel``,  users can use ``setObj``, ``solve``, and ``relax`` methods.
-
-You can get the current list of supported solvers using the pyomo command:
-
-.. code-block:: bash
-
-   pyomo help --solvers
-
 
 Traveling Salesman
 ------------------
 
-The traveling salesman problem (TSP) is the shortest route that visits each city exactly once and returns to the origin city. We consider the symmetric TSP, in which the distance between two cities is the same in each opposite direction. In our examples, the number of nodes is 20.
+The traveling salesman problem (TSP) seeks the shortest route that visits each city exactly once and returns to the origin. We consider the symmetric TSP with 20 nodes.
 
-The TSP can be formulated as an Integer Linear Programming with several formulations. We implemented Dantzig–Fulkerson–Johnson (DFJ) formulation, Gavish–Graves (GG) formulation, and Miller–Tucker–Zemlin (MTZ) formulation.
+Three ILP formulations are available: Dantzig-Fulkerson-Johnson (DFJ), Gavish-Graves (GG), and Miller-Tucker-Zemlin (MTZ).
 
-.. note:: The implementation of TSP is only based on GurobiPy. Pyomo is not supported.
+.. note:: TSP models are only available with GurobiPy.
 
 DFJ formulation
 ^^^^^^^^^^^^^^^
@@ -429,9 +420,7 @@ DFJ formulation
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-The number of subtour elimination constraints for DFJ formulation is exponential. Thus, we solved it with column generation. Because of that, the linear relaxation of DFJ is **not** supported in our implementation.
-
-Same as previous model, the code for traveling salesman problem with DFJ formulation is as follows:
+The DFJ formulation has exponentially many subtour elimination constraints, solved via column generation. LP relaxation is **not** supported.
 
 .. code-block:: python
 
@@ -452,8 +441,6 @@ GG formulation
 .. autoclass:: pyepo.model.grb.tspGGModel
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
-
-Same as previous model, the code for traveling salesman problem with GG formulation is as follows:
 
 .. code-block:: python
 
@@ -477,8 +464,6 @@ MTZ formulation
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
 
-Same as previous model, the code for traveling salesman problem with MTZ formulation is as follows:
-
 .. code-block:: python
 
    import pyepo
@@ -498,7 +483,7 @@ Same as previous model, the code for traveling salesman problem with MTZ formula
 Portfolio
 ---------
 
-Portfolio optimization is a crucial concept in financial management and investment theory, primarily concerned with the process of selecting the best portfolio (asset distribution) out of the set of all portfolios being considered according to some objective. Our model seeks highest expected return for a given level of risk.
+Portfolio optimization selects an asset allocation that maximizes expected return for a given level of risk:
 
 .. math::
   \begin{aligned}
@@ -512,8 +497,6 @@ Portfolio optimization is a crucial concept in financial management and investme
 Portfolio GurobiPy Model
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``optModel`` is built from ``pyepo.model.grb.portfolioModel``, in which API uses GurobiPy to model the portfolio optimization.
-
 .. autoclass:: pyepo.model.grb.portfolioModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
@@ -521,11 +504,11 @@ The ``optModel`` is built from ``pyepo.model.grb.portfolioModel``, in which API 
 .. code-block:: python
 
    import pyepo
+   import numpy as np
+
    m = 50 # number of assets
    cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
    optmodel = pyepo.model.grb.portfolioModel(m, cov) # build model
-
-Similarly, users can use ``setObj`` to assign a specific cost vector and use ``solve`` to optimize. However, ``setObj`` or  ``solve`` methods do not require manual calls during training.
 
 .. code-block:: python
 
