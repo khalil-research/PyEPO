@@ -304,3 +304,28 @@ Learning-to-Rank methods learn a scoring function that ranks feasible solutions.
            optimizer.zero_grad()
            loss.backward()
            optimizer.step()
+
+
+Training with PG
+=================
+
+Perturbation Gradient uses zeroth-order gradient approximation via finite differences along the true cost direction. It takes predicted costs and true costs as input.
+
+.. code-block:: python
+
+   # init PG loss
+   pg = pyepo.func.perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=2)
+
+   # training
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for data in dataloader:
+           x, c, w, z = data
+           # forward pass
+           cp = predmodel(x)
+           # PG loss
+           loss = pg(cp, c)
+           # backward pass
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()

@@ -209,6 +209,25 @@ All three variants support parallel computation (**0 uses all available cores**)
 
 
 
+Perturbation Gradient (PG)
+==========================
+
+PG [#f9]_ is a surrogate loss based on zeroth-order gradient approximation via Danskin's Theorem. It uses finite differences along the true cost direction to estimate informative gradients through the optimization solver.
+
+.. autoclass:: pyepo.func.perturbationGradient
+    :noindex:
+    :members:
+
+``pyepo.func.perturbationGradient`` supports parallel computation (**0 uses all available cores**). ``sigma`` controls the finite difference width. ``two_sides`` enables central differencing for more accurate gradient estimates.
+
+.. code-block:: python
+
+   import pyepo
+
+   pg = pyepo.func.perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=2)
+
+
+
 Parallel Computation
 ====================
 
@@ -229,3 +248,4 @@ The figure shows that increasing the number of processes reduces runtime.
 .. [#f6] Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.
 .. [#f7] Niepert, M., Minervini, P., & Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.
 .. [#f8] Minervini, P., Franceschi, L., & Niepert, M. (2023, June). Adaptive perturbation-based gradient estimation for discrete latent variable models. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 8, pp. 9200-9208).
+.. [#f9] Gupta, V., & Huang, M. (2024). Decision-Focused Learning with Directional Gradients. arXiv preprint arXiv:2402.03256.
