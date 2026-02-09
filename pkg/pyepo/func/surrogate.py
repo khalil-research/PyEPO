@@ -44,16 +44,7 @@ class SPOPlus(optModule):
         Forward pass
         """
         loss = SPOPlusFunc.apply(pred_cost, true_cost, true_sol, true_obj, self)
-        # reduction
-        if self.reduction == "mean":
-            loss = torch.mean(loss)
-        elif self.reduction == "sum":
-            loss = torch.sum(loss)
-        elif self.reduction == "none":
-            loss = loss
-        else:
-            raise ValueError("No reduction '{}'.".format(self.reduction))
-        return loss
+        return self._reduce(loss)
 
 
 class SPOPlusFunc(Function):
@@ -155,16 +146,7 @@ class perturbationGradient(optModule):
         Forward pass
         """
         loss = self._finiteDifference(pred_cost, true_cost)
-        # reduction
-        if self.reduction == "mean":
-            loss = torch.mean(loss)
-        elif self.reduction == "sum":
-            loss = torch.sum(loss)
-        elif self.reduction == "none":
-            loss = loss
-        else:
-            raise ValueError("No reduction '{}'.".format(self.reduction))
-        return loss
+        return self._reduce(loss)
 
     def _finiteDifference(self, pred_cost, true_cost):
         """
@@ -180,12 +162,9 @@ class perturbationGradient(optModule):
             # solve
             wp, _ = _solve_or_cache(cp + self.sigma * c, self)
             wm, _ = _solve_or_cache(cp - self.sigma * c, self)
-            # convert numpy
-            sol_plus = torch.as_tensor(wp, dtype=torch.float32, device=device)
-            sol_minus = torch.as_tensor(wm, dtype=torch.float32, device=device)
             # differentiable objective value
-            obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * true_cost, sol_plus)
-            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
+            obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * true_cost, wp)
+            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
             # loss
             if self.optmodel.modelSense == EPO.MINIMIZE:
                 loss = (obj_plus - obj_minus) / (2 * self.sigma)
@@ -198,12 +177,9 @@ class perturbationGradient(optModule):
             # solve
             w, _ = _solve_or_cache(cp, self)
             wm, _ = _solve_or_cache(cp - self.sigma * c, self)
-            # convert numpy
-            sol = torch.as_tensor(w, dtype=torch.float32, device=device)
-            sol_minus = torch.as_tensor(wm, dtype=torch.float32, device=device)
             # differentiable objective value
-            obj = torch.einsum("bi,bi->b", pred_cost, sol)
-            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, sol_minus)
+            obj = torch.einsum("bi,bi->b", pred_cost, w)
+            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
             # loss
             if self.optmodel.modelSense == EPO.MINIMIZE:
                 loss = (obj - obj_minus) / self.sigma

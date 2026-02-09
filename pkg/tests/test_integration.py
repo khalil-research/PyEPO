@@ -243,6 +243,35 @@ class TestPointwiseLTR:
 
 
 # ============================================================
+# Parallel solving (processes > 1)
+# ============================================================
+
+@requires_gurobi
+class TestParallelSolving:
+
+    def test_spo_plus_parallel(self, sp_data):
+        optmodel, dataset, loader = sp_data
+        predmodel = _fresh_predmodel()
+        spo = pyepo.func.SPOPlus(optmodel, processes=2)
+        _train_loop(spo, loader, predmodel,
+                    lambda fn, cp, c, w, z: fn(cp, c, w, z))
+
+    def test_blackbox_parallel(self, sp_data):
+        optmodel, dataset, loader = sp_data
+        predmodel = _fresh_predmodel()
+        bb = pyepo.func.blackboxOpt(optmodel, processes=2, lambd=10)
+        _train_loop(bb, loader, predmodel,
+                    lambda fn, cp, c, w, z: fn(cp).mean())
+
+    def test_perturbed_opt_parallel(self, sp_data):
+        optmodel, dataset, loader = sp_data
+        predmodel = _fresh_predmodel()
+        ptb = pyepo.func.perturbedOpt(optmodel, processes=2, n_samples=3, sigma=1.0)
+        _train_loop(ptb, loader, predmodel,
+                    lambda fn, cp, c, w, z: fn(cp).mean())
+
+
+# ============================================================
 # Knapsack (MAXIMIZE) integration
 # ============================================================
 

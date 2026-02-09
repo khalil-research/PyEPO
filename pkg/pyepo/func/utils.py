@@ -41,7 +41,7 @@ def _solve_in_pass(cp, optmodel, processes, pool):
     A function to solve optimization in the forward/backward pass
     """
     # get device
-    device = cp.device
+    device = cp.device if isinstance(cp, torch.Tensor) else torch.device("cpu")
     # number of instance
     ins_num = len(cp)
     # MPAX batch solving
@@ -63,19 +63,21 @@ def _solve_in_pass(cp, optmodel, processes, pool):
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     # single-core
     elif processes == 1:
+        cp = cp.detach().cpu().numpy() if isinstance(cp, torch.Tensor) else np.asarray(cp)
         sol = []
         obj = []
         for i in range(ins_num):
             # solve
             optmodel.setObj(cp[i])
             solp, objp = optmodel.solve()
-            sol.append(torch.as_tensor(solp, dtype=torch.float32))
+            sol.append(np.asarray(solp, dtype=np.float32))
             obj.append(objp)
         # to tensor
-        sol = torch.stack(sol, dim=0).to(device)
+        sol = torch.as_tensor(np.stack(sol), dtype=torch.float32).to(device)
         obj = torch.tensor(obj, dtype=torch.float32, device=device)
     # multi-core
     else:
+        cp = cp.detach().cpu().numpy() if isinstance(cp, torch.Tensor) else np.asarray(cp)
         # get class
         model_type = type(optmodel)
         # get args
@@ -84,7 +86,7 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         res = pool.amap(_solveWithObj4Par, cp, [args] * ins_num,
                         [model_type] * ins_num).get()
         # get res
-        sol = torch.stack([r[0] for r in res], dim=0).to(device)
+        sol = torch.as_tensor(np.stack([r[0] for r in res]), dtype=torch.float32).to(device)
         obj = torch.tensor([r[1] for r in res], dtype=torch.float32, device=device)
     return sol, obj
 
@@ -135,8 +137,7 @@ def _solveWithObj4Par(cost, args, model_type):
     optmodel.setObj(cost)
     # solve
     sol, obj = optmodel.solve()
-    # to tensor
-    sol = torch.tensor(sol, dtype=torch.float32)
+    sol = np.asarray(sol, dtype=np.float32)
     return sol, obj
 
 
@@ -144,7 +145,8 @@ def _check_sol(c, w, z):
     """
     A function to check solution is correct
     """
-    error = torch.abs(z - torch.einsum("bi,bi->b", c, w)) / (torch.abs(z) + 1e-3)
+    z_flat = z.squeeze(-1) if z.dim() > 1 else z
+    error = torch.abs(z_flat - torch.einsum("bi,bi->b", c, w)) / (torch.abs(z_flat) + 1e-3)
     if torch.any(error >= 1e-3):
         raise AssertionError("Some solutions do not match the objective value.")
 

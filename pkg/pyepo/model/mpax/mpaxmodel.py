@@ -99,6 +99,10 @@ class optMpaxModel(optModel):
         Args:
             c (np.ndarray / list): cost of objective function
         """
+        # validate shape before assignment
+        c_len = c.shape[-1] if hasattr(c, "shape") else len(c)
+        if c_len != self.num_cost:
+            raise ValueError("Size of cost vector does not match number of cost variables.")
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):
             device = c.device  # get tensor device
@@ -129,8 +133,6 @@ class optMpaxModel(optModel):
         # c is already a NumPy array
         else:
             self.c = jnp.array(c, dtype=jnp.float32)
-        if c.shape[-1] != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
         # change sign for model sense
         if self.modelSense == EPO.MINIMIZE:
             pass
@@ -216,7 +218,7 @@ class optMpaxModel(optModel):
         """
         Placeholder method for MPAX. MPAX does not require an explicit model creation.
         """
-        return None, None
+        return None, []
 
 
 if __name__ == "__main__":

@@ -91,3 +91,26 @@ class optModel(ABC):
         An unimplemented method to relax the MIP model
         """
         raise RuntimeError("Method 'relax' is not implemented.")
+
+
+def _get_grid_arcs(grid):
+    """
+    Get list of arcs for a grid network.
+
+    Args:
+        grid (tuple of int): size of grid network (rows, cols)
+
+    Returns:
+        list: arcs as (source, target) tuples
+    """
+    arcs = []
+    for i in range(grid[0]):
+        for j in range(grid[1] - 1):
+            v = i * grid[1] + j
+            arcs.append((v, v + 1))
+        if i == grid[0] - 1:
+            continue
+        for j in range(grid[1]):
+            v = i * grid[1] + j
+            arcs.append((v, v + grid[1]))
+    return arcs
