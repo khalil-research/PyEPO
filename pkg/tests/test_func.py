@@ -17,7 +17,7 @@ try:
     from pyepo.model.grb.shortestpath import shortestPathModel
     from pyepo.model.grb.knapsack import knapsackModel
     _HAS_GUROBI = True
-except ImportError:
+except (ImportError, NameError):
     _HAS_GUROBI = False
 
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
