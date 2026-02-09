@@ -208,22 +208,24 @@ All three variants support parallel computation (**0 uses all available cores**)
    ltr = pyepo.func.listwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
 
-Perturbation Gradient Loss (PG)
-===============================
 
-PG Loss function [#f9]_  a surrogate loss function of objective value, which measures the decision quality of the optimization problem. For PG Loss, the objective function is linear, and constraints are known and fixed, but the cost vector needs to be predicted from contextual data. According to Danskin’s Theorem, the PG Loss is derived from different zeroth order approximations and has the informative gradient. Thus, it allows us to design an algorithm based on stochastic gradient descent.
+Perturbation Gradient (PG)
+==========================
+
+PG [#f9]_ is a surrogate loss based on zeroth-order gradient approximation via Danskin's Theorem. It uses finite differences along the true cost direction to estimate informative gradients through the optimization solver.
 
 .. autoclass:: pyepo.func.perturbationGradient
     :noindex:
     :members:
 
-``pyepo.func.perturbationGradient`` supports to solve optimization problems in parallel, parameter ``processes`` is the number of processors, **0 for using all available cores**.
+``pyepo.func.perturbationGradient`` supports parallel computation (**0 uses all available cores**). ``sigma`` controls the finite difference width. ``two_sides`` enables central differencing for more accurate gradient estimates.
 
 .. code-block:: python
 
    import pyepo
 
    pg = pyepo.func.perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=2)
+
 
 
 Parallel Computation
@@ -246,4 +248,4 @@ The figure shows that increasing the number of processes reduces runtime.
 .. [#f6] Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.
 .. [#f7] Niepert, M., Minervini, P., & Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.
 .. [#f8] Minervini, P., Franceschi, L., & Niepert, M. (2023, June). Adaptive perturbation-based gradient estimation for discrete latent variable models. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 8, pp. 9200-9208).
-.. [#f9] Gupta, V., & Huang, M. (2024). Decision-Focused Learning with Directional Gradients. Training, 50(100), 150.
+.. [#f9] Gupta, V., & Huang, M. (2024). Decision-Focused Learning with Directional Gradients. arXiv preprint arXiv:2402.03256.
