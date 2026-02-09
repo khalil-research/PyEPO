@@ -42,10 +42,10 @@ class optModule(nn.Module):
             print("MPAX does not support multiprocessing. Setting `processes = 1`.")
             processes = 1
         # number of processes
-        if processes not in range(mp.cpu_count()+1):
+        if processes < 0 or processes > mp.cpu_count():
             raise ValueError("Invalid processors number {}, only {} cores.".
                 format(processes, mp.cpu_count()))
-        self.processes = mp.cpu_count() if not processes else processes
+        self.processes = mp.cpu_count() if processes == 0 else processes
         # single-core
         if self.processes == 1:
             self.pool = None
