@@ -113,25 +113,22 @@
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.unionFind" title="pyepo.model.grb.tsp.unionFind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unionFind</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspABModel" title="pyepo.model.grb.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p></td>
 <td><p>This abstract class is an optimization model for the traveling salesman problem.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspGGModel" title="pyepo.model.grb.tsp.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspGGModel" title="pyepo.model.grb.tsp.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p></td>
 <td><p>This class is an optimization model for the traveling salesman problem based on Gavish–Graves (GG) formulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspGGModelRel" title="pyepo.model.grb.tsp.tspGGModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModelRel</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspGGModelRel" title="pyepo.model.grb.tsp.tspGGModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModelRel</span></code></a></p></td>
 <td><p>This class is relaxation of tspGGModel.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspDFJModel" title="pyepo.model.grb.tsp.tspDFJModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspDFJModel</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspDFJModel" title="pyepo.model.grb.tsp.tspDFJModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspDFJModel</span></code></a></p></td>
 <td><p>This class is an optimization model for the traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspMTZModel" title="pyepo.model.grb.tsp.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspMTZModel" title="pyepo.model.grb.tsp.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p></td>
 <td><p>This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspMTZModelRel" title="pyepo.model.grb.tsp.tspMTZModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModelRel</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.grb.tsp.tspMTZModelRel" title="pyepo.model.grb.tsp.tspMTZModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModelRel</span></code></a></p></td>
 <td><p>This class is relaxation of tspMTZModel.</p></td>
 </tr>
 </tbody>
@@ -143,26 +140,6 @@
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp._HAS_GUROBI">
 <span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">_HAS_GUROBI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pyepo.model.grb.tsp._HAS_GUROBI" title="Link to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.grb.tsp.unionFind">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.tsp.</span></span><span class="sig-name descname"><span class="pre">unionFind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.unionFind" title="Link to this definition"></a></dt>
-<dd><dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.tsp.unionFind.parent">
-<span class="sig-name descname"><span class="pre">parent</span></span><a class="headerlink" href="#pyepo.model.grb.tsp.unionFind.parent" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tsp.unionFind.find">
-<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.unionFind.find" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.grb.tsp.unionFind.union">
-<span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.tsp.unionFind.union" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.tsp.tspABModel">

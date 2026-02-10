@@ -20,5 +20,6 @@ Submodules
    /autoapi/pyepo/model/mpax/index
    /autoapi/pyepo/model/omo/index
    /autoapi/pyepo/model/opt/index
+   /autoapi/pyepo/model/ort/index
 
 

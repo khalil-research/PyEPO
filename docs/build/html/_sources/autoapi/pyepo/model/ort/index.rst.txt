@@ -1,0 +1,415 @@
+pyepo.model.ort
+===============
+
+.. py:module:: pyepo.model.ort
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on Google OR-Tools
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/model/ort/knapsack/index
+   /autoapi/pyepo/model/ort/ortcpmodel/index
+   /autoapi/pyepo/model/ort/ortmodel/index
+   /autoapi/pyepo/model/ort/shortestpath/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.ort.optOrtModel
+   pyepo.model.ort.optOrtCpModel
+   pyepo.model.ort.shortestPathModel
+   pyepo.model.ort.shortestPathCpModel
+   pyepo.model.ort.knapsackModel
+   pyepo.model.ort.knapsackModelRel
+   pyepo.model.ort.knapsackCpModel
+
+
+Package Contents
+----------------
+
+.. py:class:: optOrtModel(solver='scip')
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for an OR-Tools pywraplp optimization model
+
+   .. attribute:: _model
+
+      OR-Tools linear solver
+
+      :type: pywraplp.Solver
+
+   .. attribute:: solver
+
+      solver backend (e.g. "scip", "glop", "cbc")
+
+      :type: str
+
+
+   .. py:attribute:: solver
+      :value: 'scip'
+
+
+
+   .. py:attribute:: _extra_constrs
+      :value: []
+
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost of objective function
+      :type c: np.ndarray / list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve the model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy()
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add a new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: np.ndarray / list
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+.. py:class:: optOrtCpModel
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for an OR-Tools CP-SAT optimization model
+
+   .. attribute:: _model
+
+      OR-Tools CP-SAT model
+
+      :type: cp_model.CpModel
+
+
+   .. py:attribute:: _OBJ_SCALE
+      :value: 1000000
+
+
+
+   .. py:attribute:: _extra_constrs
+      :value: []
+
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost of objective function
+      :type c: np.ndarray / list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve the model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy()
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add a new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: np.ndarray / list
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax()
+
+      CP-SAT does not support LP relaxation.
+
+
+
+.. py:class:: shortestPathModel(grid, solver='glop')
+
+   Bases: :py:obj:`pyepo.model.ort.ortmodel.optOrtModel`
+
+
+   This class is an optimization model for the shortest path problem
+
+   .. attribute:: _model
+
+      OR-Tools linear solver
+
+      :type: pywraplp.Solver
+
+   .. attribute:: solver
+
+      solver backend
+
+      :type: str
+
+   .. attribute:: grid
+
+      size of grid network
+
+      :type: tuple of int
+
+   .. attribute:: arcs
+
+      list of arcs
+
+      :type: list
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools pywraplp model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:class:: shortestPathCpModel(grid)
+
+   Bases: :py:obj:`pyepo.model.ort.ortcpmodel.optOrtCpModel`
+
+
+   This class is an optimization model for the shortest path problem using CP-SAT
+
+   .. attribute:: _model
+
+      OR-Tools CP-SAT model
+
+      :type: cp_model.CpModel
+
+   .. attribute:: grid
+
+      size of grid network
+
+      :type: tuple of int
+
+   .. attribute:: arcs
+
+      list of arcs
+
+      :type: list
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools CP-SAT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:class:: knapsackModel(weights, capacity, solver='scip')
+
+   Bases: :py:obj:`pyepo.model.ort.ortmodel.optOrtModel`
+
+
+   This class is an optimization model for the knapsack problem
+
+   .. attribute:: _model
+
+      OR-Tools linear solver
+
+      :type: pywraplp.Solver
+
+   .. attribute:: solver
+
+      solver backend
+
+      :type: str
+
+   .. attribute:: weights
+
+      weights of items
+
+      :type: np.ndarray
+
+   .. attribute:: capacity
+
+      total capacity
+
+      :type: np.ndarray
+
+   .. attribute:: items
+
+      list of item index
+
+      :type: list
+
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools pywraplp model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: knapsackModelRel(weights, capacity, solver='scip')
+
+   Bases: :py:obj:`knapsackModel`
+
+
+   This class is relaxed optimization model for knapsack problem.
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools pywraplp model (relaxed)
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+
+.. py:class:: knapsackCpModel(weights, capacity)
+
+   Bases: :py:obj:`pyepo.model.ort.ortcpmodel.optOrtCpModel`
+
+
+   This class is an optimization model for the knapsack problem using CP-SAT
+
+   .. attribute:: _model
+
+      OR-Tools CP-SAT model
+
+      :type: cp_model.CpModel
+
+   .. attribute:: weights
+
+      weights of items
+
+      :type: np.ndarray
+
+   .. attribute:: capacity
+
+      total capacity
+
+      :type: np.ndarray
+
+   .. attribute:: items
+
+      list of item index
+
+      :type: list
+
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools CP-SAT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+

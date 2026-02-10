@@ -112,7 +112,7 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.abcmodule.optModule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.abcmodule.</span></span><span class="sig-name descname"><span class="pre">optModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.abcmodule.optModule" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.func.abcmodule.</span></span><span class="sig-name descname"><span class="pre">optModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_solpool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.abcmodule.optModule" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <p>An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
 vector and the true cost vector rank a pool of feasible solutions.</p>
@@ -123,7 +123,7 @@ vector and the true cost vector rank a pool of feasible solutions.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.abcmodule.optModule.processes">
-<span class="sig-name descname"><span class="pre">processes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyepo.func.abcmodule.optModule.processes" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">processes</span></span><a class="headerlink" href="#pyepo.func.abcmodule.optModule.processes" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -137,8 +137,8 @@ vector and the true cost vector rank a pool of feasible solutions.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.abcmodule.optModule._sol_set">
-<span class="sig-name descname"><span class="pre">_sol_set</span></span><a class="headerlink" href="#pyepo.func.abcmodule.optModule._sol_set" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pyepo.func.abcmodule.optModule._solset">
+<span class="sig-name descname"><span class="pre">_solset</span></span><a class="headerlink" href="#pyepo.func.abcmodule.optModule._solset" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -153,9 +153,9 @@ vector and the true cost vector rank a pool of feasible solutions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.abcmodule.optModule._update_solution_pool">
-<span class="sig-name descname"><span class="pre">_update_solution_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.abcmodule.optModule._update_solution_pool" title="Link to this definition"></a></dt>
-<dd><p>Add new solutions to solution pool</p>
+<dt class="sig sig-object py" id="pyepo.func.abcmodule.optModule._reduce">
+<span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.abcmodule.optModule._reduce" title="Link to this definition"></a></dt>
+<dd><p>Apply reduction to loss tensor</p>
 </dd></dl>
 
 </dd></dl>

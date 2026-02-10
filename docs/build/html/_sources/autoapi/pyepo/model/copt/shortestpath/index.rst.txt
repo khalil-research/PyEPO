@@ -62,15 +62,6 @@ Module Contents
 
 
 
-   .. py:method:: _getArcs()
-
-      A method to get list of arcs for grid network
-
-      :returns: arcs
-      :rtype: list
-
-
-
    .. py:method:: _getModel()
 
       A method to build COPT model

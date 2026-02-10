@@ -1,0 +1,130 @@
+pyepo.model.ort.shortestpath
+============================
+
+.. py:module:: pyepo.model.ort.shortestpath
+
+.. autoapi-nested-parse::
+
+   Shortest path problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.ort.shortestpath._HAS_ORTOOLS
+   pyepo.model.ort.shortestpath.cost
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.ort.shortestpath.shortestPathModel
+   pyepo.model.ort.shortestpath.shortestPathCpModel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_ORTOOLS
+   :value: True
+
+
+.. py:class:: shortestPathModel(grid, solver='glop')
+
+   Bases: :py:obj:`pyepo.model.ort.ortmodel.optOrtModel`
+
+
+   This class is an optimization model for the shortest path problem
+
+   .. attribute:: _model
+
+      OR-Tools linear solver
+
+      :type: pywraplp.Solver
+
+   .. attribute:: solver
+
+      solver backend
+
+      :type: str
+
+   .. attribute:: grid
+
+      size of grid network
+
+      :type: tuple of int
+
+   .. attribute:: arcs
+
+      list of arcs
+
+      :type: list
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools pywraplp model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:class:: shortestPathCpModel(grid)
+
+   Bases: :py:obj:`pyepo.model.ort.ortcpmodel.optOrtCpModel`
+
+
+   This class is an optimization model for the shortest path problem using CP-SAT
+
+   .. attribute:: _model
+
+      OR-Tools CP-SAT model
+
+      :type: cp_model.CpModel
+
+   .. attribute:: grid
+
+      size of grid network
+
+      :type: tuple of int
+
+   .. attribute:: arcs
+
+      list of arcs
+
+      :type: list
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools CP-SAT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:data:: cost
+

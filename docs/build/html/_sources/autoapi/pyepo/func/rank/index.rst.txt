@@ -39,9 +39,6 @@ Module Contents
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
 
 
-   .. py:attribute:: solpool
-
-
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
@@ -68,9 +65,6 @@ Module Contents
    .. py:attribute:: relu
 
 
-   .. py:attribute:: solpool
-
-
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
@@ -93,9 +87,6 @@ Module Contents
    descent.
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
-
-
-   .. py:attribute:: solpool
 
 
    .. py:method:: forward(pred_cost, true_cost)

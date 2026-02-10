@@ -15,6 +15,15 @@ Classes
 .. autoapisummary::
 
    pyepo.model.opt.optModel
+   pyepo.model.opt.unionFind
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.model.opt._get_grid_arcs
 
 
 Module Contents
@@ -104,5 +113,30 @@ Module Contents
 
       An unimplemented method to relax the MIP model
 
+
+
+.. py:class:: unionFind(n)
+
+   Union-Find data structure for cycle detection in graphs
+
+
+   .. py:attribute:: parent
+
+
+   .. py:method:: find(i)
+
+
+   .. py:method:: union(i, j)
+
+
+.. py:function:: _get_grid_arcs(grid)
+
+   Get list of arcs for a grid network.
+
+   :param grid: size of grid network (rows, cols)
+   :type grid: tuple of int
+
+   :returns: arcs as (source, target) tuples
+   :rtype: list
 
 

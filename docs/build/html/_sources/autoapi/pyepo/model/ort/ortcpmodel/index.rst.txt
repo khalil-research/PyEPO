@@ -1,0 +1,108 @@
+pyepo.model.ort.ortcpmodel
+==========================
+
+.. py:module:: pyepo.model.ort.ortcpmodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model based on Google OR-Tools CP-SAT
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.ort.ortcpmodel._HAS_ORTOOLS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.ort.ortcpmodel.optOrtCpModel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_ORTOOLS
+   :value: True
+
+
+.. py:class:: optOrtCpModel
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for an OR-Tools CP-SAT optimization model
+
+   .. attribute:: _model
+
+      OR-Tools CP-SAT model
+
+      :type: cp_model.CpModel
+
+
+   .. py:attribute:: _OBJ_SCALE
+      :value: 1000000
+
+
+
+   .. py:attribute:: _extra_constrs
+      :value: []
+
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost of objective function
+      :type c: np.ndarray / list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve the model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy()
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add a new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: np.ndarray / list
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax()
+
+      CP-SAT does not support LP relaxation.
+
+
+

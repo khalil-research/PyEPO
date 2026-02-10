@@ -17,7 +17,9 @@ Submodules
 
    /autoapi/pyepo/model/copt/coptmodel/index
    /autoapi/pyepo/model/copt/knapsack/index
+   /autoapi/pyepo/model/copt/portfolio/index
    /autoapi/pyepo/model/copt/shortestpath/index
+   /autoapi/pyepo/model/copt/tsp/index
 
 
 Classes
@@ -29,6 +31,12 @@ Classes
    pyepo.model.copt.shortestPathModel
    pyepo.model.copt.knapsackModel
    pyepo.model.copt.knapsackModelRel
+   pyepo.model.copt.tspGGModel
+   pyepo.model.copt.tspGGModelRel
+   pyepo.model.copt.tspDFJModel
+   pyepo.model.copt.tspMTZModel
+   pyepo.model.copt.tspMTZModelRel
+   pyepo.model.copt.portfolioModel
 
 
 Package Contents
@@ -126,15 +134,6 @@ Package Contents
 
 
 
-   .. py:method:: _getArcs()
-
-      A method to get list of arcs for grid network
-
-      :returns: arcs
-      :rtype: list
-
-
-
    .. py:method:: _getModel()
 
       A method to build COPT model
@@ -211,6 +210,406 @@ Package Contents
    .. py:method:: relax()
 
       A forbidden method to relax MIP model
+
+
+
+.. py:class:: tspGGModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+
+   This class is an optimization model for the traveling salesman problem based on Gavish-Graves (GG) formulation.
+
+   .. attribute:: _model
+
+      COPT model
+
+      :type: COPT model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build COPT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: tspGGModelRel(num_nodes)
+
+   Bases: :py:obj:`tspGGModel`
+
+
+   This class is relaxation of tspGGModel.
+
+   .. attribute:: _model
+
+      COPT model
+
+      :type: COPT model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build COPT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+
+   .. py:method:: getTour(sol)
+
+      A forbidden method to get a tour from solution
+
+
+
+.. py:class:: tspDFJModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+
+   This class is an optimization model for the traveling salesman problem based on Danzig-Fulkerson-Johnson (DFJ) formulation and
+   constraint generation.
+
+   .. attribute:: _model
+
+      COPT model
+
+      :type: COPT model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:class:: _SubtourCallback(x, n, edges)
+
+      Bases: :py:obj:`coptpy.CallbackBase`
+
+
+      A callback class for subtour elimination
+
+
+      .. py:attribute:: _x
+
+
+      .. py:attribute:: _n
+
+
+      .. py:attribute:: _edges
+
+
+      .. py:method:: callback()
+
+
+
+   .. py:method:: _getModel()
+
+      A method to build COPT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+.. py:class:: tspMTZModel(num_nodes)
+
+   Bases: :py:obj:`tspABModel`
+
+
+   This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
+
+   .. attribute:: _model
+
+      COPT model
+
+      :type: COPT model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build COPT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: tspMTZModelRel(num_nodes)
+
+   Bases: :py:obj:`tspMTZModel`
+
+
+   This class is relaxation of tspMTZModel.
+
+   .. attribute:: _model
+
+      COPT model
+
+      :type: COPT model
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build COPT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+
+   .. py:method:: getTour(sol)
+
+      A forbidden method to get a tour from solution
+
+
+
+.. py:class:: portfolioModel(num_assets, covariance, gamma=2.25)
+
+   Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
+
+
+   This class is an optimization model for the portfolio problem
+
+   .. attribute:: _model
+
+      COPT model
+
+      :type: COPT model
+
+   .. attribute:: num_assets
+
+      number of assets
+
+      :type: int
+
+   .. attribute:: covariance
+
+      covariance matrix of the returns
+
+      :type: numpy.ndarray
+
+   .. attribute:: risk_level
+
+      risk level
+
+      :type: float
+
+
+   .. py:attribute:: num_assets
+
+
+   .. py:attribute:: covariance
+
+
+   .. py:attribute:: risk_level
+
+
+   .. py:method:: _getRiskLevel(gamma)
+
+      A method to calculate the risk level
+
+      :param gamma: risk level parameter
+      :type gamma: float
+
+      :returns: risk level
+      :rtype: float
+
+
+
+   .. py:method:: _getModel()
+
+      A method to build COPT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
 
 
 

@@ -1,0 +1,94 @@
+pyepo.model.copt.portfolio
+==========================
+
+.. py:module:: pyepo.model.copt.portfolio
+
+.. autoapi-nested-parse::
+
+   Portfolio problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.copt.portfolio.optmodel
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.copt.portfolio.portfolioModel
+
+
+Module Contents
+---------------
+
+.. py:class:: portfolioModel(num_assets, covariance, gamma=2.25)
+
+   Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
+
+
+   This class is an optimization model for the portfolio problem
+
+   .. attribute:: _model
+
+      COPT model
+
+      :type: COPT model
+
+   .. attribute:: num_assets
+
+      number of assets
+
+      :type: int
+
+   .. attribute:: covariance
+
+      covariance matrix of the returns
+
+      :type: numpy.ndarray
+
+   .. attribute:: risk_level
+
+      risk level
+
+      :type: float
+
+
+   .. py:attribute:: num_assets
+
+
+   .. py:attribute:: covariance
+
+
+   .. py:attribute:: risk_level
+
+
+   .. py:method:: _getRiskLevel(gamma)
+
+      A method to calculate the risk level
+
+      :param gamma: risk level parameter
+      :type gamma: float
+
+      :returns: risk level
+      :rtype: float
+
+
+
+   .. py:method:: _getModel()
+
+      A method to build COPT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:data:: optmodel
+

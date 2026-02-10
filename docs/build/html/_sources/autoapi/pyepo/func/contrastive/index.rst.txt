@@ -37,9 +37,6 @@ Module Contents
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
 
-   .. py:attribute:: solpool
-
-
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
@@ -60,9 +57,6 @@ Module Contents
    Thus, it allows us to design an algorithm based on stochastic gradient descent.
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
-
-
-   .. py:attribute:: solpool
 
 
    .. py:method:: forward(pred_cost, true_sol)

@@ -3,12 +3,12 @@ Model
 
 ``PyEPO`` supports end-to-end predict-then-optimize with linear objective functions and unknown cost coefficients. At its core is the differentiable optimization solver, which computes gradients of the cost coefficients with respect to the optimal solution.
 
-``optModel`` is the base abstraction in ``PyEPO``. It wraps an optimization solver or algorithm as a container, providing a unified interface for training and evaluation. ``PyEPO`` provides several pre-defined models using GurobiPy, Pyomo, COPT, and MPAX:
+``optModel`` is the base abstraction in ``PyEPO``. It wraps an optimization solver or algorithm as a container, providing a unified interface for training and evaluation. ``PyEPO`` provides several pre-defined models using GurobiPy, Pyomo, COPT, OR-Tools, and MPAX:
 
-* **Shortest path** (GurobiPy, Pyomo, COPT & MPAX)
-* **Knapsack** (GurobiPy, Pyomo, COPT & MPAX)
-* **Traveling salesman** (GurobiPy)
-* **Portfolio optimization** (GurobiPy)
+* **Shortest path** (GurobiPy, Pyomo, COPT, OR-Tools & MPAX)
+* **Knapsack** (GurobiPy, Pyomo, COPT, OR-Tools & MPAX)
+* **Traveling salesman** (GurobiPy, Pyomo & COPT)
+* **Portfolio optimization** (GurobiPy, Pyomo & COPT)
 
 When building models with ``PyEPO``, users do **not** need to specify the cost coefficients, since they are unknown and will be predicted from data.
 
@@ -18,11 +18,12 @@ For more details, see the `01 Optimization Model <https://colab.research.google.
 User-defined Models
 ===================
 
-Users can define custom optimization problems with linear objective functions. ``PyEPO`` provides three ways to do this:
+Users can define custom optimization problems with linear objective functions. ``PyEPO`` provides several ways to do this:
 
 1. **GurobiPy-based**: Inherit from ``optGrbModel`` and implement ``_getModel``.
 2. **Pyomo-based**: Inherit from ``optOmoModel`` and implement ``_getModel``.
-3. **From scratch**: Inherit from ``optModel`` and implement ``_getModel``, ``setObj``, ``solve``, and ``num_cost``.
+3. **OR-Tools-based**: Inherit from ``optOrtModel`` (pywraplp) or ``optOrtCpModel`` (CP-SAT) and implement ``_getModel``.
+4. **From scratch**: Inherit from ``optModel`` and implement ``_getModel``, ``setObj``, ``solve``, and ``num_cost``.
 
 The ``optModel`` interface consists of:
 
@@ -129,59 +130,79 @@ Here is the same problem implemented with Pyomo:
    myoptmodel.solve() # solve
 
 
-User-defined COPTPy Models
-----------------------------
+User-defined OR-Tools Models
+-----------------------------
 
-   User-defined models withCOPTPy can be easily defined by the inheritance of the abstract class ``pyepo.model.copt.optCoptModel``.
+OR-Tools provides two solving paradigms: pywraplp (LP/MIP solvers) and CP-SAT (constraint programming). ``PyEPO`` provides base classes for both.
 
-   For ``optCoptModel``, users does not need specify the sense ``modelSense`` as ``EPO.MINIMIZE`` or ``EPO.MINIMIZE``. Both the minimization and maximization models are correctly recognized and run by ``pyepo``.
+**pywraplp** — Inherit from ``pyepo.model.ort.optOrtModel`` and implement ``_getModel``. The ``solver`` parameter selects the backend (e.g., ``"scip"``, ``"glop"``, ``"cbc"``).
 
-   .. autoclass:: pyepo.model.copt.optCoptModel
-       :noindex:
-       :members: __init__, _getModel, setObj, solve, num_cost, relax
+.. autoclass:: pyepo.model.ort.optOrtModel
+    :noindex:
+    :members: __init__, _getModel, setObj, solve, num_cost
 
+.. warning::  Unlike ``optGrbModel``, ``optOrtModel`` requires explicitly setting ``modelSense`` in ``_getModel``.
 
-   For example, users can build models for the following problem:
+.. code-block:: python
 
-   .. math::
-     \begin{aligned}
-     \max_{x} & \sum_{i=0}^4 c_i x_i \\
-     s.t. \quad & 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
-     & 4 x_0 + 5 x_1 + 2 x_2 + 3 x_3 + 5 x_4 \leq 10 \\
-     & 5 x_0 + 4 x_1 + 6 x_2 + 2 x_3 + 3 x_4 \leq 15 \\
-     & \forall x_i \in \{0, 1\}
-     \end{aligned}
+   import random
 
-   In the general case, users only need to implement ``_getModel`` method with GurobiPy.
+   from ortools.linear_solver import pywraplp
 
-   .. code-block:: python
+   from pyepo.model.ort import optOrtModel
+   from pyepo import EPO
 
-      import random
+   class myModel(optOrtModel):
 
-      from coptpy import COPT
-      from coptpy import Envr
+       def _getModel(self):
+           # sense
+           self.modelSense = EPO.MAXIMIZE
+           # create a model
+           m = pywraplp.Solver.CreateSolver("SCIP")
+           # variables
+           x = {i: m.BoolVar(f"x_{i}") for i in range(5)}
+           # constraints
+           m.Add(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
+           m.Add(4 * x[0] + 5 * x[1] + 2 * x[2] + 3 * x[3] + 5 * x[4] <= 10)
+           m.Add(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
+           return m, x
 
-      from pyepo.model.copt import optCoptModel
+   myoptmodel = myModel(solver="scip")
+   cost = [random.random() for _ in range(myoptmodel.num_cost)] # random cost vector
+   myoptmodel.setObj(cost) # set objective function
+   myoptmodel.solve() # solve
 
-      class myModel(optGrbModel):
+**CP-SAT** — Inherit from ``pyepo.model.ort.optOrtCpModel`` and implement ``_getModel``. CP-SAT is an integer-only solver; float cost vectors are automatically scaled internally.
 
-          def _getModel(self):
-              # create a model
-              m = Envr().createModel()
-              # variables
-              x = m.addVars(5, nameprefix='x', vtype=COPT.BINARY)
-              # model sense
-              m.setObjSense(COPT.MAXIMIZE)
-              # constraints
-              m.addConstr(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
-              m.addConstr(4 * x[0] + 5 * x[1] + 2 * x[2] + 3 * x[3] + 5 * x[4] <= 10)
-              m.addConstr(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
-              return m, x
+.. autoclass:: pyepo.model.ort.optOrtCpModel
+    :noindex:
+    :members: __init__, _getModel, setObj, solve, num_cost
 
-      myoptmodel = myModel()
-      cost = [random.random() for _ in range(myoptmodel.num_cost)] # random cost vector
-      myoptmodel.setObj(cost) # set objective function
-      myoptmodel.solve() # solve
+.. code-block:: python
+
+   from ortools.sat.python import cp_model
+
+   from pyepo.model.ort import optOrtCpModel
+   from pyepo import EPO
+
+   class myCpModel(optOrtCpModel):
+
+       def _getModel(self):
+           # sense
+           self.modelSense = EPO.MAXIMIZE
+           # create a model
+           m = cp_model.CpModel()
+           # variables
+           x = {i: m.NewBoolVar(f"x_{i}") for i in range(5)}
+           # constraints (integer coefficients)
+           m.Add(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
+           m.Add(4 * x[0] + 5 * x[1] + 2 * x[2] + 3 * x[3] + 5 * x[4] <= 10)
+           m.Add(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
+           return m, x
+
+   myoptmodel = myCpModel()
+
+.. note::  CP-SAT does not support LP relaxation. Calling ``relax()`` will raise a ``RuntimeError``.
 
 
 User-defined Models from Scratch
@@ -389,6 +410,34 @@ To list available solvers:
 
    pyomo help --solvers
 
+Shortest Path OR-Tools Models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+OR-Tools provides two approaches: pywraplp (LP/MIP) and CP-SAT (constraint programming).
+
+.. autoclass:: pyepo.model.ort.shortestPathModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+
+   grid = (5,5) # network grid
+   optmodel = pyepo.model.ort.shortestPathModel(grid) # pywraplp with GLOP (default)
+   optmodel = pyepo.model.ort.shortestPathModel(grid, solver="scip") # pywraplp with SCIP
+
+.. autoclass:: pyepo.model.ort.shortestPathCpModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+
+   grid = (5,5) # network grid
+   optmodel = pyepo.model.ort.shortestPathCpModel(grid) # CP-SAT
+
 
 Knapsack
 --------
@@ -458,6 +507,39 @@ Knapsack Pyomo Model
    # build model with Gurobi
    optmodel = pyepo.model.omo.knapsackModel(weights, capacities, solver="gurobi")
 
+Knapsack OR-Tools Models
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: pyepo.model.ort.knapsackModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. code-block:: python
+
+   import pyepo
+
+   weights = [[3, 4, 3, 6, 4],
+              [4, 5, 2, 3, 5],
+              [5, 4, 6, 2, 3]] # constraints coefficients
+   capacities = [12, 10, 15] # constraints rhs
+   optmodel = pyepo.model.ort.knapsackModel(weights, capacities) # pywraplp with SCIP (default)
+
+.. autoclass:: pyepo.model.ort.knapsackCpModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+
+   weights = [[3, 4, 3, 6, 4],
+              [4, 5, 2, 3, 5],
+              [5, 4, 6, 2, 3]] # integer coefficients for CP-SAT
+   capacities = [12, 10, 15] # constraints rhs
+   optmodel = pyepo.model.ort.knapsackCpModel(weights, capacities) # CP-SAT
+
+.. note::  CP-SAT requires integer coefficients. Float weights will be truncated to integers.
+
 
 Traveling Salesman
 ------------------
@@ -466,7 +548,10 @@ The traveling salesman problem (TSP) seeks the shortest route that visits each c
 
 Three ILP formulations are available: Dantzig-Fulkerson-Johnson (DFJ), Gavish-Graves (GG), and Miller-Tucker-Zemlin (MTZ).
 
-.. note:: TSP models are only available with GurobiPy.
+.. note:: The DFJ formulation uses lazy constraints and is available with GurobiPy and COPT. The GG and MTZ formulations are available with GurobiPy, Pyomo, and COPT.
+
+TSP GurobiPy Models
+^^^^^^^^^^^^^^^^^^^^
 
 DFJ formulation
 ^^^^^^^^^^^^^^^
@@ -534,6 +619,71 @@ MTZ formulation
    optmodel.relax() # relax
 
 
+TSP Pyomo Models
+^^^^^^^^^^^^^^^^
+
+The GG and MTZ formulations are available with Pyomo. The DFJ formulation is not supported in Pyomo due to the lack of a native callback API.
+
+.. autoclass:: pyepo.model.omo.tspGGModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. autoclass:: pyepo.model.omo.tspMTZModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. code-block:: python
+
+   import pyepo
+   import random
+
+   num_nodes = 20 # number of nodes
+
+   # GG formulation with Gurobi solver
+   optmodel = pyepo.model.omo.tspGGModel(num_nodes, solver="gurobi")
+   # MTZ formulation with GLPK solver
+   optmodel = pyepo.model.omo.tspMTZModel(num_nodes, solver="glpk")
+
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
+
+
+TSP COPT Models
+^^^^^^^^^^^^^^^
+
+All three formulations (DFJ, GG, MTZ) are available with COPT. The DFJ formulation uses COPT's callback API for lazy subtour elimination constraints.
+
+.. autoclass:: pyepo.model.copt.tspDFJModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. autoclass:: pyepo.model.copt.tspGGModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. autoclass:: pyepo.model.copt.tspMTZModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. code-block:: python
+
+   import pyepo
+   import random
+
+   num_nodes = 20 # number of nodes
+
+   # DFJ formulation
+   optmodel = pyepo.model.copt.tspDFJModel(num_nodes)
+   # GG formulation
+   optmodel = pyepo.model.copt.tspGGModel(num_nodes)
+   # MTZ formulation
+   optmodel = pyepo.model.copt.tspMTZModel(num_nodes)
+
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
+
 
 Portfolio
 ---------
@@ -550,7 +700,7 @@ Portfolio optimization selects an asset allocation that maximizes expected retur
 
 
 Portfolio GurobiPy Model
-^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: pyepo.model.grb.portfolioModel
     :noindex:
@@ -571,3 +721,35 @@ Portfolio GurobiPy Model
    revenue = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
    optmodel.setObj(revenue) # set objective function
    optmodel.solve() # solve
+
+Portfolio Pyomo Model
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: pyepo.model.omo.portfolioModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+   import numpy as np
+
+   m = 50 # number of assets
+   cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
+   optmodel = pyepo.model.omo.portfolioModel(m, cov, solver="gurobi") # build model
+
+Portfolio COPT Model
+^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: pyepo.model.copt.portfolioModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+   import numpy as np
+
+   m = 50 # number of assets
+   cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
+   optmodel = pyepo.model.copt.portfolioModel(m, cov) # build model
