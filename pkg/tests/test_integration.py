@@ -23,7 +23,16 @@ try:
 except (ImportError, NameError):
     _HAS_GUROBI = False
 
+try:
+    from pyepo.model.ort.shortestpath import shortestPathModel as ortSPModel
+    from pyepo.model.ort.knapsack import knapsackModel as ortKnapsackModel
+    ortSPModel(grid=(3, 3))
+    _HAS_ORTOOLS = True
+except (ImportError, NameError, Exception):
+    _HAS_ORTOOLS = False
+
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
+requires_ortools = pytest.mark.skipif(not _HAS_ORTOOLS, reason="OR-Tools not installed")
 
 
 # ============================================================
@@ -330,3 +339,110 @@ class TestKNNIntegration:
         assert cost.shape == (optmodel.num_cost,)
         assert sol.shape == (optmodel.num_cost,)
         assert obj.shape == (1,)
+
+
+# ============================================================
+# DYS-Net integration (uses OR-Tools, no Gurobi needed)
+# ============================================================
+
+def _sp_constraint_matrices(grid):
+    """Build flow conservation constraint matrices for shortest path."""
+    from pyepo.model.opt import _get_grid_arcs
+    arcs = _get_grid_arcs(grid)
+    num_nodes = grid[0] * grid[1]
+    num_arcs = len(arcs)
+    A = np.zeros((num_nodes, num_arcs), dtype=np.float32)
+    for idx, (s, e) in enumerate(arcs):
+        A[s, idx] = 1
+        A[e, idx] = -1
+    b = np.zeros(num_nodes, dtype=np.float32)
+    b[0] = 1
+    b[num_nodes - 1] = -1
+    l = np.zeros(num_arcs, dtype=np.float32)
+    u = np.ones(num_arcs, dtype=np.float32)
+    return A, b, l, u
+
+
+@requires_ortools
+class TestDysOptIntegration:
+
+    def test_train_shortest_path(self):
+        """End-to-end training with DYS-Net on shortest path."""
+        A, b, l, u = _sp_constraint_matrices(_GRID)
+        num_cost = A.shape[1]
+        dys = pyepo.func.dysOpt(A, b, l, u,
+                                alpha=0.1, max_iter=500, tol=1e-3)
+        predmodel = _LinearModel(_NUM_FEAT, num_cost)
+        optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-2)
+
+        # generate synthetic data
+        np.random.seed(42)
+        x_data = np.random.randn(_NUM_DATA, _NUM_FEAT).astype(np.float32)
+        c_data = np.abs(np.random.randn(_NUM_DATA, num_cost)).astype(np.float32)
+
+        x_tensor = torch.tensor(x_data)
+        c_tensor = torch.tensor(c_data)
+
+        dys.train()
+        losses = []
+        for step in range(_STEPS):
+            cp = predmodel(x_tensor[:_BATCH])
+            sol = dys(cp)
+            # task loss: predicted cost on predicted solution
+            loss = torch.mean(torch.sum(c_tensor[:_BATCH] * sol, dim=1))
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            losses.append(loss.item())
+
+        # verify loss is finite
+        assert all(np.isfinite(l) for l in losses)
+
+    def test_solution_quality_vs_solver(self):
+        """DYS solutions should have reasonable objective compared to solver."""
+        optmodel = ortSPModel(grid=_GRID)
+        A, b, l, u = _sp_constraint_matrices(_GRID)
+        dys = pyepo.func.dysOpt(A, b, l, u,
+                                alpha=0.1, max_iter=1000, tol=1e-4)
+        dys.eval()
+
+        np.random.seed(123)
+        costs = np.random.rand(4, optmodel.num_cost).astype(np.float32)
+        pred_cost = torch.tensor(costs)
+
+        with torch.no_grad():
+            dys_sols = dys(pred_cost).numpy()
+
+        for i in range(4):
+            # exact solver
+            optmodel.setObj(costs[i])
+            _, exact_obj = optmodel.solve()
+            dys_obj = costs[i] @ dys_sols[i]
+            # DYS objective should not be more than 20% worse
+            gap = abs(dys_obj - exact_obj) / (abs(exact_obj) + 1e-8)
+            assert gap < 0.2, f"Instance {i}: gap {gap:.2%} too large"
+
+    def test_maximize_knapsack(self):
+        """DYS-Net with minimize=False (maximization)."""
+        n = 4
+        # equality: x_0 = 0.5
+        A = np.zeros((1, n), dtype=np.float32)
+        A[0, 0] = 1.0
+        b = np.array([0.5], dtype=np.float32)
+        l = np.zeros(n, dtype=np.float32)
+        u = np.ones(n, dtype=np.float32)
+
+        dys = pyepo.func.dysOpt(A, b, l, u,
+                                alpha=0.1, max_iter=500, tol=1e-3, minimize=False)
+        predmodel = _LinearModel(_NUM_FEAT, n)
+        optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-2)
+
+        dys.train()
+        x_data = torch.randn(_BATCH, _NUM_FEAT)
+        for _ in range(_STEPS):
+            cp = predmodel(x_data)
+            sol = dys(cp)
+            loss = -torch.mean(torch.sum(cp * sol, dim=1))
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()

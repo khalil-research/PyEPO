@@ -479,6 +479,17 @@ if __name__ == "__main__":
     train_and_eval("pointwiseLTR", pt,
                    lambda fn, cp, c, w, z: fn(cp, c))
 
+    # 14. DYS-Net (Davis-Yin Splitting)
+    # Use a simple equality constraint (sum of items = half of num_item)
+    # to demonstrate DYS-Net with the knapsack model
+    A_dys = np.ones((1, num_item), dtype=np.float32)
+    b_dys = np.array([num_item * 0.5], dtype=np.float32)
+    l_dys = np.zeros(num_item, dtype=np.float32)
+    u_dys = np.ones(num_item, dtype=np.float32)
+    dys = pyepo.func.dysOpt(A_dys, b_dys, l_dys, u_dys,
+                             alpha=0.1, max_iter=500, tol=1e-3)
+    train_and_eval("dysOpt (DYS-Net)", dys, task_loss)
+
     # ============================================================
     # Part C: Training with Pyomo backend (SPO+ only)
     # ============================================================

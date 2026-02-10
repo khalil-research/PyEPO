@@ -9,7 +9,7 @@ long_description = """# PyEPO: A PyTorch-based End-to-End Predict-then-Optimize 
 
 ## Features
 
-- Implement **SPO+**, **DBB**, **NID**, **DPO**, **PFYL**, **NCE**, **LTR**, **I-MLE**, **AI-MLE**, and **PG**
+- Implement **SPO+**, **DBB**, **NID**, **DPO**, **PFYL**, **NCE**, **LTR**, **I-MLE**, **AI-MLE**, **PG**, and **DYS**
 - Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
 - Support parallel computing for optimization solvers
 - Support solution caching to speed up training
@@ -44,7 +44,7 @@ setuptools.setup(
                 "optimization", "deep learning", "pytorch", "linear programming",
                 "integer programming"],
     # version
-    version = "1.1.0",
+    version = "1.2.0",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
