@@ -54,12 +54,24 @@ try:
 except (ImportError, NameError):
     _HAS_COPT = False
 
+try:
+    from pyepo.model.ort.ortmodel import _HAS_ORTOOLS
+    if _HAS_ORTOOLS:
+        from pyepo.model.ort.shortestpath import shortestPathModel as ortShortestPathModel
+        from pyepo.model.ort.shortestpath import shortestPathCpModel as ortShortestPathCpModel
+        from pyepo.model.ort.knapsack import knapsackModel as ortKnapsackModel
+        from pyepo.model.ort.knapsack import knapsackModelRel as ortKnapsackModelRel
+        from pyepo.model.ort.knapsack import knapsackCpModel as ortKnapsackCpModel
+except (ImportError, NameError):
+    _HAS_ORTOOLS = False
+
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
 requires_pyomo = pytest.mark.skipif(
     not (_HAS_PYOMO and _HAS_GUROBI),
     reason="Pyomo or Gurobi not installed"
 )
 requires_copt = pytest.mark.skipif(not _HAS_COPT, reason="COPT not installed")
+requires_ortools = pytest.mark.skipif(not _HAS_ORTOOLS, reason="OR-Tools not installed")
 
 
 # ============================================================
@@ -1432,3 +1444,322 @@ class TestCrossBackendCopt:
         copt_model.setObj(cost)
         _, copt_obj = copt_model.solve()
         np.testing.assert_allclose(grb_obj, copt_obj, atol=1e-4)
+
+
+# ============================================================
+# OR-Tools pywraplp: Shortest path model
+# ============================================================
+
+@requires_ortools
+class TestOrtShortestPathModel:
+
+    @pytest.fixture
+    def model(self):
+        return ortShortestPathModel(grid=(3, 3))
+
+    def test_init(self, model):
+        assert model.grid == (3, 3)
+        assert model.modelSense == EPO.MINIMIZE
+
+    def test_num_cost(self, model):
+        assert model.num_cost == 12
+
+    def test_arcs_count(self, model):
+        assert len(model.arcs) == 12
+
+    def test_setObj_and_solve(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model.setObj(cost)
+        sol, obj = model.solve()
+        assert len(sol) == model.num_cost
+        assert isinstance(obj, float)
+        assert obj > 0
+
+    def test_setObj_wrong_size(self, model):
+        with pytest.raises(ValueError):
+            model.setObj(np.ones(5))
+
+    def test_solution_is_path(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model.setObj(cost)
+        sol, _ = model.solve()
+        sol = np.array(sol)
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_copy(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model_copy = model.copy()
+        model_copy.setObj(cost)
+        sol, obj = model_copy.solve()
+        assert isinstance(obj, float)
+
+    def test_addConstr(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model2 = model.addConstr(np.ones(model.num_cost), 5)
+        model2.setObj(cost)
+        _, obj2 = model2.solve()
+        model.setObj(cost)
+        _, obj1 = model.solve()
+        assert obj2 >= obj1 - 1e-6
+
+    def test_setObj_accepts_tensor(self, model):
+        import torch
+        cost = torch.rand(model.num_cost)
+        model.setObj(cost)
+        sol, obj = model.solve()
+        assert isinstance(obj, float)
+
+    def test_repr(self, model):
+        r = repr(model)
+        assert "shortestPathModel" in r
+
+    def test_different_grid_sizes(self):
+        for grid in [(2, 2), (3, 4), (5, 5)]:
+            m = ortShortestPathModel(grid=grid)
+            expected = (grid[0] - 1) * grid[1] + (grid[1] - 1) * grid[0]
+            assert m.num_cost == expected
+
+
+# ============================================================
+# OR-Tools pywraplp: Knapsack model
+# ============================================================
+
+@requires_ortools
+class TestOrtKnapsackModel:
+
+    @pytest.fixture
+    def model(self):
+        weights = np.array([[3.0, 4.0, 5.0, 6.0]])
+        capacity = np.array([10.0])
+        return ortKnapsackModel(weights=weights, capacity=capacity)
+
+    def test_init(self, model):
+        assert model.modelSense == EPO.MAXIMIZE
+        assert model.items == [0, 1, 2, 3]
+
+    def test_num_cost(self, model):
+        assert model.num_cost == 4
+
+    def test_solve(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+        assert np.all(model.weights @ sol <= model.capacity + 1e-6)
+
+    def test_objective_value(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        np.testing.assert_allclose(obj, np.dot(cost, sol), atol=1e-6)
+
+    def test_setObj_wrong_size(self, model):
+        with pytest.raises(ValueError):
+            model.setObj(np.ones(10))
+
+    def test_relax(self, model):
+        rel_model = model.relax()
+        assert isinstance(rel_model, ortKnapsackModelRel)
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        rel_model.setObj(cost)
+        _, obj_rel = rel_model.solve()
+        model.setObj(cost)
+        _, obj_int = model.solve()
+        assert obj_rel >= obj_int - 1e-6
+
+    def test_relax_cannot_relax_again(self, model):
+        rel_model = model.relax()
+        with pytest.raises(RuntimeError):
+            rel_model.relax()
+
+    def test_multidim_knapsack(self):
+        weights = np.array([[3.0, 4.0, 5.0], [2.0, 3.0, 4.0]])
+        capacity = np.array([8.0, 7.0])
+        model = ortKnapsackModel(weights=weights, capacity=capacity)
+        cost = np.array([5.0, 4.0, 3.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert np.all(weights @ sol <= capacity + 1e-6)
+
+    def test_copy(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        _, obj1 = model.solve()
+        model_copy = model.copy()
+        model_copy.setObj(cost)
+        _, obj2 = model_copy.solve()
+        np.testing.assert_allclose(obj1, obj2, atol=1e-6)
+
+    def test_addConstr(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        _, obj1 = model.solve()
+        model2 = model.addConstr(np.ones(model.num_cost), 1)
+        model2.setObj(cost)
+        _, obj2 = model2.solve()
+        assert obj2 <= obj1 + 1e-6
+
+
+# ============================================================
+# OR-Tools CP-SAT: Shortest path model
+# ============================================================
+
+@requires_ortools
+class TestOrtCpShortestPathModel:
+
+    @pytest.fixture
+    def model(self):
+        return ortShortestPathCpModel(grid=(3, 3))
+
+    def test_init(self, model):
+        assert model.grid == (3, 3)
+        assert model.modelSense == EPO.MINIMIZE
+
+    def test_num_cost(self, model):
+        assert model.num_cost == 12
+
+    def test_setObj_and_solve(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model.setObj(cost)
+        sol, obj = model.solve()
+        assert len(sol) == model.num_cost
+        assert isinstance(obj, float)
+        assert obj > 0
+
+    def test_solution_is_path(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model.setObj(cost)
+        sol, _ = model.solve()
+        sol = np.array(sol)
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_copy(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model_copy = model.copy()
+        model_copy.setObj(cost)
+        sol, obj = model_copy.solve()
+        assert isinstance(obj, float)
+
+    def test_addConstr(self, model):
+        cost = np.random.RandomState(42).rand(model.num_cost)
+        model2 = model.addConstr(np.ones(model.num_cost), 5)
+        model2.setObj(cost)
+        _, obj2 = model2.solve()
+        model.setObj(cost)
+        _, obj1 = model.solve()
+        assert obj2 >= obj1 - 1e-6
+
+    def test_relax_not_supported(self, model):
+        with pytest.raises(RuntimeError):
+            model.relax()
+
+
+# ============================================================
+# OR-Tools CP-SAT: Knapsack model
+# ============================================================
+
+@requires_ortools
+class TestOrtCpKnapsackModel:
+
+    @pytest.fixture
+    def model(self):
+        weights = np.array([[3, 4, 5, 6]])
+        capacity = np.array([10])
+        return ortKnapsackCpModel(weights=weights, capacity=capacity)
+
+    def test_init(self, model):
+        assert model.modelSense == EPO.MAXIMIZE
+
+    def test_num_cost(self, model):
+        assert model.num_cost == 4
+
+    def test_solve(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_objective_value(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        np.testing.assert_allclose(obj, np.dot(cost, sol), atol=1e-2)
+
+    def test_copy(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        _, obj1 = model.solve()
+        model_copy = model.copy()
+        model_copy.setObj(cost)
+        _, obj2 = model_copy.solve()
+        np.testing.assert_allclose(obj1, obj2, atol=1e-2)
+
+    def test_addConstr(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        _, obj1 = model.solve()
+        model2 = model.addConstr(np.ones(model.num_cost), 1)
+        model2.setObj(cost)
+        _, obj2 = model2.solve()
+        assert obj2 <= obj1 + 1e-6
+
+    def test_relax_not_supported(self, model):
+        with pytest.raises(RuntimeError):
+            model.relax()
+
+
+# ============================================================
+# Cross-backend consistency: OR-Tools
+# ============================================================
+
+@pytest.mark.skipif(not (_HAS_GUROBI and _HAS_ORTOOLS), reason="Gurobi or OR-Tools not installed")
+class TestCrossBackendOrt:
+
+    def test_shortestpath_grb_vs_ort(self):
+        cost = np.random.RandomState(42).rand(12)
+        grb_model = shortestPathModel(grid=(3, 3))
+        grb_model.setObj(cost)
+        _, grb_obj = grb_model.solve()
+        ort_model = ortShortestPathModel(grid=(3, 3))
+        ort_model.setObj(cost)
+        _, ort_obj = ort_model.solve()
+        np.testing.assert_allclose(grb_obj, ort_obj, atol=1e-4)
+
+    def test_knapsack_grb_vs_ort(self):
+        weights = np.array([[3.0, 4.0, 5.0, 6.0]])
+        capacity = np.array([10.0])
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        grb_model = knapsackModel(weights=weights, capacity=capacity)
+        grb_model.setObj(cost)
+        _, grb_obj = grb_model.solve()
+        ort_model = ortKnapsackModel(weights=weights, capacity=capacity)
+        ort_model.setObj(cost)
+        _, ort_obj = ort_model.solve()
+        np.testing.assert_allclose(grb_obj, ort_obj, atol=1e-4)
+
+    def test_shortestpath_grb_vs_ort_cpsat(self):
+        cost = np.random.RandomState(42).rand(12)
+        grb_model = shortestPathModel(grid=(3, 3))
+        grb_model.setObj(cost)
+        _, grb_obj = grb_model.solve()
+        ort_model = ortShortestPathCpModel(grid=(3, 3))
+        ort_model.setObj(cost)
+        _, ort_obj = ort_model.solve()
+        np.testing.assert_allclose(grb_obj, ort_obj, atol=1e-2)
+
+    def test_knapsack_grb_vs_ort_cpsat(self):
+        weights = np.array([[3.0, 4.0, 5.0, 6.0]])
+        capacity = np.array([10.0])
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        grb_model = knapsackModel(weights=weights, capacity=capacity)
+        grb_model.setObj(cost)
+        _, grb_obj = grb_model.solve()
+        ort_model = ortKnapsackCpModel(weights=weights, capacity=capacity)
+        ort_model.setObj(cost)
+        _, ort_obj = ort_model.solve()
+        np.testing.assert_allclose(grb_obj, ort_obj, atol=1e-2)

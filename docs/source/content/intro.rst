@@ -6,7 +6,7 @@ Introduction
 
 ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python library for modeling and solving predict-then-optimize problems with linear objective functions.
 
-``PyEPO`` allows users to build optimization models with `GurobiPy <https://www.gurobi.com/>`_, `COPT <https://shanshu.ai/copt>`_, `Pyomo <http://www.pyomo.org/>`_, `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, or any custom solver, and embed them into neural networks for end-to-end training. It provides a collection of decision-focused learning methods -- including SPO+ loss, differentiable black-box optimizers, perturbed optimizers, Fenchel-Young loss, contrastive losses, learning-to-rank losses, and perturbation gradient -- implemented as `PyTorch <https://pytorch.org/>`_ autograd modules.
+``PyEPO`` allows users to build optimization models with `GurobiPy <https://www.gurobi.com/>`_, `COPT <https://shanshu.ai/copt>`_, `Pyomo <http://www.pyomo.org/>`_, `Google OR-Tools <https://developers.google.com/optimization>`_, `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, or any custom solver, and embed them into neural networks for end-to-end training. It provides a collection of decision-focused learning methods -- including SPO+ loss, differentiable black-box optimizers, perturbed optimizers, Fenchel-Young loss, contrastive losses, learning-to-rank losses, and perturbation gradient -- implemented as `PyTorch <https://pytorch.org/>`_ autograd modules.
 
 End-to-End Predict-then-Optimize Framework
 ------------------------------------------

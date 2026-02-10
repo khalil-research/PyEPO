@@ -35,7 +35,7 @@ release = "v1.0.4"
 # -- General configuration ---------------------------------------------------
 
 # Mock modules that may not be installed locally
-autodoc_mock_imports = ["coptpy", "mpax", "jax", "jaxlib", "gurobipy", "pyomo"]
+autodoc_mock_imports = ["coptpy", "mpax", "jax", "jaxlib", "gurobipy", "pyomo", "ortools"]
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom

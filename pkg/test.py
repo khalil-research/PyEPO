@@ -246,6 +246,30 @@ if __name__ == "__main__":
     except (ImportError, NameError) as e:
         print("\n  [SKIP] MPAX not available: {}".format(e))
 
+    # A6b. OR-Tools pywraplp backend
+    try:
+        from pyepo.model.ort.knapsack import knapsackModel as ortKnapsack
+        from pyepo.model.ort.shortestpath import shortestPathModel as ortSP
+
+        ort_ks = ortKnapsack(weights, capacity)
+        test_model_ops("OR-Tools knapsack", ort_ks, cost_knapsack)
+        test_shortestpath_backend("OR-Tools", ortSP(grid), num_arcs)
+    except ImportError as e:
+        print("\n  [SKIP] OR-Tools not available: {}".format(e))
+
+    # A6c. OR-Tools CP-SAT backend
+    try:
+        from pyepo.model.ort.knapsack import knapsackCpModel as ortCpKnapsack
+        from pyepo.model.ort.shortestpath import shortestPathCpModel as ortCpSP
+
+        weights_int = np.round(weights).astype(int)
+        capacity_int = np.array([7, 8, 9])
+        ort_cp_ks = ortCpKnapsack(weights_int, capacity_int)
+        test_model_ops("OR-Tools CP-SAT knapsack", ort_cp_ks, cost_knapsack)
+        test_shortestpath_backend("OR-Tools CP-SAT", ortCpSP(grid), num_arcs)
+    except ImportError as e:
+        print("\n  [SKIP] OR-Tools CP-SAT not available: {}".format(e))
+
     # A7. Cross-backend consistency (Gurobi vs Pyomo vs COPT shortestpath)
     print("\n=== Cross-backend ShortestPath Consistency ===")
     sp_cost = np.random.RandomState(99).rand(num_arcs)
@@ -277,6 +301,22 @@ if __name__ == "__main__":
         print("  MPAX   obj: {:.6f} (matches)".format(mpax_obj))
     except Exception as e:
         print("  MPAX: {}".format(e))
+    try:
+        ort_sp2 = ortSP(grid)
+        ort_sp2.setObj(sp_cost)
+        _, ort_obj = ort_sp2.solve()
+        assert np.isclose(grb_obj, ort_obj, atol=1e-3), "OR-Tools mismatch"
+        print("  ORT    obj: {:.6f} (matches)".format(ort_obj))
+    except Exception as e:
+        print("  ORT: {}".format(e))
+    try:
+        ort_cp_sp2 = ortCpSP(grid)
+        ort_cp_sp2.setObj(sp_cost)
+        _, ort_cp_obj = ort_cp_sp2.solve()
+        assert np.isclose(grb_obj, ort_cp_obj, atol=1e-2), "OR-Tools CP-SAT mismatch"
+        print("  ORT-CP obj: {:.6f} (matches)".format(ort_cp_obj))
+    except Exception as e:
+        print("  ORT-CP: {}".format(e))
 
     # A8. Gurobi portfolio
     num_assets = 50
@@ -510,6 +550,42 @@ if __name__ == "__main__":
         print("  Regret: {:.4f}".format(reg))
     except ImportError as e:
         print("\n[SKIP] COPT not available: {}".format(e))
+
+    # ============================================================
+    # Part E: Training with OR-Tools backend (SPO+ only)
+    # ============================================================
+    try:
+        from pyepo.model.ort.knapsack import knapsackModel as ortKnapsack
+        print("\n" + "="*60)
+        print("Part E: Training with OR-Tools Backend (SPO+)")
+        print("="*60)
+
+        ort_optmodel = ortKnapsack(weights, capacity)
+        ort_dataset = pyepo.data.dataset.optDataset(ort_optmodel, x, c)
+        ort_dataloader = DataLoader(ort_dataset, batch_size=32, shuffle=True)
+
+        pred_ort = LinearRegression(num_feat, num_item)
+        opt_ort = torch.optim.Adam(pred_ort.parameters(), lr=1e-2)
+        spo_ort = pyepo.func.SPOPlus(ort_optmodel, processes=2)
+        print("\n--- SPOPlus (OR-Tools) ---")
+        for epoch in range(num_epochs):
+            epoch_loss = 0
+            num_batches = 0
+            for data in ort_dataloader:
+                xi, ci, wi, zi = data
+                cp = pred_ort(xi)
+                loss = spo_ort(cp, ci, wi, zi)
+                opt_ort.zero_grad()
+                loss.backward()
+                opt_ort.step()
+                epoch_loss += loss.item()
+                num_batches += 1
+            print("  Epoch {:3d}/{}: avg loss = {:.4f}".format(
+                epoch + 1, num_epochs, epoch_loss / num_batches))
+        reg = pyepo.metric.regret(pred_ort, ort_optmodel, ort_dataloader)
+        print("  Regret: {:.4f}".format(reg))
+    except ImportError as e:
+        print("\n[SKIP] OR-Tools not available: {}".format(e))
 
     print("\n" + "="*60)
     print("All tests completed!")
