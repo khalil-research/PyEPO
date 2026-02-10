@@ -22,8 +22,10 @@ Users can define custom optimization problems with linear objective functions. `
 
 1. **GurobiPy-based**: Inherit from ``optGrbModel`` and implement ``_getModel``.
 2. **Pyomo-based**: Inherit from ``optOmoModel`` and implement ``_getModel``.
-3. **OR-Tools-based**: Inherit from ``optOrtModel`` (pywraplp) or ``optOrtCpModel`` (CP-SAT) and implement ``_getModel``.
-4. **From scratch**: Inherit from ``optModel`` and implement ``_getModel``, ``setObj``, ``solve``, and ``num_cost``.
+3. **COPT-based**: Inherit from ``optCoptModel`` and implement ``_getModel``.
+4. **OR-Tools-based**: Inherit from ``optOrtModel`` (pywraplp) or ``optOrtCpModel`` (CP-SAT) and implement ``_getModel``.
+5. **MPAX-based**: Inherit from ``optMpaxModel`` and provide constraint matrices ``A``, ``b``, ``G``, ``h``.
+6. **From scratch**: Inherit from ``optModel`` and implement ``_getModel``, ``setObj``, ``solve``, and ``num_cost``.
 
 The ``optModel`` interface consists of:
 
@@ -130,6 +132,46 @@ Here is the same problem implemented with Pyomo:
    myoptmodel.solve() # solve
 
 
+User-defined COPT Models
+-------------------------
+
+To define a COPT model, inherit from ``pyepo.model.copt.optCoptModel`` and implement the ``_getModel`` method. The model sense (minimize/maximize) is automatically detected from the COPT model.
+
+.. autoclass:: pyepo.model.copt.optCoptModel
+    :noindex:
+    :members: __init__, _getModel, setObj, solve, num_cost
+
+Here is the same problem implemented with COPT:
+
+.. code-block:: python
+
+   import random
+
+   from coptpy import Envr, COPT
+
+   from pyepo.model.copt import optCoptModel
+
+   class myModel(optCoptModel):
+
+       def _getModel(self):
+           # create a model
+           m = Envr().createModel()
+           # variables
+           x = m.addVars(range(5), vtype=COPT.BINARY)
+           # model sense
+           m.setObjSense(COPT.MAXIMIZE)
+           # constraints
+           m.addConstr(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
+           m.addConstr(4 * x[0] + 5 * x[1] + 2 * x[2] + 3 * x[3] + 5 * x[4] <= 10)
+           m.addConstr(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
+           return m, x
+
+   myoptmodel = myModel()
+   cost = [random.random() for _ in range(myoptmodel.num_cost)] # random cost vector
+   myoptmodel.setObj(cost) # set objective function
+   myoptmodel.solve() # solve
+
+
 User-defined OR-Tools Models
 -----------------------------
 
@@ -203,6 +245,33 @@ OR-Tools provides two solving paradigms: pywraplp (LP/MIP solvers) and CP-SAT (c
    myoptmodel = myCpModel()
 
 .. note::  CP-SAT does not support LP relaxation. Calling ``relax()`` will raise a ``RuntimeError``.
+
+
+User-defined MPAX Models
+------------------------
+
+MPAX (Mathematical Programming in JAX) is a hardware-accelerated mathematical programming framework based on the PDHG (Primal-Dual Hybrid Gradient) algorithm, designed for large-scale LP problems.
+
+``optMpaxModel`` is a ``PyEPO`` model that uses MPAX to solve LP relaxations via PDHG. It accepts constraints in matrix/vector form:
+
+   - ``A``, ``b``: Equality constraints :math:`Ax = b`. Omit if there are no equality constraints.
+   - ``G``, ``h``: Inequality constraints :math:`Gx \leq h`. Omit if there are no inequality constraints.
+   - ``l``: Lower bounds (default: 0, i.e., non-negative variables).
+   - ``u``: Upper bounds (default: infinity, i.e., unbounded).
+   - ``use_sparse_matrix`` (default: ``True``): Whether to use sparse matrix storage.
+   - ``minimize`` (default: ``True``): Whether to minimize the objective.
+
+.. autoclass:: pyepo.model.mpax.optMpaxModel
+  :noindex:
+  :members: __init__, _getModel, setObj, solve, num_cost, relax
+
+.. code-block:: python
+
+   from pyepo.model.mpax import optMpaxModel
+   optmodel = optMpaxModel(A=A, b=b, G=G, h=h, use_sparse_matrix=False, minimize=True)
+
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
 
 
 User-defined Models from Scratch
@@ -319,34 +388,6 @@ The following example uses ``networkx`` with the Dijkstra algorithm to solve a s
        if sol[i] > 1e-3:
            print(e)
 
-
-MPAX Models
-===========
-
-MPAX (Mathematical Programming in JAX) is a hardware-accelerated mathematical programming framework based on the PDHG (Primal-Dual Hybrid Gradient) algorithm, designed for large-scale LP problems.
-
-``optMpaxModel`` is a ``PyEPO`` model that uses MPAX to solve LP relaxations via PDHG. It accepts constraints in matrix/vector form:
-
-   - ``A``, ``b``: Equality constraints :math:`Ax = b`. Omit if there are no equality constraints.
-   - ``G``, ``h``: Inequality constraints :math:`Gx \leq h`. Omit if there are no inequality constraints.
-   - ``l``: Lower bounds (default: 0, i.e., non-negative variables).
-   - ``u``: Upper bounds (default: infinity, i.e., unbounded).
-   - ``use_sparse_matrix`` (default: ``True``): Whether to use sparse matrix storage.
-   - ``minimize`` (default: ``True``): Whether to minimize the objective.
-
-.. autoclass:: pyepo.model.mpax.optMpaxModel
-  :noindex:
-  :members: __init__, _getModel, setObj, solve, num_cost, relax
-
-.. code-block:: python
-
-   from pyepo.model.mpax import optMpaxModel
-   optmodel = optMpaxModel(A=A, b=b, G=G, h=h, use_sparse_matrix=False, minimize=True)
-
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
-
-
 Pre-defined Models
 ==================
 
@@ -364,8 +405,8 @@ The shortest path problem finds the minimum-cost path from the northwest corner 
 
 The problem is formulated as a minimum cost flow linear program.
 
-Shortest Path GurobiPy Model
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+GurobiPy
+^^^^^^^^
 
 .. autoclass:: pyepo.model.grb.shortestPathModel
     :noindex:
@@ -387,8 +428,8 @@ The ``setObj`` and ``solve`` methods can be called manually, but they are invoke
    optmodel.setObj(cost) # set objective function
    optmodel.solve() # solve
 
-Shortest Path Pyomo Model
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Pyomo
+^^^^^
 
 .. autoclass:: pyepo.model.omo.shortestPathModel
     :noindex:
@@ -410,8 +451,22 @@ To list available solvers:
 
    pyomo help --solvers
 
-Shortest Path OR-Tools Models
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COPT
+^^^^
+
+.. autoclass:: pyepo.model.copt.shortestPathModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+
+   grid = (5,5) # network grid
+   optmodel = pyepo.model.copt.shortestPathModel(grid) # build model
+
+OR-Tools
+^^^^^^^^
 
 OR-Tools provides two approaches: pywraplp (LP/MIP) and CP-SAT (constraint programming).
 
@@ -438,6 +493,20 @@ OR-Tools provides two approaches: pywraplp (LP/MIP) and CP-SAT (constraint progr
    grid = (5,5) # network grid
    optmodel = pyepo.model.ort.shortestPathCpModel(grid) # CP-SAT
 
+MPAX
+^^^^
+
+.. autoclass:: pyepo.model.mpax.shortestPathModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+
+   grid = (5,5) # network grid
+   optmodel = pyepo.model.mpax.shortestPathModel(grid) # build model
+
 
 Knapsack
 --------
@@ -457,8 +526,8 @@ The constraint coefficients **weights** and right-hand sides **capacities** defi
 
 .. note:: The number of dimensions and items are determined by the shape of **weights** and **capacities**.
 
-Knapsack GurobiPy Model
-^^^^^^^^^^^^^^^^^^^^^^^
+GurobiPy
+^^^^^^^^
 
 .. autoclass:: pyepo.model.grb.knapsackModel
     :noindex:
@@ -487,8 +556,8 @@ The ``relax`` method returns an LP relaxation by removing integrality constraint
 
    optmodel_rel = optmodel.relax() # relax
 
-Knapsack Pyomo Model
-^^^^^^^^^^^^^^^^^^^^
+Pyomo
+^^^^^
 
 .. autoclass:: pyepo.model.omo.knapsackModel
     :noindex:
@@ -507,8 +576,25 @@ Knapsack Pyomo Model
    # build model with Gurobi
    optmodel = pyepo.model.omo.knapsackModel(weights, capacities, solver="gurobi")
 
-Knapsack OR-Tools Models
-^^^^^^^^^^^^^^^^^^^^^^^^^
+COPT
+^^^^
+
+.. autoclass:: pyepo.model.copt.knapsackModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. code-block:: python
+
+   import pyepo
+
+   weights = [[3, 4, 3, 6, 4],
+              [4, 5, 2, 3, 5],
+              [5, 4, 6, 2, 3]] # constraints coefficients
+   capacities = [12, 10, 15] # constraints rhs
+   optmodel = pyepo.model.copt.knapsackModel(weights, capacities) # build model
+
+OR-Tools
+^^^^^^^^
 
 .. autoclass:: pyepo.model.ort.knapsackModel
     :noindex:
@@ -540,6 +626,26 @@ Knapsack OR-Tools Models
 
 .. note::  CP-SAT requires integer coefficients. Float weights will be truncated to integers.
 
+MPAX
+^^^^
+
+MPAX solves the LP relaxation of the knapsack problem using the PDHG algorithm.
+
+.. autoclass:: pyepo.model.mpax.knapsackModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+   import numpy as np
+
+   weights = np.array([[3, 4, 3, 6, 4],
+                        [4, 5, 2, 3, 5],
+                        [5, 4, 6, 2, 3]]) # constraints coefficients
+   capacities = [12, 10, 15] # constraints rhs
+   optmodel = pyepo.model.mpax.knapsackModel(weights, capacities) # build model
+
 
 Traveling Salesman
 ------------------
@@ -550,11 +656,11 @@ Three ILP formulations are available: Dantzig-Fulkerson-Johnson (DFJ), Gavish-Gr
 
 .. note:: The DFJ formulation uses lazy constraints and is available with GurobiPy and COPT. The GG and MTZ formulations are available with GurobiPy, Pyomo, and COPT.
 
-TSP GurobiPy Models
-^^^^^^^^^^^^^^^^^^^^
+GurobiPy
+^^^^^^^^
 
-DFJ formulation
-^^^^^^^^^^^^^^^
+DFJ Formulation
+""""""""""""""""
 
 .. autoclass:: pyepo.model.grb.tspDFJModel
     :noindex:
@@ -575,8 +681,8 @@ The DFJ formulation has exponentially many subtour elimination constraints, solv
    optmodel.solve() # solve
 
 
-GG formulation
-^^^^^^^^^^^^^^
+GG Formulation
+"""""""""""""""
 
 .. autoclass:: pyepo.model.grb.tspGGModel
     :noindex:
@@ -597,8 +703,8 @@ GG formulation
    optmodel.relax() # relax
 
 
-MTZ formulation
-^^^^^^^^^^^^^^^
+MTZ Formulation
+""""""""""""""""
 
 .. autoclass:: pyepo.model.grb.tspMTZModel
     :noindex:
@@ -619,8 +725,8 @@ MTZ formulation
    optmodel.relax() # relax
 
 
-TSP Pyomo Models
-^^^^^^^^^^^^^^^^
+Pyomo
+^^^^^
 
 The GG and MTZ formulations are available with Pyomo. The DFJ formulation is not supported in Pyomo due to the lack of a native callback API.
 
@@ -649,8 +755,8 @@ The GG and MTZ formulations are available with Pyomo. The DFJ formulation is not
    optmodel.solve() # solve
 
 
-TSP COPT Models
-^^^^^^^^^^^^^^^
+COPT
+^^^^
 
 All three formulations (DFJ, GG, MTZ) are available with COPT. The DFJ formulation uses COPT's callback API for lazy subtour elimination constraints.
 
@@ -699,8 +805,8 @@ Portfolio optimization selects an asset allocation that maximizes expected retur
   \end{aligned}
 
 
-Portfolio GurobiPy Model
-^^^^^^^^^^^^^^^^^^^^^^^^^
+GurobiPy
+^^^^^^^^
 
 .. autoclass:: pyepo.model.grb.portfolioModel
     :noindex:
@@ -722,8 +828,8 @@ Portfolio GurobiPy Model
    optmodel.setObj(revenue) # set objective function
    optmodel.solve() # solve
 
-Portfolio Pyomo Model
-^^^^^^^^^^^^^^^^^^^^^
+Pyomo
+^^^^^
 
 .. autoclass:: pyepo.model.omo.portfolioModel
     :noindex:
@@ -738,8 +844,8 @@ Portfolio Pyomo Model
    cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
    optmodel = pyepo.model.omo.portfolioModel(m, cov, solver="gurobi") # build model
 
-Portfolio COPT Model
-^^^^^^^^^^^^^^^^^^^^
+COPT
+^^^^
 
 .. autoclass:: pyepo.model.copt.portfolioModel
     :noindex:

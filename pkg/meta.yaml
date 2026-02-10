@@ -44,12 +44,23 @@ extra:
 about:
   home: https://github.com/khalil-research/PyEPO
   license: MIT
+  license_file: pyepo/LICENSE
   summary: "PyTorch-based End-to-End Predict-then-Optimize Tool"
+  doc_url: https://khalil-research.github.io/PyEPO
+  dev_url: https://github.com/khalil-research/PyEPO
   description: |
-    ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based,
+    PyEPO (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based,
     open-source software that supports modeling and solving predict-then-optimize problems
-    with the linear objective function. The core capability of ``PyEPO`` is to build optimization
-    models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other
-    solvers and algorithms, then embed the optimization model into an artificial neural network
-    for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as
-    [PyTorch](https://pytorch.org/) autograd modules.
+    with linear objective functions. The core capability of PyEPO is to build optimization
+    models with GurobiPy, COPT, Pyomo, Google OR-Tools, MPAX, or any other solvers and
+    algorithms, then embed the optimization model into an artificial neural network for
+    the end-to-end training. For this purpose, PyEPO implements various methods as
+    PyTorch autograd modules.
+
+    Features:
+    - Implement SPO+, DBB, NID, DPO, PFYL, NCE, LTR, I-MLE, AI-MLE, and PG
+    - Support Gurobi, COPT, Pyomo, Google OR-Tools, and MPAX API
+    - Support parallel computing for optimization solvers
+    - Support solution caching to speed up training
+    - Support kNN robust loss to improve decision quality
+    - GPU-accelerated solving with MPAX (JAX-based PDHG solver)
