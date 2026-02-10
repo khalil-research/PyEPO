@@ -1,15 +1,16 @@
 # PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Tool
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/khalil-research/PyEPO/actions/workflows/test.yml/badge.svg)](https://github.com/khalil-research/PyEPO/actions/workflows/test.yml)
-[![Python](https://img.shields.io/pypi/pyversions/pyepo.svg)](https://pypi.org/project/pyepo/)
-[![PyPI version](https://badge.fury.io/py/pyepo.svg)](https://pypi.org/project/pyepo/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/pyepo)](https://pepy.tech/project/pyepo)
-[![Conda version](https://img.shields.io/conda/vn/pyepo/pyepo.svg)](https://anaconda.org/pyepo/pyepo)
-[![Conda Downloads](https://img.shields.io/conda/dn/pyepo/pyepo.svg)](https://anaconda.org/pyepo/pyepo)
-[![GitHub Stars](https://img.shields.io/github/stars/khalil-research/PyEPO)](https://github.com/khalil-research/PyEPO/stargazers)
-[![Docs](https://img.shields.io/badge/docs-online-green.svg)](https://khalil-research.github.io/PyEPO)
-[![Paper](https://img.shields.io/badge/MPC-10.1007/s12532--024--00255--x-blue.svg)](https://link.springer.com/article/10.1007/s12532-024-00255-x)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![GitHub Stars](https://img.shields.io/github/stars/khalil-research/PyEPO?style=flat-square)](https://github.com/khalil-research/PyEPO/stargazers)
+[![Tests](https://img.shields.io/github/actions/workflow/status/khalil-research/PyEPO/test.yml?branch=main&style=flat-square&label=tests)](https://github.com/khalil-research/PyEPO/actions/workflows/test.yml)
+[![Python](https://img.shields.io/pypi/pyversions/pyepo.svg?style=flat-square)](https://pypi.org/project/pyepo/)
+![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg?style=flat-square)
+[![PyPI version](https://img.shields.io/pypi/v/pyepo.svg?style=flat-square)](https://pypi.org/project/pyepo/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/pyepo?style=flat-square)](https://pepy.tech/project/pyepo)
+[![Conda version](https://img.shields.io/conda/vn/pyepo/pyepo.svg?style=flat-square)](https://anaconda.org/pyepo/pyepo)
+[![Conda Downloads](https://img.shields.io/conda/dn/pyepo/pyepo.svg?style=flat-square)](https://anaconda.org/pyepo/pyepo)
+[![Docs](https://img.shields.io/badge/docs-online-green.svg?style=flat-square)](https://khalil-research.github.io/PyEPO)
+[![Paper](https://img.shields.io/badge/MPC-10.1007/s12532--024--00255--x-blue.svg?style=flat-square)](https://link.springer.com/article/10.1007/s12532-024-00255-x)
 
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
 
