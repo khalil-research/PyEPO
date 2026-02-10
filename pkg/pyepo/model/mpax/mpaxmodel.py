@@ -6,6 +6,7 @@ Abstract optimization model based on MPAX
 
 from copy import deepcopy
 from functools import partial
+import numpy as np
 import torch
 
 try:
