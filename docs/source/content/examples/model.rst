@@ -7,8 +7,8 @@ Model
 
 * **Shortest path** (GurobiPy, Pyomo, COPT & MPAX)
 * **Knapsack** (GurobiPy, Pyomo, COPT & MPAX)
-* **Traveling salesman** (GurobiPy)
-* **Portfolio optimization** (GurobiPy)
+* **Traveling salesman** (GurobiPy, Pyomo & COPT)
+* **Portfolio optimization** (GurobiPy, Pyomo & COPT)
 
 When building models with ``PyEPO``, users do **not** need to specify the cost coefficients, since they are unknown and will be predicted from data.
 
@@ -411,7 +411,10 @@ The traveling salesman problem (TSP) seeks the shortest route that visits each c
 
 Three ILP formulations are available: Dantzig-Fulkerson-Johnson (DFJ), Gavish-Graves (GG), and Miller-Tucker-Zemlin (MTZ).
 
-.. note:: TSP models are only available with GurobiPy.
+.. note:: The DFJ formulation uses lazy constraints and is available with GurobiPy and COPT. The GG and MTZ formulations are available with GurobiPy, Pyomo, and COPT.
+
+TSP GurobiPy Models
+^^^^^^^^^^^^^^^^^^^^
 
 DFJ formulation
 ^^^^^^^^^^^^^^^
@@ -479,6 +482,71 @@ MTZ formulation
    optmodel.relax() # relax
 
 
+TSP Pyomo Models
+^^^^^^^^^^^^^^^^
+
+The GG and MTZ formulations are available with Pyomo. The DFJ formulation is not supported in Pyomo due to the lack of a native callback API.
+
+.. autoclass:: pyepo.model.omo.tspGGModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. autoclass:: pyepo.model.omo.tspMTZModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. code-block:: python
+
+   import pyepo
+   import random
+
+   num_nodes = 20 # number of nodes
+
+   # GG formulation with Gurobi solver
+   optmodel = pyepo.model.omo.tspGGModel(num_nodes, solver="gurobi")
+   # MTZ formulation with GLPK solver
+   optmodel = pyepo.model.omo.tspMTZModel(num_nodes, solver="glpk")
+
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
+
+
+TSP COPT Models
+^^^^^^^^^^^^^^^
+
+All three formulations (DFJ, GG, MTZ) are available with COPT. The DFJ formulation uses COPT's callback API for lazy subtour elimination constraints.
+
+.. autoclass:: pyepo.model.copt.tspDFJModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. autoclass:: pyepo.model.copt.tspGGModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. autoclass:: pyepo.model.copt.tspMTZModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, relax
+
+.. code-block:: python
+
+   import pyepo
+   import random
+
+   num_nodes = 20 # number of nodes
+
+   # DFJ formulation
+   optmodel = pyepo.model.copt.tspDFJModel(num_nodes)
+   # GG formulation
+   optmodel = pyepo.model.copt.tspGGModel(num_nodes)
+   # MTZ formulation
+   optmodel = pyepo.model.copt.tspMTZModel(num_nodes)
+
+   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
+   optmodel.setObj(cost) # set objective function
+   optmodel.solve() # solve
+
 
 Portfolio
 ---------
@@ -495,7 +563,7 @@ Portfolio optimization selects an asset allocation that maximizes expected retur
 
 
 Portfolio GurobiPy Model
-^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: pyepo.model.grb.portfolioModel
     :noindex:
@@ -516,3 +584,35 @@ Portfolio GurobiPy Model
    revenue = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
    optmodel.setObj(revenue) # set objective function
    optmodel.solve() # solve
+
+Portfolio Pyomo Model
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: pyepo.model.omo.portfolioModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+   import numpy as np
+
+   m = 50 # number of assets
+   cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
+   optmodel = pyepo.model.omo.portfolioModel(m, cov, solver="gurobi") # build model
+
+Portfolio COPT Model
+^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: pyepo.model.copt.portfolioModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost
+
+.. code-block:: python
+
+   import pyepo
+   import numpy as np
+
+   m = 50 # number of assets
+   cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
+   optmodel = pyepo.model.copt.portfolioModel(m, cov) # build model
