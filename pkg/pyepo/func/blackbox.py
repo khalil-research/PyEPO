@@ -68,8 +68,6 @@ class blackboxOptFunc(Function):
         Returns:
             torch.tensor: predicted solutions
         """
-        # get device
-        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
         # solve
@@ -89,8 +87,6 @@ class blackboxOptFunc(Function):
         pred_cost, pred_sol = ctx.saved_tensors
         lambd = ctx.lambd
         module = ctx.module
-        # get device
-        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
         wp = pred_sol.detach()
@@ -101,8 +97,6 @@ class blackboxOptFunc(Function):
         sol, _ = _solve_or_cache(cq, module)
         # get gradient
         grad = (sol - wp) / lambd
-        # convert to tensor
-        grad = torch.as_tensor(grad, dtype=torch.float32, device=device)
         return grad, None
 
 
@@ -158,8 +152,6 @@ class negativeIdentityFunc(Function):
         Returns:
             torch.tensor: predicted solutions
         """
-        # get device
-        device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
         # solve

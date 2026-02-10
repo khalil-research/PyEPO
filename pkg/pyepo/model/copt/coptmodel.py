@@ -6,7 +6,11 @@ Abstract optimization model based on Cardinal Optimizer (COPT)
 
 from copy import copy
 
-from coptpy import COPT
+try:
+    from coptpy import COPT
+    _HAS_COPT = True
+except ImportError:
+    _HAS_COPT = False
 
 from pyepo import EPO
 from pyepo.model.opt import optModel
@@ -21,6 +25,8 @@ class optCoptModel(optModel):
     """
 
     def __init__(self):
+        if not _HAS_COPT:
+            raise ImportError("COPT is not installed. Please install coptpy to use this feature.")
         super().__init__()
         # model sense
         if self._model.ObjSense == COPT.MINIMIZE:

@@ -3,7 +3,7 @@
 
 import setuptools
 
-long_description = "``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [Pyomo](http://www.pyomo.org/), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules."
+long_description = "``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with the linear objective function. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), [MPAX](https://github.com/MIT-Lu-Lab/MPAX), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules."
 
 setuptools.setup(
     # includes all other files
@@ -17,7 +17,7 @@ setuptools.setup(
     long_description = long_description,
     long_description_content_type = "text/markdown",
     # version
-    version = "1.0.4",
+    version = "1.1.0",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
@@ -38,7 +38,9 @@ setuptools.setup(
     extras_require = {
         "pyomo": ["pyomo>=6.1.2"],
         "gurobi": ["gurobipy>=9.1.2"],
-        "all": ["pyomo>=6.1.2", "gurobipy>=9.1.2"],
+        "ortools": ["ortools>=9.6"],
+        "mpax": ["mpax", "jax>=0.4.1", "jaxlib>=0.4.1"],
+        "all": ["pyomo>=6.1.2", "gurobipy>=9.1.2", "ortools>=9.6", "mpax", "jax>=0.4.1", "jaxlib>=0.4.1"],
     },
     # classifiers
     classifiers = [

@@ -89,7 +89,7 @@ class optGrbModel(optModel):
         if isinstance(self.x, gp.MVar):
             sol = self.x.x
         else:
-            sol = [self.x[k].x for k in self.x]
+            sol = np.array([self.x[k].x for k in self.x])
         # objective value
         obj = self._model.objVal
         return sol, obj
@@ -107,8 +107,11 @@ class optGrbModel(optModel):
         # new model
         new_model._model = self._model.copy()
         # variables for new model
-        x = new_model._model.getVars()
-        new_model.x = {key: x[i] for i, key in enumerate(x)}
+        new_vars = new_model._model.getVars()
+        if isinstance(self.x, gp.MVar):
+            new_model.x = {i: new_vars[i] for i in range(len(new_vars))}
+        else:
+            new_model.x = {key: new_vars[i] for i, key in enumerate(self.x)}
         return new_model
 
     def addConstr(self, coefs, rhs):

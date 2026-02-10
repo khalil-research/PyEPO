@@ -189,6 +189,8 @@ class optDatasetKNN(optDataset):
         """
         # calculate distances between features
         distances = distance.cdist(self.feats, self.feats, "euclidean")
+        # exclude self (diagonal) to get true nearest neighbours
+        np.fill_diagonal(distances, np.inf)
         indexes = np.argpartition(distances, self.k, axis=1)[:, :self.k]
         # vectorized interpolation: (n, num_cost, 1) + (n, num_cost, k)
         neighbours = self.costs[indexes]  # (n, k, num_cost)
