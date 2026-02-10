@@ -1,9 +1,15 @@
 # PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Tool
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![GitHub Release](https://img.shields.io/github/v/release/khalil-research/PyEPO)
-[![PyPI version](https://badge.fury.io/py/pyepo.svg)](https://badge.fury.io/py/pyepo)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/pyepo)
+[![Tests](https://github.com/khalil-research/PyEPO/actions/workflows/test.yml/badge.svg)](https://github.com/khalil-research/PyEPO/actions/workflows/test.yml)
+[![Python](https://img.shields.io/pypi/pyversions/pyepo.svg)](https://pypi.org/project/pyepo/)
+[![PyPI version](https://badge.fury.io/py/pyepo.svg)](https://pypi.org/project/pyepo/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/pyepo)](https://pepy.tech/project/pyepo)
+[![Conda version](https://img.shields.io/conda/vn/pyepo/pyepo.svg)](https://anaconda.org/pyepo/pyepo)
+[![Conda Downloads](https://img.shields.io/conda/dn/pyepo/pyepo.svg)](https://anaconda.org/pyepo/pyepo)
+[![GitHub Stars](https://img.shields.io/github/stars/khalil-research/PyEPO)](https://github.com/khalil-research/PyEPO/stargazers)
+[![Docs](https://img.shields.io/badge/docs-online-green.svg)](https://khalil-research.github.io/PyEPO)
+[![Paper](https://img.shields.io/badge/MPC-10.1007/s12532--024--00255--x-blue.svg)](https://link.springer.com/article/10.1007/s12532-024-00255-x)
 
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
 
