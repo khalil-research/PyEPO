@@ -9,3 +9,4 @@ from pyepo.func.blackbox import blackboxOpt, negativeIdentity
 from pyepo.func.perturbed import perturbedOpt, perturbedFenchelYoung, implicitMLE, adaptiveImplicitMLE
 from pyepo.func.contrastive import NCE, contrastiveMAP
 from pyepo.func.rank import listwiseLTR, pairwiseLTR, pointwiseLTR
+from pyepo.func.unrolling import dysOpt
