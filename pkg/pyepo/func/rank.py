@@ -11,7 +11,6 @@ from torch import nn
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
-from pyepo.data.dataset import optDataset
 from pyepo.func.utils import _solve_in_pass
 
 
@@ -38,31 +37,21 @@ class listwiseLTR(optModule):
             reduction (str): the reduction to apply to the output
             dataset (optDataset): the training data, usually this is simply the training set
         """
-        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
-        # solution pool
-        if not isinstance(dataset, optDataset): # type checking
-            raise TypeError("dataset is not an optDataset")
-        # convert to tensor
-        self.solpool = dataset.sols.clone()
-        # remove duplicate
-        self.solpool = torch.unique(self.solpool, dim=0)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 
     def forward(self, pred_cost, true_cost):
         """
         Forward pass
         """
-        # get device
-        device = pred_cost.device
-        # to device
-        if self.solpool.device != device:
-            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
-        # solve
+        # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
-            # add into solpool
-            self._update_solution_pool(sol)
+            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
+                                                self.pool, self.solpool, self._solset)
+        # to device
+        if self.solpool.device != cp.device:
+            self.solpool = self.solpool.to(cp.device)
         # obj for solpool
         objpool_c = true_cost @ self.solpool.T # true cost
         objpool_cp = pred_cost @ self.solpool.T # pred cost
@@ -73,16 +62,7 @@ class listwiseLTR(optModule):
             loss = - (F.log_softmax(- objpool_cp, dim=1) * F.softmax(- objpool_c, dim=1))
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        # reduction
-        if self.reduction == "mean":
-            loss = torch.mean(loss)
-        elif self.reduction == "sum":
-            loss = torch.sum(loss)
-        elif self.reduction == "none":
-            loss = loss
-        else:
-            raise ValueError("No reduction '{}'.".format(self.reduction))
-        return loss
+        return self._reduce(loss)
 
 
 class pairwiseLTR(optModule):
@@ -108,33 +88,25 @@ class pairwiseLTR(optModule):
             reduction (str): the reduction to apply to the output
             dataset (optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
-        # solution pool
-        if not isinstance(dataset, optDataset): # type checking
-            raise TypeError("dataset is not an optDataset")
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
         # function
         self.relu = nn.ReLU()
-        # convert to tensor
-        self.solpool = dataset.sols.clone()
-        # remove duplicate
-        self.solpool = torch.unique(self.solpool, dim=0)
 
     def forward(self, pred_cost, true_cost):
         """
         Forward pass
         """
-        # get device
-        device = pred_cost.device
-        # to device
-        if self.solpool.device != device:
-            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
-        # solve
+        # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
-            # add into solpool
-            self._update_solution_pool(sol)
+            _, _, self.solpool = _solve_in_pass(
+                cp, self.optmodel, self.processes, self.pool,
+                self.solpool, self._solset
+            )
+        # to device
+        if self.solpool.device != cp.device:
+            self.solpool = self.solpool.to(cp.device)
         # obj for solpool
         objpool_c = torch.einsum("bd,nd->bn", true_cost, self.solpool) # true cost
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool) # pred cost
@@ -148,7 +120,7 @@ class pairwiseLTR(optModule):
         objpool_cp_best = objpool_cp.gather(1, best_inds.unsqueeze(1)).squeeze(1)
         # mask out best solution index
         batch_size, solpool_size = objpool_cp.shape
-        mask = torch.ones((batch_size, solpool_size), dtype=torch.bool, device=device)
+        mask = torch.ones((batch_size, solpool_size), dtype=torch.bool, device=cp.device)
         mask.scatter_(1, best_inds.unsqueeze(1), False)
         # select the rest of the solutions
         objpool_cp_rest = objpool_cp[mask].view(batch_size, solpool_size - 1)
@@ -159,16 +131,7 @@ class pairwiseLTR(optModule):
             loss = self.relu(objpool_cp_rest - objpool_cp_best.unsqueeze(1)).mean(dim=1)
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        # reduction
-        if self.reduction == "mean":
-            loss = torch.mean(loss)
-        elif self.reduction == "sum":
-            loss = torch.sum(loss)
-        elif self.reduction == "none":
-            loss = loss
-        else:
-            raise ValueError("No reduction '{}'.".format(self.reduction))
-        return loss
+        return self._reduce(loss)
 
 
 class pointwiseLTR(optModule):
@@ -195,43 +158,24 @@ class pointwiseLTR(optModule):
             reduction (str): the reduction to apply to the output
             dataset (optDataset): the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
-        # solution pool
-        if not isinstance(dataset, optDataset): # type checking
-            raise TypeError("dataset is not an optDataset")
-        # convert to tensor
-        self.solpool = dataset.sols.clone()
-        # remove duplicate
-        self.solpool = torch.unique(self.solpool, dim=0)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 
     def forward(self, pred_cost, true_cost):
         """
         Forward pass
         """
-        # get device
-        device = pred_cost.device
-        # to device
-        if self.solpool.device != device:
-            self.solpool = self.solpool.to(device)
         # convert tensor
         cp = pred_cost.detach()
-        # solve
+        # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            sol, _ = _solve_in_pass(cp, self.optmodel, self.processes, self.pool)
-            # add into solpool
-            self._update_solution_pool(sol)
+            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
+                                                self.pool, self.solpool, self._solset)
+        # to device
+        if self.solpool.device != cp.device:
+            self.solpool = self.solpool.to(cp.device)
         # obj for solpool as score
         objpool_c = true_cost @ self.solpool.T # true cost
         objpool_cp = pred_cost @ self.solpool.T # pred cost
         # squared loss
         loss = (objpool_c - objpool_cp).square().mean(dim=1)
-        # reduction
-        if self.reduction == "mean":
-            loss = torch.mean(loss)
-        elif self.reduction == "sum":
-            loss = torch.sum(loss)
-        elif self.reduction == "none":
-            loss = loss
-        else:
-            raise ValueError("No reduction '{}'.".format(self.reduction))
-        return loss
+        return self._reduce(loss)

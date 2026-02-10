@@ -8,24 +8,21 @@ from collections import defaultdict
 from itertools import combinations
 
 import numpy as np
-try:
-    import gurobipy as gp
-    from gurobipy import GRB
-    _HAS_GUROBI = True
-except ImportError:
-    _HAS_GUROBI = False
+from coptpy import Envr
+from coptpy import COPT
+from coptpy import CallbackBase
 
-from pyepo.model.grb.grbmodel import optGrbModel
+from pyepo.model.copt.coptmodel import optCoptModel
 from pyepo.model.opt import unionFind
 
 
-class tspABModel(optGrbModel):
+class tspABModel(optCoptModel):
     """
     This abstract class is an optimization model for the traveling salesman problem.
     This model is for further implementation of different formulation.
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model (COPT model): COPT model
         num_nodes (int): Number of nodes
         edges (list): List of edge index
     """
@@ -88,39 +85,40 @@ class tspABModel(optGrbModel):
 
 class tspGGModel(tspABModel):
     """
-    This class is an optimization model for the traveling salesman problem based on Gavish–Graves (GG) formulation.
+    This class is an optimization model for the traveling salesman problem based on Gavish-Graves (GG) formulation.
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model (COPT model): COPT model
         num_nodes (int): Number of nodes
         edges (list): List of edge index
     """
 
     def _getModel(self):
         """
-        A method to build Gurobi model
+        A method to build COPT model
 
         Returns:
             tuple: optimization model and variables
         """
         # create a model
-        m = gp.Model("tsp")
+        m = Envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
-        y = m.addVars(directed_edges, name="y")
+        x = m.addVars(directed_edges, nameprefix='x', vtype=COPT.BINARY)
+        y = m.addVars(directed_edges, nameprefix='y', vtype=COPT.CONTINUOUS)
         # sense
-        m.modelSense = GRB.MINIMIZE
+        m.setObjSense(COPT.MINIMIZE)
         # constraints
-        m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
-        m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(y.sum(i, "*") -
-                     gp.quicksum(y[j,i]
-                                 for j in self.nodes[1:]
-                                 if j != i) == 1
-                     for i in self.nodes[1:])
-        m.addConstrs(y[i,j] <= (len(self.nodes) - 1) * x[i,j]
-                     for (i,j) in x if i != 0)
+        for j in self.nodes:
+            m.addConstr(sum(x[i, j] for i in self.nodes if i != j) == 1)
+        for i in self.nodes:
+            m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
+        for i in self.nodes[1:]:
+            m.addConstr(sum(y[i, j] for j in self.nodes if j != i) -
+                        sum(y[j, i] for j in self.nodes[1:] if j != i) == 1)
+        for (i, j) in directed_edges:
+            if i != 0:
+                m.addConstr(y[i, j] <= (len(self.nodes) - 1) * x[i, j])
         return m, x
 
     def setObj(self, c):
@@ -132,19 +130,18 @@ class tspGGModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
-                          for k, (i,j) in enumerate(self.edges))
+        obj = sum(c[k] * (self.x[i, j] + self.x[j, i])
+                  for k, (i, j) in enumerate(self.edges))
         self._model.setObjective(obj)
 
     def solve(self):
         """
         A method to solve model
         """
-        self._model.update()
-        self._model.optimize()
+        self._model.solve()
         sol = np.zeros(self.num_cost, dtype=np.uint8)
-        for k, (i,j) in enumerate(self.edges):
-            if self.x[i,j].x > 1e-2 or self.x[j,i].x > 1e-2:
+        for k, (i, j) in enumerate(self.edges):
+            if self.x[i, j].x > 1e-2 or self.x[j, i].x > 1e-2:
                 sol[k] = 1
         return sol, self._model.objVal
 
@@ -165,8 +162,8 @@ class tspGGModel(tspABModel):
         new_model = self.copy()
         # add constraint
         new_model._model.addConstr(
-            gp.quicksum(coefs[k] * (new_model.x[i,j] + new_model.x[j,i])
-                        for k, (i,j) in enumerate(new_model.edges)) <= rhs)
+            sum(coefs[k] * (new_model.x[i, j] + new_model.x[j, i])
+                for k, (i, j) in enumerate(new_model.edges)) <= rhs)
         return new_model
 
     def relax(self):
@@ -183,38 +180,38 @@ class tspGGModelRel(tspGGModel):
     This class is relaxation of tspGGModel.
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model (COPT model): COPT model
         num_nodes (int): Number of nodes
         edges (list): List of edge index
     """
 
     def _getModel(self):
         """
-        A method to build Gurobi model
+        A method to build COPT model
 
         Returns:
             tuple: optimization model and variables
         """
         # create a model
-        m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
+        m = Envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        x = m.addVars(directed_edges, name="x", ub=1)
-        y = m.addVars(directed_edges, name="y")
+        x = m.addVars(directed_edges, nameprefix='x', vtype=COPT.CONTINUOUS,
+                       lb=0, ub=1)
+        y = m.addVars(directed_edges, nameprefix='y', vtype=COPT.CONTINUOUS)
         # sense
-        m.modelSense = GRB.MINIMIZE
+        m.setObjSense(COPT.MINIMIZE)
         # constraints
-        m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
-        m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(y.sum(i, "*") -
-                     gp.quicksum(y[j,i]
-                                 for j in self.nodes[1:]
-                                 if j != i) == 1
-                     for i in self.nodes[1:])
-        m.addConstrs(y[i,j] <= (len(self.nodes) - 1) * x[i,j]
-                     for (i,j) in x if i != 0)
+        for j in self.nodes:
+            m.addConstr(sum(x[i, j] for i in self.nodes if i != j) == 1)
+        for i in self.nodes:
+            m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
+        for i in self.nodes[1:]:
+            m.addConstr(sum(y[i, j] for j in self.nodes if j != i) -
+                        sum(y[j, i] for j in self.nodes[1:] if j != i) == 1)
+        for (i, j) in directed_edges:
+            if i != 0:
+                m.addConstr(y[i, j] <= (len(self.nodes) - 1) * x[i, j])
         return m, x
 
     def solve(self):
@@ -224,11 +221,10 @@ class tspGGModelRel(tspGGModel):
         Returns:
             tuple: optimal solution (list) and objective value (float)
         """
-        self._model.update()
-        self._model.optimize()
+        self._model.solve()
         sol = np.zeros(self.num_cost)
-        for k, (i,j) in enumerate(self.edges):
-            sol[k] = self.x[i,j].x + self.x[j,i].x
+        for k, (i, j) in enumerate(self.edges):
+            sol[k] = self.x[i, j].x + self.x[j, i].x
         return sol, self._model.objVal
 
     def relax(self):
@@ -246,61 +242,63 @@ class tspGGModelRel(tspGGModel):
 
 class tspDFJModel(tspABModel):
     """
-    This class is an optimization model for the traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
+    This class is an optimization model for the traveling salesman problem based on Danzig-Fulkerson-Johnson (DFJ) formulation and
     constraint generation.
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model (COPT model): COPT model
         num_nodes (int): Number of nodes
         edges (list): List of edge index
     """
 
+    class _SubtourCallback(CallbackBase):
+        """
+        A callback class for subtour elimination
+        """
+        def __init__(self, x, n, edges):
+            super().__init__()
+            self._x = x
+            self._n = n
+            self._edges = edges
+
+        def callback(self):
+            if self.where() == COPT.CBCONTEXT_MIPSOL:
+                # selected edges
+                xvals = self.getSolution(self._x)
+                selected = [(i, j) for i, j in self._x.keys()
+                            if xvals[i, j] > 1e-2]
+                # check subcycle with unionfind
+                uf = unionFind(self._n)
+                for i, j in selected:
+                    if not uf.union(i, j):
+                        # find subcycle
+                        cycle = [k for k in range(self._n)
+                                 if uf.find(k) == uf.find(i)]
+                        if len(cycle) < self._n:
+                            constr = sum(self._x[i, j]
+                                         for i, j in combinations(cycle, 2))
+                            self.addLazyConstr(constr <= len(cycle) - 1)
+                        break
+
     def _getModel(self):
         """
-        A method to build Gurobi model
+        A method to build COPT model
 
         Returns:
             tuple: optimization model and variables
         """
         # create a model
-        m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
+        m = Envr().createModel("tsp")
         # variables
-        x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
+        x = m.addVars(self.edges, nameprefix='x', vtype=COPT.BINARY)
         for i, j in self.edges:
             x[j, i] = x[i, j]
         # sense
-        m.modelSense = GRB.MINIMIZE
+        m.setObjSense(COPT.MINIMIZE)
         # constraints
-        m.addConstrs(x.sum(i, "*") == 2 for i in self.nodes)  # 2 degree
-        # activate lazy constraints
-        m._x = x
-        m._n = len(self.nodes)
-        m.Params.lazyConstraints = 1
+        for i in self.nodes:
+            m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 2)
         return m, x
-
-    @staticmethod
-    def _subtourelim(model, where):
-        """
-        A static method to add lazy constraints for subtour elimination
-        """
-        if where == GRB.Callback.MIPSOL:
-            # selected edges
-            xvals = model.cbGetSolution(model._x)
-            selected = gp.tuplelist(
-                (i, j) for i, j in model._x.keys() if xvals[i, j] > 1e-2)
-            # check subcycle with unionfind
-            uf = unionFind(model._n)
-            for i, j in selected:
-                if not uf.union(i, j):
-                    # find subcycle
-                    cycle = [k for k in range(model._n) if uf.find(k) == uf.find(i)]
-                    if len(cycle) < model._n:
-                        constr = gp.quicksum(model._x[i, j]
-                                     for i, j in combinations(cycle, 2)) <= len(cycle) - 1
-                        model.cbLazy(constr)
-                    break
 
     def setObj(self, c):
         """
@@ -311,15 +309,16 @@ class tspDFJModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.edges))
+        obj = sum(c[i] * self.x[k] for i, k in enumerate(self.edges))
         self._model.setObjective(obj)
 
     def solve(self):
         """
         A method to solve model
         """
-        self._model.update()
-        self._model.optimize(self._subtourelim)
+        cb = self._SubtourCallback(self.x, len(self.nodes), self.edges)
+        self._model.setCallback(cb, COPT.CBCONTEXT_MIPSOL)
+        self._model.solve()
         sol = np.zeros(self.num_cost, dtype=np.uint8)
         for i, e in enumerate(self.edges):
             if self.x[e].x > 1e-2:
@@ -343,8 +342,8 @@ class tspDFJModel(tspABModel):
         new_model = self.copy()
         # add constraint
         new_model._model.addConstr(
-            gp.quicksum(coefs[i] * new_model.x[k]
-                        for i, k in enumerate(new_model.edges)) <= rhs)
+            sum(coefs[i] * new_model.x[k]
+                for i, k in enumerate(new_model.edges)) <= rhs)
         return new_model
 
 
@@ -353,34 +352,35 @@ class tspMTZModel(tspABModel):
     This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model (COPT model): COPT model
         num_nodes (int): Number of nodes
         edges (list): List of edge index
     """
+
     def _getModel(self):
         """
-        A method to build Gurobi model
+        A method to build COPT model
 
         Returns:
             tuple: optimization model and variables
         """
         # create a model
-        m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
+        m = Envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
-        u = m.addVars(self.nodes, name="u")
+        x = m.addVars(directed_edges, nameprefix='x', vtype=COPT.BINARY)
+        u = m.addVars(self.nodes, nameprefix='u', vtype=COPT.CONTINUOUS)
         # sense
-        m.modelSense = GRB.MINIMIZE
+        m.setObjSense(COPT.MINIMIZE)
         # constraints
-        m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
-        m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(u[j] - u[i] >=
-                     len(self.nodes) * (x[i,j] - 1) + 1
-                     for (i,j) in directed_edges
-                     if (i != 0) and (j != 0))
+        for j in self.nodes:
+            m.addConstr(sum(x[i, j] for i in self.nodes if i != j) == 1)
+        for i in self.nodes:
+            m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
+        for (i, j) in directed_edges:
+            if (i != 0) and (j != 0):
+                m.addConstr(u[j] - u[i] >=
+                            len(self.nodes) * (x[i, j] - 1) + 1)
         return m, x
 
     def setObj(self, c):
@@ -392,19 +392,18 @@ class tspMTZModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
-                          for k, (i,j) in enumerate(self.edges))
+        obj = sum(c[k] * (self.x[i, j] + self.x[j, i])
+                  for k, (i, j) in enumerate(self.edges))
         self._model.setObjective(obj)
 
     def solve(self):
         """
         A method to solve model
         """
-        self._model.update()
-        self._model.optimize()
+        self._model.solve()
         sol = np.zeros(self.num_cost, dtype=np.uint8)
-        for k, (i,j) in enumerate(self.edges):
-            if self.x[i,j].x > 1e-2 or self.x[j,i].x > 1e-2:
+        for k, (i, j) in enumerate(self.edges):
+            if self.x[i, j].x > 1e-2 or self.x[j, i].x > 1e-2:
                 sol[k] = 1
         return sol, self._model.objVal
 
@@ -425,8 +424,8 @@ class tspMTZModel(tspABModel):
         new_model = self.copy()
         # add constraint
         new_model._model.addConstr(
-            gp.quicksum(coefs[k] * (new_model.x[i,j] + new_model.x[j,i])
-                        for k, (i,j) in enumerate(new_model.edges)) <= rhs)
+            sum(coefs[k] * (new_model.x[i, j] + new_model.x[j, i])
+                for k, (i, j) in enumerate(new_model.edges)) <= rhs)
         return new_model
 
     def relax(self):
@@ -443,35 +442,36 @@ class tspMTZModelRel(tspMTZModel):
     This class is relaxation of tspMTZModel.
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model (COPT model): COPT model
         num_nodes (int): Number of nodes
         edges (list): List of edge index
     """
 
     def _getModel(self):
         """
-        A method to build Gurobi model
+        A method to build COPT model
 
         Returns:
             tuple: optimization model and variables
         """
         # create a model
-        m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
+        m = Envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        x = m.addVars(directed_edges, name="x", ub=1)
-        u = m.addVars(self.nodes, name="u")
+        x = m.addVars(directed_edges, nameprefix='x', vtype=COPT.CONTINUOUS,
+                       lb=0, ub=1)
+        u = m.addVars(self.nodes, nameprefix='u', vtype=COPT.CONTINUOUS)
         # sense
-        m.modelSense = GRB.MINIMIZE
+        m.setObjSense(COPT.MINIMIZE)
         # constraints
-        m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
-        m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(u[j] - u[i] >=
-                     len(self.nodes) * (x[i,j] - 1) + 1
-                     for (i,j) in directed_edges
-                     if (i != 0) and (j != 0))
+        for j in self.nodes:
+            m.addConstr(sum(x[i, j] for i in self.nodes if i != j) == 1)
+        for i in self.nodes:
+            m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
+        for (i, j) in directed_edges:
+            if (i != 0) and (j != 0):
+                m.addConstr(u[j] - u[i] >=
+                            len(self.nodes) * (x[i, j] - 1) + 1)
         return m, x
 
     def solve(self):
@@ -481,11 +481,10 @@ class tspMTZModelRel(tspMTZModel):
         Returns:
             tuple: optimal solution (list) and objective value (float)
         """
-        self._model.update()
-        self._model.optimize()
+        self._model.solve()
         sol = np.zeros(self.num_cost)
-        for k, (i,j) in enumerate(self.edges):
-            sol[k] = self.x[i,j].x + self.x[j,i].x
+        for k, (i, j) in enumerate(self.edges):
+            sol[k] = self.x[i, j].x + self.x[j, i].x
         return sol, self._model.objVal
 
     def relax(self):
@@ -499,3 +498,52 @@ class tspMTZModelRel(tspMTZModel):
         A forbidden method to get a tour from solution
         """
         raise RuntimeError("Relaxation Model has no integer solution.")
+
+
+if __name__ == "__main__":
+
+    import random
+    # random seed
+    random.seed(42)
+    num_nodes = 5
+    num_edges = num_nodes * (num_nodes - 1) // 2
+    cost = [random.random() for _ in range(num_edges)]
+
+    # solve GG model
+    optmodel = tspGGModel(num_nodes=num_nodes)
+    optmodel = optmodel.copy()
+    optmodel.setObj(cost)
+    sol, obj = optmodel.solve()
+    print('GG Obj: {}'.format(obj))
+    tour = optmodel.getTour(sol)
+    print('GG Tour: {}'.format(tour))
+
+    # solve DFJ model
+    optmodel = tspDFJModel(num_nodes=num_nodes)
+    optmodel.setObj(cost)
+    sol, obj = optmodel.solve()
+    print('DFJ Obj: {}'.format(obj))
+    tour = optmodel.getTour(sol)
+    print('DFJ Tour: {}'.format(tour))
+
+    # solve MTZ model
+    optmodel = tspMTZModel(num_nodes=num_nodes)
+    optmodel.setObj(cost)
+    sol, obj = optmodel.solve()
+    print('MTZ Obj: {}'.format(obj))
+    tour = optmodel.getTour(sol)
+    print('MTZ Tour: {}'.format(tour))
+
+    # relax GG model
+    optmodel = tspGGModel(num_nodes=num_nodes)
+    optmodel = optmodel.relax()
+    optmodel.setObj(cost)
+    sol, obj = optmodel.solve()
+    print('GG Relaxed Obj: {}'.format(obj))
+
+    # add constraint
+    optmodel = tspMTZModel(num_nodes=num_nodes)
+    optmodel = optmodel.addConstr([1] * num_edges, num_edges - 1)
+    optmodel.setObj(cost)
+    sol, obj = optmodel.solve()
+    print('MTZ + Constr Obj: {}'.format(obj))

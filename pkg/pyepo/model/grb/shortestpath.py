@@ -4,6 +4,8 @@
 Shortest path problem
 """
 
+from collections import defaultdict
+
 try:
     import gurobipy as gp
     from gurobipy import GRB
@@ -12,6 +14,7 @@ except ImportError:
     _HAS_GUROBI = False
 
 from pyepo.model.grb.grbmodel import optGrbModel
+from pyepo.model.opt import _get_grid_arcs
 
 
 class shortestPathModel(optGrbModel):
@@ -30,29 +33,8 @@ class shortestPathModel(optGrbModel):
             grid (tuple of int): size of grid network
         """
         self.grid = grid
-        self.arcs = self._getArcs()
+        self.arcs = _get_grid_arcs(grid)
         super().__init__()
-
-    def _getArcs(self):
-        """
-        A method to get list of arcs for grid network
-
-        Returns:
-            list: arcs
-        """
-        arcs = []
-        for i in range(self.grid[0]):
-            # edges along rows
-            for j in range(self.grid[1] - 1):
-                v = i * self.grid[1] + j
-                arcs.append((v, v + 1))
-            # edges along columns
-            if i == self.grid[0] - 1:
-                continue
-            for j in range(self.grid[1]):
-                v = i * self.grid[1] + j
-                arcs.append((v, v + self.grid[1]))
-        return arcs
 
     def _getModel(self):
         """
@@ -67,18 +49,17 @@ class shortestPathModel(optGrbModel):
         x = m.addVars(self.arcs, name="x")
         # sense
         m.modelSense = GRB.MINIMIZE
+        # build adjacency lists
+        out_arcs = defaultdict(list)
+        in_arcs = defaultdict(list)
+        for e in self.arcs:
+            out_arcs[e[0]].append(e)
+            in_arcs[e[1]].append(e)
         # constraints
         for i in range(self.grid[0]):
             for j in range(self.grid[1]):
                 v = i * self.grid[1] + j
-                expr = 0
-                for e in self.arcs:
-                    # flow in
-                    if v == e[1]:
-                        expr += x[e]
-                    # flow out
-                    elif v == e[0]:
-                        expr -= x[e]
+                expr = gp.quicksum(x[e] for e in in_arcs[v]) - gp.quicksum(x[e] for e in out_arcs[v])
                 # source
                 if i == 0 and j == 0:
                     m.addConstr(expr == -1)

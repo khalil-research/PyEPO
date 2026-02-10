@@ -11,13 +11,15 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.func.utils import _cache_in_pass, _check_sol, sumGammaDistribution
+from pyepo.func.utils import _cache_in_pass, _check_sol, _update_solution_pool, sumGammaDistribution
 
 try:
     from pyepo.model.grb.shortestpath import shortestPathModel
     from pyepo.model.grb.knapsack import knapsackModel
+    # verify Gurobi actually works (import may succeed without a valid license)
+    shortestPathModel(grid=(3, 3))
     _HAS_GUROBI = True
-except (ImportError, NameError):
+except (ImportError, NameError, Exception):
     _HAS_GUROBI = False
 
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
@@ -49,7 +51,7 @@ class TestCacheInPass:
         # solution pool: 2 solutions
         solpool = torch.tensor([[1.0, 0.0, 0.0],
                                 [0.0, 0.0, 1.0]])
-        sol, obj = _cache_in_pass(cp, model, solpool)
+        sol, obj, _ = _cache_in_pass(cp, model, solpool)
         # instance 0: costs=[1,2,3], sol0 gives obj=1, sol1 gives obj=3 → pick sol0
         assert torch.allclose(sol[0], solpool[0])
         # instance 1: costs=[3,2,1], sol0 gives obj=3, sol1 gives obj=1 → pick sol1
@@ -61,7 +63,7 @@ class TestCacheInPass:
                            [3.0, 2.0, 1.0]])
         solpool = torch.tensor([[1.0, 0.0, 0.0],
                                 [0.0, 0.0, 1.0]])
-        sol, obj = _cache_in_pass(cp, model, solpool)
+        sol, obj, _ = _cache_in_pass(cp, model, solpool)
         # instance 0: sol0→1, sol1→3 → pick sol1 (max)
         assert torch.allclose(sol[0], solpool[1])
         # instance 1: sol0→3, sol1→1 → pick sol0 (max)
@@ -81,7 +83,7 @@ class TestCacheInPass:
         n, d, pool_size = 5, 4, 10
         cp = torch.randn(n, d)
         solpool = torch.randn(pool_size, d)
-        sol, obj = _cache_in_pass(cp, model, solpool)
+        sol, obj, _ = _cache_in_pass(cp, model, solpool)
         assert sol.shape == (n, d)
         assert obj.shape == (n,)
 
@@ -150,59 +152,50 @@ class TestSumGammaDistribution:
 
 class TestSolutionPool:
 
-    def _make_module(self):
-        """Create a bare optModule-like object for pool testing."""
-        from pyepo.func.abcmodule import optModule
-        # We can't instantiate optModule (abstract), so make a minimal mock
-        obj = object.__new__(optModule)
-        obj.solpool = None
-        obj._sol_set = set()
-        return obj
-
     def test_init_pool(self):
-        mod = self._make_module()
+        solset = set()
         sol = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        mod._update_solution_pool(sol)
-        assert mod.solpool.shape == (2, 2)
-        assert len(mod._sol_set) == 2
+        solpool = _update_solution_pool(sol, None, solset)
+        assert solpool.shape == (2, 2)
+        assert len(solset) == 2
 
     def test_dedup(self):
-        mod = self._make_module()
+        solset = set()
         sol1 = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        mod._update_solution_pool(sol1)
+        solpool = _update_solution_pool(sol1, None, solset)
         # add same solutions again
         sol2 = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        mod._update_solution_pool(sol2)
+        solpool = _update_solution_pool(sol2, solpool, solset)
         # pool should still have only 2 solutions
-        assert mod.solpool.shape[0] == 2
-        assert len(mod._sol_set) == 2
+        assert solpool.shape[0] == 2
+        assert len(solset) == 2
 
     def test_add_new(self):
-        mod = self._make_module()
+        solset = set()
         sol1 = torch.tensor([[1.0, 0.0]])
-        mod._update_solution_pool(sol1)
+        solpool = _update_solution_pool(sol1, None, solset)
         sol2 = torch.tensor([[0.0, 1.0]])
-        mod._update_solution_pool(sol2)
-        assert mod.solpool.shape[0] == 2
+        solpool = _update_solution_pool(sol2, solpool, solset)
+        assert solpool.shape[0] == 2
 
     def test_mixed_new_and_dup(self):
-        mod = self._make_module()
+        solset = set()
         sol1 = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        mod._update_solution_pool(sol1)
+        solpool = _update_solution_pool(sol1, None, solset)
         # one new, one duplicate
         sol2 = torch.tensor([[1.0, 0.0], [1.0, 1.0]])
-        mod._update_solution_pool(sol2)
-        assert mod.solpool.shape[0] == 3
-        assert len(mod._sol_set) == 3
+        solpool = _update_solution_pool(sol2, solpool, solset)
+        assert solpool.shape[0] == 3
+        assert len(solset) == 3
 
     def test_empty_new_after_dedup(self):
-        mod = self._make_module()
+        solset = set()
         sol = torch.tensor([[1.0, 2.0]])
-        mod._update_solution_pool(sol)
+        solpool = _update_solution_pool(sol, None, solset)
         # all duplicates
-        mod._update_solution_pool(sol)
-        mod._update_solution_pool(sol)
-        assert mod.solpool.shape[0] == 1
+        solpool = _update_solution_pool(sol, solpool, solset)
+        solpool = _update_solution_pool(sol, solpool, solset)
+        assert solpool.shape[0] == 1
 
 
 # ============================================================

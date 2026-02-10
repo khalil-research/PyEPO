@@ -11,37 +11,43 @@ from pyepo import EPO
 from pyepo.utils import getArgs
 from pyepo.model.mpax import optMpaxModel
 
-try:
-    import jax
-except ImportError:
-    pass
-
 
 def _solve_or_cache(cp, module):
     """
     A function to get optimization solution in the forward/backward pass
     """
-    # solve optimization
+    optmodel = module.optmodel
+    processes = module.processes
+    pool = module.pool
+    solpool = module.solpool
+    solset = module._solset
     if np.random.uniform() <= module.solve_ratio:
-        sol, obj = _solve_in_pass(cp, module.optmodel, module.processes, module.pool)
-        if module.solve_ratio < 1:
-            # add into solpool
-            module._update_solution_pool(sol)
-    # best cached solution
+        sol, obj, solpool = _solve_in_pass(cp, optmodel, processes, pool, solpool, solset)
     else:
-        # move solpool to the correct device
-        if module.solpool.device != cp.device:
-            module.solpool = module.solpool.to(cp.device)
-        sol, obj = _cache_in_pass(cp, module.optmodel, module.solpool)
+        sol, obj, solpool = _cache_in_pass(cp, optmodel, solpool)
+    module.solpool = solpool
     return sol, obj
 
 
-def _solve_in_pass(cp, optmodel, processes, pool):
+def _solve_in_pass(cp, optmodel, processes, pool, solpool=None, solset=None):
+    """
+    A function to solve optimization and update solution pool
+    """
+    sol, obj = _solve_batch(cp, optmodel, processes, pool)
+    # update solution pool and ensure correct device
+    if solpool is not None:
+        if solpool.device != cp.device:
+            solpool = solpool.to(cp.device)
+        solpool = _update_solution_pool(sol, solpool, solset)
+    return sol, obj, solpool
+
+
+def _solve_batch(cp, optmodel, processes, pool):
     """
     A function to solve optimization in the forward/backward pass
     """
     # get device
-    device = cp.device
+    device = cp.device if isinstance(cp, torch.Tensor) else torch.device("cpu")
     # number of instance
     ins_num = len(cp)
     # MPAX batch solving
@@ -52,8 +58,8 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         # batch solving
         sol, obj = optmodel.batch_optimize(cp)
         # convert to torch
-        sol = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(sol)).to(device)
-        obj = torch.utils.dlpack.from_dlpack(jax.dlpack.to_dlpack(obj)).to(device)
+        sol = torch.from_dlpack(sol).to(device)
+        obj = torch.from_dlpack(obj).to(device)
         # obj sense
         if optmodel.modelSense == EPO.MINIMIZE:
             pass
@@ -63,19 +69,21 @@ def _solve_in_pass(cp, optmodel, processes, pool):
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     # single-core
     elif processes == 1:
+        cp = cp.detach().cpu().numpy() if isinstance(cp, torch.Tensor) else np.asarray(cp)
         sol = []
         obj = []
         for i in range(ins_num):
             # solve
             optmodel.setObj(cp[i])
             solp, objp = optmodel.solve()
-            sol.append(torch.as_tensor(solp, dtype=torch.float32))
+            sol.append(np.asarray(solp, dtype=np.float32))
             obj.append(objp)
         # to tensor
-        sol = torch.stack(sol, dim=0).to(device)
+        sol = torch.as_tensor(np.stack(sol), dtype=torch.float32).to(device)
         obj = torch.tensor(obj, dtype=torch.float32, device=device)
     # multi-core
     else:
+        cp = cp.detach().cpu().numpy() if isinstance(cp, torch.Tensor) else np.asarray(cp)
         # get class
         model_type = type(optmodel)
         # get args
@@ -84,17 +92,52 @@ def _solve_in_pass(cp, optmodel, processes, pool):
         res = pool.amap(_solveWithObj4Par, cp, [args] * ins_num,
                         [model_type] * ins_num).get()
         # get res
-        sol = torch.stack([r[0] for r in res], dim=0).to(device)
+        sol = torch.as_tensor(np.stack([r[0] for r in res]), dtype=torch.float32).to(device)
         obj = torch.tensor([r[1] for r in res], dtype=torch.float32, device=device)
     return sol, obj
+
+
+def _update_solution_pool(sol, solpool, solset):
+    """
+    Add new solutions to solution pool
+
+    Args:
+        sol (torch.tensor): new solutions
+        solpool (torch.tensor): existing solution pool
+        solset (set): hash set for deduplication
+
+    Returns:
+        torch.tensor: updated solution pool
+    """
+    sol = torch.as_tensor(sol, dtype=torch.float32)
+    # move to CPU numpy once for hashing (avoids per-row GPU→CPU sync)
+    sol_np = sol.cpu().numpy()
+    if solpool is None:
+        solset.update(s.tobytes() for s in sol_np)
+        return sol.clone()
+    # filter to only genuinely new solutions
+    new_mask = []
+    for s in sol_np:
+        key = s.tobytes()
+        if key not in solset:
+            solset.add(key)
+            new_mask.append(True)
+        else:
+            new_mask.append(False)
+    # append new solutions
+    if any(new_mask):
+        new_sols = sol[torch.tensor(new_mask)].to(solpool.device)
+        solpool = torch.cat((solpool, new_sols), dim=0)
+    return solpool
 
 
 def _cache_in_pass(cp, optmodel, solpool):
     """
     A function to use solution pool in the forward/backward pass
     """
-    # get device
-    device = cp.device
+    # move solpool to the correct device
+    if solpool.device != cp.device:
+        solpool = solpool.to(cp.device)
     # best solution in pool
     solpool_obj = torch.matmul(cp, solpool.T)
     if optmodel.modelSense == EPO.MINIMIZE:
@@ -105,7 +148,7 @@ def _cache_in_pass(cp, optmodel, solpool):
         raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     obj = solpool_obj.gather(1, ind.view(-1, 1)).squeeze(1)
     sol = solpool[ind]
-    return sol, obj
+    return sol, obj, solpool
 
 
 # worker-local model cache (persists across calls in pathos worker processes)
@@ -135,8 +178,7 @@ def _solveWithObj4Par(cost, args, model_type):
     optmodel.setObj(cost)
     # solve
     sol, obj = optmodel.solve()
-    # to tensor
-    sol = torch.tensor(sol, dtype=torch.float32)
+    sol = np.asarray(sol, dtype=np.float32)
     return sol, obj
 
 
@@ -144,7 +186,8 @@ def _check_sol(c, w, z):
     """
     A function to check solution is correct
     """
-    error = torch.abs(z - torch.einsum("bi,bi->b", c, w)) / (torch.abs(z) + 1e-3)
+    z_flat = z.squeeze(-1) if z.dim() > 1 else z
+    error = torch.abs(z_flat - torch.einsum("bi,bi->b", c, w)) / (torch.abs(z_flat) + 1e-3)
     if torch.any(error >= 1e-3):
         raise AssertionError("Some solutions do not match the objective value.")
 

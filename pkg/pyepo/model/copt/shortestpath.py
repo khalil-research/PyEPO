@@ -4,10 +4,13 @@
 Shortest path problem
 """
 
+from collections import defaultdict
+
 from coptpy import Envr
 from coptpy import COPT
 
 from pyepo.model.copt.coptmodel import optCoptModel
+from pyepo.model.opt import _get_grid_arcs
 
 
 class shortestPathModel(optCoptModel):
@@ -26,29 +29,8 @@ class shortestPathModel(optCoptModel):
             grid (tuple of int): size of grid network
         """
         self.grid = grid
-        self.arcs = self._getArcs()
+        self.arcs = _get_grid_arcs(grid)
         super().__init__()
-
-    def _getArcs(self):
-        """
-        A method to get list of arcs for grid network
-
-        Returns:
-            list: arcs
-        """
-        arcs = []
-        for i in range(self.grid[0]):
-            # edges along rows
-            for j in range(self.grid[1] - 1):
-                v = i * self.grid[1] + j
-                arcs.append((v, v + 1))
-            # edges along columns
-            if i == self.grid[0] - 1:
-                continue
-            for j in range(self.grid[1]):
-                v = i * self.grid[1] + j
-                arcs.append((v, v + self.grid[1]))
-        return arcs
 
     def _getModel(self):
         """
@@ -60,18 +42,17 @@ class shortestPathModel(optCoptModel):
         x = m.addVars(self.arcs, nameprefix='x', vtype=COPT.CONTINUOUS, lb=0, ub=1)
         # sense
         m.setObjSense(COPT.MINIMIZE)
+        # build adjacency lists
+        out_arcs = defaultdict(list)
+        in_arcs = defaultdict(list)
+        for e in self.arcs:
+            out_arcs[e[0]].append(e)
+            in_arcs[e[1]].append(e)
         # constraints
         for i in range(self.grid[0]):
             for j in range(self.grid[1]):
                 v = i * self.grid[1] + j
-                expr = 0
-                for e in self.arcs:
-                    # flow in
-                    if v == e[1]:
-                        expr += x[e]
-                    # flow out
-                    elif v == e[0]:
-                        expr -= x[e]
+                expr = sum(x[e] for e in in_arcs[v]) - sum(x[e] for e in out_arcs[v])
                 # source
                 if i == 0 and j == 0:
                     m.addConstr(expr == -1)
