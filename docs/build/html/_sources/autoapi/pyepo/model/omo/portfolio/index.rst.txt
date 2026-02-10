@@ -1,0 +1,105 @@
+pyepo.model.omo.portfolio
+=========================
+
+.. py:module:: pyepo.model.omo.portfolio
+
+.. autoapi-nested-parse::
+
+   Portfolio problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.omo.portfolio._HAS_PYOMO
+   pyepo.model.omo.portfolio.optmodel
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.omo.portfolio.portfolioModel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_PYOMO
+   :value: True
+
+
+.. py:class:: portfolioModel(num_assets, covariance, gamma=2.25, solver='glpk')
+
+   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+
+
+   This class is an optimization model for the portfolio problem
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: Pyomo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: num_assets
+
+      number of assets
+
+      :type: int
+
+   .. attribute:: covariance
+
+      covariance matrix of the returns
+
+      :type: numpy.ndarray
+
+   .. attribute:: risk_level
+
+      risk level
+
+      :type: float
+
+
+   .. py:attribute:: num_assets
+
+
+   .. py:attribute:: covariance
+
+
+   .. py:attribute:: risk_level
+
+
+   .. py:method:: _getRiskLevel(gamma)
+
+      A method to calculate the risk level
+
+      :param gamma: risk level parameter
+      :type gamma: float
+
+      :returns: risk level
+      :rtype: float
+
+
+
+   .. py:method:: _getModel()
+
+      A method to build Pyomo model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:data:: optmodel
+

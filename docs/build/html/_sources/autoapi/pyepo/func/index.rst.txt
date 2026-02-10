@@ -369,9 +369,6 @@ Package Contents
    Reference: <https://www.ijcai.org/proceedings/2021/390>
 
 
-   .. py:attribute:: solpool
-
-
    .. py:method:: forward(pred_cost, true_sol)
 
       Forward pass
@@ -392,9 +389,6 @@ Package Contents
    Thus, it allows us to design an algorithm based on stochastic gradient descent.
 
    Reference: <https://www.ijcai.org/proceedings/2021/390>
-
-
-   .. py:attribute:: solpool
 
 
    .. py:method:: forward(pred_cost, true_sol)
@@ -418,9 +412,6 @@ Package Contents
    descent.
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
-
-
-   .. py:attribute:: solpool
 
 
    .. py:method:: forward(pred_cost, true_cost)
@@ -449,9 +440,6 @@ Package Contents
    .. py:attribute:: relu
 
 
-   .. py:attribute:: solpool
-
-
    .. py:method:: forward(pred_cost, true_cost)
 
       Forward pass
@@ -474,9 +462,6 @@ Package Contents
    descent.
 
    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
-
-
-   .. py:attribute:: solpool
 
 
    .. py:method:: forward(pred_cost, true_cost)

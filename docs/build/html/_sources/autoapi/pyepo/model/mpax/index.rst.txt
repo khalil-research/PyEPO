@@ -110,13 +110,16 @@ Package Contents
 
 
 
-   .. py:attribute:: jitted_solve
-
-
-   .. py:attribute:: batch_optimize
+   .. py:attribute:: _has_jax_gpu
 
 
    .. py:method:: __repr__()
+
+
+   .. py:method:: _rebuild_jit()
+
+      Rebuild JIT-compiled solve functions with current constraints.
+
 
 
    .. py:property:: num_cost
@@ -204,15 +207,6 @@ Package Contents
 
    .. py:attribute:: arcs
       :value: []
-
-
-
-   .. py:method:: _getArcs()
-
-      A method to get list of arcs for grid network
-
-      :returns: arcs
-      :rtype: list
 
 
 

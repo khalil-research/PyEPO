@@ -1,0 +1,174 @@
+pyepo.model.ort.knapsack
+========================
+
+.. py:module:: pyepo.model.ort.knapsack
+
+.. autoapi-nested-parse::
+
+   Knapsack problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.ort.knapsack._HAS_ORTOOLS
+   pyepo.model.ort.knapsack.cost
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.ort.knapsack.knapsackModel
+   pyepo.model.ort.knapsack.knapsackModelRel
+   pyepo.model.ort.knapsack.knapsackCpModel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_ORTOOLS
+   :value: True
+
+
+.. py:class:: knapsackModel(weights, capacity, solver='scip')
+
+   Bases: :py:obj:`pyepo.model.ort.ortmodel.optOrtModel`
+
+
+   This class is an optimization model for the knapsack problem
+
+   .. attribute:: _model
+
+      OR-Tools linear solver
+
+      :type: pywraplp.Solver
+
+   .. attribute:: solver
+
+      solver backend
+
+      :type: str
+
+   .. attribute:: weights
+
+      weights of items
+
+      :type: np.ndarray
+
+   .. attribute:: capacity
+
+      total capacity
+
+      :type: np.ndarray
+
+   .. attribute:: items
+
+      list of item index
+
+      :type: list
+
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools pywraplp model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: knapsackModelRel(weights, capacity, solver='scip')
+
+   Bases: :py:obj:`knapsackModel`
+
+
+   This class is relaxed optimization model for knapsack problem.
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools pywraplp model (relaxed)
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+
+.. py:class:: knapsackCpModel(weights, capacity)
+
+   Bases: :py:obj:`pyepo.model.ort.ortcpmodel.optOrtCpModel`
+
+
+   This class is an optimization model for the knapsack problem using CP-SAT
+
+   .. attribute:: _model
+
+      OR-Tools CP-SAT model
+
+      :type: cp_model.CpModel
+
+   .. attribute:: weights
+
+      weights of items
+
+      :type: np.ndarray
+
+   .. attribute:: capacity
+
+      total capacity
+
+      :type: np.ndarray
+
+   .. attribute:: items
+
+      list of item index
+
+      :type: list
+
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
+   .. py:method:: _getModel()
+
+      A method to build OR-Tools CP-SAT model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+.. py:data:: cost
+

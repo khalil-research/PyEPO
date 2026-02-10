@@ -9,6 +9,14 @@ pyepo.model.copt.coptmodel
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.copt.coptmodel._HAS_COPT
+
+
 Classes
 -------
 
@@ -19,6 +27,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: _HAS_COPT
+   :value: True
+
 
 .. py:class:: optCoptModel
 

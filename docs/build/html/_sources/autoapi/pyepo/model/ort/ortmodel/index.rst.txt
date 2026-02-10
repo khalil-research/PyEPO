@@ -1,0 +1,113 @@
+pyepo.model.ort.ortmodel
+========================
+
+.. py:module:: pyepo.model.ort.ortmodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model based on Google OR-Tools (pywraplp)
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.ort.ortmodel._HAS_ORTOOLS
+   pyepo.model.ort.ortmodel.num_vars
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.ort.ortmodel.optOrtModel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_ORTOOLS
+   :value: True
+
+
+.. py:class:: optOrtModel(solver='scip')
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for an OR-Tools pywraplp optimization model
+
+   .. attribute:: _model
+
+      OR-Tools linear solver
+
+      :type: pywraplp.Solver
+
+   .. attribute:: solver
+
+      solver backend (e.g. "scip", "glop", "cbc")
+
+      :type: str
+
+
+   .. py:attribute:: solver
+      :value: 'scip'
+
+
+
+   .. py:attribute:: _extra_constrs
+      :value: []
+
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost of objective function
+      :type c: np.ndarray / list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve the model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy()
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add a new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: np.ndarray / list
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+.. py:data:: num_vars
+   :value: 10
+
+

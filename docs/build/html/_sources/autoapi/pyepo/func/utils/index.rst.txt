@@ -33,6 +33,8 @@ Functions
 
    pyepo.func.utils._solve_or_cache
    pyepo.func.utils._solve_in_pass
+   pyepo.func.utils._solve_batch
+   pyepo.func.utils._update_solution_pool
    pyepo.func.utils._cache_in_pass
    pyepo.func.utils._solveWithObj4Par
    pyepo.func.utils._check_sol
@@ -46,9 +48,29 @@ Module Contents
    A function to get optimization solution in the forward/backward pass
 
 
-.. py:function:: _solve_in_pass(cp, optmodel, processes, pool)
+.. py:function:: _solve_in_pass(cp, optmodel, processes, pool, solpool=None, solset=None)
+
+   A function to solve optimization and update solution pool
+
+
+.. py:function:: _solve_batch(cp, optmodel, processes, pool)
 
    A function to solve optimization in the forward/backward pass
+
+
+.. py:function:: _update_solution_pool(sol, solpool, solset)
+
+   Add new solutions to solution pool
+
+   :param sol: new solutions
+   :type sol: torch.tensor
+   :param solpool: existing solution pool
+   :type solpool: torch.tensor
+   :param solset: hash set for deduplication
+   :type solset: set
+
+   :returns: updated solution pool
+   :rtype: torch.tensor
 
 
 .. py:function:: _cache_in_pass(cp, optmodel, solpool)

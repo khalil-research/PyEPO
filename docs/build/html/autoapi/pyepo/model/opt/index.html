@@ -21,8 +21,8 @@
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="pyepo.twostage" href="../../twostage/index.html" />
-    <link rel="prev" title="pyepo.model.omo.shortestpath" href="../omo/shortestpath/index.html" /> 
+    <link rel="next" title="pyepo.model.ort" href="../ort/index.html" />
+    <link rel="prev" title="pyepo.model.omo.tsp" href="../omo/tsp/index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -104,6 +104,19 @@
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optModel</span></code></a></p></td>
 <td><p>This is an abstract class for an optimization model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.opt.unionFind" title="pyepo.model.opt.unionFind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unionFind</span></code></a></p></td>
+<td><p>Union-Find data structure for cycle detection in graphs</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.opt._get_grid_arcs" title="pyepo.model.opt._get_grid_arcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_grid_arcs</span></code></a>(grid)</p></td>
+<td><p>Get list of arcs for a grid network.</p></td>
 </tr>
 </tbody>
 </table>
@@ -218,6 +231,44 @@
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.opt.unionFind">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">unionFind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.unionFind" title="Link to this definition"></a></dt>
+<dd><p>Union-Find data structure for cycle detection in graphs</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.opt.unionFind.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><a class="headerlink" href="#pyepo.model.opt.unionFind.parent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.opt.unionFind.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.unionFind.find" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.opt.unionFind.union">
+<span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.unionFind.union" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.model.opt._get_grid_arcs">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">_get_grid_arcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt._get_grid_arcs" title="Link to this definition"></a></dt>
+<dd><p>Get list of arcs for a grid network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>grid</strong> (<em>tuple</em><em> of </em><em>int</em>) – size of grid network (rows, cols)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>arcs as (source, target) tuples</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -225,8 +276,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../omo/shortestpath/index.html" class="btn btn-neutral float-left" title="pyepo.model.omo.shortestpath" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../twostage/index.html" class="btn btn-neutral float-right" title="pyepo.twostage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../omo/tsp/index.html" class="btn btn-neutral float-left" title="pyepo.model.omo.tsp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ort/index.html" class="btn btn-neutral float-right" title="pyepo.model.ort" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

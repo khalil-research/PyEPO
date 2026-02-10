@@ -1,0 +1,387 @@
+pyepo.model.omo.tsp
+===================
+
+.. py:module:: pyepo.model.omo.tsp
+
+.. autoapi-nested-parse::
+
+   Traveling salesman problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.omo.tsp._HAS_PYOMO
+   pyepo.model.omo.tsp.num_nodes
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.omo.tsp.tspABModel
+   pyepo.model.omo.tsp.tspGGModel
+   pyepo.model.omo.tsp.tspGGModelRel
+   pyepo.model.omo.tsp.tspMTZModel
+   pyepo.model.omo.tsp.tspMTZModelRel
+
+
+Module Contents
+---------------
+
+.. py:data:: _HAS_PYOMO
+   :value: True
+
+
+.. py:class:: tspABModel(num_nodes, solver='glpk')
+
+   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+
+
+   This abstract class is an optimization model for the traveling salesman problem.
+   This model is for further implementation of different formulation.
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: Pyomo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:attribute:: num_nodes
+
+
+   .. py:attribute:: nodes
+
+
+   .. py:attribute:: edges
+
+
+   .. py:property:: num_cost
+
+      number of costs to be predicted
+
+
+   .. py:method:: copy()
+
+      A method to copy model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: getTour(sol)
+
+      A method to get a tour from solution
+
+      :param sol: solution
+      :type sol: list
+
+      :returns: a TSP tour
+      :rtype: list
+
+
+
+.. py:class:: tspGGModel(num_nodes, solver='glpk')
+
+   Bases: :py:obj:`tspABModel`
+
+
+   This class is an optimization model for the traveling salesman problem based on Gavish-Graves (GG) formulation.
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: Pyomo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build Pyomo model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: tspGGModelRel(num_nodes, solver='glpk')
+
+   Bases: :py:obj:`tspGGModel`
+
+
+   This class is relaxation of tspGGModel.
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: Pyomo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build Pyomo model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+
+   .. py:method:: getTour(sol)
+
+      A forbidden method to get a tour from solution
+
+
+
+.. py:class:: tspMTZModel(num_nodes, solver='glpk')
+
+   Bases: :py:obj:`tspABModel`
+
+
+   This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: Pyomo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build Pyomo model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: setObj(c)
+
+      A method to set the objective function
+
+      :param c: cost vector
+      :type c: list
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add new constraint
+
+      :param coefs: coefficients of new constraint
+      :type coefs: ndarray
+      :param rhs: right-hand side of new constraint
+      :type rhs: float
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax()
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: tspMTZModelRel(num_nodes, solver='glpk')
+
+   Bases: :py:obj:`tspMTZModel`
+
+
+   This class is relaxation of tspMTZModel.
+
+   .. attribute:: _model
+
+      Pyomo model
+
+      :type: Pyomo model
+
+   .. attribute:: solver
+
+      optimization solver in the background
+
+      :type: str
+
+   .. attribute:: num_nodes
+
+      Number of nodes
+
+      :type: int
+
+   .. attribute:: edges
+
+      List of edge index
+
+      :type: list
+
+
+   .. py:method:: _getModel()
+
+      A method to build Pyomo model
+
+      :returns: optimization model and variables
+      :rtype: tuple
+
+
+
+   .. py:method:: solve()
+
+      A method to solve model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: relax()
+
+      A forbidden method to relax MIP model
+
+
+
+   .. py:method:: getTour(sol)
+
+      A forbidden method to get a tour from solution
+
+
+
+.. py:data:: num_nodes
+   :value: 5
+
+

@@ -1,0 +1,720 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyepo.model.ort &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool v1.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=8a93c2b0"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="pyepo.model.ort.knapsack" href="knapsack/index.html" />
+    <link rel="prev" title="pyepo.model.opt" href="../opt/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            PyTorch-based End-to-End Predict-then-Optimize Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/ref.html">Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">pyepo</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../data/index.html">pyepo.data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../func/index.html">pyepo.func</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../metric/index.html">pyepo.metric</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">pyepo.model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../twostage/index.html">pyepo.twostage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/index.html">pyepo.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">PyTorch-based End-to-End Predict-then-Optimize Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">pyepo</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">pyepo.model</a></li>
+      <li class="breadcrumb-item active">pyepo.model.ort</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/pyepo/model/ort/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyepo.model.ort">
+<span id="pyepo-model-ort"></span><h1>pyepo.model.ort<a class="headerlink" href="#module-pyepo.model.ort" title="Link to this heading"></a></h1>
+<p>Optimization Model based on Google OR-Tools</p>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="knapsack/index.html">pyepo.model.ort.knapsack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ortcpmodel/index.html">pyepo.model.ort.ortcpmodel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ortmodel/index.html">pyepo.model.ort.ortmodel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shortestpath/index.html">pyepo.model.ort.shortestpath</a></li>
+</ul>
+</div>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.optOrtModel" title="pyepo.model.ort.optOrtModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optOrtModel</span></code></a></p></td>
+<td><p>This is an abstract class for an OR-Tools pywraplp optimization model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.ort.optOrtCpModel" title="pyepo.model.ort.optOrtCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optOrtCpModel</span></code></a></p></td>
+<td><p>This is an abstract class for an OR-Tools CP-SAT optimization model</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.shortestPathModel" title="pyepo.model.ort.shortestPathModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortestPathModel</span></code></a></p></td>
+<td><p>This class is an optimization model for the shortest path problem</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.ort.shortestPathCpModel" title="pyepo.model.ort.shortestPathCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortestPathCpModel</span></code></a></p></td>
+<td><p>This class is an optimization model for the shortest path problem using CP-SAT</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.knapsackModel" title="pyepo.model.ort.knapsackModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModel</span></code></a></p></td>
+<td><p>This class is an optimization model for the knapsack problem</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.ort.knapsackModelRel" title="pyepo.model.ort.knapsackModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModelRel</span></code></a></p></td>
+<td><p>This class is relaxed optimization model for knapsack problem.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.knapsackCpModel" title="pyepo.model.ort.knapsackCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackCpModel</span></code></a></p></td>
+<td><p>This class is an optimization model for the knapsack problem using CP-SAT</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="package-contents">
+<h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.</span></span><span class="sig-name descname"><span class="pre">optOrtModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scip'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
+<p>This is an abstract class for an OR-Tools pywraplp optimization model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.ort.optOrtModel._model" title="Link to this definition"></a></dt>
+<dd><p>OR-Tools linear solver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pywraplp.Solver</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel.solver">
+<span class="sig-name descname"><span class="pre">solver</span></span><a class="headerlink" href="#pyepo.model.ort.optOrtModel.solver" title="Link to this definition"></a></dt>
+<dd><p>solver backend (e.g. “scip”, “glop”, “cbc”)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">solver</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scip'</span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel._extra_constrs">
+<span class="sig-name descname"><span class="pre">_extra_constrs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#pyepo.model.ort.optOrtModel._extra_constrs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtModel.__repr__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel.setObj">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtModel.setObj" title="Link to this definition"></a></dt>
+<dd><p>A method to set the objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtModel.solve" title="Link to this definition"></a></dt>
+<dd><p>A method to solve the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtModel.copy" title="Link to this definition"></a></dt>
+<dd><p>A method to copy the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new copied model</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtModel.addConstr">
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtModel.addConstr" title="Link to this definition"></a></dt>
+<dd><p>A method to add a new constraint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coefs</strong> (<em>np.ndarray / list</em>) – coefficients of new constraint</p></li>
+<li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new model with the added constraint</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.</span></span><span class="sig-name descname"><span class="pre">optOrtCpModel</span></span><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
+<p>This is an abstract class for an OR-Tools CP-SAT optimization model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel._model" title="Link to this definition"></a></dt>
+<dd><p>OR-Tools CP-SAT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cp_model.CpModel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel._OBJ_SCALE">
+<span class="sig-name descname"><span class="pre">_OBJ_SCALE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000000</span></em><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel._OBJ_SCALE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel._extra_constrs">
+<span class="sig-name descname"><span class="pre">_extra_constrs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel._extra_constrs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel.__repr__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel.setObj">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel.setObj" title="Link to this definition"></a></dt>
+<dd><p>A method to set the objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>np.ndarray / list</em>) – cost of objective function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel.solve" title="Link to this definition"></a></dt>
+<dd><p>A method to solve the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel.copy" title="Link to this definition"></a></dt>
+<dd><p>A method to copy the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new copied model</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel.addConstr">
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel.addConstr" title="Link to this definition"></a></dt>
+<dd><p>A method to add a new constraint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coefs</strong> (<em>np.ndarray / list</em>) – coefficients of new constraint</p></li>
+<li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new model with the added constraint</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.optOrtCpModel.relax">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.optOrtCpModel.relax" title="Link to this definition"></a></dt>
+<dd><p>CP-SAT does not support LP relaxation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'glop'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.shortestPathModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="ortmodel/index.html#pyepo.model.ort.ortmodel.optOrtModel" title="pyepo.model.ort.ortmodel.optOrtModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.ort.ortmodel.optOrtModel</span></code></a></p>
+<p>This class is an optimization model for the shortest path problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.ort.shortestPathModel._model" title="Link to this definition"></a></dt>
+<dd><p>OR-Tools linear solver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pywraplp.Solver</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathModel.solver">
+<span class="sig-name descname"><span class="pre">solver</span></span><a class="headerlink" href="#pyepo.model.ort.shortestPathModel.solver" title="Link to this definition"></a></dt>
+<dd><p>solver backend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathModel.grid">
+<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#pyepo.model.ort.shortestPathModel.grid" title="Link to this definition"></a></dt>
+<dd><p>size of grid network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathModel.arcs">
+<span class="sig-name descname"><span class="pre">arcs</span></span><a class="headerlink" href="#pyepo.model.ort.shortestPathModel.arcs" title="Link to this definition"></a></dt>
+<dd><p>list of arcs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">arcs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.shortestPathModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build OR-Tools pywraplp model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathCpModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.</span></span><span class="sig-name descname"><span class="pre">shortestPathCpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.shortestPathCpModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="ortcpmodel/index.html#pyepo.model.ort.ortcpmodel.optOrtCpModel" title="pyepo.model.ort.ortcpmodel.optOrtCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.ort.ortcpmodel.optOrtCpModel</span></code></a></p>
+<p>This class is an optimization model for the shortest path problem using CP-SAT</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathCpModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.ort.shortestPathCpModel._model" title="Link to this definition"></a></dt>
+<dd><p>OR-Tools CP-SAT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cp_model.CpModel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathCpModel.grid">
+<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#pyepo.model.ort.shortestPathCpModel.grid" title="Link to this definition"></a></dt>
+<dd><p>size of grid network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathCpModel.arcs">
+<span class="sig-name descname"><span class="pre">arcs</span></span><a class="headerlink" href="#pyepo.model.ort.shortestPathCpModel.arcs" title="Link to this definition"></a></dt>
+<dd><p>list of arcs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">arcs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.shortestPathCpModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.shortestPathCpModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build OR-Tools CP-SAT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scip'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsackModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="ortmodel/index.html#pyepo.model.ort.ortmodel.optOrtModel" title="pyepo.model.ort.ortmodel.optOrtModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.ort.ortmodel.optOrtModel</span></code></a></p>
+<p>This class is an optimization model for the knapsack problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackModel._model" title="Link to this definition"></a></dt>
+<dd><p>OR-Tools linear solver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pywraplp.Solver</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModel.solver">
+<span class="sig-name descname"><span class="pre">solver</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackModel.solver" title="Link to this definition"></a></dt>
+<dd><p>solver backend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModel.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackModel.weights" title="Link to this definition"></a></dt>
+<dd><p>weights of items</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModel.capacity">
+<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackModel.capacity" title="Link to this definition"></a></dt>
+<dd><p>total capacity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModel.items">
+<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackModel.items" title="Link to this definition"></a></dt>
+<dd><p>list of item index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsackModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build OR-Tools pywraplp model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModel.relax">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsackModel.relax" title="Link to this definition"></a></dt>
+<dd><p>A method to get linear relaxation model</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModelRel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.</span></span><span class="sig-name descname"><span class="pre">knapsackModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scip'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsackModelRel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.ort.knapsackModel" title="pyepo.model.ort.knapsackModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModel</span></code></a></p>
+<p>This class is relaxed optimization model for knapsack problem.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModelRel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsackModelRel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build OR-Tools pywraplp model (relaxed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackModelRel.relax">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsackModelRel.relax" title="Link to this definition"></a></dt>
+<dd><p>A forbidden method to relax MIP model</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackCpModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.</span></span><span class="sig-name descname"><span class="pre">knapsackCpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsackCpModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="ortcpmodel/index.html#pyepo.model.ort.ortcpmodel.optOrtCpModel" title="pyepo.model.ort.ortcpmodel.optOrtCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.ort.ortcpmodel.optOrtCpModel</span></code></a></p>
+<p>This class is an optimization model for the knapsack problem using CP-SAT</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackCpModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackCpModel._model" title="Link to this definition"></a></dt>
+<dd><p>OR-Tools CP-SAT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cp_model.CpModel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackCpModel.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackCpModel.weights" title="Link to this definition"></a></dt>
+<dd><p>weights of items</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackCpModel.capacity">
+<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackCpModel.capacity" title="Link to this definition"></a></dt>
+<dd><p>total capacity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackCpModel.items">
+<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#pyepo.model.ort.knapsackCpModel.items" title="Link to this definition"></a></dt>
+<dd><p>list of item index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.ort.knapsackCpModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsackCpModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build OR-Tools CP-SAT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../opt/index.html" class="btn btn-neutral float-left" title="pyepo.model.opt" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="knapsack/index.html" class="btn btn-neutral float-right" title="pyepo.model.ort.knapsack" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Bo Tang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

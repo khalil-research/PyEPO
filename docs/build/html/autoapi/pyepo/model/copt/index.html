@@ -104,7 +104,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="knapsack/index.html">pyepo.model.copt.knapsack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="portfolio/index.html">pyepo.model.copt.portfolio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="shortestpath/index.html">pyepo.model.copt.shortestpath</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tsp/index.html">pyepo.model.copt.tsp</a></li>
 </ul>
 </div>
 </section>
@@ -123,6 +125,24 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.copt.knapsackModelRel" title="pyepo.model.copt.knapsackModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModelRel</span></code></a></p></td>
 <td><p>This class is relaxed optimization model for knapsack problem.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.copt.tspGGModel" title="pyepo.model.copt.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p></td>
+<td><p>This class is an optimization model for the traveling salesman problem based on Gavish-Graves (GG) formulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.copt.tspGGModelRel" title="pyepo.model.copt.tspGGModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModelRel</span></code></a></p></td>
+<td><p>This class is relaxation of tspGGModel.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.copt.tspDFJModel" title="pyepo.model.copt.tspDFJModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspDFJModel</span></code></a></p></td>
+<td><p>This class is an optimization model for the traveling salesman problem based on Danzig-Fulkerson-Johnson (DFJ) formulation and</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.copt.tspMTZModel" title="pyepo.model.copt.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p></td>
+<td><p>This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.copt.tspMTZModelRel" title="pyepo.model.copt.tspMTZModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModelRel</span></code></a></p></td>
+<td><p>This class is relaxation of tspMTZModel.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.copt.portfolioModel" title="pyepo.model.copt.portfolioModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">portfolioModel</span></code></a></p></td>
+<td><p>This class is an optimization model for the portfolio problem</p></td>
 </tr>
 </tbody>
 </table>
@@ -260,20 +280,6 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.copt.shortestPathModel._getArcs">
-<span class="sig-name descname"><span class="pre">_getArcs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.shortestPathModel._getArcs" title="Link to this definition"></a></dt>
-<dd><p>A method to get list of arcs for grid network</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>arcs</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.copt.shortestPathModel._getModel">
 <span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.shortestPathModel._getModel" title="Link to this definition"></a></dt>
 <dd><p>A method to build COPT model</p>
@@ -374,6 +380,576 @@
 <dt class="sig sig-object py" id="pyepo.model.copt.knapsackModelRel.relax">
 <span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.knapsackModelRel.relax" title="Link to this definition"></a></dt>
 <dd><p>A forbidden method to relax MIP model</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.</span></span><span class="sig-name descname"><span class="pre">tspGGModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></p>
+<p>This class is an optimization model for the traveling salesman problem based on Gavish-Graves (GG) formulation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.copt.tspGGModel._model" title="Link to this definition"></a></dt>
+<dd><p>COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COPT model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel.num_nodes">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.copt.tspGGModel.num_nodes" title="Link to this definition"></a></dt>
+<dd><p>Number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.copt.tspGGModel.edges" title="Link to this definition"></a></dt>
+<dd><p>List of edge index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel.setObj">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModel.setObj" title="Link to this definition"></a></dt>
+<dd><p>A method to set the objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModel.solve" title="Link to this definition"></a></dt>
+<dd><p>A method to solve model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel.addConstr">
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModel.addConstr" title="Link to this definition"></a></dt>
+<dd><p>A method to add new constraint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coefs</strong> (<em>ndarray</em>) – coefficients of new constraint</p></li>
+<li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new model with the added constraint</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModel.relax">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModel.relax" title="Link to this definition"></a></dt>
+<dd><p>A method to get linear relaxation model</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModelRel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.</span></span><span class="sig-name descname"><span class="pre">tspGGModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModelRel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.copt.tspGGModel" title="pyepo.model.copt.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p>
+<p>This class is relaxation of tspGGModel.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModelRel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.copt.tspGGModelRel._model" title="Link to this definition"></a></dt>
+<dd><p>COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COPT model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModelRel.num_nodes">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.copt.tspGGModelRel.num_nodes" title="Link to this definition"></a></dt>
+<dd><p>Number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModelRel.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.copt.tspGGModelRel.edges" title="Link to this definition"></a></dt>
+<dd><p>List of edge index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModelRel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModelRel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModelRel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModelRel.solve" title="Link to this definition"></a></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModelRel.relax">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModelRel.relax" title="Link to this definition"></a></dt>
+<dd><p>A forbidden method to relax MIP model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspGGModelRel.getTour">
+<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspGGModelRel.getTour" title="Link to this definition"></a></dt>
+<dd><p>A forbidden method to get a tour from solution</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.</span></span><span class="sig-name descname"><span class="pre">tspDFJModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></p>
+<p>This class is an optimization model for the traveling salesman problem based on Danzig-Fulkerson-Johnson (DFJ) formulation and
+constraint generation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel._model" title="Link to this definition"></a></dt>
+<dd><p>COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COPT model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel.num_nodes">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel.num_nodes" title="Link to this definition"></a></dt>
+<dd><p>Number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel.edges" title="Link to this definition"></a></dt>
+<dd><p>List of edge index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel._SubtourCallback">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_SubtourCallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel._SubtourCallback" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">coptpy.CallbackBase</span></code></p>
+<p>A callback class for subtour elimination</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel._SubtourCallback._x">
+<span class="sig-name descname"><span class="pre">_x</span></span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel._SubtourCallback._x" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel._SubtourCallback._n">
+<span class="sig-name descname"><span class="pre">_n</span></span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel._SubtourCallback._n" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel._SubtourCallback._edges">
+<span class="sig-name descname"><span class="pre">_edges</span></span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel._SubtourCallback._edges" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel._SubtourCallback.callback">
+<span class="sig-name descname"><span class="pre">callback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel._SubtourCallback.callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel.setObj">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel.setObj" title="Link to this definition"></a></dt>
+<dd><p>A method to set the objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel.solve" title="Link to this definition"></a></dt>
+<dd><p>A method to solve model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspDFJModel.addConstr">
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspDFJModel.addConstr" title="Link to this definition"></a></dt>
+<dd><p>A method to add new constraint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coefs</strong> (<em>ndarray</em>) – coefficients of new constraint</p></li>
+<li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new model with the added constraint</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.</span></span><span class="sig-name descname"><span class="pre">tspMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></p>
+<p>This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel._model" title="Link to this definition"></a></dt>
+<dd><p>COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COPT model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel.num_nodes">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel.num_nodes" title="Link to this definition"></a></dt>
+<dd><p>Number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel.edges" title="Link to this definition"></a></dt>
+<dd><p>List of edge index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel.setObj">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel.setObj" title="Link to this definition"></a></dt>
+<dd><p>A method to set the objective function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>list</em>) – cost vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel.solve" title="Link to this definition"></a></dt>
+<dd><p>A method to solve model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel.addConstr">
+<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel.addConstr" title="Link to this definition"></a></dt>
+<dd><p>A method to add new constraint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coefs</strong> (<em>ndarray</em>) – coefficients of new constraint</p></li>
+<li><p><strong>rhs</strong> (<em>float</em>) – right-hand side of new constraint</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new model with the added constraint</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModel.relax">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModel.relax" title="Link to this definition"></a></dt>
+<dd><p>A method to get linear relaxation model</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModelRel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.</span></span><span class="sig-name descname"><span class="pre">tspMTZModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModelRel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.copt.tspMTZModel" title="pyepo.model.copt.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p>
+<p>This class is relaxation of tspMTZModel.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModelRel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.copt.tspMTZModelRel._model" title="Link to this definition"></a></dt>
+<dd><p>COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COPT model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModelRel.num_nodes">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.copt.tspMTZModelRel.num_nodes" title="Link to this definition"></a></dt>
+<dd><p>Number of nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModelRel.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.copt.tspMTZModelRel.edges" title="Link to this definition"></a></dt>
+<dd><p>List of edge index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModelRel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModelRel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModelRel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModelRel.solve" title="Link to this definition"></a></dt>
+<dd><p>A method to solve model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModelRel.relax">
+<span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModelRel.relax" title="Link to this definition"></a></dt>
+<dd><p>A forbidden method to relax MIP model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.tspMTZModelRel.getTour">
+<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.tspMTZModelRel.getTour" title="Link to this definition"></a></dt>
+<dd><p>A forbidden method to get a tour from solution</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.copt.portfolioModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.</span></span><span class="sig-name descname"><span class="pre">portfolioModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.25</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.portfolioModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="coptmodel/index.html#pyepo.model.copt.coptmodel.optCoptModel" title="pyepo.model.copt.coptmodel.optCoptModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.copt.coptmodel.optCoptModel</span></code></a></p>
+<p>This class is an optimization model for the portfolio problem</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.portfolioModel._model">
+<span class="sig-name descname"><span class="pre">_model</span></span><a class="headerlink" href="#pyepo.model.copt.portfolioModel._model" title="Link to this definition"></a></dt>
+<dd><p>COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COPT model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.portfolioModel.num_assets">
+<span class="sig-name descname"><span class="pre">num_assets</span></span><a class="headerlink" href="#pyepo.model.copt.portfolioModel.num_assets" title="Link to this definition"></a></dt>
+<dd><p>number of assets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.portfolioModel.covariance">
+<span class="sig-name descname"><span class="pre">covariance</span></span><a class="headerlink" href="#pyepo.model.copt.portfolioModel.covariance" title="Link to this definition"></a></dt>
+<dd><p>covariance matrix of the returns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.copt.portfolioModel.risk_level">
+<span class="sig-name descname"><span class="pre">risk_level</span></span><a class="headerlink" href="#pyepo.model.copt.portfolioModel.risk_level" title="Link to this definition"></a></dt>
+<dd><p>risk level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">num_assets</span></span><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">covariance</span></span><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">risk_level</span></span><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.portfolioModel._getRiskLevel">
+<span class="sig-name descname"><span class="pre">_getRiskLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.portfolioModel._getRiskLevel" title="Link to this definition"></a></dt>
+<dd><p>A method to calculate the risk level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gamma</strong> (<em>float</em>) – risk level parameter</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>risk level</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.copt.portfolioModel._getModel">
+<span class="sig-name descname"><span class="pre">_getModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.portfolioModel._getModel" title="Link to this definition"></a></dt>
+<dd><p>A method to build COPT model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optimization model and variables</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

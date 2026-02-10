@@ -22,7 +22,6 @@ Classes
 
 .. autoapisummary::
 
-   pyepo.model.grb.tsp.unionFind
    pyepo.model.grb.tsp.tspABModel
    pyepo.model.grb.tsp.tspGGModel
    pyepo.model.grb.tsp.tspGGModelRel
@@ -36,17 +35,6 @@ Module Contents
 
 .. py:data:: _HAS_GUROBI
    :value: True
-
-
-.. py:class:: unionFind(n)
-
-   .. py:attribute:: parent
-
-
-   .. py:method:: find(i)
-
-
-   .. py:method:: union(i, j)
 
 
 .. py:class:: tspABModel(num_nodes)
