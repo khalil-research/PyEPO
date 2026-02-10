@@ -22,7 +22,16 @@ try:
 except (ImportError, NameError, Exception):
     _HAS_GUROBI = False
 
+try:
+    from pyepo.model.ort.shortestpath import shortestPathModel as ortSPModel
+    from pyepo.model.ort.knapsack import knapsackModel as ortKnapsackModel
+    ortSPModel(grid=(3, 3))
+    _HAS_ORTOOLS = True
+except (ImportError, NameError, Exception):
+    _HAS_ORTOOLS = False
+
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
+requires_ortools = pytest.mark.skipif(not _HAS_ORTOOLS, reason="OR-Tools not installed")
 
 
 # ============================================================
@@ -229,3 +238,206 @@ class TestOptModuleInit:
         model = shortestPathModel(grid=(3, 3))
         with pytest.raises(TypeError):
             SPOPlus(model, solve_ratio=0.5, dataset=None)
+
+
+# ============================================================
+# dysOpt (DYS-Net) unit tests
+# ============================================================
+
+def _sp_constraint_matrices(grid):
+    """Build flow conservation constraint matrices for shortest path."""
+    from pyepo.model.opt import _get_grid_arcs
+    arcs = _get_grid_arcs(grid)
+    num_nodes = grid[0] * grid[1]
+    num_arcs = len(arcs)
+    A = np.zeros((num_nodes, num_arcs), dtype=np.float32)
+    for idx, (s, e) in enumerate(arcs):
+        A[s, idx] = 1
+        A[e, idx] = -1
+    b = np.zeros(num_nodes, dtype=np.float32)
+    b[0] = 1
+    b[num_nodes - 1] = -1
+    l = np.zeros(num_arcs, dtype=np.float32)
+    u = np.ones(num_arcs, dtype=np.float32)
+    return A, b, l, u
+
+
+class TestDysOptInit:
+
+    def test_invalid_A_shape_raises(self):
+        from pyepo.func.unrolling import dysOpt
+        with pytest.raises(ValueError):
+            dysOpt(np.ones(5, dtype=np.float32), np.ones(5, dtype=np.float32),
+                   np.zeros(5, dtype=np.float32), np.ones(5, dtype=np.float32))
+
+    def test_mismatched_b_length_raises(self):
+        from pyepo.func.unrolling import dysOpt
+        A = np.eye(3, 5, dtype=np.float32)
+        b = np.ones(5, dtype=np.float32)  # wrong length (should be 3)
+        l = np.zeros(5, dtype=np.float32)
+        u = np.ones(5, dtype=np.float32)
+        with pytest.raises(ValueError):
+            dysOpt(A, b, l, u)
+
+    def test_mismatched_lu_length_raises(self):
+        from pyepo.func.unrolling import dysOpt
+        A = np.eye(3, 5, dtype=np.float32)
+        b = np.ones(3, dtype=np.float32)
+        l = np.zeros(4, dtype=np.float32)  # wrong length (should be 5)
+        u = np.ones(5, dtype=np.float32)
+        with pytest.raises(ValueError):
+            dysOpt(A, b, l, u)
+
+    def test_invalid_alpha_raises(self):
+        from pyepo.func.unrolling import dysOpt
+        A, b, l, u = _sp_constraint_matrices((3, 3))
+        with pytest.raises(ValueError):
+            dysOpt(A, b, l, u, alpha=-0.1)
+        with pytest.raises(ValueError):
+            dysOpt(A, b, l, u, alpha=0)
+
+    def test_construction_succeeds(self):
+        from pyepo.func.unrolling import dysOpt
+        A, b, l, u = _sp_constraint_matrices((3, 3))
+        dys = dysOpt(A, b, l, u)
+        assert dys.n == A.shape[1]
+        assert dys.alpha == 0.05
+        assert dys.max_iter == 1000
+
+
+class TestDysOptProjections:
+
+    def _make_dys(self, grid=(3, 3)):
+        from pyepo.func.unrolling import dysOpt
+        A, b, l, u = _sp_constraint_matrices(grid)
+        return dysOpt(A, b, l, u, alpha=0.1, max_iter=500, tol=1e-4)
+
+    def test_project_box(self):
+        dys = self._make_dys()
+        n = dys.n
+        # build input with known out-of-bound values
+        x = torch.zeros(1, n)
+        x[0, 0] = -0.5  # below lb (0)
+        x[0, 1] = 0.3   # within [0, 1]
+        x[0, 2] = 1.5   # above ub (1)
+        px = dys._project_box(x)
+        # clamp to [0, 1]
+        assert (px >= 0).all()
+        assert (px <= 1).all()
+        assert px[0, 0].item() == 0.0
+        assert px[0, 1].item() == pytest.approx(0.3, abs=1e-6)
+        assert px[0, 2].item() == 1.0
+
+    def test_project_equality_satisfies_Ax_eq_b(self):
+        dys = self._make_dys()
+        z = torch.randn(4, dys.n)
+        pz = dys._project_equality(z)
+        # Ax should equal b for all instances
+        residual = dys._A @ pz.T - dys._b.unsqueeze(1)
+        assert torch.allclose(residual, torch.zeros_like(residual), atol=1e-4)
+
+    def test_project_equality_idempotent(self):
+        dys = self._make_dys()
+        z = torch.randn(2, dys.n)
+        pz = dys._project_equality(z)
+        ppz = dys._project_equality(pz)
+        assert torch.allclose(pz, ppz, atol=1e-5)
+
+    def test_project_equality_empty_A(self):
+        """Empty equality constraints should return input unchanged."""
+        from pyepo.func.unrolling import dysOpt
+        n = 12
+        A = np.zeros((0, n), dtype=np.float32)
+        b = np.zeros(0, dtype=np.float32)
+        l = np.zeros(n, dtype=np.float32)
+        u = np.ones(n, dtype=np.float32)
+        dys = dysOpt(A, b, l, u)
+        z = torch.randn(3, n)
+        pz = dys._project_equality(z)
+        assert torch.allclose(pz, z)
+
+
+class TestDysOptForward:
+
+    def _make_dys(self, grid=(3, 3)):
+        from pyepo.func.unrolling import dysOpt
+        A, b, l, u = _sp_constraint_matrices(grid)
+        return dysOpt(A, b, l, u, alpha=0.1, max_iter=1000, tol=1e-4)
+
+    def test_output_shape(self):
+        dys = self._make_dys()
+        dys.eval()
+        pred_cost = torch.rand(8, dys.n)
+        with torch.no_grad():
+            sol = dys(pred_cost)
+        assert sol.shape == (8, dys.n)
+
+    def test_output_within_bounds(self):
+        dys = self._make_dys()
+        dys.eval()
+        pred_cost = torch.rand(4, dys.n)
+        with torch.no_grad():
+            sol = dys(pred_cost)
+        assert (sol >= -1e-5).all()
+        assert (sol <= 1 + 1e-5).all()
+
+    def test_output_satisfies_constraints(self):
+        dys = self._make_dys()
+        dys.eval()
+        pred_cost = torch.rand(4, dys.n)
+        with torch.no_grad():
+            sol = dys(pred_cost)
+        residual = dys._A @ sol.T - dys._b.unsqueeze(1)
+        assert torch.allclose(residual, torch.zeros_like(residual), atol=1e-3)
+
+    def test_gradient_flows(self):
+        dys = self._make_dys()
+        dys.train()
+        pred_cost = torch.rand(4, dys.n, requires_grad=True)
+        sol = dys(pred_cost)
+        loss = (sol * pred_cost).sum()
+        loss.backward()
+        assert pred_cost.grad is not None
+        assert (pred_cost.grad.abs() > 0).any()
+
+    def test_gradient_nonzero_per_instance(self):
+        dys = self._make_dys()
+        dys.train()
+        pred_cost = torch.rand(4, dys.n, requires_grad=True)
+        sol = dys(pred_cost)
+        loss = (sol * pred_cost).sum()
+        loss.backward()
+        # each instance should have at least one nonzero gradient
+        for i in range(4):
+            assert (pred_cost.grad[i].abs() > 1e-8).any()
+
+    def test_batch_size_one(self):
+        dys = self._make_dys()
+        dys.train()
+        pred_cost = torch.rand(1, dys.n, requires_grad=True)
+        sol = dys(pred_cost)
+        loss = sol.sum()
+        loss.backward()
+        assert pred_cost.grad is not None
+
+    def test_maximize_sense(self):
+        """Test that minimize=False produces valid solutions."""
+        from pyepo.func.unrolling import dysOpt
+        n = 4
+        # simple equality: x_0 = 0.5
+        A = np.zeros((1, n), dtype=np.float32)
+        A[0, 0] = 1.0
+        b = np.array([0.5], dtype=np.float32)
+        l = np.zeros(n, dtype=np.float32)
+        u = np.ones(n, dtype=np.float32)
+        dys = dysOpt(A, b, l, u, alpha=0.1, max_iter=500, tol=1e-4, minimize=False)
+        dys.train()
+        pred_cost = torch.rand(2, n, requires_grad=True)
+        sol = dys(pred_cost)
+        assert sol.shape == (2, n)
+        # x_0 should be close to 0.5
+        assert torch.allclose(sol[:, 0], torch.tensor(0.5), atol=1e-2)
+        # gradient should flow
+        loss = (sol * pred_cost).sum()
+        loss.backward()
+        assert pred_cost.grad is not None
