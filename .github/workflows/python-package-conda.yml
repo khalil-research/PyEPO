@@ -18,7 +18,8 @@ jobs:
       with:
         activate-environment: pyepo-build
         python-version: 3.9
-        auto-activate-base: false
+        auto-activate: false
+        conda-remove-defaults: true
     - name: Install Conda-Build and Anaconda-Client
       run: conda install conda-build anaconda-client
     - name: Build Conda Package
