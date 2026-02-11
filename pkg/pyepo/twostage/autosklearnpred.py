@@ -24,6 +24,9 @@ def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
 
     Args:
         optmodel (optModel): optimization model
+        seed (int): random seed for reproducibility
+        timelimit (int): time limit in seconds for auto-sklearn search
+        metric (str): evaluation metric, "mse" or "regret"
 
     Returns:
         AutoSklearnRegressor: Auto-sklearn multi-output regression model

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-Optimization Model based on Cardinal Optimizer（COPT）
+Optimization Model based on Cardinal Optimizer (COPT)
 """
 
 from pyepo.model.copt.coptmodel import optCoptModel

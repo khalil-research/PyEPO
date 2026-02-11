@@ -53,12 +53,12 @@ def calRegret(optmodel, pred_cost, true_cost, true_obj):
 
     Args:
         optmodel (optModel): optimization model
-        pred_cost (torch.tensor): predicted costs
-        true_cost (torch.tensor): true costs
-        true_obj (torch.tensor): true optimal objective values
+        pred_cost (np.ndarray): predicted costs
+        true_cost (np.ndarray): true costs
+        true_obj (float): true optimal objective value
 
     Returns:
-        float: true regret losses
+        float: true regret loss
     """
     # opt sol for pred cost
     optmodel.setObj(pred_cost)
