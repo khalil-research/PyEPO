@@ -4,6 +4,8 @@
 Shortest path problem
 """
 
+import numpy as np
+
 try:
     import jax.numpy as jnp
     _HAS_MPAX = True
@@ -46,15 +48,17 @@ class shortestPathModel(optMpaxModel):
         # number of nodes and arcs
         num_nodes = self.grid[0] * self.grid[1]
         num_arcs = len(self.arcs)
-        # construct incidence matrix A for flow conservation
-        A = jnp.zeros((num_nodes, num_arcs), dtype=jnp.float32)
+        # construct incidence matrix A for flow conservation (build in numpy, then convert)
+        A_np = np.zeros((num_nodes, num_arcs), dtype=np.float32)
         for arc_idx, (start, end) in enumerate(self.arcs):
-            A = A.at[start, arc_idx].set(1)
-            A = A.at[end, arc_idx].set(-1)
+            A_np[start, arc_idx] = 1
+            A_np[end, arc_idx] = -1
+        A = jnp.array(A_np)
         # construct supply/demand vector b
-        b = jnp.zeros(num_nodes, dtype=jnp.float32)
-        b = b.at[0].set(1)                  # source node (top-left) sends one unit
-        b = b.at[num_nodes-1].set(-1)       # sink node (bottom-right) receives one unit
+        b_np = np.zeros(num_nodes, dtype=np.float32)
+        b_np[0] = 1            # source node (top-left) sends one unit
+        b_np[num_nodes-1] = -1 # sink node (bottom-right) receives one unit
+        b = jnp.array(b_np)
         # upper bound
         u = jnp.ones(len(self.arcs), dtype=jnp.float32)
         return A, b, u
