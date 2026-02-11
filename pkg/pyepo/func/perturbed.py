@@ -375,8 +375,8 @@ class adaptiveImplicitMLE(optModule):
         # symmetric perturbation
         self.two_sides = two_sides
         # init adaptive params
-        self.alpha = 0 # adaptive magnitude α
-        self.grad_norm_avg = 1 # gradient norm estimate
+        self.alpha = 1.0 # adaptive magnitude α
+        self.grad_norm_avg = 1 # gradient sparsity estimate
         self.step = 1e-3 # update step for α
 
     def forward(self, pred_cost):
@@ -404,7 +404,11 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         cp = pred_cost.detach()
         dl = grad_output.detach()
         # calculate λ
-        lambd = module.alpha * torch.norm(cp) / torch.norm(dl)
+        dl_norm = torch.norm(dl)
+        if dl_norm > 0:
+            lambd = module.alpha * torch.norm(cp) / dl_norm
+        else:
+            lambd = 0.0
         # positive perturbed costs
         ptb_cp_pos = cp + lambd * dl + module.sigma * noises
         # solve with perturbation
@@ -422,11 +426,11 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         # moving average of the gradient norm
         grad_norm = (grad.abs() > 1e-7).float().mean()
         module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm
-        # update α to make grad_norm closer to 1
+        # update α to target gradient
         if module.grad_norm_avg < 1:
             module.alpha += module.step
         else:
-            module.alpha -= module.step
+            module.alpha = max(0.0, module.alpha - module.step)
         return grad, None
 
 
