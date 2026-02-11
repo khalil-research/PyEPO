@@ -34,11 +34,11 @@ def _solve_in_pass(cp, optmodel, processes, pool, solpool=None, solset=None):
     A function to solve optimization and update solution pool
     """
     sol, obj = _solve_batch(cp, optmodel, processes, pool)
-    # update solution pool and ensure correct device
+    # update solution pool (dedup on CPU), then move to correct device
     if solpool is not None:
+        solpool = _update_solution_pool(sol, solpool, solset)
         if solpool.device != cp.device:
             solpool = solpool.to(cp.device)
-        solpool = _update_solution_pool(sol, solpool, solset)
     return sol, obj, solpool
 
 
