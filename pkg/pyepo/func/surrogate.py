@@ -163,9 +163,9 @@ class perturbationGradient(optModule):
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
             # loss
             if self.optmodel.modelSense == EPO.MINIMIZE:
-                loss = (obj_plus - obj_minus) / (2 * self.sigma)
+                loss = (obj_plus - obj_minus) / (2 * self.sigma + 1e-7)
             elif self.optmodel.modelSense == EPO.MAXIMIZE:
-                loss = (obj_minus - obj_plus) / (2 * self.sigma)
+                loss = (obj_minus - obj_plus) / (2 * self.sigma + 1e-7)
             else:
                 raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # back differencing
@@ -178,9 +178,9 @@ class perturbationGradient(optModule):
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
             # loss
             if self.optmodel.modelSense == EPO.MINIMIZE:
-                loss = (obj - obj_minus) / self.sigma
+                loss = (obj - obj_minus) / (self.sigma + 1e-7)
             elif self.optmodel.modelSense == EPO.MAXIMIZE:
-                loss = (obj_minus - obj) / self.sigma
+                loss = (obj_minus - obj) / (self.sigma + 1e-7)
             else:
                 raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         return loss

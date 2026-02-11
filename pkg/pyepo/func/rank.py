@@ -57,9 +57,9 @@ class listwiseLTR(optModule):
         objpool_cp = pred_cost @ self.solpool.T # pred cost
         # cross entropy loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
-            loss = - (F.log_softmax(objpool_cp, dim=1) * F.softmax(objpool_c, dim=1))
+            loss = - (F.log_softmax(objpool_cp, dim=1) * F.softmax(objpool_c, dim=1).clamp(min=1e-8))
         elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = - (F.log_softmax(- objpool_cp, dim=1) * F.softmax(- objpool_c, dim=1))
+            loss = - (F.log_softmax(- objpool_cp, dim=1) * F.softmax(- objpool_c, dim=1).clamp(min=1e-8))
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         return self._reduce(loss)

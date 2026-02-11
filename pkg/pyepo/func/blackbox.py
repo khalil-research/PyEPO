@@ -96,7 +96,7 @@ class blackboxOptFunc(Function):
         # solve
         sol, _ = _solve_or_cache(cq, module)
         # get gradient
-        grad = (sol - wp) / lambd
+        grad = (sol - wp) / (lambd + 1e-7)
         return grad, None
 
 
