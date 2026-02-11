@@ -63,7 +63,7 @@ class optCoptModel(optModel):
         """
         # solve
         self._model.solve()
-        return [var.x for var in self._model.getVars()], self._model.objVal
+        return [self.x[k].x for k in self.x], self._model.objVal
 
     def copy(self):
         """
