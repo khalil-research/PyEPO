@@ -10,6 +10,9 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
+# device
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 # optimization model
 class myModel(optGrbModel):
@@ -150,6 +153,8 @@ def test_tsp_backend(name, tsp_model, num_edges):
 
 if __name__ == "__main__":
 
+    print("Using device: {}".format(device))
+
     # generate data
     num_data = 1000 # number of data
     num_feat = 5 # size of feature
@@ -169,7 +174,7 @@ if __name__ == "__main__":
 
     def train_and_eval(name, loss_fn, call, lr=1e-2):
         """Train with a given loss function and print results."""
-        pred = LinearRegression(num_feat, num_item)
+        pred = LinearRegression(num_feat, num_item).to(device)
         opt = torch.optim.Adam(pred.parameters(), lr=lr)
         print("\n--- {} ---".format(name))
         for epoch in range(num_epochs):
@@ -177,6 +182,7 @@ if __name__ == "__main__":
             num_batches = 0
             for data in dataloader:
                 x, c, w, z = data
+                x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
                 cp = pred(x)
                 loss = call(loss_fn, cp, c, w, z)
                 opt.zero_grad()
@@ -492,7 +498,7 @@ if __name__ == "__main__":
         omo_dataset = pyepo.data.dataset.optDataset(omo_optmodel, x, c)
         omo_dataloader = DataLoader(omo_dataset, batch_size=32, shuffle=True)
 
-        pred_omo = LinearRegression(num_feat, num_item)
+        pred_omo = LinearRegression(num_feat, num_item).to(device)
         opt_omo = torch.optim.Adam(pred_omo.parameters(), lr=1e-2)
         spo_omo = pyepo.func.SPOPlus(omo_optmodel, processes=2)
         print("\n--- SPOPlus (Pyomo/Gurobi) ---")
@@ -501,6 +507,7 @@ if __name__ == "__main__":
             num_batches = 0
             for data in omo_dataloader:
                 xi, ci, wi, zi = data
+                xi, ci, wi, zi = xi.to(device), ci.to(device), wi.to(device), zi.to(device)
                 cp = pred_omo(xi)
                 loss = spo_omo(cp, ci, wi, zi)
                 opt_omo.zero_grad()
@@ -528,7 +535,7 @@ if __name__ == "__main__":
         copt_dataset = pyepo.data.dataset.optDataset(copt_optmodel, x, c)
         copt_dataloader = DataLoader(copt_dataset, batch_size=32, shuffle=True)
 
-        pred_copt = LinearRegression(num_feat, num_item)
+        pred_copt = LinearRegression(num_feat, num_item).to(device)
         opt_copt = torch.optim.Adam(pred_copt.parameters(), lr=1e-2)
         spo_copt = pyepo.func.SPOPlus(copt_optmodel, processes=2)
         print("\n--- SPOPlus (COPT) ---")
@@ -537,6 +544,7 @@ if __name__ == "__main__":
             num_batches = 0
             for data in copt_dataloader:
                 xi, ci, wi, zi = data
+                xi, ci, wi, zi = xi.to(device), ci.to(device), wi.to(device), zi.to(device)
                 cp = pred_copt(xi)
                 loss = spo_copt(cp, ci, wi, zi)
                 opt_copt.zero_grad()
@@ -564,7 +572,7 @@ if __name__ == "__main__":
         ort_dataset = pyepo.data.dataset.optDataset(ort_optmodel, x, c)
         ort_dataloader = DataLoader(ort_dataset, batch_size=32, shuffle=True)
 
-        pred_ort = LinearRegression(num_feat, num_item)
+        pred_ort = LinearRegression(num_feat, num_item).to(device)
         opt_ort = torch.optim.Adam(pred_ort.parameters(), lr=1e-2)
         spo_ort = pyepo.func.SPOPlus(ort_optmodel, processes=2)
         print("\n--- SPOPlus (OR-Tools) ---")
@@ -573,6 +581,7 @@ if __name__ == "__main__":
             num_batches = 0
             for data in ort_dataloader:
                 xi, ci, wi, zi = data
+                xi, ci, wi, zi = xi.to(device), ci.to(device), wi.to(device), zi.to(device)
                 cp = pred_ort(xi)
                 loss = spo_ort(cp, ci, wi, zi)
                 opt_ort.zero_grad()
