@@ -109,7 +109,7 @@ class perturbedOptFunc(Function):
         grad = torch.einsum("nbd,bn->bd",
                             noises,
                             torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
-        grad /= n_samples * sigma
+        grad /= (n_samples * sigma + 1e-7)
         return grad, None
 
 
@@ -326,10 +326,10 @@ class implicitMLEFunc(Function):
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
             # get two-side gradient
-            grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd)
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + 1e-7)
         else:
             # get single side gradient
-            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / module.lambd
+            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (module.lambd + 1e-7)
         return grad, None
 
 
