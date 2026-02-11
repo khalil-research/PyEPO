@@ -426,7 +426,7 @@ if __name__ == "__main__":
                    lambda fn, cp, c, w, z: fn(cp, c, w, z))
 
     # 2. Perturbation Gradient (surrogate)
-    pg = pyepo.func.perturbationGradient(optmodel, processes=1, sigma=1.0)
+    pg = pyepo.func.perturbationGradient(optmodel, processes=1, sigma=0.1)
     train_and_eval("perturbationGradient", pg,
                    lambda fn, cp, c, w, z: fn(cp, c))
 
