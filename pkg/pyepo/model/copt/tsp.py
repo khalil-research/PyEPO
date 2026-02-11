@@ -78,6 +78,9 @@ class tspABModel(optCoptModel):
                     tour.append(j)
                     visited.add(j)
                     break
+            else:
+                # all neighbors visited: disconnected graph, stop
+                break
         if 0 in edges[tour[-1]]:
             tour.append(0)
         return tour
