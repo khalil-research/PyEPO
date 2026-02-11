@@ -19,8 +19,9 @@ from pyepo.model.mpax import optMpaxModel
 
 class optModule(nn.Module):
     """
-        An abstract module for the learning to rank losses, which measure the difference in how the predicted cost
-        vector and the true cost vector rank a pool of feasible solutions.
+    An abstract module for differentiable optimization losses in end-to-end
+    predict-then-optimize. It provides common functionality (multiprocessing,
+    solution pooling, loss reduction) for all loss modules.
     """
     def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None, require_solpool=False):
         """

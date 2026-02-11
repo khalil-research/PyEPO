@@ -41,7 +41,7 @@ def genData(num_data, num_features, num_assets, deg=1, noise_level=1, seed=135):
     L = rnd.uniform(-2.5e-3*noise_level, 2.5e-3*noise_level, (num_assets, num_features))
     # feature vectors
     x = rnd.normal(0, 1, (n, p))
-    # value of items
+    # mean return of assets
     r = np.zeros((n, m))
     for i in range(n):
         # mean return of assets

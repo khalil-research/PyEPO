@@ -18,10 +18,10 @@ class optDataset(Dataset):
 
     Attributes:
         model (optModel): Optimization model
-        feats (np.ndarray): Data features
-        costs (np.ndarray): Cost vectors
-        sols (np.ndarray): Optimal solutions
-        objs (np.ndarray): Optimal objective values
+        feats (torch.Tensor): Data features
+        costs (torch.Tensor): Cost vectors
+        sols (torch.Tensor): Optimal solutions
+        objs (torch.Tensor): Optimal objective values
     """
 
     def __init__(self, model, feats, costs):

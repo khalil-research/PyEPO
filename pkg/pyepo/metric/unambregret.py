@@ -56,14 +56,14 @@ def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5, max
 
     Args:
         optmodel (optModel): optimization model
-        pred_cost (torch.tensor): predicted costs
-        true_cost (torch.tensor): true costs
-        true_obj (torch.tensor): true optimal objective values
+        pred_cost (np.ndarray): predicted costs
+        true_cost (np.ndarray): true costs
+        true_obj (float): true optimal objective value
         tolerance (float): tolerance for precision
         max_iter (int): maximum number of recursive retries
 
     Returns:
-        float: unambiguous regret losses
+        float: unambiguous regret loss
     """
     if max_iter <= 0:
         raise RuntimeError("Max iterations reached in calUnambRegret.")

@@ -75,7 +75,7 @@ class optModel(ABC):
 
     def addConstr(self, coefs, rhs):
         """
-        An abstract method to add a new constraint
+        A method to add a new constraint. Subclasses should override.
 
         Args:
             coefs (ndarray): coefficients of the new constraint
@@ -88,7 +88,7 @@ class optModel(ABC):
 
     def relax(self):
         """
-        An unimplemented method to relax the MIP model
+        A method to relax the MIP model. Subclasses should override.
         """
         raise RuntimeError("Method 'relax' is not implemented.")
 
