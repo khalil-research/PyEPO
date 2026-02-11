@@ -86,7 +86,7 @@ class knapsackModelRel(knapsackModel):
         # parameters
         m.its = pe.Set(initialize=self.items)
         # variables
-        x = pe.Var(m.its, domain=pe.PositiveReals, bounds=(0,1))
+        x = pe.Var(m.its, domain=pe.NonNegativeReals, bounds=(0,1))
         m.x = x
         # constraints
         m.cons = pe.ConstraintList()
