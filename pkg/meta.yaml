@@ -44,7 +44,7 @@ extra:
 about:
   home: https://github.com/khalil-research/PyEPO
   license: MIT
-  license_file: pyepo/LICENSE
+  license_file: LICENSE
   summary: "PyTorch-based End-to-End Predict-then-Optimize Tool"
   doc_url: https://khalil-research.github.io/PyEPO
   dev_url: https://github.com/khalil-research/PyEPO
