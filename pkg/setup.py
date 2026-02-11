@@ -44,7 +44,7 @@ setuptools.setup(
                 "optimization", "deep learning", "pytorch", "linear programming",
                 "integer programming"],
     # version
-    version = "1.1.0",
+    version = "1.1.1",
     # Github repo
     url = "https://github.com/khalil-research/PyEPO",
     # author name
