@@ -106,10 +106,10 @@ class optGrbModel(optModel):
         self._model.update()
         # new model
         new_model._model = self._model.copy()
-        # variables for new model
+        # variables for new model (preserve MVar type if original uses MVar)
         new_vars = new_model._model.getVars()
         if isinstance(self.x, gp.MVar):
-            new_model.x = {i: new_vars[i] for i in range(len(new_vars))}
+            new_model.x = gp.MVar.fromlist(new_vars)
         else:
             new_model.x = {key: new_vars[i] for i, key in enumerate(self.x)}
         return new_model
