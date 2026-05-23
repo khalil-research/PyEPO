@@ -52,9 +52,9 @@ def regret(
                 cp = costToNumpy(predmodel(x))
             c_np = costToNumpy(c)
             # solve
-            for j in range(cp.shape[0]):
+            for i in range(cp.shape[0]):
                 # accumulate loss
-                loss += calRegret(optmodel, cp[j], c_np[j], z[j].item())
+                loss += calRegret(optmodel, cp[i], c_np[i], z[i].item())
             optsum += abs(z).sum().item()
     finally:
         # restore training mode even if evaluation raises

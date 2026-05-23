@@ -28,8 +28,8 @@ class knapsackModel(optCoptModel):
             weights: weights of items
             capacity: total capacity
         """
-        self.weights = np.array(weights)
-        self.capacity = np.array(capacity)
+        self.weights = np.asarray(weights)
+        self.capacity = np.asarray(capacity)
         self.items = list(range(self.weights.shape[1]))
         super().__init__()
 
@@ -40,7 +40,7 @@ class knapsackModel(optCoptModel):
         # create a model
         m = Envr().createModel("knapsack")
         # variables
-        x = m.addVars(self.items, vtype=COPT.BINARY)
+        x = m.addVars(self.items, nameprefix="x", vtype=COPT.BINARY)
         # sense
         m.setObjSense(COPT.MAXIMIZE)
         # constraints

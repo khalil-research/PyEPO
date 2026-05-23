@@ -10,10 +10,8 @@ from collections import defaultdict
 try:
     from ortools.linear_solver import pywraplp
     from ortools.sat.python import cp_model
-
-    _HAS_ORTOOLS = True
 except ImportError:
-    _HAS_ORTOOLS = False
+    pass
 
 from pyepo import EPO
 from pyepo.model.opt import _get_grid_arcs

@@ -173,7 +173,7 @@ class optMpaxModel(optModel):
         A method to solve the model
 
         Returns:
-            tuple: optimal solution (list) and objective value (jnp.float32)
+            tuple: optimal solution (torch.Tensor) and objective value (float)
         """
         # create lp model
         sol, obj = self.jitted_solve(self.c)

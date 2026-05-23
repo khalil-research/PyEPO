@@ -10,10 +10,8 @@ import numpy as np
 try:
     from ortools.linear_solver import pywraplp
     from ortools.sat.python import cp_model
-
-    _HAS_ORTOOLS = True
 except ImportError:
-    _HAS_ORTOOLS = False
+    pass
 
 from pyepo import EPO
 from pyepo.model.ort.ortcpmodel import optOrtCpModel

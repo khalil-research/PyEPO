@@ -10,10 +10,8 @@ from collections import defaultdict
 try:
     import gurobipy as gp
     from gurobipy import GRB
-
-    _HAS_GUROBI = True
 except ImportError:
-    _HAS_GUROBI = False
+    pass
 
 from pyepo.model.grb.grbmodel import optGrbModel
 from pyepo.model.opt import _get_grid_arcs

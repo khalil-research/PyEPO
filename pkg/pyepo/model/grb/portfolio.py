@@ -10,10 +10,8 @@ import numpy as np
 try:
     import gurobipy as gp
     from gurobipy import GRB
-
-    _HAS_GUROBI = True
 except ImportError:
-    _HAS_GUROBI = False
+    pass
 
 from pyepo.model.grb.grbmodel import optGrbModel
 

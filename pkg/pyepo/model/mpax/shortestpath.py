@@ -9,10 +9,8 @@ import numpy as np
 
 try:
     import jax.numpy as jnp
-
-    _HAS_MPAX = True
 except ImportError:
-    _HAS_MPAX = False
+    pass
 
 from pyepo.model.mpax.mpaxmodel import optMpaxModel
 from pyepo.model.opt import _get_grid_arcs

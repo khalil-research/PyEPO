@@ -137,10 +137,10 @@ class optDatasetKNN(optDataset):
         model (optModel): Optimization model
         k (int): number of nearest neighbours selected
         weight (float): weight of kNN-loss
-        feats (np.ndarray): Data features
-        costs (np.ndarray): Cost vectors
-        sols (np.ndarray): Optimal solutions
-        objs (np.ndarray): Optimal objective values
+        feats (torch.Tensor): Data features
+        costs (torch.Tensor): Cost vectors
+        sols (torch.Tensor): Optimal solutions
+        objs (torch.Tensor): Optimal objective values
     """
 
     def __init__(

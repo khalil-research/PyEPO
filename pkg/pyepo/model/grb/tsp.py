@@ -13,10 +13,8 @@ import numpy as np
 try:
     import gurobipy as gp
     from gurobipy import GRB
-
-    _HAS_GUROBI = True
 except ImportError:
-    _HAS_GUROBI = False
+    pass
 
 from pyepo.model.grb.grbmodel import optGrbModel
 from pyepo.model.opt import getTspTour, unionFind
@@ -201,8 +199,6 @@ class tspGGModelRel(tspGGModel):
         """
         # create a model
         m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", ub=1)
@@ -266,8 +262,6 @@ class tspDFJModel(tspABModel):
         """
         # create a model
         m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
         # variables
         x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:
@@ -373,8 +367,6 @@ class tspMTZModel(tspABModel):
         """
         # create a model
         m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
@@ -472,8 +464,6 @@ class tspMTZModelRel(tspMTZModel):
         """
         # create a model
         m = gp.Model("tsp")
-        # turn off output
-        m.Params.outputFlag = 0
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", ub=1)

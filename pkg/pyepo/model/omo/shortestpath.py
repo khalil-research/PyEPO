@@ -12,10 +12,8 @@ from pyepo.model.opt import _get_grid_arcs
 
 try:
     from pyomo import environ as pe
-
-    _HAS_PYOMO = True
 except ImportError:
-    _HAS_PYOMO = False
+    pass
 
 
 class shortestPathModel(optOmoModel):

@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pyepo import EPO
 from pyepo.model.omo.omomodel import optOmoModel
 from pyepo.model.opt import costToNumpy, getTspTour
 
@@ -18,10 +17,8 @@ if TYPE_CHECKING:
 
 try:
     from pyomo import environ as pe
-
-    _HAS_PYOMO = True
 except ImportError:
-    _HAS_PYOMO = False
+    pass
 
 
 class tspABModel(optOmoModel):
@@ -104,8 +101,6 @@ class tspGGModel(tspABModel):
         Returns:
             tuple: optimization model and variables
         """
-        # sense
-        self.modelSense = EPO.MINIMIZE
         # create a model
         m = pe.ConcreteModel("tsp")
         # parameters
@@ -212,8 +207,6 @@ class tspGGModelRel(tspGGModel):
         Returns:
             tuple: optimization model and variables
         """
-        # sense
-        self.modelSense = EPO.MINIMIZE
         # create a model
         m = pe.ConcreteModel("tsp")
         # parameters
@@ -285,8 +278,6 @@ class tspMTZModel(tspABModel):
         Returns:
             tuple: optimization model and variables
         """
-        # sense
-        self.modelSense = EPO.MINIMIZE
         # create a model
         m = pe.ConcreteModel("tsp")
         # parameters
@@ -388,8 +379,6 @@ class tspMTZModelRel(tspMTZModel):
         Returns:
             tuple: optimization model and variables
         """
-        # sense
-        self.modelSense = EPO.MINIMIZE
         # create a model
         m = pe.ConcreteModel("tsp")
         # parameters

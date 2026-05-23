@@ -10,10 +10,8 @@ import numpy as np
 try:
     import gurobipy as gp
     from gurobipy import GRB
-
-    _HAS_GUROBI = True
 except ImportError:
-    _HAS_GUROBI = False
+    pass
 
 from pyepo.model.grb.grbmodel import optGrbModel
 
@@ -77,8 +75,6 @@ class knapsackModelRel(knapsackModel):
         """
         # create a model
         m = gp.Model("knapsack")
-        # turn off output
-        m.Params.outputFlag = 0
         # variables
         x = m.addMVar(len(self.items), name="x", ub=1)
         # sense
