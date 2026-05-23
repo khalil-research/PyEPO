@@ -1,0 +1,60 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pkg/**"
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package and docs deps
+        working-directory: ./pkg
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[docs]"
+
+      - name: Build docs
+        working-directory: ./docs
+        run: make html
+
+      - name: Deploy to gh-pages branch
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin gh-pages
+          git worktree add /tmp/gh-pages gh-pages
+          rm -rf /tmp/gh-pages/docs/build/html
+          mkdir -p /tmp/gh-pages/docs/build
+          cp -r docs/build/html /tmp/gh-pages/docs/build/
+          cd /tmp/gh-pages
+          git add docs/build/html
+          if git diff --cached --quiet; then
+            echo "No doc changes to publish."
+            exit 0
+          fi
+          git commit -m "Docs: rebuild from ${GITHUB_SHA}"
+          git push origin gh-pages

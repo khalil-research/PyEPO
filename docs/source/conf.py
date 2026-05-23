@@ -35,7 +35,6 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
-    "sphinx.ext.viewcode",
     "autoapi.extension",
 ]
 
