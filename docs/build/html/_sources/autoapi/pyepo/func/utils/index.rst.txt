@@ -33,9 +33,14 @@ Module Contents
 
 
 
+   .. py:attribute:: seed
+      :value: 135
+
+
+
    .. py:attribute:: rnd
 
 
-   .. py:method:: sample(size: int | tuple[int, Ellipsis]) -> numpy.ndarray
+   .. py:method:: sample(size: int | tuple[int, Ellipsis], *, device: torch.device | str | None = None, dtype: torch.dtype = torch.float32) -> numpy.ndarray | torch.Tensor
 
 

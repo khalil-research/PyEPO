@@ -55,7 +55,9 @@ Module Contents
 
 
 
-   .. py:attribute:: rnd
+   .. py:attribute:: seed
+      :value: 135
+
 
 
    .. py:method:: forward(pred_cost: torch.Tensor) -> torch.Tensor
@@ -123,7 +125,9 @@ Module Contents
 
 
 
-   .. py:attribute:: rnd
+   .. py:attribute:: seed
+      :value: 135
+
 
 
    .. py:method:: forward(pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor
