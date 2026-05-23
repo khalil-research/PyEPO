@@ -64,10 +64,10 @@ class optDataset(Dataset):
                 # to numpy
                 if isinstance(sol, torch.Tensor):
                     sol = sol.detach().cpu().numpy()
-            except Exception:
+            except Exception as e:
                 raise ValueError(
                     "For optModel, the method 'solve' should return solution vector and objective value."
-                )
+                ) from e
             sols.append(sol)
             objs.append([obj])
         return np.array(sols), np.array(objs)
@@ -172,10 +172,10 @@ class optDatasetKNN(optDataset):
             for i, c in enumerate(c_knn.T):
                 try:
                     sol_i, obj_i = self._solve(c)
-                except Exception:
+                except Exception as e:
                     raise ValueError(
                         "For optModel, the method 'solve' should return solution vector and objective value."
-                    )
+                    ) from e
                 sol_knn[:, i] = sol_i
                 obj_knn[i] = obj_i
             # get average
