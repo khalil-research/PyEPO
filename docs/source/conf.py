@@ -46,7 +46,6 @@ autoapi_options = [
     "undoc-members",
     "show-inheritance",
     "show-module-summary",
-    "imported-members",
 ]
 suppress_warnings = ["autoapi.python_import_resolution"]
 
@@ -55,6 +54,7 @@ napoleon_google_docstring = True
 napoleon_numpy_docstring = True
 napoleon_use_param = True
 napoleon_use_rtype = True
+napoleon_use_ivar = True
 napoleon_attr_annotations = True
 
 # cross-link external docs
@@ -72,4 +72,3 @@ exclude_patterns = []
 
 html_favicon = "../../images/favicon.ico"
 html_theme = "sphinx_rtd_theme"
-html_static_path = ["_static"]
