@@ -11,6 +11,7 @@ import weakref
 from abc import abstractmethod
 from typing import Literal
 
+import numpy as np
 import torch
 from pathos.multiprocessing import ProcessingPool
 from torch import nn
@@ -40,6 +41,7 @@ class optModule(nn.Module):
         reduction: Reduction = "mean",
         dataset: optDataset | None = None,
         require_solpool: bool = False,
+        seed: int | None = None,
     ) -> None:
         """
         Args:
@@ -49,6 +51,7 @@ class optModule(nn.Module):
             reduction: the reduction to apply to the output
             dataset: the training data
             require_solpool: if True, always initialize solution pool from dataset
+            seed: seed for the per-instance branch RNG (solve-vs-cache decision)
         """
         super().__init__()
         # optimization model
@@ -83,12 +86,12 @@ class optModule(nn.Module):
         if self.solve_ratio < 1 or require_solpool:  # init solution pool
             if not isinstance(dataset, optDataset):  # type checking
                 raise TypeError("dataset is not an optDataset")
-            # convert to tensor and deduplicate
-            sols = dataset.sols.clone()
-            sols = torch.unique(sols, dim=0)
-            self.solpool = sols
-            # build hash set for O(1) dedup
-            self._solset = {s.numpy().tobytes() for s in sols.cpu()}
+            # single pass: dedup via np.unique, then populate solpool + solset from the same array
+            sols_np = np.unique(dataset.sols.cpu().numpy(), axis=0)
+            self.solpool = torch.from_numpy(sols_np).clone()
+            self._solset = {row.tobytes() for row in sols_np}
+        # per-instance RNG for the solve-vs-cache branch (avoids global numpy RNG lock)
+        self._branch_rng = np.random.RandomState(seed)
         # reduction
         self.reduction = reduction
 

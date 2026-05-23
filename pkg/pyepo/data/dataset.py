@@ -194,6 +194,8 @@ class optDatasetKNN(optDataset):
             for i, c in enumerate(c_knn.T):
                 try:
                     sol_i, obj_i = self._solve(c)
+                    if isinstance(sol_i, torch.Tensor):
+                        sol_i = sol_i.detach().cpu().numpy()
                 except Exception as e:
                     raise ValueError(
                         "For optModel, the method 'solve' should return solution vector and objective value."

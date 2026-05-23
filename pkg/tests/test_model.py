@@ -197,7 +197,7 @@ class TestKnapsackModel:
 
     def test_init(self, model):
         assert model.modelSense == EPO.MAXIMIZE
-        assert model.items == 4
+        assert model.items == [0, 1, 2, 3]
 
     def test_num_cost(self, model):
         assert model.num_cost == 4
