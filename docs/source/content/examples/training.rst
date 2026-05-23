@@ -39,7 +39,7 @@ All training examples below share the same setup: a linear prediction model trai
    class LinearRegression(nn.Module):
 
        def __init__(self):
-           super(LinearRegression, self).__init__()
+           super().__init__()
            self.linear = nn.Linear(5, 40)
 
        def forward(self, x):
