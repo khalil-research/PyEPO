@@ -4,7 +4,6 @@
 Differentiable Black-box optimization function
 """
 
-import torch
 from torch.autograd import Function
 
 from pyepo.func.abcmodule import optModule

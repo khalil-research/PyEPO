@@ -92,7 +92,6 @@ class perturbedOptFunc(Function):
         # save solutions
         ctx.save_for_backward(ptb_sols, noises)
         # add other objects to ctx
-        ctx.optmodel = module.optmodel
         ctx.n_samples = module.n_samples
         ctx.sigma = module.sigma
         return e_sol
@@ -103,7 +102,6 @@ class perturbedOptFunc(Function):
         Backward pass for perturbed
         """
         ptb_sols, noises = ctx.saved_tensors
-        optmodel = ctx.optmodel
         n_samples = ctx.n_samples
         sigma = ctx.sigma
         grad = torch.einsum("nbd,bn->bd",

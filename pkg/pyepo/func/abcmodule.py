@@ -8,7 +8,6 @@ from abc import abstractmethod
 import multiprocessing as mp
 from pathos.multiprocessing import ProcessingPool
 
-import numpy as np
 import torch
 from torch import nn
 

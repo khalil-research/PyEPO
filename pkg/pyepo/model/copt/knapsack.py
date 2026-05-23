@@ -8,7 +8,6 @@ import numpy as np
 from coptpy import Envr
 from coptpy import COPT
 
-from pyepo import EPO
 from pyepo.model.copt.coptmodel import optCoptModel
 
 

@@ -6,8 +6,6 @@ Abstract optimization model based on Cardinal Optimizer (COPT)
 
 from copy import copy
 
-import numpy as np
-
 try:
     from coptpy import COPT
     _HAS_COPT = True

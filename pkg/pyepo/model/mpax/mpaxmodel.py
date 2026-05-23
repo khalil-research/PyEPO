@@ -221,7 +221,6 @@ class optMpaxModel(optModel):
 if __name__ == "__main__":
     import random
     import numpy as np
-    import torch
     # random seed for reproducibility
     random.seed(42)
     np.random.seed(42)

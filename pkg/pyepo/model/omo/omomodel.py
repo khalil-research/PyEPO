@@ -6,8 +6,6 @@ Abstract optimization model based on Pyomo
 
 from copy import copy
 
-import numpy as np
-
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy, optModel
 

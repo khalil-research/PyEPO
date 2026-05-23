@@ -145,7 +145,6 @@ class shortestPathCpModel(optOrtCpModel):
 if __name__ == "__main__":
 
     import random
-    import numpy as np
     # random seed
     random.seed(42)
     # set random cost for test

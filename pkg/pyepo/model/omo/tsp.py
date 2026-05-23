@@ -11,7 +11,6 @@ from pyepo.model.omo.omomodel import optOmoModel
 from pyepo.model.opt import costToNumpy, getTspTour
 
 try:
-    from pyomo import opt as po
     from pyomo import environ as pe
     _HAS_PYOMO = True
 except ImportError:
