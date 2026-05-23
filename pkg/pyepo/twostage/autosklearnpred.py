@@ -11,29 +11,7 @@ try:
     from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
     from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
     from ConfigSpace.configuration_space import ConfigurationSpace
-    _HAS_AUTO = True
-except ImportError:
-    _HAS_AUTO = False
 
-
-from pyepo.metric import makeAutoSkScorer
-
-def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
-    """
-    Two-stage prediction and optimization with auto-sklearn.
-
-    Args:
-        optmodel (optModel): optimization model
-        seed (int): random seed for reproducibility
-        timelimit (int): time limit in seconds for auto-sklearn search
-        metric (str): evaluation metric, "mse" or "regret"
-
-    Returns:
-        AutoSklearnRegressor: Auto-sklearn multi-output regression model
-    """
-    # error
-    if not _HAS_AUTO:
-        raise ImportError("Autosklearn is not installed. Please install autosklearn to use this feature.")
     class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
         """
         This is class of NoPreprocessing component for auto-sklearn
@@ -70,8 +48,33 @@ def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
         @staticmethod
         def get_hyperparameter_search_space(dataset_properties=None):
             return ConfigurationSpace()  # Return an empty configuration as there is None
-    # add NoPreprocessing component to auto-sklearn.
+
+    # register NoPreprocessing with auto-sklearn once at import time
     data_preprocessing.add_preprocessor(NoPreprocessing)
+
+    _HAS_AUTO = True
+except ImportError:
+    _HAS_AUTO = False
+
+
+from pyepo.metric import makeAutoSkScorer
+
+def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
+    """
+    Two-stage prediction and optimization with auto-sklearn.
+
+    Args:
+        optmodel (optModel): optimization model
+        seed (int): random seed for reproducibility
+        timelimit (int): time limit in seconds for auto-sklearn search
+        metric (str): evaluation metric, "mse" or "regret"
+
+    Returns:
+        AutoSklearnRegressor: Auto-sklearn multi-output regression model
+    """
+    # error
+    if not _HAS_AUTO:
+        raise ImportError("Autosklearn is not installed. Please install autosklearn to use this feature.")
     # get metrics
     pyepo_scorer = makeAutoSkScorer(optmodel)
     #scorer = makeTestMSEScorer(optmodel)
