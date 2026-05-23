@@ -28,7 +28,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: knapsackModel(weights: numpy.ndarray, capacity: numpy.ndarray | list)
+.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list)
 
    Bases: :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
 
