@@ -16,10 +16,11 @@ except PackageNotFoundError:
 # Silence library logs by default; users opt in with logging.basicConfig(level=INFO).
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-from pyepo import data, func, metric, model, twostage
+from pyepo import EPO, data, func, metric, model, twostage
 from pyepo.EPO import MAXIMIZE, MINIMIZE, ModelSense
 
 __all__ = [
+    "EPO",
     "MAXIMIZE",
     "MINIMIZE",
     "ModelSense",
