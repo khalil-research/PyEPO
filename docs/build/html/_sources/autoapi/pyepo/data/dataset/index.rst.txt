@@ -82,14 +82,14 @@ Module Contents
    :ivar weight: weight of kNN-loss
    :vartype weight: float
    :ivar feats: Data features
-   :vartype feats: np.ndarray
+   :vartype feats: torch.Tensor
    :ivar costs: Cost vectors
-   :vartype costs: np.ndarray
+   :vartype costs: torch.Tensor
    :ivar sols: Optimal solutions
-   :vartype sols: np.ndarray
+   :vartype sols: torch.Tensor
    :ivar objs: Optimal objective values
 
-   :vartype objs: np.ndarray
+   :vartype objs: torch.Tensor
 
 
    .. py:attribute:: model

@@ -92,7 +92,7 @@ Module Contents
 
       A method to solve the model
 
-      :returns: optimal solution (list) and objective value (jnp.float32)
+      :returns: optimal solution (torch.Tensor) and objective value (float)
       :rtype: tuple
 
 
