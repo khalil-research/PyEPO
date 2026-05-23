@@ -60,6 +60,11 @@ all = [
     "jaxlib>=0.4.1",
 ]
 dev = ["pytest", "ruff", "pyright"]
+docs = [
+    "sphinx>=7",
+    "sphinx-autoapi>=3",
+    "sphinx-rtd-theme>=2",
+]
 
 [project.urls]
 Homepage = "https://github.com/khalil-research/PyEPO"
@@ -76,6 +81,10 @@ pyepo = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+    # SWIG-generated stubs from OR-Tools / similar trip these on Python 3.12+
+    "ignore:builtin type \\S+ has no __module__ attribute:DeprecationWarning",
+]
 
 [tool.pyright]
 include = ["pyepo"]
