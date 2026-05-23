@@ -4,6 +4,8 @@
 Two-stage model with Scikit-learn predictor
 """
 
+from __future__ import annotations
+
 from sklearn.multioutput import MultiOutputRegressor
 
 

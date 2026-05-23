@@ -4,6 +4,8 @@
 Abstract optimization model based on Cardinal Optimizer (COPT)
 """
 
+from __future__ import annotations
+
 from copy import copy
 
 try:

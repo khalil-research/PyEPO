@@ -4,6 +4,8 @@
 Abstract optimization model based on Google OR-Tools (pywraplp)
 """
 
+from __future__ import annotations
+
 from copy import copy
 
 import numpy as np

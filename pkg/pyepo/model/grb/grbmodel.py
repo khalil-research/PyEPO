@@ -4,6 +4,8 @@
 Abstract optimization model based on GurobiPy
 """
 
+from __future__ import annotations
+
 from copy import copy
 
 import numpy as np

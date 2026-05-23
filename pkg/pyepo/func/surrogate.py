@@ -4,6 +4,8 @@
 Surrogate Loss function
 """
 
+from __future__ import annotations
+
 import torch
 from torch.autograd import Function
 

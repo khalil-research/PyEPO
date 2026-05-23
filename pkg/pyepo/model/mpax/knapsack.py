@@ -4,6 +4,8 @@
 Knapsack problem
 """
 
+from __future__ import annotations
+
 try:
     import jax.numpy as jnp
     _HAS_MPAX = True

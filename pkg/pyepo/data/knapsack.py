@@ -4,6 +4,8 @@
 Synthetic data for knapsack problem
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 

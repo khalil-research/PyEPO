@@ -5,6 +5,8 @@
 Utility function
 """
 
+from __future__ import annotations
+
 import inspect
 
 def getArgs(model):

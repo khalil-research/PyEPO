@@ -4,6 +4,8 @@
 Synthetic data for shortest path problem
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 

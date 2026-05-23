@@ -4,6 +4,8 @@
 Synthetic data for traveling salesman problem
 """
 
+from __future__ import annotations
+
 import numpy as np
 from scipy.spatial import distance
 

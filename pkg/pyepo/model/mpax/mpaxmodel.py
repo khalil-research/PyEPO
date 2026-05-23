@@ -4,6 +4,8 @@
 Abstract optimization model based on MPAX
 """
 
+from __future__ import annotations
+
 from copy import deepcopy
 from functools import partial
 import torch

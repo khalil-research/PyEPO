@@ -4,6 +4,8 @@
 Abstract optimization model based on Pyomo
 """
 
+from __future__ import annotations
+
 from copy import copy
 
 from pyepo import EPO

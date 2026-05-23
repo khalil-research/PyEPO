@@ -4,6 +4,8 @@
 Metrics for SKlearn model
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from pyepo.utils import getArgs

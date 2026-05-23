@@ -4,6 +4,8 @@
 Two-stage model with auto-sklearn predictor
 """
 
+from __future__ import annotations
+
 try:
     from autosklearn.regression import AutoSklearnRegressor
     from autosklearn.metrics import mean_squared_error

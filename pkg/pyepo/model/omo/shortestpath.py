@@ -4,6 +4,8 @@
 Shortest path problem
 """
 
+from __future__ import annotations
+
 from collections import defaultdict
 
 from pyepo.model.omo.omomodel import optOmoModel

@@ -4,6 +4,8 @@
 Abstract optimization model
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import deepcopy
