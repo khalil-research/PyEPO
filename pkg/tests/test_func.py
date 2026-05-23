@@ -229,3 +229,59 @@ class TestOptModuleInit:
         model = shortestPathModel(grid=(3, 3))
         with pytest.raises(TypeError):
             SPOPlus(model, solve_ratio=0.5, dataset=None)
+
+
+# ============================================================
+# Autograd gradient correctness for SPO+
+# ============================================================
+
+@requires_gurobi
+class TestSPOPlusGradient:
+    """Check the SPO+ autograd subgradient against its closed-form expression."""
+
+    def _setup(self, seed: int = 0):
+        from pyepo.func.surrogate import SPOPlus
+        rng = np.random.RandomState(seed)
+        model = shortestPathModel(grid=(3, 3))
+        n, d = 4, model.num_cost
+        c_true = torch.as_tensor(rng.rand(n, d) + 0.1, dtype=torch.float32)
+        # solve once to get w_true, z_true
+        w_true = np.zeros((n, d), dtype=np.float32)
+        z_true = np.zeros((n, 1), dtype=np.float32)
+        for i in range(n):
+            model.setObj(c_true[i].numpy())
+            sol, obj = model.solve()
+            w_true[i] = np.asarray(sol, dtype=np.float32)
+            z_true[i, 0] = obj
+        w_true = torch.from_numpy(w_true)
+        z_true = torch.from_numpy(z_true)
+        spo = SPOPlus(model, processes=1)
+        return spo, model, c_true, w_true, z_true
+
+    def test_subgradient_matches_closed_form(self):
+        # SPO+ subgradient: 2 * (w_true - w_spo) / batch_size, where
+        # w_spo = argmin (2*cp - c_true) for MINIMIZE
+        spo, model, c_true, w_true, z_true = self._setup(seed=0)
+        cp = (c_true * 1.3).clone().detach().requires_grad_(True)
+        loss = spo(cp, c_true, w_true, z_true)
+        loss.backward()
+        # closed-form subgradient
+        spo_costs = 2 * cp.detach() - c_true
+        w_spo = np.zeros_like(cp.detach().numpy())
+        for i in range(cp.shape[0]):
+            model.setObj(spo_costs[i].numpy())
+            sol, _ = model.solve()
+            w_spo[i] = np.asarray(sol, dtype=np.float32)
+        expected = 2.0 * (w_true.numpy() - w_spo) / cp.shape[0]
+        np.testing.assert_allclose(cp.grad.numpy(), expected, atol=1e-4)
+
+    def test_gradient_step_decreases_loss(self):
+        # Sanity check: stepping against the autograd grad reduces SPO+ loss.
+        spo, _, c_true, w_true, z_true = self._setup(seed=1)
+        cp = (c_true * 1.5).clone().detach().requires_grad_(True)
+        loss0 = spo(cp, c_true, w_true, z_true)
+        loss0.backward()
+        with torch.no_grad():
+            cp_new = cp - 0.1 * cp.grad
+        loss1 = spo(cp_new, c_true, w_true, z_true)
+        assert loss1.item() <= loss0.item() + 1e-6

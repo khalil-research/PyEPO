@@ -33,7 +33,10 @@ try:
     # probe pyomo directly: `from pyepo.model.omo.*` succeeds even when pyomo is missing
     import pyomo.environ  # noqa: F401
     from pyepo.model.omo.shortestpath import shortestPathModel as omoShortestPathModel
-    from pyepo.model.omo.knapsack import knapsackModel as omoKnapsackModel
+    from pyepo.model.omo.knapsack import (
+        knapsackModel as omoKnapsackModel,
+        knapsackModelRel as omoKnapsackModelRel,
+    )
     from pyepo.model.omo.tsp import (
         tspGGModel as omoTspGGModel, tspGGModelRel as omoTspGGModelRel,
         tspMTZModel as omoTspMTZModel, tspMTZModelRel as omoTspMTZModelRel,
@@ -45,7 +48,10 @@ except (ImportError, NameError):
 
 try:
     from pyepo.model.copt.shortestpath import shortestPathModel as coptShortestPathModel
-    from pyepo.model.copt.knapsack import knapsackModel as coptKnapsackModel
+    from pyepo.model.copt.knapsack import (
+        knapsackModel as coptKnapsackModel,
+        knapsackModelRel as coptKnapsackModelRel,
+    )
     from pyepo.model.copt.tsp import (
         tspGGModel as coptTspGGModel, tspGGModelRel as coptTspGGModelRel,
         tspDFJModel as coptTspDFJModel,
@@ -366,6 +372,16 @@ class TestOmoKnapsackModel:
         _, obj2 = model2.solve()
         assert obj2 <= obj1 + 1e-6
 
+    def test_relax(self, model):
+        rel_model = model.relax()
+        assert isinstance(rel_model, omoKnapsackModelRel)
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        rel_model.setObj(cost)
+        _, obj_rel = rel_model.solve()
+        model.setObj(cost)
+        _, obj_int = model.solve()
+        assert obj_rel >= obj_int - 1e-6
+
 
 # ============================================================
 # COPT: Shortest path model
@@ -455,6 +471,16 @@ class TestCoptKnapsackModel:
         model2.setObj(cost)
         _, obj2 = model2.solve()
         assert obj2 <= obj1 + 1e-6
+
+    def test_relax(self, model):
+        rel_model = model.relax()
+        assert isinstance(rel_model, coptKnapsackModelRel)
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        rel_model.setObj(cost)
+        _, obj_rel = rel_model.solve()
+        model.setObj(cost)
+        _, obj_int = model.solve()
+        assert obj_rel >= obj_int - 1e-6
 
 
 # ============================================================
@@ -797,6 +823,29 @@ class TestCrossBackendConsistency:
         omo_model.setObj(cost)
         _, omo_obj = omo_model.solve()
         np.testing.assert_allclose(grb_obj, omo_obj, atol=1e-4)
+
+    def test_shortestpath_solution_matches(self):
+        cost = np.random.RandomState(42).rand(12)
+        grb_model = shortestPathModel(grid=(3, 3))
+        grb_model.setObj(cost)
+        grb_sol, _ = grb_model.solve()
+        omo_model = omoShortestPathModel(grid=(3, 3), solver="gurobi")
+        omo_model.setObj(cost)
+        omo_sol, _ = omo_model.solve()
+        np.testing.assert_allclose(np.asarray(grb_sol), np.asarray(omo_sol), atol=1e-4)
+
+    def test_knapsack_solution_matches(self):
+        weights = np.array([[3.0, 4.0, 5.0, 6.0]])
+        capacity = np.array([10.0])
+        # cost yields unique optimum [1, 1, 0, 0]
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        grb_model = knapsackModel(weights=weights, capacity=capacity)
+        grb_model.setObj(cost)
+        grb_sol, _ = grb_model.solve()
+        omo_model = omoKnapsackModel(weights=weights, capacity=capacity, solver="gurobi")
+        omo_model.setObj(cost)
+        omo_sol, _ = omo_model.solve()
+        np.testing.assert_allclose(np.asarray(grb_sol), np.asarray(omo_sol), atol=1e-4)
 
 
 # ============================================================
@@ -1833,6 +1882,23 @@ class TestMpaxShortestPathModel:
         _, obj1 = new_model.solve()
         # new constraint is non-binding, obj should be unchanged
         np.testing.assert_allclose(obj0, obj1, atol=1e-3)
+
+    @requires_mpax_gurobi
+    def test_addConstr_binding(self, model):
+        # forces sum(x) >= 5, making at least 5 arcs active in 3x3 grid
+        cost = np.random.RandomState(42).rand(12)
+        model.setObj(cost)
+        _, obj0 = model.solve()
+        mpax_constrained = model.addConstr([1.0] * 12, 5.0)
+        mpax_constrained.setObj(cost)
+        _, mpax_obj = mpax_constrained.solve()
+        # binding constraint must increase (or hold equal in pathological cases) the obj
+        assert mpax_obj >= obj0 - 1e-3
+        # reference solution from gurobi with the same extra constraint
+        grb_constrained = shortestPathModel(grid=(3, 3)).addConstr(np.ones(12), 5.0)
+        grb_constrained.setObj(cost)
+        _, grb_obj = grb_constrained.solve()
+        np.testing.assert_allclose(mpax_obj, grb_obj, atol=1e-2)
 
 
 @requires_mpax

@@ -293,3 +293,59 @@ class TestKNNIntegration:
         assert cost.shape == (optmodel.num_cost,)
         assert sol.shape == (optmodel.num_cost,)
         assert obj.shape == (1,)
+
+
+# ============================================================
+# Portfolio QP integration (exercises QP setObj path)
+# ============================================================
+
+@requires_gurobi
+class TestPortfolioIntegration:
+
+    def _setup(self, num_assets=8):
+        from pyepo.data.dataset import optDataset
+        from pyepo.model.grb.portfolio import portfolioModel
+        cov, x, c = pyepo.data.portfolio.genData(
+            NUM_DATA, NUM_FEAT, num_assets, deg=1, seed=42)
+        optmodel = portfolioModel(num_assets=num_assets, covariance=cov)
+        dataset = optDataset(optmodel, x, c)
+        loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
+        return optmodel, loader
+
+    def test_spo_plus(self):
+        optmodel, loader = self._setup()
+        predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
+        spo = pyepo.func.SPOPlus(optmodel, processes=1)
+        _train_loop(spo, loader, predmodel,
+                    lambda fn, cp, c, w, z: fn(cp, c, w, z))
+
+    def test_blackbox(self):
+        optmodel, loader = self._setup()
+        predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
+        dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=1)
+        _train_loop(dbb, loader, predmodel,
+                    lambda fn, cp, c, w, z: (fn(cp) * c).sum(1).mean())
+
+
+# ============================================================
+# TSP DFJ integration (exercises lazy-callback subtour-elim path)
+# ============================================================
+
+@requires_gurobi
+class TestTspDFJIntegration:
+
+    def _setup(self, num_nodes=5):
+        from pyepo.data.dataset import optDataset
+        from pyepo.model.grb.tsp import tspDFJModel
+        x, c = pyepo.data.tsp.genData(NUM_DATA, NUM_FEAT, num_nodes, deg=1, seed=42)
+        optmodel = tspDFJModel(num_nodes=num_nodes)
+        dataset = optDataset(optmodel, x, c)
+        loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
+        return optmodel, loader
+
+    def test_blackbox(self):
+        optmodel, loader = self._setup()
+        predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
+        dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=1)
+        _train_loop(dbb, loader, predmodel,
+                    lambda fn, cp, c, w, z: (fn(cp) * c).sum(1).mean())

@@ -242,6 +242,16 @@ class TestOptDataset:
         assert z.dtype == torch.float32
 
 
+class TestOptDatasetInit:
+    """Exercise the real __init__ path (not the object.__new__ bypass)."""
+
+    def test_rejects_non_optmodel(self):
+        x = np.random.randn(5, 3).astype(np.float32)
+        c = np.random.randn(5, 4).astype(np.float32)
+        with pytest.raises(TypeError):
+            optDataset("not_a_model", x, c)
+
+
 class TestOptDatasetKNN:
 
     def test_getKNN_vectorized(self):
