@@ -5,6 +5,7 @@ Abstract optimization model
 """
 
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from copy import deepcopy
 
 from pyepo import EPO
@@ -112,6 +113,56 @@ class unionFind:
             self.parent[root_j] = root_i
             return True
         return False
+
+
+def getTspTour(edge_list, num_nodes, sol, threshold=1e-2):
+    """
+    Reconstruct a TSP tour from an undirected edge-selection vector.
+
+    Args:
+        edge_list (list): undirected edges of the model, ordered to match ``sol``
+        num_nodes (int): number of nodes in the TSP instance
+        sol (sequence): solution values aligned with ``edge_list``; an edge is
+            considered active when its value exceeds ``threshold``
+        threshold (float): activation threshold for an edge
+
+    Returns:
+        list: node sequence of the tour (closes back to node 0 if reachable)
+
+    Raises:
+        ValueError: if the solution does not form a single connected tour
+            (skips nodes or contains disconnected subtours).
+    """
+    # active edges
+    edges = defaultdict(list)
+    for i, (j, k) in enumerate(edge_list):
+        if sol[i] > threshold:
+            edges[j].append(k)
+            edges[k].append(j)
+    # all nodes must appear in the active edge set
+    if len(edges) != num_nodes:
+        raise ValueError(
+            "Solution does not cover all {} nodes (got {}); the model returned "
+            "an infeasible TSP solution.".format(num_nodes, len(edges)))
+    # walk the tour starting from the first node with an active edge
+    start = list(edges.keys())[0]
+    visited = {start}
+    tour = [start]
+    while len(visited) < len(edges):
+        i = tour[-1]
+        for j in edges[i]:
+            if j not in visited:
+                tour.append(j)
+                visited.add(j)
+                break
+        else:
+            # no unvisited neighbour: solution contains a subtour
+            raise ValueError(
+                "Solution contains disconnected subtours; cannot form a single "
+                "tour. Check that subtour elimination constraints are active.")
+    if 0 in edges[tour[-1]]:
+        tour.append(0)
+    return tour
 
 
 def _get_grid_arcs(grid):

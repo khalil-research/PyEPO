@@ -4,7 +4,6 @@
 Traveling salesman problem
 """
 
-from collections import defaultdict
 from itertools import combinations
 
 import numpy as np
@@ -14,7 +13,7 @@ from coptpy import COPT
 from coptpy import CallbackBase
 
 from pyepo.model.copt.coptmodel import optCoptModel
-from pyepo.model.opt import unionFind
+from pyepo.model.opt import getTspTour, unionFind
 
 
 class tspABModel(optCoptModel):
@@ -62,29 +61,11 @@ class tspABModel(optCoptModel):
 
         Returns:
             list: a TSP tour
+
+        Raises:
+            ValueError: if the solution does not form a single connected tour.
         """
-        # active edges
-        edges = defaultdict(list)
-        for i, (j, k) in enumerate(self.edges):
-            if sol[i] > 1e-2:
-                edges[j].append(k)
-                edges[k].append(j)
-        # get tour
-        visited = {list(edges.keys())[0]}
-        tour = [list(edges.keys())[0]]
-        while len(visited) < len(edges):
-            i = tour[-1]
-            for j in edges[i]:
-                if j not in visited:
-                    tour.append(j)
-                    visited.add(j)
-                    break
-            else:
-                # all neighbors visited: disconnected graph, stop
-                break
-        if 0 in edges[tour[-1]]:
-            tour.append(0)
-        return tour
+        return getTspTour(self.edges, self.num_nodes, sol)
 
 
 class tspGGModel(tspABModel):
