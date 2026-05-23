@@ -40,6 +40,8 @@ class tspABModel(optOmoModel):
         self.edges = [(i, j) for i in self.nodes
                       for j in self.nodes if i < j]
         super().__init__(solver)
+        # constraints added via addConstr, replayed on copy/relax
+        self._extra_constrs = []
 
     @property
     def num_cost(self):
@@ -53,7 +55,14 @@ class tspABModel(optOmoModel):
             optModel: new copied model
         """
         new_model = type(self)(self.num_nodes, self.solver)
+        self._replay_extras(new_model)
         return new_model
+
+    def _replay_extras(self, other):
+        """Replay self._extra_constrs onto another TSP model of compatible formulation."""
+        for coefs, rhs in self._extra_constrs:
+            other._extra_constrs.append((coefs, rhs))
+            other._addExtraConstr(coefs, rhs)
 
     def getTour(self, sol):
         """
@@ -143,6 +152,12 @@ class tspGGModel(tspABModel):
                 sol[k] = 1
         return sol, pe.value(self._model.obj)
 
+    def _addExtraConstr(self, coefs, rhs):
+        """Add a single linear constraint to self._model using the GG variable scheme."""
+        self._model.cons.add(
+            sum(coefs[k] * (self.x[i, j] + self.x[j, i])
+                for k, (i, j) in enumerate(self.edges)) <= rhs)
+
     def addConstr(self, coefs, rhs):
         """
         A method to add new constraint
@@ -156,20 +171,17 @@ class tspGGModel(tspABModel):
         """
         if len(coefs) != self.num_cost:
             raise ValueError("Size of coef vector does not match number of cost variables.")
-        # copy
         new_model = self.copy()
-        # add constraint
-        new_model._model.cons.add(
-            sum(coefs[k] * (new_model.x[i, j] + new_model.x[j, i])
-                for k, (i, j) in enumerate(new_model.edges)) <= rhs)
+        new_model._extra_constrs.append((coefs, rhs))
+        new_model._addExtraConstr(coefs, rhs)
         return new_model
 
     def relax(self):
         """
         A method to get linear relaxation model
         """
-        # copy
         model_rel = tspGGModelRel(self.num_nodes, self.solver)
+        self._replay_extras(model_rel)
         return model_rel
 
 
@@ -314,6 +326,12 @@ class tspMTZModel(tspABModel):
                 sol[k] = 1
         return sol, pe.value(self._model.obj)
 
+    def _addExtraConstr(self, coefs, rhs):
+        """Add a single linear constraint to self._model using the MTZ variable scheme."""
+        self._model.cons.add(
+            sum(coefs[k] * (self.x[i, j] + self.x[j, i])
+                for k, (i, j) in enumerate(self.edges)) <= rhs)
+
     def addConstr(self, coefs, rhs):
         """
         A method to add new constraint
@@ -327,20 +345,17 @@ class tspMTZModel(tspABModel):
         """
         if len(coefs) != self.num_cost:
             raise ValueError("Size of coef vector does not match number of cost variables.")
-        # copy
         new_model = self.copy()
-        # add constraint
-        new_model._model.cons.add(
-            sum(coefs[k] * (new_model.x[i, j] + new_model.x[j, i])
-                for k, (i, j) in enumerate(new_model.edges)) <= rhs)
+        new_model._extra_constrs.append((coefs, rhs))
+        new_model._addExtraConstr(coefs, rhs)
         return new_model
 
     def relax(self):
         """
         A method to get linear relaxation model
         """
-        # copy
         model_rel = tspMTZModelRel(self.num_nodes, self.solver)
+        self._replay_extras(model_rel)
         return model_rel
 
 
