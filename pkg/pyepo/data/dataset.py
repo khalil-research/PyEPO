@@ -4,6 +4,8 @@
 optDataset class based on PyTorch Dataset
 """
 
+import logging
+
 import numpy as np
 import torch
 from torch.utils.data import Dataset
@@ -11,6 +13,8 @@ from tqdm import tqdm
 
 from pyepo.model.opt import optModel
 from scipy.spatial import distance
+
+logger = logging.getLogger(__name__)
 
 class optDataset(Dataset):
     """
@@ -53,7 +57,7 @@ class optDataset(Dataset):
         """
         sols = []
         objs = []
-        print("\nOptimizing for optDataset...", flush=True)
+        logger.info("Optimizing for optDataset...")
         for c in tqdm(self.costs):
             try:
                 sol, obj = self._solve(c)
@@ -158,7 +162,7 @@ class optDatasetKNN(optDataset):
         """
         sols = []
         objs = []
-        print("\nOptimizing for optDataset...", flush=True)
+        logger.info("Optimizing for optDataset...")
         # get kNN costs
         costs_knn = self._getKNN()
         # solve optimization

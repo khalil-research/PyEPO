@@ -5,6 +5,7 @@ Abstract autograd optimization module
 """
 
 from abc import abstractmethod
+import logging
 import multiprocessing as mp
 from pathos.multiprocessing import ProcessingPool
 
@@ -14,6 +15,8 @@ from torch import nn
 from pyepo.data.dataset import optDataset
 from pyepo.model.opt import optModel
 from pyepo.model.mpax import optMpaxModel
+
+logger = logging.getLogger(__name__)
 
 
 class optModule(nn.Module):
@@ -39,7 +42,7 @@ class optModule(nn.Module):
         self.optmodel = optmodel
         # force processes to 1 for MPAX
         if isinstance(optmodel, optMpaxModel) and processes > 1:
-            print("MPAX does not support multiprocessing. Setting `processes = 1`.")
+            logger.warning("MPAX does not support multiprocessing. Setting `processes = 1`.")
             processes = 1
         # number of processes
         if processes < 0 or processes > mp.cpu_count():
@@ -52,7 +55,7 @@ class optModule(nn.Module):
         # multi-core
         else:
             self.pool = ProcessingPool(self.processes)
-        print("Num of cores: {}".format(self.processes))
+        logger.info("Num of cores: %d", self.processes)
         # solution pool
         self.solve_ratio = solve_ratio
         if (self.solve_ratio < 0) or (self.solve_ratio > 1):
