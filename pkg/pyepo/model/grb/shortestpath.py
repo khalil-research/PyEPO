@@ -5,7 +5,7 @@ Shortest path problem
 
 from __future__ import annotations
 
-from collections import defaultdict
+import numpy as np
 
 try:
     import gurobipy as gp
@@ -14,7 +14,7 @@ except ImportError:
     pass
 
 from pyepo.model.grb.grbmodel import optGrbModel
-from pyepo.model.opt import _get_grid_arcs
+from pyepo.model.utils import _get_grid_arcs
 
 
 class shortestPathModel(optGrbModel):
@@ -43,34 +43,20 @@ class shortestPathModel(optGrbModel):
         Returns:
             tuple: optimization model and variables
         """
-        # create a model
         m = gp.Model("shortest path")
-        # variables
-        x = m.addVars(self.arcs, name="x", ub=1)
-        # sense
+        num_nodes = self.grid[0] * self.grid[1]
+        num_arcs = len(self.arcs)
+        x = m.addMVar(num_arcs, ub=1.0, name="x")
         m.modelSense = GRB.MINIMIZE
-        # build adjacency lists
-        out_arcs = defaultdict(list)
-        in_arcs = defaultdict(list)
-        for e in self.arcs:
-            out_arcs[e[0]].append(e)
-            in_arcs[e[1]].append(e)
-        # constraints
-        for i in range(self.grid[0]):
-            for j in range(self.grid[1]):
-                v = i * self.grid[1] + j
-                expr = gp.quicksum(x[e] for e in in_arcs[v]) - gp.quicksum(
-                    x[e] for e in out_arcs[v]
-                )
-                # source
-                if i == 0 and j == 0:
-                    m.addConstr(expr == -1)
-                # sink
-                elif i == self.grid[0] - 1 and j == self.grid[1] - 1:
-                    m.addConstr(expr == 1)
-                # transition
-                else:
-                    m.addConstr(expr == 0)
+        # node-arc incidence: row v sums (in-flow) - (out-flow) at v
+        A = np.zeros((num_nodes, num_arcs), dtype=np.float64)
+        for a, (u, v) in enumerate(self.arcs):
+            A[u, a] = -1.0
+            A[v, a] = +1.0
+        b = np.zeros(num_nodes, dtype=np.float64)
+        b[0] = -1.0
+        b[num_nodes - 1] = 1.0
+        m.addConstr(A @ x == b)
         return m, x
 
 

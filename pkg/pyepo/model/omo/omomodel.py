@@ -9,7 +9,8 @@ from copy import copy
 from typing import TYPE_CHECKING
 
 from pyepo import EPO
-from pyepo.model.opt import costToNumpy, optModel
+from pyepo.model.opt import optModel
+from pyepo.utils import costToNumpy
 
 try:
     from pyomo import environ as pe

@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.model.opt import costToNumpy
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     from torch import nn

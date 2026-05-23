@@ -5,12 +5,11 @@ Shortest path problem
 
 from __future__ import annotations
 
-from collections import defaultdict
-
+import numpy as np
 from coptpy import COPT, Envr
 
 from pyepo.model.copt.coptmodel import optCoptModel
-from pyepo.model.opt import _get_grid_arcs
+from pyepo.model.utils import _get_grid_arcs
 
 
 class shortestPathModel(optCoptModel):
@@ -36,32 +35,20 @@ class shortestPathModel(optCoptModel):
         """
         A method to build COPT model
         """
-        # create a model
         m = Envr().createModel("shortest path")
-        # variables
-        x = m.addVars(self.arcs, nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)
-        # sense
+        num_nodes = self.grid[0] * self.grid[1]
+        num_arcs = len(self.arcs)
+        x = m.addMVar(num_arcs, lb=0.0, ub=1.0, vtype=COPT.CONTINUOUS, nameprefix="x")
         m.setObjSense(COPT.MINIMIZE)
-        # build adjacency lists
-        out_arcs = defaultdict(list)
-        in_arcs = defaultdict(list)
-        for e in self.arcs:
-            out_arcs[e[0]].append(e)
-            in_arcs[e[1]].append(e)
-        # constraints
-        for i in range(self.grid[0]):
-            for j in range(self.grid[1]):
-                v = i * self.grid[1] + j
-                expr = sum(x[e] for e in in_arcs[v]) - sum(x[e] for e in out_arcs[v])
-                # source
-                if i == 0 and j == 0:
-                    m.addConstr(expr == -1)
-                # sink
-                elif i == self.grid[0] - 1 and j == self.grid[1] - 1:
-                    m.addConstr(expr == 1)
-                # transition
-                else:
-                    m.addConstr(expr == 0)
+        # node-arc incidence: row v sums (in-flow) - (out-flow) at v
+        A = np.zeros((num_nodes, num_arcs), dtype=np.float64)
+        for a, (u, v) in enumerate(self.arcs):
+            A[u, a] = -1.0
+            A[v, a] = +1.0
+        b = np.zeros(num_nodes, dtype=np.float64)
+        b[0] = -1.0
+        b[num_nodes - 1] = 1.0
+        m.addConstr(A @ x == b)
         return m, x
 
 

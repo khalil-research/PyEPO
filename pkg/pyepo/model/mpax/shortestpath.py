@@ -13,7 +13,7 @@ except ImportError:
     pass
 
 from pyepo.model.mpax.mpaxmodel import optMpaxModel
-from pyepo.model.opt import _get_grid_arcs
+from pyepo.model.utils import _get_grid_arcs
 
 
 class shortestPathModel(optMpaxModel):

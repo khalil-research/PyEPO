@@ -59,23 +59,11 @@ class portfolioModel(optCoptModel):
         Returns:
             tuple: optimization model and variables
         """
-        # create a model
         m = Envr().createModel("portfolio")
-        # variables
-        x = m.addVars(range(self.num_assets), nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)
-        # sense
+        x = m.addMVar(self.num_assets, lb=0.0, ub=1.0, vtype=COPT.CONTINUOUS, nameprefix="x")
         m.setObjSense(COPT.MAXIMIZE)
-        # constraints
-        m.addConstr(sum(x[i] for i in range(self.num_assets)) == 1, "budget")
-        m.addQConstr(
-            sum(
-                self.covariance[i, j] * x[i] * x[j]
-                for i in range(self.num_assets)
-                for j in range(self.num_assets)
-            )
-            <= self.risk_level,
-            "risk_limit",
-        )
+        m.addConstr(x.sum() == 1, "budget")
+        m.addQConstr(x @ self.covariance @ x <= self.risk_level, "risk_limit")
         return m, x
 
 

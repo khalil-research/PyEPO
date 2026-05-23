@@ -12,7 +12,8 @@ import numpy as np
 from coptpy import COPT, CallbackBase, Envr
 
 from pyepo.model.copt.coptmodel import optCoptModel
-from pyepo.model.opt import costToNumpy, getTspTour, unionFind
+from pyepo.model.utils import getTspTour, unionFind
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch

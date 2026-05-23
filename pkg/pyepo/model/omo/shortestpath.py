@@ -8,7 +8,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from pyepo.model.omo.omomodel import optOmoModel
-from pyepo.model.opt import _get_grid_arcs
+from pyepo.model.utils import _get_grid_arcs
 
 try:
     from pyomo import environ as pe

@@ -18,7 +18,8 @@ except ImportError:
     _HAS_ORTOOLS = False
 
 from pyepo import EPO
-from pyepo.model.opt import costToNumpy, optModel
+from pyepo.model.opt import optModel
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch

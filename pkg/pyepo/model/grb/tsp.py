@@ -17,7 +17,7 @@ except ImportError:
     pass
 
 from pyepo.model.grb.grbmodel import optGrbModel
-from pyepo.model.opt import getTspTour, unionFind
+from pyepo.model.utils import getTspTour, unionFind
 
 if TYPE_CHECKING:
     import torch

@@ -8,8 +8,8 @@ import pytest
 import numpy as np
 import torch
 
-from pyepo.utils import getArgs
-from pyepo.model.opt import costToNumpy, getTspTour, unionFind
+from pyepo.utils import costToNumpy, getArgs
+from pyepo.model.utils import getTspTour, unionFind
 
 try:
     from pyepo.model.grb.knapsack import knapsackModel

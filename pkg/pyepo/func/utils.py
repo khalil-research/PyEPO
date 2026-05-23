@@ -13,8 +13,7 @@ import torch
 
 from pyepo import EPO
 from pyepo.model.mpax import optMpaxModel
-from pyepo.model.opt import costToNumpy
-from pyepo.utils import getArgs
+from pyepo.utils import costToNumpy, getArgs
 
 if TYPE_CHECKING:
     from pyepo.func.abcmodule import optModule

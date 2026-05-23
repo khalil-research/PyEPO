@@ -37,15 +37,11 @@ class knapsackModel(optCoptModel):
         """
         A method to build COPT model
         """
-        # create a model
         m = Envr().createModel("knapsack")
-        # variables
-        x = m.addVars(self.items, nameprefix="x", vtype=COPT.BINARY)
-        # sense
+        num_items = self.weights.shape[1]
+        x = m.addMVar(num_items, vtype=COPT.BINARY, nameprefix="x")
         m.setObjSense(COPT.MAXIMIZE)
-        # constraints
-        for i in range(len(self.capacity)):
-            m.addConstr(sum(self.weights[i, j] * x[j] for j in self.items) <= self.capacity[i])
+        m.addConstr(self.weights @ x <= self.capacity)
         return m, x
 
     def relax(self) -> knapsackModelRel:
@@ -66,15 +62,11 @@ class knapsackModelRel(knapsackModel):
         """
         A method to build COPT model
         """
-        # create a model
         m = Envr().createModel("knapsack")
-        # variables
-        x = m.addVars(self.items, nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)
-        # sense
+        num_items = self.weights.shape[1]
+        x = m.addMVar(num_items, lb=0.0, ub=1.0, vtype=COPT.CONTINUOUS, nameprefix="x")
         m.setObjSense(COPT.MAXIMIZE)
-        # constraints
-        for i in range(len(self.capacity)):
-            m.addConstr(sum(self.weights[i, j] * x[j] for j in self.items) <= self.capacity[i])
+        m.addConstr(self.weights @ x <= self.capacity)
         return m, x
 
     def relax(self) -> knapsackModelRel:

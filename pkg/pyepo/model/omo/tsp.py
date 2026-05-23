@@ -10,7 +10,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pyepo.model.omo.omomodel import optOmoModel
-from pyepo.model.opt import costToNumpy, getTspTour
+from pyepo.model.utils import getTspTour
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch

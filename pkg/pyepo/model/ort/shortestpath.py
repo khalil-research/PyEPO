@@ -14,9 +14,9 @@ except ImportError:
     pass
 
 from pyepo import EPO
-from pyepo.model.opt import _get_grid_arcs
 from pyepo.model.ort.ortcpmodel import optOrtCpModel
 from pyepo.model.ort.ortmodel import optOrtModel
+from pyepo.model.utils import _get_grid_arcs
 
 # ============================================================
 # pywraplp

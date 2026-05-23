@@ -8,19 +8,30 @@ from __future__ import annotations
 from copy import copy
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 try:
     from coptpy import COPT
 
+    try:
+        from coptpy import MVar as _CoptMVar
+    except ImportError:
+        _CoptMVar = None
     _HAS_COPT = True
 except ImportError:
     _HAS_COPT = False
+    _CoptMVar = None
 
 from pyepo import EPO
-from pyepo.model.opt import costToNumpy, optModel
+from pyepo.model.opt import optModel
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
-    import numpy as np
     import torch
+
+
+def _is_mvar(x) -> bool:
+    return _CoptMVar is not None and isinstance(x, _CoptMVar)
 
 
 class optCoptModel(optModel):
@@ -35,15 +46,15 @@ class optCoptModel(optModel):
         if not _HAS_COPT:
             raise ImportError("COPT is not installed. Please install coptpy to use this feature.")
         super().__init__()
-        # model sense
         if self._model.ObjSense == COPT.MINIMIZE:
             self.modelSense = EPO.MINIMIZE
         elif self._model.ObjSense == COPT.MAXIMIZE:
             self.modelSense = EPO.MAXIMIZE
         else:
             raise ValueError("Invalid modelSense.")
-        # turn off output
         self._model.setParam("Logging", 0)
+        # cache ordered Var list for setInfo/getInfo batch paths
+        self._vars_list = None if _is_mvar(self.x) else list(self.x.values())
 
     def __repr__(self) -> str:
         return "optCoptModel " + self.__class__.__name__
@@ -58,20 +69,25 @@ class optCoptModel(optModel):
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c)
-        # set obj
-        obj = sum(c[i] * self.x[k] for i, k in enumerate(self.x))
-        self._model.setObjective(obj)
+        if _is_mvar(self.x):
+            self._model.setObjective(c @ self.x)
+        else:
+            # batch C-level coefficient update
+            self._model.setInfo("Obj", self._vars_list, c.tolist())
 
-    def solve(self) -> tuple[list, float]:
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve the model
 
         Returns:
-            tuple: optimal solution (list) and objective value (float)
+            tuple: optimal solution and objective value
         """
-        # solve
         self._model.solve()
-        return [self.x[k].x for k in self.x], self._model.objVal
+        if _is_mvar(self.x):
+            sol = np.asarray(self.x.x)
+        else:
+            sol = np.asarray(self._model.getInfo("Value", self._vars_list))
+        return sol, self._model.objVal
 
     def copy(self) -> optCoptModel:
         """
@@ -81,14 +97,19 @@ class optCoptModel(optModel):
             optModel: new copied model
         """
         new_model = copy(self)
-        # new model
         new_model._model = self._model.clone()
-        # variables for new model
-        x = new_model._model.getVars()
-        new_model.x = {key: x[i] for i, key in enumerate(self.x)}
+        new_vars = new_model._model.getVars()
+        if _is_mvar(self.x):
+            new_model.x = _CoptMVar.fromlist(new_vars)
+            new_model._vars_list = None
+        else:
+            new_model.x = {key: new_vars[i] for i, key in enumerate(self.x)}
+            new_model._vars_list = list(new_model.x.values())
         return new_model
 
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optCoptModel:
+    def addConstr(
+        self, coefs: np.ndarray | torch.Tensor | list, rhs: float
+    ) -> optCoptModel:
         """
         A method to add a new constraint
 
@@ -101,9 +122,11 @@ class optCoptModel(optModel):
         """
         if len(coefs) != self.num_cost:
             raise ValueError("Size of coef vector does not match number of cost variables.")
-        # copy
         new_model = self.copy()
-        # add constraint
-        expr = sum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
-        new_model._model.addConstr(expr)
+        coefs = costToNumpy(coefs)
+        if _is_mvar(new_model.x):
+            new_model._model.addConstr(coefs @ new_model.x <= rhs)
+        else:
+            expr = sum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
+            new_model._model.addConstr(expr)
         return new_model
