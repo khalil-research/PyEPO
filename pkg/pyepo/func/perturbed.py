@@ -86,7 +86,7 @@ class perturbedOptFunc(Function):
         noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
-        ptb_sols = _solve_or_cache(ptb_c, module)
+        ptb_sols = _solve_or_cache_3d(ptb_c, module)
         # solution expectation
         e_sol = ptb_sols.mean(dim=1)
         # save solutions
@@ -186,7 +186,7 @@ class perturbedFenchelYoungFunc(Function):
         noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
-        ptb_sols = _solve_or_cache(ptb_c, module)
+        ptb_sols = _solve_or_cache_3d(ptb_c, module)
         # solution expectation
         e_sol = ptb_sols.mean(dim=1)
         # difference
@@ -293,7 +293,7 @@ class implicitMLEFunc(Function):
         noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
-        ptb_sols = _solve_or_cache(ptb_c, module)
+        ptb_sols = _solve_or_cache_3d(ptb_c, module)
         # solution average
         e_sol = ptb_sols.mean(dim=1)
         # save
@@ -319,12 +319,12 @@ class implicitMLEFunc(Function):
         # positive perturbed costs
         ptb_cp_pos = cp + module.lambd * dl + module.sigma * noises
         # solve with perturbation
-        ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
+        ptb_sols_pos = _solve_or_cache_3d(ptb_cp_pos, module)
         if module.two_sides:
             # negative perturbed costs
             ptb_cp_neg = cp - module.lambd * dl + module.sigma * noises
             # solve with perturbation
-            ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
+            ptb_sols_neg = _solve_or_cache_3d(ptb_cp_neg, module)
             # get two-side gradient
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + 1e-7)
         else:
@@ -412,12 +412,12 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         # positive perturbed costs
         ptb_cp_pos = cp + lambd * dl + module.sigma * noises
         # solve with perturbation
-        ptb_sols_pos = _solve_or_cache(ptb_cp_pos, module)
+        ptb_sols_pos = _solve_or_cache_3d(ptb_cp_pos, module)
         if module.two_sides:
             # negative perturbed costs
             ptb_cp_neg = cp - lambd * dl + module.sigma * noises
             # solve with perturbation
-            ptb_sols_neg = _solve_or_cache(ptb_cp_neg, module)
+            ptb_sols_neg = _solve_or_cache_3d(ptb_cp_neg, module)
             # get two-side gradient
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + 1e-7)
         else:
@@ -434,7 +434,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         return grad, None
 
 
-def _solve_or_cache(ptb_c, module):
+def _solve_or_cache_3d(ptb_c, module):
     """
     Solve or use cached solutions for perturbed costs (3D: n_samples × batch × vars).
     Delegates to the shared 2D functions in utils after flattening.
@@ -445,14 +445,14 @@ def _solve_or_cache(ptb_c, module):
     solpool = module.solpool
     solset = module._solset
     if np.random.uniform() <= module.solve_ratio:
-        ptb_sols, solpool = _solve_in_pass(ptb_c, optmodel, processes, pool, solpool, solset)
+        ptb_sols, solpool = _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool, solset)
     else:
-        ptb_sols, solpool = _cache_in_pass(ptb_c, optmodel, solpool)
+        ptb_sols, solpool = _cache_in_pass_3d(ptb_c, optmodel, solpool)
     module.solpool = solpool
     return ptb_sols
 
 
-def _solve_in_pass(ptb_c, optmodel, processes, pool, solpool=None, solset=None):
+def _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool=None, solset=None):
     """
     Solve optimization for perturbed 3D costs and update solution pool.
 
@@ -483,7 +483,7 @@ def _solve_in_pass(ptb_c, optmodel, processes, pool, solpool=None, solset=None):
     return ptb_sols, solpool
 
 
-def _cache_in_pass(ptb_c, optmodel, solpool):
+def _cache_in_pass_3d(ptb_c, optmodel, solpool):
     """
     Use solution pool for perturbed 3D costs (n_samples × batch × vars).
     Unlike the 2D version in utils, this handles the extra sample dimension.
