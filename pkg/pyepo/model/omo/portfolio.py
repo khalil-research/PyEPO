@@ -94,17 +94,17 @@ if __name__ == "__main__":
     optmodel.setObj(revenue[0]) # set objective function
     sol, obj = optmodel.solve() # solve
     # print res
-    print('Obj: {}'.format(obj))
+    print(f'Obj: {obj}')
     for i in range(50):
         if sol[i] > 1e-3:
-            print("Asset {}: {:.2f}%".format(i, 100*sol[i]))
+            print(f"Asset {i}: {100*sol[i]:.2f}%")
 
     # add constraint
     optmodel = optmodel.addConstr([1]*50, 30)
     optmodel.setObj(revenue[0]) # set objective function
     sol, obj = optmodel.solve() # solve
     # print res
-    print('Obj: {}'.format(obj))
+    print(f'Obj: {obj}')
     for i in range(50):
         if sol[i] > 1e-3:
-            print("Asset {}: {:.2f}%".format(i, 100*sol[i]))
+            print(f"Asset {i}: {100*sol[i]:.2f}%")

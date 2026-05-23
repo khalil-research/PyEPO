@@ -33,14 +33,14 @@ requires_cuda_gurobi = pytest.mark.skipif(
 
 def _assert_cuda(tensor, name="tensor"):
     """Assert a tensor is on CUDA."""
-    assert tensor.device.type == "cuda", "{} not on CUDA: {}".format(name, tensor.device)
+    assert tensor.device.type == "cuda", f"{name} not on CUDA: {tensor.device}"
 
 
 def _assert_grads_cuda(model):
     """Assert all parameter gradients exist and are on CUDA."""
     for name, param in model.named_parameters():
-        assert param.grad is not None, "no gradient for {}".format(name)
-        _assert_cuda(param.grad, "grad of {}".format(name))
+        assert param.grad is not None, f"no gradient for {name}"
+        _assert_cuda(param.grad, f"grad of {name}")
 
 
 def _get_batch(loader):

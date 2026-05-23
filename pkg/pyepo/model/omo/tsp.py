@@ -442,28 +442,28 @@ if __name__ == "__main__":
     optmodel = optmodel.copy()
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print('GG Obj: {}'.format(obj))
+    print(f'GG Obj: {obj}')
     tour = optmodel.getTour(sol)
-    print('GG Tour: {}'.format(tour))
+    print(f'GG Tour: {tour}')
 
     # solve MTZ model
     optmodel = tspMTZModel(num_nodes=num_nodes, solver="gurobi")
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print('MTZ Obj: {}'.format(obj))
+    print(f'MTZ Obj: {obj}')
     tour = optmodel.getTour(sol)
-    print('MTZ Tour: {}'.format(tour))
+    print(f'MTZ Tour: {tour}')
 
     # relax GG model
     optmodel = tspGGModel(num_nodes=num_nodes, solver="gurobi")
     optmodel = optmodel.relax()
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print('GG Relaxed Obj: {}'.format(obj))
+    print(f'GG Relaxed Obj: {obj}')
 
     # add constraint
     optmodel = tspMTZModel(num_nodes=num_nodes, solver="gurobi")
     optmodel = optmodel.addConstr([1] * num_edges, num_edges - 1)
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print('MTZ + Constr Obj: {}'.format(obj))
+    print(f'MTZ + Constr Obj: {obj}')

@@ -79,7 +79,7 @@ if __name__ == "__main__":
     optmodel.setObj(cost) # set objective function
     sol, obj = optmodel.solve() # solve
     # print res
-    print('Obj: {}'.format(obj))
+    print(f'Obj: {obj}')
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     optmodel.setObj(cost) # set objective function
     sol, obj = optmodel.solve() # solve
     # print res
-    print('Obj: {}'.format(obj))
+    print(f'Obj: {obj}')
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)

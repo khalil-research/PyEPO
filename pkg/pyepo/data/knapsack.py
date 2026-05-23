@@ -25,9 +25,9 @@ def genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed
     """
     # positive integer parameter
     if not isinstance(deg, int):
-        raise ValueError("deg = {} should be int.".format(deg))
+        raise ValueError(f"deg = {deg} should be int.")
     if deg <= 0:
-        raise ValueError("deg = {} should be positive.".format(deg))
+        raise ValueError(f"deg = {deg} should be positive.")
     # set seed
     rnd = np.random.RandomState(seed)
     # number of data points

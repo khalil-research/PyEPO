@@ -118,7 +118,7 @@ if __name__ == "__main__":
     optmodel.setObj(cost) # set objective function
     sol, obj = optmodel.solve() # solve
     # print res
-    print('Obj: {}'.format(obj))
+    print(f'Obj: {obj}')
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     optmodel.setObj(cost) # set objective function
     sol, obj = optmodel.solve() # solve
     # print res
-    print('Obj: {}'.format(obj))
+    print(f'Obj: {obj}')
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     optmodel.setObj(cost) # set objective function
     sol, obj = optmodel.solve() # solve
     # print res
-    print('Obj: {}'.format(obj))
+    print(f'Obj: {obj}')
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)

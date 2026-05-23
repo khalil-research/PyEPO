@@ -163,8 +163,8 @@ def getTspTour(edge_list, num_nodes, sol, threshold=1e-2):
     # all nodes must appear in the active edge set
     if len(edges) != num_nodes:
         raise ValueError(
-            "Solution does not cover all {} nodes (got {}); the model returned "
-            "an infeasible TSP solution.".format(num_nodes, len(edges)))
+            f"Solution does not cover all {num_nodes} nodes (got {len(edges)}); "
+            "the model returned an infeasible TSP solution.")
     # walk the tour starting from the first node with an active edge
     start = list(edges.keys())[0]
     visited = {start}

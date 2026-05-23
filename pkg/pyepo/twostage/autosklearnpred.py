@@ -100,5 +100,5 @@ def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
                                          include={"data_preprocessor": ["NoPreprocessing"],
                                                   "feature_preprocessor": ["no_preprocessing"]})
     else:
-        raise ValueError("Invalid metric {}. Metric should be 'regret' or 'mse'.".format(metric))
+        raise ValueError(f"Invalid metric {metric}. Metric should be 'regret' or 'mse'.")
     return regressor

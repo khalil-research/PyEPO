@@ -55,9 +55,9 @@ class shortestPathModel(optOrtModel):
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
             raise RuntimeError(
-                "Solver '{}' is not available in OR-Tools.".format(self.solver))
+                f"Solver '{self.solver}' is not available in OR-Tools.")
         # variables
-        x = {e: m.NumVar(0, 1, "x_{}".format(e)) for e in self.arcs}
+        x = {e: m.NumVar(0, 1, f"x_{e}") for e in self.arcs}
         # sense
         self.modelSense = EPO.MINIMIZE
         # build adjacency lists
@@ -116,7 +116,7 @@ class shortestPathCpModel(optOrtCpModel):
         # create a model
         m = cp_model.CpModel()
         # variables (boolean: 0 or 1 flow)
-        x = {e: m.NewBoolVar("x_{}".format(e)) for e in self.arcs}
+        x = {e: m.NewBoolVar(f"x_{e}") for e in self.arcs}
         # sense
         self.modelSense = EPO.MINIMIZE
         # build adjacency lists
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     optmodel = optmodel.copy()
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print("Obj: {}".format(obj))
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     optmodel2 = optmodel.addConstr([1] * 40, 30)
     optmodel2.setObj(cost)
     sol, obj = optmodel2.solve()
-    print("Obj: {}".format(obj))
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     optmodel_cp = optmodel_cp.copy()
     optmodel_cp.setObj(cost)
     sol, obj = optmodel_cp.solve()
-    print("Obj: {}".format(obj))
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel_cp.arcs):
         if sol[i] > 1e-3:
             print(e)

@@ -73,7 +73,7 @@ class optOrtModel(optModel):
         status = self._model.Solve()
         if status != pywraplp.Solver.OPTIMAL:
             raise RuntimeError(
-                "Solver did not find an optimal solution. Status: {}".format(status))
+                f"Solver did not find an optimal solution. Status: {status}")
         sol = np.array([self.x[k].solution_value() for k in self.x], dtype=np.float32)
         obj = self._model.Objective().Value()
         return sol, obj

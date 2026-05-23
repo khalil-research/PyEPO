@@ -67,8 +67,7 @@ class optOrtCpModel(optModel):
         status = solver.Solve(self._model)
         if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             raise RuntimeError(
-                "Solver did not find a solution. Status: {}".format(
-                    solver.StatusName(status)))
+                f"Solver did not find a solution. Status: {solver.StatusName(status)}")
         sol = np.array([solver.Value(self.x[k]) for k in self.x], dtype=np.float32)
         obj = solver.ObjectiveValue() / self._OBJ_SCALE
         return sol, obj

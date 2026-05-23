@@ -59,9 +59,9 @@ class knapsackModel(optOrtModel):
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
             raise RuntimeError(
-                "Solver '{}' is not available in OR-Tools.".format(self.solver))
+                f"Solver '{self.solver}' is not available in OR-Tools.")
         # variables
-        x = {i: m.BoolVar("x_{}".format(i)) for i in self.items}
+        x = {i: m.BoolVar(f"x_{i}") for i in self.items}
         # constraints
         for i in range(len(self.capacity)):
             m.Add(sum(float(self.weights[i, j]) * x[j]
@@ -93,9 +93,9 @@ class knapsackModelRel(knapsackModel):
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
             raise RuntimeError(
-                "Solver '{}' is not available in OR-Tools.".format(self.solver))
+                f"Solver '{self.solver}' is not available in OR-Tools.")
         # variables (continuous)
-        x = {i: m.NumVar(0, 1, "x_{}".format(i)) for i in self.items}
+        x = {i: m.NumVar(0, 1, f"x_{i}") for i in self.items}
         # constraints
         for i in range(len(self.capacity)):
             m.Add(sum(float(self.weights[i, j]) * x[j]
@@ -147,7 +147,7 @@ class knapsackCpModel(optOrtCpModel):
         # create a model
         m = cp_model.CpModel()
         # variables
-        x = {i: m.NewBoolVar("x_{}".format(i)) for i in self.items}
+        x = {i: m.NewBoolVar(f"x_{i}") for i in self.items}
         # constraints (integer coefficients)
         for i in range(len(self.capacity)):
             m.Add(sum(int(self.weights[i, j]) * x[j]
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     optmodel = optmodel.copy()
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print("Obj: {}".format(obj))
+    print(f"Obj: {obj}")
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
@@ -180,17 +180,17 @@ if __name__ == "__main__":
     optmodel_rel = optmodel.relax()
     optmodel_rel.setObj(cost)
     sol, obj = optmodel_rel.solve()
-    print("Obj: {}".format(obj))
+    print(f"Obj: {obj}")
     for i in range(16):
         if sol[i] > 1e-3:
-            print("{}: {:.4f}".format(i, sol[i]))
+            print(f"{i}: {sol[i]:.4f}")
 
     # add constraint
     print("\n=== pywraplp + addConstr ===")
     optmodel2 = optmodel.addConstr([1] * 16, 5)
     optmodel2.setObj(cost)
     sol, obj = optmodel2.solve()
-    print("Obj: {}".format(obj))
+    print(f"Obj: {obj}")
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     optmodel_cp = optmodel_cp.copy()
     optmodel_cp.setObj(cost)
     sol, obj = optmodel_cp.solve()
-    print("Obj: {}".format(obj))
+    print(f"Obj: {obj}")
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)

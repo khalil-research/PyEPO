@@ -48,8 +48,8 @@ class optModule(nn.Module):
             processes = 1
         # number of processes
         if processes < 0 or processes > mp.cpu_count():
-            raise ValueError("Invalid processors number {}, only {} cores.".
-                format(processes, mp.cpu_count()))
+            raise ValueError(
+                f"Invalid processors number {processes}, only {mp.cpu_count()} cores.")
         self.processes = mp.cpu_count() if processes == 0 else processes
         # single-core
         if self.processes == 1:
@@ -63,8 +63,8 @@ class optModule(nn.Module):
         # solution pool
         self.solve_ratio = solve_ratio
         if (self.solve_ratio < 0) or (self.solve_ratio > 1):
-            raise ValueError("Invalid solving ratio {}. It should be between 0 and 1.".
-                format(self.solve_ratio))
+            raise ValueError(
+                f"Invalid solving ratio {self.solve_ratio}. It should be between 0 and 1.")
         self.solpool = None
         self._solset = set()
         if self.solve_ratio < 1 or require_solpool: # init solution pool
@@ -98,6 +98,6 @@ class optModule(nn.Module):
         elif self.reduction == "none":
             return loss
         else:
-            raise ValueError("No reduction '{}'.".format(self.reduction))
+            raise ValueError(f"No reduction '{self.reduction}'.")
 
 

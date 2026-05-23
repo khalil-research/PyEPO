@@ -49,18 +49,18 @@ class LinearRegression(nn.Module):
 
 def test_model_ops(name, optmodel, cost):
     """Test copy, solve, and addConstr for a given model."""
-    print("\n=== Model Ops: {} ===".format(name))
+    print(f"\n=== Model Ops: {name} ===")
 
     # solve
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print("  Obj: {:.4f}  Sol sum: {:.4f}".format(obj, np.sum(sol)))
+    print(f"  Obj: {obj:.4f}  Sol sum: {np.sum(sol):.4f}")
 
     # copy
     copied = optmodel.copy()
     copied.setObj(cost)
     sol2, obj2 = copied.solve()
-    assert np.isclose(obj, obj2, atol=1e-3), "copy() changed objective: {} vs {}".format(obj, obj2)
+    assert np.isclose(obj, obj2, atol=1e-3), f"copy() changed objective: {obj} vs {obj2}"
     print("  copy() OK: obj matches")
 
     # addConstr
@@ -69,48 +69,48 @@ def test_model_ops(name, optmodel, cost):
     constrained = optmodel.addConstr(coefs, rhs)
     constrained.setObj(cost)
     sol3, obj3 = constrained.solve()
-    print("  addConstr() OK: new obj = {:.4f}".format(obj3))
+    print(f"  addConstr() OK: new obj = {obj3:.4f}")
 
     return True
 
 
 def test_shortestpath_backend(name, sp_model, num_arcs):
     """Test shortestpath model for a given backend."""
-    print("\n=== ShortestPath: {} ===".format(name))
+    print(f"\n=== ShortestPath: {name} ===")
     cost = np.random.RandomState(42).rand(num_arcs)
 
     sp_model.setObj(cost)
     sol, obj = sp_model.solve()
-    print("  Obj: {:.4f}".format(obj))
+    print(f"  Obj: {obj:.4f}")
 
     # copy
     copied = sp_model.copy()
     copied.setObj(cost)
     sol2, obj2 = copied.solve()
-    assert np.isclose(obj, obj2, atol=1e-3), "copy() mismatch: {} vs {}".format(obj, obj2)
+    assert np.isclose(obj, obj2, atol=1e-3), f"copy() mismatch: {obj} vs {obj2}"
     print("  copy() OK")
 
     # addConstr
     constrained = sp_model.addConstr([1] * num_arcs, num_arcs * 0.5)
     constrained.setObj(cost)
     sol3, obj3 = constrained.solve()
-    print("  addConstr() OK: new obj = {:.4f}".format(obj3))
+    print(f"  addConstr() OK: new obj = {obj3:.4f}")
 
 
 def test_portfolio_backend(name, portfolio_model, num_assets):
     """Test portfolio model for a given backend."""
-    print("\n=== Portfolio: {} ===".format(name))
+    print(f"\n=== Portfolio: {name} ===")
     cost = np.random.RandomState(42).rand(num_assets)
 
     portfolio_model.setObj(cost)
     sol, obj = portfolio_model.solve()
-    print("  Obj: {:.4f}".format(obj))
+    print(f"  Obj: {obj:.4f}")
 
     # copy
     copied = portfolio_model.copy()
     copied.setObj(cost)
     sol2, obj2 = copied.solve()
-    assert np.isclose(obj, obj2, atol=1e-3), "copy() mismatch: {} vs {}".format(obj, obj2)
+    assert np.isclose(obj, obj2, atol=1e-3), f"copy() mismatch: {obj} vs {obj2}"
     print("  copy() OK")
 
     # addConstr (restrict first 3 assets only to avoid infeasibility with budget constraint)
@@ -119,41 +119,41 @@ def test_portfolio_backend(name, portfolio_model, num_assets):
     constrained = portfolio_model.addConstr(coefs, 0.5)
     constrained.setObj(cost)
     sol3, obj3 = constrained.solve()
-    print("  addConstr() OK: new obj = {:.4f}".format(obj3))
+    print(f"  addConstr() OK: new obj = {obj3:.4f}")
 
 
 def test_tsp_backend(name, tsp_model, num_edges):
     """Test TSP model for a given backend."""
-    print("\n=== TSP: {} ===".format(name))
+    print(f"\n=== TSP: {name} ===")
     cost = np.random.RandomState(42).rand(num_edges)
 
     tsp_model.setObj(cost)
     sol, obj = tsp_model.solve()
-    print("  Obj: {:.4f}  Sol sum: {:.4f}".format(obj, np.sum(sol)))
+    print(f"  Obj: {obj:.4f}  Sol sum: {np.sum(sol):.4f}")
 
     # getTour
     tour = tsp_model.getTour(sol)
-    print("  Tour: {}".format(tour))
+    print(f"  Tour: {tour}")
 
     # copy
     copied = tsp_model.copy()
     copied.setObj(cost)
     sol2, obj2 = copied.solve()
-    assert np.isclose(obj, obj2, atol=1e-3), "copy() mismatch: {} vs {}".format(obj, obj2)
+    assert np.isclose(obj, obj2, atol=1e-3), f"copy() mismatch: {obj} vs {obj2}"
     print("  copy() OK")
 
     # addConstr
     constrained = tsp_model.addConstr([1] * num_edges, num_edges - 1)
     constrained.setObj(cost)
     sol3, obj3 = constrained.solve()
-    print("  addConstr() OK: new obj = {:.4f}".format(obj3))
+    print(f"  addConstr() OK: new obj = {obj3:.4f}")
 
     return obj
 
 
 if __name__ == "__main__":
 
-    print("Using device: {}".format(device))
+    print(f"Using device: {device}")
 
     # generate data
     num_data = 1000 # number of data
@@ -176,7 +176,7 @@ if __name__ == "__main__":
         """Train with a given loss function and print results."""
         pred = LinearRegression(num_feat, num_item).to(device)
         opt = torch.optim.Adam(pred.parameters(), lr=lr)
-        print("\n--- {} ---".format(name))
+        print(f"\n--- {name} ---")
         for epoch in range(num_epochs):
             epoch_loss = 0
             num_batches = 0
@@ -191,11 +191,10 @@ if __name__ == "__main__":
                 epoch_loss += loss.item()
                 num_batches += 1
             avg_loss = epoch_loss / num_batches
-            print("  Epoch {:3d}/{}: avg loss = {:.4f}".format(
-                epoch + 1, num_epochs, avg_loss))
+            print(f"  Epoch {epoch + 1:3d}/{num_epochs}: avg loss = {avg_loss:.4f}")
         reg = pyepo.metric.regret(pred, optmodel, dataloader)
         ms = pyepo.metric.MSE(pred, dataloader)
-        print("  Regret: {:.4f}  MSE: {:.4f}".format(reg, ms))
+        print(f"  Regret: {reg:.4f}  MSE: {ms:.4f}")
 
     # ============================================================
     # Part A: Model operations (copy, addConstr) across backends
@@ -230,7 +229,7 @@ if __name__ == "__main__":
         test_model_ops("Pyomo knapsack", omo_ks, cost_knapsack)
         test_shortestpath_backend("Pyomo", omoSP(grid, solver="gurobi"), num_arcs)
     except ImportError as e:
-        print("\n  [SKIP] Pyomo not available: {}".format(e))
+        print(f"\n  [SKIP] Pyomo not available: {e}")
 
     # A5. COPT backend
     try:
@@ -241,7 +240,7 @@ if __name__ == "__main__":
         test_model_ops("COPT knapsack", copt_ks, cost_knapsack)
         test_shortestpath_backend("COPT", coptSP(grid), num_arcs)
     except ImportError as e:
-        print("\n  [SKIP] COPT not available: {}".format(e))
+        print(f"\n  [SKIP] COPT not available: {e}")
 
     # A6. MPAX backend
     try:
@@ -250,7 +249,7 @@ if __name__ == "__main__":
         mpax_sp = mpaxSP(grid)
         test_shortestpath_backend("MPAX", mpax_sp, num_arcs)
     except (ImportError, NameError) as e:
-        print("\n  [SKIP] MPAX not available: {}".format(e))
+        print(f"\n  [SKIP] MPAX not available: {e}")
 
     # A6b. OR-Tools pywraplp backend
     try:
@@ -261,7 +260,7 @@ if __name__ == "__main__":
         test_model_ops("OR-Tools knapsack", ort_ks, cost_knapsack)
         test_shortestpath_backend("OR-Tools", ortSP(grid), num_arcs)
     except ImportError as e:
-        print("\n  [SKIP] OR-Tools not available: {}".format(e))
+        print(f"\n  [SKIP] OR-Tools not available: {e}")
 
     # A6c. OR-Tools CP-SAT backend
     try:
@@ -274,7 +273,7 @@ if __name__ == "__main__":
         test_model_ops("OR-Tools CP-SAT knapsack", ort_cp_ks, cost_knapsack)
         test_shortestpath_backend("OR-Tools CP-SAT", ortCpSP(grid), num_arcs)
     except ImportError as e:
-        print("\n  [SKIP] OR-Tools CP-SAT not available: {}".format(e))
+        print(f"\n  [SKIP] OR-Tools CP-SAT not available: {e}")
 
     # A7. Cross-backend consistency (Gurobi vs Pyomo vs COPT shortestpath)
     print("\n=== Cross-backend ShortestPath Consistency ===")
@@ -282,47 +281,47 @@ if __name__ == "__main__":
     grb_sp = grbSP(grid)
     grb_sp.setObj(sp_cost)
     _, grb_obj = grb_sp.solve()
-    print("  Gurobi obj: {:.6f}".format(grb_obj))
+    print(f"  Gurobi obj: {grb_obj:.6f}")
     try:
         omo_sp = omoSP(grid, solver="gurobi")
         omo_sp.setObj(sp_cost)
         _, omo_obj = omo_sp.solve()
         assert np.isclose(grb_obj, omo_obj, atol=1e-3), "Pyomo mismatch"
-        print("  Pyomo  obj: {:.6f} (matches)".format(omo_obj))
+        print(f"  Pyomo  obj: {omo_obj:.6f} (matches)")
     except Exception as e:
-        print("  Pyomo: {}".format(e))
+        print(f"  Pyomo: {e}")
     try:
         copt_sp = coptSP(grid)
         copt_sp.setObj(sp_cost)
         _, copt_obj = copt_sp.solve()
         assert np.isclose(grb_obj, copt_obj, atol=1e-3), "COPT mismatch"
-        print("  COPT   obj: {:.6f} (matches)".format(copt_obj))
+        print(f"  COPT   obj: {copt_obj:.6f} (matches)")
     except Exception as e:
-        print("  COPT: {}".format(e))
+        print(f"  COPT: {e}")
     try:
         mpax_sp2 = mpaxSP(grid)
         mpax_sp2.setObj(sp_cost)
         _, mpax_obj = mpax_sp2.solve()
         assert np.isclose(grb_obj, mpax_obj, atol=1e-2), "MPAX mismatch"
-        print("  MPAX   obj: {:.6f} (matches)".format(mpax_obj))
+        print(f"  MPAX   obj: {mpax_obj:.6f} (matches)")
     except Exception as e:
-        print("  MPAX: {}".format(e))
+        print(f"  MPAX: {e}")
     try:
         ort_sp2 = ortSP(grid)
         ort_sp2.setObj(sp_cost)
         _, ort_obj = ort_sp2.solve()
         assert np.isclose(grb_obj, ort_obj, atol=1e-3), "OR-Tools mismatch"
-        print("  ORT    obj: {:.6f} (matches)".format(ort_obj))
+        print(f"  ORT    obj: {ort_obj:.6f} (matches)")
     except Exception as e:
-        print("  ORT: {}".format(e))
+        print(f"  ORT: {e}")
     try:
         ort_cp_sp2 = ortCpSP(grid)
         ort_cp_sp2.setObj(sp_cost)
         _, ort_cp_obj = ort_cp_sp2.solve()
         assert np.isclose(grb_obj, ort_cp_obj, atol=1e-2), "OR-Tools CP-SAT mismatch"
-        print("  ORT-CP obj: {:.6f} (matches)".format(ort_cp_obj))
+        print(f"  ORT-CP obj: {ort_cp_obj:.6f} (matches)")
     except Exception as e:
-        print("  ORT-CP: {}".format(e))
+        print(f"  ORT-CP: {e}")
 
     # A8. Gurobi portfolio
     num_assets = 50
@@ -351,7 +350,7 @@ if __name__ == "__main__":
         test_tsp_backend("Pyomo TSP-GG", omoTspGG(num_nodes, solver="gurobi"), num_edges)
         test_tsp_backend("Pyomo TSP-MTZ", omoTspMTZ(num_nodes, solver="gurobi"), num_edges)
     except ImportError as e:
-        print("\n  [SKIP] Pyomo portfolio/TSP not available: {}".format(e))
+        print(f"\n  [SKIP] Pyomo portfolio/TSP not available: {e}")
 
     # A11. COPT portfolio + TSP
     try:
@@ -364,7 +363,7 @@ if __name__ == "__main__":
         test_tsp_backend("COPT TSP-MTZ", coptTspMTZ(num_nodes), num_edges)
         test_tsp_backend("COPT TSP-DFJ", coptTspDFJ(num_nodes), num_edges)
     except ImportError as e:
-        print("\n  [SKIP] COPT portfolio/TSP not available: {}".format(e))
+        print(f"\n  [SKIP] COPT portfolio/TSP not available: {e}")
 
     # A12. Cross-backend portfolio consistency
     print("\n=== Cross-backend Portfolio Consistency ===")
@@ -372,46 +371,46 @@ if __name__ == "__main__":
     grb_pf2 = grbPortfolio(num_assets, covariance)
     grb_pf2.setObj(pf_cost)
     _, grb_pf_obj = grb_pf2.solve()
-    print("  Gurobi obj: {:.6f}".format(grb_pf_obj))
+    print(f"  Gurobi obj: {grb_pf_obj:.6f}")
     try:
         omo_pf2 = omoPortfolio(num_assets, covariance, solver="gurobi")
         omo_pf2.setObj(pf_cost)
         _, omo_pf_obj = omo_pf2.solve()
         assert np.isclose(grb_pf_obj, omo_pf_obj, atol=1e-3), "Pyomo portfolio mismatch"
-        print("  Pyomo  obj: {:.6f} (matches)".format(omo_pf_obj))
+        print(f"  Pyomo  obj: {omo_pf_obj:.6f} (matches)")
     except Exception as e:
-        print("  Pyomo: {}".format(e))
+        print(f"  Pyomo: {e}")
     try:
         copt_pf2 = coptPortfolio(num_assets, covariance)
         copt_pf2.setObj(pf_cost)
         _, copt_pf_obj = copt_pf2.solve()
         assert np.isclose(grb_pf_obj, copt_pf_obj, atol=1e-3), "COPT portfolio mismatch"
-        print("  COPT   obj: {:.6f} (matches)".format(copt_pf_obj))
+        print(f"  COPT   obj: {copt_pf_obj:.6f} (matches)")
     except Exception as e:
-        print("  COPT: {}".format(e))
+        print(f"  COPT: {e}")
 
     # A13. Cross-backend TSP consistency
     print("\n=== Cross-backend TSP Consistency ===")
     grb_gg = grbTspGG(num_nodes)
     grb_gg.setObj(tsp_cost)
     _, grb_tsp_obj = grb_gg.solve()
-    print("  Gurobi GG obj: {:.6f}".format(grb_tsp_obj))
+    print(f"  Gurobi GG obj: {grb_tsp_obj:.6f}")
     try:
         omo_gg = omoTspGG(num_nodes, solver="gurobi")
         omo_gg.setObj(tsp_cost)
         _, omo_tsp_obj = omo_gg.solve()
         assert np.isclose(grb_tsp_obj, omo_tsp_obj, atol=1e-3), "Pyomo TSP mismatch"
-        print("  Pyomo  GG obj: {:.6f} (matches)".format(omo_tsp_obj))
+        print(f"  Pyomo  GG obj: {omo_tsp_obj:.6f} (matches)")
     except Exception as e:
-        print("  Pyomo: {}".format(e))
+        print(f"  Pyomo: {e}")
     try:
         copt_gg = coptTspGG(num_nodes)
         copt_gg.setObj(tsp_cost)
         _, copt_tsp_obj = copt_gg.solve()
         assert np.isclose(grb_tsp_obj, copt_tsp_obj, atol=1e-3), "COPT TSP mismatch"
-        print("  COPT   GG obj: {:.6f} (matches)".format(copt_tsp_obj))
+        print(f"  COPT   GG obj: {copt_tsp_obj:.6f} (matches)")
     except Exception as e:
-        print("  COPT: {}".format(e))
+        print(f"  COPT: {e}")
 
     # ============================================================
     # Part B: Training with different loss functions (Gurobi)
@@ -515,12 +514,11 @@ if __name__ == "__main__":
                 opt_omo.step()
                 epoch_loss += loss.item()
                 num_batches += 1
-            print("  Epoch {:3d}/{}: avg loss = {:.4f}".format(
-                epoch + 1, num_epochs, epoch_loss / num_batches))
+            print(f"  Epoch {epoch + 1:3d}/{num_epochs}: avg loss = {epoch_loss / num_batches:.4f}")
         reg = pyepo.metric.regret(pred_omo, omo_optmodel, omo_dataloader)
-        print("  Regret: {:.4f}".format(reg))
+        print(f"  Regret: {reg:.4f}")
     except ImportError as e:
-        print("\n[SKIP] Pyomo not available: {}".format(e))
+        print(f"\n[SKIP] Pyomo not available: {e}")
 
     # ============================================================
     # Part D: Training with COPT backend (SPO+ only)
@@ -552,12 +550,11 @@ if __name__ == "__main__":
                 opt_copt.step()
                 epoch_loss += loss.item()
                 num_batches += 1
-            print("  Epoch {:3d}/{}: avg loss = {:.4f}".format(
-                epoch + 1, num_epochs, epoch_loss / num_batches))
+            print(f"  Epoch {epoch + 1:3d}/{num_epochs}: avg loss = {epoch_loss / num_batches:.4f}")
         reg = pyepo.metric.regret(pred_copt, copt_optmodel, copt_dataloader)
-        print("  Regret: {:.4f}".format(reg))
+        print(f"  Regret: {reg:.4f}")
     except ImportError as e:
-        print("\n[SKIP] COPT not available: {}".format(e))
+        print(f"\n[SKIP] COPT not available: {e}")
 
     # ============================================================
     # Part E: Training with OR-Tools backend (SPO+ only)
@@ -589,12 +586,11 @@ if __name__ == "__main__":
                 opt_ort.step()
                 epoch_loss += loss.item()
                 num_batches += 1
-            print("  Epoch {:3d}/{}: avg loss = {:.4f}".format(
-                epoch + 1, num_epochs, epoch_loss / num_batches))
+            print(f"  Epoch {epoch + 1:3d}/{num_epochs}: avg loss = {epoch_loss / num_batches:.4f}")
         reg = pyepo.metric.regret(pred_ort, ort_optmodel, ort_dataloader)
-        print("  Regret: {:.4f}".format(reg))
+        print(f"  Regret: {reg:.4f}")
     except ImportError as e:
-        print("\n[SKIP] OR-Tools not available: {}".format(e))
+        print(f"\n[SKIP] OR-Tools not available: {e}")
 
     print("\n" + "="*60)
     print("All tests completed!")
