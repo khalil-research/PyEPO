@@ -8,6 +8,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
+from pyepo.model.opt import costToNumpy
 
 
 def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
@@ -36,9 +37,8 @@ def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
             x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
             # pred cost
             with torch.no_grad():
-                cp = predmodel(x).cpu().numpy()
-            # batch convert to numpy
-            c_np = c.cpu().numpy()
+                cp = costToNumpy(predmodel(x))
+            c_np = costToNumpy(c)
             # solve
             for j in range(cp.shape[0]):
                 # accumulate loss
@@ -74,7 +74,7 @@ def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5, max
     # opt sol for pred cost
     optmodel.setObj(cp)
     sol, objp = optmodel.solve()
-    # to numpy
+    # MPAX backend may return a torch tensor; convert without dtype coercion
     if isinstance(sol, torch.Tensor):
         sol = sol.detach().cpu().numpy()
     objp = np.ceil(np.dot(cp, sol.T))

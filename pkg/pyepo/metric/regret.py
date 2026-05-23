@@ -8,6 +8,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
+from pyepo.model.opt import costToNumpy
 
 def regret(predmodel, optmodel, dataloader):
     """
@@ -34,9 +35,8 @@ def regret(predmodel, optmodel, dataloader):
             x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
             # predict
             with torch.no_grad():
-                cp = predmodel(x).cpu().numpy()
-            # batch convert to numpy
-            c_np = c.cpu().numpy()
+                cp = costToNumpy(predmodel(x))
+            c_np = costToNumpy(c)
             # solve
             for j in range(cp.shape[0]):
                 # accumulate loss
@@ -65,7 +65,8 @@ def calRegret(optmodel, pred_cost, true_cost, true_obj):
     # opt sol for pred cost
     optmodel.setObj(pred_cost)
     sol, _ = optmodel.solve()
-    # to numpy
+    # solver may return a torch tensor (MPAX backend) — convert without
+    # auto-casting Python lists to float32 (would silently downcast regret)
     if isinstance(sol, torch.Tensor):
         sol = sol.detach().cpu().numpy()
     # obj with true cost

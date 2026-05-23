@@ -9,6 +9,7 @@ import torch
 
 from pyepo import EPO
 from pyepo.utils import getArgs
+from pyepo.model.opt import costToNumpy
 from pyepo.model.mpax import optMpaxModel
 
 
@@ -69,7 +70,7 @@ def _solve_batch(cp, optmodel, processes, pool):
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     # single-core
     elif processes == 1:
-        cp = cp.detach().cpu().numpy() if isinstance(cp, torch.Tensor) else np.asarray(cp)
+        cp = costToNumpy(cp)
         sol = []
         obj = []
         for i in range(ins_num):
@@ -83,7 +84,7 @@ def _solve_batch(cp, optmodel, processes, pool):
         obj = torch.tensor(obj, dtype=torch.float32, device=device)
     # multi-core
     else:
-        cp = cp.detach().cpu().numpy() if isinstance(cp, torch.Tensor) else np.asarray(cp)
+        cp = costToNumpy(cp)
         # get class
         model_type = type(optmodel)
         # get args
