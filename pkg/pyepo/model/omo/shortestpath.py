@@ -48,7 +48,7 @@ class shortestPathModel(optOmoModel):
         # parameters
         m.arcs = pe.Set(initialize=self.arcs)
         # variables
-        x = pe.Var(m.arcs, domain=pe.PositiveReals, bounds=(0, 1))
+        x = pe.Var(m.arcs, domain=pe.NonNegativeReals, bounds=(0, 1))
         m.x = x
         # build adjacency lists
         out_arcs = defaultdict(list)
