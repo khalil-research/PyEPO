@@ -1,0 +1,61 @@
+pyepo.model.utils
+=================
+
+.. py:module:: pyepo.model.utils
+
+.. autoapi-nested-parse::
+
+   Problem-level helpers for optimization model construction.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.utils.unionFind
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.model.utils.getTspTour
+
+
+Module Contents
+---------------
+
+.. py:class:: unionFind(n: int)
+
+   Union-Find data structure for cycle detection in graphs
+
+
+   .. py:attribute:: parent
+
+
+   .. py:method:: find(i: int) -> int
+
+
+   .. py:method:: union(i: int, j: int) -> bool
+
+
+.. py:function:: getTspTour(edge_list: list[tuple[int, int]], num_nodes: int, sol: numpy.ndarray | torch.Tensor | list, threshold: float = 0.01) -> list[int]
+
+   Reconstruct a TSP tour from an undirected edge-selection vector.
+
+   :param edge_list: undirected edges of the model, ordered to match ``sol``
+   :param num_nodes: number of nodes in the TSP instance
+   :param sol: solution values aligned with ``edge_list``; an edge is
+               considered active when its value exceeds ``threshold``
+   :param threshold: activation threshold for an edge
+
+   :returns: node sequence of the tour (closes back to node 0 if reachable)
+   :rtype: list
+
+   :raises ValueError: if the solution does not form a single connected tour
+       (skips nodes or contains disconnected subtours).
+
+

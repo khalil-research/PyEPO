@@ -15,33 +15,10 @@ Classes
 .. autoapisummary::
 
    pyepo.model.opt.optModel
-   pyepo.model.opt.unionFind
-
-
-Functions
----------
-
-.. autoapisummary::
-
-   pyepo.model.opt.costToNumpy
-   pyepo.model.opt.getTspTour
 
 
 Module Contents
 ---------------
-
-.. py:function:: costToNumpy(c: numpy.ndarray | torch.Tensor | list, dtype=np.float32) -> numpy.ndarray
-
-   Normalize a cost vector to a numpy array, detaching torch tensors as needed.
-
-   :param c: cost vector
-   :param dtype: target dtype when ``c`` is not already a tensor; torch
-                 tensors are converted via ``.detach().cpu().numpy()`` and keep their
-                 existing dtype.
-
-   :returns: numpy cost vector
-   :rtype: np.ndarray
-
 
 .. py:class:: optModel
 
@@ -116,36 +93,5 @@ Module Contents
 
       A method to relax the MIP model. Subclasses should override.
 
-
-
-.. py:class:: unionFind(n: int)
-
-   Union-Find data structure for cycle detection in graphs
-
-
-   .. py:attribute:: parent
-
-
-   .. py:method:: find(i: int) -> int
-
-
-   .. py:method:: union(i: int, j: int) -> bool
-
-
-.. py:function:: getTspTour(edge_list: list[tuple[int, int]], num_nodes: int, sol: numpy.ndarray | torch.Tensor | list, threshold: float = 0.01) -> list[int]
-
-   Reconstruct a TSP tour from an undirected edge-selection vector.
-
-   :param edge_list: undirected edges of the model, ordered to match ``sol``
-   :param num_nodes: number of nodes in the TSP instance
-   :param sol: solution values aligned with ``edge_list``; an edge is
-               considered active when its value exceeds ``threshold``
-   :param threshold: activation threshold for an edge
-
-   :returns: node sequence of the tour (closes back to node 0 if reachable)
-   :rtype: list
-
-   :raises ValueError: if the solution does not form a single connected tour
-       (skips nodes or contains disconnected subtours).
 
 

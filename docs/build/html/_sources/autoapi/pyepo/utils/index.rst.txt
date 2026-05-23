@@ -5,7 +5,7 @@ pyepo.utils
 
 .. autoapi-nested-parse::
 
-   Utility function
+   Package-wide utility functions
 
 
 
@@ -15,6 +15,7 @@ Functions
 .. autoapisummary::
 
    pyepo.utils.getArgs
+   pyepo.utils.costToNumpy
 
 
 Module Contents
@@ -28,5 +29,18 @@ Module Contents
 
    :returns: model args
    :rtype: dict
+
+
+.. py:function:: costToNumpy(c: numpy.ndarray | torch.Tensor | list, dtype=np.float32) -> numpy.ndarray
+
+   Normalize a cost vector to a numpy array, detaching torch tensors as needed.
+
+   :param c: cost vector
+   :param dtype: target dtype when ``c`` is not already a tensor; torch
+                 tensors are converted via ``.detach().cpu().numpy()`` and keep their
+                 existing dtype.
+
+   :returns: numpy cost vector
+   :rtype: np.ndarray
 
 

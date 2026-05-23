@@ -40,11 +40,11 @@ Module Contents
 
 
 
-   .. py:method:: solve() -> tuple[list, float]
+   .. py:method:: solve() -> tuple[numpy.ndarray, float]
 
       A method to solve the model
 
-      :returns: optimal solution (list) and objective value (float)
+      :returns: optimal solution and objective value
       :rtype: tuple
 
 
