@@ -4,11 +4,15 @@
 Unambiguous regret loss
 """
 
+import logging
+
 import numpy as np
 import torch
 
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy
+
+logger = logging.getLogger(__name__)
 
 
 def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
@@ -89,10 +93,13 @@ def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5, max
     try:
         wst_optmodel.setObj(-true_cost)
         _, obj = wst_optmodel.solve()
-    except Exception:
-        tolerance *= 10
+    except Exception as e:
+        new_tolerance = tolerance * 10
+        logger.warning(
+            "calUnambRegret: solve failed (%s: %s); retrying with tolerance=%g (%d retries left)",
+            type(e).__name__, e, new_tolerance, max_iter - 1)
         return calUnambRegret(optmodel, pred_cost, true_cost, true_obj,
-                              tolerance=tolerance, max_iter=max_iter-1)
+                              tolerance=new_tolerance, max_iter=max_iter-1)
     obj = -obj
     # loss
     if optmodel.modelSense == EPO.MINIMIZE:
