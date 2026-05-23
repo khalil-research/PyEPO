@@ -28,7 +28,7 @@ def genData(
         seed: random seed
 
     Returns:
-        tuple: data features (np.ndarray), costs (np.ndarray)
+        tuple: covariance matrix (np.ndarray), data features (np.ndarray), mean returns (np.ndarray)
     """
     # positive integer parameter
     if not isinstance(deg, int):
