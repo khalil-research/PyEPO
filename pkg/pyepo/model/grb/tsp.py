@@ -18,6 +18,7 @@ except ImportError:
 
 from pyepo.model.grb.grbmodel import optGrbModel
 from pyepo.model.utils import getTspTour, unionFind
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
@@ -116,6 +117,10 @@ class tspGGModel(tspABModel):
             for i in self.nodes[1:]
         )
         m.addConstrs(y[i, j] <= (len(self.nodes) - 1) * x[i, j] for (i, j) in x if i != 0)
+        # cache (x[i,j], x[j,i]) pairs in cost-vector order for batch setAttr/getAttr
+        self._cost_vars: list = []
+        for i, j in self.edges:
+            self._cost_vars.extend([x[i, j], x[j, i]])
         return m, x
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
@@ -127,21 +132,17 @@ class tspGGModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        obj = gp.quicksum(
-            c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges)
-        )
-        self._model.setObjective(obj)
+        c = costToNumpy(c)
+        # each undirected edge maps to 2 directed Vars; both get coefficient c[k]
+        self._model.setAttr("Obj", self._cost_vars, np.repeat(c, 2).tolist())
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve model
         """
-        self._model.update()
         self._model.optimize()
-        sol = np.zeros(self.num_cost, dtype=np.uint8)
-        for k, (i, j) in enumerate(self.edges):
-            if self.x[i, j].x > 1e-2 or self.x[j, i].x > 1e-2:
-                sol[k] = 1
+        xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
+        sol = (xvals > 1e-2).any(axis=1).astype(np.uint8)
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
@@ -213,6 +214,10 @@ class tspGGModelRel(tspGGModel):
             for i in self.nodes[1:]
         )
         m.addConstrs(y[i, j] <= (len(self.nodes) - 1) * x[i, j] for (i, j) in x if i != 0)
+        # cache (x[i,j], x[j,i]) pairs in cost-vector order for batch setAttr/getAttr
+        self._cost_vars: list = []
+        for i, j in self.edges:
+            self._cost_vars.extend([x[i, j], x[j, i]])
         return m, x
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -222,11 +227,9 @@ class tspGGModelRel(tspGGModel):
         Returns:
             tuple: optimal solution (list) and objective value (float)
         """
-        self._model.update()
         self._model.optimize()
-        sol = np.zeros(self.num_cost)
-        for k, (i, j) in enumerate(self.edges):
-            sol[k] = self.x[i, j].x + self.x[j, i].x
+        xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
+        sol = xvals.sum(axis=1)
         return sol, self._model.objVal
 
     def relax(self) -> tspABModel:
@@ -274,6 +277,8 @@ class tspDFJModel(tspABModel):
         m._x = x
         m._n = len(self.nodes)
         m.Params.lazyConstraints = 1
+        # one unique Var per undirected edge (x[j,i] aliases x[i,j])
+        self._cost_vars: list = [x[e] for e in self.edges]
         return m, x
 
     @staticmethod
@@ -308,19 +313,16 @@ class tspDFJModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.edges))
-        self._model.setObjective(obj)
+        c = costToNumpy(c)
+        self._model.setAttr("Obj", self._cost_vars, c.tolist())
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve model
         """
-        self._model.update()
         self._model.optimize(self._subtourelim)
-        sol = np.zeros(self.num_cost, dtype=np.uint8)
-        for i, e in enumerate(self.edges):
-            if self.x[e].x > 1e-2:
-                sol[i] = 1
+        xvals = np.asarray(self._model.getAttr("X", self._cost_vars))
+        sol = (xvals > 1e-2).astype(np.uint8)
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
@@ -381,6 +383,10 @@ class tspMTZModel(tspABModel):
             for (i, j) in directed_edges
             if (i != 0) and (j != 0)
         )
+        # cache (x[i,j], x[j,i]) pairs in cost-vector order for batch setAttr/getAttr
+        self._cost_vars: list = []
+        for i, j in self.edges:
+            self._cost_vars.extend([x[i, j], x[j, i]])
         return m, x
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
@@ -392,21 +398,17 @@ class tspMTZModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        obj = gp.quicksum(
-            c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges)
-        )
-        self._model.setObjective(obj)
+        c = costToNumpy(c)
+        # each undirected edge maps to 2 directed Vars; both get coefficient c[k]
+        self._model.setAttr("Obj", self._cost_vars, np.repeat(c, 2).tolist())
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve model
         """
-        self._model.update()
         self._model.optimize()
-        sol = np.zeros(self.num_cost, dtype=np.uint8)
-        for k, (i, j) in enumerate(self.edges):
-            if self.x[i, j].x > 1e-2 or self.x[j, i].x > 1e-2:
-                sol[k] = 1
+        xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
+        sol = (xvals > 1e-2).any(axis=1).astype(np.uint8)
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
@@ -478,6 +480,10 @@ class tspMTZModelRel(tspMTZModel):
             for (i, j) in directed_edges
             if (i != 0) and (j != 0)
         )
+        # cache (x[i,j], x[j,i]) pairs in cost-vector order for batch setAttr/getAttr
+        self._cost_vars: list = []
+        for i, j in self.edges:
+            self._cost_vars.extend([x[i, j], x[j, i]])
         return m, x
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -487,11 +493,9 @@ class tspMTZModelRel(tspMTZModel):
         Returns:
             tuple: optimal solution (list) and objective value (float)
         """
-        self._model.update()
         self._model.optimize()
-        sol = np.zeros(self.num_cost)
-        for k, (i, j) in enumerate(self.edges):
-            sol[k] = self.x[i, j].x + self.x[j, i].x
+        xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
+        sol = xvals.sum(axis=1)
         return sol, self._model.objVal
 
     def relax(self) -> tspABModel:

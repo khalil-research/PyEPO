@@ -42,6 +42,8 @@ class optOrtCpModel(optModel):
             )
         self._extra_constrs = []
         super().__init__()
+        # cache ordered Var list for batched weighted_sum / per-Var Value() loop
+        self._vars_list = list(self.x.values())
 
     def __repr__(self) -> str:
         return "optOrtCpModel " + self.__class__.__name__
@@ -57,9 +59,9 @@ class optOrtCpModel(optModel):
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c, dtype=np.float64)
         # scale float to int
-        scaled = (c * self._OBJ_SCALE).astype(np.int64)
-        # set obj
-        obj_expr = sum(int(scaled[i]) * self.x[k] for i, k in enumerate(self.x))
+        scaled = (c * self._OBJ_SCALE).astype(np.int64).tolist()
+        # C-level weighted sum avoids Python expression building per var
+        obj_expr = cp_model.LinearExpr.weighted_sum(self._vars_list, scaled)
         if self.modelSense == EPO.MAXIMIZE:
             self._model.Maximize(obj_expr)
         else:
@@ -78,7 +80,11 @@ class optOrtCpModel(optModel):
             raise RuntimeError(
                 f"Solver did not find a solution. Status: {solver.StatusName(status)}"
             )
-        sol = np.array([solver.Value(self.x[k]) for k in self.x], dtype=np.float32)
+        sol = np.fromiter(
+            (solver.Value(v) for v in self._vars_list),
+            dtype=np.float32,
+            count=self.num_cost,
+        )
         obj = solver.ObjectiveValue() / self._OBJ_SCALE
         return sol, obj
 
@@ -93,11 +99,11 @@ class optOrtCpModel(optModel):
         new_model._extra_constrs = list(self._extra_constrs)
         # rebuild model from scratch
         new_model._model, new_model.x = new_model._getModel()
+        new_model._vars_list = list(new_model.x.values())
         # replay extra constraints
         for coefs, rhs in new_model._extra_constrs:
-            new_model._model.Add(
-                sum(int(coefs[i]) * new_model.x[k] for i, k in enumerate(new_model.x)) <= int(rhs)
-            )
+            lhs = cp_model.LinearExpr.weighted_sum(new_model._vars_list, [int(c) for c in coefs])
+            new_model._model.Add(lhs <= int(rhs))
         return new_model
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optOrtCpModel:

@@ -48,6 +48,8 @@ class optOrtModel(optModel):
         super().__init__()
         # suppress output
         self._model.SuppressOutput()
+        # cache ordered Var list once for setCoefficient/solution_value loops
+        self._vars_list = list(self.x.values())
 
     def __repr__(self) -> str:
         return "optOrtModel " + self.__class__.__name__
@@ -62,11 +64,9 @@ class optOrtModel(optModel):
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c)
-        # set obj
         obj = self._model.Objective()
-        obj.Clear()
-        for i, k in enumerate(self.x):
-            obj.SetCoefficient(self.x[k], float(c[i]))
+        for v, coef in zip(self._vars_list, c.tolist()):
+            obj.SetCoefficient(v, coef)
         if self.modelSense == EPO.MAXIMIZE:
             obj.SetMaximization()
         else:
@@ -82,7 +82,11 @@ class optOrtModel(optModel):
         status = self._model.Solve()
         if status != pywraplp.Solver.OPTIMAL:
             raise RuntimeError(f"Solver did not find an optimal solution. Status: {status}")
-        sol = np.array([self.x[k].solution_value() for k in self.x], dtype=np.float32)
+        sol = np.fromiter(
+            (v.solution_value() for v in self._vars_list),
+            dtype=np.float32,
+            count=self.num_cost,
+        )
         obj = self._model.Objective().Value()
         return sol, obj
 
@@ -98,11 +102,12 @@ class optOrtModel(optModel):
         # rebuild model from scratch
         new_model._model, new_model.x = new_model._getModel()
         new_model._model.SuppressOutput()
+        new_model._vars_list = list(new_model.x.values())
         # replay extra constraints
         for coefs, rhs in new_model._extra_constrs:
             ct = new_model._model.Constraint(-new_model._model.infinity(), float(rhs))
-            for i, k in enumerate(new_model.x):
-                ct.SetCoefficient(new_model.x[k], float(coefs[i]))
+            for v, coef in zip(new_model._vars_list, coefs):
+                ct.SetCoefficient(v, float(coef))
         return new_model
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optOrtModel:
