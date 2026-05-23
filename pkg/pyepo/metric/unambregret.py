@@ -33,10 +33,10 @@ def unambRegret(
     A function to evaluate model performance with normalized unambiguous regret
 
     Args:
-        predmodel (nn): a regression neural network for cost prediction
-        optmodel (optModel): a PyEPO optimization model
-        dataloader (DataLoader): Torch dataloader from optDataSet
-        tolerance (float): tolerance for optimization
+        predmodel: a regression neural network for cost prediction
+        optmodel: a PyEPO optimization model
+        dataloader: Torch dataloader from optDataSet
+        tolerance: tolerance for optimization
 
     Returns:
         float: unambiguous regret loss
@@ -82,12 +82,12 @@ def calUnambRegret(
     A function to calculate normalized unambiguous regret for a batch
 
     Args:
-        optmodel (optModel): optimization model
-        pred_cost (np.ndarray): predicted costs
-        true_cost (np.ndarray): true costs
-        true_obj (float): true optimal objective value
-        tolerance (float): tolerance for precision
-        max_iter (int): maximum number of recursive retries
+        optmodel: optimization model
+        pred_cost: predicted costs
+        true_cost: true costs
+        true_obj: true optimal objective value
+        tolerance: tolerance for precision
+        max_iter: maximum number of recursive retries
 
     Returns:
         float: unambiguous regret loss

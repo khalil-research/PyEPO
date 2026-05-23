@@ -44,9 +44,9 @@ class knapsackModel(optOrtModel):
     ) -> None:
         """
         Args:
-            weights (np.ndarray / list): weights of items
-            capacity (np.ndarray / list): total capacity
-            solver (str): solver backend for pywraplp
+            weights: weights of items
+            capacity: total capacity
+            solver: solver backend for pywraplp
         """
         self.weights = np.asarray(weights)
         self.capacity = np.asarray(capacity)
@@ -135,8 +135,8 @@ class knapsackCpModel(optOrtCpModel):
     def __init__(self, weights: np.ndarray | list, capacity: np.ndarray | list) -> None:
         """
         Args:
-            weights (np.ndarray / list): weights of items
-            capacity (np.ndarray / list): total capacity
+            weights: weights of items
+            capacity: total capacity
         """
         self.weights = np.asarray(weights)
         self.capacity = np.asarray(capacity)

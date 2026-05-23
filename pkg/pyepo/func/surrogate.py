@@ -45,11 +45,11 @@ class SPOPlus(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            reduction (str): the reduction to apply to the output
-            dataset (None/optDataset): the training data
+            optmodel: a PyEPO optimization model
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            reduction: the reduction to apply to the output
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
 
@@ -87,11 +87,11 @@ class SPOPlusFunc(Function):
         Forward pass for SPO+
 
         Args:
-            pred_cost (torch.tensor): a batch of predicted values of the cost
-            true_cost (torch.tensor): a batch of true values of the cost
-            true_sol (torch.tensor): a batch of true optimal solutions
-            true_obj (torch.tensor): a batch of true optimal objective values
-            module (optModule): SPOPlus module
+            pred_cost: a batch of predicted values of the cost
+            true_cost: a batch of true values of the cost
+            true_sol: a batch of true optimal solutions
+            true_obj: a batch of true optimal objective values
+            module: SPOPlus module
 
         Returns:
             torch.tensor: SPO+ loss
@@ -162,13 +162,13 @@ class perturbationGradient(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            sigma (float): the amplitude of the finite difference width used for loss approximation
-            two_sides (bool): approximate gradient by two-sided perturbation or not
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            reduction (str): the reduction to apply to the output
-            dataset (None/optDataset): the training data
+            optmodel: a PyEPO optimization model
+            sigma: the amplitude of the finite difference width used for loss approximation
+            two_sides: approximate gradient by two-sided perturbation or not
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            reduction: the reduction to apply to the output
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # finite difference width

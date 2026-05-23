@@ -30,9 +30,9 @@ class portfolioModel(optCoptModel):
     ) -> None:
         """
         Args:
-            num_assets (int): number of assets
-            covariance (numpy.ndarray): covariance matrix of the returns
-            gamma (float): risk level parameter
+            num_assets: number of assets
+            covariance: covariance matrix of the returns
+            gamma: risk level parameter
         """
         self.num_assets = num_assets
         self.covariance = covariance
@@ -44,7 +44,7 @@ class portfolioModel(optCoptModel):
         A method to calculate the risk level
 
         Args:
-            gamma (float): risk level parameter
+            gamma: risk level parameter
 
         Returns:
             float: risk level

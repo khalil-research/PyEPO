@@ -20,12 +20,12 @@ def genData(
     A function to generate synthetic data and features for shortest path
 
     Args:
-        num_data (int): number of data points
-        num_features (int): dimension of features
-        grid (int, int): size of grid network
-        deg (int): data polynomial degree
-        noise_width (float): half width of data random noise
-        seed (int): random seed
+        num_data: number of data points
+        num_features: dimension of features
+        grid: size of grid network
+        deg: data polynomial degree
+        noise_width: half width of data random noise
+        seed: random seed
 
     Returns:
        tuple: data features (np.ndarray), costs (np.ndarray)

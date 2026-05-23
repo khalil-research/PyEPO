@@ -26,10 +26,10 @@ def SPOError(
     A function to calculate normalized true regret
 
     Args:
-        pred_cost (numpy.array): predicted costs
-        true_cost (numpy.array): true costs
-        model_type (ABCMeta): optModel class type
-        args (dict): optModel args
+        pred_cost: predicted costs
+        true_cost: true costs
+        model_type: optModel class type
+        args: optModel args
 
     Returns:
         float: regret loss
@@ -70,7 +70,7 @@ def makeSkScorer(optmodel: optModel):
     A function to create sklearn scorer
 
     Args:
-        optmodel (optModel): optimization model
+        optmodel: optimization model
 
     Returns:
         scorer: callable object that returns a scalar score; less is better.
@@ -91,7 +91,7 @@ def makeAutoSkScorer(optmodel: optModel):
     A function to create Auto-SKlearn scorer
 
     Args:
-        optmodel (optModel): optimization model
+        optmodel: optimization model
 
     Returns:
         scorer: callable object that returns a scalar score; less is better.
@@ -125,10 +125,10 @@ def testMSE(
     A function to calculate MSE for testing
 
     Args:
-        pred_cost (array): predicted costs
-        true_cost (array): true costs
-        model_type (ABCMeta): optModel class type
-        args (dict): optModel args
+        pred_cost: predicted costs
+        true_cost: true costs
+        model_type: optModel class type
+        args: optModel args
 
     Returns:
         float: mse
@@ -144,7 +144,7 @@ def makeTestMSEScorer(optmodel: optModel):
     A function to create MSE scorer for testing
 
     Args:
-        optmodel (optModel): optimization model
+        optmodel: optimization model
 
     Returns:
         scorer: callable object that returns a scalar score; less is better.

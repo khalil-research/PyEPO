@@ -43,12 +43,12 @@ class optModule(nn.Module):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            reduction (str): the reduction to apply to the output
-            dataset (None/optDataset): the training data
-            require_solpool (bool): if True, always initialize solution pool from dataset
+            optmodel: a PyEPO optimization model
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            reduction: the reduction to apply to the output
+            dataset: the training data
+            require_solpool: if True, always initialize solution pool from dataset
         """
         super().__init__()
         # optimization model

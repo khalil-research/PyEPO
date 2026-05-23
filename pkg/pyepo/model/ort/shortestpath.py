@@ -39,8 +39,8 @@ class shortestPathModel(optOrtModel):
     def __init__(self, grid: tuple[int, int], solver: str = "glop") -> None:
         """
         Args:
-            grid (tuple of int): size of grid network
-            solver (str): solver backend for pywraplp
+            grid: size of grid network
+            solver: solver backend for pywraplp
         """
         self.grid = grid
         self.arcs = _get_grid_arcs(grid)
@@ -102,7 +102,7 @@ class shortestPathCpModel(optOrtCpModel):
     def __init__(self, grid: tuple[int, int]) -> None:
         """
         Args:
-            grid (tuple of int): size of grid network
+            grid: size of grid network
         """
         self.grid = grid
         self.arcs = _get_grid_arcs(grid)

@@ -18,7 +18,7 @@ def getArgs(model: optModel) -> dict:
     A global function to get args of model
 
     Args:
-        model (optModel): optimization model
+        model: optimization model
 
     Returns:
         dict: model args

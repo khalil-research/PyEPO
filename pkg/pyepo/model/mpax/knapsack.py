@@ -31,8 +31,8 @@ class knapsackModel(optMpaxModel):
     def __init__(self, weights: np.ndarray, capacity: np.ndarray | list) -> None:
         """
         Args:
-            weights (np.ndarray / list): weights of items
-            capacity (np.ndarray / list): total capacity
+            weights: weights of items
+            capacity: total capacity
         """
         self.weights = weights
         self.capacity = capacity

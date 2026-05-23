@@ -36,7 +36,7 @@ class optOrtModel(optModel):
     def __init__(self, solver: str = "scip") -> None:
         """
         Args:
-            solver (str): solver backend for pywraplp
+            solver: solver backend for pywraplp
         """
         if not _HAS_ORTOOLS:
             raise ImportError(
@@ -56,7 +56,7 @@ class optOrtModel(optModel):
         A method to set the objective function
 
         Args:
-            c (np.ndarray / list): cost of objective function
+            c: cost of objective function
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
@@ -109,8 +109,8 @@ class optOrtModel(optModel):
         A method to add a new constraint
 
         Args:
-            coefs (np.ndarray / list): coefficients of new constraint
-            rhs (float): right-hand side of new constraint
+            coefs: coefficients of new constraint
+            rhs: right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint

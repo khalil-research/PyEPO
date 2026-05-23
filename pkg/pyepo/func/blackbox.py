@@ -46,11 +46,11 @@ class blackboxOpt(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            lambd (float): a hyperparameter for differentiable black-box to control interpolation degree
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            optmodel: a PyEPO optimization model
+            lambd: a hyperparameter for differentiable black-box to control interpolation degree
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # smoothing parameter
@@ -80,8 +80,8 @@ class blackboxOptFunc(Function):
         Forward pass for DBB
 
         Args:
-            pred_cost (torch.tensor): a batch of predicted values of the cost
-            module (optModule): blackboxOpt module
+            pred_cost: a batch of predicted values of the cost
+            module: blackboxOpt module
 
         Returns:
             torch.tensor: predicted solutions
@@ -144,10 +144,10 @@ class negativeIdentity(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            optmodel: a PyEPO optimization model
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
 
@@ -173,8 +173,8 @@ class negativeIdentityFunc(Function):
         Forward pass for NID
 
         Args:
-            pred_cost (torch.tensor): a batch of predicted values of the cost
-            module (optModule): negativeIdentity module
+            pred_cost: a batch of predicted values of the cost
+            module: negativeIdentity module
 
         Returns:
             torch.tensor: predicted solutions

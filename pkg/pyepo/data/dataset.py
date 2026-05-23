@@ -41,9 +41,9 @@ class optDataset(Dataset):
         A method to create an optDataset from optModel
 
         Args:
-            model (optModel): an instance of optModel
-            feats (np.ndarray): data features
-            costs (np.ndarray): costs of objective function
+            model: an instance of optModel
+            feats: data features
+            costs: costs of objective function
         """
         if not isinstance(model, optModel):
             raise TypeError("arg model is not an optModel")
@@ -88,7 +88,7 @@ class optDataset(Dataset):
         A method to solve optimization problem to get an optimal solution with given cost
 
         Args:
-            cost (np.ndarray): cost of objective function
+            cost: cost of objective function
 
         Returns:
             tuple: optimal solution (np.ndarray) and objective value (float)
@@ -114,7 +114,7 @@ class optDataset(Dataset):
         A method to retrieve data
 
         Args:
-            index (int): data index
+            index: data index
 
         Returns:
             tuple: data features (torch.tensor), costs (torch.tensor), optimal solutions (torch.tensor) and objective values (torch.tensor)
@@ -155,11 +155,11 @@ class optDatasetKNN(optDataset):
         A method to create an optDataset from optModel
 
         Args:
-            model (optModel): an instance of optModel
-            feats (np.ndarray): data features
-            costs (np.ndarray): costs of objective function
-            k (int): number of nearest neighbours selected
-            weight (float): weight of kNN-loss
+            model: an instance of optModel
+            feats: data features
+            costs: costs of objective function
+            k: number of nearest neighbours selected
+            weight: weight of kNN-loss
         """
         if not isinstance(model, optModel):
             raise TypeError("arg model is not an optModel")

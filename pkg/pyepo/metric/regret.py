@@ -29,9 +29,9 @@ def regret(
     A function to evaluate model performance with normalized true regret
 
     Args:
-        predmodel (nn): a regression neural network for cost prediction
-        optmodel (optModel): a PyEPO optimization model
-        dataloader (DataLoader): Torch dataloader from optDataSet
+        predmodel: a regression neural network for cost prediction
+        optmodel: a PyEPO optimization model
+        dataloader: Torch dataloader from optDataSet
 
     Returns:
         float: true regret loss
@@ -73,10 +73,10 @@ def calRegret(
     A function to calculate normalized true regret for a batch
 
     Args:
-        optmodel (optModel): optimization model
-        pred_cost (np.ndarray): predicted costs
-        true_cost (np.ndarray): true costs
-        true_obj (float): true optimal objective value
+        optmodel: optimization model
+        pred_cost: predicted costs
+        true_cost: true costs
+        true_obj: true optimal objective value
 
     Returns:
         float: true regret loss

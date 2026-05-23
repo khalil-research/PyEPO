@@ -32,8 +32,8 @@ class shortestPathModel(optOmoModel):
     def __init__(self, grid: tuple[int, int], solver: str = "glpk") -> None:
         """
         Args:
-            grid (tuple of int): size of grid network
-            solver (str): optimization solver in the background
+            grid: size of grid network
+            solver: optimization solver in the background
         """
         self.grid = grid
         self.arcs = _get_grid_arcs(grid)

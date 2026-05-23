@@ -39,7 +39,7 @@ class tspABModel(optGrbModel):
     def __init__(self, num_nodes: int) -> None:
         """
         Args:
-            num_nodes (int): number of nodes
+            num_nodes: number of nodes
         """
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))
@@ -74,7 +74,7 @@ class tspABModel(optGrbModel):
         A method to get a tour from solution
 
         Args:
-            sol (list): solution
+            sol: solution
 
         Returns:
             list: a TSP tour
@@ -125,7 +125,7 @@ class tspGGModel(tspABModel):
         A method to set the objective function
 
         Args:
-            c (list): cost vector
+            c: cost vector
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
@@ -160,8 +160,8 @@ class tspGGModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coefficients of new constraint
-            rhs (float): right-hand side of new constraint
+            coefs: coefficients of new constraint
+            rhs: right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
@@ -310,7 +310,7 @@ class tspDFJModel(tspABModel):
         A method to set the objective function
 
         Args:
-            c (list): cost vector
+            c: cost vector
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
@@ -340,8 +340,8 @@ class tspDFJModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coefficients of new constraint
-            rhs (float): right-hand side of new constraint
+            coefs: coefficients of new constraint
+            rhs: right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
@@ -396,7 +396,7 @@ class tspMTZModel(tspABModel):
         A method to set the objective function
 
         Args:
-            c (list): cost vector
+            c: cost vector
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
@@ -431,8 +431,8 @@ class tspMTZModel(tspABModel):
         A method to add new constraint
 
         Args:
-            coefs (ndarray): coefficients of new constraint
-            rhs (float): right-hand side of new constraint
+            coefs: coefficients of new constraint
+            rhs: right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint

@@ -139,9 +139,9 @@ def _update_solution_pool(
     Add new solutions to solution pool
 
     Args:
-        sol (torch.tensor): new solutions
-        solpool (torch.tensor): existing solution pool
-        solset (set): hash set for deduplication
+        sol: new solutions
+        solpool: existing solution pool
+        solset: hash set for deduplication
 
     Returns:
         torch.tensor: updated solution pool
@@ -206,9 +206,9 @@ def _solveWithObj4Par(
     A function to solve function in parallel processors
 
     Args:
-        cost (np.ndarray): cost of objective function
-        args (dict): optModel args
-        model_type (ABCMeta): optModel class type
+        cost: cost of objective function
+        args: optModel args
+        model_type: optModel class type
 
     Returns:
         tuple: optimal solution (list) and objective value (float)

@@ -18,7 +18,7 @@ def sklearnPred(pmodel: BaseEstimator) -> MultiOutputRegressor:
     Two-stage prediction and optimization with scikit-learn.
 
     Args:
-        pmodel (Regressor): scikit-learn regression model
+        pmodel: scikit-learn regression model
 
     Returns:
         MultiOutputRegressor: scikit-learn multi-output regression model

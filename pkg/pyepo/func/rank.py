@@ -46,11 +46,11 @@ class listwiseLTR(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            reduction (str): the reduction to apply to the output
-            dataset (optDataset): the training data, usually this is simply the training set
+            optmodel: a PyEPO optimization model
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            reduction: the reduction to apply to the output
+            dataset: the training data, usually this is simply the training set
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 
@@ -107,11 +107,11 @@ class pairwiseLTR(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            reduction (str): the reduction to apply to the output
-            dataset (optDataset): the training data
+            optmodel: a PyEPO optimization model
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            reduction: the reduction to apply to the output
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
         # function
@@ -183,11 +183,11 @@ class pointwiseLTR(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            reduction (str): the reduction to apply to the output
-            dataset (optDataset): the training data
+            optmodel: a PyEPO optimization model
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            reduction: the reduction to apply to the output
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 

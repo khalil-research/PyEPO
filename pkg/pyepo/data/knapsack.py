@@ -21,13 +21,13 @@ def genData(
     A function to generate synthetic data and features for knapsack
 
     Args:
-        num_data (int): number of data points
-        num_features (int): dimension of features
-        num_items (int): number of items
-        dim (int): dimension of multi-dimensional knapsack
-        deg (int): data polynomial degree
-        noise_width (float): half width of data random noise
-        seed (int): random state seed
+        num_data: number of data points
+        num_features: dimension of features
+        num_items: number of items
+        dim: dimension of multi-dimensional knapsack
+        deg: data polynomial degree
+        noise_width: half width of data random noise
+        seed: random state seed
 
     Returns:
        tuple: weights of items (np.ndarray), data features (np.ndarray), costs (np.ndarray)

@@ -21,12 +21,12 @@ def genData(
     A function to generate synthetic data and features for traveling salesman
 
     Args:
-        num_data (int): number of data points
-        num_features (int): dimension of features
-        num_nodes (int): number of nodes
-        deg (int): data polynomial degree
-        noise_width (float): half width of data random noise
-        seed (int): random seed
+        num_data: number of data points
+        num_features: dimension of features
+        num_nodes: number of nodes
+        deg: data polynomial degree
+        noise_width: half width of data random noise
+        seed: random seed
 
     Returns:
         tuple: data features (np.ndarray), costs (np.ndarray)

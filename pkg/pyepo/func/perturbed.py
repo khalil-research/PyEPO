@@ -54,13 +54,13 @@ class perturbedOpt(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            n_samples (int): number of Monte-Carlo samples
-            sigma (float): the amplitude of the perturbation
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            seed (int): random state seed
-            solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            optmodel: a PyEPO optimization model
+            n_samples: number of Monte-Carlo samples
+            sigma: the amplitude of the perturbation
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            seed: random state seed
+            solve_ratio: the ratio of new solutions computed during training
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
@@ -92,8 +92,8 @@ class perturbedOptFunc(Function):
         Forward pass for perturbed
 
         Args:
-            pred_cost (torch.tensor): a batch of predicted values of the cost
-            module (optModule): perturbedOpt module
+            pred_cost: a batch of predicted values of the cost
+            module: perturbedOpt module
 
         Returns:
             torch.tensor: solution expectations with perturbation
@@ -159,14 +159,14 @@ class perturbedFenchelYoung(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            n_samples (int): number of Monte-Carlo samples
-            sigma (float): the amplitude of the perturbation
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            seed (int): random state seed
-            solve_ratio (float): the ratio of new solutions computed during training
-            reduction (str): the reduction to apply to the output
-            dataset (None/optDataset): the training data
+            optmodel: a PyEPO optimization model
+            n_samples: number of Monte-Carlo samples
+            sigma: the amplitude of the perturbation
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            seed: random state seed
+            solve_ratio: the ratio of new solutions computed during training
+            reduction: the reduction to apply to the output
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # number of samples
@@ -200,9 +200,9 @@ class perturbedFenchelYoungFunc(Function):
         Forward pass for perturbed Fenchel-Young loss
 
         Args:
-            pred_cost (torch.tensor): a batch of predicted values of the cost
-            true_sol (torch.tensor): a batch of true optimal solutions
-            module (optModule): perturbedFenchelYoung module
+            pred_cost: a batch of predicted values of the cost
+            true_sol: a batch of true optimal solutions
+            module: perturbedFenchelYoung module
 
         Returns:
             torch.tensor: solution expectations with perturbation
@@ -273,15 +273,15 @@ class implicitMLE(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            n_samples (int): number of Monte-Carlo samples
-            sigma (float): noise temperature for the input distribution
-            lambd (float): a hyperparameter for differentiable black-box to control interpolation degree
-            distribution (distribution): noise distribution
-            two_sides (bool): approximate gradient by two-sided perturbation or not
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            optmodel: a PyEPO optimization model
+            n_samples: number of Monte-Carlo samples
+            sigma: noise temperature for the input distribution
+            lambd: a hyperparameter for differentiable black-box to control interpolation degree
+            distribution: noise distribution
+            two_sides: approximate gradient by two-sided perturbation or not
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
@@ -321,8 +321,8 @@ class implicitMLEFunc(Function):
         Forward pass for IMLE
 
         Args:
-            pred_cost (torch.tensor): a batch of predicted values of the cost
-            module (optModule): implicitMLE module
+            pred_cost: a batch of predicted values of the cost
+            module: implicitMLE module
 
         Returns:
             torch.tensor: predicted solutions
@@ -405,14 +405,14 @@ class adaptiveImplicitMLE(optModule):
     ) -> None:
         """
         Args:
-            optmodel (optModel): a PyEPO optimization model
-            n_samples (int): number of Monte-Carlo samples
-            sigma (float): noise temperature for the input distribution
-            distribution (distribution): noise distribution
-            two_sides (bool): approximate gradient by two-sided perturbation or not
-            processes (int): number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio (float): the ratio of new solutions computed during training
-            dataset (None/optDataset): the training data
+            optmodel: a PyEPO optimization model
+            n_samples: number of Monte-Carlo samples
+            sigma: noise temperature for the input distribution
+            distribution: noise distribution
+            two_sides: approximate gradient by two-sided perturbation or not
+            processes: number of processors, 1 for single-core, 0 for all of cores
+            solve_ratio: the ratio of new solutions computed during training
+            dataset: the training data
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
@@ -517,12 +517,12 @@ def _solve_in_pass_3d(
     Solve optimization for perturbed 3D costs and update solution pool.
 
     Args:
-        ptb_c (torch.tensor): perturbed costs, shape (n_samples, batch, vars)
-        optmodel (optModel): optimization model
-        processes (int): number of processors
+        ptb_c: perturbed costs, shape (n_samples, batch, vars)
+        optmodel: optimization model
+        processes: number of processors
         pool: process pool
-        solpool (torch.tensor): solution pool
-        solset (set): hash set for deduplication
+        solpool: solution pool
+        solset: hash set for deduplication
 
     Returns:
         tuple: (solutions shape (batch, n_samples, vars), updated solpool)

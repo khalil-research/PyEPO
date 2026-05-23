@@ -21,8 +21,8 @@ def MSE(predmodel: nn.Module, dataloader: DataLoader) -> float:
     A function to evaluate model performance with MSE
 
     Args:
-        predmodel (nn): a regression neural network for cost prediction
-        dataloader (DataLoader): Torch dataloader from optDataSet
+        predmodel: a regression neural network for cost prediction
+        dataloader: Torch dataloader from optDataSet
 
     Returns:
         float: MSE loss

@@ -135,7 +135,7 @@ class optMpaxModel(optModel):
         A method to set the objective function
 
         Args:
-            c (np.ndarray / list): cost of objective function
+            c: cost of objective function
         """
         # validate shape before assignment
         c_len = c.shape[-1] if hasattr(c, "shape") else len(c)
@@ -220,8 +220,8 @@ class optMpaxModel(optModel):
         A method to add a new constraint
 
         Args:
-            coefs (np.ndarray / list): coefficients of new constraint
-            rhs (jnp.float32): right-hand side of new constraint
+            coefs: coefficients of new constraint
+            rhs: right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint

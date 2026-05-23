@@ -77,10 +77,10 @@ def autoSklearnPred(
     Two-stage prediction and optimization with auto-sklearn.
 
     Args:
-        optmodel (optModel): optimization model
-        seed (int): random seed for reproducibility
-        timelimit (int): time limit in seconds for auto-sklearn search
-        metric (str): evaluation metric, "mse" or "regret"
+        optmodel: optimization model
+        seed: random seed for reproducibility
+        timelimit: time limit in seconds for auto-sklearn search
+        metric: evaluation metric, "mse" or "regret"
 
     Returns:
         AutoSklearnRegressor: Auto-sklearn multi-output regression model

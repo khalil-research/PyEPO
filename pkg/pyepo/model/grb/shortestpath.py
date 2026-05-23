@@ -32,7 +32,7 @@ class shortestPathModel(optGrbModel):
     def __init__(self, grid: tuple[int, int]) -> None:
         """
         Args:
-            grid (tuple of int): size of grid network
+            grid: size of grid network
         """
         self.grid = grid
         self.arcs = _get_grid_arcs(grid)

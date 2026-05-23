@@ -24,8 +24,8 @@ def costToNumpy(c: np.ndarray | torch.Tensor | list, dtype=np.float32) -> np.nda
     Normalize a cost vector to a numpy array, detaching torch tensors as needed.
 
     Args:
-        c (np.ndarray / list / torch.Tensor): cost vector
-        dtype (np.dtype): target dtype when ``c`` is not already a tensor; torch
+        c: cost vector
+        dtype: target dtype when ``c`` is not already a tensor; torch
             tensors are converted via ``.detach().cpu().numpy()`` and keep their
             existing dtype.
 
@@ -79,7 +79,7 @@ class optModel(ABC):
         An abstract method to set the objective function
 
         Args:
-            c (ndarray): cost of objective function
+            c: cost of objective function
         """
         raise NotImplementedError
 
@@ -108,8 +108,8 @@ class optModel(ABC):
         A method to add a new constraint. Subclasses should override.
 
         Args:
-            coefs (ndarray): coefficients of the new constraint
-            rhs (float): right-hand side of new constraint
+            coefs: coefficients of the new constraint
+            rhs: right-hand side of new constraint
 
         Returns:
             optModel: new model with the added constraint
@@ -155,11 +155,11 @@ def getTspTour(
     Reconstruct a TSP tour from an undirected edge-selection vector.
 
     Args:
-        edge_list (list): undirected edges of the model, ordered to match ``sol``
-        num_nodes (int): number of nodes in the TSP instance
-        sol (sequence): solution values aligned with ``edge_list``; an edge is
+        edge_list: undirected edges of the model, ordered to match ``sol``
+        num_nodes: number of nodes in the TSP instance
+        sol: solution values aligned with ``edge_list``; an edge is
             considered active when its value exceeds ``threshold``
-        threshold (float): activation threshold for an edge
+        threshold: activation threshold for an edge
 
     Returns:
         list: node sequence of the tour (closes back to node 0 if reachable)
@@ -207,7 +207,7 @@ def _get_grid_arcs(grid: tuple[int, int]) -> list[tuple[int, int]]:
     Get list of arcs for a grid network.
 
     Args:
-        grid (tuple of int): size of grid network (rows, cols)
+        grid: size of grid network (rows, cols)
 
     Returns:
         list: arcs as (source, target) tuples
