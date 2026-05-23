@@ -31,7 +31,7 @@ Module Contents
    :param noise_level: level of data random noise
    :param seed: random seed
 
-   :returns: data features (np.ndarray), costs (np.ndarray)
+   :returns: covariance matrix (np.ndarray), data features (np.ndarray), mean returns (np.ndarray)
    :rtype: tuple
 
 
