@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import torch
 
 from pyepo import EPO
@@ -58,9 +57,9 @@ class NCE(optModule):
         # convert tensor
         cp = pred_cost.detach()
         # solve and update pool
-        if np.random.uniform() <= self.solve_ratio:
+        if self._branch_rng.uniform() <= self.solve_ratio:
             _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+                cp, self.optmodel, self.processes, self.pool, self.solpool
             )
         # to device
         if self.solpool.device != cp.device:
@@ -117,9 +116,9 @@ class contrastiveMAP(optModule):
         # convert tensor
         cp = pred_cost.detach()
         # solve and update pool
-        if np.random.uniform() <= self.solve_ratio:
+        if self._branch_rng.uniform() <= self.solve_ratio:
             _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+                cp, self.optmodel, self.processes, self.pool, self.solpool
             )
         # to device
         if self.solpool.device != cp.device:

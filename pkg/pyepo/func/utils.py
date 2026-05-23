@@ -39,9 +39,8 @@ def _solve_or_cache(cp: torch.Tensor, module: optModule) -> tuple[torch.Tensor, 
     processes = module.processes
     pool = module.pool
     solpool = module.solpool
-    solset = module._solset
-    if np.random.uniform() <= module.solve_ratio:
-        sol, obj, solpool = _solve_in_pass(cp, optmodel, processes, pool, solpool, solset)
+    if module._branch_rng.uniform() <= module.solve_ratio:
+        sol, obj, solpool = _solve_in_pass(cp, optmodel, processes, pool, solpool)
     else:
         # reaching the cache branch requires solve_ratio < 1, which forces __init__ to populate solpool
         assert solpool is not None
@@ -56,17 +55,14 @@ def _solve_in_pass(
     processes: int,
     pool,
     solpool: torch.Tensor | None = None,
-    solset: set | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor | None]:
     """
     A function to solve optimization and update solution pool
     """
     sol, obj = _solve_batch(cp, optmodel, processes, pool)
-    # update solution pool (dedup on CPU), then move to correct device
+    # update solution pool on cp's device (tensor-side dedup, no CPU sync)
     if solpool is not None:
-        if solset is None:
-            solset = set()
-        solpool = _update_solution_pool(sol, solpool, solset)
+        solpool = _update_solution_pool(sol, solpool)
         if solpool.device != cp.device:
             solpool = solpool.to(cp.device)
     return sol, obj, solpool
@@ -134,38 +130,24 @@ def _solve_batch(
 def _update_solution_pool(
     sol: torch.Tensor,
     solpool: torch.Tensor | None,
-    solset: set,
 ) -> torch.Tensor:
     """
-    Add new solutions to solution pool
+    Append rows of `sol` to `solpool` that aren't already present.
 
-    Args:
-        sol: new solutions
-        solpool: existing solution pool
-        solset: hash set for deduplication
-
-    Returns:
-        torch.tensor: updated solution pool
+    Dedup is done with `torch.unique` + `torch.cdist` on whichever device
+    `solpool` lives on, avoiding any GPU<->CPU sync.
     """
     sol = torch.as_tensor(sol, dtype=torch.float32)
-    # move to CPU numpy once for hashing (avoids per-row GPU→CPU sync)
-    sol_np = sol.cpu().numpy()
     if solpool is None:
-        solset.update(s.tobytes() for s in sol_np)
-        return sol.clone()
-    # filter to only genuinely new solutions
-    new_mask = []
-    for s in sol_np:
-        key = s.tobytes()
-        if key not in solset:
-            solset.add(key)
-            new_mask.append(True)
-        else:
-            new_mask.append(False)
-    # append new solutions
-    if any(new_mask):
-        new_sols = sol[torch.tensor(new_mask)].to(solpool.device)
-        solpool = torch.cat((solpool, new_sols), dim=0)
+        return torch.unique(sol, dim=0).clone()
+    if sol.device != solpool.device:
+        sol = sol.to(solpool.device)
+    sol_uniq = torch.unique(sol, dim=0)
+    # exact-equality via L1 distance (== 0 ⇒ identical row)
+    dists = torch.cdist(sol_uniq, solpool, p=1.0)
+    is_new = (dists != 0).all(dim=1)
+    if bool(is_new.any()):
+        solpool = torch.cat((solpool, sol_uniq[is_new]), dim=0)
     return solpool
 
 

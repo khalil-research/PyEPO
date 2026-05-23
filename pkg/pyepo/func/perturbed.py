@@ -63,7 +63,7 @@ class perturbedOpt(optModule):
             solve_ratio: the ratio of new solutions computed during training
             dataset: the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset, seed=seed)
         # number of samples
         self.n_samples = n_samples
         # perturbation amplitude
@@ -172,7 +172,7 @@ class perturbedFenchelYoung(optModule):
             reduction: the reduction to apply to the output
             dataset: the training data
         """
-        super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
+        super().__init__(optmodel, processes, solve_ratio, reduction, dataset, seed=seed)
         # number of samples
         self.n_samples = n_samples
         # perturbation amplitude
@@ -506,9 +506,8 @@ def _solve_or_cache_3d(ptb_c: torch.Tensor, module: optModule) -> torch.Tensor:
     processes = module.processes
     pool = module.pool
     solpool = module.solpool
-    solset = module._solset
-    if np.random.uniform() <= module.solve_ratio:
-        ptb_sols, solpool = _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool, solset)
+    if module._branch_rng.uniform() <= module.solve_ratio:
+        ptb_sols, solpool = _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool)
     else:
         # cache branch only fires when solve_ratio < 1, which forces __init__ to populate solpool
         assert solpool is not None
@@ -523,7 +522,6 @@ def _solve_in_pass_3d(
     processes: int,
     pool,
     solpool: torch.Tensor | None = None,
-    solset: set | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor | None]:
     """
     Solve optimization for perturbed 3D costs and update solution pool.
@@ -534,7 +532,6 @@ def _solve_in_pass_3d(
         processes: number of processors
         pool: process pool
         solpool: solution pool
-        solset: hash set for deduplication
 
     Returns:
         tuple: (solutions shape (batch, n_samples, vars), updated solpool)
@@ -546,12 +543,10 @@ def _solve_in_pass_3d(
     flat_sols, _ = _solve_batch_2d(flat_c, optmodel, processes, pool)
     # reshape (n_samples * batch, vars) → (batch, n_samples, vars)
     ptb_sols = flat_sols.reshape(n_samples, ins_num, num_vars).permute(1, 0, 2)
-    # update solution pool and ensure correct device
+    # update solution pool on-device, then realign with ptb_c.device
     if solpool is not None:
-        if solset is None:
-            solset = set()
         sols = ptb_sols.reshape(-1, num_vars)
-        solpool = _update_solution_pool(sols, solpool, solset)
+        solpool = _update_solution_pool(sols, solpool)
         if solpool.device != ptb_c.device:
             solpool = solpool.to(ptb_c.device)
     return ptb_sols, solpool

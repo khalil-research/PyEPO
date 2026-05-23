@@ -82,14 +82,11 @@ class optModule(nn.Module):
                 f"Invalid solving ratio {self.solve_ratio}. It should be between 0 and 1."
             )
         self.solpool = None
-        self._solset = set()
         if self.solve_ratio < 1 or require_solpool:  # init solution pool
             if not isinstance(dataset, optDataset):  # type checking
                 raise TypeError("dataset is not an optDataset")
-            # single pass: dedup via np.unique, then populate solpool + solset from the same array
-            sols_np = np.unique(dataset.sols.cpu().numpy(), axis=0)
-            self.solpool = torch.from_numpy(sols_np).clone()
-            self._solset = {row.tobytes() for row in sols_np}
+            # dedup the initial pool on whichever device dataset.sols lives
+            self.solpool = torch.unique(dataset.sols, dim=0).clone()
         # per-instance RNG for the solve-vs-cache branch (avoids global numpy RNG lock)
         self._branch_rng = np.random.RandomState(seed)
         # reduction

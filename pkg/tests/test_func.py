@@ -153,48 +153,40 @@ class TestSumGammaDistribution:
 class TestSolutionPool:
 
     def test_init_pool(self):
-        solset = set()
         sol = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        solpool = _update_solution_pool(sol, None, solset)
+        solpool = _update_solution_pool(sol, None)
         assert solpool.shape == (2, 2)
-        assert len(solset) == 2
 
     def test_dedup(self):
-        solset = set()
         sol1 = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        solpool = _update_solution_pool(sol1, None, solset)
+        solpool = _update_solution_pool(sol1, None)
         # add same solutions again
         sol2 = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        solpool = _update_solution_pool(sol2, solpool, solset)
+        solpool = _update_solution_pool(sol2, solpool)
         # pool should still have only 2 solutions
         assert solpool.shape[0] == 2
-        assert len(solset) == 2
 
     def test_add_new(self):
-        solset = set()
         sol1 = torch.tensor([[1.0, 0.0]])
-        solpool = _update_solution_pool(sol1, None, solset)
+        solpool = _update_solution_pool(sol1, None)
         sol2 = torch.tensor([[0.0, 1.0]])
-        solpool = _update_solution_pool(sol2, solpool, solset)
+        solpool = _update_solution_pool(sol2, solpool)
         assert solpool.shape[0] == 2
 
     def test_mixed_new_and_dup(self):
-        solset = set()
         sol1 = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        solpool = _update_solution_pool(sol1, None, solset)
+        solpool = _update_solution_pool(sol1, None)
         # one new, one duplicate
         sol2 = torch.tensor([[1.0, 0.0], [1.0, 1.0]])
-        solpool = _update_solution_pool(sol2, solpool, solset)
+        solpool = _update_solution_pool(sol2, solpool)
         assert solpool.shape[0] == 3
-        assert len(solset) == 3
 
     def test_empty_new_after_dedup(self):
-        solset = set()
         sol = torch.tensor([[1.0, 2.0]])
-        solpool = _update_solution_pool(sol, None, solset)
+        solpool = _update_solution_pool(sol, None)
         # all duplicates
-        solpool = _update_solution_pool(sol, solpool, solset)
-        solpool = _update_solution_pool(sol, solpool, solset)
+        solpool = _update_solution_pool(sol, solpool)
+        solpool = _update_solution_pool(sol, solpool)
         assert solpool.shape[0] == 1
 
 

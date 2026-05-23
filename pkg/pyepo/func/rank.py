@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -61,9 +60,9 @@ class listwiseLTR(optModule):
         # convert tensor
         cp = pred_cost.detach()
         # solve and update pool
-        if np.random.uniform() <= self.solve_ratio:
+        if self._branch_rng.uniform() <= self.solve_ratio:
             _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+                cp, self.optmodel, self.processes, self.pool, self.solpool
             )
         # to device
         if self.solpool.device != cp.device:
@@ -124,9 +123,9 @@ class pairwiseLTR(optModule):
         # convert tensor
         cp = pred_cost.detach()
         # solve and update pool
-        if np.random.uniform() <= self.solve_ratio:
+        if self._branch_rng.uniform() <= self.solve_ratio:
             _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+                cp, self.optmodel, self.processes, self.pool, self.solpool
             )
         # to device
         if self.solpool.device != cp.device:
@@ -198,9 +197,9 @@ class pointwiseLTR(optModule):
         # convert tensor
         cp = pred_cost.detach()
         # solve and update pool
-        if np.random.uniform() <= self.solve_ratio:
+        if self._branch_rng.uniform() <= self.solve_ratio:
             _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+                cp, self.optmodel, self.processes, self.pool, self.solpool
             )
         # to device
         if self.solpool.device != cp.device:
