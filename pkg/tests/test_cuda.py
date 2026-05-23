@@ -5,25 +5,20 @@ CUDA device tests: verify tensors stay on the correct device throughout
 the predict-then-optimize pipeline (forward, loss, backward, metrics).
 
 Skipped automatically when CUDA is not available.
+
+Shared fixtures (sp_data, ks_data, LinearPred, constants) live in conftest.py.
 """
 
 import pytest
-import numpy as np
 import torch
-from torch import nn
-from torch.utils.data import DataLoader
 
 import pyepo
-from pyepo.data.dataset import optDataset
+
+from .conftest import LinearPred, NUM_FEAT, _HAS_GUROBI
 
 _HAS_CUDA = torch.cuda.is_available()
-
-try:
-    from pyepo.model.grb.shortestpath import shortestPathModel
-    from pyepo.model.grb.knapsack import knapsackModel
-    _HAS_GUROBI = True
-except (ImportError, NameError):
-    _HAS_GUROBI = False
+_DEVICE = torch.device("cuda" if _HAS_CUDA else "cpu")
+_STEPS = 2
 
 requires_cuda = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA not available")
 requires_cuda_gurobi = pytest.mark.skipif(
@@ -35,24 +30,6 @@ requires_cuda_gurobi = pytest.mark.skipif(
 # ============================================================
 # Helpers
 # ============================================================
-
-_DEVICE = torch.device("cuda" if _HAS_CUDA else "cpu")
-
-_NUM_DATA = 32
-_NUM_FEAT = 3
-_GRID = (3, 3)  # 12 edges
-_BATCH = 16
-_STEPS = 2
-
-
-class _LinearModel(nn.Module):
-    def __init__(self, num_feat, num_cost):
-        super().__init__()
-        self.linear = nn.Linear(num_feat, num_cost)
-
-    def forward(self, x):
-        return self.linear(x)
-
 
 def _assert_cuda(tensor, name="tensor"):
     """Assert a tensor is on CUDA."""
@@ -66,33 +43,6 @@ def _assert_grads_cuda(model):
         _assert_cuda(param.grad, "grad of {}".format(name))
 
 
-# ============================================================
-# Shared fixtures
-# ============================================================
-
-@pytest.fixture(scope="module")
-def sp_data():
-    if not (_HAS_GUROBI and _HAS_CUDA):
-        pytest.skip("Gurobi or CUDA not available")
-    x, c = pyepo.data.shortestpath.genData(_NUM_DATA, _NUM_FEAT, _GRID, seed=42)
-    optmodel = shortestPathModel(grid=_GRID)
-    dataset = optDataset(optmodel, x, c)
-    loader = DataLoader(dataset, batch_size=_BATCH, shuffle=False)
-    return optmodel, dataset, loader
-
-
-@pytest.fixture(scope="module")
-def ks_data():
-    if not (_HAS_GUROBI and _HAS_CUDA):
-        pytest.skip("Gurobi or CUDA not available")
-    weights, x, c = pyepo.data.knapsack.genData(
-        _NUM_DATA, _NUM_FEAT, 4, dim=1, deg=1, seed=42)
-    optmodel = knapsackModel(weights=weights, capacity=[10.0])
-    dataset = optDataset(optmodel, x, c)
-    loader = DataLoader(dataset, batch_size=_BATCH, shuffle=False)
-    return optmodel, dataset, loader
-
-
 def _get_batch(loader):
     """Get one batch and move to CUDA."""
     x, c, w, z = next(iter(loader))
@@ -100,7 +50,7 @@ def _get_batch(loader):
 
 
 def _fresh_predmodel(num_cost):
-    return _LinearModel(_NUM_FEAT, num_cost).to(_DEVICE)
+    return LinearPred(NUM_FEAT, num_cost).to(_DEVICE)
 
 
 # ============================================================
@@ -111,12 +61,12 @@ def _fresh_predmodel(num_cost):
 class TestModelDevice:
 
     def test_parameters_on_cuda(self):
-        pred = _LinearModel(5, 10).to(_DEVICE)
+        pred = LinearPred(5, 10).to(_DEVICE)
         for name, param in pred.named_parameters():
             _assert_cuda(param, name)
 
     def test_forward_output_on_cuda(self):
-        pred = _LinearModel(5, 10).to(_DEVICE)
+        pred = LinearPred(5, 10).to(_DEVICE)
         x = torch.randn(4, 5, device=_DEVICE)
         out = pred(x)
         _assert_cuda(out, "forward output")

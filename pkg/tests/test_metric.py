@@ -192,6 +192,69 @@ class TestSPOError:
 
 
 # ============================================================
+# calUnambRegret tests
+# ============================================================
+
+@requires_gurobi
+class TestCalUnambRegret:
+
+    @pytest.fixture
+    def sp_model(self):
+        return shortestPathModel(grid=(3, 3))
+
+    def test_zero_regret_with_true_cost(self, sp_model):
+        """When pred_cost == true_cost, unambiguous regret should be 0."""
+        cost = np.random.RandomState(42).rand(sp_model.num_cost) + 0.1
+        sp_model.setObj(cost)
+        _, true_obj = sp_model.solve()
+        loss = calUnambRegret(sp_model, cost, cost, true_obj)
+        assert abs(loss) < 1e-3
+
+    def test_unamb_regret_non_negative_minimize(self, sp_model):
+        """Unambiguous regret should be non-negative for MINIMIZE."""
+        rng = np.random.RandomState(42)
+        cost_true = rng.rand(sp_model.num_cost) + 0.1
+        cost_pred = rng.rand(sp_model.num_cost) + 0.1
+        sp_model.setObj(cost_true)
+        _, true_obj = sp_model.solve()
+        loss = calUnambRegret(sp_model, cost_pred, cost_true, true_obj)
+        assert loss >= -1e-3
+
+    def test_unamb_regret_non_negative_maximize(self):
+        """Unambiguous regret should be non-negative for MAXIMIZE."""
+        weights = np.array([[3.0, 4.0, 5.0]])
+        capacity = np.array([8.0])
+        model = knapsackModel(weights=weights, capacity=capacity)
+        rng = np.random.RandomState(42)
+        cost_true = rng.rand(3) + 1.0
+        cost_pred = rng.rand(3) + 1.0
+        model.setObj(cost_true)
+        _, true_obj = model.solve()
+        loss = calUnambRegret(model, cost_pred, cost_true, true_obj)
+        assert loss >= -1e-3
+
+    def test_unamb_regret_at_least_standard_regret(self, sp_model):
+        """Unambiguous regret >= standard regret (worst case among optima)."""
+        rng = np.random.RandomState(7)
+        cost_true = rng.rand(sp_model.num_cost) + 0.1
+        cost_pred = rng.rand(sp_model.num_cost) + 0.1
+        sp_model.setObj(cost_true)
+        _, true_obj = sp_model.solve()
+        std = calRegret(sp_model, cost_pred, cost_true, true_obj)
+        unamb = calUnambRegret(sp_model, cost_pred, cost_true, true_obj)
+        # unamb may equal std when the predicted optimum is unique
+        assert unamb >= std - 1e-3
+
+    def test_max_iter_raises(self, sp_model):
+        """Passing max_iter<=0 should raise RuntimeError."""
+        cost = np.random.RandomState(42).rand(sp_model.num_cost) + 0.1
+        sp_model.setObj(cost)
+        _, true_obj = sp_model.solve()
+        with pytest.raises(RuntimeError):
+            calUnambRegret(sp_model, cost, cost, true_obj, max_iter=0)
+
+
+# ============================================================
 # testMSE tests
 # ============================================================
 

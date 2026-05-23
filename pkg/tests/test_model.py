@@ -30,6 +30,8 @@ except (ImportError, NameError):
     _HAS_GUROBI = False
 
 try:
+    # probe pyomo directly: `from pyepo.model.omo.*` succeeds even when pyomo is missing
+    import pyomo.environ  # noqa: F401
     from pyepo.model.omo.shortestpath import shortestPathModel as omoShortestPathModel
     from pyepo.model.omo.knapsack import knapsackModel as omoKnapsackModel
     from pyepo.model.omo.tsp import (
@@ -65,6 +67,15 @@ try:
 except (ImportError, NameError):
     _HAS_ORTOOLS = False
 
+try:
+    import jax  # noqa: F401
+    import mpax  # noqa: F401
+    from pyepo.model.mpax.shortestpath import shortestPathModel as mpaxShortestPathModel
+    from pyepo.model.mpax.knapsack import knapsackModel as mpaxKnapsackModel
+    _HAS_MPAX = True
+except (ImportError, NameError):
+    _HAS_MPAX = False
+
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
 requires_pyomo = pytest.mark.skipif(
     not (_HAS_PYOMO and _HAS_GUROBI),
@@ -72,6 +83,11 @@ requires_pyomo = pytest.mark.skipif(
 )
 requires_copt = pytest.mark.skipif(not _HAS_COPT, reason="COPT not installed")
 requires_ortools = pytest.mark.skipif(not _HAS_ORTOOLS, reason="OR-Tools not installed")
+requires_mpax = pytest.mark.skipif(not _HAS_MPAX, reason="MPAX (jax + mpax) not installed")
+requires_mpax_gurobi = pytest.mark.skipif(
+    not (_HAS_MPAX and _HAS_GUROBI),
+    reason="MPAX or Gurobi not installed"
+)
 
 
 # ============================================================
@@ -1763,3 +1779,120 @@ class TestCrossBackendOrt:
         ort_model.setObj(cost)
         _, ort_obj = ort_model.solve()
         np.testing.assert_allclose(grb_obj, ort_obj, atol=1e-2)
+
+
+# ============================================================
+# MPAX (JAX-based LP) backend
+# ============================================================
+# MPAX is PDHG-based (tol ~1e-4); knapsack here is LP relaxation, compare vs knapsackModelRel.
+
+@requires_mpax
+class TestMpaxShortestPathModel:
+
+    @pytest.fixture
+    def model(self):
+        return mpaxShortestPathModel(grid=(3, 3))
+
+    def test_init(self, model):
+        assert model.modelSense == EPO.MINIMIZE
+        assert model.grid == (3, 3)
+
+    def test_num_cost(self, model):
+        # 3x3 grid: (3-1)*3 + (3-1)*3 = 12 arcs
+        assert model.num_cost == 12
+
+    def test_setObj_and_solve(self, model):
+        cost = np.random.RandomState(42).rand(12)
+        model.setObj(cost)
+        sol, obj = model.solve()
+        assert len(sol) == model.num_cost
+        assert isinstance(obj, float)
+        # sanity: objective equals c.T sol
+        np.testing.assert_allclose(obj, np.dot(cost, np.asarray(sol)), atol=1e-3)
+
+    def test_setObj_wrong_size(self, model):
+        with pytest.raises(ValueError):
+            model.setObj(np.zeros(99))
+
+    def test_copy(self, model):
+        cost = np.random.RandomState(42).rand(12)
+        model.setObj(cost)
+        _, obj1 = model.solve()
+        new_model = model.copy()
+        new_model.setObj(cost)
+        _, obj2 = new_model.solve()
+        np.testing.assert_allclose(obj1, obj2, atol=1e-3)
+
+    def test_addConstr(self, model):
+        cost = np.random.RandomState(42).rand(12)
+        model.setObj(cost)
+        _, obj0 = model.solve()
+        # adding redundant constraint sum(x) >= 0 should not change optimum much
+        new_model = model.addConstr([1.0] * 12, 0.0)
+        new_model.setObj(cost)
+        _, obj1 = new_model.solve()
+        # new constraint is non-binding, obj should be unchanged
+        np.testing.assert_allclose(obj0, obj1, atol=1e-3)
+
+
+@requires_mpax
+class TestMpaxKnapsackModel:
+
+    @pytest.fixture
+    def model(self):
+        weights = np.array([[3.0, 4.0, 5.0, 6.0]])
+        capacity = np.array([10.0])
+        return mpaxKnapsackModel(weights=weights, capacity=capacity)
+
+    def test_init(self, model):
+        assert model.modelSense == EPO.MAXIMIZE
+
+    def test_num_cost(self, model):
+        assert model.num_cost == 4
+
+    def test_solve(self, model):
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        assert len(sol) == model.num_cost
+        assert isinstance(obj, float)
+        # LP relaxation: items can be fractional, but all in [0, 1]
+        sol_np = np.asarray(sol)
+        assert sol_np.min() >= -1e-3
+        assert sol_np.max() <= 1.0 + 1e-3
+
+    def test_setObj_wrong_size(self, model):
+        with pytest.raises(ValueError):
+            model.setObj(np.zeros(99))
+
+
+# ============================================================
+# Cross-backend consistency: MPAX vs Gurobi
+# ============================================================
+
+@requires_mpax_gurobi
+class TestCrossBackendMpax:
+
+    def test_shortestpath_grb_vs_mpax(self):
+        # Shortest path LP relaxation matches IP because constraint matrix is TU
+        cost = np.random.RandomState(42).rand(12)
+        grb_model = shortestPathModel(grid=(3, 3))
+        grb_model.setObj(cost)
+        _, grb_obj = grb_model.solve()
+        mpax_model = mpaxShortestPathModel(grid=(3, 3))
+        mpax_model.setObj(cost)
+        _, mpax_obj = mpax_model.solve()
+        np.testing.assert_allclose(grb_obj, mpax_obj, atol=1e-2)
+
+    def test_knapsack_lp_grb_vs_mpax(self):
+        # MPAX knapsack is LP relaxation — compare against grb knapsackModelRel
+        weights = np.array([[3.0, 4.0, 5.0, 6.0]])
+        capacity = np.array([10.0])
+        cost = np.array([10.0, 6.0, 3.0, 2.0])
+        grb_model = knapsackModelRel(weights=weights, capacity=capacity)
+        grb_model.setObj(cost)
+        _, grb_obj = grb_model.solve()
+        mpax_model = mpaxKnapsackModel(weights=weights, capacity=capacity)
+        mpax_model.setObj(cost)
+        _, mpax_obj = mpax_model.solve()
+        np.testing.assert_allclose(grb_obj, mpax_obj, atol=1e-2)
