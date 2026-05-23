@@ -1,0 +1,37 @@
+pyepo.data.shortestpath
+=======================
+
+.. py:module:: pyepo.data.shortestpath
+
+.. autoapi-nested-parse::
+
+   Synthetic data for shortest path problem
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.data.shortestpath.genData
+
+
+Module Contents
+---------------
+
+.. py:function:: genData(num_data: int, num_features: int, grid: tuple[int, int], deg: int = 1, noise_width: float = 0, seed: int = 135) -> tuple[numpy.ndarray, numpy.ndarray]
+
+   A function to generate synthetic data and features for shortest path
+
+   :param num_data: number of data points
+   :param num_features: dimension of features
+   :param grid: size of grid network
+   :param deg: data polynomial degree
+   :param noise_width: half width of data random noise
+   :param seed: random seed
+
+   :returns: data features (np.ndarray), costs (np.ndarray)
+   :rtype: tuple
+
+

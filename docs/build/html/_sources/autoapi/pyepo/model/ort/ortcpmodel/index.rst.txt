@@ -1,0 +1,78 @@
+pyepo.model.ort.ortcpmodel
+==========================
+
+.. py:module:: pyepo.model.ort.ortcpmodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model based on Google OR-Tools CP-SAT
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.ort.ortcpmodel.optOrtCpModel
+
+
+Module Contents
+---------------
+
+.. py:class:: optOrtCpModel
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for an OR-Tools CP-SAT optimization model
+
+   :ivar _model: OR-Tools CP-SAT model
+
+   :vartype _model: cp_model.CpModel
+
+
+   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
+
+      A method to set the objective function
+
+      :param c: cost of objective function
+
+
+
+   .. py:method:: solve() -> tuple[numpy.ndarray, float]
+
+      A method to solve the model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy() -> optOrtCpModel
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optOrtCpModel
+
+      A method to add a new constraint
+
+      :param coefs: coefficients of new constraint
+      :param rhs: right-hand side of new constraint
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax() -> optOrtCpModel
+
+      CP-SAT does not support LP relaxation.
+
+
+

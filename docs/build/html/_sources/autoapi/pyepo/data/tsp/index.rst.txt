@@ -1,0 +1,37 @@
+pyepo.data.tsp
+==============
+
+.. py:module:: pyepo.data.tsp
+
+.. autoapi-nested-parse::
+
+   Synthetic data for traveling salesman problem
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.data.tsp.genData
+
+
+Module Contents
+---------------
+
+.. py:function:: genData(num_data: int, num_features: int, num_nodes: int, deg: int = 1, noise_width: float = 0, seed: int = 135) -> tuple[numpy.ndarray, numpy.ndarray]
+
+   A function to generate synthetic data and features for traveling salesman
+
+   :param num_data: number of data points
+   :param num_features: dimension of features
+   :param num_nodes: number of nodes
+   :param deg: data polynomial degree
+   :param noise_width: half width of data random noise
+   :param seed: random seed
+
+   :returns: data features (np.ndarray), costs (np.ndarray)
+   :rtype: tuple
+
+

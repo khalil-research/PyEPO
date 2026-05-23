@@ -1,0 +1,23 @@
+pyepo.model.ort
+===============
+
+.. py:module:: pyepo.model.ort
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on Google OR-Tools
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/model/ort/knapsack/index
+   /autoapi/pyepo/model/ort/ortcpmodel/index
+   /autoapi/pyepo/model/ort/ortmodel/index
+   /autoapi/pyepo/model/ort/shortestpath/index
+
+

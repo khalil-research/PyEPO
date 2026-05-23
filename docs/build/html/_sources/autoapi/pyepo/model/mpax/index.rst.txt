@@ -1,0 +1,22 @@
+pyepo.model.mpax
+================
+
+.. py:module:: pyepo.model.mpax
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on MPAX
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/model/mpax/knapsack/index
+   /autoapi/pyepo/model/mpax/mpaxmodel/index
+   /autoapi/pyepo/model/mpax/shortestpath/index
+
+

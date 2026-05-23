@@ -1,0 +1,24 @@
+pyepo.model.omo
+===============
+
+.. py:module:: pyepo.model.omo
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on Pyomo
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/model/omo/knapsack/index
+   /autoapi/pyepo/model/omo/omomodel/index
+   /autoapi/pyepo/model/omo/portfolio/index
+   /autoapi/pyepo/model/omo/shortestpath/index
+   /autoapi/pyepo/model/omo/tsp/index
+
+

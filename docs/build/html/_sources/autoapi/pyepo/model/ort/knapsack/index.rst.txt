@@ -1,0 +1,110 @@
+pyepo.model.ort.knapsack
+========================
+
+.. py:module:: pyepo.model.ort.knapsack
+
+.. autoapi-nested-parse::
+
+   Knapsack problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.ort.knapsack.cost
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.ort.knapsack.knapsackModel
+   pyepo.model.ort.knapsack.knapsackModelRel
+   pyepo.model.ort.knapsack.knapsackCpModel
+
+
+Module Contents
+---------------
+
+.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, solver: str = 'scip')
+
+   Bases: :py:obj:`pyepo.model.ort.ortmodel.optOrtModel`
+
+
+   This class is an optimization model for the knapsack problem
+
+   :ivar _model: OR-Tools linear solver
+   :vartype _model: pywraplp.Solver
+   :ivar solver: solver backend
+   :vartype solver: str
+   :ivar weights: weights of items
+   :vartype weights: np.ndarray
+   :ivar capacity: total capacity
+   :vartype capacity: np.ndarray
+   :ivar items: list of item index
+
+   :vartype items: list
+
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
+   .. py:method:: relax() -> knapsackModelRel
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: knapsackModelRel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, solver: str = 'scip')
+
+   Bases: :py:obj:`knapsackModel`
+
+
+   This class is relaxed optimization model for knapsack problem.
+
+
+   .. py:method:: relax() -> knapsackModelRel
+
+      A forbidden method to relax MIP model
+
+
+
+.. py:class:: knapsackCpModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list)
+
+   Bases: :py:obj:`pyepo.model.ort.ortcpmodel.optOrtCpModel`
+
+
+   This class is an optimization model for the knapsack problem using CP-SAT
+
+   :ivar _model: OR-Tools CP-SAT model
+   :vartype _model: cp_model.CpModel
+   :ivar weights: weights of items
+   :vartype weights: np.ndarray
+   :ivar capacity: total capacity
+   :vartype capacity: np.ndarray
+   :ivar items: list of item index
+
+   :vartype items: list
+
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
+.. py:data:: cost
+

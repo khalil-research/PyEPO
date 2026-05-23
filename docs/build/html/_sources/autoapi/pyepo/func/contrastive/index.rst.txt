@@ -1,0 +1,67 @@
+pyepo.func.contrastive
+======================
+
+.. py:module:: pyepo.func.contrastive
+
+.. autoapi-nested-parse::
+
+   Noise contrastive estimation loss function
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.contrastive.NCE
+   pyepo.func.contrastive.contrastiveMAP
+
+
+Module Contents
+---------------
+
+.. py:class:: NCE(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for noise contrastive estimation as surrogate loss
+   functions, based on viewing suboptimal solutions as negative examples.
+
+   For the NCE, the cost vector needs to be predicted from contextual data and
+   maximizes the separation of the probability of the optimal solution.
+
+   This allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://www.ijcai.org/proceedings/2021/390>
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: contrastiveMAP(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for Maximum A Posterior contrastive estimation as
+   surrogate loss functions, which is an efficient self-contrastive algorithm.
+
+   For the MAP, the cost vector needs to be predicted from contextual data and
+   maximizes the separation of the probability of the optimal solution.
+
+   Thus, it allows us to design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://www.ijcai.org/proceedings/2021/390>
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+

@@ -1,0 +1,151 @@
+pyepo.model.opt
+===============
+
+.. py:module:: pyepo.model.opt
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.opt.optModel
+   pyepo.model.opt.unionFind
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.model.opt.costToNumpy
+   pyepo.model.opt.getTspTour
+
+
+Module Contents
+---------------
+
+.. py:function:: costToNumpy(c: numpy.ndarray | torch.Tensor | list, dtype=np.float32) -> numpy.ndarray
+
+   Normalize a cost vector to a numpy array, detaching torch tensors as needed.
+
+   :param c: cost vector
+   :param dtype: target dtype when ``c`` is not already a tensor; torch
+                 tensors are converted via ``.detach().cpu().numpy()`` and keep their
+                 existing dtype.
+
+   :returns: numpy cost vector
+   :rtype: np.ndarray
+
+
+.. py:class:: optModel
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   This is an abstract class for an optimization model
+
+   :ivar _model: underlying solver model object
+
+   :vartype _model: optimization model
+
+
+   .. py:attribute:: modelSense
+      :type:  pyepo.EPO.ModelSense
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
+      :abstractmethod:
+
+
+      An abstract method to set the objective function
+
+      :param c: cost of objective function
+
+
+
+   .. py:method:: solve() -> tuple[numpy.ndarray | torch.Tensor | list, float]
+      :abstractmethod:
+
+
+      An abstract method to solve the model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy() -> optModel
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optModel
+      :abstractmethod:
+
+
+      A method to add a new constraint. Subclasses should override.
+
+      :param coefs: coefficients of the new constraint
+      :param rhs: right-hand side of new constraint
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax() -> optModel
+      :abstractmethod:
+
+
+      A method to relax the MIP model. Subclasses should override.
+
+
+
+.. py:class:: unionFind(n: int)
+
+   Union-Find data structure for cycle detection in graphs
+
+
+   .. py:attribute:: parent
+
+
+   .. py:method:: find(i: int) -> int
+
+
+   .. py:method:: union(i: int, j: int) -> bool
+
+
+.. py:function:: getTspTour(edge_list: list[tuple[int, int]], num_nodes: int, sol: numpy.ndarray | torch.Tensor | list, threshold: float = 0.01) -> list[int]
+
+   Reconstruct a TSP tour from an undirected edge-selection vector.
+
+   :param edge_list: undirected edges of the model, ordered to match ``sol``
+   :param num_nodes: number of nodes in the TSP instance
+   :param sol: solution values aligned with ``edge_list``; an edge is
+               considered active when its value exceeds ``threshold``
+   :param threshold: activation threshold for an edge
+
+   :returns: node sequence of the tour (closes back to node 0 if reachable)
+   :rtype: list
+
+   :raises ValueError: if the solution does not form a single connected tour
+       (skips nodes or contains disconnected subtours).
+
+

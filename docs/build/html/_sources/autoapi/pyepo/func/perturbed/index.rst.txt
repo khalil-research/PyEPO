@@ -1,0 +1,321 @@
+pyepo.func.perturbed
+====================
+
+.. py:module:: pyepo.func.perturbed
+
+.. autoapi-nested-parse::
+
+   Perturbed optimization function
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.perturbed.perturbedOpt
+   pyepo.func.perturbed.perturbedOptFunc
+   pyepo.func.perturbed.perturbedFenchelYoung
+   pyepo.func.perturbed.perturbedFenchelYoungFunc
+   pyepo.func.perturbed.implicitMLE
+   pyepo.func.perturbed.implicitMLEFunc
+   pyepo.func.perturbed.adaptiveImplicitMLE
+   pyepo.func.perturbed.adaptiveImplicitMLEFunc
+
+
+Module Contents
+---------------
+
+.. py:class:: perturbedOpt(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, processes: int = 1, seed: int = 135, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for Fenchel-Young loss using perturbation techniques. The
+   use of the loss improves the algorithm by the specific expression of the
+   gradients of the loss.
+
+   For the perturbed optimizer, the cost vector needs to be predicted from
+   contextual data and is perturbed with Gaussian noise.
+
+   Thus, it allows us to design an algorithm based on stochastic gradient
+   descent.
+
+   Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
+
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: rnd
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: perturbedOptFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+
+   An autograd function for perturbed optimizer
+
+
+   .. py:method:: forward(ctx, pred_cost: torch.Tensor, module: perturbedOpt) -> torch.Tensor
+      :staticmethod:
+
+
+      Forward pass for perturbed
+
+      :param pred_cost: a batch of predicted values of the cost
+      :param module: perturbedOpt module
+
+      :returns: solution expectations with perturbation
+      :rtype: torch.tensor
+
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for perturbed
+
+
+
+.. py:class:: perturbedFenchelYoung(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, processes: int = 1, seed: int = 135, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for Fenchel-Young loss using perturbation techniques. The
+   use of the loss improves the algorithm by the specific expression of the
+   gradients of the loss.
+
+   For the perturbed optimizer, the cost vector needs to be predicted from
+   contextual data and is perturbed with Gaussian noise.
+
+   The Fenchel-Young loss allows directly optimizing a loss between the features
+   and solutions with less computation. Thus, it allows us to design an algorithm
+   based on stochastic gradient descent.
+
+   Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
+
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: rnd
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: perturbedFenchelYoungFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+
+   An autograd function for Fenchel-Young loss using perturbation techniques.
+
+
+   .. py:method:: forward(ctx, pred_cost: torch.Tensor, true_sol: torch.Tensor, module: perturbedFenchelYoung) -> torch.Tensor
+      :staticmethod:
+
+
+      Forward pass for perturbed Fenchel-Young loss
+
+      :param pred_cost: a batch of predicted values of the cost
+      :param true_sol: a batch of true optimal solutions
+      :param module: perturbedFenchelYoung module
+
+      :returns: solution expectations with perturbation
+      :rtype: torch.tensor
+
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for perturbed Fenchel-Young loss
+
+
+
+.. py:class:: implicitMLE(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, lambd: float = 10, distribution: pyepo.func.utils.sumGammaDistribution | None = None, two_sides: bool = False, processes: int = 1, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for Implicit Maximum Likelihood Estimator, which yields
+   an optimal solution in a constrained exponential family distribution via
+   Perturb-and-MAP.
+
+   For I-MLE, it works as black-box combinatorial solvers, in which constraints
+   are known and fixed, but the cost vector needs to be predicted from
+   contextual data.
+
+   The I-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
+
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: lambd
+      :value: 10
+
+
+
+   .. py:attribute:: distribution
+      :value: None
+
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: implicitMLEFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+
+   An autograd function for Implicit Maximum Likelihood Estimator
+
+
+   .. py:method:: forward(ctx, pred_cost: torch.Tensor, module: implicitMLE) -> torch.Tensor
+      :staticmethod:
+
+
+      Forward pass for IMLE
+
+      :param pred_cost: a batch of predicted values of the cost
+      :param module: implicitMLE module
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for IMLE
+
+
+
+.. py:class:: adaptiveImplicitMLE(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, distribution: pyepo.func.utils.sumGammaDistribution | None = None, two_sides: bool = False, processes: int = 1, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
+   adaptively chooses hyperparameter λ and yields an optimal solution in a
+   constrained exponential family distribution via Perturb-and-MAP.
+
+   For AI-MLE, it works as black-box combinatorial solvers, in which constraints
+   are known and fixed, but the cost vector needs to be predicted from
+   contextual data.
+
+   The AI-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
+
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+      :value: 1.0
+
+
+
+   .. py:attribute:: distribution
+      :value: None
+
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
+   .. py:attribute:: alpha
+      :value: 1.0
+
+
+
+   .. py:attribute:: grad_norm_avg
+      :value: 1
+
+
+
+   .. py:attribute:: step
+      :value: 0.001
+
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: adaptiveImplicitMLEFunc(*args, **kwargs)
+
+   Bases: :py:obj:`implicitMLEFunc`
+
+
+   An autograd function for Adaptive Implicit Maximum Likelihood Estimator
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for IMLE
+
+
+

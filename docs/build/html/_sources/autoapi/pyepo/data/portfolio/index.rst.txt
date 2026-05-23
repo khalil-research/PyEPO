@@ -1,0 +1,37 @@
+pyepo.data.portfolio
+====================
+
+.. py:module:: pyepo.data.portfolio
+
+.. autoapi-nested-parse::
+
+   Synthetic data for portfolio
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.data.portfolio.genData
+
+
+Module Contents
+---------------
+
+.. py:function:: genData(num_data: int, num_features: int, num_assets: int, deg: int = 1, noise_level: float = 1, seed: int = 135) -> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]
+
+   A function to generate synthetic data and features for portfolio
+
+   :param num_data: number of data points
+   :param num_features: dimension of features
+   :param num_assets: number of assets
+   :param deg: data polynomial degree
+   :param noise_level: level of data random noise
+   :param seed: random seed
+
+   :returns: data features (np.ndarray), costs (np.ndarray)
+   :rtype: tuple
+
+

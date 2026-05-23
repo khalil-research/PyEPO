@@ -1,0 +1,53 @@
+pyepo.EPO
+=========
+
+.. py:module:: pyepo.EPO
+
+.. autoapi-nested-parse::
+
+   Constants
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.EPO.MINIMIZE
+   pyepo.EPO.MAXIMIZE
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.EPO.ModelSense
+
+
+Module Contents
+---------------
+
+.. py:class:: ModelSense
+
+   Bases: :py:obj:`enum.IntEnum`
+
+
+   Optimization direction for the objective.
+
+
+   .. py:attribute:: MINIMIZE
+      :value: 1
+
+
+
+   .. py:attribute:: MAXIMIZE
+      :value: -1
+
+
+
+.. py:data:: MINIMIZE
+
+.. py:data:: MAXIMIZE
+

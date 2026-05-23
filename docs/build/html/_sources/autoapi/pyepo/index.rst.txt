@@ -1,0 +1,28 @@
+pyepo
+=====
+
+.. py:module:: pyepo
+
+.. autoapi-nested-parse::
+
+   pyepo
+   =====
+   PyTorch-based End-to-End Predict-then-Optimize Tool
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/EPO/index
+   /autoapi/pyepo/data/index
+   /autoapi/pyepo/func/index
+   /autoapi/pyepo/metric/index
+   /autoapi/pyepo/model/index
+   /autoapi/pyepo/twostage/index
+   /autoapi/pyepo/utils/index
+
+

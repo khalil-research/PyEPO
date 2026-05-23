@@ -1,0 +1,41 @@
+pyepo.func.utils
+================
+
+.. py:module:: pyepo.func.utils
+
+.. autoapi-nested-parse::
+
+   Utility function
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.utils.sumGammaDistribution
+
+
+Module Contents
+---------------
+
+.. py:class:: sumGammaDistribution(kappa: float, n_iterations: int = 10, seed: int = 135)
+
+   creates a generator of samples for the Sum-of-Gamma distribution
+
+
+   .. py:attribute:: κ
+
+
+   .. py:attribute:: n_iterations
+      :value: 10
+
+
+
+   .. py:attribute:: rnd
+
+
+   .. py:method:: sample(size: int | tuple[int, Ellipsis]) -> numpy.ndarray
+
+

@@ -1,0 +1,74 @@
+pyepo.func.abcmodule
+====================
+
+.. py:module:: pyepo.func.abcmodule
+
+.. autoapi-nested-parse::
+
+   Abstract autograd optimization module
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.abcmodule.logger
+   pyepo.func.abcmodule.Reduction
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.abcmodule.optModule
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: Reduction
+
+.. py:class:: optModule(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None, require_solpool: bool = False)
+
+   Bases: :py:obj:`torch.nn.Module`
+
+
+   An abstract module for differentiable optimization losses in end-to-end
+   predict-then-optimize. It provides common functionality (multiprocessing,
+   solution pooling, loss reduction) for all loss modules.
+
+
+   .. py:attribute:: optmodel
+
+
+   .. py:attribute:: processes
+
+
+   .. py:attribute:: solve_ratio
+      :value: 1.0
+
+
+
+   .. py:attribute:: solpool
+      :value: None
+
+
+
+   .. py:attribute:: reduction
+      :value: 'mean'
+
+
+
+   .. py:method:: forward(*args: torch.Tensor) -> torch.Tensor
+      :abstractmethod:
+
+
+      Forward pass
+
+
+

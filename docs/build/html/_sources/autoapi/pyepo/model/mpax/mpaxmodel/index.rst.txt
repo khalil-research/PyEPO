@@ -1,0 +1,124 @@
+pyepo.model.mpax.mpaxmodel
+==========================
+
+.. py:module:: pyepo.model.mpax.mpaxmodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model based on MPAX
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.mpaxmodel.num_vars
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.mpaxmodel.optMpaxModel
+
+
+Module Contents
+---------------
+
+.. py:class:: optMpaxModel(A: numpy.ndarray | torch.Tensor | None = None, b: numpy.ndarray | torch.Tensor | None = None, G: numpy.ndarray | torch.Tensor | None = None, h: numpy.ndarray | torch.Tensor | None = None, l: numpy.ndarray | torch.Tensor | None = None, u: numpy.ndarray | torch.Tensor | None = None, use_sparse_matrix: bool = True, minimize: bool = True)
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for an MPAX-based optimization model
+
+   :ivar A: The matrix of equality constraints.
+   :vartype A: jnp.ndarray, BCOO or BCSR
+   :ivar b: The right hand side of equality constraints.
+   :vartype b: jnp.ndarray
+   :ivar G: The matrix for inequality constraints.
+   :vartype G: jnp.ndarray, BCOO or BCSR
+   :ivar h: The right hand side of inequality constraints.
+   :vartype h: jnp.ndarray
+   :ivar l: The lower bound of the variables.
+   :vartype l: jnp.ndarray
+   :ivar u: The upper bound of the variables.
+   :vartype u: jnp.ndarray
+   :ivar use_sparse_matrix: Whether to use sparse matrix format, by default True.
+   :vartype use_sparse_matrix: bool
+   :ivar minimize: Whether to minimize objective, by default True.
+
+   :vartype minimize: bool
+
+
+   .. py:attribute:: l
+
+
+   .. py:attribute:: u
+
+
+   .. py:attribute:: use_sparse_matrix
+      :value: True
+
+
+
+   .. py:attribute:: modelSense
+
+
+   .. py:attribute:: device
+      :value: None
+
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
+
+      A method to set the objective function
+
+      :param c: cost of objective function
+
+
+
+   .. py:method:: solve() -> tuple[torch.Tensor, float]
+
+      A method to solve the model
+
+      :returns: optimal solution (list) and objective value (jnp.float32)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy() -> optMpaxModel
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optMpaxModel
+
+      A method to add a new constraint
+
+      :param coefs: coefficients of new constraint
+      :param rhs: right-hand side of new constraint
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+.. py:data:: num_vars
+   :value: 10
+
+

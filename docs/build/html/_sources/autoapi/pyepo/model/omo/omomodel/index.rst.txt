@@ -1,0 +1,79 @@
+pyepo.model.omo.omomodel
+========================
+
+.. py:module:: pyepo.model.omo.omomodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model based on Pyomo
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.omo.omomodel.optOmoModel
+
+
+Module Contents
+---------------
+
+.. py:class:: optOmoModel(solver: str = 'glpk')
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for a Pyomo-based optimization model
+
+   :ivar _model: Pyomo model
+   :vartype _model: Pyomo model
+   :ivar solver: optimization solver in the background
+
+   :vartype solver: str
+
+
+   .. py:attribute:: solver
+      :value: 'glpk'
+
+
+
+   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
+
+      A method to set the objective function
+
+      :param c: cost of objective function
+
+
+
+   .. py:method:: solve() -> tuple[list, float]
+
+      A method to solve the model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy() -> optOmoModel
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optOmoModel
+
+      A method to add a new constraint
+
+      :param coefs: coefficients of new constraint
+      :param rhs: right-hand side of new constraint
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+

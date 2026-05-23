@@ -1,0 +1,82 @@
+pyepo.metric.metrics
+====================
+
+.. py:module:: pyepo.metric.metrics
+
+.. autoapi-nested-parse::
+
+   Metrics for SKlearn model
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.metric.metrics.SPOError
+   pyepo.metric.metrics.makeSkScorer
+   pyepo.metric.metrics.makeAutoSkScorer
+   pyepo.metric.metrics.testMSE
+   pyepo.metric.metrics.makeTestMSEScorer
+
+
+Module Contents
+---------------
+
+.. py:function:: SPOError(pred_cost: numpy.ndarray, true_cost: numpy.ndarray, model_type: type, args: dict) -> float
+
+   A function to calculate normalized true regret
+
+   :param pred_cost: predicted costs
+   :param true_cost: true costs
+   :param model_type: optModel class type
+   :param args: optModel args
+
+   :returns: regret loss
+   :rtype: float
+
+
+.. py:function:: makeSkScorer(optmodel: pyepo.model.opt.optModel)
+
+   A function to create sklearn scorer
+
+   :param optmodel: optimization model
+
+   :returns: callable object that returns a scalar score; less is better.
+   :rtype: scorer
+
+
+.. py:function:: makeAutoSkScorer(optmodel: pyepo.model.opt.optModel)
+
+   A function to create Auto-SKlearn scorer
+
+   :param optmodel: optimization model
+
+   :returns: callable object that returns a scalar score; less is better.
+   :rtype: scorer
+
+
+.. py:function:: testMSE(pred_cost: numpy.ndarray, true_cost: numpy.ndarray, model_type: type, args: dict) -> float
+
+   A function to calculate MSE for testing
+
+   :param pred_cost: predicted costs
+   :param true_cost: true costs
+   :param model_type: optModel class type
+   :param args: optModel args
+
+   :returns: mse
+   :rtype: float
+
+
+.. py:function:: makeTestMSEScorer(optmodel: pyepo.model.opt.optModel)
+
+   A function to create MSE scorer for testing
+
+   :param optmodel: optimization model
+
+   :returns: callable object that returns a scalar score; less is better.
+   :rtype: scorer
+
+

@@ -1,0 +1,116 @@
+pyepo.func.surrogate
+====================
+
+.. py:module:: pyepo.func.surrogate
+
+.. autoapi-nested-parse::
+
+   Surrogate Loss function
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.surrogate.SPOPlus
+   pyepo.func.surrogate.SPOPlusFunc
+   pyepo.func.surrogate.perturbationGradient
+
+
+Module Contents
+---------------
+
+.. py:class:: SPOPlus(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for SPO+ Loss, as a surrogate loss function of SPO
+   (regret) Loss, which measures the decision error of the optimization problem.
+
+   For SPO/SPO+ Loss, the objective function is linear and constraints are
+   known and fixed, but the cost vector needs to be predicted from contextual
+   data.
+
+   The SPO+ Loss is convex with subgradient. Thus, it allows us to design an
+   algorithm based on stochastic gradient descent.
+
+   Reference: <https://doi.org/10.1287/mnsc.2020.3922>
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor, true_cost: torch.Tensor, true_sol: torch.Tensor, true_obj: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: SPOPlusFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+
+   An autograd function for SPO+ Loss
+
+
+   .. py:method:: forward(ctx, pred_cost: torch.Tensor, true_cost: torch.Tensor, true_sol: torch.Tensor, true_obj: torch.Tensor, module: SPOPlus) -> torch.Tensor
+      :staticmethod:
+
+
+      Forward pass for SPO+
+
+      :param pred_cost: a batch of predicted values of the cost
+      :param true_cost: a batch of true values of the cost
+      :param true_sol: a batch of true optimal solutions
+      :param true_obj: a batch of true optimal objective values
+      :param module: SPOPlus module
+
+      :returns: SPO+ loss
+      :rtype: torch.tensor
+
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for SPO+
+
+
+
+.. py:class:: perturbationGradient(optmodel: pyepo.model.opt.optModel, sigma: float = 0.1, two_sides: bool = False, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for PG Loss, as a surrogate loss function of objective
+   value, which measures the decision quality of the optimization problem.
+
+   For PG Loss, the objective function is linear, and constraints are
+   known and fixed, but the cost vector needs to be predicted from contextual
+   data.
+
+   According to Danskin’s Theorem, the PG Loss is derived from different zeroth
+   order approximations and has the informative gradient. Thus, it allows us to
+   design an algorithm based on stochastic gradient descent.
+
+   Reference: <https://arxiv.org/abs/2402.03256>
+
+
+   .. py:attribute:: sigma
+      :value: 0.1
+
+
+
+   .. py:attribute:: two_sides
+      :value: False
+
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor, true_cost: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+

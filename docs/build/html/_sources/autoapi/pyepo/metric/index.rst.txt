@@ -1,0 +1,23 @@
+pyepo.metric
+============
+
+.. py:module:: pyepo.metric
+
+.. autoapi-nested-parse::
+
+   Performance evaluation
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/metric/metrics/index
+   /autoapi/pyepo/metric/mse/index
+   /autoapi/pyepo/metric/regret/index
+   /autoapi/pyepo/metric/unambregret/index
+
+

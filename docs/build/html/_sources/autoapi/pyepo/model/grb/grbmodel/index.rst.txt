@@ -1,0 +1,79 @@
+pyepo.model.grb.grbmodel
+========================
+
+.. py:module:: pyepo.model.grb.grbmodel
+
+.. autoapi-nested-parse::
+
+   Abstract optimization model based on GurobiPy
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.grb.grbmodel.optGrbModel
+
+
+Module Contents
+---------------
+
+.. py:class:: optGrbModel
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   This is an abstract class for a Gurobi-based optimization model
+
+   :ivar _model: Gurobi model
+
+   :vartype _model: GurobiPy model
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
+
+      A method to set the objective function
+
+      :param c: cost of objective function
+
+
+
+   .. py:method:: solve() -> tuple[numpy.ndarray, float]
+
+      A method to solve the model
+
+      :returns: optimal solution (list) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: copy() -> optGrbModel
+
+      A method to copy the model
+
+      :returns: new copied model
+      :rtype: optModel
+
+
+
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optGrbModel
+
+      A method to add a new constraint
+
+      :param coefs: coefficients of new constraint
+      :param rhs: right-hand side of new constraint
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+

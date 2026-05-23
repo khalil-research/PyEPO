@@ -1,0 +1,32 @@
+pyepo.twostage.sklearnpred
+==========================
+
+.. py:module:: pyepo.twostage.sklearnpred
+
+.. autoapi-nested-parse::
+
+   Two-stage model with Scikit-learn predictor
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.twostage.sklearnpred.sklearnPred
+
+
+Module Contents
+---------------
+
+.. py:function:: sklearnPred(pmodel: sklearn.base.BaseEstimator) -> sklearn.multioutput.MultiOutputRegressor
+
+   Two-stage prediction and optimization with scikit-learn.
+
+   :param pmodel: scikit-learn regression model
+
+   :returns: scikit-learn multi-output regression model
+   :rtype: MultiOutputRegressor
+
+

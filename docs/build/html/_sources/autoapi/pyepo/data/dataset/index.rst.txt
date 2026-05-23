@@ -1,0 +1,119 @@
+pyepo.data.dataset
+==================
+
+.. py:module:: pyepo.data.dataset
+
+.. autoapi-nested-parse::
+
+   optDataset class based on PyTorch Dataset
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.data.dataset.logger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.data.dataset.optDataset
+   pyepo.data.dataset.optDatasetKNN
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: optDataset(model: pyepo.model.opt.optModel, feats: numpy.ndarray | torch.Tensor, costs: numpy.ndarray | torch.Tensor)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   This class is a Torch Dataset for optimization problems.
+
+   :ivar model: Optimization model
+   :vartype model: optModel
+   :ivar feats: Data features
+   :vartype feats: torch.Tensor
+   :ivar costs: Cost vectors
+   :vartype costs: torch.Tensor
+   :ivar sols: Optimal solutions
+   :vartype sols: torch.Tensor
+   :ivar objs: Optimal objective values
+
+   :vartype objs: torch.Tensor
+
+
+   .. py:attribute:: model
+
+
+   .. py:attribute:: feats
+
+
+   .. py:attribute:: costs
+
+
+   .. py:attribute:: sols
+
+
+   .. py:attribute:: objs
+
+
+.. py:class:: optDatasetKNN(model: pyepo.model.opt.optModel, feats: numpy.ndarray | torch.Tensor, costs: numpy.ndarray | torch.Tensor, k: int = 10, weight: float = 0.5)
+
+   Bases: :py:obj:`optDataset`
+
+
+   This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.
+
+   Reference: <https://arxiv.org/abs/2310.04328>
+
+   :ivar model: Optimization model
+   :vartype model: optModel
+   :ivar k: number of nearest neighbours selected
+   :vartype k: int
+   :ivar weight: weight of kNN-loss
+   :vartype weight: float
+   :ivar feats: Data features
+   :vartype feats: np.ndarray
+   :ivar costs: Cost vectors
+   :vartype costs: np.ndarray
+   :ivar sols: Optimal solutions
+   :vartype sols: np.ndarray
+   :ivar objs: Optimal objective values
+
+   :vartype objs: np.ndarray
+
+
+   .. py:attribute:: model
+
+
+   .. py:attribute:: k
+      :value: 10
+
+
+
+   .. py:attribute:: weight
+      :value: 0.5
+
+
+
+   .. py:attribute:: feats
+
+
+   .. py:attribute:: costs
+
+
+   .. py:attribute:: sols
+
+
+   .. py:attribute:: objs
+
+

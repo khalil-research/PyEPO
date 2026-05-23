@@ -1,0 +1,24 @@
+pyepo.data
+==========
+
+.. py:module:: pyepo.data
+
+.. autoapi-nested-parse::
+
+   Synthetic data generation
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/data/dataset/index
+   /autoapi/pyepo/data/knapsack/index
+   /autoapi/pyepo/data/portfolio/index
+   /autoapi/pyepo/data/shortestpath/index
+   /autoapi/pyepo/data/tsp/index
+
+

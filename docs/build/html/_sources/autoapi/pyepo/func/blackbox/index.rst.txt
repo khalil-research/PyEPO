@@ -1,0 +1,141 @@
+pyepo.func.blackbox
+===================
+
+.. py:module:: pyepo.func.blackbox
+
+.. autoapi-nested-parse::
+
+   Differentiable Black-box optimization function
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.blackbox.blackboxOpt
+   pyepo.func.blackbox.blackboxOptFunc
+   pyepo.func.blackbox.negativeIdentity
+   pyepo.func.blackbox.negativeIdentityFunc
+
+
+Module Contents
+---------------
+
+.. py:class:: blackboxOpt(optmodel: pyepo.model.opt.optModel, lambd: float = 10, processes: int = 1, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for differentiable black-box optimizer, which yields
+   an optimal solution and derive a gradient.
+
+   For differentiable black-box, the objective function is linear and
+   constraints are known and fixed, but the cost vector needs to be predicted
+   from contextual data.
+
+   The black-box approximates the gradient of the optimizer by interpolating
+   the loss function. Thus, it allows us to design an algorithm based on
+   stochastic gradient descent.
+
+   Reference: <https://arxiv.org/abs/1912.02175>
+
+
+   .. py:attribute:: lambd
+      :value: 10
+
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: blackboxOptFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+
+   An autograd function for differentiable black-box optimizer
+
+
+   .. py:method:: forward(ctx, pred_cost: torch.Tensor, module: blackboxOpt) -> torch.Tensor
+      :staticmethod:
+
+
+      Forward pass for DBB
+
+      :param pred_cost: a batch of predicted values of the cost
+      :param module: blackboxOpt module
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for DBB
+
+
+
+.. py:class:: negativeIdentity(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for the differentiable optimizer, which yields an optimal
+   solution and uses negative identity as a gradient on the backward pass.
+
+   For negative identity backpropagation, the objective function is linear and
+   constraints are known and fixed, but the cost vector needs to be predicted
+   from contextual data.
+
+   If the interpolation hyperparameter λ aligns with an appropriate step size,
+   then the identity update is equivalent to DBB. However, the identity update
+   does not require an additional call to the solver during the backward pass
+   and tuning an additional hyperparameter λ.
+
+   Reference: <https://arxiv.org/abs/2205.15213>
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: negativeIdentityFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+
+   An autograd function for negative identity optimizer
+
+
+   .. py:method:: forward(ctx, pred_cost: torch.Tensor, module: negativeIdentity) -> torch.Tensor
+      :staticmethod:
+
+
+      Forward pass for NID
+
+      :param pred_cost: a batch of predicted values of the cost
+      :param module: negativeIdentity module
+
+      :returns: predicted solutions
+      :rtype: torch.tensor
+
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for NID
+
+
+

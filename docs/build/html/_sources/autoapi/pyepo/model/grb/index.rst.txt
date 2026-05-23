@@ -1,0 +1,24 @@
+pyepo.model.grb
+===============
+
+.. py:module:: pyepo.model.grb
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on GurobiPy
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/model/grb/grbmodel/index
+   /autoapi/pyepo/model/grb/knapsack/index
+   /autoapi/pyepo/model/grb/portfolio/index
+   /autoapi/pyepo/model/grb/shortestpath/index
+   /autoapi/pyepo/model/grb/tsp/index
+
+

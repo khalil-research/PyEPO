@@ -1,0 +1,26 @@
+pyepo.func
+==========
+
+.. py:module:: pyepo.func
+
+.. autoapi-nested-parse::
+
+   Pytorch autograd function for end-to-end training
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/func/abcmodule/index
+   /autoapi/pyepo/func/blackbox/index
+   /autoapi/pyepo/func/contrastive/index
+   /autoapi/pyepo/func/perturbed/index
+   /autoapi/pyepo/func/rank/index
+   /autoapi/pyepo/func/surrogate/index
+   /autoapi/pyepo/func/utils/index
+
+

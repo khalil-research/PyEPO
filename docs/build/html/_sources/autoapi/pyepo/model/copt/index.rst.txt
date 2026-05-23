@@ -1,0 +1,24 @@
+pyepo.model.copt
+================
+
+.. py:module:: pyepo.model.copt
+
+.. autoapi-nested-parse::
+
+   Optimization Model based on Cardinal Optimizer (COPT)
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/model/copt/coptmodel/index
+   /autoapi/pyepo/model/copt/knapsack/index
+   /autoapi/pyepo/model/copt/portfolio/index
+   /autoapi/pyepo/model/copt/shortestpath/index
+   /autoapi/pyepo/model/copt/tsp/index
+
+

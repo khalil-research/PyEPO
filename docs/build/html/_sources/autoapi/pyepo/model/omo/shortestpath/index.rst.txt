@@ -1,0 +1,58 @@
+pyepo.model.omo.shortestpath
+============================
+
+.. py:module:: pyepo.model.omo.shortestpath
+
+.. autoapi-nested-parse::
+
+   Shortest path problem
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.omo.shortestpath.cost
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.omo.shortestpath.shortestPathModel
+
+
+Module Contents
+---------------
+
+.. py:class:: shortestPathModel(grid: tuple[int, int], solver: str = 'glpk')
+
+   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+
+
+   This class is an optimization model for the shortest path problem
+
+   :ivar _model: Pyomo model
+   :vartype _model: Pyomo model
+   :ivar solver: optimization solver in the background
+   :vartype solver: str
+   :ivar grid: size of grid network
+   :vartype grid: tuple of int
+   :ivar arcs: list of arcs
+
+   :vartype arcs: list
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
+.. py:data:: cost
+

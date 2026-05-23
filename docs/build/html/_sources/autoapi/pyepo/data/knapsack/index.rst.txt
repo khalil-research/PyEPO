@@ -1,0 +1,38 @@
+pyepo.data.knapsack
+===================
+
+.. py:module:: pyepo.data.knapsack
+
+.. autoapi-nested-parse::
+
+   Synthetic data for knapsack problem
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.data.knapsack.genData
+
+
+Module Contents
+---------------
+
+.. py:function:: genData(num_data: int, num_features: int, num_items: int, dim: int = 1, deg: int = 1, noise_width: float = 0, seed: int = 135) -> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]
+
+   A function to generate synthetic data and features for knapsack
+
+   :param num_data: number of data points
+   :param num_features: dimension of features
+   :param num_items: number of items
+   :param dim: dimension of multi-dimensional knapsack
+   :param deg: data polynomial degree
+   :param noise_width: half width of data random noise
+   :param seed: random state seed
+
+   :returns: weights of items (np.ndarray), data features (np.ndarray), costs (np.ndarray)
+   :rtype: tuple
+
+
