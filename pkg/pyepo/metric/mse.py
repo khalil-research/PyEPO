@@ -5,11 +5,13 @@ Mean Squared Error
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import torch
 
 if TYPE_CHECKING:
+    from collections.abc import Sized
+
     from torch import nn
     from torch.utils.data import DataLoader
 
@@ -42,4 +44,4 @@ def MSE(predmodel: nn.Module, dataloader: DataLoader) -> float:
     finally:
         # restore training mode even if evaluation raises
         predmodel.train()
-    return loss / len(dataloader.dataset)
+    return loss / len(cast("Sized", dataloader.dataset))

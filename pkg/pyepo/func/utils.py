@@ -42,6 +42,8 @@ def _solve_or_cache(cp: torch.Tensor, module: optModule) -> tuple[torch.Tensor, 
     if np.random.uniform() <= module.solve_ratio:
         sol, obj, solpool = _solve_in_pass(cp, optmodel, processes, pool, solpool, solset)
     else:
+        # reaching the cache branch requires solve_ratio < 1, which forces __init__ to populate solpool
+        assert solpool is not None
         sol, obj, solpool = _cache_in_pass(cp, optmodel, solpool)
     module.solpool = solpool
     return sol, obj
@@ -61,6 +63,8 @@ def _solve_in_pass(
     sol, obj = _solve_batch(cp, optmodel, processes, pool)
     # update solution pool (dedup on CPU), then move to correct device
     if solpool is not None:
+        if solset is None:
+            solset = set()
         solpool = _update_solution_pool(sol, solpool, solset)
         if solpool.device != cp.device:
             solpool = solpool.to(cp.device)

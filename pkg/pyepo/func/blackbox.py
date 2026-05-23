@@ -5,7 +5,7 @@ Differentiable Black-box optimization function
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from torch.autograd import Function
 
@@ -62,8 +62,7 @@ class blackboxOpt(optModule):
         """
         Forward pass
         """
-        sols = blackboxOptFunc.apply(pred_cost, self)
-        return sols
+        return cast("torch.Tensor", blackboxOptFunc.apply(pred_cost, self))
 
 
 class blackboxOptFunc(Function):
@@ -156,8 +155,7 @@ class negativeIdentity(optModule):
         """
         Forward pass
         """
-        sols = negativeIdentityFunc.apply(pred_cost, self)
-        return sols
+        return cast("torch.Tensor", negativeIdentityFunc.apply(pred_cost, self))
 
 
 class negativeIdentityFunc(Function):

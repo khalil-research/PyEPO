@@ -5,7 +5,7 @@ Surrogate Loss function
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import torch
 from torch.autograd import Function
@@ -63,7 +63,9 @@ class SPOPlus(optModule):
         """
         Forward pass
         """
-        loss = SPOPlusFunc.apply(pred_cost, true_cost, true_sol, true_obj, self)
+        loss = cast(
+            "torch.Tensor", SPOPlusFunc.apply(pred_cost, true_cost, true_sol, true_obj, self)
+        )
         return self._reduce(loss)
 
 

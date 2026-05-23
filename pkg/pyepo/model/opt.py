@@ -8,11 +8,15 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import deepcopy
+from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
 
 from pyepo import EPO
+
+if TYPE_CHECKING:
+    from pyepo.EPO import ModelSense
 
 
 def costToNumpy(c: np.ndarray | torch.Tensor | list, dtype=np.float32) -> np.ndarray:
@@ -40,6 +44,8 @@ class optModel(ABC):
     Attributes:
         _model (optimization model): underlying solver model object
     """
+
+    modelSense: ModelSense
 
     def __init__(self) -> None:
         # default sense

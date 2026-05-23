@@ -130,6 +130,7 @@ class optGrbModel(optModel):
         """
         if len(coefs) != self.num_cost:
             raise ValueError("Size of coef vector does not match number of cost variables.")
+        coefs = costToNumpy(coefs)
         # copy
         new_model = self.copy()
         # add constraint

@@ -9,6 +9,7 @@ from enum import IntEnum
 
 class ModelSense(IntEnum):
     """Optimization direction for the objective."""
+
     MINIMIZE = 1
     MAXIMIZE = -1
 

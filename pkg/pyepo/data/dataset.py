@@ -6,6 +6,7 @@ optDataset class based on PyTorch Dataset
 from __future__ import annotations
 
 import logging
+from typing import cast
 
 import numpy as np
 import torch
@@ -82,7 +83,7 @@ class optDataset(Dataset):
     def _solve(
         self,
         cost: np.ndarray | torch.Tensor | list,
-    ) -> tuple[np.ndarray | torch.Tensor, float]:
+    ) -> tuple[np.ndarray | torch.Tensor | list, float]:
         """
         A method to solve optimization problem to get an optimal solution with given cost
 
@@ -119,8 +120,8 @@ class optDataset(Dataset):
             tuple: data features (torch.tensor), costs (torch.tensor), optimal solutions (torch.tensor) and objective values (torch.tensor)
         """
         return (
-            self.feats[index],
-            self.costs[index],
+            cast("torch.Tensor", self.feats[index]),
+            cast("torch.Tensor", self.costs[index]),
             self.sols[index],
             self.objs[index],
         )
@@ -219,7 +220,7 @@ class optDatasetKNN(optDataset):
         indexes = np.argpartition(distances, self.k, axis=1)[:, : self.k]
         # vectorized interpolation: (n, num_cost, 1) + (n, num_cost, k)
         neighbours = self.costs[indexes]  # (n, k, num_cost)
-        costs_knn = self.weight * self.costs[:, :, np.newaxis] + (
-            1 - self.weight
-        ) * neighbours.transpose(0, 2, 1)
+        costs_knn = self.weight * self.costs[:, :, np.newaxis] + (1 - self.weight) * np.transpose(
+            neighbours, (0, 2, 1)
+        )
         return costs_knn

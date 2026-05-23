@@ -5,7 +5,7 @@ Perturbed optimization function
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import torch
@@ -74,8 +74,7 @@ class perturbedOpt(optModule):
         """
         Forward pass
         """
-        sols = perturbedOptFunc.apply(pred_cost, self)
-        return sols
+        return cast("torch.Tensor", perturbedOptFunc.apply(pred_cost, self))
 
 
 class perturbedOptFunc(Function):
@@ -181,7 +180,7 @@ class perturbedFenchelYoung(optModule):
         """
         Forward pass
         """
-        loss = perturbedFenchelYoungFunc.apply(pred_cost, true_sol, self)
+        loss = cast("torch.Tensor", perturbedFenchelYoungFunc.apply(pred_cost, true_sol, self))
         return self._reduce(loss)
 
 
@@ -304,8 +303,7 @@ class implicitMLE(optModule):
         """
         Forward pass
         """
-        sols = implicitMLEFunc.apply(pred_cost, self)
-        return sols
+        return cast("torch.Tensor", implicitMLEFunc.apply(pred_cost, self))
 
 
 class implicitMLEFunc(Function):
@@ -436,8 +434,7 @@ class adaptiveImplicitMLE(optModule):
         """
         Forward pass
         """
-        sols = adaptiveImplicitMLEFunc.apply(pred_cost, self)
-        return sols
+        return cast("torch.Tensor", adaptiveImplicitMLEFunc.apply(pred_cost, self))
 
 
 class adaptiveImplicitMLEFunc(implicitMLEFunc):
@@ -501,6 +498,8 @@ def _solve_or_cache_3d(ptb_c: torch.Tensor, module: optModule) -> torch.Tensor:
     if np.random.uniform() <= module.solve_ratio:
         ptb_sols, solpool = _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool, solset)
     else:
+        # cache branch only fires when solve_ratio < 1, which forces __init__ to populate solpool
+        assert solpool is not None
         ptb_sols, solpool = _cache_in_pass_3d(ptb_c, optmodel, solpool)
     module.solpool = solpool
     return ptb_sols
@@ -537,6 +536,8 @@ def _solve_in_pass_3d(
     ptb_sols = flat_sols.reshape(n_samples, ins_num, num_vars).permute(1, 0, 2)
     # update solution pool and ensure correct device
     if solpool is not None:
+        if solset is None:
+            solset = set()
         sols = ptb_sols.reshape(-1, num_vars)
         solpool = _update_solution_pool(sols, solpool, solset)
         if solpool.device != ptb_c.device:

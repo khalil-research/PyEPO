@@ -48,6 +48,4 @@ jobs:
 
       - name: Pyright
         working-directory: ./pkg
-        # informational until known issues cleanup
-        continue-on-error: true
         run: pyright pyepo
