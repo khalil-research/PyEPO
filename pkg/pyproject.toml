@@ -103,6 +103,36 @@ reportAttributeAccessIssue = "warning"
 reportIncompatibleMethodOverride = "warning"
 reportOptionalMemberAccess = "warning"
 
+# pyomo stubs misread valid Constraint/sum/value expressions
+[[tool.pyright.executionEnvironments]]
+root = "pyepo/model/omo"
+reportCallIssue = "warning"
+reportArgumentType = "warning"
+reportOperatorIssue = "warning"
+reportOptionalOperand = "warning"
+reportReturnType = "warning"
+
+# jax Array not seen as ndarray|Tensor
+[[tool.pyright.executionEnvironments]]
+root = "pyepo/model/mpax"
+reportAssignmentType = "warning"
+reportArgumentType = "warning"
+
+# coptpy intentionally not installed in CI
+[[tool.pyright.executionEnvironments]]
+root = "pyepo/model/copt"
+reportMissingImports = "none"
+
+# autosklearn/ConfigSpace intentionally not installed in CI
+[[tool.pyright.executionEnvironments]]
+root = "pyepo/twostage"
+reportMissingImports = "none"
+
+# torch autograd Function.forward/backward signature in typeshed is too strict
+[[tool.pyright.executionEnvironments]]
+root = "pyepo/func"
+reportIncompatibleMethodOverride = "none"
+
 [tool.ruff]
 line-length = 100
 target-version = "py39"

@@ -96,7 +96,7 @@ def makeAutoSkScorer(optmodel: optModel):
     Returns:
         scorer: callable object that returns a scalar score; less is better.
     """
-    from autosklearn.metrics import make_scorer
+    from autosklearn.metrics import make_scorer  # pyright: ignore[reportMissingImports]
 
     # get class
     model_type = type(optmodel)
@@ -149,7 +149,7 @@ def makeTestMSEScorer(optmodel: optModel):
     Returns:
         scorer: callable object that returns a scalar score; less is better.
     """
-    from autosklearn.metrics import make_scorer
+    from autosklearn.metrics import make_scorer  # pyright: ignore[reportMissingImports]
 
     # get class
     model_type = type(optmodel)

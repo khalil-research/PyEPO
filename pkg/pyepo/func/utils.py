@@ -88,7 +88,7 @@ def _solve_batch(
     if isinstance(optmodel, optMpaxModel):
         # get params
         optmodel.setObj(cp)
-        cp = optmodel.c
+        cp = optmodel.c  # pyright: ignore[reportAssignmentType]  # jax Array
         # batch solving
         sol, obj = optmodel.batch_optimize(cp)
         # convert to torch
