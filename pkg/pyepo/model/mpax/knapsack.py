@@ -28,7 +28,7 @@ class knapsackModel(optMpaxModel):
         items (list): List of item index
     """
 
-    def __init__(self, weights: np.ndarray, capacity: np.ndarray | list) -> None:
+    def __init__(self, weights: np.ndarray | list, capacity: np.ndarray | list) -> None:
         """
         Args:
             weights: weights of items
