@@ -8,8 +8,13 @@ Utility function
 from __future__ import annotations
 
 import inspect
+from typing import TYPE_CHECKING
 
-def getArgs(model):
+if TYPE_CHECKING:
+    from pyepo.model.opt import optModel
+
+
+def getArgs(model: optModel) -> dict:
     """
     A global function to get args of model
 

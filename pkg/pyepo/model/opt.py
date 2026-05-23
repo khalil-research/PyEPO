@@ -16,7 +16,7 @@ import torch
 from pyepo import EPO
 
 
-def costToNumpy(c, dtype=np.float32):
+def costToNumpy(c: np.ndarray | torch.Tensor | list, dtype=np.float32) -> np.ndarray:
     """
     Normalize a cost vector to a numpy array, detaching torch tensors as needed.
 
@@ -41,24 +41,24 @@ class optModel(ABC):
         _model (optimization model): underlying solver model object
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # default sense
         if not hasattr(self, "modelSense"):
             self.modelSense = EPO.MINIMIZE
         self._model, self.x = self._getModel()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'optModel ' + self.__class__.__name__
 
     @property
-    def num_cost(self):
+    def num_cost(self) -> int:
         """
         number of costs to be predicted
         """
         return len(self.x)
 
     @abstractmethod
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         An abstract method to build a model from an optimization solver
 
@@ -68,7 +68,7 @@ class optModel(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         An abstract method to set the objective function
 
@@ -78,7 +78,7 @@ class optModel(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray | torch.Tensor | list, float]:
         """
         An abstract method to solve the model
 
@@ -87,7 +87,7 @@ class optModel(ABC):
         """
         raise NotImplementedError
 
-    def copy(self):
+    def copy(self) -> optModel:
         """
         A method to copy the model
 
@@ -97,7 +97,7 @@ class optModel(ABC):
         new_model = deepcopy(self)
         return new_model
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optModel:
         """
         A method to add a new constraint. Subclasses should override.
 
@@ -110,7 +110,7 @@ class optModel(ABC):
         """
         raise NotImplementedError
 
-    def relax(self):
+    def relax(self) -> optModel:
         """
         A method to relax the MIP model. Subclasses should override.
         """
@@ -121,15 +121,15 @@ class unionFind:
     """
     Union-Find data structure for cycle detection in graphs
     """
-    def __init__(self, n):
+    def __init__(self, n: int) -> None:
         self.parent = list(range(n))
 
-    def find(self, i):
+    def find(self, i: int) -> int:
         if self.parent[i] != i:
             self.parent[i] = self.find(self.parent[i])
         return self.parent[i]
 
-    def union(self, i, j):
+    def union(self, i: int, j: int) -> bool:
         root_i = self.find(i)
         root_j = self.find(j)
         if root_i != root_j:
@@ -138,7 +138,12 @@ class unionFind:
         return False
 
 
-def getTspTour(edge_list, num_nodes, sol, threshold=1e-2):
+def getTspTour(
+    edge_list: list[tuple[int, int]],
+    num_nodes: int,
+    sol: np.ndarray | torch.Tensor | list,
+    threshold: float = 1e-2,
+) -> list[int]:
     """
     Reconstruct a TSP tour from an undirected edge-selection vector.
 
@@ -188,7 +193,7 @@ def getTspTour(edge_list, num_nodes, sol, threshold=1e-2):
     return tour
 
 
-def _get_grid_arcs(grid):
+def _get_grid_arcs(grid: tuple[int, int]) -> list[tuple[int, int]]:
     """
     Get list of arcs for a grid network.
 

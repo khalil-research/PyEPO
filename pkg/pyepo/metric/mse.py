@@ -6,10 +6,16 @@ Mean Squared Error
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import torch
 
+if TYPE_CHECKING:
+    from torch import nn
+    from torch.utils.data import DataLoader
 
-def MSE(predmodel, dataloader):
+
+def MSE(predmodel: nn.Module, dataloader: DataLoader) -> float:
     """
     A function to evaluate model performance with MSE
 

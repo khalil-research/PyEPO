@@ -7,6 +7,7 @@ Abstract optimization model based on Pyomo
 from __future__ import annotations
 
 from copy import copy
+from typing import TYPE_CHECKING
 
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy, optModel
@@ -18,6 +19,10 @@ try:
 except ImportError:
     _HAS_PYOMO = False
 
+if TYPE_CHECKING:
+    import numpy as np
+    import torch
+
 
 class optOmoModel(optModel):
     """
@@ -28,7 +33,7 @@ class optOmoModel(optModel):
         solver (str): optimization solver in the background
     """
 
-    def __init__(self, solver="glpk"):
+    def __init__(self, solver: str = "glpk") -> None:
         """
         Args:
             solver (str): optimization solver in the background
@@ -51,10 +56,10 @@ class optOmoModel(optModel):
         else:
             self._solverfac = po.SolverFactory(self.solver)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "optOmoModel " + self.__class__.__name__
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -75,7 +80,7 @@ class optOmoModel(optModel):
         else:
             raise ValueError("Invalid modelSense.")
 
-    def solve(self):
+    def solve(self) -> tuple[list, float]:
         """
         A method to solve the model
 
@@ -86,7 +91,7 @@ class optOmoModel(optModel):
         self._solverfac.solve(self._model)
         return [pe.value(self.x[k]) for k in self.x], pe.value(self._model.obj)
 
-    def copy(self):
+    def copy(self) -> optOmoModel:
         """
         A method to copy the model
 
@@ -100,7 +105,7 @@ class optOmoModel(optModel):
         new_model.x = new_model._model.x
         return new_model
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optOmoModel:
         """
         A method to add a new constraint
 

@@ -10,6 +10,7 @@ from abc import abstractmethod
 import logging
 import multiprocessing as mp
 import weakref
+from typing import Literal
 from pathos.multiprocessing import ProcessingPool
 
 import torch
@@ -22,6 +23,8 @@ from pyepo.model.mpax import optMpaxModel
 
 logger = logging.getLogger(__name__)
 
+Reduction = Literal["mean", "sum", "none"]
+
 
 class optModule(nn.Module):
     """
@@ -29,7 +32,15 @@ class optModule(nn.Module):
     predict-then-optimize. It provides common functionality (multiprocessing,
     solution pooling, loss reduction) for all loss modules.
     """
-    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None, require_solpool=False):
+    def __init__(
+        self,
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+        require_solpool: bool = False,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -82,14 +93,14 @@ class optModule(nn.Module):
         self.reduction = reduction
 
     @abstractmethod
-    def forward(self, pred_cost, true_cost):
+    def forward(self, *args: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
         # convert tensor
         pass
 
-    def _reduce(self, loss):
+    def _reduce(self, loss: torch.Tensor) -> torch.Tensor:
         """
         Apply reduction to loss tensor
         """

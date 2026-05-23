@@ -6,12 +6,19 @@ Noise contrastive estimation loss function
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import torch
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_in_pass
+
+if TYPE_CHECKING:
+    from pyepo.data.dataset import optDataset
+    from pyepo.func.abcmodule import Reduction
+    from pyepo.model.opt import optModel
 
 
 class NCE(optModule):
@@ -27,7 +34,14 @@ class NCE(optModule):
     Reference: <https://www.ijcai.org/proceedings/2021/390>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -38,7 +52,7 @@ class NCE(optModule):
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 
-    def forward(self, pred_cost, true_sol):
+    def forward(self, pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -46,7 +60,7 @@ class NCE(optModule):
         cp = pred_cost.detach()
         # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
+            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes,
                                                 self.pool, self.solpool, self._solset)
         # to device
         if self.solpool.device != cp.device:
@@ -78,7 +92,14 @@ class contrastiveMAP(optModule):
     Reference: <https://www.ijcai.org/proceedings/2021/390>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -89,7 +110,7 @@ class contrastiveMAP(optModule):
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 
-    def forward(self, pred_cost, true_sol):
+    def forward(self, pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """

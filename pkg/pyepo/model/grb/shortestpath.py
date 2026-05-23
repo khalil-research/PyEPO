@@ -29,7 +29,7 @@ class shortestPathModel(optGrbModel):
         arcs (list): List of arcs
     """
 
-    def __init__(self, grid):
+    def __init__(self, grid: tuple[int, int]) -> None:
         """
         Args:
             grid (tuple of int): size of grid network
@@ -38,7 +38,7 @@ class shortestPathModel(optGrbModel):
         self.arcs = _get_grid_arcs(grid)
         super().__init__()
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build Gurobi model
 

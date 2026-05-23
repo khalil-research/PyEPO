@@ -7,6 +7,7 @@ Unambiguous regret loss
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
@@ -14,10 +15,21 @@ import torch
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy
 
+if TYPE_CHECKING:
+    from torch import nn
+    from torch.utils.data import DataLoader
+
+    from pyepo.model.opt import optModel
+
 logger = logging.getLogger(__name__)
 
 
-def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
+def unambRegret(
+    predmodel: nn.Module,
+    optmodel: optModel,
+    dataloader: DataLoader,
+    tolerance: float = 1e-5,
+) -> float:
     """
     A function to evaluate model performance with normalized unambiguous regret
 
@@ -58,7 +70,14 @@ def unambRegret(predmodel, optmodel, dataloader, tolerance=1e-5):
     return loss / (optsum + 1e-7)
 
 
-def calUnambRegret(optmodel, pred_cost, true_cost, true_obj, tolerance=1e-5, max_iter=10):
+def calUnambRegret(
+    optmodel: optModel,
+    pred_cost: np.ndarray,
+    true_cost: np.ndarray,
+    true_obj: float,
+    tolerance: float = 1e-5,
+    max_iter: int = 10,
+) -> float:
     """
     A function to calculate normalized unambiguous regret for a batch
 

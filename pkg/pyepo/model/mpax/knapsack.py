@@ -6,6 +6,8 @@ Knapsack problem
 
 from __future__ import annotations
 
+import numpy as np
+
 try:
     import jax.numpy as jnp
     _HAS_MPAX = True
@@ -26,7 +28,7 @@ class knapsackModel(optMpaxModel):
         items (list): List of item index
     """
 
-    def __init__(self, weights, capacity):
+    def __init__(self, weights: np.ndarray, capacity: np.ndarray | list) -> None:
         """
         Args:
             weights (np.ndarray / list): weights of items
@@ -38,7 +40,7 @@ class knapsackModel(optMpaxModel):
         G, h, u = self._constructMatrix()
         super().__init__(G=G, h=h, u=u, use_sparse_matrix=False, minimize=False)
 
-    def _constructMatrix(self):
+    def _constructMatrix(self) -> tuple:
         """
         Constructs the inequality constraint matrix G, right-hand side h, and
         upper bound u for the knapsack problem.
@@ -55,8 +57,6 @@ class knapsackModel(optMpaxModel):
 
 
 if __name__ == "__main__":
-    import numpy as np
-
     # random seed
     np.random.seed(42)
     # set random cost for test

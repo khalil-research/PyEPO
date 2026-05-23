@@ -6,6 +6,8 @@ Two-stage model with auto-sklearn predictor
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 try:
     from autosklearn.regression import AutoSklearnRegressor
     from autosklearn.metrics import mean_squared_error
@@ -61,7 +63,16 @@ except ImportError:
 
 from pyepo.metric import makeAutoSkScorer
 
-def autoSklearnPred(optmodel, seed, timelimit, metric="mse"):
+if TYPE_CHECKING:
+    from pyepo.model.opt import optModel
+
+
+def autoSklearnPred(
+    optmodel: optModel,
+    seed: int,
+    timelimit: int,
+    metric: str = "mse",
+):
     """
     Two-stage prediction and optimization with auto-sklearn.
 

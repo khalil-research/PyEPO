@@ -9,7 +9,14 @@ from __future__ import annotations
 import numpy as np
 
 
-def genData(num_data, num_features, num_assets, deg=1, noise_level=1, seed=135):
+def genData(
+    num_data: int,
+    num_features: int,
+    num_assets: int,
+    deg: int = 1,
+    noise_level: float = 1,
+    seed: int = 135,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     A function to generate synthetic data and features for portfolio
 

@@ -30,7 +30,13 @@ class portfolioModel(optOmoModel):
         risk_level (float): risk level
     """
 
-    def __init__(self, num_assets, covariance, gamma=2.25, solver="glpk"):
+    def __init__(
+        self,
+        num_assets: int,
+        covariance: np.ndarray,
+        gamma: float = 2.25,
+        solver: str = "glpk",
+    ) -> None:
         """
         Args:
             num_assets (int): number of assets
@@ -43,7 +49,7 @@ class portfolioModel(optOmoModel):
         self.risk_level = self._getRiskLevel(gamma)
         super().__init__(solver)
 
-    def _getRiskLevel(self, gamma):
+    def _getRiskLevel(self, gamma: float) -> float:
         """
         A method to calculate the risk level
 
@@ -56,7 +62,7 @@ class portfolioModel(optOmoModel):
         risk_level = gamma * np.mean(self.covariance)
         return risk_level
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build Pyomo model
 

@@ -6,12 +6,23 @@ Metrics for SKlearn model
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from pyepo.utils import getArgs
 from pyepo import EPO
 
-def SPOError(pred_cost, true_cost, model_type, args):
+if TYPE_CHECKING:
+    from pyepo.model.opt import optModel
+
+
+def SPOError(
+    pred_cost: np.ndarray,
+    true_cost: np.ndarray,
+    model_type: type,
+    args: dict,
+) -> float:
     """
     A function to calculate normalized true regret
 
@@ -56,7 +67,7 @@ def SPOError(pred_cost, true_cost, model_type, args):
     return norm_regret
 
 
-def makeSkScorer(optmodel):
+def makeSkScorer(optmodel: optModel):
     """
     A function to create sklearn scorer
 
@@ -77,7 +88,7 @@ def makeSkScorer(optmodel):
     return SPO_scorer
 
 
-def makeAutoSkScorer(optmodel):
+def makeAutoSkScorer(optmodel: optModel):
     """
     A function to create Auto-SKlearn scorer
 
@@ -103,7 +114,12 @@ def makeAutoSkScorer(optmodel):
     return SPO_scorer
 
 
-def testMSE(pred_cost, true_cost, model_type, args):
+def testMSE(
+    pred_cost: np.ndarray,
+    true_cost: np.ndarray,
+    model_type: type,
+    args: dict,
+) -> float:
     """
     A function to calculate MSE for testing
 
@@ -123,7 +139,7 @@ def testMSE(pred_cost, true_cost, model_type, args):
     return np.square(pred_cost - true_cost).mean()
 
 
-def makeTestMSEScorer(optmodel):
+def makeTestMSEScorer(optmodel: optModel):
     """
     A function to create MSE scorer for testing
 

@@ -30,7 +30,12 @@ class optDataset(Dataset):
         objs (torch.Tensor): Optimal objective values
     """
 
-    def __init__(self, model, feats, costs):
+    def __init__(
+        self,
+        model: optModel,
+        feats: np.ndarray | torch.Tensor,
+        costs: np.ndarray | torch.Tensor,
+    ) -> None:
         """
         A method to create an optDataset from optModel
 
@@ -53,7 +58,7 @@ class optDataset(Dataset):
         self.sols = torch.as_tensor(sols, dtype=torch.float32)
         self.objs = torch.as_tensor(objs, dtype=torch.float32)
 
-    def _getSols(self):
+    def _getSols(self) -> tuple[np.ndarray, np.ndarray]:
         """
         A method to get optimal solutions for all cost vectors
         """
@@ -74,7 +79,9 @@ class optDataset(Dataset):
             objs.append([obj])
         return np.array(sols), np.array(objs)
 
-    def _solve(self, cost):
+    def _solve(
+        self, cost: np.ndarray | torch.Tensor | list,
+    ) -> tuple[np.ndarray | torch.Tensor, float]:
         """
         A method to solve optimization problem to get an optimal solution with given cost
 
@@ -88,7 +95,7 @@ class optDataset(Dataset):
         sol, obj = self.model.solve()
         return sol, obj
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         A method to get data size
 
@@ -97,7 +104,9 @@ class optDataset(Dataset):
         """
         return len(self.costs)
 
-    def __getitem__(self, index):
+    def __getitem__(
+        self, index: int,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         A method to retrieve data
 
@@ -130,7 +139,14 @@ class optDatasetKNN(optDataset):
         sols (np.ndarray): Optimal solutions
         objs (np.ndarray): Optimal objective values
     """
-    def __init__(self, model, feats, costs, k=10, weight=0.5):
+    def __init__(
+        self,
+        model: optModel,
+        feats: np.ndarray | torch.Tensor,
+        costs: np.ndarray | torch.Tensor,
+        k: int = 10,
+        weight: float = 0.5,
+    ) -> None:
         """
         A method to create an optDataset from optModel
 
@@ -158,7 +174,7 @@ class optDatasetKNN(optDataset):
         self.sols = torch.as_tensor(sols, dtype=torch.float32)
         self.objs = torch.as_tensor(objs, dtype=torch.float32)
 
-    def _getSols(self):
+    def _getSols(self) -> tuple[np.ndarray, np.ndarray]:
         """
         A method to get optimal solutions for all cost vectors
         """
@@ -189,7 +205,7 @@ class optDatasetKNN(optDataset):
         self.costs = costs_knn.mean(axis=2)
         return np.array(sols), np.array(objs)
 
-    def _getKNN(self):
+    def _getKNN(self) -> np.ndarray:
         """
         A method to get kNN costs
         """

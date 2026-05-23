@@ -7,6 +7,7 @@ Abstract optimization model based on Google OR-Tools (pywraplp)
 from __future__ import annotations
 
 from copy import copy
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -19,6 +20,9 @@ except ImportError:
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy, optModel
 
+if TYPE_CHECKING:
+    import torch
+
 
 class optOrtModel(optModel):
     """
@@ -29,7 +33,7 @@ class optOrtModel(optModel):
         solver (str): solver backend (e.g. "scip", "glop", "cbc")
     """
 
-    def __init__(self, solver="scip"):
+    def __init__(self, solver: str = "scip") -> None:
         """
         Args:
             solver (str): solver backend for pywraplp
@@ -42,10 +46,10 @@ class optOrtModel(optModel):
         # suppress output
         self._model.SuppressOutput()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "optOrtModel " + self.__class__.__name__
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -65,7 +69,7 @@ class optOrtModel(optModel):
         else:
             obj.SetMinimization()
 
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve the model
 
@@ -80,7 +84,7 @@ class optOrtModel(optModel):
         obj = self._model.Objective().Value()
         return sol, obj
 
-    def copy(self):
+    def copy(self) -> optOrtModel:
         """
         A method to copy the model
 
@@ -99,7 +103,7 @@ class optOrtModel(optModel):
                 ct.SetCoefficient(new_model.x[k], float(coefs[i]))
         return new_model
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optOrtModel:
         """
         A method to add a new constraint
 

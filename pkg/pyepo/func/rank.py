@@ -6,6 +6,8 @@ Learning to rank Losses
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -14,6 +16,11 @@ from torch import nn
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_in_pass
+
+if TYPE_CHECKING:
+    from pyepo.data.dataset import optDataset
+    from pyepo.func.abcmodule import Reduction
+    from pyepo.model.opt import optModel
 
 
 class listwiseLTR(optModule):
@@ -30,7 +37,14 @@ class listwiseLTR(optModule):
     Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -41,7 +55,7 @@ class listwiseLTR(optModule):
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost: torch.Tensor, true_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -81,7 +95,14 @@ class pairwiseLTR(optModule):
     Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -94,7 +115,7 @@ class pairwiseLTR(optModule):
         # function
         self.relu = nn.ReLU()
 
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost: torch.Tensor, true_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -151,7 +172,14 @@ class pointwiseLTR(optModule):
     Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -162,7 +190,7 @@ class pointwiseLTR(optModule):
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost: torch.Tensor, true_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """

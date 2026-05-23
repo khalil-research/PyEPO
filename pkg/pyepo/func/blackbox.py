@@ -6,11 +6,18 @@ Differentiable Black-box optimization function
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+import torch
 from torch.autograd import Function
 
-from pyepo.func.abcmodule import optModule
 from pyepo import EPO
+from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
+
+if TYPE_CHECKING:
+    from pyepo.data.dataset import optDataset
+    from pyepo.model.opt import optModel
 
 
 class blackboxOpt(optModule):
@@ -29,7 +36,14 @@ class blackboxOpt(optModule):
     Reference: <https://arxiv.org/abs/1912.02175>
     """
 
-    def __init__(self, optmodel, lambd=10, processes=1, solve_ratio=1, dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        lambd: float = 10,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -44,7 +58,7 @@ class blackboxOpt(optModule):
             raise ValueError("lambda is not positive.")
         self.lambd = lambd
 
-    def forward(self, pred_cost):
+    def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -58,7 +72,11 @@ class blackboxOptFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, module):
+    def forward(
+        ctx,
+        pred_cost: torch.Tensor,
+        module: blackboxOpt,
+    ) -> torch.Tensor:
         """
         Forward pass for DBB
 
@@ -81,7 +99,7 @@ class blackboxOptFunc(Function):
         return sol
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
         Backward pass for DBB
         """
@@ -118,7 +136,13 @@ class negativeIdentity(optModule):
     Reference: <https://arxiv.org/abs/2205.15213>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -128,7 +152,7 @@ class negativeIdentity(optModule):
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
 
-    def forward(self, pred_cost):
+    def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -142,7 +166,11 @@ class negativeIdentityFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, module):
+    def forward(
+        ctx,
+        pred_cost: torch.Tensor,
+        module: negativeIdentity,
+    ) -> torch.Tensor:
         """
         Forward pass for NID
 
@@ -162,7 +190,7 @@ class negativeIdentityFunc(Function):
         return sol
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
         Backward pass for NID
         """

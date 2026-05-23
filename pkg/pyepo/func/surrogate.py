@@ -6,12 +6,19 @@ Surrogate Loss function
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import torch
 from torch.autograd import Function
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
+
+if TYPE_CHECKING:
+    from pyepo.data.dataset import optDataset
+    from pyepo.func.abcmodule import Reduction
+    from pyepo.model.opt import optModel
 
 
 class SPOPlus(optModule):
@@ -29,7 +36,14 @@ class SPOPlus(optModule):
     Reference: <https://doi.org/10.1287/mnsc.2020.3922>
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1, reduction="mean", dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -40,7 +54,13 @@ class SPOPlus(optModule):
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
 
-    def forward(self, pred_cost, true_cost, true_sol, true_obj):
+    def forward(
+        self,
+        pred_cost: torch.Tensor,
+        true_cost: torch.Tensor,
+        true_sol: torch.Tensor,
+        true_obj: torch.Tensor,
+    ) -> torch.Tensor:
         """
         Forward pass
         """
@@ -54,7 +74,14 @@ class SPOPlusFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, true_cost, true_sol, true_obj, module):
+    def forward(
+        ctx,
+        pred_cost: torch.Tensor,
+        true_cost: torch.Tensor,
+        true_sol: torch.Tensor,
+        true_obj: torch.Tensor,
+        module: SPOPlus,
+    ) -> torch.Tensor:
         """
         Forward pass for SPO+
 
@@ -91,7 +118,7 @@ class SPOPlusFunc(Function):
         return loss
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
         Backward pass for SPO+
         """
@@ -122,8 +149,16 @@ class perturbationGradient(optModule):
     Reference: <https://arxiv.org/abs/2402.03256>
     """
 
-    def __init__(self, optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1,
-                 reduction="mean", dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        sigma: float = 0.1,
+        two_sides: bool = False,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -140,14 +175,14 @@ class perturbationGradient(optModule):
         # symmetric perturbation
         self.two_sides = two_sides
 
-    def forward(self, pred_cost, true_cost):
+    def forward(self, pred_cost: torch.Tensor, true_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
         loss = self._finiteDifference(pred_cost, true_cost)
         return self._reduce(loss)
 
-    def _finiteDifference(self, pred_cost, true_cost):
+    def _finiteDifference(self, pred_cost: torch.Tensor, true_cost: torch.Tensor) -> torch.Tensor:
         """
         Zeroth order approximations for surrogate objective value
         """

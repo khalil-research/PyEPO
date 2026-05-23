@@ -27,7 +27,7 @@ class shortestPathModel(optMpaxModel):
         arcs (list): List of arcs
     """
 
-    def __init__(self, grid):
+    def __init__(self, grid: tuple[int, int]) -> None:
         """
         Args:
             grid (tuple of int): size of grid network
@@ -37,7 +37,7 @@ class shortestPathModel(optMpaxModel):
         A, b, u = self._constructMatrix()
         super().__init__(A=A, b=b, u=u, use_sparse_matrix=True, minimize=True)
 
-    def _constructMatrix(self):
+    def _constructMatrix(self) -> tuple:
         """
         Constructs the incidence matrix A, supply/demand vector b, and upper bound u
         for the shortest path problem.

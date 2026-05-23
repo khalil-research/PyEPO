@@ -6,13 +6,26 @@ True regret loss
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import torch
 
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy
 
-def regret(predmodel, optmodel, dataloader):
+if TYPE_CHECKING:
+    from torch import nn
+    from torch.utils.data import DataLoader
+
+    from pyepo.model.opt import optModel
+
+
+def regret(
+    predmodel: nn.Module,
+    optmodel: optModel,
+    dataloader: DataLoader,
+) -> float:
     """
     A function to evaluate model performance with normalized true regret
 
@@ -51,7 +64,12 @@ def regret(predmodel, optmodel, dataloader):
     return loss / (optsum + 1e-7)
 
 
-def calRegret(optmodel, pred_cost, true_cost, true_obj):
+def calRegret(
+    optmodel: optModel,
+    pred_cost: np.ndarray,
+    true_cost: np.ndarray,
+    true_obj: float,
+) -> float:
     """
     A function to calculate normalized true regret for a batch
 

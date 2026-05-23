@@ -6,10 +6,11 @@ Two-stage model with Scikit-learn predictor
 
 from __future__ import annotations
 
+from sklearn.base import BaseEstimator
 from sklearn.multioutput import MultiOutputRegressor
 
 
-def sklearnPred(pmodel):
+def sklearnPred(pmodel: BaseEstimator) -> MultiOutputRegressor:
     """
     Two-stage prediction and optimization with scikit-learn.
 

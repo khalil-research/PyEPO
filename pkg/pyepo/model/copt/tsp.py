@@ -7,6 +7,7 @@ Traveling salesman problem
 from __future__ import annotations
 
 from itertools import combinations
+from typing import TYPE_CHECKING
 
 import numpy as np
 from coptpy import Envr
@@ -15,6 +16,9 @@ from coptpy import CallbackBase
 
 from pyepo.model.copt.coptmodel import optCoptModel
 from pyepo.model.opt import costToNumpy, getTspTour, unionFind
+
+if TYPE_CHECKING:
+    import torch
 
 
 class tspABModel(optCoptModel):
@@ -28,7 +32,7 @@ class tspABModel(optCoptModel):
         edges (list): List of edge index
     """
 
-    def __init__(self, num_nodes):
+    def __init__(self, num_nodes: int) -> None:
         """
         Args:
             num_nodes (int): number of nodes
@@ -42,10 +46,10 @@ class tspABModel(optCoptModel):
         self._extra_constrs = []
 
     @property
-    def num_cost(self):
+    def num_cost(self) -> int:
         return len(self.edges)
 
-    def copy(self):
+    def copy(self) -> tspABModel:
         """
         A method to copy model
 
@@ -56,13 +60,13 @@ class tspABModel(optCoptModel):
         self._replay_extras(new_model)
         return new_model
 
-    def _replay_extras(self, other):
+    def _replay_extras(self, other: tspABModel) -> None:
         """Replay self._extra_constrs onto another TSP model of compatible formulation."""
         for coefs, rhs in self._extra_constrs:
             other._extra_constrs.append((coefs, rhs))
             other._addExtraConstr(coefs, rhs)
 
-    def getTour(self, sol):
+    def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[int]:
         """
         A method to get a tour from solution
 
@@ -88,7 +92,7 @@ class tspGGModel(tspABModel):
         edges (list): List of edge index
     """
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build COPT model
 
@@ -116,7 +120,7 @@ class tspGGModel(tspABModel):
                 m.addConstr(y[i, j] <= (len(self.nodes) - 1) * x[i, j])
         return m, x
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -130,7 +134,7 @@ class tspGGModel(tspABModel):
                   for k, (i, j) in enumerate(self.edges))
         self._model.setObjective(obj)
 
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve model
         """
@@ -141,13 +145,13 @@ class tspGGModel(tspABModel):
                 sol[k] = 1
         return sol, self._model.objVal
 
-    def _addExtraConstr(self, coefs, rhs):
+    def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the GG variable scheme."""
         self._model.addConstr(
             sum(coefs[k] * (self.x[i, j] + self.x[j, i])
                 for k, (i, j) in enumerate(self.edges)) <= rhs)
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
         A method to add new constraint
 
@@ -165,7 +169,7 @@ class tspGGModel(tspABModel):
         new_model._addExtraConstr(coefs, rhs)
         return new_model
 
-    def relax(self):
+    def relax(self) -> tspGGModelRel:
         """
         A method to get linear relaxation model
         """
@@ -184,7 +188,7 @@ class tspGGModelRel(tspGGModel):
         edges (list): List of edge index
     """
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build COPT model
 
@@ -213,7 +217,7 @@ class tspGGModelRel(tspGGModel):
                 m.addConstr(y[i, j] <= (len(self.nodes) - 1) * x[i, j])
         return m, x
 
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve model
 
@@ -226,13 +230,13 @@ class tspGGModelRel(tspGGModel):
             sol[k] = self.x[i, j].x + self.x[j, i].x
         return sol, self._model.objVal
 
-    def relax(self):
+    def relax(self) -> tspABModel:
         """
         A forbidden method to relax MIP model
         """
         raise RuntimeError("Model has already been relaxed.")
 
-    def getTour(self, sol):
+    def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[int]:
         """
         A forbidden method to get a tour from solution
         """
@@ -279,7 +283,7 @@ class tspDFJModel(tspABModel):
                             self.addLazyConstr(constr <= len(cycle) - 1)
                         break
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build COPT model
 
@@ -299,7 +303,7 @@ class tspDFJModel(tspABModel):
             m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 2)
         return m, x
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -312,7 +316,7 @@ class tspDFJModel(tspABModel):
         obj = sum(c[i] * self.x[k] for i, k in enumerate(self.edges))
         self._model.setObjective(obj)
 
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve model
         """
@@ -325,13 +329,13 @@ class tspDFJModel(tspABModel):
                 sol[i] = 1
         return sol, self._model.objVal
 
-    def _addExtraConstr(self, coefs, rhs):
+    def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the DFJ variable scheme."""
         self._model.addConstr(
             sum(coefs[i] * self.x[k]
                 for i, k in enumerate(self.edges)) <= rhs)
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
         A method to add new constraint
 
@@ -360,7 +364,7 @@ class tspMTZModel(tspABModel):
         edges (list): List of edge index
     """
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build COPT model
 
@@ -386,7 +390,7 @@ class tspMTZModel(tspABModel):
                             len(self.nodes) * (x[i, j] - 1) + 1)
         return m, x
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -400,7 +404,7 @@ class tspMTZModel(tspABModel):
                   for k, (i, j) in enumerate(self.edges))
         self._model.setObjective(obj)
 
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve model
         """
@@ -411,13 +415,13 @@ class tspMTZModel(tspABModel):
                 sol[k] = 1
         return sol, self._model.objVal
 
-    def _addExtraConstr(self, coefs, rhs):
+    def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the MTZ variable scheme."""
         self._model.addConstr(
             sum(coefs[k] * (self.x[i, j] + self.x[j, i])
                 for k, (i, j) in enumerate(self.edges)) <= rhs)
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
         A method to add new constraint
 
@@ -435,7 +439,7 @@ class tspMTZModel(tspABModel):
         new_model._addExtraConstr(coefs, rhs)
         return new_model
 
-    def relax(self):
+    def relax(self) -> tspMTZModelRel:
         """
         A method to get linear relaxation model
         """
@@ -454,7 +458,7 @@ class tspMTZModelRel(tspMTZModel):
         edges (list): List of edge index
     """
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build COPT model
 
@@ -481,7 +485,7 @@ class tspMTZModelRel(tspMTZModel):
                             len(self.nodes) * (x[i, j] - 1) + 1)
         return m, x
 
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve model
 
@@ -494,13 +498,13 @@ class tspMTZModelRel(tspMTZModel):
             sol[k] = self.x[i, j].x + self.x[j, i].x
         return sol, self._model.objVal
 
-    def relax(self):
+    def relax(self) -> tspABModel:
         """
         A forbidden method to relax MIP model
         """
         raise RuntimeError("Model has already been relaxed.")
 
-    def getTour(self, sol):
+    def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[int]:
         """
         A forbidden method to get a tour from solution
         """

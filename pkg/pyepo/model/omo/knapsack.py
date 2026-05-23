@@ -30,7 +30,12 @@ class knapsackModel(optOmoModel):
         items (list): list of item index
     """
 
-    def __init__(self, weights, capacity, solver="glpk"):
+    def __init__(
+        self,
+        weights: np.ndarray | list,
+        capacity: np.ndarray | list,
+        solver: str = "glpk",
+    ) -> None:
         """
         Args:
             weights (np.ndarray / list): weights of items
@@ -42,7 +47,7 @@ class knapsackModel(optOmoModel):
         self.items = list(range(self.weights.shape[1]))
         super().__init__(solver)
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build Pyomo model
         """
@@ -63,7 +68,7 @@ class knapsackModel(optOmoModel):
 
         return m, x
 
-    def relax(self):
+    def relax(self) -> knapsackModelRel:
         """
         A method to get linear relaxation model
         """
@@ -77,7 +82,7 @@ class knapsackModelRel(knapsackModel):
     This class is relaxed optimization model for knapsack problem.
     """
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build Pyomo model
         """
@@ -97,7 +102,7 @@ class knapsackModelRel(knapsackModel):
                        for j in self.items) <= self.capacity[i])
         return m, x
 
-    def relax(self):
+    def relax(self) -> knapsackModelRel:
         """
         A forbidden method to relax MIP model
         """

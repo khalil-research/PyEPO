@@ -28,7 +28,7 @@ class knapsackModel(optGrbModel):
         items (list): List of item index
     """
 
-    def __init__(self, weights, capacity):
+    def __init__(self, weights: np.ndarray | list, capacity: np.ndarray | list) -> None:
         """
         Args:
             weights (np.ndarray / list): weights of items
@@ -39,7 +39,7 @@ class knapsackModel(optGrbModel):
         self.items = self.weights.shape[1]
         super().__init__()
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build Gurobi model
 
@@ -56,7 +56,7 @@ class knapsackModel(optGrbModel):
         m.addConstr(self.weights @ x <= self.capacity)
         return m, x
 
-    def relax(self):
+    def relax(self) -> knapsackModelRel:
         """
         A method to get linear relaxation model
         """
@@ -70,7 +70,7 @@ class knapsackModelRel(knapsackModel):
     This class is relaxed optimization model for knapsack problem.
     """
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build Gurobi model
         """
@@ -86,7 +86,7 @@ class knapsackModelRel(knapsackModel):
         m.addConstr(self.weights @ x <= self.capacity)
         return m, x
 
-    def relax(self):
+    def relax(self) -> knapsackModelRel:
         """
         A forbidden method to relax MIP model
         """

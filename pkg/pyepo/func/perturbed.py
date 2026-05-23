@@ -6,6 +6,8 @@ Perturbed optimization function
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import torch
 from torch.autograd import Function
@@ -17,6 +19,11 @@ from pyepo.func.utils import (
     _update_solution_pool,
     sumGammaDistribution,
 )
+
+if TYPE_CHECKING:
+    from pyepo.data.dataset import optDataset
+    from pyepo.func.abcmodule import Reduction
+    from pyepo.model.opt import optModel
 
 
 class perturbedOpt(optModule):
@@ -34,8 +41,16 @@ class perturbedOpt(optModule):
     Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
     """
 
-    def __init__(self, optmodel, n_samples=10, sigma=1.0, processes=1,
-                 seed=135, solve_ratio=1, dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        n_samples: int = 10,
+        sigma: float = 1.0,
+        processes: int = 1,
+        seed: int = 135,
+        solve_ratio: float = 1.0,
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -54,7 +69,7 @@ class perturbedOpt(optModule):
         # random state
         self.rnd = np.random.RandomState(seed)
 
-    def forward(self, pred_cost):
+    def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -68,7 +83,11 @@ class perturbedOptFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, module):
+    def forward(
+        ctx,
+        pred_cost: torch.Tensor,
+        module: perturbedOpt,
+    ) -> torch.Tensor:
         """
         Forward pass for perturbed
 
@@ -99,7 +118,7 @@ class perturbedOptFunc(Function):
         return e_sol
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
         Backward pass for perturbed
         """
@@ -129,8 +148,17 @@ class perturbedFenchelYoung(optModule):
     Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
     """
 
-    def __init__(self, optmodel, n_samples=10, sigma=1.0, processes=1,
-                 seed=135, solve_ratio=1, reduction="mean", dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        n_samples: int = 10,
+        sigma: float = 1.0,
+        processes: int = 1,
+        seed: int = 135,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -150,7 +178,7 @@ class perturbedFenchelYoung(optModule):
         # random state
         self.rnd = np.random.RandomState(seed)
 
-    def forward(self, pred_cost, true_sol):
+    def forward(self, pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -164,7 +192,12 @@ class perturbedFenchelYoungFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, true_sol, module):
+    def forward(
+        ctx,
+        pred_cost: torch.Tensor,
+        true_sol: torch.Tensor,
+        module: perturbedFenchelYoung,
+    ) -> torch.Tensor:
         """
         Forward pass for perturbed Fenchel-Young loss
 
@@ -203,7 +236,7 @@ class perturbedFenchelYoungFunc(Function):
         return loss
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
         Backward pass for perturbed Fenchel-Young loss
         """
@@ -228,9 +261,18 @@ class implicitMLE(optModule):
     Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
     """
 
-    def __init__(self, optmodel, n_samples=10, sigma=1.0, lambd=10,
-                 distribution=None, two_sides=False,
-                 processes=1, solve_ratio=1, dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        n_samples: int = 10,
+        sigma: float = 1.0,
+        lambd: float = 10,
+        distribution: sumGammaDistribution | None = None,
+        two_sides: bool = False,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -259,7 +301,7 @@ class implicitMLE(optModule):
         # symmetric perturbation
         self.two_sides = two_sides
 
-    def forward(self, pred_cost):
+    def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -273,7 +315,11 @@ class implicitMLEFunc(Function):
     """
 
     @staticmethod
-    def forward(ctx, pred_cost, module):
+    def forward(
+        ctx,
+        pred_cost: torch.Tensor,
+        module: implicitMLE,
+    ) -> torch.Tensor:
         """
         Forward pass for IMLE
 
@@ -305,7 +351,7 @@ class implicitMLEFunc(Function):
         return e_sol
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
         Backward pass for IMLE
         """
@@ -349,9 +395,17 @@ class adaptiveImplicitMLE(optModule):
     Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
     """
 
-    def __init__(self, optmodel, n_samples=10, sigma=1.0,
-                 distribution=None, two_sides=False,
-                 processes=1, solve_ratio=1, dataset=None):
+    def __init__(
+        self,
+        optmodel: optModel,
+        n_samples: int = 10,
+        sigma: float = 1.0,
+        distribution: sumGammaDistribution | None = None,
+        two_sides: bool = False,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        dataset: optDataset | None = None,
+    ) -> None:
         """
         Args:
             optmodel (optModel): a PyEPO optimization model
@@ -379,7 +433,7 @@ class adaptiveImplicitMLE(optModule):
         self.grad_norm_avg = 1 # gradient sparsity estimate
         self.step = 1e-3 # update step for α
 
-    def forward(self, pred_cost):
+    def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:
         """
         Forward pass
         """
@@ -392,7 +446,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
     An autograd function for Adaptive Implicit Maximum Likelihood Estimator
     """
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
         Backward pass for IMLE
         """
@@ -434,7 +488,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         return grad, None
 
 
-def _solve_or_cache_3d(ptb_c, module):
+def _solve_or_cache_3d(ptb_c: torch.Tensor, module: optModule) -> torch.Tensor:
     """
     Solve or use cached solutions for perturbed costs (3D: n_samples × batch × vars).
     Delegates to the shared 2D functions in utils after flattening.
@@ -452,7 +506,14 @@ def _solve_or_cache_3d(ptb_c, module):
     return ptb_sols
 
 
-def _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool=None, solset=None):
+def _solve_in_pass_3d(
+    ptb_c: torch.Tensor,
+    optmodel: optModel,
+    processes: int,
+    pool,
+    solpool: torch.Tensor | None = None,
+    solset: set | None = None,
+) -> tuple[torch.Tensor, torch.Tensor | None]:
     """
     Solve optimization for perturbed 3D costs and update solution pool.
 
@@ -483,7 +544,11 @@ def _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool=None, solset=Non
     return ptb_sols, solpool
 
 
-def _cache_in_pass_3d(ptb_c, optmodel, solpool):
+def _cache_in_pass_3d(
+    ptb_c: torch.Tensor,
+    optmodel: optModel,
+    solpool: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Use solution pool for perturbed 3D costs (n_samples × batch × vars).
     Unlike the 2D version in utils, this handles the extra sample dimension.

@@ -36,7 +36,7 @@ class shortestPathModel(optOrtModel):
         arcs (list): list of arcs
     """
 
-    def __init__(self, grid, solver="glop"):
+    def __init__(self, grid: tuple[int, int], solver: str = "glop") -> None:
         """
         Args:
             grid (tuple of int): size of grid network
@@ -46,7 +46,7 @@ class shortestPathModel(optOrtModel):
         self.arcs = _get_grid_arcs(grid)
         super().__init__(solver)
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build OR-Tools pywraplp model
 
@@ -99,7 +99,7 @@ class shortestPathCpModel(optOrtCpModel):
         arcs (list): list of arcs
     """
 
-    def __init__(self, grid):
+    def __init__(self, grid: tuple[int, int]) -> None:
         """
         Args:
             grid (tuple of int): size of grid network
@@ -108,7 +108,7 @@ class shortestPathCpModel(optOrtCpModel):
         self.arcs = _get_grid_arcs(grid)
         super().__init__()
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         A method to build OR-Tools CP-SAT model
 

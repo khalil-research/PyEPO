@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 from functools import partial
+
+import numpy as np
 import torch
 
 try:
@@ -37,7 +39,17 @@ class optMpaxModel(optModel):
         minimize (bool): Whether to minimize objective, by default True.
     """
 
-    def __init__(self, A=None, b=None, G=None, h=None, l=None, u=None, use_sparse_matrix=True, minimize=True):
+    def __init__(
+        self,
+        A: np.ndarray | torch.Tensor | None = None,
+        b: np.ndarray | torch.Tensor | None = None,
+        G: np.ndarray | torch.Tensor | None = None,
+        h: np.ndarray | torch.Tensor | None = None,
+        l: np.ndarray | torch.Tensor | None = None,
+        u: np.ndarray | torch.Tensor | None = None,
+        use_sparse_matrix: bool = True,
+        minimize: bool = True,
+    ) -> None:
         super().__init__()
         # error
         if not _HAS_MPAX:
@@ -82,10 +94,10 @@ class optMpaxModel(optModel):
         # JIT pre-compile
         self._rebuild_jit()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "optMpaxModel " + self.__class__.__name__
 
-    def _rebuild_jit(self):
+    def _rebuild_jit(self) -> None:
         """Rebuild JIT-compiled solve functions with current constraints."""
         self.jitted_solve = jax.jit(partial(self._jitted_solve,
                                             A=self.A, b=self.b, G=self.G,
@@ -94,13 +106,13 @@ class optMpaxModel(optModel):
         self.batch_optimize = jax.vmap(self.jitted_solve)
 
     @property
-    def num_cost(self):
+    def num_cost(self) -> int:
         """
         number of costs to be predicted
         """
         return self.A.shape[1]
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -138,7 +150,7 @@ class optMpaxModel(optModel):
         if self.modelSense == EPO.MAXIMIZE:
             self.c = - self.c
 
-    def solve(self):
+    def solve(self) -> tuple[torch.Tensor, float]:
         """
         A method to solve the model
 
@@ -168,7 +180,7 @@ class optMpaxModel(optModel):
         obj = jnp.dot(c, result.primal_solution)
         return result.primal_solution, obj
 
-    def copy(self):
+    def copy(self) -> optMpaxModel:
         """
         A method to copy the model
 
@@ -185,7 +197,7 @@ class optMpaxModel(optModel):
         new_model.device = device
         return new_model
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optMpaxModel:
         """
         A method to add a new constraint
 
@@ -213,7 +225,7 @@ class optMpaxModel(optModel):
         new_model._rebuild_jit()
         return new_model
 
-    def _getModel(self):
+    def _getModel(self) -> tuple:
         """
         Placeholder method for MPAX. MPAX does not require an explicit model creation.
         """
@@ -222,7 +234,6 @@ class optMpaxModel(optModel):
 
 if __name__ == "__main__":
     import random
-    import numpy as np
     # random seed for reproducibility
     random.seed(42)
     np.random.seed(42)

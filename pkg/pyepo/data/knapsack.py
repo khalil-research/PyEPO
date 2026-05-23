@@ -9,7 +9,15 @@ from __future__ import annotations
 import numpy as np
 
 
-def genData(num_data, num_features, num_items, dim=1, deg=1, noise_width=0, seed=135):
+def genData(
+    num_data: int,
+    num_features: int,
+    num_items: int,
+    dim: int = 1,
+    deg: int = 1,
+    noise_width: float = 0,
+    seed: int = 135,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     A function to generate synthetic data and features for knapsack
 

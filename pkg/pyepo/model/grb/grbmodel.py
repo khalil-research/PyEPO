@@ -7,6 +7,7 @@ Abstract optimization model based on GurobiPy
 from __future__ import annotations
 
 from copy import copy
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -20,6 +21,9 @@ except ImportError:
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy, optModel
 
+if TYPE_CHECKING:
+    import torch
+
 
 class optGrbModel(optModel):
     """
@@ -29,7 +33,7 @@ class optGrbModel(optModel):
         _model (GurobiPy model): Gurobi model
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # error
         if not _HAS_GUROBI:
             raise ImportError("Gurobi is not installed. Please install gurobipy to use this feature.")
@@ -45,17 +49,17 @@ class optGrbModel(optModel):
         # turn off output
         self._model.Params.outputFlag = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "optGRBModel " + self.__class__.__name__
 
     @property
-    def num_cost(self):
+    def num_cost(self) -> int:
         """
         number of costs to be predicted
         """
         return self.x.size if isinstance(self.x, gp.MVar) else len(self.x)
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -73,7 +77,7 @@ class optGrbModel(optModel):
             obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)
 
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve the model
 
@@ -91,7 +95,7 @@ class optGrbModel(optModel):
         obj = self._model.objVal
         return sol, obj
 
-    def copy(self):
+    def copy(self) -> optGrbModel:
         """
         A method to copy the model
 
@@ -111,7 +115,7 @@ class optGrbModel(optModel):
             new_model.x = {key: new_vars[i] for i, key in enumerate(self.x)}
         return new_model
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optGrbModel:
         """
         A method to add a new constraint
 

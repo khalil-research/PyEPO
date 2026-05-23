@@ -7,6 +7,7 @@ Abstract optimization model based on Google OR-Tools CP-SAT
 from __future__ import annotations
 
 from copy import copy
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -19,6 +20,9 @@ except ImportError:
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy, optModel
 
+if TYPE_CHECKING:
+    import torch
+
 
 class optOrtCpModel(optModel):
     """
@@ -30,16 +34,16 @@ class optOrtCpModel(optModel):
 
     _OBJ_SCALE = 1_000_000
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not _HAS_ORTOOLS:
             raise ImportError("OR-Tools is not installed. Please install ortools to use this feature.")
         self._extra_constrs = []
         super().__init__()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "optOrtCpModel " + self.__class__.__name__
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -58,7 +62,7 @@ class optOrtCpModel(optModel):
         else:
             self._model.Minimize(obj_expr)
 
-    def solve(self):
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve the model
 
@@ -74,7 +78,7 @@ class optOrtCpModel(optModel):
         obj = solver.ObjectiveValue() / self._OBJ_SCALE
         return sol, obj
 
-    def copy(self):
+    def copy(self) -> optOrtCpModel:
         """
         A method to copy the model
 
@@ -92,7 +96,7 @@ class optOrtCpModel(optModel):
                     for i, k in enumerate(new_model.x)) <= int(rhs))
         return new_model
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optOrtCpModel:
         """
         A method to add a new constraint
 
@@ -118,7 +122,7 @@ class optOrtCpModel(optModel):
                 for i, k in enumerate(new_model.x)) <= scaled_rhs)
         return new_model
 
-    def relax(self):
+    def relax(self) -> optOrtCpModel:
         """
         CP-SAT does not support LP relaxation.
         """

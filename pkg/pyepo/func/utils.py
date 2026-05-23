@@ -6,6 +6,8 @@ Utility function
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import torch
 
@@ -14,8 +16,12 @@ from pyepo.utils import getArgs
 from pyepo.model.opt import costToNumpy
 from pyepo.model.mpax import optMpaxModel
 
+if TYPE_CHECKING:
+    from pyepo.func.abcmodule import optModule
+    from pyepo.model.opt import optModel
 
-def _close_pool(pool):
+
+def _close_pool(pool) -> None:
     """Best-effort shutdown of a pathos ProcessingPool; swallows shutdown errors."""
     try:
         pool.close()
@@ -25,7 +31,7 @@ def _close_pool(pool):
         pass
 
 
-def _solve_or_cache(cp, module):
+def _solve_or_cache(cp: torch.Tensor, module: optModule) -> tuple[torch.Tensor, torch.Tensor]:
     """
     A function to get optimization solution in the forward/backward pass
     """
@@ -42,7 +48,14 @@ def _solve_or_cache(cp, module):
     return sol, obj
 
 
-def _solve_in_pass(cp, optmodel, processes, pool, solpool=None, solset=None):
+def _solve_in_pass(
+    cp: torch.Tensor,
+    optmodel: optModel,
+    processes: int,
+    pool,
+    solpool: torch.Tensor | None = None,
+    solset: set | None = None,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor | None]:
     """
     A function to solve optimization and update solution pool
     """
@@ -55,7 +68,12 @@ def _solve_in_pass(cp, optmodel, processes, pool, solpool=None, solset=None):
     return sol, obj, solpool
 
 
-def _solve_batch(cp, optmodel, processes, pool):
+def _solve_batch(
+    cp: torch.Tensor | np.ndarray,
+    optmodel: optModel,
+    processes: int,
+    pool,
+) -> tuple[torch.Tensor, torch.Tensor]:
     """
     A function to solve optimization in the forward/backward pass
     """
@@ -110,7 +128,11 @@ def _solve_batch(cp, optmodel, processes, pool):
     return sol, obj
 
 
-def _update_solution_pool(sol, solpool, solset):
+def _update_solution_pool(
+    sol: torch.Tensor,
+    solpool: torch.Tensor | None,
+    solset: set,
+) -> torch.Tensor:
     """
     Add new solutions to solution pool
 
@@ -144,7 +166,11 @@ def _update_solution_pool(sol, solpool, solset):
     return solpool
 
 
-def _cache_in_pass(cp, optmodel, solpool):
+def _cache_in_pass(
+    cp: torch.Tensor,
+    optmodel: optModel,
+    solpool: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     A function to use solution pool in the forward/backward pass
     """
@@ -168,7 +194,11 @@ def _cache_in_pass(cp, optmodel, solpool):
 _worker_model = None
 _worker_model_key = None
 
-def _solveWithObj4Par(cost, args, model_type):
+def _solveWithObj4Par(
+    cost: np.ndarray,
+    args: dict,
+    model_type: type,
+) -> tuple[np.ndarray, float]:
     """
     A function to solve function in parallel processors
 
@@ -195,7 +225,7 @@ def _solveWithObj4Par(cost, args, model_type):
     return sol, obj
 
 
-def _check_sol(c, w, z):
+def _check_sol(c: torch.Tensor, w: torch.Tensor, z: torch.Tensor) -> None:
     """
     A function to check solution is correct
     """
@@ -209,12 +239,12 @@ class sumGammaDistribution:
     """
     creates a generator of samples for the Sum-of-Gamma distribution
     """
-    def __init__(self, kappa, n_iterations=10, seed=135):
+    def __init__(self, kappa: float, n_iterations: int = 10, seed: int = 135) -> None:
         self.κ = kappa
         self.n_iterations = n_iterations
         self.rnd = np.random.RandomState(seed)
 
-    def sample(self, size):
+    def sample(self, size: int | tuple[int, ...]) -> np.ndarray:
         # init samples
         samples = 0
         # calculate samples

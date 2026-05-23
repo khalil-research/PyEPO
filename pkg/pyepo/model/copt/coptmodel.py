@@ -7,6 +7,7 @@ Abstract optimization model based on Cardinal Optimizer (COPT)
 from __future__ import annotations
 
 from copy import copy
+from typing import TYPE_CHECKING
 
 try:
     from coptpy import COPT
@@ -17,6 +18,10 @@ except ImportError:
 from pyepo import EPO
 from pyepo.model.opt import costToNumpy, optModel
 
+if TYPE_CHECKING:
+    import numpy as np
+    import torch
+
 
 class optCoptModel(optModel):
     """
@@ -26,7 +31,7 @@ class optCoptModel(optModel):
         _model (COPT model): COPT model
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not _HAS_COPT:
             raise ImportError("COPT is not installed. Please install coptpy to use this feature.")
         super().__init__()
@@ -40,10 +45,10 @@ class optCoptModel(optModel):
         # turn off output
         self._model.setParam("Logging", 0)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "optCoptModel " + self.__class__.__name__
 
-    def setObj(self, c):
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
 
@@ -57,7 +62,7 @@ class optCoptModel(optModel):
         obj = sum(c[i] * self.x[k] for i, k in enumerate(self.x))
         self._model.setObjective(obj)
 
-    def solve(self):
+    def solve(self) -> tuple[list, float]:
         """
         A method to solve the model
 
@@ -68,7 +73,7 @@ class optCoptModel(optModel):
         self._model.solve()
         return [self.x[k].x for k in self.x], self._model.objVal
 
-    def copy(self):
+    def copy(self) -> optCoptModel:
         """
         A method to copy the model
 
@@ -83,7 +88,7 @@ class optCoptModel(optModel):
         new_model.x = {key: x[i] for i, key in enumerate(self.x)}
         return new_model
 
-    def addConstr(self, coefs, rhs):
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optCoptModel:
         """
         A method to add a new constraint
 
