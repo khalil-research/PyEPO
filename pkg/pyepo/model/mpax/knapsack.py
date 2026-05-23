@@ -34,9 +34,9 @@ class knapsackModel(optMpaxModel):
             weights: weights of items
             capacity: total capacity
         """
-        self.weights = weights
+        self.weights = np.asarray(weights)
         self.capacity = capacity
-        self.items = self.weights.shape[1]
+        self.items = list(range(self.weights.shape[1]))
         G, h, u = self._constructMatrix()
         super().__init__(G=G, h=h, u=u, use_sparse_matrix=False, minimize=False)
 
@@ -52,7 +52,7 @@ class knapsackModel(optMpaxModel):
         """
         G = -jnp.array(self.weights, dtype=jnp.float32)
         h = -jnp.array(self.capacity, dtype=jnp.float32)
-        u = jnp.ones(self.items, dtype=jnp.float32)
+        u = jnp.ones(len(self.items), dtype=jnp.float32)
         return G, h, u
 
 

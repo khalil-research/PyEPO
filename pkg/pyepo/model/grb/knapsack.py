@@ -37,7 +37,7 @@ class knapsackModel(optGrbModel):
         """
         self.weights = np.asarray(weights)
         self.capacity = np.asarray(capacity)
-        self.items = self.weights.shape[1]
+        self.items = list(range(self.weights.shape[1]))
         super().__init__()
 
     def _getModel(self) -> tuple:
@@ -50,7 +50,7 @@ class knapsackModel(optGrbModel):
         # create a model
         m = gp.Model("knapsack")
         # variables
-        x = m.addMVar(self.items, name="x", vtype=GRB.BINARY)
+        x = m.addMVar(len(self.items), name="x", vtype=GRB.BINARY)
         # sense
         m.modelSense = GRB.MAXIMIZE
         # constraints
@@ -80,7 +80,7 @@ class knapsackModelRel(knapsackModel):
         # turn off output
         m.Params.outputFlag = 0
         # variables
-        x = m.addMVar(self.items, name="x", ub=1)
+        x = m.addMVar(len(self.items), name="x", ub=1)
         # sense
         m.modelSense = GRB.MAXIMIZE
         # constraints
