@@ -7,12 +7,14 @@ Abstract autograd optimization module
 from abc import abstractmethod
 import logging
 import multiprocessing as mp
+import weakref
 from pathos.multiprocessing import ProcessingPool
 
 import torch
 from torch import nn
 
 from pyepo.data.dataset import optDataset
+from pyepo.func.utils import _close_pool
 from pyepo.model.opt import optModel
 from pyepo.model.mpax import optMpaxModel
 
@@ -55,6 +57,8 @@ class optModule(nn.Module):
         # multi-core
         else:
             self.pool = ProcessingPool(self.processes)
+            # release worker processes when this module is garbage-collected
+            weakref.finalize(self, _close_pool, self.pool)
         logger.info("Num of cores: %d", self.processes)
         # solution pool
         self.solve_ratio = solve_ratio

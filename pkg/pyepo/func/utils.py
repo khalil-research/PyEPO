@@ -13,6 +13,16 @@ from pyepo.model.opt import costToNumpy
 from pyepo.model.mpax import optMpaxModel
 
 
+def _close_pool(pool):
+    """Best-effort shutdown of a pathos ProcessingPool; swallows shutdown errors."""
+    try:
+        pool.close()
+        pool.join()
+        pool.clear()
+    except Exception:
+        pass
+
+
 def _solve_or_cache(cp, module):
     """
     A function to get optimization solution in the forward/backward pass
