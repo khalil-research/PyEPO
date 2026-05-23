@@ -120,7 +120,7 @@ class optModel(ABC):
         """
         A method to relax the MIP model. Subclasses should override.
         """
-        raise RuntimeError("Method 'relax' is not implemented.")
+        raise NotImplementedError("Method 'relax' is not implemented.")
 
 
 class unionFind:
