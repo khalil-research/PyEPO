@@ -52,22 +52,24 @@ setuptools.setup(
     # mail address
     author_email = "bolucas.tang@mail.utoronto.ca",
     # restrict Python version
-    python_requires = ">=3.7",
+    python_requires = ">=3.9",
     # dependencies
     install_requires = [
         "numpy",
         "scipy",
         "pathos",
         "tqdm",
-        "configspace",
         "scikit_learn",
         "torch>=1.13.1"],
     extras_require = {
         "pyomo": ["pyomo>=6.1.2"],
         "gurobi": ["gurobipy>=9.1.2"],
+        "copt": ["coptpy"],
         "ortools": ["ortools>=9.6"],
         "mpax": ["mpax", "jax>=0.4.1", "jaxlib>=0.4.1"],
-        "all": ["pyomo>=6.1.2", "gurobipy>=9.1.2", "ortools>=9.6", "mpax", "jax>=0.4.1", "jaxlib>=0.4.1"],
+        "autosklearn": ["auto-sklearn", "configspace"],
+        "all": ["pyomo>=6.1.2", "gurobipy>=9.1.2", "coptpy", "ortools>=9.6",
+                "mpax", "jax>=0.4.1", "jaxlib>=0.4.1"],
     },
     # classifiers
     classifiers = [

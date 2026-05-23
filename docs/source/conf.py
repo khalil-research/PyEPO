@@ -13,13 +13,11 @@
 import os
 import sys
 sys.path.append(os.path.abspath("../../pkg"))
-#sys.path.append(os.path.abspath("../../pyepo"))
 sys.path.append(os.path.abspath("../../pkg/pyepo/data"))
 sys.path.append(os.path.abspath("../../pkg/pyepo/model"))
 sys.path.append(os.path.abspath("../../pkg/pyepo/twostage"))
 sys.path.append(os.path.abspath("../../pkg/pyepo/func"))
-sys.path.append(os.path.abspath("../../pkg/pyepo/train"))
-sys.path.append(os.path.abspath("../../pkg/pyepo/eval"))
+sys.path.append(os.path.abspath("../../pkg/pyepo/metric"))
 
 
 # -- Project information -----------------------------------------------------
@@ -29,7 +27,7 @@ copyright = "2021, Bo Tang"
 author = "Bo Tang"
 
 # The full version, including alpha/beta/rc tags
-release = "v1.0.4"
+release = "1.1.1"
 
 
 # -- General configuration ---------------------------------------------------

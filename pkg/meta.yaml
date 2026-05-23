@@ -22,17 +22,16 @@ channels:
 
 requirements:
   host:
-    - python >=3.7
+    - python >=3.9
     - pip
     - numpy
     - tqdm
   run:
-    - python >=3.7
+    - python >=3.9
     - numpy
     - scipy
     - pathos
     - tqdm
-    - configspace
     - scikit-learn
     - pytorch >=1.13
 
@@ -40,6 +39,7 @@ extra:
   optional-dependencies:
     - gurobi >=9.1.2
     - pyomo >=6.1.2
+    - coptpy
 
 about:
   home: https://github.com/khalil-research/PyEPO
