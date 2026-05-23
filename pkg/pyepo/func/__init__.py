@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Pytorch autograd function for end-to-end training
 """
@@ -13,3 +12,19 @@ from pyepo.func.perturbed import (
 )
 from pyepo.func.rank import listwiseLTR, pairwiseLTR, pointwiseLTR
 from pyepo.func.surrogate import SPOPlus, perturbationGradient
+
+__all__ = [
+    "NCE",
+    "SPOPlus",
+    "adaptiveImplicitMLE",
+    "blackboxOpt",
+    "contrastiveMAP",
+    "implicitMLE",
+    "listwiseLTR",
+    "negativeIdentity",
+    "pairwiseLTR",
+    "perturbationGradient",
+    "perturbedFenchelYoung",
+    "perturbedOpt",
+    "pointwiseLTR",
+]

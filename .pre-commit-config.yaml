@@ -1,0 +1,26 @@
+# Pre-commit hooks. Setup: `pip install pre-commit && pre-commit install`. Manual: `pre-commit run --all-files`. Pyright lives in CI / Pylance, not here.
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.14
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        files: ^pkg/pyepo/.*\.py$
+      - id: ruff-format
+        files: ^pkg/pyepo/.*\.py$
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.(ipynb|md)$
+      - id: end-of-file-fixer
+        exclude: \.(ipynb|md)$
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: \.ipynb$

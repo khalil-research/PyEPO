@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 pyepo
 =====
@@ -18,8 +16,17 @@ except PackageNotFoundError:
 # Silence library logs by default; users opt in with logging.basicConfig(level=INFO).
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-import pyepo.data
-import pyepo.func
-import pyepo.metric
-import pyepo.model
-import pyepo.twostage
+from pyepo import data, func, metric, model, twostage
+from pyepo.EPO import MAXIMIZE, MINIMIZE, ModelSense
+
+__all__ = [
+    "MAXIMIZE",
+    "MINIMIZE",
+    "ModelSense",
+    "__version__",
+    "data",
+    "func",
+    "metric",
+    "model",
+    "twostage",
+]
