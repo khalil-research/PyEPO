@@ -5,11 +5,10 @@ Traveling salesman problem
 """
 
 import numpy as np
-import torch
 
 from pyepo import EPO
 from pyepo.model.omo.omomodel import optOmoModel
-from pyepo.model.opt import getTspTour
+from pyepo.model.opt import costToNumpy, getTspTour
 
 try:
     from pyomo import opt as po
@@ -126,11 +125,7 @@ class tspGGModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        # check if c is a PyTorch tensor
-        if isinstance(c, torch.Tensor):
-            c = c.detach().cpu().numpy()
-        else:
-            c = np.asarray(c, dtype=np.float32)
+        c = costToNumpy(c)
         # delete previous component
         self._model.del_component(self._model.obj)
         # set obj
@@ -301,11 +296,7 @@ class tspMTZModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        # check if c is a PyTorch tensor
-        if isinstance(c, torch.Tensor):
-            c = c.detach().cpu().numpy()
-        else:
-            c = np.asarray(c, dtype=np.float32)
+        c = costToNumpy(c)
         # delete previous component
         self._model.del_component(self._model.obj)
         # set obj

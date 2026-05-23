@@ -8,7 +8,28 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import deepcopy
 
+import numpy as np
+import torch
+
 from pyepo import EPO
+
+
+def costToNumpy(c, dtype=np.float32):
+    """
+    Normalize a cost vector to a numpy array, detaching torch tensors as needed.
+
+    Args:
+        c (np.ndarray / list / torch.Tensor): cost vector
+        dtype (np.dtype): target dtype when ``c`` is not already a tensor; torch
+            tensors are converted via ``.detach().cpu().numpy()`` and keep their
+            existing dtype.
+
+    Returns:
+        np.ndarray: numpy cost vector
+    """
+    if isinstance(c, torch.Tensor):
+        return c.detach().cpu().numpy()
+    return np.asarray(c, dtype=dtype)
 
 class optModel(ABC):
     """

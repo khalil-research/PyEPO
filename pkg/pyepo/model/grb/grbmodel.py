@@ -7,7 +7,6 @@ Abstract optimization model based on GurobiPy
 from copy import copy
 
 import numpy as np
-import torch
 
 try:
     import gurobipy as gp
@@ -17,7 +16,7 @@ except ImportError:
     _HAS_GUROBI = False
 
 from pyepo import EPO
-from pyepo.model.opt import optModel
+from pyepo.model.opt import costToNumpy, optModel
 
 
 class optGrbModel(optModel):
@@ -63,11 +62,7 @@ class optGrbModel(optModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        # check if c is a PyTorch tensor
-        if isinstance(c, torch.Tensor):
-            c = c.detach().cpu().numpy()
-        else:
-            c = np.asarray(c, dtype=np.float32)
+        c = costToNumpy(c)
         # mvar
         if isinstance(self.x, gp.MVar):
             obj = c @ self.x

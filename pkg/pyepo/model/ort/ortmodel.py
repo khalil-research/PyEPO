@@ -7,7 +7,6 @@ Abstract optimization model based on Google OR-Tools (pywraplp)
 from copy import copy
 
 import numpy as np
-import torch
 
 try:
     from ortools.linear_solver import pywraplp
@@ -16,7 +15,7 @@ except ImportError:
     _HAS_ORTOOLS = False
 
 from pyepo import EPO
-from pyepo.model.opt import optModel
+from pyepo.model.opt import costToNumpy, optModel
 
 
 class optOrtModel(optModel):
@@ -53,11 +52,7 @@ class optOrtModel(optModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        # check if c is a PyTorch tensor
-        if isinstance(c, torch.Tensor):
-            c = c.detach().cpu().numpy()
-        else:
-            c = np.asarray(c, dtype=np.float32)
+        c = costToNumpy(c)
         # set obj
         obj = self._model.Objective()
         obj.Clear()

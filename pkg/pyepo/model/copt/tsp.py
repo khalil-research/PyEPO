@@ -7,13 +7,12 @@ Traveling salesman problem
 from itertools import combinations
 
 import numpy as np
-import torch
 from coptpy import Envr
 from coptpy import COPT
 from coptpy import CallbackBase
 
 from pyepo.model.copt.coptmodel import optCoptModel
-from pyepo.model.opt import getTspTour, unionFind
+from pyepo.model.opt import costToNumpy, getTspTour, unionFind
 
 
 class tspABModel(optCoptModel):
@@ -115,11 +114,7 @@ class tspGGModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        # check if c is a PyTorch tensor
-        if isinstance(c, torch.Tensor):
-            c = c.detach().cpu().numpy()
-        else:
-            c = np.asarray(c, dtype=np.float32)
+        c = costToNumpy(c)
         obj = sum(c[k] * (self.x[i, j] + self.x[j, i])
                   for k, (i, j) in enumerate(self.edges))
         self._model.setObjective(obj)
@@ -299,11 +294,7 @@ class tspDFJModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        # check if c is a PyTorch tensor
-        if isinstance(c, torch.Tensor):
-            c = c.detach().cpu().numpy()
-        else:
-            c = np.asarray(c, dtype=np.float32)
+        c = costToNumpy(c)
         obj = sum(c[i] * self.x[k] for i, k in enumerate(self.edges))
         self._model.setObjective(obj)
 
@@ -387,11 +378,7 @@ class tspMTZModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        # check if c is a PyTorch tensor
-        if isinstance(c, torch.Tensor):
-            c = c.detach().cpu().numpy()
-        else:
-            c = np.asarray(c, dtype=np.float32)
+        c = costToNumpy(c)
         obj = sum(c[k] * (self.x[i, j] + self.x[j, i])
                   for k, (i, j) in enumerate(self.edges))
         self._model.setObjective(obj)

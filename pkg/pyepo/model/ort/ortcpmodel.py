@@ -7,7 +7,6 @@ Abstract optimization model based on Google OR-Tools CP-SAT
 from copy import copy
 
 import numpy as np
-import torch
 
 try:
     from ortools.sat.python import cp_model
@@ -16,7 +15,7 @@ except ImportError:
     _HAS_ORTOOLS = False
 
 from pyepo import EPO
-from pyepo.model.opt import optModel
+from pyepo.model.opt import costToNumpy, optModel
 
 
 class optOrtCpModel(optModel):
@@ -47,11 +46,7 @@ class optOrtCpModel(optModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        # check if c is a PyTorch tensor
-        if isinstance(c, torch.Tensor):
-            c = c.detach().cpu().numpy()
-        else:
-            c = np.asarray(c, dtype=np.float64)
+        c = costToNumpy(c, dtype=np.float64)
         # scale float to int
         scaled = (c * self._OBJ_SCALE).astype(np.int64)
         # set obj
