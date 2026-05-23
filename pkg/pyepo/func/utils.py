@@ -215,7 +215,7 @@ def _solveWithObj4Par(
     """
     global _worker_model, _worker_model_key
     # reuse cached model if same type; rebuild only on first call or type change
-    key = model_type.__qualname__
+    key = (model_type.__module__, model_type.__qualname__)
     if _worker_model_key != key:
         _worker_model = model_type(**args)
         _worker_model_key = key
