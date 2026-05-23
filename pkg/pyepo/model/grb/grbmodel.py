@@ -50,6 +50,8 @@ class optGrbModel(optModel):
             raise ValueError("Invalid modelSense.")
         # turn off output
         self._model.Params.outputFlag = 0
+        # cache ordered Var list once for setAttr/getAttr batch paths
+        self._vars_list = None if isinstance(self.x, gp.MVar) else list(self.x.values())
 
     def __repr__(self) -> str:
         return "optGRBModel " + self.__class__.__name__
@@ -71,13 +73,11 @@ class optGrbModel(optModel):
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c)
-        # mvar
         if isinstance(self.x, gp.MVar):
-            obj = c @ self.x
-        # vars
+            self._model.setObjective(c @ self.x)
         else:
-            obj = gp.quicksum(c[i] * self.x[k] for i, k in enumerate(self.x))
-        self._model.setObjective(obj)
+            # batch C-level coefficient update
+            self._model.setAttr("Obj", self._vars_list, c.tolist())
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
@@ -86,14 +86,12 @@ class optGrbModel(optModel):
         Returns:
             tuple: optimal solution (list) and objective value (float)
         """
-        self._model.update()
+        # optimize() flushes pending changes
         self._model.optimize()
-        # solution
         if isinstance(self.x, gp.MVar):
             sol = self.x.x
         else:
-            sol = np.array([self.x[k].x for k in self.x])
-        # objective value
+            sol = np.asarray(self._model.getAttr("X", self._vars_list))
         obj = self._model.objVal
         return sol, obj
 
@@ -113,8 +111,10 @@ class optGrbModel(optModel):
         new_vars = new_model._model.getVars()
         if isinstance(self.x, gp.MVar):
             new_model.x = gp.MVar.fromlist(new_vars)
+            new_model._vars_list = None
         else:
             new_model.x = {key: new_vars[i] for i, key in enumerate(self.x)}
+            new_model._vars_list = list(new_model.x.values())
         return new_model
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optGrbModel:

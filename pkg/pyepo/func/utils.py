@@ -101,17 +101,16 @@ def _solve_batch(
     # single-core
     elif processes == 1:
         cp = costToNumpy(cp)
-        sol = []
-        obj = []
+        sol_list: list = []
+        obj_list: list = []
         for i in range(ins_num):
-            # solve
             optmodel.setObj(cp[i])
             solp, objp = optmodel.solve()
-            sol.append(np.asarray(solp, dtype=np.float32))
-            obj.append(objp)
-        # to tensor
-        sol = torch.as_tensor(np.stack(sol), dtype=torch.float32).to(device)
-        obj = torch.tensor(obj, dtype=torch.float32, device=device)
+            sol_list.append(solp)
+            obj_list.append(objp)
+        # stack + dtype convert in a single call
+        sol = torch.as_tensor(np.asarray(sol_list, dtype=np.float32)).to(device)
+        obj = torch.tensor(obj_list, dtype=torch.float32, device=device)
     # multi-core
     else:
         cp = costToNumpy(cp)
@@ -134,8 +133,7 @@ def _update_solution_pool(
     """
     Append rows of `sol` to `solpool` that aren't already present.
 
-    Dedup is done with `torch.unique` + `torch.cdist` on whichever device
-    `solpool` lives on, avoiding any GPU<->CPU sync.
+    Dedup runs with `torch.unique` + `torch.cdist` on `solpool`'s device.
     """
     sol = torch.as_tensor(sol, dtype=torch.float32)
     if solpool is None:

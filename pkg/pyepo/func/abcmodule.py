@@ -87,7 +87,7 @@ class optModule(nn.Module):
                 raise TypeError("dataset is not an optDataset")
             # dedup the initial pool on whichever device dataset.sols lives
             self.solpool = torch.unique(dataset.sols, dim=0).clone()
-        # per-instance RNG for the solve-vs-cache branch (avoids global numpy RNG lock)
+        # per-instance RNG for the solve-vs-cache branch
         self._branch_rng = np.random.RandomState(seed)
         # reduction
         self.reduction = reduction
