@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Traveling salesman problem
 """
@@ -10,9 +9,7 @@ from itertools import combinations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from coptpy import Envr
-from coptpy import COPT
-from coptpy import CallbackBase
+from coptpy import COPT, CallbackBase, Envr
 
 from pyepo.model.copt.coptmodel import optCoptModel
 from pyepo.model.opt import costToNumpy, getTspTour, unionFind
@@ -39,8 +36,7 @@ class tspABModel(optCoptModel):
         """
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))
-        self.edges = [(i, j) for i in self.nodes
-                      for j in self.nodes if i < j]
+        self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
         super().__init__()
         # constraints added via addConstr, replayed on copy/relax
         self._extra_constrs = []
@@ -103,8 +99,8 @@ class tspGGModel(tspABModel):
         m = Envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        x = m.addVars(directed_edges, nameprefix='x', vtype=COPT.BINARY)
-        y = m.addVars(directed_edges, nameprefix='y', vtype=COPT.CONTINUOUS)
+        x = m.addVars(directed_edges, nameprefix="x", vtype=COPT.BINARY)
+        y = m.addVars(directed_edges, nameprefix="y", vtype=COPT.CONTINUOUS)
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # constraints
@@ -113,9 +109,12 @@ class tspGGModel(tspABModel):
         for i in self.nodes:
             m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
         for i in self.nodes[1:]:
-            m.addConstr(sum(y[i, j] for j in self.nodes if j != i) -
-                        sum(y[j, i] for j in self.nodes[1:] if j != i) == 1)
-        for (i, j) in directed_edges:
+            m.addConstr(
+                sum(y[i, j] for j in self.nodes if j != i)
+                - sum(y[j, i] for j in self.nodes[1:] if j != i)
+                == 1
+            )
+        for i, j in directed_edges:
             if i != 0:
                 m.addConstr(y[i, j] <= (len(self.nodes) - 1) * x[i, j])
         return m, x
@@ -130,8 +129,7 @@ class tspGGModel(tspABModel):
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c)
-        obj = sum(c[k] * (self.x[i, j] + self.x[j, i])
-                  for k, (i, j) in enumerate(self.edges))
+        obj = sum(c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
         self._model.setObjective(obj)
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -148,8 +146,9 @@ class tspGGModel(tspABModel):
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the GG variable scheme."""
         self._model.addConstr(
-            sum(coefs[k] * (self.x[i, j] + self.x[j, i])
-                for k, (i, j) in enumerate(self.edges)) <= rhs)
+            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
+            <= rhs
+        )
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
@@ -199,9 +198,8 @@ class tspGGModelRel(tspGGModel):
         m = Envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        x = m.addVars(directed_edges, nameprefix='x', vtype=COPT.CONTINUOUS,
-                       lb=0, ub=1)
-        y = m.addVars(directed_edges, nameprefix='y', vtype=COPT.CONTINUOUS)
+        x = m.addVars(directed_edges, nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)
+        y = m.addVars(directed_edges, nameprefix="y", vtype=COPT.CONTINUOUS)
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # constraints
@@ -210,9 +208,12 @@ class tspGGModelRel(tspGGModel):
         for i in self.nodes:
             m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
         for i in self.nodes[1:]:
-            m.addConstr(sum(y[i, j] for j in self.nodes if j != i) -
-                        sum(y[j, i] for j in self.nodes[1:] if j != i) == 1)
-        for (i, j) in directed_edges:
+            m.addConstr(
+                sum(y[i, j] for j in self.nodes if j != i)
+                - sum(y[j, i] for j in self.nodes[1:] if j != i)
+                == 1
+            )
+        for i, j in directed_edges:
             if i != 0:
                 m.addConstr(y[i, j] <= (len(self.nodes) - 1) * x[i, j])
         return m, x
@@ -258,6 +259,7 @@ class tspDFJModel(tspABModel):
         """
         A callback class for subtour elimination
         """
+
         def __init__(self, x, n, edges):
             super().__init__()
             self._x = x
@@ -268,18 +270,15 @@ class tspDFJModel(tspABModel):
             if self.where() == COPT.CBCONTEXT_MIPSOL:
                 # selected edges
                 xvals = self.getSolution(self._x)
-                selected = [(i, j) for i, j in self._x.keys()
-                            if xvals[i, j] > 1e-2]
+                selected = [(i, j) for i, j in self._x if xvals[i, j] > 1e-2]
                 # check subcycle with unionfind
                 uf = unionFind(self._n)
                 for i, j in selected:
                     if not uf.union(i, j):
                         # find subcycle
-                        cycle = [k for k in range(self._n)
-                                 if uf.find(k) == uf.find(i)]
+                        cycle = [k for k in range(self._n) if uf.find(k) == uf.find(i)]
                         if len(cycle) < self._n:
-                            constr = sum(self._x[i, j]
-                                         for i, j in combinations(cycle, 2))
+                            constr = sum(self._x[i, j] for i, j in combinations(cycle, 2))
                             self.addLazyConstr(constr <= len(cycle) - 1)
                         break
 
@@ -293,7 +292,7 @@ class tspDFJModel(tspABModel):
         # create a model
         m = Envr().createModel("tsp")
         # variables
-        x = m.addVars(self.edges, nameprefix='x', vtype=COPT.BINARY)
+        x = m.addVars(self.edges, nameprefix="x", vtype=COPT.BINARY)
         for i, j in self.edges:
             x[j, i] = x[i, j]
         # sense
@@ -331,9 +330,7 @@ class tspDFJModel(tspABModel):
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the DFJ variable scheme."""
-        self._model.addConstr(
-            sum(coefs[i] * self.x[k]
-                for i, k in enumerate(self.edges)) <= rhs)
+        self._model.addConstr(sum(coefs[i] * self.x[k] for i, k in enumerate(self.edges)) <= rhs)
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
@@ -375,8 +372,8 @@ class tspMTZModel(tspABModel):
         m = Envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        x = m.addVars(directed_edges, nameprefix='x', vtype=COPT.BINARY)
-        u = m.addVars(self.nodes, nameprefix='u', vtype=COPT.CONTINUOUS)
+        x = m.addVars(directed_edges, nameprefix="x", vtype=COPT.BINARY)
+        u = m.addVars(self.nodes, nameprefix="u", vtype=COPT.CONTINUOUS)
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # constraints
@@ -384,10 +381,9 @@ class tspMTZModel(tspABModel):
             m.addConstr(sum(x[i, j] for i in self.nodes if i != j) == 1)
         for i in self.nodes:
             m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
-        for (i, j) in directed_edges:
+        for i, j in directed_edges:
             if (i != 0) and (j != 0):
-                m.addConstr(u[j] - u[i] >=
-                            len(self.nodes) * (x[i, j] - 1) + 1)
+                m.addConstr(u[j] - u[i] >= len(self.nodes) * (x[i, j] - 1) + 1)
         return m, x
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
@@ -400,8 +396,7 @@ class tspMTZModel(tspABModel):
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c)
-        obj = sum(c[k] * (self.x[i, j] + self.x[j, i])
-                  for k, (i, j) in enumerate(self.edges))
+        obj = sum(c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
         self._model.setObjective(obj)
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -418,8 +413,9 @@ class tspMTZModel(tspABModel):
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the MTZ variable scheme."""
         self._model.addConstr(
-            sum(coefs[k] * (self.x[i, j] + self.x[j, i])
-                for k, (i, j) in enumerate(self.edges)) <= rhs)
+            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
+            <= rhs
+        )
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
@@ -469,9 +465,8 @@ class tspMTZModelRel(tspMTZModel):
         m = Envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
-        x = m.addVars(directed_edges, nameprefix='x', vtype=COPT.CONTINUOUS,
-                       lb=0, ub=1)
-        u = m.addVars(self.nodes, nameprefix='u', vtype=COPT.CONTINUOUS)
+        x = m.addVars(directed_edges, nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)
+        u = m.addVars(self.nodes, nameprefix="u", vtype=COPT.CONTINUOUS)
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # constraints
@@ -479,10 +474,9 @@ class tspMTZModelRel(tspMTZModel):
             m.addConstr(sum(x[i, j] for i in self.nodes if i != j) == 1)
         for i in self.nodes:
             m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
-        for (i, j) in directed_edges:
+        for i, j in directed_edges:
             if (i != 0) and (j != 0):
-                m.addConstr(u[j] - u[i] >=
-                            len(self.nodes) * (x[i, j] - 1) + 1)
+                m.addConstr(u[j] - u[i] >= len(self.nodes) * (x[i, j] - 1) + 1)
         return m, x
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -512,8 +506,8 @@ class tspMTZModelRel(tspMTZModel):
 
 
 if __name__ == "__main__":
-
     import random
+
     # random seed
     random.seed(42)
     num_nodes = 5
@@ -525,36 +519,36 @@ if __name__ == "__main__":
     optmodel = optmodel.copy()
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'GG Obj: {obj}')
+    print(f"GG Obj: {obj}")
     tour = optmodel.getTour(sol)
-    print(f'GG Tour: {tour}')
+    print(f"GG Tour: {tour}")
 
     # solve DFJ model
     optmodel = tspDFJModel(num_nodes=num_nodes)
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'DFJ Obj: {obj}')
+    print(f"DFJ Obj: {obj}")
     tour = optmodel.getTour(sol)
-    print(f'DFJ Tour: {tour}')
+    print(f"DFJ Tour: {tour}")
 
     # solve MTZ model
     optmodel = tspMTZModel(num_nodes=num_nodes)
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'MTZ Obj: {obj}')
+    print(f"MTZ Obj: {obj}")
     tour = optmodel.getTour(sol)
-    print(f'MTZ Tour: {tour}')
+    print(f"MTZ Tour: {tour}")
 
     # relax GG model
     optmodel = tspGGModel(num_nodes=num_nodes)
     optmodel = optmodel.relax()
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'GG Relaxed Obj: {obj}')
+    print(f"GG Relaxed Obj: {obj}")
 
     # add constraint
     optmodel = tspMTZModel(num_nodes=num_nodes)
     optmodel = optmodel.addConstr([1] * num_edges, num_edges - 1)
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'MTZ + Constr Obj: {obj}')
+    print(f"MTZ + Constr Obj: {obj}")

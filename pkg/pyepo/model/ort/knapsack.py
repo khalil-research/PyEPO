@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Knapsack problem
 """
@@ -11,18 +10,19 @@ import numpy as np
 try:
     from ortools.linear_solver import pywraplp
     from ortools.sat.python import cp_model
+
     _HAS_ORTOOLS = True
 except ImportError:
     _HAS_ORTOOLS = False
 
 from pyepo import EPO
-from pyepo.model.ort.ortmodel import optOrtModel
 from pyepo.model.ort.ortcpmodel import optOrtCpModel
-
+from pyepo.model.ort.ortmodel import optOrtModel
 
 # ============================================================
 # pywraplp
 # ============================================================
+
 
 class knapsackModel(optOrtModel):
     """
@@ -65,14 +65,14 @@ class knapsackModel(optOrtModel):
         # create a model
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
-            raise RuntimeError(
-                f"Solver '{self.solver}' is not available in OR-Tools.")
+            raise RuntimeError(f"Solver '{self.solver}' is not available in OR-Tools.")
         # variables
         x = {i: m.BoolVar(f"x_{i}") for i in self.items}
         # constraints
         for i in range(len(self.capacity)):
-            m.Add(sum(float(self.weights[i, j]) * x[j]
-                      for j in self.items) <= float(self.capacity[i]))
+            m.Add(
+                sum(float(self.weights[i, j]) * x[j] for j in self.items) <= float(self.capacity[i])
+            )
         return m, x
 
     def relax(self) -> knapsackModelRel:
@@ -99,14 +99,14 @@ class knapsackModelRel(knapsackModel):
         # create a model
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
-            raise RuntimeError(
-                f"Solver '{self.solver}' is not available in OR-Tools.")
+            raise RuntimeError(f"Solver '{self.solver}' is not available in OR-Tools.")
         # variables (continuous)
         x = {i: m.NumVar(0, 1, f"x_{i}") for i in self.items}
         # constraints
         for i in range(len(self.capacity)):
-            m.Add(sum(float(self.weights[i, j]) * x[j]
-                      for j in self.items) <= float(self.capacity[i]))
+            m.Add(
+                sum(float(self.weights[i, j]) * x[j] for j in self.items) <= float(self.capacity[i])
+            )
         return m, x
 
     def relax(self) -> knapsackModelRel:
@@ -119,6 +119,7 @@ class knapsackModelRel(knapsackModel):
 # ============================================================
 # CP-SAT
 # ============================================================
+
 
 class knapsackCpModel(optOrtCpModel):
     """
@@ -157,13 +158,11 @@ class knapsackCpModel(optOrtCpModel):
         x = {i: m.NewBoolVar(f"x_{i}") for i in self.items}
         # constraints (integer coefficients)
         for i in range(len(self.capacity)):
-            m.Add(sum(int(self.weights[i, j]) * x[j]
-                      for j in self.items) <= int(self.capacity[i]))
+            m.Add(sum(int(self.weights[i, j]) * x[j] for j in self.items) <= int(self.capacity[i]))
         return m, x
 
 
 if __name__ == "__main__":
-
     # random seed
     np.random.seed(42)
     # set random cost for test

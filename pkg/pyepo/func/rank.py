@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Learning to rank Losses
 """
@@ -63,19 +62,22 @@ class listwiseLTR(optModule):
         cp = pred_cost.detach()
         # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
-                                                self.pool, self.solpool, self._solset)
+            _, _, self.solpool = _solve_in_pass(
+                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+            )
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)
         # obj for solpool
-        objpool_c = true_cost @ self.solpool.T # true cost
-        objpool_cp = pred_cost @ self.solpool.T # pred cost
+        objpool_c = true_cost @ self.solpool.T  # true cost
+        objpool_cp = pred_cost @ self.solpool.T  # pred cost
         # cross entropy loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
-            loss = - (F.log_softmax(objpool_cp, dim=1) * F.softmax(objpool_c, dim=1).clamp(min=1e-8))
+            loss = -(F.log_softmax(objpool_cp, dim=1) * F.softmax(objpool_c, dim=1).clamp(min=1e-8))
         elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = - (F.log_softmax(- objpool_cp, dim=1) * F.softmax(- objpool_c, dim=1).clamp(min=1e-8))
+            loss = -(
+                F.log_softmax(-objpool_cp, dim=1) * F.softmax(-objpool_c, dim=1).clamp(min=1e-8)
+            )
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         return self._reduce(loss)
@@ -124,15 +126,14 @@ class pairwiseLTR(optModule):
         # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
             _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool,
-                self.solpool, self._solset
+                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
             )
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)
         # obj for solpool
-        objpool_c = torch.einsum("bd,nd->bn", true_cost, self.solpool) # true cost
-        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool) # pred cost
+        objpool_c = torch.einsum("bd,nd->bn", true_cost, self.solpool)  # true cost
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool)  # pred cost
         # best solutions for each instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
             best_inds = torch.argmin(objpool_c, dim=1)  # Best solution indices
@@ -198,14 +199,15 @@ class pointwiseLTR(optModule):
         cp = pred_cost.detach()
         # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
-                                                self.pool, self.solpool, self._solset)
+            _, _, self.solpool = _solve_in_pass(
+                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+            )
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)
         # obj for solpool as score
-        objpool_c = true_cost @ self.solpool.T # true cost
-        objpool_cp = pred_cost @ self.solpool.T # pred cost
+        objpool_c = true_cost @ self.solpool.T  # true cost
+        objpool_cp = pred_cost @ self.solpool.T  # pred cost
         # squared loss
         loss = (objpool_c - objpool_cp).square().mean(dim=1)
         return self._reduce(loss)

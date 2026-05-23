@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 optDataset class based on PyTorch Dataset
 """
@@ -10,13 +9,14 @@ import logging
 
 import numpy as np
 import torch
+from scipy.spatial import distance
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
 from pyepo.model.opt import optModel
-from scipy.spatial import distance
 
 logger = logging.getLogger(__name__)
+
 
 class optDataset(Dataset):
     """
@@ -80,7 +80,8 @@ class optDataset(Dataset):
         return np.array(sols), np.array(objs)
 
     def _solve(
-        self, cost: np.ndarray | torch.Tensor | list,
+        self,
+        cost: np.ndarray | torch.Tensor | list,
     ) -> tuple[np.ndarray | torch.Tensor, float]:
         """
         A method to solve optimization problem to get an optimal solution with given cost
@@ -105,7 +106,8 @@ class optDataset(Dataset):
         return len(self.costs)
 
     def __getitem__(
-        self, index: int,
+        self,
+        index: int,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         A method to retrieve data
@@ -139,6 +141,7 @@ class optDatasetKNN(optDataset):
         sols (np.ndarray): Optimal solutions
         objs (np.ndarray): Optimal objective values
     """
+
     def __init__(
         self,
         model: optModel,
@@ -213,9 +216,10 @@ class optDatasetKNN(optDataset):
         distances = distance.cdist(self.feats, self.feats, "euclidean")
         # exclude self (diagonal) to get true nearest neighbours
         np.fill_diagonal(distances, np.inf)
-        indexes = np.argpartition(distances, self.k, axis=1)[:, :self.k]
+        indexes = np.argpartition(distances, self.k, axis=1)[:, : self.k]
         # vectorized interpolation: (n, num_cost, 1) + (n, num_cost, k)
         neighbours = self.costs[indexes]  # (n, k, num_cost)
-        costs_knn = self.weight * self.costs[:, :, np.newaxis] \
-                  + (1 - self.weight) * neighbours.transpose(0, 2, 1)
+        costs_knn = self.weight * self.costs[:, :, np.newaxis] + (
+            1 - self.weight
+        ) * neighbours.transpose(0, 2, 1)
         return costs_knn

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Shortest path problem
 """
@@ -11,6 +10,7 @@ from collections import defaultdict
 try:
     import gurobipy as gp
     from gurobipy import GRB
+
     _HAS_GUROBI = True
 except ImportError:
     _HAS_GUROBI = False
@@ -61,7 +61,9 @@ class shortestPathModel(optGrbModel):
         for i in range(self.grid[0]):
             for j in range(self.grid[1]):
                 v = i * self.grid[1] + j
-                expr = gp.quicksum(x[e] for e in in_arcs[v]) - gp.quicksum(x[e] for e in out_arcs[v])
+                expr = gp.quicksum(x[e] for e in in_arcs[v]) - gp.quicksum(
+                    x[e] for e in out_arcs[v]
+                )
                 # source
                 if i == 0 and j == 0:
                     m.addConstr(expr == -1)
@@ -75,31 +77,30 @@ class shortestPathModel(optGrbModel):
 
 
 if __name__ == "__main__":
-
     import random
+
     # random seed
     random.seed(42)
     # set random cost for test
     cost = [random.random() for _ in range(40)]
 
     # solve model
-    optmodel = shortestPathModel(grid=(5,5)) # init model
+    optmodel = shortestPathModel(grid=(5, 5))  # init model
     optmodel = optmodel.copy()
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)
 
-
     # add constraint
-    optmodel = optmodel.addConstr([1]*40, 30)
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel = optmodel.addConstr([1] * 40, 30)
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)

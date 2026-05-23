@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 """
 Constants
 """
+
 from __future__ import annotations
 
 # sense

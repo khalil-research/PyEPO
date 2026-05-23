@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Abstract optimization model based on MPAX
 """
@@ -16,6 +15,7 @@ try:
     import jax
     from jax import numpy as jnp
     from mpax import create_lp, raPDHG
+
     _HAS_MPAX = True
 except ImportError:
     _HAS_MPAX = False
@@ -56,7 +56,9 @@ class optMpaxModel(optModel):
             raise ImportError("MPAX is not installed. Please install MPAX to use this feature.")
         # at least one of A or G must be provided
         if A is None and G is None:
-            raise ValueError("At least one of A (equality constraints) or G (inequality constraints) must be provided.")
+            raise ValueError(
+                "At least one of A (equality constraints) or G (inequality constraints) must be provided."
+            )
         # rhs is provided
         if A is not None and b is None:
             raise ValueError("If A (equality constraints) is provided, b must also be provided.")
@@ -81,8 +83,16 @@ class optMpaxModel(optModel):
             self.G = jnp.zeros((0, num_vars), dtype=jnp.float32)
             self.h = jnp.zeros((0,), dtype=jnp.float32)
         # variable bounds
-        self.l = jnp.array(l, dtype=jnp.float32) if l is not None else jnp.zeros(num_vars, dtype=jnp.float32)
-        self.u = jnp.array(u, dtype=jnp.float32) if u is not None else jnp.full(num_vars, jnp.inf, dtype=jnp.float32)
+        self.l = (
+            jnp.array(l, dtype=jnp.float32)
+            if l is not None
+            else jnp.zeros(num_vars, dtype=jnp.float32)
+        )
+        self.u = (
+            jnp.array(u, dtype=jnp.float32)
+            if u is not None
+            else jnp.full(num_vars, jnp.inf, dtype=jnp.float32)
+        )
         # matrix type
         self.use_sparse_matrix = use_sparse_matrix
         # model sense
@@ -99,10 +109,18 @@ class optMpaxModel(optModel):
 
     def _rebuild_jit(self) -> None:
         """Rebuild JIT-compiled solve functions with current constraints."""
-        self.jitted_solve = jax.jit(partial(self._jitted_solve,
-                                            A=self.A, b=self.b, G=self.G,
-                                            h=self.h, l=self.l, u=self.u,
-                                            use_sparse_matrix=self.use_sparse_matrix))
+        self.jitted_solve = jax.jit(
+            partial(
+                self._jitted_solve,
+                A=self.A,
+                b=self.b,
+                G=self.G,
+                h=self.h,
+                l=self.l,
+                u=self.u,
+                use_sparse_matrix=self.use_sparse_matrix,
+            )
+        )
         self.batch_optimize = jax.vmap(self.jitted_solve)
 
     @property
@@ -148,7 +166,7 @@ class optMpaxModel(optModel):
             self.c = jnp.array(c, dtype=jnp.float32)
         # change sign for maximization
         if self.modelSense == EPO.MAXIMIZE:
-            self.c = - self.c
+            self.c = -self.c
 
     def solve(self) -> tuple[torch.Tensor, float]:
         """
@@ -164,7 +182,7 @@ class optMpaxModel(optModel):
         if self.modelSense == EPO.MINIMIZE:
             obj = obj.item()
         elif self.modelSense == EPO.MAXIMIZE:
-            obj = - obj.item()
+            obj = -obj.item()
         else:
             raise ValueError("Invalid modelSense.")
         return sol, obj
@@ -234,6 +252,7 @@ class optMpaxModel(optModel):
 
 if __name__ == "__main__":
     import random
+
     # random seed for reproducibility
     random.seed(42)
     np.random.seed(42)
@@ -244,8 +263,8 @@ if __name__ == "__main__":
     b = np.random.rand(3)
     G = np.random.rand(5, num_vars)  # 5 inequality constraints
     h = np.random.rand(5)
-    #l = np.zeros(num_vars)  # Lower bounds (default zero)
-    #u = np.ones(num_vars) * 10  # Upper bounds
+    # l = np.zeros(num_vars)  # Lower bounds (default zero)
+    # u = np.ones(num_vars) * 10  # Upper bounds
     # create optimization model
     optmodel = optMpaxModel(A=A, b=b, G=G, h=h, minimize=True)
     # generate a random cost vector

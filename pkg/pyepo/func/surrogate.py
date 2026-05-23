@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Surrogate Loss function
 """
@@ -101,12 +100,12 @@ class SPOPlusFunc(Function):
         w = true_sol.detach()
         z = true_obj.detach()
         # check sol
-        #_check_sol(c, w, z)
+        # _check_sol(c, w, z)
         # solve
         sol, obj = _solve_or_cache(2 * cp - c, module)
         # calculate loss
         if module.optmodel.modelSense == EPO.MINIMIZE:
-            loss = - obj + 2 * torch.einsum("bi,bi->b", cp, w) - z.squeeze(dim=-1)
+            loss = -obj + 2 * torch.einsum("bi,bi->b", cp, w) - z.squeeze(dim=-1)
         elif module.optmodel.modelSense == EPO.MAXIMIZE:
             loss = obj - 2 * torch.einsum("bi,bi->b", cp, w) + z.squeeze(dim=-1)
         else:

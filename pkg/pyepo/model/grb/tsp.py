@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Traveling salesman problem
 """
@@ -10,9 +9,11 @@ from itertools import combinations
 from typing import TYPE_CHECKING
 
 import numpy as np
+
 try:
     import gurobipy as gp
     from gurobipy import GRB
+
     _HAS_GUROBI = True
 except ImportError:
     _HAS_GUROBI = False
@@ -42,8 +43,7 @@ class tspABModel(optGrbModel):
         """
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))
-        self.edges = [(i, j) for i in self.nodes
-                      for j in self.nodes if i < j]
+        self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
         super().__init__()
         # constraints added via addConstr, replayed on copy/relax
         self._extra_constrs = []
@@ -113,13 +113,11 @@ class tspGGModel(tspABModel):
         # constraints
         m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
         m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(y.sum(i, "*") -
-                     gp.quicksum(y[j,i]
-                                 for j in self.nodes[1:]
-                                 if j != i) == 1
-                     for i in self.nodes[1:])
-        m.addConstrs(y[i,j] <= (len(self.nodes) - 1) * x[i,j]
-                     for (i,j) in x if i != 0)
+        m.addConstrs(
+            y.sum(i, "*") - gp.quicksum(y[j, i] for j in self.nodes[1:] if j != i) == 1
+            for i in self.nodes[1:]
+        )
+        m.addConstrs(y[i, j] <= (len(self.nodes) - 1) * x[i, j] for (i, j) in x if i != 0)
         return m, x
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
@@ -131,8 +129,9 @@ class tspGGModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
-                          for k, (i,j) in enumerate(self.edges))
+        obj = gp.quicksum(
+            c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges)
+        )
         self._model.setObjective(obj)
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -142,16 +141,19 @@ class tspGGModel(tspABModel):
         self._model.update()
         self._model.optimize()
         sol = np.zeros(self.num_cost, dtype=np.uint8)
-        for k, (i,j) in enumerate(self.edges):
-            if self.x[i,j].x > 1e-2 or self.x[j,i].x > 1e-2:
+        for k, (i, j) in enumerate(self.edges):
+            if self.x[i, j].x > 1e-2 or self.x[j, i].x > 1e-2:
                 sol[k] = 1
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the GG variable scheme."""
         self._model.addConstr(
-            gp.quicksum(coefs[k] * (self.x[i,j] + self.x[j,i])
-                        for k, (i,j) in enumerate(self.edges)) <= rhs)
+            gp.quicksum(
+                coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges)
+            )
+            <= rhs
+        )
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
@@ -210,13 +212,11 @@ class tspGGModelRel(tspGGModel):
         # constraints
         m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
         m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(y.sum(i, "*") -
-                     gp.quicksum(y[j,i]
-                                 for j in self.nodes[1:]
-                                 if j != i) == 1
-                     for i in self.nodes[1:])
-        m.addConstrs(y[i,j] <= (len(self.nodes) - 1) * x[i,j]
-                     for (i,j) in x if i != 0)
+        m.addConstrs(
+            y.sum(i, "*") - gp.quicksum(y[j, i] for j in self.nodes[1:] if j != i) == 1
+            for i in self.nodes[1:]
+        )
+        m.addConstrs(y[i, j] <= (len(self.nodes) - 1) * x[i, j] for (i, j) in x if i != 0)
         return m, x
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -229,8 +229,8 @@ class tspGGModelRel(tspGGModel):
         self._model.update()
         self._model.optimize()
         sol = np.zeros(self.num_cost)
-        for k, (i,j) in enumerate(self.edges):
-            sol[k] = self.x[i,j].x + self.x[j,i].x
+        for k, (i, j) in enumerate(self.edges):
+            sol[k] = self.x[i, j].x + self.x[j, i].x
         return sol, self._model.objVal
 
     def relax(self) -> tspABModel:
@@ -290,8 +290,7 @@ class tspDFJModel(tspABModel):
         if where == GRB.Callback.MIPSOL:
             # selected edges
             xvals = model.cbGetSolution(model._x)
-            selected = gp.tuplelist(
-                (i, j) for i, j in model._x.keys() if xvals[i, j] > 1e-2)
+            selected = gp.tuplelist((i, j) for i, j in model._x if xvals[i, j] > 1e-2)
             # check subcycle with unionfind
             uf = unionFind(model._n)
             for i, j in selected:
@@ -299,8 +298,10 @@ class tspDFJModel(tspABModel):
                     # find subcycle
                     cycle = [k for k in range(model._n) if uf.find(k) == uf.find(i)]
                     if len(cycle) < model._n:
-                        constr = gp.quicksum(model._x[i, j]
-                                     for i, j in combinations(cycle, 2)) <= len(cycle) - 1
+                        constr = (
+                            gp.quicksum(model._x[i, j] for i, j in combinations(cycle, 2))
+                            <= len(cycle) - 1
+                        )
                         model.cbLazy(constr)
                     break
 
@@ -331,8 +332,8 @@ class tspDFJModel(tspABModel):
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the DFJ variable scheme."""
         self._model.addConstr(
-            gp.quicksum(coefs[i] * self.x[k]
-                        for i, k in enumerate(self.edges)) <= rhs)
+            gp.quicksum(coefs[i] * self.x[k] for i, k in enumerate(self.edges)) <= rhs
+        )
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
@@ -362,6 +363,7 @@ class tspMTZModel(tspABModel):
         num_nodes (int): Number of nodes
         edges (list): List of edge index
     """
+
     def _getModel(self) -> tuple:
         """
         A method to build Gurobi model
@@ -382,10 +384,11 @@ class tspMTZModel(tspABModel):
         # constraints
         m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
         m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(u[j] - u[i] >=
-                     len(self.nodes) * (x[i,j] - 1) + 1
-                     for (i,j) in directed_edges
-                     if (i != 0) and (j != 0))
+        m.addConstrs(
+            u[j] - u[i] >= len(self.nodes) * (x[i, j] - 1) + 1
+            for (i, j) in directed_edges
+            if (i != 0) and (j != 0)
+        )
         return m, x
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
@@ -397,8 +400,9 @@ class tspMTZModel(tspABModel):
         """
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
-        obj = gp.quicksum(c[k] * (self.x[i,j] + self.x[j,i])
-                          for k, (i,j) in enumerate(self.edges))
+        obj = gp.quicksum(
+            c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges)
+        )
         self._model.setObjective(obj)
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -408,16 +412,19 @@ class tspMTZModel(tspABModel):
         self._model.update()
         self._model.optimize()
         sol = np.zeros(self.num_cost, dtype=np.uint8)
-        for k, (i,j) in enumerate(self.edges):
-            if self.x[i,j].x > 1e-2 or self.x[j,i].x > 1e-2:
+        for k, (i, j) in enumerate(self.edges):
+            if self.x[i, j].x > 1e-2 or self.x[j, i].x > 1e-2:
                 sol[k] = 1
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the MTZ variable scheme."""
         self._model.addConstr(
-            gp.quicksum(coefs[k] * (self.x[i,j] + self.x[j,i])
-                        for k, (i,j) in enumerate(self.edges)) <= rhs)
+            gp.quicksum(
+                coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges)
+            )
+            <= rhs
+        )
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
@@ -476,10 +483,11 @@ class tspMTZModelRel(tspMTZModel):
         # constraints
         m.addConstrs(x.sum("*", j) == 1 for j in self.nodes)
         m.addConstrs(x.sum(i, "*") == 1 for i in self.nodes)
-        m.addConstrs(u[j] - u[i] >=
-                     len(self.nodes) * (x[i,j] - 1) + 1
-                     for (i,j) in directed_edges
-                     if (i != 0) and (j != 0))
+        m.addConstrs(
+            u[j] - u[i] >= len(self.nodes) * (x[i, j] - 1) + 1
+            for (i, j) in directed_edges
+            if (i != 0) and (j != 0)
+        )
         return m, x
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -492,8 +500,8 @@ class tspMTZModelRel(tspMTZModel):
         self._model.update()
         self._model.optimize()
         sol = np.zeros(self.num_cost)
-        for k, (i,j) in enumerate(self.edges):
-            sol[k] = self.x[i,j].x + self.x[j,i].x
+        for k, (i, j) in enumerate(self.edges):
+            sol[k] = self.x[i, j].x + self.x[j, i].x
         return sol, self._model.objVal
 
     def relax(self) -> tspABModel:

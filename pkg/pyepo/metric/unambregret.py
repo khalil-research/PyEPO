@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Unambiguous regret loss
 """
@@ -60,8 +59,9 @@ def unambRegret(
             # solve
             for j in range(cp.shape[0]):
                 # accumulate loss
-                loss += calUnambRegret(optmodel, cp[j], c_np[j],
-                                    z[j].item(), tolerance, max_iter=10)
+                loss += calUnambRegret(
+                    optmodel, cp[j], c_np[j], z[j].item(), tolerance, max_iter=10
+                )
             optsum += abs(z).sum().item()
     finally:
         # restore training mode even if evaluation raises
@@ -105,22 +105,27 @@ def calUnambRegret(
     objp = np.ceil(np.dot(cp, sol.T))
     # opt for pred cost
     if optmodel.modelSense == EPO.MINIMIZE:
-        wst_optmodel = optmodel.addConstr(cp, objp+1e-2)
+        wst_optmodel = optmodel.addConstr(cp, objp + 1e-2)
     elif optmodel.modelSense == EPO.MAXIMIZE:
-        wst_optmodel = optmodel.addConstr(-cp, -objp+1e-2)
+        wst_optmodel = optmodel.addConstr(-cp, -objp + 1e-2)
     else:
         raise ValueError("Invalid modelSense.")
     # opt model to find worst case
     try:
         wst_optmodel.setObj(-true_cost)
         _, obj = wst_optmodel.solve()
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001  any solver failure triggers retry
         new_tolerance = tolerance * 10
         logger.warning(
             "calUnambRegret: solve failed (%s: %s); retrying with tolerance=%g (%d retries left)",
-            type(e).__name__, e, new_tolerance, max_iter - 1)
-        return calUnambRegret(optmodel, pred_cost, true_cost, true_obj,
-                              tolerance=new_tolerance, max_iter=max_iter-1)
+            type(e).__name__,
+            e,
+            new_tolerance,
+            max_iter - 1,
+        )
+        return calUnambRegret(
+            optmodel, pred_cost, true_cost, true_obj, tolerance=new_tolerance, max_iter=max_iter - 1
+        )
     obj = -obj
     # loss
     if optmodel.modelSense == EPO.MINIMIZE:

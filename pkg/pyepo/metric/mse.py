@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Mean Squared Error
 """
@@ -35,7 +34,7 @@ def MSE(predmodel: nn.Module, dataloader: DataLoader) -> float:
         # load data
         with torch.no_grad():
             for data in dataloader:
-                x, c, w, z = data
+                x, c, _, _ = data
                 x, c = x.to(device), c.to(device)
                 # predict
                 cp = predmodel(x)

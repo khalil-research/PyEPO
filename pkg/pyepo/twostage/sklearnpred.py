@@ -1,13 +1,16 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Two-stage model with Scikit-learn predictor
 """
 
 from __future__ import annotations
 
-from sklearn.base import BaseEstimator
+from typing import TYPE_CHECKING
+
 from sklearn.multioutput import MultiOutputRegressor
+
+if TYPE_CHECKING:
+    from sklearn.base import BaseEstimator
 
 
 def sklearnPred(pmodel: BaseEstimator) -> MultiOutputRegressor:

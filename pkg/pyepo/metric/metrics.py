@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Metrics for SKlearn model
 """
@@ -10,8 +9,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pyepo.utils import getArgs
 from pyepo import EPO
+from pyepo.utils import getArgs
 
 if TYPE_CHECKING:
     from pyepo.model.opt import optModel
@@ -37,8 +36,7 @@ def SPOError(
     """
     pred_cost = np.array(pred_cost)
     true_cost = np.array(true_cost)
-    assert pred_cost.shape == true_cost.shape, \
-    "Shape of true and predicted value does not match."
+    assert pred_cost.shape == true_cost.shape, "Shape of true and predicted value does not match."
     # rebuild model
     optmodel = model_type(**args)
     # init sum
@@ -78,13 +76,13 @@ def makeSkScorer(optmodel: optModel):
         scorer: callable object that returns a scalar score; less is better.
     """
     from sklearn.metrics import make_scorer
+
     # get class
     model_type = type(optmodel)
     # get args
     args = getArgs(optmodel)
     # build score
-    SPO_scorer = make_scorer(SPOError, greater_is_better=False,
-                             model_type=model_type, args=args)
+    SPO_scorer = make_scorer(SPOError, greater_is_better=False, model_type=model_type, args=args)
     return SPO_scorer
 
 
@@ -99,18 +97,21 @@ def makeAutoSkScorer(optmodel: optModel):
         scorer: callable object that returns a scalar score; less is better.
     """
     from autosklearn.metrics import make_scorer
+
     # get class
     model_type = type(optmodel)
     # get args
     args = getArgs(optmodel)
     # build score
-    SPO_scorer = make_scorer(name='SPO_error',
-                             score_func=SPOError,
-                             greater_is_better=False,
-                             needs_proba=False,
-                             needs_threshold=False,
-                             model_type=model_type,
-                             args=args)
+    SPO_scorer = make_scorer(
+        name="SPO_error",
+        score_func=SPOError,
+        greater_is_better=False,
+        needs_proba=False,
+        needs_threshold=False,
+        model_type=model_type,
+        args=args,
+    )
     return SPO_scorer
 
 
@@ -134,8 +135,7 @@ def testMSE(
     """
     pred_cost = np.array(pred_cost)
     true_cost = np.array(true_cost)
-    assert pred_cost.shape == true_cost.shape, \
-    "Shape of true and predicted value does not match."
+    assert pred_cost.shape == true_cost.shape, "Shape of true and predicted value does not match."
     return np.square(pred_cost - true_cost).mean()
 
 
@@ -150,14 +150,17 @@ def makeTestMSEScorer(optmodel: optModel):
         scorer: callable object that returns a scalar score; less is better.
     """
     from autosklearn.metrics import make_scorer
+
     # get class
     model_type = type(optmodel)
     # get args
     args = getArgs(optmodel)
     # build score
-    mse_scorer = make_scorer(name='test_error',
-                             score_func=testMSE,
-                             greater_is_better=False,
-                             model_type=model_type,
-                             args=args)
+    mse_scorer = make_scorer(
+        name="test_error",
+        score_func=testMSE,
+        greater_is_better=False,
+        model_type=model_type,
+        args=args,
+    )
     return mse_scorer

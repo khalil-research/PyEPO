@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Knapsack problem
 """
@@ -7,8 +6,7 @@ Knapsack problem
 from __future__ import annotations
 
 import numpy as np
-from coptpy import Envr
-from coptpy import COPT
+from coptpy import COPT, Envr
 
 from pyepo.model.copt.coptmodel import optCoptModel
 
@@ -47,8 +45,7 @@ class knapsackModel(optCoptModel):
         m.setObjSense(COPT.MAXIMIZE)
         # constraints
         for i in range(len(self.capacity)):
-            m.addConstr(sum(self.weights[i,j] * x[j]
-                        for j in self.items) <= self.capacity[i])
+            m.addConstr(sum(self.weights[i, j] * x[j] for j in self.items) <= self.capacity[i])
         return m, x
 
     def relax(self) -> knapsackModelRel:
@@ -72,13 +69,12 @@ class knapsackModelRel(knapsackModel):
         # create a model
         m = Envr().createModel("knapsack")
         # variables
-        x = m.addVars(self.items, nameprefix='x', vtype=COPT.CONTINUOUS, lb=0, ub=1)
+        x = m.addVars(self.items, nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)
         # sense
         m.setObjSense(COPT.MAXIMIZE)
         # constraints
         for i in range(len(self.capacity)):
-            m.addConstr(sum(self.weights[i,j] * x[j]
-                        for j in self.items) <= self.capacity[i])
+            m.addConstr(sum(self.weights[i, j] * x[j] for j in self.items) <= self.capacity[i])
         return m, x
 
     def relax(self) -> knapsackModelRel:
@@ -89,42 +85,42 @@ class knapsackModelRel(knapsackModel):
 
 
 if __name__ == "__main__":
-
     import random
+
     # random seed
     random.seed(42)
     # set random cost for test
     cost = [random.random() for _ in range(16)]
-    weights = np.random.choice(range(300, 800), size=(2,16)) / 100
+    weights = np.random.choice(range(300, 800), size=(2, 16)) / 100
     capacity = [20, 20]
 
     # solve model
-    optmodel = knapsackModel(weights=weights, capacity=capacity) # init model
+    optmodel = knapsackModel(weights=weights, capacity=capacity)  # init model
     optmodel = optmodel.copy()
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
 
     # relax
     optmodel = optmodel.relax()
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)
 
     # add constraint
-    optmodel = optmodel.addConstr([weights[0,i] for i in range(16)], 10)
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel = optmodel.addConstr([weights[0, i] for i in range(16)], 10)
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i in range(16):
         if sol[i] > 1e-3:
             print(i)

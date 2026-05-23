@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Noise contrastive estimation loss function
 """
@@ -60,8 +59,9 @@ class NCE(optModule):
         cp = pred_cost.detach()
         # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes,
-                                                self.pool, self.solpool, self._solset)
+            _, _, self.solpool = _solve_in_pass(
+                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+            )
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)
@@ -118,8 +118,9 @@ class contrastiveMAP(optModule):
         cp = pred_cost.detach()
         # solve and update pool
         if np.random.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(cp, self.optmodel, self.processes, 
-                                                self.pool, self.solpool, self._solset)
+            _, _, self.solpool = _solve_in_pass(
+                cp, self.optmodel, self.processes, self.pool, self.solpool, self._solset
+            )
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)

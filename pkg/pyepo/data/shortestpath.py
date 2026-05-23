@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Synthetic data for shortest path problem
 """
@@ -51,7 +50,7 @@ def genData(
     # cost vectors (vectorized)
     c = (x @ B.T / np.sqrt(p) + 3) ** deg + 1
     # rescale
-    c /= 3.5 ** deg
+    c /= 3.5**deg
     # noise
     epsilon = rnd.uniform(1 - noise_width, 1 + noise_width, (n, d))
     c *= epsilon

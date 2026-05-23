@@ -1,0 +1,154 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyepo"
+version = "1.1.1"
+description = "PyTorch-based End-to-End Predict-then-Optimize Tool"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { text = "MIT" }
+authors = [{ name = "Bo Tang", email = "bolucas.tang@mail.utoronto.ca" }]
+requires-python = ">=3.9"
+keywords = [
+    "predict-then-optimize",
+    "end-to-end",
+    "decision-focused learning",
+    "optimization",
+    "deep learning",
+    "pytorch",
+    "linear programming",
+    "integer programming",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Intended Audience :: Science/Research",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "pathos",
+    "tqdm",
+    "scikit_learn",
+    "torch>=1.13.1",
+]
+
+[project.optional-dependencies]
+pyomo = ["pyomo>=6.1.2"]
+gurobi = ["gurobipy>=9.1.2"]
+copt = ["coptpy"]
+ortools = ["ortools>=9.6"]
+mpax = ["mpax", "jax>=0.4.1", "jaxlib>=0.4.1"]
+autosklearn = ["auto-sklearn", "configspace"]
+all = [
+    "pyomo>=6.1.2",
+    "gurobipy>=9.1.2",
+    "coptpy",
+    "ortools>=9.6",
+    "mpax",
+    "jax>=0.4.1",
+    "jaxlib>=0.4.1",
+]
+dev = ["pytest", "ruff", "pyright"]
+
+[project.urls]
+Homepage = "https://github.com/khalil-research/PyEPO"
+Documentation = "https://khalil-research.github.io/PyEPO"
+Repository = "https://github.com/khalil-research/PyEPO"
+Issues = "https://github.com/khalil-research/PyEPO/issues"
+Paper = "https://link.springer.com/article/10.1007/s12532-024-00255-x"
+
+[tool.setuptools.packages.find]
+include = ["pyepo*"]
+
+[tool.setuptools.package-data]
+pyepo = ["py.typed"]
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+# ---------------------------------------------------------------------------
+# Pyright (used by VS Code Pylance + CLI)
+# ---------------------------------------------------------------------------
+[tool.pyright]
+include = ["pyepo"]
+exclude = ["**/__pycache__", "**/.pytest_cache", "tests", "test.py"]
+pythonVersion = "3.9"
+typeCheckingMode = "standard"
+# optional solver backends may be missing in some envs; soften to warning
+reportMissingImports = "warning"
+reportMissingModuleSource = "none"
+# library cares about correctness, not pedantry
+reportPrivateImportUsage = "none"
+# try/except `import gurobipy` patterns: pyright sees the symbol as possibly
+# unbound, but we guard usage with `_HAS_GUROBI` flags. Demote to "none".
+reportPossiblyUnboundVariable = "none"
+# Attributes set in subclass __init__ before super().__init__() — pyright
+# can't statically resolve them via the base class; informational only.
+reportAttributeAccessIssue = "warning"
+# Covariant return narrowing in concrete solver subclasses
+# (e.g., `relax() -> tspGGModelRel` overrides `relax() -> optGrbModel`).
+reportIncompatibleMethodOverride = "warning"
+# Subclass attrs that may be Optional pre-init
+reportOptionalMemberAccess = "warning"
+
+# ---------------------------------------------------------------------------
+# Ruff (linter + formatter)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+extend-exclude = ["test.py", "**/*.ipynb"]
+
+[tool.ruff.lint]
+# Wide curated rule set (most of "ALL" minus the noisy/breaking ones)
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade (modern syntax)
+    "B",    # flake8-bugbear (common bugs)
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific
+    "PIE",  # misc lints
+    "RET",  # flake8-return
+    "TC",   # flake8-type-checking (TYPE_CHECKING placement)
+    "PERF", # perflint
+    "BLE",  # blind-except
+    "LOG",  # logging
+    "PYI",  # pyi/stub style (also applies to type hints)
+]
+ignore = [
+    "E501",    # line too long (formatter handles)
+    "E741",    # ambiguous variable names (l/I/o ok in math contexts)
+    "B008",    # function calls in defaults (np.float32 etc. are intentional)
+    "RUF002",  # ambiguous unicode in docstrings (× α – etc. are intentional)
+    "RUF003",  # ambiguous unicode in comments
+    "RUF012",  # mutable class attrs (ABC patterns)
+    "SIM105",  # try/except/pass for optional ImportError sentinels is fine
+    "SIM108",  # ternary not always clearer than if/else
+    "RET504",  # assign-then-return is stylistic
+    "PERF203", # try/except in loop is fine for solver retries
+]
+
+[tool.ruff.lint.per-file-ignores]
+# __init__.py: re-exports, side-effect-after-init code patterns
+"__init__.py" = ["F401", "E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pyepo"]

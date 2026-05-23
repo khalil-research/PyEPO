@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Synthetic data for portfolio
 """
@@ -47,15 +46,14 @@ def genData(
     # random matrix parameter B
     B = rnd.binomial(1, 0.5, (m, p))
     # random matrix parameter L
-    L = rnd.uniform(-2.5e-3*noise_level, 2.5e-3*noise_level, (num_assets, num_features))
+    L = rnd.uniform(-2.5e-3 * noise_level, 2.5e-3 * noise_level, (num_assets, num_features))
     # feature vectors
     x = rnd.normal(0, 1, (n, p))
     # mean return of assets
     r = np.zeros((n, m))
     for i in range(n):
         # mean return of assets
-        r[i] = (0.05 * np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + \
-                0.1 ** (1 / deg)) ** deg
+        r[i] = (0.05 * np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 0.1 ** (1 / deg)) ** deg
         # random noise
         f = rnd.randn(num_features)
         eps = rnd.randn(num_assets)

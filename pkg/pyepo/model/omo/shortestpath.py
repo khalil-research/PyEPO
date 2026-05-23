@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Shortest path problem
 """
@@ -13,6 +12,7 @@ from pyepo.model.opt import _get_grid_arcs
 
 try:
     from pyomo import environ as pe
+
     _HAS_PYOMO = True
 except ImportError:
     _HAS_PYOMO = False
@@ -48,7 +48,7 @@ class shortestPathModel(optOmoModel):
         # parameters
         m.arcs = pe.Set(initialize=self.arcs)
         # variables
-        x = pe.Var(m.arcs, domain=pe.PositiveReals, bounds=(0,1))
+        x = pe.Var(m.arcs, domain=pe.PositiveReals, bounds=(0, 1))
         m.x = x
         # build adjacency lists
         out_arcs = defaultdict(list)
@@ -75,31 +75,30 @@ class shortestPathModel(optOmoModel):
 
 
 if __name__ == "__main__":
-
     import random
+
     # random seed
     random.seed(42)
     # set random cost for test
     cost = [random.random() for _ in range(40)]
 
     # solve model
-    optmodel = shortestPathModel(grid=(5,5), solver="gurobi") # init model
+    optmodel = shortestPathModel(grid=(5, 5), solver="gurobi")  # init model
     optmodel = optmodel.copy()
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)
 
-
     # add constraint
-    optmodel = optmodel.addConstr([1]*40, 30)
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel = optmodel.addConstr([1] * 40, 30)
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)

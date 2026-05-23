@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Abstract optimization model based on Google OR-Tools (pywraplp)
 """
@@ -13,6 +12,7 @@ import numpy as np
 
 try:
     from ortools.linear_solver import pywraplp
+
     _HAS_ORTOOLS = True
 except ImportError:
     _HAS_ORTOOLS = False
@@ -39,7 +39,9 @@ class optOrtModel(optModel):
             solver (str): solver backend for pywraplp
         """
         if not _HAS_ORTOOLS:
-            raise ImportError("OR-Tools is not installed. Please install ortools to use this feature.")
+            raise ImportError(
+                "OR-Tools is not installed. Please install ortools to use this feature."
+            )
         self.solver = solver
         self._extra_constrs = []
         super().__init__()
@@ -78,8 +80,7 @@ class optOrtModel(optModel):
         """
         status = self._model.Solve()
         if status != pywraplp.Solver.OPTIMAL:
-            raise RuntimeError(
-                f"Solver did not find an optimal solution. Status: {status}")
+            raise RuntimeError(f"Solver did not find an optimal solution. Status: {status}")
         sol = np.array([self.x[k].solution_value() for k in self.x], dtype=np.float32)
         obj = self._model.Objective().Value()
         return sol, obj
@@ -127,8 +128,8 @@ class optOrtModel(optModel):
 
 
 if __name__ == "__main__":
-
     import random
+
     # random seed
     random.seed(42)
     np.random.seed(42)

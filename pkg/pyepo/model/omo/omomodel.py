@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Abstract optimization model based on Pyomo
 """
@@ -13,8 +12,9 @@ from pyepo import EPO
 from pyepo.model.opt import costToNumpy, optModel
 
 try:
-    from pyomo import opt as po
     from pyomo import environ as pe
+    from pyomo import opt as po
+
     _HAS_PYOMO = True
 except ImportError:
     _HAS_PYOMO = False
@@ -121,7 +121,6 @@ class optOmoModel(optModel):
         # copy
         new_model = self.copy()
         # add constraint
-        expr = sum(coefs[i] * new_model.x[k]
-                   for i, k in enumerate(new_model.x)) <= rhs
+        expr = sum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
         new_model._model.cons.add(expr)
         return new_model

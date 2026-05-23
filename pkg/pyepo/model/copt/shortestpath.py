@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Shortest path problem
 """
@@ -8,8 +7,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from coptpy import Envr
-from coptpy import COPT
+from coptpy import COPT, Envr
 
 from pyepo.model.copt.coptmodel import optCoptModel
 from pyepo.model.opt import _get_grid_arcs
@@ -41,7 +39,7 @@ class shortestPathModel(optCoptModel):
         # create a model
         m = Envr().createModel("shortest path")
         # variables
-        x = m.addVars(self.arcs, nameprefix='x', vtype=COPT.CONTINUOUS, lb=0, ub=1)
+        x = m.addVars(self.arcs, nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # build adjacency lists
@@ -68,31 +66,30 @@ class shortestPathModel(optCoptModel):
 
 
 if __name__ == "__main__":
-
     import random
+
     # random seed
     random.seed(42)
     # set random cost for test
     cost = [random.random() for _ in range(40)]
 
     # solve model
-    optmodel = shortestPathModel(grid=(5,5)) # init model
+    optmodel = shortestPathModel(grid=(5, 5))  # init model
     optmodel = optmodel.copy()
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)
 
-
     # add constraint
-    optmodel = optmodel.addConstr([1]*40, 30)
-    optmodel.setObj(cost) # set objective function
-    sol, obj = optmodel.solve() # solve
+    optmodel = optmodel.addConstr([1] * 40, 30)
+    optmodel.setObj(cost)  # set objective function
+    sol, obj = optmodel.solve()  # solve
     # print res
-    print(f'Obj: {obj}')
+    print(f"Obj: {obj}")
     for i, e in enumerate(optmodel.arcs):
         if sol[i] > 1e-3:
             print(e)

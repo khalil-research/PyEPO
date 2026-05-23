@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Traveling salesman problem
 """
@@ -19,6 +18,7 @@ if TYPE_CHECKING:
 
 try:
     from pyomo import environ as pe
+
     _HAS_PYOMO = True
 except ImportError:
     _HAS_PYOMO = False
@@ -44,8 +44,7 @@ class tspABModel(optOmoModel):
         """
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))
-        self.edges = [(i, j) for i in self.nodes
-                      for j in self.nodes if i < j]
+        self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
         super().__init__(solver)
         # constraints added via addConstr, replayed on copy/relax
         self._extra_constrs = []
@@ -124,9 +123,12 @@ class tspGGModel(tspABModel):
         for i in self.nodes:
             m.cons.add(sum(x[i, j] for j in self.nodes if j != i) == 1)
         for i in self.nodes[1:]:
-            m.cons.add(sum(y[i, j] for j in self.nodes if j != i) -
-                       sum(y[j, i] for j in self.nodes[1:] if j != i) == 1)
-        for (i, j) in directed_edges:
+            m.cons.add(
+                sum(y[i, j] for j in self.nodes if j != i)
+                - sum(y[j, i] for j in self.nodes[1:] if j != i)
+                == 1
+            )
+        for i, j in directed_edges:
             if i != 0:
                 m.cons.add(y[i, j] <= (len(self.nodes) - 1) * x[i, j])
         return m, x
@@ -144,8 +146,7 @@ class tspGGModel(tspABModel):
         # delete previous component
         self._model.del_component(self._model.obj)
         # set obj
-        obj = sum(c[k] * (self.x[i, j] + self.x[j, i])
-                  for k, (i, j) in enumerate(self.edges))
+        obj = sum(c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
         self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -162,8 +163,9 @@ class tspGGModel(tspABModel):
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the GG variable scheme."""
         self._model.cons.add(
-            sum(coefs[k] * (self.x[i, j] + self.x[j, i])
-                for k, (i, j) in enumerate(self.edges)) <= rhs)
+            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
+            <= rhs
+        )
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
@@ -229,9 +231,12 @@ class tspGGModelRel(tspGGModel):
         for i in self.nodes:
             m.cons.add(sum(x[i, j] for j in self.nodes if j != i) == 1)
         for i in self.nodes[1:]:
-            m.cons.add(sum(y[i, j] for j in self.nodes if j != i) -
-                       sum(y[j, i] for j in self.nodes[1:] if j != i) == 1)
-        for (i, j) in directed_edges:
+            m.cons.add(
+                sum(y[i, j] for j in self.nodes if j != i)
+                - sum(y[j, i] for j in self.nodes[1:] if j != i)
+                == 1
+            )
+        for i, j in directed_edges:
             if i != 0:
                 m.cons.add(y[i, j] <= (len(self.nodes) - 1) * x[i, j])
         return m, x
@@ -299,10 +304,9 @@ class tspMTZModel(tspABModel):
             m.cons.add(sum(x[i, j] for i in self.nodes if i != j) == 1)
         for i in self.nodes:
             m.cons.add(sum(x[i, j] for j in self.nodes if j != i) == 1)
-        for (i, j) in directed_edges:
+        for i, j in directed_edges:
             if (i != 0) and (j != 0):
-                m.cons.add(u[j] - u[i] >=
-                           len(self.nodes) * (x[i, j] - 1) + 1)
+                m.cons.add(u[j] - u[i] >= len(self.nodes) * (x[i, j] - 1) + 1)
         return m, x
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
@@ -318,8 +322,7 @@ class tspMTZModel(tspABModel):
         # delete previous component
         self._model.del_component(self._model.obj)
         # set obj
-        obj = sum(c[k] * (self.x[i, j] + self.x[j, i])
-                  for k, (i, j) in enumerate(self.edges))
+        obj = sum(c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
         self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -336,8 +339,9 @@ class tspMTZModel(tspABModel):
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to self._model using the MTZ variable scheme."""
         self._model.cons.add(
-            sum(coefs[k] * (self.x[i, j] + self.x[j, i])
-                for k, (i, j) in enumerate(self.edges)) <= rhs)
+            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
+            <= rhs
+        )
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
         """
@@ -403,10 +407,9 @@ class tspMTZModelRel(tspMTZModel):
             m.cons.add(sum(x[i, j] for i in self.nodes if i != j) == 1)
         for i in self.nodes:
             m.cons.add(sum(x[i, j] for j in self.nodes if j != i) == 1)
-        for (i, j) in directed_edges:
+        for i, j in directed_edges:
             if (i != 0) and (j != 0):
-                m.cons.add(u[j] - u[i] >=
-                           len(self.nodes) * (x[i, j] - 1) + 1)
+                m.cons.add(u[j] - u[i] >= len(self.nodes) * (x[i, j] - 1) + 1)
         return m, x
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -436,8 +439,8 @@ class tspMTZModelRel(tspMTZModel):
 
 
 if __name__ == "__main__":
-
     import random
+
     # random seed
     random.seed(42)
     num_nodes = 5
@@ -449,28 +452,28 @@ if __name__ == "__main__":
     optmodel = optmodel.copy()
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'GG Obj: {obj}')
+    print(f"GG Obj: {obj}")
     tour = optmodel.getTour(sol)
-    print(f'GG Tour: {tour}')
+    print(f"GG Tour: {tour}")
 
     # solve MTZ model
     optmodel = tspMTZModel(num_nodes=num_nodes, solver="gurobi")
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'MTZ Obj: {obj}')
+    print(f"MTZ Obj: {obj}")
     tour = optmodel.getTour(sol)
-    print(f'MTZ Tour: {tour}')
+    print(f"MTZ Tour: {tour}")
 
     # relax GG model
     optmodel = tspGGModel(num_nodes=num_nodes, solver="gurobi")
     optmodel = optmodel.relax()
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'GG Relaxed Obj: {obj}')
+    print(f"GG Relaxed Obj: {obj}")
 
     # add constraint
     optmodel = tspMTZModel(num_nodes=num_nodes, solver="gurobi")
     optmodel = optmodel.addConstr([1] * num_edges, num_edges - 1)
     optmodel.setObj(cost)
     sol, obj = optmodel.solve()
-    print(f'MTZ + Constr Obj: {obj}')
+    print(f"MTZ + Constr Obj: {obj}")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Two-stage model with auto-sklearn predictor
 """
@@ -9,17 +8,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 try:
-    from autosklearn.regression import AutoSklearnRegressor
     from autosklearn.metrics import mean_squared_error
     from autosklearn.pipeline.components import data_preprocessing
     from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
-    from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
+    from autosklearn.pipeline.constants import DENSE, INPUT, SPARSE, UNSIGNED_DATA
+    from autosklearn.regression import AutoSklearnRegressor
     from ConfigSpace.configuration_space import ConfigurationSpace
 
     class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
         """
         This is class of NoPreprocessing component for auto-sklearn
         """
+
         def __init__(self, **kwargs):
             """
             This preprocessor does not change the data
@@ -46,7 +46,7 @@ try:
                 "handles_multioutput": True,
                 "is_deterministic": True,
                 "input": (SPARSE, DENSE, UNSIGNED_DATA),
-                "output": (INPUT,)
+                "output": (INPUT,),
             }
 
         @staticmethod
@@ -87,31 +87,41 @@ def autoSklearnPred(
     """
     # error
     if not _HAS_AUTO:
-        raise ImportError("Autosklearn is not installed. Please install autosklearn to use this feature.")
+        raise ImportError(
+            "Autosklearn is not installed. Please install autosklearn to use this feature."
+        )
     # get metrics
     pyepo_scorer = makeAutoSkScorer(optmodel)
-    #scorer = makeTestMSEScorer(optmodel)
+    # scorer = makeTestMSEScorer(optmodel)
     # build regressor
     if metric == "regret":
-        regressor = AutoSklearnRegressor(time_left_for_this_task=timelimit,
-                                         per_run_time_limit=1200,
-                                         memory_limit=None,
-                                         seed=seed,
-                                         metric=pyepo_scorer,
-                                         #scoring_functions=[pyepo_scorer, mean_squared_error],
-                                         include={"data_preprocessor": ["NoPreprocessing"],
-                                                  "feature_preprocessor": ["no_preprocessing"]})
-                                                  #"regressor": ["adaboost", "ard_regression", "extra_trees",
-                                                    #            "gaussian_process", "k_nearest_neighbors",
-                                                    #            "mlp", "random_forest"]})
+        regressor = AutoSklearnRegressor(
+            time_left_for_this_task=timelimit,
+            per_run_time_limit=1200,
+            memory_limit=None,
+            seed=seed,
+            metric=pyepo_scorer,
+            # scoring_functions=[pyepo_scorer, mean_squared_error],
+            include={
+                "data_preprocessor": ["NoPreprocessing"],
+                "feature_preprocessor": ["no_preprocessing"],
+            },
+        )
+        # "regressor": ["adaboost", "ard_regression", "extra_trees",
+        #            "gaussian_process", "k_nearest_neighbors",
+        #            "mlp", "random_forest"]})
     elif metric == "mse":
-        regressor = AutoSklearnRegressor(time_left_for_this_task=timelimit,
-                                         per_run_time_limit=150,
-                                         memory_limit=None,
-                                         seed=seed,
-                                         metric=mean_squared_error,
-                                         include={"data_preprocessor": ["NoPreprocessing"],
-                                                  "feature_preprocessor": ["no_preprocessing"]})
+        regressor = AutoSklearnRegressor(
+            time_left_for_this_task=timelimit,
+            per_run_time_limit=150,
+            memory_limit=None,
+            seed=seed,
+            metric=mean_squared_error,
+            include={
+                "data_preprocessor": ["NoPreprocessing"],
+                "feature_preprocessor": ["no_preprocessing"],
+            },
+        )
     else:
         raise ValueError(f"Invalid metric {metric}. Metric should be 'regret' or 'mse'.")
     return regressor

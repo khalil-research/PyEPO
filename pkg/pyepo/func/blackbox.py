@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Differentiable Black-box optimization function
 """
@@ -8,7 +7,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import torch
 from torch.autograd import Function
 
 from pyepo import EPO
@@ -16,6 +14,8 @@ from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
 
 if TYPE_CHECKING:
+    import torch
+
     from pyepo.data.dataset import optDataset
     from pyepo.model.opt import optModel
 
@@ -198,7 +198,6 @@ class negativeIdentityFunc(Function):
         # negative identity gradient
         if optmodel.modelSense == EPO.MINIMIZE:
             return -grad_output, None
-        elif optmodel.modelSense == EPO.MAXIMIZE:
+        if optmodel.modelSense == EPO.MAXIMIZE:
             return grad_output, None
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Abstract optimization model based on Cardinal Optimizer (COPT)
 """
@@ -11,6 +10,7 @@ from typing import TYPE_CHECKING
 
 try:
     from coptpy import COPT
+
     _HAS_COPT = True
 except ImportError:
     _HAS_COPT = False
@@ -104,7 +104,6 @@ class optCoptModel(optModel):
         # copy
         new_model = self.copy()
         # add constraint
-        expr = sum(coefs[i] * new_model.x[k]
-                   for i, k in enumerate(new_model.x)) <= rhs
+        expr = sum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
         new_model._model.addConstr(expr)
         return new_model

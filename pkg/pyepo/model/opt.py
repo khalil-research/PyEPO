@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Abstract optimization model
 """
@@ -33,6 +32,7 @@ def costToNumpy(c: np.ndarray | torch.Tensor | list, dtype=np.float32) -> np.nda
         return c.detach().cpu().numpy()
     return np.asarray(c, dtype=dtype)
 
+
 class optModel(ABC):
     """
     This is an abstract class for an optimization model
@@ -48,7 +48,7 @@ class optModel(ABC):
         self._model, self.x = self._getModel()
 
     def __repr__(self) -> str:
-        return 'optModel ' + self.__class__.__name__
+        return "optModel " + self.__class__.__name__
 
     @property
     def num_cost(self) -> int:
@@ -121,6 +121,7 @@ class unionFind:
     """
     Union-Find data structure for cycle detection in graphs
     """
+
     def __init__(self, n: int) -> None:
         self.parent = list(range(n))
 
@@ -171,9 +172,10 @@ def getTspTour(
     if len(edges) != num_nodes:
         raise ValueError(
             f"Solution does not cover all {num_nodes} nodes (got {len(edges)}); "
-            "the model returned an infeasible TSP solution.")
+            "the model returned an infeasible TSP solution."
+        )
     # walk the tour starting from the first node with an active edge
-    start = list(edges.keys())[0]
+    start = next(iter(edges))
     visited = {start}
     tour = [start]
     while len(visited) < len(edges):
@@ -187,7 +189,8 @@ def getTspTour(
             # no unvisited neighbour: solution contains a subtour
             raise ValueError(
                 "Solution contains disconnected subtours; cannot form a single "
-                "tour. Check that subtour elimination constraints are active.")
+                "tour. Check that subtour elimination constraints are active."
+            )
     if 0 in edges[tour[-1]]:
         tour.append(0)
     return tour

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Synthetic data for knapsack problem
 """
@@ -49,7 +48,7 @@ def genData(
     # number of items
     m = num_items
     # weights of items
-    weights = rnd.choice(range(300, 800), size=(d,m)) / 100
+    weights = rnd.choice(range(300, 800), size=(d, m)) / 100
     # random matrix parameter B
     B = rnd.binomial(1, 0.5, (m, p))
     # feature vectors
@@ -58,7 +57,7 @@ def genData(
     c = (x @ B.T / np.sqrt(p) + 3) ** deg + 1
     # rescale
     c *= 5
-    c /= 3.5 ** deg
+    c /= 3.5**deg
     # noise
     epsilon = rnd.uniform(1 - noise_width, 1 + noise_width, (n, m))
     c *= epsilon

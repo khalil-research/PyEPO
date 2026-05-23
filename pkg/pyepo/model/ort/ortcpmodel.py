@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Abstract optimization model based on Google OR-Tools CP-SAT
 """
@@ -13,6 +12,7 @@ import numpy as np
 
 try:
     from ortools.sat.python import cp_model
+
     _HAS_ORTOOLS = True
 except ImportError:
     _HAS_ORTOOLS = False
@@ -36,7 +36,9 @@ class optOrtCpModel(optModel):
 
     def __init__(self) -> None:
         if not _HAS_ORTOOLS:
-            raise ImportError("OR-Tools is not installed. Please install ortools to use this feature.")
+            raise ImportError(
+                "OR-Tools is not installed. Please install ortools to use this feature."
+            )
         self._extra_constrs = []
         super().__init__()
 
@@ -73,7 +75,8 @@ class optOrtCpModel(optModel):
         status = solver.Solve(self._model)
         if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             raise RuntimeError(
-                f"Solver did not find a solution. Status: {solver.StatusName(status)}")
+                f"Solver did not find a solution. Status: {solver.StatusName(status)}"
+            )
         sol = np.array([solver.Value(self.x[k]) for k in self.x], dtype=np.float32)
         obj = solver.ObjectiveValue() / self._OBJ_SCALE
         return sol, obj
@@ -92,8 +95,8 @@ class optOrtCpModel(optModel):
         # replay extra constraints
         for coefs, rhs in new_model._extra_constrs:
             new_model._model.Add(
-                sum(int(coefs[i]) * new_model.x[k]
-                    for i, k in enumerate(new_model.x)) <= int(rhs))
+                sum(int(coefs[i]) * new_model.x[k] for i, k in enumerate(new_model.x)) <= int(rhs)
+            )
         return new_model
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optOrtCpModel:
@@ -111,15 +114,15 @@ class optOrtCpModel(optModel):
             raise ValueError("Size of coef vector does not match number of cost variables.")
         # scale to int
         scale = self._OBJ_SCALE
-        scaled_coefs = [int(round(float(c) * scale)) for c in coefs]
-        scaled_rhs = int(round(float(rhs) * scale))
+        scaled_coefs = [round(float(c) * scale) for c in coefs]
+        scaled_rhs = round(float(rhs) * scale)
         # copy
         new_model = self.copy()
         # store and add constraint
         new_model._extra_constrs.append((scaled_coefs, scaled_rhs))
         new_model._model.Add(
-            sum(scaled_coefs[i] * new_model.x[k]
-                for i, k in enumerate(new_model.x)) <= scaled_rhs)
+            sum(scaled_coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= scaled_rhs
+        )
         return new_model
 
     def relax(self) -> optOrtCpModel:

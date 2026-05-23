@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Utility function
 """
@@ -12,9 +11,9 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.utils import getArgs
-from pyepo.model.opt import costToNumpy
 from pyepo.model.mpax import optMpaxModel
+from pyepo.model.opt import costToNumpy
+from pyepo.utils import getArgs
 
 if TYPE_CHECKING:
     from pyepo.func.abcmodule import optModule
@@ -27,7 +26,7 @@ def _close_pool(pool) -> None:
         pool.close()
         pool.join()
         pool.clear()
-    except Exception:
+    except Exception:  # noqa: BLE001  intentional best-effort shutdown
         pass
 
 
@@ -95,7 +94,7 @@ def _solve_batch(
         if optmodel.modelSense == EPO.MINIMIZE:
             pass
         elif optmodel.modelSense == EPO.MAXIMIZE:
-            obj = - obj
+            obj = -obj
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     # single-core
@@ -120,8 +119,7 @@ def _solve_batch(
         # get args
         args = getArgs(optmodel)
         # parallel computing
-        res = pool.amap(_solveWithObj4Par, cp, [args] * ins_num,
-                        [model_type] * ins_num).get()
+        res = pool.amap(_solveWithObj4Par, cp, [args] * ins_num, [model_type] * ins_num).get()
         # get res
         sol = torch.as_tensor(np.stack([r[0] for r in res]), dtype=torch.float32).to(device)
         obj = torch.tensor([r[1] for r in res], dtype=torch.float32, device=device)
@@ -194,6 +192,7 @@ def _cache_in_pass(
 _worker_model = None
 _worker_model_key = None
 
+
 def _solveWithObj4Par(
     cost: np.ndarray,
     args: dict,
@@ -239,6 +238,7 @@ class sumGammaDistribution:
     """
     creates a generator of samples for the Sum-of-Gamma distribution
     """
+
     def __init__(self, kappa: float, n_iterations: int = 10, seed: int = 135) -> None:
         self.κ = kappa
         self.n_iterations = n_iterations
@@ -248,8 +248,8 @@ class sumGammaDistribution:
         # init samples
         samples = 0
         # calculate samples
-        for i in range(1, self.n_iterations+1):
-            samples += self.rnd.gamma(1/self.κ, self.κ/i, size)
+        for i in range(1, self.n_iterations + 1):
+            samples += self.rnd.gamma(1 / self.κ, self.κ / i, size)
         samples -= np.log(self.n_iterations)
         samples /= self.κ
         return samples

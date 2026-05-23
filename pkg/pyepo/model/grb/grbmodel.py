@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Abstract optimization model based on GurobiPy
 """
@@ -14,6 +13,7 @@ import numpy as np
 try:
     import gurobipy as gp
     from gurobipy import GRB
+
     _HAS_GUROBI = True
 except ImportError:
     _HAS_GUROBI = False
@@ -36,7 +36,9 @@ class optGrbModel(optModel):
     def __init__(self) -> None:
         # error
         if not _HAS_GUROBI:
-            raise ImportError("Gurobi is not installed. Please install gurobipy to use this feature.")
+            raise ImportError(
+                "Gurobi is not installed. Please install gurobipy to use this feature."
+            )
         super().__init__()
         # model sense
         self._model.update()
@@ -132,10 +134,8 @@ class optGrbModel(optModel):
         new_model = self.copy()
         # add constraint
         if isinstance(new_model.x, gp.MVar):
-            expr = gp.quicksum(coefs[i] * new_model.x[i]
-                               for i in range(len(coefs))) <= rhs
+            expr = gp.quicksum(coefs[i] * new_model.x[i] for i in range(len(coefs))) <= rhs
         else:
-            expr = gp.quicksum(coefs[i] * new_model.x[k]
-                               for i, k in enumerate(new_model.x)) <= rhs
+            expr = gp.quicksum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
         new_model._model.addConstr(expr)
         return new_model

@@ -1,0 +1,54 @@
+name: Lint and Type Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Ruff check
+        working-directory: ./pkg
+        run: ruff check pyepo
+
+      - name: Ruff format check
+        working-directory: ./pkg
+        run: ruff format --check pyepo
+
+  pyright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package and pyright
+        working-directory: ./pkg
+        run: |
+          python -m pip install --upgrade pip
+          # install runtime + optional backends so pyright sees their stubs
+          # (autosklearn skipped — heavy install, hooked via try/except anyway)
+          pip install -e ".[pyomo,gurobi,ortools,mpax]"
+          pip install pyright
+
+      - name: Pyright
+        working-directory: ./pkg
+        run: pyright pyepo
+        # known issues exist; treat as informational until follow-up cleanup
+        continue-on-error: true

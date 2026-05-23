@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Synthetic data for traveling salesman problem
 """
@@ -46,13 +45,11 @@ def genData(
     # number of nodes
     m = num_nodes
     # random coordinates
-    coords = np.concatenate((rnd.uniform(-2, 2, (m // 2, 2)),
-                             rnd.normal(0, 1, (m - m // 2, 2))))
+    coords = np.concatenate((rnd.uniform(-2, 2, (m // 2, 2)), rnd.normal(0, 1, (m - m // 2, 2))))
     # distance matrix
     org_dist = distance.cdist(coords, coords, "euclidean")
     # random matrix parameter B
-    B = rnd.binomial(1, 0.5, (m * (m - 1) // 2, p)) * rnd.uniform(
-        -2, 2, (m * (m - 1) // 2, p))
+    B = rnd.binomial(1, 0.5, (m * (m - 1) // 2, p)) * rnd.uniform(-2, 2, (m * (m - 1) // 2, p))
     # feature vectors
     x = rnd.normal(0, 1, (n, p))
     # extract upper triangle distances (vectorized)

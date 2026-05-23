@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Shortest path problem
 """
@@ -11,19 +10,20 @@ from collections import defaultdict
 try:
     from ortools.linear_solver import pywraplp
     from ortools.sat.python import cp_model
+
     _HAS_ORTOOLS = True
 except ImportError:
     _HAS_ORTOOLS = False
 
 from pyepo import EPO
-from pyepo.model.ort.ortmodel import optOrtModel
-from pyepo.model.ort.ortcpmodel import optOrtCpModel
 from pyepo.model.opt import _get_grid_arcs
-
+from pyepo.model.ort.ortcpmodel import optOrtCpModel
+from pyepo.model.ort.ortmodel import optOrtModel
 
 # ============================================================
 # pywraplp
 # ============================================================
+
 
 class shortestPathModel(optOrtModel):
     """
@@ -56,8 +56,7 @@ class shortestPathModel(optOrtModel):
         # create a model
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
-            raise RuntimeError(
-                f"Solver '{self.solver}' is not available in OR-Tools.")
+            raise RuntimeError(f"Solver '{self.solver}' is not available in OR-Tools.")
         # variables
         x = {e: m.NumVar(0, 1, f"x_{e}") for e in self.arcs}
         # sense
@@ -88,6 +87,7 @@ class shortestPathModel(optOrtModel):
 # ============================================================
 # CP-SAT
 # ============================================================
+
 
 class shortestPathCpModel(optOrtCpModel):
     """
@@ -145,8 +145,8 @@ class shortestPathCpModel(optOrtCpModel):
 
 
 if __name__ == "__main__":
-
     import random
+
     # random seed
     random.seed(42)
     # set random cost for test

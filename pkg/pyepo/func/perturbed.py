@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Perturbed optimization function
 """
@@ -16,6 +15,8 @@ from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import (
     _solve_batch as _solve_batch_2d,
+)
+from pyepo.func.utils import (
     _update_solution_pool,
     sumGammaDistribution,
 )
@@ -125,10 +126,8 @@ class perturbedOptFunc(Function):
         ptb_sols, noises = ctx.saved_tensors
         n_samples = ctx.n_samples
         sigma = ctx.sigma
-        grad = torch.einsum("nbd,bn->bd",
-                            noises,
-                            torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
-        grad /= (n_samples * sigma + 1e-7)
+        grad = torch.einsum("nbd,bn->bd", noises, torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
+        grad /= n_samples * sigma + 1e-7
         return grad, None
 
 
@@ -240,7 +239,7 @@ class perturbedFenchelYoungFunc(Function):
         """
         Backward pass for perturbed Fenchel-Young loss
         """
-        grad, = ctx.saved_tensors
+        (grad,) = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
         return grad * grad_output, None, None
 
@@ -355,7 +354,7 @@ class implicitMLEFunc(Function):
         """
         Backward pass for IMLE
         """
-        pred_cost, = ctx.saved_tensors
+        (pred_cost,) = ctx.saved_tensors
         noises = ctx.noises
         ptb_sols = ctx.ptb_sols
         module = ctx.module
@@ -429,9 +428,9 @@ class adaptiveImplicitMLE(optModule):
         # symmetric perturbation
         self.two_sides = two_sides
         # init adaptive params
-        self.alpha = 1.0 # adaptive magnitude α
-        self.grad_norm_avg = 1 # gradient sparsity estimate
-        self.step = 1e-3 # update step for α
+        self.alpha = 1.0  # adaptive magnitude α
+        self.grad_norm_avg = 1  # gradient sparsity estimate
+        self.step = 1e-3  # update step for α
 
     def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:
         """
@@ -445,12 +444,13 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
     """
     An autograd function for Adaptive Implicit Maximum Likelihood Estimator
     """
+
     @staticmethod
     def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
         Backward pass for IMLE
         """
-        pred_cost, = ctx.saved_tensors
+        (pred_cost,) = ctx.saved_tensors
         noises = ctx.noises
         ptb_sols = ctx.ptb_sols
         module = ctx.module

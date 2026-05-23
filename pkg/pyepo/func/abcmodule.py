@@ -1,25 +1,24 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Abstract autograd optimization module
 """
 
 from __future__ import annotations
 
-from abc import abstractmethod
 import logging
 import multiprocessing as mp
 import weakref
+from abc import abstractmethod
 from typing import Literal
-from pathos.multiprocessing import ProcessingPool
 
 import torch
+from pathos.multiprocessing import ProcessingPool
 from torch import nn
 
 from pyepo.data.dataset import optDataset
 from pyepo.func.utils import _close_pool
-from pyepo.model.opt import optModel
 from pyepo.model.mpax import optMpaxModel
+from pyepo.model.opt import optModel
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +31,7 @@ class optModule(nn.Module):
     predict-then-optimize. It provides common functionality (multiprocessing,
     solution pooling, loss reduction) for all loss modules.
     """
+
     def __init__(
         self,
         optmodel: optModel,
@@ -61,8 +61,7 @@ class optModule(nn.Module):
             processes = 1
         # number of processes
         if processes < 0 or processes > mp.cpu_count():
-            raise ValueError(
-                f"Invalid processors number {processes}, only {mp.cpu_count()} cores.")
+            raise ValueError(f"Invalid processors number {processes}, only {mp.cpu_count()} cores.")
         self.processes = mp.cpu_count() if processes == 0 else processes
         # single-core
         if self.processes == 1:
@@ -77,11 +76,12 @@ class optModule(nn.Module):
         self.solve_ratio = solve_ratio
         if (self.solve_ratio < 0) or (self.solve_ratio > 1):
             raise ValueError(
-                f"Invalid solving ratio {self.solve_ratio}. It should be between 0 and 1.")
+                f"Invalid solving ratio {self.solve_ratio}. It should be between 0 and 1."
+            )
         self.solpool = None
         self._solset = set()
-        if self.solve_ratio < 1 or require_solpool: # init solution pool
-            if not isinstance(dataset, optDataset): # type checking
+        if self.solve_ratio < 1 or require_solpool:  # init solution pool
+            if not isinstance(dataset, optDataset):  # type checking
                 raise TypeError("dataset is not an optDataset")
             # convert to tensor and deduplicate
             sols = dataset.sols.clone()
@@ -98,7 +98,6 @@ class optModule(nn.Module):
         Forward pass
         """
         # convert tensor
-        pass
 
     def _reduce(self, loss: torch.Tensor) -> torch.Tensor:
         """
@@ -106,11 +105,8 @@ class optModule(nn.Module):
         """
         if self.reduction == "mean":
             return torch.mean(loss)
-        elif self.reduction == "sum":
+        if self.reduction == "sum":
             return torch.sum(loss)
-        elif self.reduction == "none":
+        if self.reduction == "none":
             return loss
-        else:
-            raise ValueError(f"No reduction '{self.reduction}'.")
-
-
+        raise ValueError(f"No reduction '{self.reduction}'.")
