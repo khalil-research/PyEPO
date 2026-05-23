@@ -48,7 +48,7 @@ class shortestPathModel(optGrbModel):
         # create a model
         m = gp.Model("shortest path")
         # variables
-        x = m.addVars(self.arcs, name="x")
+        x = m.addVars(self.arcs, name="x", ub=1)
         # sense
         m.modelSense = GRB.MINIMIZE
         # build adjacency lists
