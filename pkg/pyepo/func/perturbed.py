@@ -17,6 +17,7 @@ from pyepo.func.utils import (
     _solve_batch as _solve_batch_2d,
 )
 from pyepo.func.utils import (
+    _torch_generator,
     _update_solution_pool,
     sumGammaDistribution,
 )
@@ -68,7 +69,8 @@ class perturbedOpt(optModule):
         # perturbation amplitude
         self.sigma = sigma
         # random state
-        self.rnd = np.random.RandomState(seed)
+        self.seed = seed
+        self._gen_cache: dict[str, torch.Generator] = {}
 
     def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:
         """
@@ -102,9 +104,11 @@ class perturbedOptFunc(Function):
         device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
-        # sample perturbations
-        noises = module.rnd.normal(0, 1, size=(module.n_samples, *cp.shape))
-        noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
+        # sample perturbations on-device
+        gen = _torch_generator(module._gen_cache, device, module.seed)
+        noises = torch.randn(
+            (module.n_samples, *cp.shape), device=device, dtype=torch.float32, generator=gen,
+        )
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
@@ -174,7 +178,8 @@ class perturbedFenchelYoung(optModule):
         # perturbation amplitude
         self.sigma = sigma
         # random state
-        self.rnd = np.random.RandomState(seed)
+        self.seed = seed
+        self._gen_cache: dict[str, torch.Generator] = {}
 
     def forward(self, pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor:
         """
@@ -212,9 +217,11 @@ class perturbedFenchelYoungFunc(Function):
         # convert tensor
         cp = pred_cost.detach()
         w = true_sol.detach()
-        # sample perturbations
-        noises = module.rnd.normal(0, 1, size=(module.n_samples, *cp.shape))
-        noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
+        # sample perturbations on-device
+        gen = _torch_generator(module._gen_cache, device, module.seed)
+        noises = torch.randn(
+            (module.n_samples, *cp.shape), device=device, dtype=torch.float32, generator=gen,
+        )
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
@@ -331,9 +338,14 @@ class implicitMLEFunc(Function):
         device = pred_cost.device
         # convert tensor
         cp = pred_cost.detach()
-        # sample perturbations
-        noises = module.distribution.sample(size=(module.n_samples, *cp.shape))
-        noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
+        # sample perturbations; fall back to H2D for custom distributions
+        size = (module.n_samples, *cp.shape)
+        try:
+            noises = module.distribution.sample(size=size, device=device, dtype=torch.float32)
+        except TypeError:
+            noises = module.distribution.sample(size=size)
+        if isinstance(noises, np.ndarray):
+            noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)

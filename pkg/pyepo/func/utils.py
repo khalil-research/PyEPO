@@ -5,6 +5,7 @@ Utility function
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -238,6 +239,22 @@ def _check_sol(c: torch.Tensor, w: torch.Tensor, z: torch.Tensor) -> None:
         raise AssertionError("Some solutions do not match the objective value.")
 
 
+def _torch_generator(
+    cache: dict[str, torch.Generator],
+    device: torch.device | str,
+    seed: int,
+) -> torch.Generator:
+    """Lazily create and cache a per-device torch.Generator seeded from `seed`."""
+    dev = torch.device(device) if isinstance(device, str) else device
+    key = str(dev)
+    gen = cache.get(key)
+    if gen is None:
+        gen = torch.Generator(device=dev)
+        gen.manual_seed(seed)
+        cache[key] = gen
+    return gen
+
+
 class sumGammaDistribution:
     """
     creates a generator of samples for the Sum-of-Gamma distribution
@@ -246,14 +263,32 @@ class sumGammaDistribution:
     def __init__(self, kappa: float, n_iterations: int = 10, seed: int = 135) -> None:
         self.κ = kappa
         self.n_iterations = n_iterations
+        self.seed = seed
         self.rnd = np.random.RandomState(seed)
+        self._gen_cache: dict[str, torch.Generator] = {}
 
-    def sample(self, size: int | tuple[int, ...]) -> np.ndarray:
-        # init samples
-        samples = 0
-        # calculate samples
+    def sample(
+        self,
+        size: int | tuple[int, ...],
+        *,
+        device: torch.device | str | None = None,
+        dtype: torch.dtype = torch.float32,
+    ) -> np.ndarray | torch.Tensor:
+        # numpy path
+        if device is None:
+            samples = 0
+            for i in range(1, self.n_iterations + 1):
+                samples += self.rnd.gamma(1 / self.κ, self.κ / i, size)
+            samples -= np.log(self.n_iterations)
+            samples /= self.κ
+            return samples
+        # torch path
+        size_t = size if isinstance(size, tuple) else (size,)
+        gen = _torch_generator(self._gen_cache, device, self.seed)
+        alpha = torch.full(size_t, 1.0 / self.κ, device=device, dtype=dtype)
+        samples = torch.zeros(size_t, device=device, dtype=dtype)
         for i in range(1, self.n_iterations + 1):
-            samples += self.rnd.gamma(1 / self.κ, self.κ / i, size)
-        samples -= np.log(self.n_iterations)
-        samples /= self.κ
+            samples.add_(torch._standard_gamma(alpha, generator=gen), alpha=self.κ / i)
+        samples.sub_(math.log(self.n_iterations))
+        samples.div_(self.κ)
         return samples
