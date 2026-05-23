@@ -33,7 +33,7 @@ Module Contents
 
 .. py:data:: Reduction
 
-.. py:class:: optModule(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None, require_solpool: bool = False)
+.. py:class:: optModule(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None, require_solpool: bool = False, seed: int | None = None)
 
    Bases: :py:obj:`torch.nn.Module`
 
