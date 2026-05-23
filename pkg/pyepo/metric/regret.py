@@ -27,22 +27,24 @@ def regret(predmodel, optmodel, dataloader):
     optsum = 0
     # get device
     device = next(predmodel.parameters()).device
-    # load data
-    for data in dataloader:
-        x, c, w, z = data
-        x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
-        # predict
-        with torch.no_grad():
-            cp = predmodel(x).cpu().numpy()
-        # batch convert to numpy
-        c_np = c.cpu().numpy()
-        # solve
-        for j in range(cp.shape[0]):
-            # accumulate loss
-            loss += calRegret(optmodel, cp[j], c_np[j], z[j].item())
-        optsum += abs(z).sum().item()
-    # turn back train mode
-    predmodel.train()
+    try:
+        # load data
+        for data in dataloader:
+            x, c, w, z = data
+            x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
+            # predict
+            with torch.no_grad():
+                cp = predmodel(x).cpu().numpy()
+            # batch convert to numpy
+            c_np = c.cpu().numpy()
+            # solve
+            for j in range(cp.shape[0]):
+                # accumulate loss
+                loss += calRegret(optmodel, cp[j], c_np[j], z[j].item())
+            optsum += abs(z).sum().item()
+    finally:
+        # restore training mode even if evaluation raises
+        predmodel.train()
     # normalized
     return loss / (optsum + 1e-7)
 

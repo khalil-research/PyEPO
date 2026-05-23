@@ -23,14 +23,16 @@ def MSE(predmodel, dataloader):
     loss = 0
     # get device
     device = next(predmodel.parameters()).device
-    # load data
-    with torch.no_grad():
-        for data in dataloader:
-            x, c, w, z = data
-            x, c = x.to(device), c.to(device)
-            # predict
-            cp = predmodel(x)
-            loss += ((cp - c) ** 2).mean(dim=1).sum().item()
-    # restore training mode
-    predmodel.train()
+    try:
+        # load data
+        with torch.no_grad():
+            for data in dataloader:
+                x, c, w, z = data
+                x, c = x.to(device), c.to(device)
+                # predict
+                cp = predmodel(x)
+                loss += ((cp - c) ** 2).mean(dim=1).sum().item()
+    finally:
+        # restore training mode even if evaluation raises
+        predmodel.train()
     return loss / len(dataloader.dataset)
