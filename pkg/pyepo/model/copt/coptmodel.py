@@ -81,7 +81,8 @@ class optCoptModel(optModel):
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c)
         if _is_mvar(self.x):
-            self._model.setObjective(c @ self.x)
+            # direct Obj attr write skips MLinExpr allocation
+            self.x.Obj = c
         else:
             # batch C-level coefficient update
             self._model.setInfo("Obj", self._vars_list, c.tolist())
