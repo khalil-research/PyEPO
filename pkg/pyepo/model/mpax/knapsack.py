@@ -12,46 +12,39 @@ try:
 except ImportError:
     pass
 
+from pyepo.model.bases import knapsackBase
 from pyepo.model.mpax.mpaxmodel import optMpaxModel
 
 
-class knapsackModel(optMpaxModel):
+class knapsackModel(knapsackBase, optMpaxModel):
     """
-    This class is an optimization model for the relaxed knapsack problem
+    MPAX-backed (JAX LP) knapsack — LP relaxation.
 
     Attributes:
         _model: MPAX model
-        weights (np.ndarray / list): Weights of items
-        capacity (np.ndarray / list): Total capacity
+        weights (np.ndarray): Weights of items
+        capacity (np.ndarray): Total capacity
         items (list): List of item index
     """
 
-    def __init__(self, weights: np.ndarray | list, capacity: np.ndarray | list) -> None:
-        """
-        Args:
-            weights: weights of items
-            capacity: total capacity
-        """
-        self.weights = np.asarray(weights)
-        self.capacity = capacity
-        self.items = list(range(self.weights.shape[1]))
-        G, h, u = self._constructMatrix()
-        super().__init__(G=G, h=h, u=u, use_sparse_matrix=False, minimize=False)
+    use_sparse_matrix = False
 
-    def _constructMatrix(self) -> tuple:
+    def _getModel(self) -> tuple:
         """
-        Constructs the inequality constraint matrix G, right-hand side h, and
-        upper bound u for the knapsack problem.
-
-        Returns:
-            G (jnp.ndarray): Weights of items
-            h (jnp.ndarray): Total capacity
-            u (jnp.ndarray): Upper bound for item selection
+        Build MPAX matrices: inequality G x >= h with G = -W, h = -c,
+        which encodes W x <= c. Variables relaxed to x in [0, 1].
         """
-        G = -jnp.array(self.weights, dtype=jnp.float32)
-        h = -jnp.array(self.capacity, dtype=jnp.float32)
-        u = jnp.ones(len(self.items), dtype=jnp.float32)
-        return G, h, u
+        num_items = self.weights.shape[1]
+        # no equality constraints
+        self.A = jnp.zeros((0, num_items), dtype=jnp.float32)
+        self.b = jnp.zeros((0,), dtype=jnp.float32)
+        # inequality: -W x >= -c  (equivalent to W x <= c)
+        self.G = -jnp.array(self.weights, dtype=jnp.float32)
+        self.h = -jnp.array(np.asarray(self.capacity), dtype=jnp.float32)
+        # variable bounds: x in [0, 1]
+        self.l = jnp.zeros(num_items, dtype=jnp.float32)
+        self.u = jnp.ones(num_items, dtype=jnp.float32)
+        return None, []
 
 
 if __name__ == "__main__":

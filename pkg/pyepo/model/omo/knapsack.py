@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from pyepo import EPO
+from pyepo.model.bases import knapsackBase
 from pyepo.model.omo.omomodel import optOmoModel
 
 try:
@@ -16,9 +16,9 @@ except ImportError:
     pass
 
 
-class knapsackModel(optOmoModel):
+class knapsackModel(knapsackBase, optOmoModel):
     """
-    This class is an optimization model for the knapsack problem
+    Pyomo-backed knapsack.
 
     Attributes:
         _model (Pyomo model): Pyomo model
@@ -40,17 +40,12 @@ class knapsackModel(optOmoModel):
             capacity: total capacity
             solver: optimization solver in the background
         """
-        self.weights = np.asarray(weights)
-        self.capacity = np.asarray(capacity)
-        self.items = list(range(self.weights.shape[1]))
-        super().__init__(solver)
+        super().__init__(weights, capacity, solver)
 
     def _getModel(self) -> tuple:
         """
         A method to build Pyomo model
         """
-        # sense
-        self.modelSense = EPO.MAXIMIZE
         # create a model
         m = pe.ConcreteModel("knapsack")
         # parameters
@@ -62,29 +57,24 @@ class knapsackModel(optOmoModel):
         m.cons = pe.ConstraintList()
         for i in range(len(self.capacity)):
             m.cons.add(sum(self.weights[i, j] * x[j] for j in self.items) <= self.capacity[i])
-
         return m, x
 
     def relax(self) -> knapsackModelRel:
         """
         A method to get linear relaxation model
         """
-        # copy
-        model_rel = knapsackModelRel(self.weights, self.capacity, self.solver)
-        return model_rel
+        return knapsackModelRel(self.weights, self.capacity, self.solver)
 
 
 class knapsackModelRel(knapsackModel):
     """
-    This class is relaxed optimization model for knapsack problem.
+    LP relaxation of the Pyomo knapsack.
     """
 
     def _getModel(self) -> tuple:
         """
         A method to build Pyomo model
         """
-        # sense
-        self.modelSense = EPO.MAXIMIZE
         # create a model
         m = pe.ConcreteModel("knapsack")
         # parameters

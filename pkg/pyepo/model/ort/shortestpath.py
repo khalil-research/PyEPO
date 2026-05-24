@@ -13,25 +13,20 @@ try:
 except ImportError:
     pass
 
-from pyepo import EPO
+from pyepo.model.bases import shortestPathBase
 from pyepo.model.ort.ortcpmodel import optOrtCpModel
 from pyepo.model.ort.ortmodel import optOrtModel
-from pyepo.model.utils import _get_grid_arcs
-
-# ============================================================
-# pywraplp
-# ============================================================
 
 
-class shortestPathModel(optOrtModel):
+class shortestPathModel(shortestPathBase, optOrtModel):
     """
-    This class is an optimization model for the shortest path problem
+    OR-Tools (pywraplp) backed shortest path on a grid network.
 
     Attributes:
         _model (pywraplp.Solver): OR-Tools linear solver
         solver (str): solver backend
-        grid (tuple of int): size of grid network
-        arcs (list): list of arcs
+        grid (tuple of int): Size of grid network
+        arcs (list): List of arcs
     """
 
     def __init__(self, grid: tuple[int, int], solver: str = "glop") -> None:
@@ -40,9 +35,7 @@ class shortestPathModel(optOrtModel):
             grid: size of grid network
             solver: solver backend for pywraplp
         """
-        self.grid = grid
-        self.arcs = _get_grid_arcs(grid)
-        super().__init__(solver)
+        super().__init__(grid, solver)
 
     def _getModel(self) -> tuple:
         """
@@ -57,8 +50,6 @@ class shortestPathModel(optOrtModel):
             raise RuntimeError(f"Solver '{self.solver}' is not available in OR-Tools.")
         # variables
         x = {e: m.NumVar(0, 1, f"x_{e}") for e in self.arcs}
-        # sense
-        self.modelSense = EPO.MINIMIZE
         # build adjacency lists
         out_arcs = defaultdict(list)
         in_arcs = defaultdict(list)
@@ -82,29 +73,15 @@ class shortestPathModel(optOrtModel):
         return m, x
 
 
-# ============================================================
-# CP-SAT
-# ============================================================
-
-
-class shortestPathCpModel(optOrtCpModel):
+class shortestPathCpModel(shortestPathBase, optOrtCpModel):
     """
-    This class is an optimization model for the shortest path problem using CP-SAT
+    OR-Tools CP-SAT backed shortest path on a grid network.
 
     Attributes:
         _model (cp_model.CpModel): OR-Tools CP-SAT model
-        grid (tuple of int): size of grid network
-        arcs (list): list of arcs
+        grid (tuple of int): Size of grid network
+        arcs (list): List of arcs
     """
-
-    def __init__(self, grid: tuple[int, int]) -> None:
-        """
-        Args:
-            grid: size of grid network
-        """
-        self.grid = grid
-        self.arcs = _get_grid_arcs(grid)
-        super().__init__()
 
     def _getModel(self) -> tuple:
         """
@@ -117,8 +94,6 @@ class shortestPathCpModel(optOrtCpModel):
         m = cp_model.CpModel()
         # variables (boolean: 0 or 1 flow)
         x = {e: m.NewBoolVar(f"x_{e}") for e in self.arcs}
-        # sense
-        self.modelSense = EPO.MINIMIZE
         # build adjacency lists
         out_arcs = defaultdict(list)
         in_arcs = defaultdict(list)

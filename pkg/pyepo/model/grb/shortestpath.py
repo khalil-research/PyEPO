@@ -5,7 +5,7 @@ Shortest path problem
 
 from __future__ import annotations
 
-import numpy as np
+from collections import defaultdict
 
 try:
     import gurobipy as gp
@@ -13,28 +13,19 @@ try:
 except ImportError:
     pass
 
+from pyepo.model.bases import shortestPathBase
 from pyepo.model.grb.grbmodel import optGrbModel
-from pyepo.model.utils import _get_grid_arcs
 
 
-class shortestPathModel(optGrbModel):
+class shortestPathModel(shortestPathBase, optGrbModel):
     """
-    This class is an optimization model for the shortest path problem
+    Gurobi-backed shortest path on a grid network.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
         grid (tuple of int): Size of grid network
         arcs (list): List of arcs
     """
-
-    def __init__(self, grid: tuple[int, int]) -> None:
-        """
-        Args:
-            grid: size of grid network
-        """
-        self.grid = grid
-        self.arcs = _get_grid_arcs(grid)
-        super().__init__()
 
     def _getModel(self) -> tuple:
         """
@@ -43,20 +34,34 @@ class shortestPathModel(optGrbModel):
         Returns:
             tuple: optimization model and variables
         """
+        # create a model
         m = gp.Model("shortest path")
-        num_nodes = self.grid[0] * self.grid[1]
-        num_arcs = len(self.arcs)
-        x = m.addMVar(num_arcs, ub=1.0, name="x")
+        # variables
+        x = m.addVars(self.arcs, name="x", ub=1)
+        # sense
         m.modelSense = GRB.MINIMIZE
-        # node-arc incidence: row v sums (in-flow) - (out-flow) at v
-        A = np.zeros((num_nodes, num_arcs), dtype=np.float64)
-        for a, (u, v) in enumerate(self.arcs):
-            A[u, a] = -1.0
-            A[v, a] = +1.0
-        b = np.zeros(num_nodes, dtype=np.float64)
-        b[0] = -1.0
-        b[num_nodes - 1] = 1.0
-        m.addConstr(A @ x == b)
+        # build adjacency lists
+        out_arcs = defaultdict(list)
+        in_arcs = defaultdict(list)
+        for e in self.arcs:
+            out_arcs[e[0]].append(e)
+            in_arcs[e[1]].append(e)
+        # constraints
+        for i in range(self.grid[0]):
+            for j in range(self.grid[1]):
+                v = i * self.grid[1] + j
+                expr = gp.quicksum(x[e] for e in in_arcs[v]) - gp.quicksum(
+                    x[e] for e in out_arcs[v]
+                )
+                # source
+                if i == 0 and j == 0:
+                    m.addConstr(expr == -1)
+                # sink
+                elif i == self.grid[0] - 1 and j == self.grid[1] - 1:
+                    m.addConstr(expr == 1)
+                # transition
+                else:
+                    m.addConstr(expr == 0)
         return m, x
 
 

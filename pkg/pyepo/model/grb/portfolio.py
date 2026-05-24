@@ -13,12 +13,13 @@ try:
 except ImportError:
     pass
 
+from pyepo.model.bases import portfolioBase
 from pyepo.model.grb.grbmodel import optGrbModel
 
 
-class portfolioModel(optGrbModel):
+class portfolioModel(portfolioBase, optGrbModel):
     """
-    This class is an optimization model for the portfolio problem
+    Gurobi-backed Markowitz portfolio.
 
     Attributes:
         _model (GurobiPy model): Gurobi model
@@ -26,36 +27,6 @@ class portfolioModel(optGrbModel):
         covariance (numpy.ndarray): covariance matrix of the returns
         risk_level (float): risk level
     """
-
-    def __init__(
-        self,
-        num_assets: int,
-        covariance: np.ndarray,
-        gamma: float = 2.25,
-    ) -> None:
-        """
-        Args:
-            num_assets: number of assets
-            covariance: covariance matrix of the returns
-            gamma: risk level parameter
-        """
-        self.num_assets = num_assets
-        self.covariance = covariance
-        self.risk_level = self._getRiskLevel(gamma)
-        super().__init__()
-
-    def _getRiskLevel(self, gamma: float) -> float:
-        """
-        A method to calculate the risk level
-
-        Args:
-            gamma: risk level parameter
-
-        Returns:
-            float: risk level
-        """
-        risk_level = gamma * np.mean(self.covariance)
-        return risk_level
 
     def _getModel(self) -> tuple:
         """

@@ -8,28 +8,19 @@ from __future__ import annotations
 import numpy as np
 from coptpy import COPT, Envr
 
+from pyepo.model.bases import shortestPathBase
 from pyepo.model.copt.coptmodel import optCoptModel
-from pyepo.model.utils import _get_grid_arcs
 
 
-class shortestPathModel(optCoptModel):
+class shortestPathModel(shortestPathBase, optCoptModel):
     """
-    This class is an optimization model for the shortest path problem
+    COPT-backed shortest path on a grid network.
 
     Attributes:
         _model (COPT model): COPT model
-        grid (tuple of int): size of grid network
-        arcs (list): list of arcs
+        grid (tuple of int): Size of grid network
+        arcs (list): List of arcs
     """
-
-    def __init__(self, grid: tuple[int, int]) -> None:
-        """
-        Args:
-            grid: size of grid network
-        """
-        self.grid = grid
-        self.arcs = _get_grid_arcs(grid)
-        super().__init__()
 
     def _getModel(self) -> tuple:
         """

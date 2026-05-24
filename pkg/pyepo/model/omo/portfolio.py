@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from pyepo import EPO
+from pyepo.model.bases import portfolioBase
 from pyepo.model.omo.omomodel import optOmoModel
 
 try:
@@ -16,9 +16,9 @@ except ImportError:
     pass
 
 
-class portfolioModel(optOmoModel):
+class portfolioModel(portfolioBase, optOmoModel):
     """
-    This class is an optimization model for the portfolio problem
+    Pyomo-backed Markowitz portfolio.
 
     Attributes:
         _model (Pyomo model): Pyomo model
@@ -42,23 +42,7 @@ class portfolioModel(optOmoModel):
             gamma: risk level parameter
             solver: optimization solver in the background
         """
-        self.num_assets = num_assets
-        self.covariance = covariance
-        self.risk_level = self._getRiskLevel(gamma)
-        super().__init__(solver)
-
-    def _getRiskLevel(self, gamma: float) -> float:
-        """
-        A method to calculate the risk level
-
-        Args:
-            gamma: risk level parameter
-
-        Returns:
-            float: risk level
-        """
-        risk_level = gamma * np.mean(self.covariance)
-        return risk_level
+        super().__init__(num_assets, covariance, gamma, solver)
 
     def _getModel(self) -> tuple:
         """
@@ -67,8 +51,6 @@ class portfolioModel(optOmoModel):
         Returns:
             tuple: optimization model and variables
         """
-        # sense
-        self.modelSense = EPO.MAXIMIZE
         # create a model
         m = pe.ConcreteModel("portfolio")
         # parameters

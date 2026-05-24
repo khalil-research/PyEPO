@@ -11,82 +11,54 @@ from typing import TYPE_CHECKING
 import numpy as np
 from coptpy import COPT, CallbackBase, Envr
 
+from pyepo.model.bases import tspABBase
 from pyepo.model.copt.coptmodel import optCoptModel
-from pyepo.model.utils import getTspTour, unionFind
+from pyepo.model.utils import unionFind
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
 
 
-class tspABModel(optCoptModel):
+class tspABModel(tspABBase, optCoptModel):
     """
-    This abstract class is an optimization model for the traveling salesman problem.
-    This model is for further implementation of different formulation.
-
-    Attributes:
-        _model (COPT model): COPT model
-        num_nodes (int): Number of nodes
-        edges (list): List of edge index
+    COPT-backed TSP abstract base. Provides paired-variable ``setObj`` /
+    ``solve`` / ``_addExtraConstr`` shared by GG and MTZ. DFJ overrides those.
     """
 
-    def __init__(self, num_nodes: int) -> None:
+    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
-        Args:
-            num_nodes: number of nodes
-        """
-        self.num_nodes = num_nodes
-        self.nodes = list(range(num_nodes))
-        self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
-        super().__init__()
-        # constraints added via addConstr, replayed on copy/relax
-        self._extra_constrs = []
-
-    @property
-    def num_cost(self) -> int:
-        return len(self.edges)
-
-    def copy(self) -> tspABModel:
-        """
-        A method to copy model
-
-        Returns:
-            optModel: new copied model
-        """
-        new_model = type(self)(self.num_nodes)
-        self._replay_extras(new_model)
-        return new_model
-
-    def _replay_extras(self, other: tspABModel) -> None:
-        """Replay self._extra_constrs onto another TSP model of compatible formulation."""
-        for coefs, rhs in self._extra_constrs:
-            other._extra_constrs.append((coefs, rhs))
-            other._addExtraConstr(coefs, rhs)
-
-    def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[int]:
-        """
-        A method to get a tour from solution
+        A method to set the objective function
 
         Args:
-            sol: solution
-
-        Returns:
-            list: a TSP tour
-
-        Raises:
-            ValueError: if the solution does not form a single connected tour.
+            c: cost vector
         """
-        return getTspTour(self.edges, self.num_nodes, sol)
+        if len(c) != self.num_cost:
+            raise ValueError("Size of cost vector does not match number of cost variables.")
+        c = costToNumpy(c)
+        # each undirected edge maps to 2 directed Vars; both get coefficient c[k]
+        self._model.setInfo("Obj", self._cost_vars, np.repeat(c, 2).tolist())
+
+    def solve(self) -> tuple[np.ndarray, float]:
+        """
+        A method to solve model
+        """
+        self._model.solve()
+        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
+        sol = (xvals > 1e-2).any(axis=1).astype(np.uint8)
+        return sol, self._model.objVal
+
+    def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
+        """Add a single linear constraint to ``self._model`` using paired (x[i,j] + x[j,i])."""
+        self._model.addConstr(
+            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
+            <= rhs
+        )
 
 
 class tspGGModel(tspABModel):
     """
-    This class is an optimization model for the traveling salesman problem based on Gavish-Graves (GG) formulation.
-
-    Attributes:
-        _model (COPT model): COPT model
-        num_nodes (int): Number of nodes
-        edges (list): List of edge index
+    Gavish-Graves (GG) formulation.
     """
 
     def _getModel(self) -> tuple:
@@ -124,53 +96,6 @@ class tspGGModel(tspABModel):
             self._cost_vars.extend([x[i, j], x[j, i]])
         return m, x
 
-    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
-        """
-        A method to set the objective function
-
-        Args:
-            c: cost vector
-        """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
-        c = costToNumpy(c)
-        # each undirected edge maps to 2 directed Vars; both get coefficient c[k]
-        self._model.setInfo("Obj", self._cost_vars, np.repeat(c, 2).tolist())
-
-    def solve(self) -> tuple[np.ndarray, float]:
-        """
-        A method to solve model
-        """
-        self._model.solve()
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
-        sol = (xvals > 1e-2).any(axis=1).astype(np.uint8)
-        return sol, self._model.objVal
-
-    def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
-        """Add a single linear constraint to self._model using the GG variable scheme."""
-        self._model.addConstr(
-            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
-            <= rhs
-        )
-
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
-        """
-        A method to add new constraint
-
-        Args:
-            coefs: coefficients of new constraint
-            rhs: right-hand side of new constraint
-
-        Returns:
-            optModel: new model with the added constraint
-        """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
-        new_model = self.copy()
-        new_model._extra_constrs.append((coefs, rhs))
-        new_model._addExtraConstr(coefs, rhs)
-        return new_model
-
     def relax(self) -> tspGGModelRel:
         """
         A method to get linear relaxation model
@@ -182,12 +107,7 @@ class tspGGModel(tspABModel):
 
 class tspGGModelRel(tspGGModel):
     """
-    This class is relaxation of tspGGModel.
-
-    Attributes:
-        _model (COPT model): COPT model
-        num_nodes (int): Number of nodes
-        edges (list): List of edge index
+    LP relaxation of the GG formulation.
     """
 
     def _getModel(self) -> tuple:
@@ -227,10 +147,7 @@ class tspGGModelRel(tspGGModel):
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
-        A method to solve model
-
-        Returns:
-            tuple: optimal solution (list) and objective value (float)
+        A method to solve model — returns fractional solution.
         """
         self._model.solve()
         xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
@@ -252,13 +169,11 @@ class tspGGModelRel(tspGGModel):
 
 class tspDFJModel(tspABModel):
     """
-    This class is an optimization model for the traveling salesman problem based on Danzig-Fulkerson-Johnson (DFJ) formulation and
-    constraint generation.
+    Danzig-Fulkerson-Johnson (DFJ) formulation with lazy subtour elimination.
 
-    Attributes:
-        _model (COPT model): COPT model
-        num_nodes (int): Number of nodes
-        edges (list): List of edge index
+    Uses one undirected Var per edge, so the paired-vars ``setObj`` /
+    ``solve`` / ``_addExtraConstr`` inherited from ``tspABModel`` are
+    overridden here.
     """
 
     class _SubtourCallback(CallbackBase):
@@ -334,36 +249,13 @@ class tspDFJModel(tspABModel):
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
-        """Add a single linear constraint to self._model using the DFJ variable scheme."""
+        """Add a single linear constraint to ``self._model`` using the DFJ variable scheme."""
         self._model.addConstr(sum(coefs[i] * self.x[k] for i, k in enumerate(self.edges)) <= rhs)
-
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
-        """
-        A method to add new constraint
-
-        Args:
-            coefs: coefficients of new constraint
-            rhs: right-hand side of new constraint
-
-        Returns:
-            optModel: new model with the added constraint
-        """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
-        new_model = self.copy()
-        new_model._extra_constrs.append((coefs, rhs))
-        new_model._addExtraConstr(coefs, rhs)
-        return new_model
 
 
 class tspMTZModel(tspABModel):
     """
-    This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
-
-    Attributes:
-        _model (COPT model): COPT model
-        num_nodes (int): Number of nodes
-        edges (list): List of edge index
+    Miller-Tucker-Zemlin (MTZ) formulation.
     """
 
     def _getModel(self) -> tuple:
@@ -395,53 +287,6 @@ class tspMTZModel(tspABModel):
             self._cost_vars.extend([x[i, j], x[j, i]])
         return m, x
 
-    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
-        """
-        A method to set the objective function
-
-        Args:
-            c: cost vector
-        """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
-        c = costToNumpy(c)
-        # each undirected edge maps to 2 directed Vars; both get coefficient c[k]
-        self._model.setInfo("Obj", self._cost_vars, np.repeat(c, 2).tolist())
-
-    def solve(self) -> tuple[np.ndarray, float]:
-        """
-        A method to solve model
-        """
-        self._model.solve()
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
-        sol = (xvals > 1e-2).any(axis=1).astype(np.uint8)
-        return sol, self._model.objVal
-
-    def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
-        """Add a single linear constraint to self._model using the MTZ variable scheme."""
-        self._model.addConstr(
-            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
-            <= rhs
-        )
-
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> tspABModel:
-        """
-        A method to add new constraint
-
-        Args:
-            coefs: coefficients of new constraint
-            rhs: right-hand side of new constraint
-
-        Returns:
-            optModel: new model with the added constraint
-        """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
-        new_model = self.copy()
-        new_model._extra_constrs.append((coefs, rhs))
-        new_model._addExtraConstr(coefs, rhs)
-        return new_model
-
     def relax(self) -> tspMTZModelRel:
         """
         A method to get linear relaxation model
@@ -453,12 +298,7 @@ class tspMTZModel(tspABModel):
 
 class tspMTZModelRel(tspMTZModel):
     """
-    This class is relaxation of tspMTZModel.
-
-    Attributes:
-        _model (COPT model): COPT model
-        num_nodes (int): Number of nodes
-        edges (list): List of edge index
+    LP relaxation of the MTZ formulation.
     """
 
     def _getModel(self) -> tuple:
@@ -492,10 +332,7 @@ class tspMTZModelRel(tspMTZModel):
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
-        A method to solve model
-
-        Returns:
-            tuple: optimal solution (list) and objective value (float)
+        A method to solve model — returns fractional solution.
         """
         self._model.solve()
         xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)

@@ -8,12 +8,13 @@ from __future__ import annotations
 import numpy as np
 from coptpy import COPT, Envr
 
+from pyepo.model.bases import knapsackBase
 from pyepo.model.copt.coptmodel import optCoptModel
 
 
-class knapsackModel(optCoptModel):
+class knapsackModel(knapsackBase, optCoptModel):
     """
-    This class is an optimization model for the knapsack problem
+    COPT-backed knapsack.
 
     Attributes:
         _model (COPT model): COPT model
@@ -21,17 +22,6 @@ class knapsackModel(optCoptModel):
         capacity (np.ndarray): total capacity
         items (list): list of item index
     """
-
-    def __init__(self, weights: np.ndarray | list, capacity: np.ndarray | list) -> None:
-        """
-        Args:
-            weights: weights of items
-            capacity: total capacity
-        """
-        self.weights = np.asarray(weights)
-        self.capacity = np.asarray(capacity)
-        self.items = list(range(self.weights.shape[1]))
-        super().__init__()
 
     def _getModel(self) -> tuple:
         """
@@ -55,7 +45,7 @@ class knapsackModel(optCoptModel):
 
 class knapsackModelRel(knapsackModel):
     """
-    This class is relaxed optimization model for knapsack problem.
+    LP relaxation of the COPT knapsack.
     """
 
     def _getModel(self) -> tuple:

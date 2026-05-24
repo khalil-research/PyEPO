@@ -5,15 +5,15 @@ Portfolio problem
 
 from __future__ import annotations
 
-import numpy as np
 from coptpy import COPT, Envr
 
+from pyepo.model.bases import portfolioBase
 from pyepo.model.copt.coptmodel import optCoptModel
 
 
-class portfolioModel(optCoptModel):
+class portfolioModel(portfolioBase, optCoptModel):
     """
-    This class is an optimization model for the portfolio problem
+    COPT-backed Markowitz portfolio.
 
     Attributes:
         _model (COPT model): COPT model
@@ -21,36 +21,6 @@ class portfolioModel(optCoptModel):
         covariance (numpy.ndarray): covariance matrix of the returns
         risk_level (float): risk level
     """
-
-    def __init__(
-        self,
-        num_assets: int,
-        covariance: np.ndarray,
-        gamma: float = 2.25,
-    ) -> None:
-        """
-        Args:
-            num_assets: number of assets
-            covariance: covariance matrix of the returns
-            gamma: risk level parameter
-        """
-        self.num_assets = num_assets
-        self.covariance = covariance
-        self.risk_level = self._getRiskLevel(gamma)
-        super().__init__()
-
-    def _getRiskLevel(self, gamma: float) -> float:
-        """
-        A method to calculate the risk level
-
-        Args:
-            gamma: risk level parameter
-
-        Returns:
-            float: risk level
-        """
-        risk_level = gamma * np.mean(self.covariance)
-        return risk_level
 
     def _getModel(self) -> tuple:
         """

@@ -12,56 +12,45 @@ try:
 except ImportError:
     pass
 
+from pyepo.model.bases import shortestPathBase
 from pyepo.model.mpax.mpaxmodel import optMpaxModel
-from pyepo.model.utils import _get_grid_arcs
 
 
-class shortestPathModel(optMpaxModel):
+class shortestPathModel(shortestPathBase, optMpaxModel):
     """
-    This class is an optimization model for the shortest path problem
+    MPAX-backed (JAX LP) shortest path on a grid network.
 
     Attributes:
         grid (tuple of int): Size of grid network
         arcs (list): List of arcs
     """
 
-    def __init__(self, grid: tuple[int, int]) -> None:
-        """
-        Args:
-            grid: size of grid network
-        """
-        self.grid = grid
-        self.arcs = _get_grid_arcs(grid)
-        A, b, u = self._constructMatrix()
-        super().__init__(A=A, b=b, u=u, use_sparse_matrix=True, minimize=True)
+    use_sparse_matrix = True
 
-    def _constructMatrix(self) -> tuple:
+    def _getModel(self) -> tuple:
         """
-        Constructs the incidence matrix A, supply/demand vector b, and upper bound u
-        for the shortest path problem.
-
-        Returns:
-            A (jnp.ndarray): Incidence matrix for flow conservation
-            b (jnp.ndarray): Supply/demand vector
-            u (jnp.ndarray): Upper bound for flow variables
+        Build MPAX matrices: equality flow-conservation A x = b, x in [0, 1].
         """
-        # number of nodes and arcs
         num_nodes = self.grid[0] * self.grid[1]
         num_arcs = len(self.arcs)
-        # construct incidence matrix A for flow conservation (build in numpy, then convert)
+        # node-arc incidence: +1 outgoing, -1 incoming
         A_np = np.zeros((num_nodes, num_arcs), dtype=np.float32)
         for arc_idx, (start, end) in enumerate(self.arcs):
             A_np[start, arc_idx] = 1
             A_np[end, arc_idx] = -1
-        A = jnp.array(A_np)
-        # construct supply/demand vector b
+        self.A = jnp.array(A_np)
+        # supply / demand: source sends 1, sink receives 1
         b_np = np.zeros(num_nodes, dtype=np.float32)
-        b_np[0] = 1  # source node (top-left) sends one unit
-        b_np[num_nodes - 1] = -1  # sink node (bottom-right) receives one unit
-        b = jnp.array(b_np)
-        # upper bound
-        u = jnp.ones(len(self.arcs), dtype=jnp.float32)
-        return A, b, u
+        b_np[0] = 1
+        b_np[num_nodes - 1] = -1
+        self.b = jnp.array(b_np)
+        # no inequality constraints
+        self.G = jnp.zeros((0, num_arcs), dtype=jnp.float32)
+        self.h = jnp.zeros((0,), dtype=jnp.float32)
+        # variable bounds: x in [0, 1]
+        self.l = jnp.zeros(num_arcs, dtype=jnp.float32)
+        self.u = jnp.ones(num_arcs, dtype=jnp.float32)
+        return None, []
 
 
 if __name__ == "__main__":

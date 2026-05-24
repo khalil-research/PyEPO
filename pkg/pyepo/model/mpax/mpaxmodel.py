@@ -26,77 +26,41 @@ from pyepo.model.opt import optModel
 
 class optMpaxModel(optModel):
     """
-    This is an abstract class for an MPAX-based optimization model
+    This is an abstract class for an MPAX-based optimization model.
+
+    Concrete subclasses populate the constraint matrices and bounds inside
+    ``_getModel``:
+
+        def _getModel(self):
+            self.A = jnp.array(...)   # equality A x = b
+            self.b = jnp.array(...)
+            self.G = jnp.array(...)   # inequality G x >= h
+            self.h = jnp.array(...)
+            self.l = jnp.array(...)   # variable lower bound
+            self.u = jnp.array(...)   # variable upper bound
+            return None, []
+
+    Sense (MIN / MAX) follows ``self.modelSense`` (set by a problem-level base
+    such as ``knapsackBase`` before this ``__init__`` runs; defaults to MIN).
+    Sparse-matrix format can be toggled by overriding the class attribute
+    ``use_sparse_matrix`` on the concrete subclass.
 
     Attributes:
-        A (jnp.ndarray, BCOO or BCSR): The matrix of equality constraints.
+        A (jnp.ndarray): The matrix of equality constraints.
         b (jnp.ndarray): The right hand side of equality constraints.
-        G (jnp.ndarray, BCOO or BCSR): The matrix for inequality constraints.
+        G (jnp.ndarray): The matrix for inequality constraints.
         h (jnp.ndarray): The right hand side of inequality constraints.
         l (jnp.ndarray): The lower bound of the variables.
         u (jnp.ndarray): The upper bound of the variables.
-        use_sparse_matrix (bool): Whether to use sparse matrix format, by default True.
-        minimize (bool): Whether to minimize objective, by default True.
+        use_sparse_matrix (bool): Whether to use sparse matrix format.
     """
 
-    def __init__(
-        self,
-        A: np.ndarray | torch.Tensor | None = None,
-        b: np.ndarray | torch.Tensor | None = None,
-        G: np.ndarray | torch.Tensor | None = None,
-        h: np.ndarray | torch.Tensor | None = None,
-        l: np.ndarray | torch.Tensor | None = None,
-        u: np.ndarray | torch.Tensor | None = None,
-        use_sparse_matrix: bool = True,
-        minimize: bool = True,
-    ) -> None:
-        super().__init__()
-        # error
+    use_sparse_matrix: bool = True
+
+    def __init__(self) -> None:
         if not _HAS_MPAX:
             raise ImportError("MPAX is not installed. Please install MPAX to use this feature.")
-        # at least one of A or G must be provided
-        if A is None and G is None:
-            raise ValueError(
-                "At least one of A (equality constraints) or G (inequality constraints) must be provided."
-            )
-        # rhs is provided
-        if A is not None and b is None:
-            raise ValueError("If A (equality constraints) is provided, b must also be provided.")
-        if G is not None and h is None:
-            raise ValueError("If G (inequality constraints) is provided, h must also be provided.")
-        # number of variables
-        num_vars = A.shape[1] if A is not None else G.shape[1]
-        # params for equality constraints (A x = b)
-        if A is not None and b is not None:
-            self.A = jnp.array(A, dtype=jnp.float32)
-            self.b = jnp.array(b, dtype=jnp.float32)
-        else:
-            # no equality constraints: use empty arrays
-            self.A = jnp.zeros((0, num_vars), dtype=jnp.float32)
-            self.b = jnp.zeros((0,), dtype=jnp.float32)
-        # params for inequality constraints (G x >= h)
-        if G is not None and h is not None:
-            self.G = jnp.array(G, dtype=jnp.float32)
-            self.h = jnp.array(h, dtype=jnp.float32)
-        else:
-            # no inequality constraints: use empty arrays
-            self.G = jnp.zeros((0, num_vars), dtype=jnp.float32)
-            self.h = jnp.zeros((0,), dtype=jnp.float32)
-        # variable bounds
-        self.l = (
-            jnp.array(l, dtype=jnp.float32)
-            if l is not None
-            else jnp.zeros(num_vars, dtype=jnp.float32)
-        )
-        self.u = (
-            jnp.array(u, dtype=jnp.float32)
-            if u is not None
-            else jnp.full(num_vars, jnp.inf, dtype=jnp.float32)
-        )
-        # matrix type
-        self.use_sparse_matrix = use_sparse_matrix
-        # model sense
-        self.modelSense = EPO.MINIMIZE if minimize else EPO.MAXIMIZE
+        super().__init__()  # → optModel.__init__ → self._getModel() populates A/b/G/h/l/u
         # init device
         self.device = None
         # cache GPU availability
@@ -242,65 +206,3 @@ class optMpaxModel(optModel):
         # rebuild JIT with updated constraints
         new_model._rebuild_jit()
         return new_model
-
-    def _getModel(self) -> tuple:
-        """
-        Placeholder method for MPAX. MPAX does not require an explicit model creation.
-        """
-        return None, []
-
-
-if __name__ == "__main__":
-    import random
-
-    # random seed for reproducibility
-    random.seed(42)
-    np.random.seed(42)
-    # number of variables
-    num_vars = 10
-    # random equality and inequality constraints
-    A = np.random.rand(3, num_vars)  # 3 equality constraints
-    b = np.random.rand(3)
-    G = np.random.rand(5, num_vars)  # 5 inequality constraints
-    h = np.random.rand(5)
-    # l = np.zeros(num_vars)  # Lower bounds (default zero)
-    # u = np.ones(num_vars) * 10  # Upper bounds
-    # create optimization model
-    optmodel = optMpaxModel(A=A, b=b, G=G, h=h, minimize=True)
-    # generate a random cost vector
-    cost = np.random.rand(num_vars)
-    # solve the model
-    optmodel.setObj(cost)
-    sol, obj = optmodel.solve()
-    # print results
-    print(f"Objective Value: {obj}")
-    print(f"Solution: {sol}")
-
-    # cpu tensor
-    cost_cpu = torch.tensor(cost, dtype=torch.float32, device="cpu")
-    # solve the model
-    optmodel.setObj(cost_cpu)
-    sol, obj = optmodel.solve()
-    # print results
-    print(f"Objective Value: {obj}")
-    print(f"Solution: {sol}")
-
-    # gpu tensor
-    cost_gpu = torch.tensor(cost, dtype=torch.float32, device="cuda")
-    # solve the model
-    optmodel.setObj(cost_gpu)
-    sol, obj = optmodel.solve()
-    # print results
-    print(f"Objective Value: {obj}")
-    print(f"Solution: {sol}")
-
-    # add a new constraint (sum of variables should be ≤ num_vars * 0.5)
-    new_constraint = [1] * num_vars  # All coefficients are 1
-    new_rhs = num_vars * 0.5  # Right-hand side
-    optmodel = optmodel.addConstr(new_constraint, new_rhs)
-    # solve again
-    optmodel.setObj(cost)
-    sol, obj = optmodel.solve()
-    # Print updated results
-    print(f"Objective Value after adding constraint: {obj}")
-    print(f"Updated Solution: {sol}")

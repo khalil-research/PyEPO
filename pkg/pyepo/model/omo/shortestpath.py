@@ -7,8 +7,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 
+from pyepo.model.bases import shortestPathBase
 from pyepo.model.omo.omomodel import optOmoModel
-from pyepo.model.utils import _get_grid_arcs
 
 try:
     from pyomo import environ as pe
@@ -16,15 +16,15 @@ except ImportError:
     pass
 
 
-class shortestPathModel(optOmoModel):
+class shortestPathModel(shortestPathBase, optOmoModel):
     """
-    This class is an optimization model for the shortest path problem
+    Pyomo-backed shortest path on a grid network.
 
     Attributes:
         _model (Pyomo model): Pyomo model
         solver (str): optimization solver in the background
-        grid (tuple of int): size of grid network
-        arcs (list): list of arcs
+        grid (tuple of int): Size of grid network
+        arcs (list): List of arcs
     """
 
     def __init__(self, grid: tuple[int, int], solver: str = "glpk") -> None:
@@ -33,9 +33,7 @@ class shortestPathModel(optOmoModel):
             grid: size of grid network
             solver: optimization solver in the background
         """
-        self.grid = grid
-        self.arcs = _get_grid_arcs(grid)
-        super().__init__(solver)
+        super().__init__(grid, solver)
 
     def _getModel(self) -> tuple:
         """

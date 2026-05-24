@@ -13,18 +13,14 @@ try:
 except ImportError:
     pass
 
-from pyepo import EPO
+from pyepo.model.bases import knapsackBase
 from pyepo.model.ort.ortcpmodel import optOrtCpModel
 from pyepo.model.ort.ortmodel import optOrtModel
 
-# ============================================================
-# pywraplp
-# ============================================================
 
-
-class knapsackModel(optOrtModel):
+class knapsackModel(knapsackBase, optOrtModel):
     """
-    This class is an optimization model for the knapsack problem
+    OR-Tools (pywraplp) backed knapsack.
 
     Attributes:
         _model (pywraplp.Solver): OR-Tools linear solver
@@ -34,23 +30,6 @@ class knapsackModel(optOrtModel):
         items (list): list of item index
     """
 
-    def __init__(
-        self,
-        weights: np.ndarray | list,
-        capacity: np.ndarray | list,
-        solver: str = "scip",
-    ) -> None:
-        """
-        Args:
-            weights: weights of items
-            capacity: total capacity
-            solver: solver backend for pywraplp
-        """
-        self.weights = np.asarray(weights)
-        self.capacity = np.asarray(capacity)
-        self.items = list(range(self.weights.shape[1]))
-        super().__init__(solver)
-
     def _getModel(self) -> tuple:
         """
         A method to build OR-Tools pywraplp model
@@ -58,8 +37,6 @@ class knapsackModel(optOrtModel):
         Returns:
             tuple: optimization model and variables
         """
-        # sense
-        self.modelSense = EPO.MAXIMIZE
         # create a model
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
@@ -82,7 +59,7 @@ class knapsackModel(optOrtModel):
 
 class knapsackModelRel(knapsackModel):
     """
-    This class is relaxed optimization model for knapsack problem.
+    LP relaxation of the OR-Tools knapsack.
     """
 
     def _getModel(self) -> tuple:
@@ -92,8 +69,6 @@ class knapsackModelRel(knapsackModel):
         Returns:
             tuple: optimization model and variables
         """
-        # sense
-        self.modelSense = EPO.MAXIMIZE
         # create a model
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
@@ -114,14 +89,9 @@ class knapsackModelRel(knapsackModel):
         raise RuntimeError("Model has already been relaxed.")
 
 
-# ============================================================
-# CP-SAT
-# ============================================================
-
-
-class knapsackCpModel(optOrtCpModel):
+class knapsackCpModel(knapsackBase, optOrtCpModel):
     """
-    This class is an optimization model for the knapsack problem using CP-SAT
+    OR-Tools CP-SAT backed knapsack.
 
     Attributes:
         _model (cp_model.CpModel): OR-Tools CP-SAT model
@@ -130,17 +100,6 @@ class knapsackCpModel(optOrtCpModel):
         items (list): list of item index
     """
 
-    def __init__(self, weights: np.ndarray | list, capacity: np.ndarray | list) -> None:
-        """
-        Args:
-            weights: weights of items
-            capacity: total capacity
-        """
-        self.weights = np.asarray(weights)
-        self.capacity = np.asarray(capacity)
-        self.items = list(range(self.weights.shape[1]))
-        super().__init__()
-
     def _getModel(self) -> tuple:
         """
         A method to build OR-Tools CP-SAT model
@@ -148,8 +107,6 @@ class knapsackCpModel(optOrtCpModel):
         Returns:
             tuple: optimization model and variables
         """
-        # sense
-        self.modelSense = EPO.MAXIMIZE
         # create a model
         m = cp_model.CpModel()
         # variables
