@@ -9,12 +9,12 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import TYPE_CHECKING
 
-import numpy as np
-import torch
-
 from pyepo import EPO
 
 if TYPE_CHECKING:
+    import numpy as np
+    import torch
+
     from pyepo.EPO import ModelSense
 
 

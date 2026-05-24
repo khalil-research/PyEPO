@@ -5,8 +5,6 @@ Portfolio problem
 
 from __future__ import annotations
 
-import numpy as np
-
 try:
     import gurobipy as gp
     from gurobipy import GRB

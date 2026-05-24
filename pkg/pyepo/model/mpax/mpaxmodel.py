@@ -7,8 +7,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 from functools import partial
+from typing import TYPE_CHECKING
 
-import numpy as np
 import torch
 
 try:
@@ -22,6 +22,9 @@ except ImportError:
 
 from pyepo import EPO
 from pyepo.model.opt import optModel
+
+if TYPE_CHECKING:
+    import numpy as np
 
 
 class optMpaxModel(optModel):

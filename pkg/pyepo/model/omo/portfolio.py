@@ -5,7 +5,7 @@ Portfolio problem
 
 from __future__ import annotations
 
-import numpy as np
+from typing import TYPE_CHECKING
 
 from pyepo.model.bases import portfolioBase
 from pyepo.model.omo.omomodel import optOmoModel
@@ -14,6 +14,9 @@ try:
     from pyomo import environ as pe
 except ImportError:
     pass
+
+if TYPE_CHECKING:
+    import numpy as np
 
 
 class portfolioModel(portfolioBase, optOmoModel):
