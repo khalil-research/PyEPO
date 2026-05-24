@@ -104,8 +104,10 @@ class regularizedFrankWolfeOpt(optModule):
         # active-set buffer
         vertices = torch.zeros((batch, self.max_iter + 1, num_vars), device=device, dtype=dtype)
         weights = torch.zeros((batch, self.max_iter + 1), device=device, dtype=dtype)
+        vertex_norms = torch.zeros((batch, self.max_iter + 1), device=device, dtype=dtype)
         vertices[:, 0] = v0
         weights[:, 0] = 1.0
+        vertex_norms[:, 0] = (v0 * v0).sum(dim=-1)
         mu = v0.clone()
         # Frank-Wolfe iterations
         alive = torch.ones(batch, device=device, dtype=torch.bool)
@@ -131,14 +133,18 @@ class regularizedFrankWolfeOpt(optModule):
             gamma = (gap / denom).clamp(0.0, 1.0) * active
             # in-place update
             mu.sub_(gamma.unsqueeze(-1) * diff)
-            # vertex dedup against active set
-            match_mask = (vertices[:, :k + 1] - v.unsqueeze(1)).abs().sum(dim=-1) < 1e-6
+            # vertex dedup via cached norms + inner products
+            v_norm_sq = (v * v).sum(dim=-1)
+            inner = torch.einsum("bnv,bv->bn", vertices[:, :k + 1], v)
+            dist_sq = vertex_norms[:, :k + 1] - 2 * inner + v_norm_sq.unsqueeze(-1)
+            match_mask = dist_sq < 1e-6
             has_match = match_mask.any(dim=-1)
             match_idx = match_mask.to(dtype).argmax(dim=-1)
             # in-place weight shrink
             weights.mul_((1.0 - gamma).unsqueeze(-1))
             weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma * has_match.to(dtype)
             vertices[:, k + 1] = v
+            vertex_norms[:, k + 1] = v_norm_sq
             weights[:, k + 1] = gamma * (~has_match).to(dtype)
             alive = active_mask
         return mu, vertices, weights
