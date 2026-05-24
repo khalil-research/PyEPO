@@ -129,7 +129,6 @@ def _update_solution_pool(
 
     Dedup runs with `torch.unique` + `torch.cdist` on `solpool`'s device.
     """
-    sol = torch.as_tensor(sol, dtype=torch.float32)
     if solpool is None:
         return torch.unique(sol, dim=0).clone()
     if sol.device != solpool.device:

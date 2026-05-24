@@ -39,7 +39,7 @@ class TestKnapsackData:
 
     def test_cost_dtype(self):
         _, _, c = knapsack.genData(10, 3, 4)
-        assert c.dtype == np.float64
+        assert c.dtype == np.float32
 
     def test_deg_positive_int(self):
         with pytest.raises(ValueError):

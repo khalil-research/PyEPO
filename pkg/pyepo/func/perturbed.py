@@ -126,7 +126,7 @@ class perturbedOptFunc(Function):
         # sample perturbations on-device
         gen = _torch_generator(module._gen_cache, device, module.seed)
         noises = torch.randn(
-            (module.n_samples, *cp.shape), device=device, dtype=torch.float32, generator=gen,
+            (module.n_samples, *cp.shape), device=device, dtype=cp.dtype, generator=gen,
         )
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
@@ -274,7 +274,7 @@ class perturbedFenchelYoungFunc(Function):
         # sample perturbations on-device
         gen = _torch_generator(module._gen_cache, device, module.seed)
         noises = torch.randn(
-            (module.n_samples, *cp.shape), device=device, dtype=torch.float32, generator=gen,
+            (module.n_samples, *cp.shape), device=device, dtype=cp.dtype, generator=gen,
         )
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
@@ -425,11 +425,11 @@ class implicitMLEFunc(Function):
         # sample perturbations; fall back to H2D for custom distributions
         size = (module.n_samples, *cp.shape)
         try:
-            noises = module.distribution.sample(size=size, device=device, dtype=torch.float32)
+            noises = module.distribution.sample(size=size, device=device, dtype=cp.dtype)
         except TypeError:
             noises = module.distribution.sample(size=size)
         if isinstance(noises, np.ndarray):
-            noises = torch.from_numpy(noises).to(device, dtype=torch.float32)
+            noises = torch.from_numpy(noises).to(device, dtype=cp.dtype)
         ptb_c = cp + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)

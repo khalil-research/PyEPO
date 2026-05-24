@@ -26,7 +26,7 @@ def genData(
         num_nodes: number of nodes
         deg: data polynomial degree
         noise_width: half width of data random noise
-        seed: random seed
+        seed: random seed (default 135 for reproducibility)
 
     Returns:
         tuple: data features (np.ndarray), costs (np.ndarray)
@@ -59,5 +59,5 @@ def genData(
     # broadcast base distances over data points
     c = dist_upper + feature_cost * noise
     # rounding
-    c = np.around(c, decimals=4)
+    c = np.around(c, decimals=4).astype(np.float32)
     return x, c

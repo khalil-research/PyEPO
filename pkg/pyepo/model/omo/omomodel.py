@@ -8,6 +8,8 @@ from __future__ import annotations
 from copy import copy
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 from pyepo import EPO
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
@@ -21,7 +23,6 @@ except ImportError:
     _HAS_PYOMO = False
 
 if TYPE_CHECKING:
-    import numpy as np
     import torch
 
 
@@ -81,16 +82,19 @@ class optOmoModel(optModel):
         else:
             raise ValueError("Invalid modelSense.")
 
-    def solve(self) -> tuple[list, float]:
+    def solve(self) -> tuple[np.ndarray, float]:
         """
         A method to solve the model
 
         Returns:
-            tuple: optimal solution (list) and objective value (float)
+            tuple: optimal solution (np.ndarray) and objective value (float)
         """
-        # solve
         self._solverfac.solve(self._model)
-        return [pe.value(self.x[k]) for k in self.x], pe.value(self._model.obj)
+        sol = np.fromiter(
+            (pe.value(self.x[k]) for k in self.x),
+            dtype=np.float32,
+        )
+        return sol, pe.value(self._model.obj)
 
     def copy(self) -> optOmoModel:
         """

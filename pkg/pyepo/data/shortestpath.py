@@ -25,7 +25,7 @@ def genData(
         grid: size of grid network
         deg: data polynomial degree
         noise_width: half width of data random noise
-        seed: random seed
+        seed: random seed (default 135 for reproducibility)
 
     Returns:
        tuple: data features (np.ndarray), costs (np.ndarray)
@@ -55,4 +55,4 @@ def genData(
     epsilon = rnd.uniform(1 - noise_width, 1 + noise_width, (n, d))
     c *= epsilon
 
-    return x, c
+    return x, c.astype(np.float32)

@@ -25,7 +25,7 @@ def genData(
         num_assets: number of assets
         deg: data polynomial degree
         noise_level: level of data random noise
-        seed: random seed
+        seed: random seed (default 135 for reproducibility)
 
     Returns:
         tuple: covariance matrix (np.ndarray), data features (np.ndarray), mean returns (np.ndarray)
@@ -56,4 +56,4 @@ def genData(
     r += F @ L.T + 0.01 * noise_level * E
     # covariance
     cov = L @ L.T + (1e-2 * noise_level) ** 2 * np.eye(m)
-    return cov, x, r
+    return cov, x, r.astype(np.float32)
