@@ -1773,6 +1773,18 @@ class TestOrtCpKnapsackModel:
         _, obj2 = model2.solve()
         assert obj2 <= obj1 + 1e-6
 
+    def test_float_weights_raise(self):
+        weights = np.array([[3.5, 4.0, 5.0, 6.0]])
+        capacity = np.array([10])
+        with pytest.raises(ValueError, match="integer weights"):
+            ortKnapsackCpModel(weights=weights, capacity=capacity)
+
+    def test_float_capacity_raise(self):
+        weights = np.array([[3, 4, 5, 6]])
+        capacity = np.array([10.5])
+        with pytest.raises(ValueError, match="integer capacity"):
+            ortKnapsackCpModel(weights=weights, capacity=capacity)
+
     def test_relax_not_supported(self, model):
         with pytest.raises(RuntimeError):
             model.relax()

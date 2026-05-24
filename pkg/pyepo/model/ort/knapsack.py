@@ -106,14 +106,30 @@ class knapsackCpModel(knapsackBase, optOrtCpModel):
 
         Returns:
             tuple: optimization model and variables
+
+        Raises:
+            ValueError: if weights or capacity contain non-integer values
+                (CP-SAT solves over integers; silent truncation would yield
+                wrong knapsack solutions).
         """
+        weights = self.weights.astype(np.int64)
+        capacity = np.asarray(self.capacity).astype(np.int64)
+        if not np.array_equal(weights, self.weights):
+            raise ValueError(
+                "CP-SAT knapsack requires integer weights; got non-integer values. "
+                "Cast explicitly, e.g. np.round(weights).astype(int)."
+            )
+        if not np.array_equal(capacity, np.asarray(self.capacity)):
+            raise ValueError(
+                "CP-SAT knapsack requires integer capacity; got non-integer values."
+            )
         # create a model
         m = cp_model.CpModel()
         # variables
         x = {i: m.NewBoolVar(f"x_{i}") for i in self.items}
-        # constraints (integer coefficients)
-        for i in range(len(self.capacity)):
-            m.Add(sum(int(self.weights[i, j]) * x[j] for j in self.items) <= int(self.capacity[i]))
+        # constraints
+        for i in range(len(capacity)):
+            m.Add(sum(int(weights[i, j]) * x[j] for j in self.items) <= int(capacity[i]))
         return m, x
 
 
