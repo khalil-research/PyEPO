@@ -102,7 +102,6 @@ class optModule(nn.Module):
         """
         Forward pass
         """
-        # convert tensor
 
     def _reduce(self, loss: torch.Tensor) -> torch.Tensor:
         """
