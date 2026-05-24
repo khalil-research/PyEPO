@@ -46,22 +46,18 @@ def genData(
     m = num_nodes
     # random coordinates
     coords = np.concatenate((rnd.uniform(-2, 2, (m // 2, 2)), rnd.normal(0, 1, (m - m // 2, 2))))
-    # distance matrix
-    org_dist = distance.cdist(coords, coords, "euclidean")
+    # condensed pairwise distances (upper triangle, row-major)
+    dist_upper = distance.pdist(coords, "euclidean")
     # random matrix parameter B
     B = rnd.binomial(1, 0.5, (m * (m - 1) // 2, p)) * rnd.uniform(-2, 2, (m * (m - 1) // 2, p))
     # feature vectors
     x = rnd.normal(0, 1, (n, p))
-    # extract upper triangle distances (vectorized)
-    triu_idx = np.triu_indices(m, k=1)
-    dist_upper = org_dist[triu_idx]
-    # base distance for all data points
-    c = np.tile(dist_upper, (n, 1))
     # feature-based cost
     feature_cost = ((x @ B.T / np.sqrt(p) + 3) ** deg) / 3 ** (deg - 1)
     # noise
     noise = rnd.uniform(1 - noise_width, 1 + noise_width, (n, m * (m - 1) // 2))
-    c += feature_cost * noise
+    # broadcast base distances over data points
+    c = dist_upper + feature_cost * noise
     # rounding
     c = np.around(c, decimals=4)
     return x, c
