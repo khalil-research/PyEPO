@@ -191,6 +191,7 @@ class perturbationGradient(optModule):
         # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
+        # sense sign
         if self.optmodel.modelSense == EPO.MINIMIZE:
             sign = 1.0
         elif self.optmodel.modelSense == EPO.MAXIMIZE:
@@ -198,22 +199,28 @@ class perturbationGradient(optModule):
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         b = cp.shape[0]
-        # central differencing: batch the +sigma and -sigma perturbations into one solve
+        # central differencing
         if self.two_sides:
+            # batch +sigma and -sigma into one solve
             combined_sol, _ = _solve_or_cache(
                 torch.cat([cp + self.sigma * c, cp - self.sigma * c], dim=0), self,
             )
             wp, wm = combined_sol[:b], combined_sol[b:]
+            # differentiable objective value
             obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * true_cost, wp)
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
+            # loss
             loss = sign * (obj_plus - obj_minus) / (2 * self.sigma + _EPS)
-        # back differencing: batch the clean and -sigma perturbations into one solve
+        # back differencing
         else:
+            # batch clean and -sigma into one solve
             combined_sol, _ = _solve_or_cache(
                 torch.cat([cp, cp - self.sigma * c], dim=0), self,
             )
             w, wm = combined_sol[:b], combined_sol[b:]
+            # differentiable objective value
             obj = torch.einsum("bi,bi->b", pred_cost, w)
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
+            # loss
             loss = sign * (obj - obj_minus) / (self.sigma + _EPS)
         return loss
