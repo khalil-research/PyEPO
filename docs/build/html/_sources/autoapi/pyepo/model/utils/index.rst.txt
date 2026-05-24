@@ -52,10 +52,11 @@ Module Contents
                considered active when its value exceeds ``threshold``
    :param threshold: activation threshold for an edge
 
-   :returns: node sequence of the tour (closes back to node 0 if reachable)
+   :returns: node sequence of the tour, starting and ending at node 0
    :rtype: list
 
-   :raises ValueError: if the solution does not form a single connected tour
-       (skips nodes or contains disconnected subtours).
+   :raises ValueError: if the solution does not form a single Hamiltonian tour
+       closed back to node 0 (skips nodes, contains disconnected subtours,
+       or the last visited node is not adjacent to 0).
 
 

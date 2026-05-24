@@ -156,14 +156,15 @@ considered active when its value exceeds <code class="docutils literal notransla
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>node sequence of the tour (closes back to node 0 if reachable)</p>
+<dd class="field-even"><p>node sequence of the tour, starting and ending at node 0</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if the solution does not form a single connected tour
-(skips nodes or contains disconnected subtours).</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if the solution does not form a single Hamiltonian tour
+closed back to node 0 (skips nodes, contains disconnected subtours,
+or the last visited node is not adjacent to 0).</p>
 </dd>
 </dl>
 </dd></dl>
