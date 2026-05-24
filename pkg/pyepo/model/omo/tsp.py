@@ -11,6 +11,7 @@ import numpy as np
 
 from pyepo.model.bases import tspABBase
 from pyepo.model.omo.omomodel import optOmoModel
+from pyepo.model.utils import _EDGE_ACTIVE_TOL
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
@@ -64,7 +65,7 @@ class tspABModel(tspABBase, optOmoModel):
         self._solverfac.solve(self._model)
         sol = np.zeros(self.num_cost, dtype=np.uint8)
         for k, (i, j) in enumerate(self.edges):
-            if pe.value(self.x[i, j]) > 1e-2 or pe.value(self.x[j, i]) > 1e-2:
+            if pe.value(self.x[i, j]) > _EDGE_ACTIVE_TOL or pe.value(self.x[j, i]) > _EDGE_ACTIVE_TOL:
                 sol[k] = 1
         return sol, pe.value(self._model.obj)
 

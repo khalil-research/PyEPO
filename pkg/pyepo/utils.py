@@ -16,6 +16,10 @@ if TYPE_CHECKING:
     from pyepo.model.opt import optModel
 
 
+# defensive denominator regularizer (gradient / regret normalization)
+_EPS: float = 1e-8
+
+
 def getArgs(model: optModel) -> dict:
     """
     A global function to get args of model

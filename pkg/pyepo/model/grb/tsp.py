@@ -18,7 +18,7 @@ except ImportError:
 
 from pyepo.model.bases import tspABBase
 from pyepo.model.grb.grbmodel import optGrbModel
-from pyepo.model.utils import unionFind
+from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
@@ -50,7 +50,7 @@ class tspABModel(tspABBase, optGrbModel):
         """
         self._model.optimize()
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
-        sol = (xvals > 1e-2).any(axis=1).astype(np.uint8)
+        sol = (xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8)
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
@@ -201,7 +201,9 @@ class tspDFJModel(tspABModel):
         if where == GRB.Callback.MIPSOL:
             # selected edges
             xvals = model.cbGetSolution(model._x)
-            selected = gp.tuplelist((i, j) for i, j in model._x if xvals[i, j] > 1e-2)
+            selected = gp.tuplelist(
+                (i, j) for i, j in model._x if xvals[i, j] > _EDGE_ACTIVE_TOL
+            )
             # check subcycle with unionfind
             uf = unionFind(model._n)
             for i, j in selected:
@@ -234,7 +236,7 @@ class tspDFJModel(tspABModel):
         """
         self._model.optimize(self._subtourelim)
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars))
-        sol = (xvals > 1e-2).astype(np.uint8)
+        sol = (xvals > _EDGE_ACTIVE_TOL).astype(np.uint8)
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:

@@ -14,6 +14,10 @@ if TYPE_CHECKING:
     import torch
 
 
+# edge/arc treated as inactive when solver value falls below this (≈ MIP feasibility tol)
+_EDGE_ACTIVE_TOL: float = 1e-6
+
+
 def _get_grid_arcs(grid: tuple[int, int]) -> list[tuple[int, int]]:
     """
     Get list of arcs for a grid network.
@@ -63,7 +67,7 @@ def getTspTour(
     edge_list: list[tuple[int, int]],
     num_nodes: int,
     sol: np.ndarray | torch.Tensor | list,
-    threshold: float = 1e-2,
+    threshold: float = _EDGE_ACTIVE_TOL,
 ) -> list[int]:
     """
     Reconstruct a TSP tour from an undirected edge-selection vector.

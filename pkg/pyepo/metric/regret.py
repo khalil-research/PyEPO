@@ -11,7 +11,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.utils import costToNumpy
+from pyepo.utils import _EPS, costToNumpy
 
 if TYPE_CHECKING:
     from torch import nn
@@ -60,7 +60,7 @@ def regret(
         # restore training mode even if evaluation raises
         predmodel.train()
     # normalized
-    return loss / (optsum + 1e-7)
+    return loss / (optsum + _EPS)
 
 
 def calRegret(

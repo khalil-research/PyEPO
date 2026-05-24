@@ -12,6 +12,7 @@ from torch.autograd import Function
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
+from pyepo.utils import _EPS
 
 if TYPE_CHECKING:
     import torch
@@ -114,7 +115,7 @@ class blackboxOptFunc(Function):
         # solve
         sol, _ = _solve_or_cache(cq, module)
         # get gradient
-        grad = (sol - wp) / (lambd + 1e-7)
+        grad = (sol - wp) / (lambd + _EPS)
         return grad, None
 
 

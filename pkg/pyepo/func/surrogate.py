@@ -13,6 +13,7 @@ from torch.autograd import Function
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
+from pyepo.utils import _EPS
 
 if TYPE_CHECKING:
     from pyepo.data.dataset import optDataset
@@ -200,9 +201,9 @@ class perturbationGradient(optModule):
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
             # loss
             if self.optmodel.modelSense == EPO.MINIMIZE:
-                loss = (obj_plus - obj_minus) / (2 * self.sigma + 1e-7)
+                loss = (obj_plus - obj_minus) / (2 * self.sigma + _EPS)
             elif self.optmodel.modelSense == EPO.MAXIMIZE:
-                loss = (obj_minus - obj_plus) / (2 * self.sigma + 1e-7)
+                loss = (obj_minus - obj_plus) / (2 * self.sigma + _EPS)
             else:
                 raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # back differencing
@@ -215,9 +216,9 @@ class perturbationGradient(optModule):
             obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
             # loss
             if self.optmodel.modelSense == EPO.MINIMIZE:
-                loss = (obj - obj_minus) / (self.sigma + 1e-7)
+                loss = (obj - obj_minus) / (self.sigma + _EPS)
             elif self.optmodel.modelSense == EPO.MAXIMIZE:
-                loss = (obj_minus - obj) / (self.sigma + 1e-7)
+                loss = (obj_minus - obj) / (self.sigma + _EPS)
             else:
                 raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         return loss

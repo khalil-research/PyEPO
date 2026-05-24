@@ -13,7 +13,7 @@ from coptpy import COPT, CallbackBase, Envr
 
 from pyepo.model.bases import tspABBase
 from pyepo.model.copt.coptmodel import optCoptModel
-from pyepo.model.utils import unionFind
+from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
@@ -45,7 +45,7 @@ class tspABModel(tspABBase, optCoptModel):
         """
         self._model.solve()
         xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
-        sol = (xvals > 1e-2).any(axis=1).astype(np.uint8)
+        sol = (xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8)
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
@@ -191,7 +191,7 @@ class tspDFJModel(tspABModel):
             if self.where() == COPT.CBCONTEXT_MIPSOL:
                 # selected edges
                 xvals = self.getSolution(self._x)
-                selected = [(i, j) for i, j in self._x if xvals[i, j] > 1e-2]
+                selected = [(i, j) for i, j in self._x if xvals[i, j] > _EDGE_ACTIVE_TOL]
                 # check subcycle with unionfind
                 uf = unionFind(self._n)
                 for i, j in selected:
@@ -245,7 +245,7 @@ class tspDFJModel(tspABModel):
         self._model.setCallback(cb, COPT.CBCONTEXT_MIPSOL)
         self._model.solve()
         xvals = np.asarray(self._model.getInfo("Value", self._cost_vars))
-        sol = (xvals > 1e-2).astype(np.uint8)
+        sol = (xvals > _EDGE_ACTIVE_TOL).astype(np.uint8)
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:

@@ -21,6 +21,7 @@ from pyepo.func.utils import (
     _update_solution_pool,
     sumGammaDistribution,
 )
+from pyepo.utils import _EPS
 
 if TYPE_CHECKING:
     from pyepo.data.dataset import optDataset
@@ -130,7 +131,7 @@ class perturbedOptFunc(Function):
         n_samples = ctx.n_samples
         sigma = ctx.sigma
         grad = torch.einsum("nbd,bn->bd", noises, torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
-        grad /= n_samples * sigma + 1e-7
+        grad /= n_samples * sigma + _EPS
         return grad, None
 
 
@@ -381,10 +382,10 @@ class implicitMLEFunc(Function):
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache_3d(ptb_cp_neg, module)
             # get two-side gradient
-            grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + 1e-7)
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + _EPS)
         else:
             # get single side gradient
-            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (module.lambd + 1e-7)
+            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (module.lambd + _EPS)
         return grad, None
 
 
@@ -482,12 +483,12 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             # solve with perturbation
             ptb_sols_neg = _solve_or_cache_3d(ptb_cp_neg, module)
             # get two-side gradient
-            grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + 1e-7)
+            grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + _EPS)
         else:
             # get single side gradient
-            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + 1e-7)
+            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
         # moving average of the gradient norm
-        grad_norm = (grad.abs() > 1e-7).float().mean()
+        grad_norm = (grad.abs() > _EPS).float().mean()
         module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm
         # update α to target gradient
         if module.grad_norm_avg < 1:

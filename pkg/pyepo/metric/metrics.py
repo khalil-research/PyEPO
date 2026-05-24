@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Callable
 import numpy as np
 
 from pyepo import EPO
-from pyepo.utils import getArgs
+from pyepo.utils import _EPS, getArgs
 
 if TYPE_CHECKING:
     from pyepo.model.opt import optModel
@@ -61,7 +61,7 @@ def SPOError(
         regret_sum += regret
         optobj_sum += np.abs(optobj)
     # normalized regret
-    norm_regret = regret_sum / (optobj_sum + 1e-7)
+    norm_regret = regret_sum / (optobj_sum + _EPS)
     return norm_regret
 
 
