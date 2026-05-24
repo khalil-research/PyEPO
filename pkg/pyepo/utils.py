@@ -36,7 +36,7 @@ def getArgs(model: optModel) -> dict:
 
 def costToNumpy(
     c: np.ndarray | torch.Tensor | list,
-    dtype: np.typing.DTypeLike = np.float32,
+    dtype=np.float32,
 ) -> np.ndarray:
     """
     Normalize a cost vector to a numpy array, detaching torch tensors as needed.
