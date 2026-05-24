@@ -31,7 +31,7 @@ Module Contents
    :rtype: dict
 
 
-.. py:function:: costToNumpy(c: numpy.ndarray | torch.Tensor | list, dtype=np.float32) -> numpy.ndarray
+.. py:function:: costToNumpy(c: numpy.ndarray | torch.Tensor | list, dtype: numpy.typing.DTypeLike = np.float32) -> numpy.ndarray
 
    Normalize a cost vector to a numpy array, detaching torch tensors as needed.
 

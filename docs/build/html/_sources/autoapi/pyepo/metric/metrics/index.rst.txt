@@ -37,7 +37,7 @@ Module Contents
    :rtype: float
 
 
-.. py:function:: makeSkScorer(optmodel: pyepo.model.opt.optModel)
+.. py:function:: makeSkScorer(optmodel: pyepo.model.opt.optModel) -> Callable
 
    A function to create sklearn scorer
 
@@ -47,7 +47,7 @@ Module Contents
    :rtype: scorer
 
 
-.. py:function:: makeAutoSkScorer(optmodel: pyepo.model.opt.optModel)
+.. py:function:: makeAutoSkScorer(optmodel: pyepo.model.opt.optModel) -> Callable
 
    A function to create Auto-SKlearn scorer
 
@@ -70,7 +70,7 @@ Module Contents
    :rtype: float
 
 
-.. py:function:: makeTestMSEScorer(optmodel: pyepo.model.opt.optModel)
+.. py:function:: makeTestMSEScorer(optmodel: pyepo.model.opt.optModel) -> Callable
 
    A function to create MSE scorer for testing
 

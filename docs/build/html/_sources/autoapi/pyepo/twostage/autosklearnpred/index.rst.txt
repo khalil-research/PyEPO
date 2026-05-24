@@ -52,7 +52,7 @@ Module Contents
 
 
 
-.. py:function:: autoSklearnPred(optmodel: pyepo.model.opt.optModel, seed: int, timelimit: int, metric: str = 'mse')
+.. py:function:: autoSklearnPred(optmodel: pyepo.model.opt.optModel, seed: int, timelimit: int, metric: str = 'mse') -> autosklearn.regression.AutoSklearnRegressor
 
    Two-stage prediction and optimization with auto-sklearn.
 
