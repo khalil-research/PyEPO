@@ -554,7 +554,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             ptb_sols_pos = _solve_or_cache_3d(ptb_c + delta, module)
             grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
         # moving average of the gradient norm
-        grad_norm = (grad.abs() > _EPS).float().mean()
+        grad_norm = (grad.abs() > _EPS).float().mean().item()
         module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm
         # update α to target gradient
         if module.grad_norm_avg < 1:
