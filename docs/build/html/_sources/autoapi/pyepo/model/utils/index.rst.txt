@@ -42,7 +42,7 @@ Module Contents
    .. py:method:: union(i: int, j: int) -> bool
 
 
-.. py:function:: getTspTour(edge_list: list[tuple[int, int]], num_nodes: int, sol: numpy.ndarray | torch.Tensor | list, threshold: float = 0.01) -> list[int]
+.. py:function:: getTspTour(edge_list: list[tuple[int, int]], num_nodes: int, sol: numpy.ndarray | torch.Tensor | list, threshold: float = _EDGE_ACTIVE_TOL) -> list[int]
 
    Reconstruct a TSP tour from an undirected edge-selection vector.
 
