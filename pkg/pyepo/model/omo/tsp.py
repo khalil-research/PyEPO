@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from pyepo import EPO
 from pyepo.model.bases import tspABBase
 from pyepo.model.omo.omomodel import optOmoModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL
@@ -56,7 +57,12 @@ class tspABModel(tspABBase, optOmoModel):
         self._model.del_component(self._model.obj)
         # set obj (paired: each undirected edge → x[i,j] + x[j,i])
         obj = sum(c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
-        self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
+        if self.modelSense == EPO.MINIMIZE:
+            self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
+        elif self.modelSense == EPO.MAXIMIZE:
+            self._model.obj = pe.Objective(sense=pe.maximize, expr=obj)
+        else:
+            raise ValueError("Invalid modelSense.")
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
