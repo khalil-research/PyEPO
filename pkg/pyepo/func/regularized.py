@@ -194,15 +194,11 @@ class regularizedFrankWolfeOptFunc(Function):
         V_mean = (V_b * s.unsqueeze(-1)).sum(dim=-2) / n_active  # (batch, vars)
         # centered, with inactive rows kept at zero
         V_centered = (V_b - V_mean.unsqueeze(-2)) * s.unsqueeze(-1)
-        # batched SVD; right singular vectors span the row space
-        _, sv, Vt = torch.linalg.svd(V_centered, full_matrices=False)
-        # per-batch relative rank threshold
-        rank_thresh = sv.amax(dim=-1, keepdim=True) * 1e-6       # (batch, 1)
-        keep = (sv > rank_thresh).to(dtype).unsqueeze(-1)        # (batch, r, 1)
-        Vt_masked = Vt * keep                                    # (batch, r, vars)
-        # projector applied to grad_output: Vtᵀ diag(keep) Vt · g
-        g_b = grad_output.unsqueeze(-1)                          # (batch, vars, 1)
-        grad = (Vt_masked.transpose(-1, -2) @ (Vt_masked @ g_b)).squeeze(-1)
+        # project grad_output onto row space of V_centered via (K+1, K+1) Gram matrix
+        M = V_centered @ V_centered.transpose(-1, -2)            # (batch, K+1, K+1)
+        h = V_centered @ grad_output.unsqueeze(-1)               # (batch, K+1, 1)
+        alpha = torch.linalg.pinv(M, rtol=1e-6) @ h              # (batch, K+1, 1)
+        grad = (V_centered.transpose(-1, -2) @ alpha).squeeze(-1)
         # chain rule for pred_cost
         return scale * grad, None
 
