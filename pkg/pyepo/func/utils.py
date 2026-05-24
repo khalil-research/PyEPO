@@ -237,14 +237,17 @@ class sumGammaDistribution:
             samples -= np.log(self.n_iterations)
             samples /= self.κ
             return samples
-        # torch path: vectorize the n_iterations axis into a single _standard_gamma call
+        # torch path
         size_t = size if isinstance(size, tuple) else (size,)
         gen = _torch_generator(self._gen_cache, device, self.seed)
-        # one alpha block of shape (n_iterations, *size); per-iteration weight kappa/i broadcast on the leading axis
+        # stacked alpha
         alpha = torch.full((self.n_iterations, *size_t), 1.0 / self.κ, device=device, dtype=dtype)
+        # single sample call
         gammas = torch._standard_gamma(alpha, generator=gen)
-        weights = (self.κ / torch.arange(1, self.n_iterations + 1, device=device, dtype=dtype))
+        # per-iteration weights kappa/i
+        weights = self.κ / torch.arange(1, self.n_iterations + 1, device=device, dtype=dtype)
         weights = weights.view(self.n_iterations, *([1] * len(size_t)))
+        # weighted sum
         samples = (gammas * weights).sum(dim=0)
         samples.sub_(math.log(self.n_iterations))
         samples.div_(self.κ)
