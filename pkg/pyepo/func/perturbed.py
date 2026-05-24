@@ -168,7 +168,7 @@ class perturbedOptMul(perturbedOpt):
 
     def _grad_scale(self, cp: torch.Tensor) -> torch.Tensor:
         denom = self.sigma * cp
-        # clamp |denom| up to _EPS while preserving sign (+ on zero)
+        # clamp |denom| >= _EPS, keep sign
         denom_safe = torch.where(
             denom.abs() < _EPS,
             torch.where(denom >= 0, _EPS, -_EPS),
@@ -612,7 +612,7 @@ def _solve_in_pass_3d(
     flat_c = ptb_c.reshape(-1, num_vars)
     # solve using shared 2D function
     flat_sols, _ = _solve_batch_2d(flat_c, optmodel, processes, pool)
-    # update solution pool on the contiguous flat_sols, before the permute view
+    # update pool while flat_sols is still contiguous
     if solpool is not None:
         solpool = _update_solution_pool(flat_sols, solpool)
         if solpool.device != ptb_c.device:
