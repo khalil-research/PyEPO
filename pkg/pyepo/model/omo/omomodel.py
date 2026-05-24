@@ -44,13 +44,14 @@ class optOmoModel(optModel):
         if not _HAS_PYOMO:
             raise ImportError("Pyomo is not installed. Please install pyomo to use this feature.")
         super().__init__()
-        # init obj
+        self._model.cost = pe.Param(range(self.num_cost), mutable=True, initialize=0.0)
         if self.modelSense == EPO.MINIMIZE:
-            self._model.obj = pe.Objective(sense=pe.minimize, expr=0)
+            sense = pe.minimize
         elif self.modelSense == EPO.MAXIMIZE:
-            self._model.obj = pe.Objective(sense=pe.maximize, expr=0)
+            sense = pe.maximize
         else:
             raise ValueError("Invalid modelSense.")
+        self._model.obj = pe.Objective(expr=self._obj_expr(), sense=sense)
         # set solver
         self.solver = solver
         if self.solver == "gurobi":
@@ -60,6 +61,10 @@ class optOmoModel(optModel):
 
     def __repr__(self) -> str:
         return "optOmoModel " + self.__class__.__name__
+
+    def _obj_expr(self):
+        """Parameterized objective expression. Override for non-trivial variable groupings (e.g., TSP paired edges)."""
+        return sum(self._model.cost[i] * self.x[k] for i, k in enumerate(self.x))
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
@@ -71,16 +76,8 @@ class optOmoModel(optModel):
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c)
-        # delete previous component
-        self._model.del_component(self._model.obj)
-        # set obj
-        obj = sum(c[i] * self.x[k] for i, k in enumerate(self.x))
-        if self.modelSense == EPO.MINIMIZE:
-            self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
-        elif self.modelSense == EPO.MAXIMIZE:
-            self._model.obj = pe.Objective(sense=pe.maximize, expr=obj)
-        else:
-            raise ValueError("Invalid modelSense.")
+        for i in range(self.num_cost):
+            self._model.cost[i] = float(c[i])
 
     def solve(self) -> tuple[np.ndarray, float]:
         """

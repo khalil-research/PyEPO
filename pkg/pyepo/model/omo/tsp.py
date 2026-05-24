@@ -9,11 +9,9 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pyepo import EPO
 from pyepo.model.bases import tspABBase
 from pyepo.model.omo.omomodel import optOmoModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL
-from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
@@ -26,7 +24,7 @@ except ImportError:
 
 class tspABModel(tspABBase, optOmoModel):
     """
-    Pyomo-backed TSP abstract base. Provides paired-variable ``setObj`` /
+    Pyomo-backed TSP abstract base. Provides paired-variable objective /
     ``solve`` / ``_addExtraConstr`` shared by GG and MTZ. Pyomo lacks easy
     callback support, so no DFJ formulation exists for this backend.
     """
@@ -43,26 +41,12 @@ class tspABModel(tspABBase, optOmoModel):
         """Override: omo carries a ``solver`` ctor arg."""
         return type(self)(self.num_nodes, self.solver)
 
-    def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
-        """
-        A method to set the objective function
-
-        Args:
-            c: cost vector
-        """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
-        c = costToNumpy(c)
-        # delete previous component
-        self._model.del_component(self._model.obj)
-        # set obj (paired: each undirected edge → x[i,j] + x[j,i])
-        obj = sum(c[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
-        if self.modelSense == EPO.MINIMIZE:
-            self._model.obj = pe.Objective(sense=pe.minimize, expr=obj)
-        elif self.modelSense == EPO.MAXIMIZE:
-            self._model.obj = pe.Objective(sense=pe.maximize, expr=obj)
-        else:
-            raise ValueError("Invalid modelSense.")
+    def _obj_expr(self):
+        """Paired: each undirected edge cost weights x[i,j] + x[j,i]."""
+        return sum(
+            self._model.cost[k] * (self.x[i, j] + self.x[j, i])
+            for k, (i, j) in enumerate(self.edges)
+        )
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
