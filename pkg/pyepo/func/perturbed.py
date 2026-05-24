@@ -95,7 +95,7 @@ class perturbedOpt(optModule):
         n_samples = reward.shape[1]
         if not self.variance_reduction or n_samples <= 1:
             return reward
-        return n_samples * (reward - reward.mean(dim=1, keepdim=True)) / (n_samples - 1)
+        return (reward - reward.mean(dim=1, keepdim=True)) * (n_samples / (n_samples - 1))
 
 
 class perturbedOptFunc(Function):
@@ -278,23 +278,15 @@ class perturbedFenchelYoungFunc(Function):
         # solution expectation term in the Fenchel-Young gradient
         e_sol = module._calculate_expected_solution(cp, ptb_c, ptb_sols, noises)
         if module.optmodel.modelSense == EPO.MINIMIZE:
-            sign = -1.0
+            sign, diff = -1.0, w - e_sol
         elif module.optmodel.modelSense == EPO.MAXIMIZE:
-            sign = 1.0
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        # difference
-        if module.optmodel.modelSense == EPO.MINIMIZE:
-            diff = w - e_sol
-        elif module.optmodel.modelSense == EPO.MAXIMIZE:
-            diff = e_sol - w
+            sign, diff = 1.0, e_sol - w
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # Fenchel-Young loss: F(theta) - <theta, true_sol>
-        ptb_c_b = ptb_c.permute(1, 0, 2)
-        f_theta = torch.einsum("bnd,bnd->bn", sign * ptb_c_b, ptb_sols).mean(dim=1)
-        target_obj = torch.einsum("bd,bd->b", sign * cp, w)
-        loss = f_theta - target_obj
+        f_theta = torch.einsum("nbd,bnd->bn", ptb_c, ptb_sols).mean(dim=1)
+        target_obj = (cp * w).sum(dim=-1)
+        loss = sign * (f_theta - target_obj)
         # save solutions
         ctx.save_for_backward(diff)
         return loss
@@ -321,7 +313,9 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        return cp * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        # factor cached for reuse by _calculate_expected_solution in the same forward
+        self._last_factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        return cp * self._last_factor
 
     def _calculate_expected_solution(
         self,
@@ -330,7 +324,9 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
         ptb_sols: torch.Tensor,
         noises: torch.Tensor,
     ) -> torch.Tensor:
-        factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        factor = self.__dict__.pop("_last_factor", None)
+        if factor is None:
+            factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
         return (ptb_sols * factor.permute(1, 0, 2)).mean(dim=1)
 
 
@@ -438,7 +434,7 @@ class implicitMLEFunc(Function):
         # save
         ctx.save_for_backward(pred_cost)
         # add other objects to ctx
-        ctx.noises = noises
+        ctx.ptb_c = ptb_c
         ctx.ptb_sols = ptb_sols
         ctx.module = module
         return e_sol
@@ -448,26 +444,18 @@ class implicitMLEFunc(Function):
         """
         Backward pass for IMLE
         """
-        pred_cost, = ctx.saved_tensors
-        noises = ctx.noises
+        ptb_c = ctx.ptb_c
         ptb_sols = ctx.ptb_sols
         module = ctx.module
-        # convert tensor
-        cp = pred_cost.detach()
-        dl = grad_output.detach()
-        # positive perturbed costs
-        ptb_cp_pos = cp + module.lambd * dl + module.sigma * noises
-        # solve with perturbation
-        ptb_sols_pos = _solve_or_cache_3d(ptb_cp_pos, module)
+        delta = module.lambd * grad_output.detach()
         if module.two_sides:
-            # negative perturbed costs
-            ptb_cp_neg = cp - module.lambd * dl + module.sigma * noises
-            # solve with perturbation
-            ptb_sols_neg = _solve_or_cache_3d(ptb_cp_neg, module)
-            # get two-side gradient
+            # batch positive and negative perturbations into one solve
+            n = module.n_samples
+            combined_sols = _solve_or_cache_3d(torch.cat([ptb_c + delta, ptb_c - delta], dim=0), module)
+            ptb_sols_pos, ptb_sols_neg = combined_sols[:, :n], combined_sols[:, n:]
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + _EPS)
         else:
-            # get single side gradient
+            ptb_sols_pos = _solve_or_cache_3d(ptb_c + delta, module)
             grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (module.lambd + _EPS)
         return grad, None
 
@@ -544,10 +532,9 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         Backward pass for IMLE
         """
         pred_cost, = ctx.saved_tensors
-        noises = ctx.noises
+        ptb_c = ctx.ptb_c
         ptb_sols = ctx.ptb_sols
         module = ctx.module
-        # convert tensor
         cp = pred_cost.detach()
         dl = grad_output.detach()
         # calculate λ
@@ -556,19 +543,15 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             lambd = module.alpha * torch.norm(cp) / dl_norm
         else:
             lambd = 0.0
-        # positive perturbed costs
-        ptb_cp_pos = cp + lambd * dl + module.sigma * noises
-        # solve with perturbation
-        ptb_sols_pos = _solve_or_cache_3d(ptb_cp_pos, module)
+        delta = lambd * dl
         if module.two_sides:
-            # negative perturbed costs
-            ptb_cp_neg = cp - lambd * dl + module.sigma * noises
-            # solve with perturbation
-            ptb_sols_neg = _solve_or_cache_3d(ptb_cp_neg, module)
-            # get two-side gradient
+            # batch positive and negative perturbations into one solve
+            n = module.n_samples
+            combined_sols = _solve_or_cache_3d(torch.cat([ptb_c + delta, ptb_c - delta], dim=0), module)
+            ptb_sols_pos, ptb_sols_neg = combined_sols[:, :n], combined_sols[:, n:]
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + _EPS)
         else:
-            # get single side gradient
+            ptb_sols_pos = _solve_or_cache_3d(ptb_c + delta, module)
             grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
         # moving average of the gradient norm
         grad_norm = (grad.abs() > _EPS).float().mean()
