@@ -80,11 +80,12 @@ def getTspTour(
         threshold: activation threshold for an edge
 
     Returns:
-        list: node sequence of the tour (closes back to node 0 if reachable)
+        list: node sequence of the tour, starting and ending at node 0
 
     Raises:
-        ValueError: if the solution does not form a single connected tour
-            (skips nodes or contains disconnected subtours).
+        ValueError: if the solution does not form a single Hamiltonian tour
+            closed back to node 0 (skips nodes, contains disconnected subtours,
+            or the last visited node is not adjacent to 0).
     """
     # active edges
     edges = defaultdict(list)
@@ -98,10 +99,8 @@ def getTspTour(
             f"Solution does not cover all {num_nodes} nodes (got {len(edges)}); "
             "the model returned an infeasible TSP solution."
         )
-    # walk the tour starting from the first node with an active edge
-    start = next(iter(edges))
-    visited = {start}
-    tour = [start]
+    visited = {0}
+    tour = [0]
     while len(visited) < len(edges):
         i = tour[-1]
         for j in edges[i]:
@@ -115,6 +114,9 @@ def getTspTour(
                 "Solution contains disconnected subtours; cannot form a single "
                 "tour. Check that subtour elimination constraints are active."
             )
-    if 0 in edges[tour[-1]]:
-        tour.append(0)
+    if 0 not in edges[tour[-1]]:
+        raise ValueError(
+            f"Last visited node {tour[-1]} is not adjacent to node 0; tour does not close."
+        )
+    tour.append(0)
     return tour
