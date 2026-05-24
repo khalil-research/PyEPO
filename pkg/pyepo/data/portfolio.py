@@ -48,13 +48,12 @@ def genData(
     L = rnd.uniform(-2.5e-3 * noise_level, 2.5e-3 * noise_level, (m, p))
     # feature vectors
     x = rnd.normal(0, 1, (n, p))
-    # signal: per-asset mean return from features, applied across all rows at once
+    # signal
     r = (0.05 * (x @ B.T) / np.sqrt(p) + 0.1 ** (1 / deg)) ** deg
-    # noise: draw (f, eps) per row in one shot — equivalent to the loop's RNG order
-    # (C-order fill of (n, p+m) matches the per-i sequence of randn(p) then randn(m))
+    # noise: (f, eps) per row drawn together to match the per-i loop's RNG order
     fe = rnd.randn(n, p + m)
     F, E = fe[:, :p], fe[:, p:]
     r += F @ L.T + 0.01 * noise_level * E
-    # covariance matrix of the returns
+    # covariance
     cov = L @ L.T + (1e-2 * noise_level) ** 2 * np.eye(m)
     return cov, x, r

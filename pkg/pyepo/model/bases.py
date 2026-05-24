@@ -145,7 +145,7 @@ class tspABBase(optModel):
 
     @property
     def num_cost(self) -> int:
-        # MRO requires (tspABBase, backendBase): backend's len(self.x) holds 2*num_edges directed Vars
+        # use edges; backend's self.x has 2*num_edges directed Vars
         return len(self.edges)
 
     def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[int]:

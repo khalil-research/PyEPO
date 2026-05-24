@@ -93,8 +93,7 @@ def calRegret(
     # opt sol for pred cost
     optmodel.setObj(pred_cost)
     sol, _ = optmodel.solve()
-    # solver may return a torch tensor (MPAX backend) — convert without
-    # auto-casting Python lists to float32 (would silently downcast regret)
+    # MPAX backend returns a torch tensor; convert without coercing dtype
     if isinstance(sol, torch.Tensor):
         sol = sol.detach().cpu().numpy()
     # obj with true cost

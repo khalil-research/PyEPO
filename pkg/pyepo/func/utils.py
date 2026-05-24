@@ -41,7 +41,7 @@ def _solve_or_cache(cp: torch.Tensor, module: optModule) -> tuple[torch.Tensor, 
     if module._branch_rng.uniform() <= module.solve_ratio:
         sol, obj, solpool = _solve_in_pass(cp, optmodel, processes, pool, solpool)
     else:
-        # reaching the cache branch requires solve_ratio < 1, which forces __init__ to populate solpool
+        # cache branch implies solve_ratio < 1, so __init__ has populated solpool
         assert solpool is not None
         sol, obj, solpool = _cache_in_pass(cp, optmodel, solpool)
     module.solpool = solpool
@@ -240,14 +240,12 @@ class sumGammaDistribution:
         # torch path
         size_t = size if isinstance(size, tuple) else (size,)
         gen = _torch_generator(self._gen_cache, device, self.seed)
-        # stacked alpha
+        # alpha block: n_iterations on the leading axis for a single sampler call
         alpha = torch.full((self.n_iterations, *size_t), 1.0 / self.κ, device=device, dtype=dtype)
-        # single sample call
         gammas = torch._standard_gamma(alpha, generator=gen)
-        # per-iteration weights kappa/i
+        # per-iteration weights kappa/i, broadcast over the trailing sample axes
         weights = self.κ / torch.arange(1, self.n_iterations + 1, device=device, dtype=dtype)
         weights = weights.view(self.n_iterations, *([1] * len(size_t)))
-        # weighted sum
         samples = (gammas * weights).sum(dim=0)
         samples.sub_(math.log(self.n_iterations))
         samples.div_(self.κ)

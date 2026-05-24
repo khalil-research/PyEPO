@@ -91,7 +91,7 @@ class regularizedFrankWolfeOpt(optModule):
         # device, dtype, sizes
         batch, num_vars = theta.shape
         device, dtype = theta.device, theta.dtype
-        # sense-aware sign: flip so optmodel.solve always returns argmax direction.v
+        # sense sign: flip so optmodel.solve runs as argmax
         if self.optmodel.modelSense == EPO.MINIMIZE:
             sense_sign = -1.0
         elif self.optmodel.modelSense == EPO.MAXIMIZE:
@@ -277,7 +277,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         """
         # device, dtype
         device, dtype = theta.device, theta.dtype
-        # sense-aware sign: flip so optmodel.solve always returns argmax direction.v
+        # sense sign: flip so optmodel.solve runs as argmax
         if self.optmodel.modelSense == EPO.MINIMIZE:
             sense_sign = -1.0
         elif self.optmodel.modelSense == EPO.MAXIMIZE:

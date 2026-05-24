@@ -59,7 +59,7 @@ class optDataset(Dataset):
         self.costs = costs
         # find optimal solutions
         sols, objs = self._getSols()
-        # pre-convert to tensors (on CPU) to avoid repeated numpy→tensor copies
+        # pre-convert to CPU tensors to avoid repeated numpy→tensor copies
         self.feats = torch.as_tensor(feats, dtype=torch.float32)
         self.costs = torch.as_tensor(costs, dtype=torch.float32)
         self.sols = torch.as_tensor(sols, dtype=torch.float32)
@@ -96,7 +96,7 @@ class optDataset(Dataset):
         logger.info("Optimizing for optDataset (MPAX batched)...")
         self.model.setObj(self.costs)
         sols, objs = self.model.batch_optimize(self.model.c)
-        # np.array gives a writable copy (torch.as_tensor warns on JAX's read-only buffers)
+        # writable copy; torch.as_tensor warns on JAX read-only buffers
         sols_np = np.array(sols, dtype=np.float32)
         objs_np = np.array(objs, dtype=np.float32)
         # jitted_solve returns c·sol where setObj already negated c for MAX
@@ -196,7 +196,7 @@ class optDatasetKNN(optDataset):
         self.costs = costs
         # find optimal solutions
         sols, objs = self._getSols()
-        # pre-convert to tensors (on CPU) to avoid repeated numpy→tensor copies
+        # pre-convert to CPU tensors to avoid repeated numpy→tensor copies
         self.feats = torch.as_tensor(self.feats, dtype=torch.float32)
         self.costs = torch.as_tensor(self.costs, dtype=torch.float32)
         self.sols = torch.as_tensor(sols, dtype=torch.float32)

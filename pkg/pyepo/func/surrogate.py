@@ -191,7 +191,7 @@ class perturbationGradient(optModule):
         # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
-        # sense sign
+        # sense-flipped loss sign: MAX problems become minimization
         if self.optmodel.modelSense == EPO.MINIMIZE:
             sign = 1.0
         elif self.optmodel.modelSense == EPO.MAXIMIZE:

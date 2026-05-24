@@ -90,7 +90,7 @@ class optModule(nn.Module):
         if self.solve_ratio < 1 or require_solpool:  # init solution pool
             if not isinstance(dataset, optDataset):  # type checking
                 raise TypeError("dataset is not an optDataset")
-            # dedup the initial pool on whichever device dataset.sols lives
+            # dedup on dataset.sols' device
             self.solpool = torch.unique(dataset.sols, dim=0).clone()
         # per-instance RNG for the solve-vs-cache branch
         self._branch_rng = np.random.RandomState(seed)

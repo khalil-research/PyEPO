@@ -317,7 +317,7 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        # factor cached for reuse by _calculate_expected_solution in the same forward
+        # factor cached for _calculate_expected_solution to reuse within the same forward
         self._last_factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
         return cp * self._last_factor
 
@@ -580,7 +580,7 @@ def _solve_or_cache_3d(ptb_c: torch.Tensor, module: optModule) -> torch.Tensor:
     if module._branch_rng.uniform() <= module.solve_ratio:
         ptb_sols, solpool = _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool)
     else:
-        # cache branch only fires when solve_ratio < 1, which forces __init__ to populate solpool
+        # cache branch implies solve_ratio < 1, so __init__ has populated solpool
         assert solpool is not None
         ptb_sols, solpool = _cache_in_pass_3d(ptb_c, optmodel, solpool)
     module.solpool = solpool
