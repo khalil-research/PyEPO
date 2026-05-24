@@ -8,7 +8,9 @@ from pyepo.func.perturbed import (
     adaptiveImplicitMLE,
     implicitMLE,
     perturbedFenchelYoung,
+    perturbedFenchelYoungMul,
     perturbedOpt,
+    perturbedOptMul,
 )
 from pyepo.func.rank import listwiseLTR, pairwiseLTR, pointwiseLTR
 from pyepo.func.surrogate import SPOPlus, perturbationGradient
@@ -25,6 +27,8 @@ __all__ = [
     "pairwiseLTR",
     "perturbationGradient",
     "perturbedFenchelYoung",
+    "perturbedFenchelYoungMul",
     "perturbedOpt",
+    "perturbedOptMul",
     "pointwiseLTR",
 ]

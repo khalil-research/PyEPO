@@ -113,7 +113,8 @@ class TestNegativeIdentity:
 
 
 # ============================================================
-# Perturbed losses: perturbedOpt, perturbedFenchelYoung,
+# Perturbed losses: perturbedOpt, perturbedOptMul,
+#                   perturbedFenchelYoung, perturbedFenchelYoungMul,
 #                   implicitMLE, adaptiveImplicitMLE
 # ============================================================
 
@@ -128,11 +129,31 @@ class TestPerturbedOpt:
 
 
 @requires_gurobi
+class TestPerturbedOptMul:
+    def test_train(self, sp_data):
+        optmodel, dataset, loader = sp_data
+        predmodel = _fresh_predmodel()
+        ptb = pyepo.func.perturbedOptMul(optmodel, processes=1, n_samples=3, sigma=0.5)
+        _train_loop(ptb, loader, predmodel,
+                    lambda fn, cp, c, w, z: fn(cp).mean())
+
+
+@requires_gurobi
 class TestPerturbedFenchelYoung:
     def test_train(self, sp_data):
         optmodel, dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         pfy = pyepo.func.perturbedFenchelYoung(optmodel, processes=1, n_samples=3, sigma=1.0)
+        _train_loop(pfy, loader, predmodel,
+                    lambda fn, cp, c, w, z: fn(cp, w))
+
+
+@requires_gurobi
+class TestPerturbedFenchelYoungMul:
+    def test_train(self, sp_data):
+        optmodel, dataset, loader = sp_data
+        predmodel = _fresh_predmodel()
+        pfy = pyepo.func.perturbedFenchelYoungMul(optmodel, processes=1, n_samples=3, sigma=0.5)
         _train_loop(pfy, loader, predmodel,
                     lambda fn, cp, c, w, z: fn(cp, w))
 

@@ -31,15 +31,14 @@ if TYPE_CHECKING:
 
 class perturbedOpt(optModule):
     """
-    An autograd module for Fenchel-Young loss using perturbation techniques. The
-    use of the loss improves the algorithm by the specific expression of the
-    gradients of the loss.
+    A differentiable perturbed optimizer that estimates the expected solution
+    by solving randomly perturbed cost vectors.
 
-    For the perturbed optimizer, the cost vector needs to be predicted from
-    contextual data and is perturbed with Gaussian noise.
+    For the perturbed optimizer, the cost vector is predicted from contextual
+    data and perturbed with Gaussian noise.
 
-    Thus, it allows us to design an algorithm based on stochastic gradient
-    descent.
+    The custom backward pass provides a Monte Carlo gradient estimator for
+    stochastic gradient descent.
 
     Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
     """
@@ -57,10 +56,10 @@ class perturbedOpt(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            n_samples: number of Monte-Carlo samples
+            n_samples: number of Monte Carlo samples
             sigma: the amplitude of the perturbation
             processes: number of processors, 1 for single-core, 0 for all of cores
-            seed: random state seed
+            seed: random seed
             solve_ratio: the ratio of new solutions computed during training
             dataset: the training data
         """
@@ -78,6 +77,14 @@ class perturbedOpt(optModule):
         Forward pass
         """
         return cast("torch.Tensor", perturbedOptFunc.apply(pred_cost, self))
+
+    def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
+        """Perturbed cost from clean cost and noises."""
+        return cp + self.sigma * noises
+
+    def _grad_scale(self, cp: torch.Tensor) -> torch.Tensor | float:
+        """Divisor for the backward estimator."""
+        return self.n_samples * self.sigma + _EPS
 
 
 class perturbedOptFunc(Function):
@@ -110,16 +117,14 @@ class perturbedOptFunc(Function):
         noises = torch.randn(
             (module.n_samples, *cp.shape), device=device, dtype=torch.float32, generator=gen,
         )
-        ptb_c = cp + module.sigma * noises
+        ptb_c = module._perturb(cp, noises)
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
         # solution expectation
         e_sol = ptb_sols.mean(dim=1)
         # save solutions
-        ctx.save_for_backward(ptb_sols, noises)
-        # add other objects to ctx
-        ctx.n_samples = module.n_samples
-        ctx.sigma = module.sigma
+        ctx.save_for_backward(cp, ptb_sols, noises)
+        ctx.module = module
         return e_sol
 
     @staticmethod
@@ -127,26 +132,43 @@ class perturbedOptFunc(Function):
         """
         Backward pass for perturbed
         """
-        ptb_sols, noises = ctx.saved_tensors
-        n_samples = ctx.n_samples
-        sigma = ctx.sigma
+        cp, ptb_sols, noises = ctx.saved_tensors
         grad = torch.einsum("nbd,bn->bd", noises, torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
-        grad /= n_samples * sigma + _EPS
-        return grad, None
+        return grad / ctx.module._grad_scale(cp), None
+
+
+class perturbedOptMul(perturbedOpt):
+    """
+    Multiplicative-perturbation variant of perturbedOpt.
+
+    The perturbation ``cp * exp(sigma * noise - sigma**2 / 2)`` preserves the
+    sign of each cost entry, which is useful for sign-sensitive oracles.
+    This estimator assumes predicted costs already have the intended nonzero
+    sign. For nonnegative-cost problems, use a positive-output prediction layer,
+    such as Softplus plus a small epsilon.
+
+    Reference: <https://arxiv.org/abs/2207.13513>
+    """
+
+    def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
+        return cp * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+
+    def _grad_scale(self, cp: torch.Tensor) -> torch.Tensor:
+        denom = self.sigma * cp
+        sign = torch.where(denom >= 0, torch.ones_like(denom), -torch.ones_like(denom))
+        denom_safe = torch.where(denom.abs() < _EPS, sign * _EPS, denom)
+        return self.n_samples * denom_safe
 
 
 class perturbedFenchelYoung(optModule):
     """
-    An autograd module for Fenchel-Young loss using perturbation techniques. The
-    use of the loss improves the algorithm by the specific expression of the
-    gradients of the loss.
+    A perturbed Fenchel-Young loss using Monte Carlo perturbations.
 
-    For the perturbed optimizer, the cost vector needs to be predicted from
-    contextual data and is perturbed with Gaussian noise.
+    The cost vector is predicted from contextual data and perturbed with
+    Gaussian noise.
 
-    The Fenchel-Young loss allows directly optimizing a loss between the features
-    and solutions with less computation. Thus, it allows us to design an algorithm
-    based on stochastic gradient descent.
+    This loss directly compares the expected perturbed solution with the true
+    optimal solution, avoiding the extra task loss needed by perturbedOpt.
 
     Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
     """
@@ -165,10 +187,10 @@ class perturbedFenchelYoung(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            n_samples: number of Monte-Carlo samples
+            n_samples: number of Monte Carlo samples
             sigma: the amplitude of the perturbation
             processes: number of processors, 1 for single-core, 0 for all of cores
-            seed: random state seed
+            seed: random seed
             solve_ratio: the ratio of new solutions computed during training
             reduction: the reduction to apply to the output
             dataset: the training data
@@ -188,6 +210,10 @@ class perturbedFenchelYoung(optModule):
         """
         loss = cast("torch.Tensor", perturbedFenchelYoungFunc.apply(pred_cost, true_sol, self))
         return self._reduce(loss)
+
+    def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
+        """Perturbed cost from clean cost and noises."""
+        return cp + self.sigma * noises
 
 
 class perturbedFenchelYoungFunc(Function):
@@ -223,7 +249,7 @@ class perturbedFenchelYoungFunc(Function):
         noises = torch.randn(
             (module.n_samples, *cp.shape), device=device, dtype=torch.float32, generator=gen,
         )
-        ptb_c = cp + module.sigma * noises
+        ptb_c = module._perturb(cp, noises)
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
         # solution expectation
@@ -249,6 +275,21 @@ class perturbedFenchelYoungFunc(Function):
         (grad,) = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
         return grad * grad_output, None, None
+
+
+class perturbedFenchelYoungMul(perturbedFenchelYoung):
+    """
+    Multiplicative-perturbation variant of perturbedFenchelYoung.
+
+    This variant preserves the sign of each predicted cost entry. It assumes
+    predicted costs already have the intended nonzero sign; for nonnegative-cost
+    problems, use a positive-output prediction layer.
+
+    Reference: <https://arxiv.org/abs/2207.13513>
+    """
+
+    def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
+        return cp * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
 
 
 class implicitMLE(optModule):
@@ -282,7 +323,7 @@ class implicitMLE(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            n_samples: number of Monte-Carlo samples
+            n_samples: number of Monte Carlo samples
             sigma: noise temperature for the input distribution
             lambd: a hyperparameter for differentiable black-box to control interpolation degree
             distribution: noise distribution
@@ -419,7 +460,7 @@ class adaptiveImplicitMLE(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            n_samples: number of Monte-Carlo samples
+            n_samples: number of Monte Carlo samples
             sigma: noise temperature for the input distribution
             distribution: noise distribution
             two_sides: approximate gradient by two-sided perturbation or not

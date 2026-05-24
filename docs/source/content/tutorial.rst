@@ -1,7 +1,7 @@
 Tutorial
 ++++++++
 
-This guide demonstrates how to use ``PyEPO`` for modeling and solving predict-then-optimize problems.
+This guide walks through the main ``PyEPO`` workflow for predict-then-optimize problems: define an optimization model, build an optimization-aware dataset, choose a training module, train a predictor, and evaluate decision quality.
 
 .. toctree::
    :maxdepth: 2
