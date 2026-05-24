@@ -6,10 +6,10 @@ Shortest path problem
 from __future__ import annotations
 
 import numpy as np
-from coptpy import COPT, Envr
+from coptpy import COPT
 
 from pyepo.model.bases import shortestPathBase
-from pyepo.model.copt.coptmodel import optCoptModel
+from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
 
 
 class shortestPathModel(shortestPathBase, optCoptModel):
@@ -26,7 +26,7 @@ class shortestPathModel(shortestPathBase, optCoptModel):
         """
         A method to build COPT model
         """
-        m = Envr().createModel("shortest path")
+        m = _get_envr().createModel("shortest path")
         num_nodes = self.grid[0] * self.grid[1]
         num_arcs = len(self.arcs)
         x = m.addMVar(num_arcs, lb=0.0, ub=1.0, vtype=COPT.CONTINUOUS, nameprefix="x")

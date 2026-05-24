@@ -5,10 +5,10 @@ Portfolio problem
 
 from __future__ import annotations
 
-from coptpy import COPT, Envr
+from coptpy import COPT
 
 from pyepo.model.bases import portfolioBase
-from pyepo.model.copt.coptmodel import optCoptModel
+from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
 
 
 class portfolioModel(portfolioBase, optCoptModel):
@@ -29,7 +29,7 @@ class portfolioModel(portfolioBase, optCoptModel):
         Returns:
             tuple: optimization model and variables
         """
-        m = Envr().createModel("portfolio")
+        m = _get_envr().createModel("portfolio")
         x = m.addMVar(self.num_assets, lb=0.0, ub=1.0, vtype=COPT.CONTINUOUS, nameprefix="x")
         m.setObjSense(COPT.MAXIMIZE)
         m.addConstr(x.sum() == 1, "budget")

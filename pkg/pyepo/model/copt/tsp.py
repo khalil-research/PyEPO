@@ -9,10 +9,10 @@ from itertools import combinations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from coptpy import COPT, CallbackBase, Envr, LinExpr
+from coptpy import COPT, CallbackBase, LinExpr
 
 from pyepo.model.bases import tspABBase
-from pyepo.model.copt.coptmodel import optCoptModel
+from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
 from pyepo.utils import costToNumpy
 
@@ -69,7 +69,7 @@ class tspGGModel(tspABModel):
             tuple: optimization model and variables
         """
         # create a model
-        m = Envr().createModel("tsp")
+        m = _get_envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, nameprefix="x", vtype=COPT.BINARY)
@@ -118,7 +118,7 @@ class tspGGModelRel(tspGGModel):
             tuple: optimization model and variables
         """
         # create a model
-        m = Envr().createModel("tsp")
+        m = _get_envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)
@@ -211,7 +211,7 @@ class tspDFJModel(tspABModel):
             tuple: optimization model and variables
         """
         # create a model
-        m = Envr().createModel("tsp")
+        m = _get_envr().createModel("tsp")
         # variables
         x = m.addVars(self.edges, nameprefix="x", vtype=COPT.BINARY)
         for i, j in self.edges:
@@ -268,7 +268,7 @@ class tspMTZModel(tspABModel):
             tuple: optimization model and variables
         """
         # create a model
-        m = Envr().createModel("tsp")
+        m = _get_envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, nameprefix="x", vtype=COPT.BINARY)
@@ -311,7 +311,7 @@ class tspMTZModelRel(tspMTZModel):
             tuple: optimization model and variables
         """
         # create a model
-        m = Envr().createModel("tsp")
+        m = _get_envr().createModel("tsp")
         # variables
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, nameprefix="x", vtype=COPT.CONTINUOUS, lb=0, ub=1)

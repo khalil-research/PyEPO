@@ -6,10 +6,10 @@ Knapsack problem
 from __future__ import annotations
 
 import numpy as np
-from coptpy import COPT, Envr
+from coptpy import COPT
 
 from pyepo.model.bases import knapsackBase
-from pyepo.model.copt.coptmodel import optCoptModel
+from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
 
 
 class knapsackModel(knapsackBase, optCoptModel):
@@ -27,7 +27,7 @@ class knapsackModel(knapsackBase, optCoptModel):
         """
         A method to build COPT model
         """
-        m = Envr().createModel("knapsack")
+        m = _get_envr().createModel("knapsack")
         num_items = self.weights.shape[1]
         x = m.addMVar(num_items, vtype=COPT.BINARY, nameprefix="x")
         m.setObjSense(COPT.MAXIMIZE)
@@ -52,7 +52,7 @@ class knapsackModelRel(knapsackModel):
         """
         A method to build COPT model
         """
-        m = Envr().createModel("knapsack")
+        m = _get_envr().createModel("knapsack")
         num_items = self.weights.shape[1]
         x = m.addMVar(num_items, lb=0.0, ub=1.0, vtype=COPT.CONTINUOUS, nameprefix="x")
         m.setObjSense(COPT.MAXIMIZE)

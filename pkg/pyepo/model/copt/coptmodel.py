@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 try:
-    from coptpy import COPT, LinExpr
+    from coptpy import COPT, Envr, LinExpr
 
     try:
         from coptpy import MVar as _CoptMVar
@@ -32,6 +32,17 @@ if TYPE_CHECKING:
 
 def _is_mvar(x) -> bool:
     return _CoptMVar is not None and isinstance(x, _CoptMVar)
+
+
+_envr = None
+
+
+def _get_envr():
+    """Process-local COPT Envr singleton; avoids re-booting license/threads per model build."""
+    global _envr
+    if _envr is None:
+        _envr = Envr()
+    return _envr
 
 
 class optCoptModel(optModel):
