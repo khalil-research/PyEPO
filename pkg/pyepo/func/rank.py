@@ -148,7 +148,7 @@ class pairwiseLTR(optModule):
         else:
             diff = objpool_cp - objpool_cp_best
         # ranking loss; best-vs-best slot contributes 0
-        loss = self.relu(diff).sum(dim=1) / (solpool_size - 1)
+        loss = self.relu(diff).sum(dim=1) / max(solpool_size - 1, 1)
         return self._reduce(loss)
 
 
