@@ -215,6 +215,16 @@ class perturbedFenchelYoung(optModule):
         """Perturbed cost from clean cost and noises."""
         return cp + self.sigma * noises
 
+    def _calculate_expected_solution(
+        self,
+        cp: torch.Tensor,
+        ptb_c: torch.Tensor,
+        ptb_sols: torch.Tensor,
+        noises: torch.Tensor,
+    ) -> torch.Tensor:
+        """First gradient term for perturbed Fenchel-Young."""
+        return ptb_sols.mean(dim=1)
+
 
 class perturbedFenchelYoungFunc(Function):
     """
@@ -252,8 +262,14 @@ class perturbedFenchelYoungFunc(Function):
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
-        # solution expectation
-        e_sol = ptb_sols.mean(dim=1)
+        # solution expectation term in the Fenchel-Young gradient
+        e_sol = module._calculate_expected_solution(cp, ptb_c, ptb_sols, noises)
+        if module.optmodel.modelSense == EPO.MINIMIZE:
+            sign = -1.0
+        elif module.optmodel.modelSense == EPO.MAXIMIZE:
+            sign = 1.0
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # difference
         if module.optmodel.modelSense == EPO.MINIMIZE:
             diff = w - e_sol
@@ -261,8 +277,11 @@ class perturbedFenchelYoungFunc(Function):
             diff = e_sol - w
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        # loss
-        loss = torch.sum(diff**2, dim=1)
+        # Fenchel-Young loss: F(theta) - <theta, true_sol>
+        ptb_c_b = ptb_c.permute(1, 0, 2)
+        f_theta = torch.einsum("bnd,bnd->bn", sign * ptb_c_b, ptb_sols).mean(dim=1)
+        target_obj = torch.einsum("bd,bd->b", sign * cp, w)
+        loss = f_theta - target_obj
         # save solutions
         ctx.save_for_backward(diff)
         return loss
@@ -272,7 +291,7 @@ class perturbedFenchelYoungFunc(Function):
         """
         Backward pass for perturbed Fenchel-Young loss
         """
-        (grad,) = ctx.saved_tensors
+        grad, = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
         return grad * grad_output, None, None
 
@@ -290,6 +309,16 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
         return cp * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+
+    def _calculate_expected_solution(
+        self,
+        cp: torch.Tensor,
+        ptb_c: torch.Tensor,
+        ptb_sols: torch.Tensor,
+        noises: torch.Tensor,
+    ) -> torch.Tensor:
+        factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        return (ptb_sols * factor.permute(1, 0, 2)).mean(dim=1)
 
 
 class implicitMLE(optModule):
@@ -406,7 +435,7 @@ class implicitMLEFunc(Function):
         """
         Backward pass for IMLE
         """
-        (pred_cost,) = ctx.saved_tensors
+        pred_cost, = ctx.saved_tensors
         noises = ctx.noises
         ptb_sols = ctx.ptb_sols
         module = ctx.module
@@ -501,7 +530,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         """
         Backward pass for IMLE
         """
-        (pred_cost,) = ctx.saved_tensors
+        pred_cost, = ctx.saved_tensors
         noises = ctx.noises
         ptb_sols = ctx.ptb_sols
         module = ctx.module
