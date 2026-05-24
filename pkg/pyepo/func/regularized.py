@@ -78,6 +78,7 @@ class regularizedFrankWolfeOpt(optModule):
         """
         return 0.5 * self.lambd * (y ** 2).sum(dim=-1)
 
+    @torch.no_grad()
     def _frankWolfe(
         self, theta: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -273,6 +274,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         )
         return self._reduce(loss)
 
+    @torch.no_grad()
     def _frankWolfe(
         self, theta: torch.Tensor,
     ) -> torch.Tensor:
