@@ -60,6 +60,8 @@ class knapsackBase(optModel):
         items (list): item indices
     """
 
+    modelSense = EPO.MAXIMIZE
+
     def __init__(
         self,
         weights: np.ndarray | list,
@@ -75,7 +77,6 @@ class knapsackBase(optModel):
         self.weights = np.asarray(weights)
         self.capacity = np.asarray(capacity)
         self.items = list(range(self.weights.shape[1]))
-        self.modelSense = EPO.MAXIMIZE
         super().__init__(*args, **kwargs)
 
     @property
@@ -92,6 +93,8 @@ class portfolioBase(optModel):
         covariance (np.ndarray): asset return covariance matrix
         risk_level (float): risk budget = gamma * mean(covariance)
     """
+
+    modelSense = EPO.MAXIMIZE
 
     def __init__(
         self,
@@ -110,7 +113,6 @@ class portfolioBase(optModel):
         self.num_assets = num_assets
         self.covariance = np.asarray(covariance)
         self.risk_level = gamma * np.mean(self.covariance)
-        self.modelSense = EPO.MAXIMIZE
         super().__init__(*args, **kwargs)
 
     @property

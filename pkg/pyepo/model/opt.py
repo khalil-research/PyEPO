@@ -26,12 +26,9 @@ class optModel(ABC):
         _model (optimization model): underlying solver model object
     """
 
-    modelSense: ModelSense
+    modelSense: ModelSense = EPO.MINIMIZE
 
     def __init__(self) -> None:
-        # default sense
-        if not hasattr(self, "modelSense"):
-            self.modelSense = EPO.MINIMIZE
         self._model, self.x = self._getModel()
 
     def __repr__(self) -> str:
