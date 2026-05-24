@@ -9,7 +9,7 @@ from itertools import combinations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from coptpy import COPT, CallbackBase, Envr
+from coptpy import COPT, CallbackBase, Envr, LinExpr
 
 from pyepo.model.bases import tspABBase
 from pyepo.model.copt.coptmodel import optCoptModel
