@@ -1884,17 +1884,12 @@ class TestMpaxShortestPathModel:
         np.testing.assert_allclose(obj0, obj1, atol=1e-3)
 
     @requires_mpax_gurobi
-    def test_addConstr_binding(self, model):
-        # forces sum(x) >= 5, making at least 5 arcs active in 3x3 grid
+    def test_addConstr_matches_gurobi(self, model):
+        # PyEPO convention: addConstr enforces `coefs · x <= rhs`; verify mpax matches grb
         cost = np.random.RandomState(42).rand(12)
-        model.setObj(cost)
-        _, obj0 = model.solve()
         mpax_constrained = model.addConstr([1.0] * 12, 5.0)
         mpax_constrained.setObj(cost)
         _, mpax_obj = mpax_constrained.solve()
-        # binding constraint must increase (or hold equal in pathological cases) the obj
-        assert mpax_obj >= obj0 - 1e-3
-        # reference solution from gurobi with the same extra constraint
         grb_constrained = shortestPathModel(grid=(3, 3)).addConstr(np.ones(12), 5.0)
         grb_constrained.setObj(cost)
         _, grb_obj = grb_constrained.solve()

@@ -192,8 +192,9 @@ class optMpaxModel(optModel):
         """
         if len(coefs) != self.num_cost:
             raise ValueError("Size of coef vector does not match number of cost variables.")
-        # convert coefs to jnp
-        coefs = jnp.array(coefs, dtype=jnp.float32).reshape(1, -1)
+        # PyEPO addConstr convention is `coefs · x <= rhs`; MPAX stores G x >= h, so flip signs
+        coefs = -jnp.array(coefs, dtype=jnp.float32).reshape(1, -1)
+        rhs = -float(rhs)
         # copy
         new_model = self.copy()
         # add constraint
