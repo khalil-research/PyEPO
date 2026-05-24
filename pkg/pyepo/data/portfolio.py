@@ -43,21 +43,18 @@ def genData(
     p = num_features
     # number of assets
     m = num_assets
-    # random matrix parameter B
+    # random matrix parameters
     B = rnd.binomial(1, 0.5, (m, p))
-    # random matrix parameter L
-    L = rnd.uniform(-2.5e-3 * noise_level, 2.5e-3 * noise_level, (num_assets, num_features))
+    L = rnd.uniform(-2.5e-3 * noise_level, 2.5e-3 * noise_level, (m, p))
     # feature vectors
     x = rnd.normal(0, 1, (n, p))
-    # mean return of assets
-    r = np.zeros((n, m))
-    for i in range(n):
-        # mean return of assets
-        r[i] = (0.05 * np.dot(B, x[i].reshape(p, 1)).T / np.sqrt(p) + 0.1 ** (1 / deg)) ** deg
-        # random noise
-        f = rnd.randn(num_features)
-        eps = rnd.randn(num_assets)
-        r[i] += L @ f + 0.01 * noise_level * eps
+    # signal: per-asset mean return from features, applied across all rows at once
+    r = (0.05 * (x @ B.T) / np.sqrt(p) + 0.1 ** (1 / deg)) ** deg
+    # noise: draw (f, eps) per row in one shot — equivalent to the loop's RNG order
+    # (C-order fill of (n, p+m) matches the per-i sequence of randn(p) then randn(m))
+    fe = rnd.randn(n, p + m)
+    F, E = fe[:, :p], fe[:, p:]
+    r += F @ L.T + 0.01 * noise_level * E
     # covariance matrix of the returns
-    cov = L @ L.T + (1e-2 * noise_level) ** 2 * np.eye(num_assets)
+    cov = L @ L.T + (1e-2 * noise_level) ** 2 * np.eye(m)
     return cov, x, r
