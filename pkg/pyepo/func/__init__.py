@@ -13,6 +13,7 @@ from pyepo.func.perturbed import (
     perturbedOptMul,
 )
 from pyepo.func.rank import listwiseLTR, pairwiseLTR, pointwiseLTR
+from pyepo.func.regularized import regularizedFrankWolfeFenchelYoung, regularizedFrankWolfeOpt
 from pyepo.func.surrogate import SPOPlus, perturbationGradient
 
 __all__ = [
@@ -31,4 +32,6 @@ __all__ = [
     "perturbedOpt",
     "perturbedOptMul",
     "pointwiseLTR",
+    "regularizedFrankWolfeFenchelYoung",
+    "regularizedFrankWolfeOpt",
 ]

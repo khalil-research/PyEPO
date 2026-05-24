@@ -30,6 +30,14 @@ The modules differ mainly in what they return and what supervision they use:
      - loss
      - true optimal solutions
      - PFYL; use the multiplicative variant for sign-sensitive oracles
+   * - ``regularizedFrankWolfeOpt``
+     - regularized predicted solutions
+     - task loss chosen by the user
+     - L2-regularized smooth optimizer over the convex hull of feasible solutions
+   * - ``regularizedFrankWolfeFenchelYoung``
+     - loss
+     - true optimal solutions
+     - Fenchel-Young loss paired with L2-regularized Frank-Wolfe
    * - ``NCE`` / ``contrastiveMAP``
      - loss
      - true optimal solutions and a solution pool
@@ -145,6 +153,26 @@ Both PFYL variants support parallel computation. ``n_samples`` is the number of 
    pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
    # multiplicative PFYL
    pfy_mul = pyepo.func.perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+
+L2 Regularized Frank-Wolfe (RFWO)
+=================================
+
+RFWO [#f6]_ returns a smooth solution in the convex hull of feasible solutions. PyEPO implements the L2 special case ``Omega(y) = lambd / 2 * ||y||^2``.
+
+.. autoclass:: pyepo.func.regularizedFrankWolfeOpt
+    :noindex:
+    :members:
+
+
+L2 Regularized Frank-Wolfe Fenchel-Young Loss (RFYL)
+====================================================
+
+RFYL [#f6]_ computes the Fenchel-Young loss paired with the L2 regularized Frank-Wolfe layer.
+
+.. autoclass:: pyepo.func.regularizedFrankWolfeFenchelYoung
+    :noindex:
+    :members:
+
 
 Noise Contrastive Estimation (NCE)
 ===================================

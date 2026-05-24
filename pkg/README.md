@@ -4,7 +4,7 @@
 
 ## Features
 
-- Implement **SPO+**, **DBB**, **NID**, **DPO** (additive and multiplicative perturbations), **PFYL** (additive and multiplicative perturbations), **NCE**, **LTR**, **I-MLE**, **AI-MLE**, and **PG**
+- Implement **SPO+**, **DBB**, **NID**, **DPO** (additive and multiplicative perturbations), **PFYL** (additive and multiplicative perturbations), L2-regularized **RFWO/RFYL**, **NCE**, **LTR**, **I-MLE**, **AI-MLE**, and **PG**
 - Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
 - Support parallel computing for optimization solvers
 - Support solution caching to speed up training

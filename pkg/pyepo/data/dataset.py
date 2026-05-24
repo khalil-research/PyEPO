@@ -14,7 +14,13 @@ from scipy.spatial import distance
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
+from pyepo import EPO
 from pyepo.model.opt import optModel
+
+try:
+    from pyepo.model.mpax import optMpaxModel
+except ImportError:
+    optMpaxModel = None  # type: ignore[assignment]
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +69,9 @@ class optDataset(Dataset):
         """
         A method to get optimal solutions for all cost vectors
         """
+        # MPAX fast path: vmap-solve the whole dataset in a single dispatch
+        if optMpaxModel is not None and isinstance(self.model, optMpaxModel):
+            return self._getSolsMpaxBatch()
         sols = []
         objs = []
         logger.info("Optimizing for optDataset...")
@@ -79,6 +88,21 @@ class optDataset(Dataset):
             sols.append(np.asarray(sol))
             objs.append(obj)
         return np.stack(sols), np.asarray(objs).reshape(-1, 1)
+
+    def _getSolsMpaxBatch(self) -> tuple[np.ndarray, np.ndarray]:
+        """
+        A method to batch-solve every cost vector in one MPAX vmap call.
+        """
+        logger.info("Optimizing for optDataset (MPAX batched)...")
+        self.model.setObj(self.costs)
+        sols, objs = self.model.batch_optimize(self.model.c)
+        # np.array gives a writable copy (torch.as_tensor warns on JAX's read-only buffers)
+        sols_np = np.array(sols, dtype=np.float32)
+        objs_np = np.array(objs, dtype=np.float32)
+        # jitted_solve returns c·sol where setObj already negated c for MAX
+        if self.model.modelSense == EPO.MAXIMIZE:
+            objs_np = -objs_np
+        return sols_np, objs_np.reshape(-1, 1)
 
     def _solve(
         self,

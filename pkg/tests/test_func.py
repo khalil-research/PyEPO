@@ -277,3 +277,170 @@ class TestSPOPlusGradient:
             cp_new = cp - 0.1 * cp.grad
         loss1 = spo(cp_new, c_true, w_true, z_true)
         assert loss1.item() <= loss0.item() + 1e-6
+
+
+# ============================================================
+# Frank-Wolfe inner loop (used by regularizedFrankWolfeOpt)
+# ============================================================
+
+@requires_gurobi
+class TestFrankWolfeBatched:
+
+    def _ks(self):
+        return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
+
+    def test_extreme_theta_collapses_to_vertex(self):
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+        m = regularizedFrankWolfeOpt(self._ks(), max_iter=10, tol=1e-6)
+        theta = torch.tensor([[100.0, -100.0, -100.0, -100.0]])
+        mu, vertices, weights = m._frankWolfe(theta)
+        assert mu.shape == (1, 4)
+        assert mu[0, 0].item() > 0.99
+        assert vertices.shape[1:] == (1, 4)
+        assert weights.shape == vertices.shape[:2]
+        assert weights.sum(dim=0)[0].item() == pytest.approx(1.0, abs=1e-5)
+
+    def test_mu_equals_weighted_sum_of_vertices(self):
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+        m = regularizedFrankWolfeOpt(self._ks(), max_iter=12, tol=1e-6)
+        theta = torch.tensor([[1.0, 1.5, 2.0, 0.5],
+                              [2.0, 1.0, 1.0, 2.0]])
+        mu, V, w = m._frankWolfe(theta)
+        mu_check = (w.unsqueeze(-1) * V).sum(dim=0)
+        assert torch.allclose(mu, mu_check, atol=1e-5)
+
+    def test_converged_instances_are_skipped(self, monkeypatch):
+        import pyepo.func.regularized as regularized
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+
+        batch_sizes = []
+
+        def fake_solve_or_cache(cp, module):
+            batch_sizes.append(cp.shape[0])
+            if len(batch_sizes) == 1:
+                sol = torch.zeros_like(cp)
+            else:
+                sol = cp.clone()
+            return sol, torch.zeros(cp.shape[0], dtype=cp.dtype, device=cp.device)
+
+        monkeypatch.setattr(regularized, "_solve_or_cache", fake_solve_or_cache)
+        m = regularizedFrankWolfeOpt(self._ks(), max_iter=3, tol=1e-6)
+        theta = torch.tensor([[0.0, 0.0, 0.0, 0.0],
+                              [1.0, 0.0, 0.0, 0.0]])
+
+        m._frankWolfe(theta)
+
+        assert batch_sizes == [2, 2, 1]
+
+
+# ============================================================
+# regularizedFrankWolfeOpt: lambd validation, regularization, gradient correctness
+# ============================================================
+
+@requires_gurobi
+class TestRegularizedFrankWolfe:
+
+    def _ks(self):
+        return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
+
+    def test_lambd_must_be_positive(self):
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+        with pytest.raises(ValueError):
+            regularizedFrankWolfeOpt(self._ks(), lambd=0.0)
+        with pytest.raises(ValueError):
+            regularizedFrankWolfeOpt(self._ks(), lambd=-1.0)
+
+    def test_compute_regularization_includes_lambd(self):
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+        m = regularizedFrankWolfeOpt(self._ks(), lambd=3.0, max_iter=5)
+        y = torch.tensor([[0.5, 0.5, 0.0, 0.0]])
+        # Omega(y) = (lambd / 2) * ||y||^2 = 1.5 * 0.5 = 0.75
+        assert torch.allclose(m.compute_regularization(y), torch.tensor([0.75]))
+
+    def test_smaller_lambd_closer_to_IP_vertex(self):
+        # Small lambd makes mu approach a conv(V) vertex (= IP optimum for this
+        # Gurobi oracle); large lambd keeps mu inside conv(V).
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+        opt = self._ks()
+        # MAXIMIZE knapsack: weights [3,4,2,5], cap 7, profits cp = [4,3,2,1].
+        # Gurobi binary IP optimum: items {0,1} (weight 7, value 7).
+        cp = torch.tensor([[4.0, 3.0, 2.0, 1.0]])
+        ip_sol = torch.tensor([[1.0, 1.0, 0.0, 0.0]])
+        out_sharp = regularizedFrankWolfeOpt(opt, lambd=0.05, max_iter=30)(cp)
+        out_smooth = regularizedFrankWolfeOpt(opt, lambd=10.0, max_iter=30)(cp)
+        assert (out_sharp - ip_sol).norm().item() < (out_smooth - ip_sol).norm().item()
+
+
+@requires_gurobi
+class TestRegularizedFrankWolfeGradient:
+    """Check regularizedFrankWolfeOpt autograd against finite-difference Jacobian. Primary
+    correctness gate, mirrors the pattern of TestSPOPlusGradient."""
+
+    @pytest.mark.parametrize("lambd", [0.5, 1.0, 5.0])
+    def test_backward_matches_finite_difference(self, lambd):
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+        opt = knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
+        m = regularizedFrankWolfeOpt(opt, lambd=lambd, max_iter=30, tol=1e-8)
+        torch.manual_seed(0)
+        # cp in [1, 3]: positive and away from 0 (avoids active-set boundary
+        # ambiguity in the projection)
+        cp = (torch.rand(1, 4) * 2 + 1.0).requires_grad_(True)
+        target = torch.randn_like(cp)
+        (target * m(cp)).sum().backward()
+        analytic = cp.grad.clone()
+        eps = 5e-3
+        fd = torch.zeros_like(cp)
+        for j in range(cp.shape[1]):
+            cp_p = cp.detach().clone(); cp_p[0, j] += eps
+            cp_m = cp.detach().clone(); cp_m[0, j] -= eps
+            fd[0, j] = ((target * m(cp_p)).sum() - (target * m(cp_m)).sum()) / (2 * eps)
+        np.testing.assert_allclose(analytic.numpy(), fd.numpy(), atol=5e-2,
+            err_msg=f"lambd={lambd}")
+
+
+@requires_gurobi
+class TestRegularizedFrankWolfeFenchelYoung:
+
+    def _ks(self):
+        return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
+
+    def test_forward_matches_half_square_fenchel_young_formula(self):
+        from pyepo.func.regularized import regularizedFrankWolfeFenchelYoung
+        opt = self._ks()
+        lambd = 1.7
+        fy = regularizedFrankWolfeFenchelYoung(
+            opt, lambd=lambd, max_iter=30, tol=1e-8, reduction="none"
+        )
+        cp = torch.tensor([[4.0, 3.0, 2.0, 1.0],
+                           [1.0, 2.0, 3.0, 4.0]])
+        w = torch.tensor([[1.0, 1.0, 0.0, 0.0],
+                          [0.0, 0.0, 1.0, 1.0]])
+
+        loss = fy(cp, w)
+        r_sol = fy._frankWolfe(cp / lambd)
+        omega_w = 0.5 * lambd * (w ** 2).sum(dim=-1)
+        omega_r = 0.5 * lambd * (r_sol ** 2).sum(dim=-1)
+        expected = omega_w - omega_r + torch.sum(cp * (r_sol - w), dim=1)
+
+        assert torch.allclose(loss, expected, atol=1e-5)
+
+    def test_backward_matches_fenchel_young_subgradient(self):
+        from pyepo.func.regularized import regularizedFrankWolfeFenchelYoung
+        opt = self._ks()
+        lambd = 1.0
+        fy = regularizedFrankWolfeFenchelYoung(
+            opt, lambd=lambd, max_iter=30, tol=1e-8, reduction="mean"
+        )
+        cp = torch.tensor([[4.0, 3.0, 2.0, 1.0],
+                           [1.0, 2.0, 3.0, 4.0]], requires_grad=True)
+        w = torch.tensor([[1.0, 1.0, 0.0, 0.0],
+                          [0.0, 0.0, 1.0, 1.0]])
+
+        loss = fy(cp, w)
+        loss.backward()
+
+        with torch.no_grad():
+            r_sol = fy._frankWolfe(cp.detach() / lambd)
+            expected = (r_sol - w) / cp.shape[0]
+
+        assert torch.allclose(cp.grad, expected, atol=1e-5)

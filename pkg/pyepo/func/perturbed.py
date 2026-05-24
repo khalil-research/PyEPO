@@ -50,6 +50,7 @@ class perturbedOpt(optModule):
         sigma: float = 1.0,
         processes: int = 1,
         seed: int = 135,
+        variance_reduction: bool = True,
         solve_ratio: float = 1.0,
         dataset: optDataset | None = None,
     ) -> None:
@@ -60,6 +61,7 @@ class perturbedOpt(optModule):
             sigma: the amplitude of the perturbation
             processes: number of processors, 1 for single-core, 0 for all of cores
             seed: random seed
+            variance_reduction: use a leave-one-out baseline for the Monte Carlo backward estimator
             solve_ratio: the ratio of new solutions computed during training
             dataset: the training data
         """
@@ -70,6 +72,8 @@ class perturbedOpt(optModule):
         self.sigma = sigma
         # random state
         self.seed = seed
+        # variance reduction
+        self.variance_reduction = variance_reduction
         self._gen_cache: dict[str, torch.Generator] = {}
 
     def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:
@@ -85,6 +89,13 @@ class perturbedOpt(optModule):
     def _grad_scale(self, cp: torch.Tensor) -> torch.Tensor | float:
         """Divisor for the backward estimator."""
         return self.n_samples * self.sigma + _EPS
+
+    def _apply_variance_reduction(self, reward: torch.Tensor) -> torch.Tensor:
+        """Apply a leave-one-out baseline to sample rewards."""
+        n_samples = reward.shape[1]
+        if not self.variance_reduction or n_samples <= 1:
+            return reward
+        return n_samples * (reward - reward.mean(dim=1, keepdim=True)) / (n_samples - 1)
 
 
 class perturbedOptFunc(Function):
@@ -133,7 +144,9 @@ class perturbedOptFunc(Function):
         Backward pass for perturbed
         """
         cp, ptb_sols, noises = ctx.saved_tensors
-        grad = torch.einsum("nbd,bn->bd", noises, torch.einsum("bnd,bd->bn", ptb_sols, grad_output))
+        reward = torch.einsum("bnd,bd->bn", ptb_sols, grad_output)
+        reward = ctx.module._apply_variance_reduction(reward)
+        grad = torch.einsum("nbd,bn->bd", noises, reward)
         return grad / ctx.module._grad_scale(cp), None
 
 

@@ -247,6 +247,35 @@ Here ``positive_predmodel`` denotes a predictor whose output is constrained to t
            optimizer.step()
 
 
+Training with RFWO
+==================
+
+The regularized Frank-Wolfe optimizer returns a smooth solution in the convex hull of feasible solutions. Since it returns a solution rather than a loss, define a task loss explicitly, for example MSE between the regularized solution and the true optimal solution.
+
+.. code-block:: python
+
+   rfwo = pyepo.func.regularizedFrankWolfeOpt(
+       optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
+   criterion = nn.MSELoss()
+
+   def rfwomse(cp, w):
+       wr = rfwo(cp)
+       return criterion(wr, w)
+
+
+Training with RFYL
+==================
+
+Regularized Frank-Wolfe Fenchel-Young loss computes the L2 regularized Fenchel-Young objective directly from predicted costs and true optimal solutions.
+
+.. code-block:: python
+
+   rfyl = pyepo.func.regularizedFrankWolfeFenchelYoung(
+       optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
+
+   loss = rfyl(cp, w)
+
+
 Training with NCE
 =================
 

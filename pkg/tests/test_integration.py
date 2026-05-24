@@ -138,6 +138,27 @@ class TestPerturbedOptMul:
                     lambda fn, cp, c, w, z: fn(cp).mean())
 
 
+def test_perturbed_opt_variance_reduction_uses_leave_one_out_baseline():
+    ptb = pyepo.func.perturbedOpt.__new__(pyepo.func.perturbedOpt)
+    ptb.variance_reduction = True
+    reward = torch.tensor([[1.0, 2.0, 4.0],
+                           [3.0, 3.0, 9.0]])
+
+    expected = reward.shape[1] * (reward - reward.mean(dim=1, keepdim=True)) / (reward.shape[1] - 1)
+    actual = ptb._apply_variance_reduction(reward)
+
+    assert torch.allclose(actual, expected)
+
+
+def test_perturbed_opt_variance_reduction_skips_single_sample():
+    ptb = pyepo.func.perturbedOpt.__new__(pyepo.func.perturbedOpt)
+    ptb.variance_reduction = True
+    reward = torch.tensor([[1.0],
+                           [3.0]])
+
+    assert torch.equal(ptb._apply_variance_reduction(reward), reward)
+
+
 @requires_gurobi
 class TestPerturbedFenchelYoung:
     def test_train(self, sp_data):
@@ -158,6 +179,25 @@ class TestPerturbedFenchelYoungMul:
                     lambda fn, cp, c, w, z: fn(cp, w))
 
 
+def test_perturbed_fenchel_young_mul_uses_weighted_expected_solution():
+    pfy = pyepo.func.perturbedFenchelYoungMul.__new__(pyepo.func.perturbedFenchelYoungMul)
+    pfy.sigma = 0.5
+    noises = torch.tensor([
+        [[0.0, 1.0, -1.0]],
+        [[0.5, -0.5, 0.25]],
+    ])
+    ptb_sols = torch.tensor([
+        [[1.0, 0.0, 1.0],
+         [0.0, 1.0, 1.0]],
+    ])
+
+    factor = torch.exp(pfy.sigma * noises - 0.5 * pfy.sigma**2)
+    expected = (ptb_sols * factor.permute(1, 0, 2)).mean(dim=1)
+    actual = pfy._calculate_expected_solution(None, None, ptb_sols, noises)
+
+    assert torch.allclose(actual, expected)
+
+
 @requires_gurobi
 class TestImplicitMLE:
     def test_train(self, sp_data):
@@ -176,6 +216,32 @@ class TestAdaptiveImplicitMLE:
         aimle = pyepo.func.adaptiveImplicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0)
         _train_loop(aimle, loader, predmodel,
                     lambda fn, cp, c, w, z: fn(cp).mean())
+
+
+# ============================================================
+# Regularized Frank-Wolfe + Fenchel-Young loss
+# ============================================================
+
+@requires_gurobi
+class TestRegularizedFrankWolfe:
+    def test_train(self, sp_data):
+        optmodel, dataset, loader = sp_data
+        predmodel = _fresh_predmodel()
+        rfw = pyepo.func.regularizedFrankWolfeOpt(optmodel, lambd=1.0, max_iter=10, processes=1)
+        mse = torch.nn.MSELoss()
+        _train_loop(rfw, loader, predmodel,
+                    lambda fn, cp, c, w, z: mse(fn(cp), w))
+
+
+@requires_gurobi
+class TestRegularizedFrankWolfeFenchelYoung:
+    def test_train(self, sp_data):
+        optmodel, dataset, loader = sp_data
+        predmodel = _fresh_predmodel()
+        fy = pyepo.func.regularizedFrankWolfeFenchelYoung(
+            optmodel, lambd=1.0, max_iter=10, processes=1)
+        _train_loop(fy, loader, predmodel,
+                    lambda fn, cp, c, w, z: fn(cp, w))
 
 
 # ============================================================
