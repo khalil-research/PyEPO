@@ -76,9 +76,9 @@ class optDataset(Dataset):
                 raise ValueError(
                     "For optModel, the method 'solve' should return solution vector and objective value."
                 ) from e
-            sols.append(sol)
-            objs.append([obj])
-        return np.array(sols), np.array(objs)
+            sols.append(np.asarray(sol))
+            objs.append(obj)
+        return np.stack(sols), np.asarray(objs).reshape(-1, 1)
 
     def _solve(
         self,
@@ -206,10 +206,10 @@ class optDatasetKNN(optDataset):
             sol = sol_knn.mean(axis=1)
             obj = obj_knn.mean()
             sols.append(sol)
-            objs.append([obj])
+            objs.append(obj)
         # update cost as average kNN
         self.costs = costs_knn.mean(axis=2)
-        return np.array(sols), np.array(objs)
+        return np.stack(sols), np.asarray(objs).reshape(-1, 1)
 
     def _getKNN(self) -> np.ndarray:
         """
