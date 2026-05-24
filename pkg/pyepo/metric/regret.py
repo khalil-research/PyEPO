@@ -11,6 +11,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
+from pyepo.func.utils import _solve_batch
 from pyepo.utils import _EPS, costToNumpy
 
 if TYPE_CHECKING:
@@ -38,24 +39,32 @@ def regret(
     """
     # evaluate
     predmodel.eval()
-    loss = 0
-    optsum = 0
+    loss = 0.0
+    optsum = 0.0
     # get device
     device = next(predmodel.parameters()).device
     try:
         # load data
         for data in dataloader:
-            x, c, w, z = data
-            x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
-            # predict
+            x, c, _, z = data
+            x, c, z = x.to(device), c.to(device), z.to(device)
+            # predict and batch-solve all instances in one call
             with torch.no_grad():
-                cp = costToNumpy(predmodel(x))
+                cp = predmodel(x)
+            sols, _ = _solve_batch(cp, optmodel, processes=1, pool=None)
+            # vectorized regret accumulation (one host sync per batch)
+            sols_np = costToNumpy(sols)
             c_np = costToNumpy(c)
-            # solve
-            for i in range(cp.shape[0]):
-                # accumulate loss
-                loss += calRegret(optmodel, cp[i], c_np[i], z[i].item())
-            optsum += abs(z).sum().item()
+            z_np = costToNumpy(z).reshape(-1)
+            obj = np.einsum("bi,bi->b", sols_np, c_np)
+            if optmodel.modelSense == EPO.MINIMIZE:
+                batch_loss = obj - z_np
+            elif optmodel.modelSense == EPO.MAXIMIZE:
+                batch_loss = z_np - obj
+            else:
+                raise ValueError("Invalid modelSense.")
+            loss += float(batch_loss.sum())
+            optsum += float(np.abs(z_np).sum())
     finally:
         # restore training mode even if evaluation raises
         predmodel.train()
