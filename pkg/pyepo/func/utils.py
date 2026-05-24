@@ -13,7 +13,7 @@ import torch
 
 from pyepo import EPO
 from pyepo.model.mpax import optMpaxModel
-from pyepo.utils import costToNumpy, getArgs
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     from pyepo.func.abcmodule import optModule
@@ -110,15 +110,10 @@ def _solve_batch(
         # stack + dtype convert in a single call
         sol = torch.as_tensor(np.asarray(sol_list, dtype=np.float32)).to(device)
         obj = torch.tensor(obj_list, dtype=torch.float32, device=device)
-    # multi-core
+    # multi-core (workers pre-loaded with optmodel via pool initializer)
     else:
         cp = costToNumpy(cp)
-        # get class
-        model_type = type(optmodel)
-        # get args
-        args = getArgs(optmodel)
-        # parallel computing
-        res = pool.amap(_solveWithObj4Par, cp, [args] * ins_num, [model_type] * ins_num).get()
+        res = pool.amap(_solveWithObj4Par, cp).get()
         # get res
         sol = torch.as_tensor(np.stack([r[0] for r in res]), dtype=torch.float32).to(device)
         obj = torch.tensor([r[1] for r in res], dtype=torch.float32, device=device)
@@ -172,40 +167,21 @@ def _cache_in_pass(
     return sol, obj, solpool
 
 
-# worker-local model cache (persists across calls in pathos worker processes)
+# per-worker optmodel, built by `_init_worker_model` at pool startup
 _worker_model = None
-_worker_model_key = None
 
 
-def _solveWithObj4Par(
-    cost: np.ndarray,
-    args: dict,
-    model_type: type,
-) -> tuple[np.ndarray, float]:
-    """
-    A function to solve function in parallel processors
+def _init_worker_model(model_type: type, args: dict) -> None:
+    """Pool-initializer hook: build the optmodel once per worker process."""
+    global _worker_model
+    _worker_model = model_type(**args)
 
-    Args:
-        cost: cost of objective function
-        args: optModel args
-        model_type: optModel class type
 
-    Returns:
-        tuple: optimal solution (list) and objective value (float)
-    """
-    global _worker_model, _worker_model_key
-    # reuse cached model if same type; rebuild only on first call or type change
-    key = (model_type.__module__, model_type.__qualname__)
-    if _worker_model_key != key:
-        _worker_model = model_type(**args)
-        _worker_model_key = key
-    optmodel = _worker_model
-    # set obj
-    optmodel.setObj(cost)
-    # solve
-    sol, obj = optmodel.solve()
-    sol = np.asarray(sol, dtype=np.float32)
-    return sol, obj
+def _solveWithObj4Par(cost: np.ndarray) -> tuple[np.ndarray, float]:
+    """Solve a single instance in a pool worker using the pre-built optmodel."""
+    _worker_model.setObj(cost)
+    sol, obj = _worker_model.solve()
+    return np.asarray(sol, dtype=np.float32), obj
 
 
 def _check_sol(c: torch.Tensor, w: torch.Tensor, z: torch.Tensor) -> None:
