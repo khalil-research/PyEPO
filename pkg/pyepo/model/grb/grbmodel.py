@@ -75,7 +75,8 @@ class optGrbModel(optModel):
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c)
         if isinstance(self.x, gp.MVar):
-            self._model.setObjective(c @ self.x)
+            # direct Obj attr write skips MLinExpr allocation
+            self.x.Obj = c
         else:
             # batch C-level coefficient update
             self._model.setAttr("Obj", self._vars_list, c.tolist())
@@ -136,8 +137,9 @@ class optGrbModel(optModel):
         new_model = self.copy()
         # add constraint
         if isinstance(new_model.x, gp.MVar):
-            expr = gp.quicksum(coefs[i] * new_model.x[i] for i in range(len(coefs))) <= rhs
+            new_model._model.addConstr(coefs @ new_model.x <= rhs)
         else:
-            expr = gp.quicksum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
-        new_model._model.addConstr(expr)
+            # LinExpr(coeffs, vars) builds the affine expression in one C call
+            expr = gp.LinExpr(coefs.tolist(), new_model._vars_list) <= rhs
+            new_model._model.addConstr(expr)
         return new_model

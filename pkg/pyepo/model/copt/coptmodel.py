@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 try:
-    from coptpy import COPT
+    from coptpy import COPT, LinExpr
 
     try:
         from coptpy import MVar as _CoptMVar
@@ -127,6 +127,8 @@ class optCoptModel(optModel):
         if _is_mvar(new_model.x):
             new_model._model.addConstr(coefs @ new_model.x <= rhs)
         else:
-            expr = sum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
-            new_model._model.addConstr(expr)
+            # LinExpr().addTerms builds the affine expression in one C call
+            expr = LinExpr()
+            expr.addTerms(coefs.tolist(), new_model._vars_list)
+            new_model._model.addConstr(expr <= rhs)
         return new_model

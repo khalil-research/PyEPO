@@ -50,10 +50,10 @@ class tspABModel(tspABBase, optCoptModel):
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to ``self._model`` using paired (x[i,j] + x[j,i])."""
-        self._model.addConstr(
-            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
-            <= rhs
-        )
+        # both directed Vars share coef[k]; mirror setObj's np.repeat layout
+        expr = LinExpr()
+        expr.addTerms(np.repeat(coefs, 2).tolist(), self._cost_vars)
+        self._model.addConstr(expr <= rhs)
 
 
 class tspGGModel(tspABModel):
@@ -250,7 +250,9 @@ class tspDFJModel(tspABModel):
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to ``self._model`` using the DFJ variable scheme."""
-        self._model.addConstr(sum(coefs[i] * self.x[k] for i, k in enumerate(self.edges)) <= rhs)
+        expr = LinExpr()
+        expr.addTerms(coefs.tolist(), self._cost_vars)
+        self._model.addConstr(expr <= rhs)
 
 
 class tspMTZModel(tspABModel):
