@@ -129,14 +129,14 @@ class regularizedFrankWolfeOpt(optModule):
             # exact line search for the quadratic
             denom = (diff * diff).sum(dim=-1).clamp(min=1e-12)
             gamma = (gap / denom).clamp(0.0, 1.0) * active
-            # update iterate
-            mu = mu - gamma.unsqueeze(-1) * diff
+            # in-place iterate update; mu is detached scratch inside Function.forward
+            mu.sub_(gamma.unsqueeze(-1) * diff)
             # vertex dedup against active set
             match_mask = (vertices[:, :k + 1] - v.unsqueeze(1)).abs().sum(dim=-1) < 1e-6
             has_match = match_mask.any(dim=-1)
             match_idx = match_mask.to(dtype).argmax(dim=-1)
-            # update active-set weights
-            weights = weights * (1.0 - gamma).unsqueeze(-1)
+            # in-place weight shrink, then deposit gamma on the matched vertex or a new slot
+            weights.mul_((1.0 - gamma).unsqueeze(-1))
             weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma * has_match.to(dtype)
             vertices[:, k + 1] = v
             weights[:, k + 1] = gamma * (~has_match).to(dtype)
@@ -309,8 +309,8 @@ class regularizedFrankWolfeFenchelYoung(optModule):
             # exact line search for the quadratic
             denom = (diff * diff).sum(dim=-1).clamp(min=1e-12)
             gamma = (gap / denom).clamp(0.0, 1.0) * active
-            # update iterate
-            mu = mu - gamma.unsqueeze(-1) * diff
+            # in-place iterate update; mu is detached scratch inside Function.forward
+            mu.sub_(gamma.unsqueeze(-1) * diff)
             alive = active_mask
         return mu
 
@@ -341,24 +341,16 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
         # convert tensor
         cp = pred_cost.detach()
         w = true_sol.detach()
-        # rescale by sense and lambd
+        # batched Frank-Wolfe; sense flips both the FW input scale and the Danskin diff direction
         if module.optmodel.modelSense == EPO.MINIMIZE:
-            sign = -1.0
-        elif module.optmodel.modelSense == EPO.MAXIMIZE:
-            sign = 1.0
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        theta = (sign / module.lambd) * cp
-        # batched Frank-Wolfe
-        r_sol = module._frankWolfe(theta)
-        # difference
-        if module.optmodel.modelSense == EPO.MINIMIZE:
+            r_sol = module._frankWolfe(-cp / module.lambd)
             diff = w - r_sol
         elif module.optmodel.modelSense == EPO.MAXIMIZE:
+            r_sol = module._frankWolfe(cp / module.lambd)
             diff = r_sol - w
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        # loss
+        # Fenchel-Young loss: Omega(w) - Omega(r_sol) + <cp, sign * (w - r_sol)>
         omega_w = 0.5 * module.lambd * (w ** 2).sum(dim=-1)
         omega_r = 0.5 * module.lambd * (r_sol ** 2).sum(dim=-1)
         loss = (omega_w - omega_r) + torch.einsum("bi,bi->b", cp, diff)

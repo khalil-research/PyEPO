@@ -168,8 +168,12 @@ class perturbedOptMul(perturbedOpt):
 
     def _grad_scale(self, cp: torch.Tensor) -> torch.Tensor:
         denom = self.sigma * cp
-        sign = torch.where(denom >= 0, torch.ones_like(denom), -torch.ones_like(denom))
-        denom_safe = torch.where(denom.abs() < _EPS, sign * _EPS, denom)
+        # clamp |denom| up to _EPS while preserving sign (+ on zero)
+        denom_safe = torch.where(
+            denom.abs() < _EPS,
+            torch.where(denom >= 0, _EPS, -_EPS),
+            denom,
+        )
         return self.n_samples * denom_safe
 
 
@@ -608,14 +612,13 @@ def _solve_in_pass_3d(
     flat_c = ptb_c.reshape(-1, num_vars)
     # solve using shared 2D function
     flat_sols, _ = _solve_batch_2d(flat_c, optmodel, processes, pool)
-    # reshape (n_samples * batch, vars) → (batch, n_samples, vars)
-    ptb_sols = flat_sols.reshape(n_samples, ins_num, num_vars).permute(1, 0, 2)
-    # update solution pool on-device, then realign with ptb_c.device
+    # update solution pool on the contiguous flat_sols, before the permute view
     if solpool is not None:
-        sols = ptb_sols.reshape(-1, num_vars)
-        solpool = _update_solution_pool(sols, solpool)
+        solpool = _update_solution_pool(flat_sols, solpool)
         if solpool.device != ptb_c.device:
             solpool = solpool.to(ptb_c.device)
+    # reshape (n_samples * batch, vars) → (batch, n_samples, vars)
+    ptb_sols = flat_sols.reshape(n_samples, ins_num, num_vars).permute(1, 0, 2)
     return ptb_sols, solpool
 
 

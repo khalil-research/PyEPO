@@ -131,29 +131,23 @@ class pairwiseLTR(optModule):
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)
         # obj for solpool
-        objpool_c = torch.einsum("bd,nd->bn", true_cost, self.solpool)  # true cost
-        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool)  # pred cost
+        objpool_c = true_cost @ self.solpool.T  # true cost
+        objpool_cp = pred_cost @ self.solpool.T  # pred cost
         # best solutions for each instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
-            best_inds = torch.argmin(objpool_c, dim=1)  # Best solution indices
+            best_inds = torch.argmin(objpool_c, dim=1)
         elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            best_inds = torch.argmax(objpool_c, dim=1)  # Best solution indices
+            best_inds = torch.argmax(objpool_c, dim=1)
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        objpool_cp_best = objpool_cp.gather(1, best_inds.unsqueeze(1)).squeeze(1)
-        # mask out best solution index
-        batch_size, solpool_size = objpool_cp.shape
-        mask = torch.ones((batch_size, solpool_size), dtype=torch.bool, device=cp.device)
-        mask.scatter_(1, best_inds.unsqueeze(1), False)
-        # select the rest of the solutions
-        objpool_cp_rest = objpool_cp[mask].view(batch_size, solpool_size - 1)
-        # ranking loss: best v.s. rest
+        objpool_cp_best = objpool_cp.gather(1, best_inds.unsqueeze(1))
+        # relu of best-vs-rest; best-vs-best slot is zero and contributes nothing to the sum
+        solpool_size = objpool_cp.shape[1]
         if self.optmodel.modelSense == EPO.MINIMIZE:
-            loss = self.relu(objpool_cp_best.unsqueeze(1) - objpool_cp_rest).mean(dim=1)
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = self.relu(objpool_cp_rest - objpool_cp_best.unsqueeze(1)).mean(dim=1)
+            diff = objpool_cp_best - objpool_cp
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            diff = objpool_cp - objpool_cp_best
+        loss = self.relu(diff).sum(dim=1) / (solpool_size - 1)
         return self._reduce(loss)
 
 
@@ -204,9 +198,6 @@ class pointwiseLTR(optModule):
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)
-        # obj for solpool as score
-        objpool_c = true_cost @ self.solpool.T  # true cost
-        objpool_cp = pred_cost @ self.solpool.T  # pred cost
-        # squared loss
-        loss = (objpool_c - objpool_cp).square().mean(dim=1)
+        # squared loss on (true - pred) projected onto the solution pool
+        loss = ((true_cost - pred_cost) @ self.solpool.T).square().mean(dim=1)
         return self._reduce(loss)
