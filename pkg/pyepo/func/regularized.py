@@ -102,37 +102,44 @@ class regularizedFrankWolfeOpt(optModule):
         v0, _ = _solve_or_cache(sense_sign * theta, self)
         v0 = v0.to(device=device, dtype=dtype)
         # active-set buffer
-        vertices = torch.zeros((self.max_iter + 1, batch, num_vars), device=device, dtype=dtype)
-        weights = torch.zeros((self.max_iter + 1, batch), device=device, dtype=dtype)
-        vertices[0] = v0
-        weights[0] = 1.0
+        vertices = torch.zeros((batch, self.max_iter + 1, num_vars), device=device, dtype=dtype)
+        weights = torch.zeros((batch, self.max_iter + 1), device=device, dtype=dtype)
+        vertices[:, 0] = v0
+        weights[:, 0] = 1.0
         mu = v0.clone()
         # Frank-Wolfe iterations
         alive = torch.ones(batch, device=device, dtype=torch.bool)
+        # loop buffers
+        v = torch.zeros_like(mu)
+        gap = torch.zeros(batch, device=device, dtype=dtype)
+        batch_idx = torch.arange(batch, device=device)
         for k in range(self.max_iter):
             # Frank-Wolfe direction
             grad = mu - theta
-            v = torch.zeros_like(mu)
             v_alive, _ = _solve_or_cache(sense_sign * (theta[alive] - mu[alive]), self)
             v[alive] = v_alive.to(device=device, dtype=dtype)
+            diff = mu - v
             # per-instance Frank-Wolfe gap
-            gap = torch.zeros(batch, device=device, dtype=dtype)
-            gap[alive] = (grad[alive] * (mu[alive] - v[alive])).sum(dim=-1)
+            gap[alive] = (grad[alive] * diff[alive]).sum(dim=-1)
             active_mask = alive & (gap >= self.tol)
             active = active_mask.to(dtype)
             # early break when all instances converged
             if not bool(active_mask.any()):
-                return mu, vertices[:k + 1], weights[:k + 1]
+                return mu, vertices[:, :k + 1], weights[:, :k + 1]
             # exact line search for the quadratic
-            denom = ((mu - v) ** 2).sum(dim=-1).clamp(min=1e-12)
+            denom = (diff * diff).sum(dim=-1).clamp(min=1e-12)
             gamma = (gap / denom).clamp(0.0, 1.0) * active
             # update iterate
-            g = gamma.unsqueeze(-1)
-            mu = mu + g * (v - mu)
+            mu = mu - gamma.unsqueeze(-1) * diff
+            # vertex dedup against active set
+            match_mask = (vertices[:, :k + 1] - v.unsqueeze(1)).abs().sum(dim=-1) < 1e-6
+            has_match = match_mask.any(dim=-1)
+            match_idx = match_mask.to(dtype).argmax(dim=-1)
             # update active-set weights
-            weights = weights * (1.0 - gamma).unsqueeze(0)
-            vertices[k + 1] = v
-            weights[k + 1] = gamma
+            weights = weights * (1.0 - gamma).unsqueeze(-1)
+            weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma * has_match.to(dtype)
+            vertices[:, k + 1] = v
+            weights[:, k + 1] = gamma * (~has_match).to(dtype)
             alive = active_mask
         return mu, vertices, weights
 
@@ -186,14 +193,12 @@ class regularizedFrankWolfeOptFunc(Function):
         scale = ctx.scale
         # batched orthogonal projector onto each instance's active hull
         dtype = vertices.dtype
-        # batch-major view + active mask: zero out inactive vertex rows
-        s = (weights > 0).to(dtype).permute(1, 0)                # (batch, K+1)
-        V_b = vertices.permute(1, 0, 2)                          # (batch, K+1, vars)
+        s = (weights > 0).to(dtype)                                       # (batch, K+1)
         # active-only mean per instance
-        n_active = s.sum(dim=-1, keepdim=True).clamp(min=1.0)    # (batch, 1)
-        V_mean = (V_b * s.unsqueeze(-1)).sum(dim=-2) / n_active  # (batch, vars)
+        n_active = s.sum(dim=-1, keepdim=True).clamp(min=1.0)             # (batch, 1)
+        V_mean = (vertices * s.unsqueeze(-1)).sum(dim=-2) / n_active      # (batch, vars)
         # centered, with inactive rows kept at zero
-        V_centered = (V_b - V_mean.unsqueeze(-2)) * s.unsqueeze(-1)
+        V_centered = (vertices - V_mean.unsqueeze(-2)) * s.unsqueeze(-1)
         # project grad_output onto row space of V_centered via (K+1, K+1) Gram matrix
         M = V_centered @ V_centered.transpose(-1, -2)            # (batch, K+1, K+1)
         h = V_centered @ grad_output.unsqueeze(-1)               # (batch, K+1, 1)
@@ -285,25 +290,27 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         # Frank-Wolfe iterations
         batch = theta.shape[0]
         alive = torch.ones(batch, device=device, dtype=torch.bool)
+        # loop buffers
+        v = torch.zeros_like(mu)
+        gap = torch.zeros(batch, device=device, dtype=dtype)
         for _ in range(self.max_iter):
             # Frank-Wolfe direction
             grad = mu - theta
-            v = torch.zeros_like(mu)
             v_alive, _ = _solve_or_cache(sense_sign * (theta[alive] - mu[alive]), self)
             v[alive] = v_alive.to(device=device, dtype=dtype)
+            diff = mu - v
             # per-instance Frank-Wolfe gap
-            gap = torch.zeros(batch, device=device, dtype=dtype)
-            gap[alive] = (grad[alive] * (mu[alive] - v[alive])).sum(dim=-1)
+            gap[alive] = (grad[alive] * diff[alive]).sum(dim=-1)
             active_mask = alive & (gap >= self.tol)
             active = active_mask.to(dtype)
             # early break when all instances converged
             if not bool(active_mask.any()):
                 break
             # exact line search for the quadratic
-            denom = ((mu - v) ** 2).sum(dim=-1).clamp(min=1e-12)
+            denom = (diff * diff).sum(dim=-1).clamp(min=1e-12)
             gamma = (gap / denom).clamp(0.0, 1.0) * active
             # update iterate
-            mu = mu + gamma.unsqueeze(-1) * (v - mu)
+            mu = mu - gamma.unsqueeze(-1) * diff
             alive = active_mask
         return mu
 

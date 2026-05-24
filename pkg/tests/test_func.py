@@ -296,9 +296,9 @@ class TestFrankWolfeBatched:
         mu, vertices, weights = m._frankWolfe(theta)
         assert mu.shape == (1, 4)
         assert mu[0, 0].item() > 0.99
-        assert vertices.shape[1:] == (1, 4)
+        assert vertices.shape[0] == 1 and vertices.shape[-1] == 4
         assert weights.shape == vertices.shape[:2]
-        assert weights.sum(dim=0)[0].item() == pytest.approx(1.0, abs=1e-5)
+        assert weights.sum(dim=1)[0].item() == pytest.approx(1.0, abs=1e-5)
 
     def test_mu_equals_weighted_sum_of_vertices(self):
         from pyepo.func.regularized import regularizedFrankWolfeOpt
@@ -306,7 +306,7 @@ class TestFrankWolfeBatched:
         theta = torch.tensor([[1.0, 1.5, 2.0, 0.5],
                               [2.0, 1.0, 1.0, 2.0]])
         mu, V, w = m._frankWolfe(theta)
-        mu_check = (w.unsqueeze(-1) * V).sum(dim=0)
+        mu_check = (w.unsqueeze(-1) * V).sum(dim=1)
         assert torch.allclose(mu, mu_check, atol=1e-5)
 
     def test_converged_instances_are_skipped(self, monkeypatch):
