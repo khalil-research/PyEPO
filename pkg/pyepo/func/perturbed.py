@@ -317,9 +317,7 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        # factor cached for _calculate_expected_solution to reuse within the same forward
-        self._last_factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
-        return cp * self._last_factor
+        return cp * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
 
     def _calculate_expected_solution(
         self,
@@ -328,9 +326,7 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
         ptb_sols: torch.Tensor,
         noises: torch.Tensor,
     ) -> torch.Tensor:
-        factor = self.__dict__.pop("_last_factor", None)
-        if factor is None:
-            factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
         return (ptb_sols * factor.permute(1, 0, 2)).mean(dim=1)
 
 
