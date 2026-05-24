@@ -5,7 +5,7 @@ Metrics for SKlearn model
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
@@ -65,7 +65,7 @@ def SPOError(
     return norm_regret
 
 
-def makeSkScorer(optmodel: optModel):
+def makeSkScorer(optmodel: optModel) -> Callable:
     """
     A function to create sklearn scorer
 
@@ -86,7 +86,7 @@ def makeSkScorer(optmodel: optModel):
     return SPO_scorer
 
 
-def makeAutoSkScorer(optmodel: optModel):
+def makeAutoSkScorer(optmodel: optModel) -> Callable:
     """
     A function to create Auto-SKlearn scorer
 
@@ -139,7 +139,7 @@ def testMSE(
     return np.square(pred_cost - true_cost).mean()
 
 
-def makeTestMSEScorer(optmodel: optModel):
+def makeTestMSEScorer(optmodel: optModel) -> Callable:
     """
     A function to create MSE scorer for testing
 

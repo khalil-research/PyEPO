@@ -30,7 +30,10 @@ def getArgs(model: optModel) -> dict:
     return {name: getattr(model, name) for name in params if hasattr(model, name)}
 
 
-def costToNumpy(c: np.ndarray | torch.Tensor | list, dtype=np.float32) -> np.ndarray:
+def costToNumpy(
+    c: np.ndarray | torch.Tensor | list,
+    dtype: np.typing.DTypeLike = np.float32,
+) -> np.ndarray:
     """
     Normalize a cost vector to a numpy array, detaching torch tensors as needed.
 

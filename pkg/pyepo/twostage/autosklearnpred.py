@@ -72,7 +72,7 @@ def autoSklearnPred(
     seed: int,
     timelimit: int,
     metric: str = "mse",
-):
+) -> AutoSklearnRegressor:
     """
     Two-stage prediction and optimization with auto-sklearn.
 
