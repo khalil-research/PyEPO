@@ -99,22 +99,12 @@
   <section id="module-pyepo.model.mpax.mpaxmodel">
 <span id="pyepo-model-mpax-mpaxmodel"></span><h1>pyepo.model.mpax.mpaxmodel<a class="headerlink" href="#module-pyepo.model.mpax.mpaxmodel" title="Link to this heading"></a></h1>
 <p>Abstract optimization model based on MPAX</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.num_vars" title="pyepo.model.mpax.mpaxmodel.num_vars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_vars</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</section>
 <section id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="pyepo.model.mpax.mpaxmodel.optMpaxModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optMpaxModel</span></code></a></p></td>
-<td><p>This is an abstract class for an MPAX-based optimization model</p></td>
+<td><p>This is an abstract class for an MPAX-based optimization model.</p></td>
 </tr>
 </tbody>
 </table>
@@ -123,41 +113,43 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.mpaxmodel.</span></span><span class="sig-name descname"><span class="pre">optMpaxModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sparse_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.mpaxmodel.</span></span><span class="sig-name descname"><span class="pre">optMpaxModel</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>This is an abstract class for an MPAX-based optimization model</p>
+<p>This is an abstract class for an MPAX-based optimization model.</p>
+<p>Concrete subclasses populate the constraint matrices and bounds inside
+<code class="docutils literal notranslate"><span class="pre">_getModel</span></code>:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>def _getModel(self):</dt><dd><p>self.A = jnp.array(…)   # equality A x = b
+self.b = jnp.array(…)
+self.G = jnp.array(…)   # inequality G x &gt;= h
+self.h = jnp.array(…)
+self.l = jnp.array(…)   # variable lower bound
+self.u = jnp.array(…)   # variable upper bound
+return None, []</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Sense (MIN / MAX) follows <code class="docutils literal notranslate"><span class="pre">self.modelSense</span></code> (set by a problem-level base
+such as <code class="docutils literal notranslate"><span class="pre">knapsackBase</span></code> before this <code class="docutils literal notranslate"><span class="pre">__init__</span></code> runs; defaults to MIN).
+Sparse-matrix format can be toggled by overriding the class attribute
+<code class="docutils literal notranslate"><span class="pre">use_sparse_matrix</span></code> on the concrete subclass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<em>jnp.ndarray</em><em>, </em><em>BCOO</em><em> or </em><em>BCSR</em>) – The matrix of equality constraints.</p></li>
+<li><p><strong>A</strong> (<em>jnp.ndarray</em>) – The matrix of equality constraints.</p></li>
 <li><p><strong>b</strong> (<em>jnp.ndarray</em>) – The right hand side of equality constraints.</p></li>
-<li><p><strong>G</strong> (<em>jnp.ndarray</em><em>, </em><em>BCOO</em><em> or </em><em>BCSR</em>) – The matrix for inequality constraints.</p></li>
+<li><p><strong>G</strong> (<em>jnp.ndarray</em>) – The matrix for inequality constraints.</p></li>
 <li><p><strong>h</strong> (<em>jnp.ndarray</em>) – The right hand side of inequality constraints.</p></li>
 <li><p><strong>l</strong> (<em>jnp.ndarray</em>) – The lower bound of the variables.</p></li>
 <li><p><strong>u</strong> (<em>jnp.ndarray</em>) – The upper bound of the variables.</p></li>
-<li><p><strong>use_sparse_matrix</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to use sparse matrix format, by default True.</p></li>
-<li><p><strong>minimize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to minimize objective, by default True.</p></li>
+<li><p><strong>use_sparse_matrix</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to use sparse matrix format.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.l">
-<span class="sig-name descname"><span class="pre">l</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.l" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.u">
-<span class="sig-name descname"><span class="pre">u</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.u" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.use_sparse_matrix">
-<span class="sig-name descname"><span class="pre">use_sparse_matrix</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.use_sparse_matrix" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.modelSense">
-<span class="sig-name descname"><span class="pre">modelSense</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.modelSense" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">use_sparse_matrix</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.use_sparse_matrix" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -231,11 +223,6 @@
 </dd></dl>
 
 </dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.num_vars">
-<span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.mpaxmodel.</span></span><span class="sig-name descname"><span class="pre">num_vars</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.num_vars" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 </section>
 </section>

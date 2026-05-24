@@ -1,0 +1,192 @@
+pyepo.model.bases
+=================
+
+.. py:module:: pyepo.model.bases
+
+.. autoapi-nested-parse::
+
+   Problem-level base classes for optimization models.
+
+   Each base captures the problem-specific state (data, indices, derived attrs)
+   and methods that are independent of the underlying solver. Concrete classes
+   combine a problem base with a backend base via multiple inheritance, with the
+   problem base listed first so its ``__init__`` runs before the backend's::
+
+       class shortestPathModel(shortestPathBase, optGrbModel):
+           def _getModel(self):
+               ...  # solver-specific build
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.bases.shortestPathBase
+   pyepo.model.bases.knapsackBase
+   pyepo.model.bases.portfolioBase
+   pyepo.model.bases.tspABBase
+
+
+Module Contents
+---------------
+
+.. py:class:: shortestPathBase(grid: tuple[int, int], *args, **kwargs)
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   Problem-level base for grid shortest path.
+
+   :ivar grid: grid dimensions (rows, cols)
+   :vartype grid: tuple of int
+   :ivar arcs: list of (source, target) arcs in the grid
+
+   :vartype arcs: list
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: arcs
+      :value: []
+
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+.. py:class:: knapsackBase(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   Problem-level base for multi-dim knapsack.
+
+   :ivar weights: item weights, shape (dim, n_items)
+   :vartype weights: np.ndarray
+   :ivar capacity: per-dimension capacity
+   :vartype capacity: np.ndarray
+   :ivar items: item indices
+
+   :vartype items: list
+
+
+   .. py:attribute:: weights
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: items
+
+
+   .. py:attribute:: modelSense
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+.. py:class:: portfolioBase(num_assets: int, covariance: numpy.ndarray, gamma: float = 2.25, *args, **kwargs)
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   Problem-level base for Markowitz portfolio.
+
+   :ivar num_assets: number of assets
+   :vartype num_assets: int
+   :ivar covariance: asset return covariance matrix
+   :vartype covariance: np.ndarray
+   :ivar risk_level: risk budget = gamma * mean(covariance)
+
+   :vartype risk_level: float
+
+
+   .. py:attribute:: num_assets
+
+
+   .. py:attribute:: covariance
+
+
+   .. py:attribute:: risk_level
+
+
+   .. py:attribute:: modelSense
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+.. py:class:: tspABBase(num_nodes: int, *args, **kwargs)
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   Problem-level base for TSP (formulation-independent state and helpers).
+
+   Concrete formulations (GG, MTZ, DFJ) only need to implement
+   ``_getModel`` (build the solver model) and ``_addExtraConstr``
+   (add a single linear extra constraint to ``self._model``).
+
+   :ivar num_nodes: number of nodes
+   :vartype num_nodes: int
+   :ivar nodes: node indices 0..num_nodes-1
+   :vartype nodes: list
+   :ivar edges: undirected edges as (i, j) with i < j
+
+   :vartype edges: list
+
+
+   .. py:attribute:: num_nodes
+
+
+   .. py:attribute:: nodes
+
+
+   .. py:attribute:: edges
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+   .. py:method:: getTour(sol: numpy.ndarray | torch.Tensor | list) -> list[int]
+
+      Reconstruct a TSP tour from an undirected edge-selection vector.
+
+      :raises ValueError: if the solution does not form a single connected tour.
+
+
+
+   .. py:method:: copy() -> tspABBase
+
+      Return a fresh model with all extra constraints replayed onto it.
+
+
+
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> tspABBase
+
+      Return a new model with one extra linear constraint added.
+
+      :param coefs: per-edge coefficients aligned with ``self.edges``
+      :param rhs: right-hand side
+
+
+

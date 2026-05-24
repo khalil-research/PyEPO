@@ -25,75 +25,13 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: tspABModel(num_nodes: int)
+.. py:class:: tspABModel(num_nodes: int, *args, **kwargs)
 
-   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
-
-
-   This abstract class is an optimization model for the traveling salesman problem.
-   This model is for further implementation of different formulation.
-
-   :ivar _model: Gurobi model
-   :vartype _model: GurobiPy model
-   :ivar num_nodes: Number of nodes
-   :vartype num_nodes: int
-   :ivar edges: List of edge index
-
-   :vartype edges: list
+   Bases: :py:obj:`pyepo.model.bases.tspABBase`, :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
 
-   .. py:attribute:: num_nodes
-
-
-   .. py:attribute:: nodes
-
-
-   .. py:attribute:: edges
-
-
-   .. py:property:: num_cost
-      :type: int
-
-
-      number of costs to be predicted
-
-
-   .. py:method:: copy() -> tspABModel
-
-      A method to copy model
-
-      :returns: new copied model
-      :rtype: optModel
-
-
-
-   .. py:method:: getTour(sol: numpy.ndarray | torch.Tensor | list) -> list[int]
-
-      A method to get a tour from solution
-
-      :param sol: solution
-
-      :returns: a TSP tour
-      :rtype: list
-
-      :raises ValueError: if the solution does not form a single connected tour.
-
-
-
-.. py:class:: tspGGModel(num_nodes: int)
-
-   Bases: :py:obj:`tspABModel`
-
-
-   This class is an optimization model for the traveling salesman problem based on Gavish–Graves (GG) formulation.
-
-   :ivar _model: Gurobi model
-   :vartype _model: GurobiPy model
-   :ivar num_nodes: Number of nodes
-   :vartype num_nodes: int
-   :ivar edges: List of edge index
-
-   :vartype edges: list
+   Gurobi-backed TSP abstract base. Provides paired-variable ``setObj`` /
+   ``solve`` / ``_addExtraConstr`` shared by GG and MTZ. DFJ overrides those.
 
 
    .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
@@ -110,16 +48,12 @@ Module Contents
 
 
 
-   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> tspABModel
+.. py:class:: tspGGModel(num_nodes: int, *args, **kwargs)
 
-      A method to add new constraint
+   Bases: :py:obj:`tspABModel`
 
-      :param coefs: coefficients of new constraint
-      :param rhs: right-hand side of new constraint
 
-      :returns: new model with the added constraint
-      :rtype: optModel
-
+   Gavish-Graves (GG) formulation.
 
 
    .. py:method:: relax() -> tspGGModelRel
@@ -128,28 +62,17 @@ Module Contents
 
 
 
-.. py:class:: tspGGModelRel(num_nodes: int)
+.. py:class:: tspGGModelRel(num_nodes: int, *args, **kwargs)
 
    Bases: :py:obj:`tspGGModel`
 
 
-   This class is relaxation of tspGGModel.
-
-   :ivar _model: Gurobi model
-   :vartype _model: GurobiPy model
-   :ivar num_nodes: Number of nodes
-   :vartype num_nodes: int
-   :ivar edges: List of edge index
-
-   :vartype edges: list
+   LP relaxation of the GG formulation.
 
 
    .. py:method:: solve() -> tuple[numpy.ndarray, float]
 
-      A method to solve model
-
-      :returns: optimal solution (list) and objective value (float)
-      :rtype: tuple
+      A method to solve model — returns fractional solution.
 
 
 
@@ -165,21 +88,16 @@ Module Contents
 
 
 
-.. py:class:: tspDFJModel(num_nodes: int)
+.. py:class:: tspDFJModel(num_nodes: int, *args, **kwargs)
 
    Bases: :py:obj:`tspABModel`
 
 
-   This class is an optimization model for the traveling salesman problem based on Danzig–Fulkerson–Johnson (DFJ) formulation and
-   constraint generation.
+   Danzig-Fulkerson-Johnson (DFJ) formulation with lazy subtour elimination.
 
-   :ivar _model: Gurobi model
-   :vartype _model: GurobiPy model
-   :ivar num_nodes: Number of nodes
-   :vartype num_nodes: int
-   :ivar edges: List of edge index
-
-   :vartype edges: list
+   Uses one undirected Var per edge (``x[j,i]`` aliases ``x[i,j]``), so the
+   paired-vars ``setObj`` / ``solve`` / ``_addExtraConstr`` inherited from
+   ``tspABModel`` are overridden here.
 
 
    .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
@@ -196,58 +114,12 @@ Module Contents
 
 
 
-   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> tspABModel
-
-      A method to add new constraint
-
-      :param coefs: coefficients of new constraint
-      :param rhs: right-hand side of new constraint
-
-      :returns: new model with the added constraint
-      :rtype: optModel
-
-
-
-.. py:class:: tspMTZModel(num_nodes: int)
+.. py:class:: tspMTZModel(num_nodes: int, *args, **kwargs)
 
    Bases: :py:obj:`tspABModel`
 
 
-   This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.
-
-   :ivar _model: Gurobi model
-   :vartype _model: GurobiPy model
-   :ivar num_nodes: Number of nodes
-   :vartype num_nodes: int
-   :ivar edges: List of edge index
-
-   :vartype edges: list
-
-
-   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
-
-      A method to set the objective function
-
-      :param c: cost vector
-
-
-
-   .. py:method:: solve() -> tuple[numpy.ndarray, float]
-
-      A method to solve model
-
-
-
-   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> tspABModel
-
-      A method to add new constraint
-
-      :param coefs: coefficients of new constraint
-      :param rhs: right-hand side of new constraint
-
-      :returns: new model with the added constraint
-      :rtype: optModel
-
+   Miller-Tucker-Zemlin (MTZ) formulation.
 
 
    .. py:method:: relax() -> tspMTZModelRel
@@ -256,28 +128,17 @@ Module Contents
 
 
 
-.. py:class:: tspMTZModelRel(num_nodes: int)
+.. py:class:: tspMTZModelRel(num_nodes: int, *args, **kwargs)
 
    Bases: :py:obj:`tspMTZModel`
 
 
-   This class is relaxation of tspMTZModel.
-
-   :ivar _model: Gurobi model
-   :vartype _model: GurobiPy model
-   :ivar num_nodes: Number of nodes
-   :vartype num_nodes: int
-   :ivar edges: List of edge index
-
-   :vartype edges: list
+   LP relaxation of the MTZ formulation.
 
 
    .. py:method:: solve() -> tuple[numpy.ndarray, float]
 
-      A method to solve model
-
-      :returns: optimal solution (list) and objective value (float)
-      :rtype: tuple
+      A method to solve model — returns fractional solution.
 
 
 

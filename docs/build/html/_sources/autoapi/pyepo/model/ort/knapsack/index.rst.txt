@@ -30,12 +30,12 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, solver: str = 'scip')
+.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
-   Bases: :py:obj:`pyepo.model.ort.ortmodel.optOrtModel`
+   Bases: :py:obj:`pyepo.model.bases.knapsackBase`, :py:obj:`pyepo.model.ort.ortmodel.optOrtModel`
 
 
-   This class is an optimization model for the knapsack problem
+   OR-Tools (pywraplp) backed knapsack.
 
    :ivar _model: OR-Tools linear solver
    :vartype _model: pywraplp.Solver
@@ -50,27 +50,18 @@ Module Contents
    :vartype items: list
 
 
-   .. py:attribute:: weights
-
-
-   .. py:attribute:: capacity
-
-
-   .. py:attribute:: items
-
-
    .. py:method:: relax() -> knapsackModelRel
 
       A method to get linear relaxation model
 
 
 
-.. py:class:: knapsackModelRel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, solver: str = 'scip')
+.. py:class:: knapsackModelRel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
    Bases: :py:obj:`knapsackModel`
 
 
-   This class is relaxed optimization model for knapsack problem.
+   LP relaxation of the OR-Tools knapsack.
 
 
    .. py:method:: relax() -> knapsackModelRel
@@ -79,12 +70,12 @@ Module Contents
 
 
 
-.. py:class:: knapsackCpModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list)
+.. py:class:: knapsackCpModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
-   Bases: :py:obj:`pyepo.model.ort.ortcpmodel.optOrtCpModel`
+   Bases: :py:obj:`pyepo.model.bases.knapsackBase`, :py:obj:`pyepo.model.ort.ortcpmodel.optOrtCpModel`
 
 
-   This class is an optimization model for the knapsack problem using CP-SAT
+   OR-Tools CP-SAT backed knapsack.
 
    :ivar _model: OR-Tools CP-SAT model
    :vartype _model: cp_model.CpModel
@@ -95,15 +86,6 @@ Module Contents
    :ivar items: list of item index
 
    :vartype items: list
-
-
-   .. py:attribute:: weights
-
-
-   .. py:attribute:: capacity
-
-
-   .. py:attribute:: items
 
 
 .. py:data:: cost

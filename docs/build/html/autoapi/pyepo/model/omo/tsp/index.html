@@ -114,19 +114,19 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.omo.tsp.tspABModel" title="pyepo.model.omo.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p></td>
-<td><p>This abstract class is an optimization model for the traveling salesman problem.</p></td>
+<td><p>Pyomo-backed TSP abstract base. Provides paired-variable <code class="docutils literal notranslate"><span class="pre">setObj</span></code> /</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.omo.tsp.tspGGModel" title="pyepo.model.omo.tsp.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p></td>
-<td><p>This class is an optimization model for the traveling salesman problem based on Gavish-Graves (GG) formulation.</p></td>
+<td><p>Gavish-Graves (GG) formulation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.omo.tsp.tspGGModelRel" title="pyepo.model.omo.tsp.tspGGModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModelRel</span></code></a></p></td>
-<td><p>This class is relaxation of tspGGModel.</p></td>
+<td><p>LP relaxation of the GG formulation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.omo.tsp.tspMTZModel" title="pyepo.model.omo.tsp.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p></td>
-<td><p>This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p></td>
+<td><p>Miller-Tucker-Zemlin (MTZ) formulation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.omo.tsp.tspMTZModelRel" title="pyepo.model.omo.tsp.tspMTZModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModelRel</span></code></a></p></td>
-<td><p>This class is relaxation of tspMTZModel.</p></td>
+<td><p>LP relaxation of the MTZ formulation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -136,94 +136,13 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.tsp.</span></span><span class="sig-name descname"><span class="pre">tspABModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="../omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel" title="pyepo.model.omo.omomodel.optOmoModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel.optOmoModel</span></code></a></p>
-<p>This abstract class is an optimization model for the traveling salesman problem.
-This model is for further implementation of different formulation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>_model</strong> (<em>Pyomo model</em>) – Pyomo model</p></li>
-<li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – optimization solver in the background</p></li>
-<li><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of nodes</p></li>
-<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of edge index</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.num_nodes">
-<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.num_nodes" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.nodes" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.edges">
-<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.edges" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.num_cost">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">num_cost</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.num_cost" title="Link to this definition"></a></dt>
-<dd><p>number of costs to be predicted</p>
-</dd></dl>
-
+<dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.tspABBase" title="pyepo.model.bases.tspABBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.tspABBase</span></code></a>, <a class="reference internal" href="../omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel" title="pyepo.model.omo.omomodel.optOmoModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel.optOmoModel</span></code></a></p>
+<p>Pyomo-backed TSP abstract base. Provides paired-variable <code class="docutils literal notranslate"><span class="pre">setObj</span></code> /
+<code class="docutils literal notranslate"><span class="pre">solve</span></code> / <code class="docutils literal notranslate"><span class="pre">_addExtraConstr</span></code> shared by GG and MTZ. Pyomo lacks easy
+callback support, so no DFJ formulation exists for this backend.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.omo.tsp.tspABModel" title="pyepo.model.omo.tsp.tspABModel"><span class="pre">tspABModel</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.copy" title="Link to this definition"></a></dt>
-<dd><p>A method to copy model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>new copied model</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.getTour">
-<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.getTour" title="Link to this definition"></a></dt>
-<dd><p>A method to get a tour from solution</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sol</strong> – solution</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a TSP tour</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if the solution does not form a single connected tour.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspGGModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.tsp.</span></span><span class="sig-name descname"><span class="pre">tspGGModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.tsp.tspGGModel" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyepo.model.omo.tsp.tspABModel" title="pyepo.model.omo.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
-<p>This class is an optimization model for the traveling salesman problem based on Gavish-Graves (GG) formulation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>_model</strong> (<em>Pyomo model</em>) – Pyomo model</p></li>
-<li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – optimization solver in the background</p></li>
-<li><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of nodes</p></li>
-<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of edge index</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspGGModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspGGModel.setObj" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.setObj">
+<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.setObj" title="Link to this definition"></a></dt>
 <dd><p>A method to set the objective function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -233,31 +152,18 @@ This model is for further implementation of different formulation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspGGModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspGGModel.solve" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.solve" title="Link to this definition"></a></dt>
 <dd><p>A method to solve model</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspGGModel.addConstr">
-<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.omo.tsp.tspABModel" title="pyepo.model.omo.tsp.tspABModel"><span class="pre">tspABModel</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspGGModel.addConstr" title="Link to this definition"></a></dt>
-<dd><p>A method to add new constraint</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>coefs</strong> – coefficients of new constraint</p></li>
-<li><p><strong>rhs</strong> – right-hand side of new constraint</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>new model with the added constraint</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
-</dd>
-</dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspGGModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.tsp.</span></span><span class="sig-name descname"><span class="pre">tspGGModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.tsp.tspGGModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.model.omo.tsp.tspABModel" title="pyepo.model.omo.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
+<p>Gavish-Graves (GG) formulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspGGModel.relax">
 <span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.omo.tsp.tspGGModelRel" title="pyepo.model.omo.tsp.tspGGModelRel"><span class="pre">tspGGModelRel</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspGGModel.relax" title="Link to this definition"></a></dt>
@@ -270,29 +176,11 @@ This model is for further implementation of different formulation.</p>
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspGGModelRel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.tsp.</span></span><span class="sig-name descname"><span class="pre">tspGGModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.tsp.tspGGModelRel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.omo.tsp.tspGGModel" title="pyepo.model.omo.tsp.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p>
-<p>This class is relaxation of tspGGModel.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>_model</strong> (<em>Pyomo model</em>) – Pyomo model</p></li>
-<li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – optimization solver in the background</p></li>
-<li><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of nodes</p></li>
-<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of edge index</p></li>
-</ul>
-</dd>
-</dl>
+<p>LP relaxation of the GG formulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspGGModelRel.solve">
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspGGModelRel.solve" title="Link to this definition"></a></dt>
-<dd><p>A method to solve model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
-</dd>
-</dl>
+<dd><p>A method to solve model — returns fractional solution.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -313,54 +201,7 @@ This model is for further implementation of different formulation.</p>
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspMTZModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.tsp.</span></span><span class="sig-name descname"><span class="pre">tspMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.tsp.tspMTZModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.omo.tsp.tspABModel" title="pyepo.model.omo.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p>
-<p>This class is an optimization model for the traveling salesman problem based on Miller-Tucker-Zemlin (MTZ) formulation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>_model</strong> (<em>Pyomo model</em>) – Pyomo model</p></li>
-<li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – optimization solver in the background</p></li>
-<li><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of nodes</p></li>
-<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of edge index</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspMTZModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspMTZModel.setObj" title="Link to this definition"></a></dt>
-<dd><p>A method to set the objective function</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>c</strong> – cost vector</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspMTZModel.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspMTZModel.solve" title="Link to this definition"></a></dt>
-<dd><p>A method to solve model</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspMTZModel.addConstr">
-<span class="sig-name descname"><span class="pre">addConstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.omo.tsp.tspABModel" title="pyepo.model.omo.tsp.tspABModel"><span class="pre">tspABModel</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspMTZModel.addConstr" title="Link to this definition"></a></dt>
-<dd><p>A method to add new constraint</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>coefs</strong> – coefficients of new constraint</p></li>
-<li><p><strong>rhs</strong> – right-hand side of new constraint</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>new model with the added constraint</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel">optModel</a></p>
-</dd>
-</dl>
-</dd></dl>
-
+<p>Miller-Tucker-Zemlin (MTZ) formulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspMTZModel.relax">
 <span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.omo.tsp.tspMTZModelRel" title="pyepo.model.omo.tsp.tspMTZModelRel"><span class="pre">tspMTZModelRel</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspMTZModel.relax" title="Link to this definition"></a></dt>
@@ -373,29 +214,11 @@ This model is for further implementation of different formulation.</p>
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspMTZModelRel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.tsp.</span></span><span class="sig-name descname"><span class="pre">tspMTZModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.tsp.tspMTZModelRel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.omo.tsp.tspMTZModel" title="pyepo.model.omo.tsp.tspMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspMTZModel</span></code></a></p>
-<p>This class is relaxation of tspMTZModel.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>_model</strong> (<em>Pyomo model</em>) – Pyomo model</p></li>
-<li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – optimization solver in the background</p></li>
-<li><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of nodes</p></li>
-<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of edge index</p></li>
-</ul>
-</dd>
-</dl>
+<p>LP relaxation of the MTZ formulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspMTZModelRel.solve">
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspMTZModelRel.solve" title="Link to this definition"></a></dt>
-<dd><p>A method to solve model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>optimal solution (list) and objective value (float)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
-</dd>
-</dl>
+<dd><p>A method to solve model — returns fractional solution.</p>
 </dd></dl>
 
 <dl class="py method">

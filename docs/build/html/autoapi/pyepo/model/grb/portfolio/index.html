@@ -114,7 +114,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.portfolio.portfolioModel" title="pyepo.model.grb.portfolio.portfolioModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">portfolioModel</span></code></a></p></td>
-<td><p>This class is an optimization model for the portfolio problem</p></td>
+<td><p>Gurobi-backed Markowitz portfolio.</p></td>
 </tr>
 </tbody>
 </table>
@@ -123,9 +123,9 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.portfolio.portfolioModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.portfolio.</span></span><span class="sig-name descname"><span class="pre">portfolioModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_assets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.25</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.portfolio.portfolioModel" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="../grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel.optGrbModel</span></code></a></p>
-<p>This class is an optimization model for the portfolio problem</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.portfolio.</span></span><span class="sig-name descname"><span class="pre">portfolioModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_assets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.25</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.portfolio.portfolioModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.portfolioBase" title="pyepo.model.bases.portfolioBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.portfolioBase</span></code></a>, <a class="reference internal" href="../grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel.optGrbModel</span></code></a></p>
+<p>Gurobi-backed Markowitz portfolio.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -136,21 +136,6 @@
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.portfolio.portfolioModel.num_assets">
-<span class="sig-name descname"><span class="pre">num_assets</span></span><a class="headerlink" href="#pyepo.model.grb.portfolio.portfolioModel.num_assets" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.portfolio.portfolioModel.covariance">
-<span class="sig-name descname"><span class="pre">covariance</span></span><a class="headerlink" href="#pyepo.model.grb.portfolio.portfolioModel.covariance" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.portfolio.portfolioModel.risk_level">
-<span class="sig-name descname"><span class="pre">risk_level</span></span><a class="headerlink" href="#pyepo.model.grb.portfolio.portfolioModel.risk_level" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="py data">

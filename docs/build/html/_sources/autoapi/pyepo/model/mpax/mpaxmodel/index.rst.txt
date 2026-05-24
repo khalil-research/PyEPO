@@ -9,14 +9,6 @@ pyepo.model.mpax.mpaxmodel
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.mpax.mpaxmodel.num_vars
-
-
 Classes
 -------
 
@@ -28,44 +20,51 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: optMpaxModel(A: numpy.ndarray | torch.Tensor | None = None, b: numpy.ndarray | torch.Tensor | None = None, G: numpy.ndarray | torch.Tensor | None = None, h: numpy.ndarray | torch.Tensor | None = None, l: numpy.ndarray | torch.Tensor | None = None, u: numpy.ndarray | torch.Tensor | None = None, use_sparse_matrix: bool = True, minimize: bool = True)
+.. py:class:: optMpaxModel
 
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for an MPAX-based optimization model
+   This is an abstract class for an MPAX-based optimization model.
+
+   Concrete subclasses populate the constraint matrices and bounds inside
+   ``_getModel``:
+
+       def _getModel(self):
+           self.A = jnp.array(...)   # equality A x = b
+           self.b = jnp.array(...)
+           self.G = jnp.array(...)   # inequality G x >= h
+           self.h = jnp.array(...)
+           self.l = jnp.array(...)   # variable lower bound
+           self.u = jnp.array(...)   # variable upper bound
+           return None, []
+
+   Sense (MIN / MAX) follows ``self.modelSense`` (set by a problem-level base
+   such as ``knapsackBase`` before this ``__init__`` runs; defaults to MIN).
+   Sparse-matrix format can be toggled by overriding the class attribute
+   ``use_sparse_matrix`` on the concrete subclass.
 
    :ivar A: The matrix of equality constraints.
-   :vartype A: jnp.ndarray, BCOO or BCSR
+   :vartype A: jnp.ndarray
    :ivar b: The right hand side of equality constraints.
    :vartype b: jnp.ndarray
    :ivar G: The matrix for inequality constraints.
-   :vartype G: jnp.ndarray, BCOO or BCSR
+   :vartype G: jnp.ndarray
    :ivar h: The right hand side of inequality constraints.
    :vartype h: jnp.ndarray
    :ivar l: The lower bound of the variables.
    :vartype l: jnp.ndarray
    :ivar u: The upper bound of the variables.
    :vartype u: jnp.ndarray
-   :ivar use_sparse_matrix: Whether to use sparse matrix format, by default True.
+   :ivar use_sparse_matrix: Whether to use sparse matrix format.
+
    :vartype use_sparse_matrix: bool
-   :ivar minimize: Whether to minimize objective, by default True.
-
-   :vartype minimize: bool
-
-
-   .. py:attribute:: l
-
-
-   .. py:attribute:: u
 
 
    .. py:attribute:: use_sparse_matrix
+      :type:  bool
       :value: True
 
-
-
-   .. py:attribute:: modelSense
 
 
    .. py:attribute:: device
@@ -116,9 +115,5 @@ Module Contents
       :returns: new model with the added constraint
       :rtype: optModel
 
-
-
-.. py:data:: num_vars
-   :value: 10
 
 

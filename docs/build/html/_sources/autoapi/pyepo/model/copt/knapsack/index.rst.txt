@@ -29,12 +29,12 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list)
+.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
-   Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
+   Bases: :py:obj:`pyepo.model.bases.knapsackBase`, :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
 
 
-   This class is an optimization model for the knapsack problem
+   COPT-backed knapsack.
 
    :ivar _model: COPT model
    :vartype _model: COPT model
@@ -47,27 +47,18 @@ Module Contents
    :vartype items: list
 
 
-   .. py:attribute:: weights
-
-
-   .. py:attribute:: capacity
-
-
-   .. py:attribute:: items
-
-
    .. py:method:: relax() -> knapsackModelRel
 
       A method to get linear relaxation model
 
 
 
-.. py:class:: knapsackModelRel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list)
+.. py:class:: knapsackModelRel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
    Bases: :py:obj:`knapsackModel`
 
 
-   This class is relaxed optimization model for knapsack problem.
+   LP relaxation of the COPT knapsack.
 
 
    .. py:method:: relax() -> knapsackModelRel

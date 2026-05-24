@@ -28,12 +28,12 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: portfolioModel(num_assets: int, covariance: numpy.ndarray, gamma: float = 2.25)
+.. py:class:: portfolioModel(num_assets: int, covariance: numpy.ndarray, gamma: float = 2.25, *args, **kwargs)
 
-   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+   Bases: :py:obj:`pyepo.model.bases.portfolioBase`, :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
 
-   This class is an optimization model for the portfolio problem
+   Gurobi-backed Markowitz portfolio.
 
    :ivar _model: Gurobi model
    :vartype _model: GurobiPy model
@@ -44,15 +44,6 @@ Module Contents
    :ivar risk_level: risk level
 
    :vartype risk_level: float
-
-
-   .. py:attribute:: num_assets
-
-
-   .. py:attribute:: covariance
-
-
-   .. py:attribute:: risk_level
 
 
 .. py:data:: optmodel

@@ -28,30 +28,26 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list)
+.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
-   Bases: :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
+   Bases: :py:obj:`pyepo.model.bases.knapsackBase`, :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
 
 
-   This class is an optimization model for the relaxed knapsack problem
+   MPAX-backed (JAX LP) knapsack — LP relaxation.
 
    :ivar _model: MPAX model
    :ivar weights: Weights of items
-   :vartype weights: np.ndarray / list
+   :vartype weights: np.ndarray
    :ivar capacity: Total capacity
-   :vartype capacity: np.ndarray / list
+   :vartype capacity: np.ndarray
    :ivar items: List of item index
 
    :vartype items: list
 
 
-   .. py:attribute:: weights
+   .. py:attribute:: use_sparse_matrix
+      :value: False
 
-
-   .. py:attribute:: capacity
-
-
-   .. py:attribute:: items
 
 
 .. py:data:: cost

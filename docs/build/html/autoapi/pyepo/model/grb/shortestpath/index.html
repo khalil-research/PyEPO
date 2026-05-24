@@ -114,7 +114,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.shortestpath.shortestPathModel" title="pyepo.model.grb.shortestpath.shortestPathModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortestPathModel</span></code></a></p></td>
-<td><p>This class is an optimization model for the shortest path problem</p></td>
+<td><p>Gurobi-backed shortest path on a grid network.</p></td>
 </tr>
 </tbody>
 </table>
@@ -123,9 +123,9 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.grb.shortestpath.shortestPathModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.shortestpath.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.shortestpath.shortestPathModel" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="../grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel.optGrbModel</span></code></a></p>
-<p>This class is an optimization model for the shortest path problem</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.shortestpath.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.grb.shortestpath.shortestPathModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.shortestPathBase" title="pyepo.model.bases.shortestPathBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.shortestPathBase</span></code></a>, <a class="reference internal" href="../grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.grb.grbmodel.optGrbModel</span></code></a></p>
+<p>Gurobi-backed shortest path on a grid network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -135,16 +135,6 @@
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestpath.shortestPathModel.grid">
-<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#pyepo.model.grb.shortestpath.shortestPathModel.grid" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.grb.shortestpath.shortestPathModel.arcs">
-<span class="sig-name descname"><span class="pre">arcs</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></span><a class="headerlink" href="#pyepo.model.grb.shortestpath.shortestPathModel.arcs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="py data">

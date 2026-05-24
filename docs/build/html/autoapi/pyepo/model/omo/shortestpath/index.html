@@ -114,7 +114,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.omo.shortestpath.shortestPathModel" title="pyepo.model.omo.shortestpath.shortestPathModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortestPathModel</span></code></a></p></td>
-<td><p>This class is an optimization model for the shortest path problem</p></td>
+<td><p>Pyomo-backed shortest path on a grid network.</p></td>
 </tr>
 </tbody>
 </table>
@@ -124,28 +124,18 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.omo.shortestpath.shortestPathModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.shortestpath.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.shortestpath.shortestPathModel" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="../omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel" title="pyepo.model.omo.omomodel.optOmoModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel.optOmoModel</span></code></a></p>
-<p>This class is an optimization model for the shortest path problem</p>
+<dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.shortestPathBase" title="pyepo.model.bases.shortestPathBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.shortestPathBase</span></code></a>, <a class="reference internal" href="../omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel" title="pyepo.model.omo.omomodel.optOmoModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel.optOmoModel</span></code></a></p>
+<p>Pyomo-backed shortest path on a grid network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>_model</strong> (<em>Pyomo model</em>) – Pyomo model</p></li>
 <li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – optimization solver in the background</p></li>
-<li><p><strong>grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – size of grid network</p></li>
-<li><p><strong>arcs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – list of arcs</p></li>
+<li><p><strong>grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Size of grid network</p></li>
+<li><p><strong>arcs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of arcs</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestpath.shortestPathModel.grid">
-<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#pyepo.model.omo.shortestpath.shortestPathModel.grid" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.omo.shortestpath.shortestPathModel.arcs">
-<span class="sig-name descname"><span class="pre">arcs</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></span><a class="headerlink" href="#pyepo.model.omo.shortestpath.shortestPathModel.arcs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="py data">

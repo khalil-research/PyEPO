@@ -114,13 +114,13 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.knapsack.knapsackModel" title="pyepo.model.ort.knapsack.knapsackModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModel</span></code></a></p></td>
-<td><p>This class is an optimization model for the knapsack problem</p></td>
+<td><p>OR-Tools (pywraplp) backed knapsack.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.ort.knapsack.knapsackModelRel" title="pyepo.model.ort.knapsack.knapsackModelRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModelRel</span></code></a></p></td>
-<td><p>This class is relaxed optimization model for knapsack problem.</p></td>
+<td><p>LP relaxation of the OR-Tools knapsack.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.knapsack.knapsackCpModel" title="pyepo.model.ort.knapsack.knapsackCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackCpModel</span></code></a></p></td>
-<td><p>This class is an optimization model for the knapsack problem using CP-SAT</p></td>
+<td><p>OR-Tools CP-SAT backed knapsack.</p></td>
 </tr>
 </tbody>
 </table>
@@ -129,9 +129,9 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'scip'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModel" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="../ortmodel/index.html#pyepo.model.ort.ortmodel.optOrtModel" title="pyepo.model.ort.ortmodel.optOrtModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.ort.ortmodel.optOrtModel</span></code></a></p>
-<p>This class is an optimization model for the knapsack problem</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.knapsackBase" title="pyepo.model.bases.knapsackBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.knapsackBase</span></code></a>, <a class="reference internal" href="../ortmodel/index.html#pyepo.model.ort.ortmodel.optOrtModel" title="pyepo.model.ort.ortmodel.optOrtModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.ort.ortmodel.optOrtModel</span></code></a></p>
+<p>OR-Tools (pywraplp) backed knapsack.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -143,21 +143,6 @@
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackModel.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModel.weights" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackModel.capacity">
-<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModel.capacity" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackModel.items">
-<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModel.items" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackModel.relax">
 <span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.ort.knapsack.knapsackModelRel" title="pyepo.model.ort.knapsack.knapsackModelRel"><span class="pre">knapsackModelRel</span></a></span></span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModel.relax" title="Link to this definition"></a></dt>
@@ -168,9 +153,9 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackModelRel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'scip'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModelRel" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModelRel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.ort.knapsack.knapsackModel" title="pyepo.model.ort.knapsack.knapsackModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModel</span></code></a></p>
-<p>This class is relaxed optimization model for knapsack problem.</p>
+<p>LP relaxation of the OR-Tools knapsack.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackModelRel.relax">
 <span class="sig-name descname"><span class="pre">relax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.ort.knapsack.knapsackModelRel" title="pyepo.model.ort.knapsack.knapsackModelRel"><span class="pre">knapsackModelRel</span></a></span></span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackModelRel.relax" title="Link to this definition"></a></dt>
@@ -181,9 +166,9 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackCpModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackCpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackCpModel" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="../ortcpmodel/index.html#pyepo.model.ort.ortcpmodel.optOrtCpModel" title="pyepo.model.ort.ortcpmodel.optOrtCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.ort.ortcpmodel.optOrtCpModel</span></code></a></p>
-<p>This class is an optimization model for the knapsack problem using CP-SAT</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackCpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackCpModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.knapsackBase" title="pyepo.model.bases.knapsackBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.knapsackBase</span></code></a>, <a class="reference internal" href="../ortcpmodel/index.html#pyepo.model.ort.ortcpmodel.optOrtCpModel" title="pyepo.model.ort.ortcpmodel.optOrtCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.ort.ortcpmodel.optOrtCpModel</span></code></a></p>
+<p>OR-Tools CP-SAT backed knapsack.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -194,21 +179,6 @@
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackCpModel.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackCpModel.weights" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackCpModel.capacity">
-<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackCpModel.capacity" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.ort.knapsack.knapsackCpModel.items">
-<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#pyepo.model.ort.knapsack.knapsackCpModel.items" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="py data">

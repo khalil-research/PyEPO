@@ -114,7 +114,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.mpax.knapsack.knapsackModel" title="pyepo.model.mpax.knapsack.knapsackModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackModel</span></code></a></p></td>
-<td><p>This class is an optimization model for the relaxed knapsack problem</p></td>
+<td><p>MPAX-backed (JAX LP) knapsack — LP relaxation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -123,32 +123,22 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.mpax.knapsack.knapsackModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.knapsack.knapsackModel" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="../mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="pyepo.model.mpax.mpaxmodel.optMpaxModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.mpax.mpaxmodel.optMpaxModel</span></code></a></p>
-<p>This class is an optimization model for the relaxed knapsack problem</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.knapsack.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.mpax.knapsack.knapsackModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.knapsackBase" title="pyepo.model.bases.knapsackBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.knapsackBase</span></code></a>, <a class="reference internal" href="../mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="pyepo.model.mpax.mpaxmodel.optMpaxModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.mpax.mpaxmodel.optMpaxModel</span></code></a></p>
+<p>MPAX-backed (JAX LP) knapsack — LP relaxation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>_model</strong> – MPAX model</p></li>
-<li><p><strong>weights</strong> (<em>np.ndarray / list</em>) – Weights of items</p></li>
-<li><p><strong>capacity</strong> (<em>np.ndarray / list</em>) – Total capacity</p></li>
+<li><p><strong>weights</strong> (<em>np.ndarray</em>) – Weights of items</p></li>
+<li><p><strong>capacity</strong> (<em>np.ndarray</em>) – Total capacity</p></li>
 <li><p><strong>items</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of item index</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.mpax.knapsack.knapsackModel.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#pyepo.model.mpax.knapsack.knapsackModel.weights" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.mpax.knapsack.knapsackModel.capacity">
-<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.mpax.knapsack.knapsackModel.capacity" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.mpax.knapsack.knapsackModel.items">
-<span class="sig-name descname"><span class="pre">items</span></span><a class="headerlink" href="#pyepo.model.mpax.knapsack.knapsackModel.items" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pyepo.model.mpax.knapsack.knapsackModel.use_sparse_matrix">
+<span class="sig-name descname"><span class="pre">use_sparse_matrix</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#pyepo.model.mpax.knapsack.knapsackModel.use_sparse_matrix" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

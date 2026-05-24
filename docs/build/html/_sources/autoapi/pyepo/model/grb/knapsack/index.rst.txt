@@ -29,31 +29,22 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list)
+.. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
-   Bases: :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
+   Bases: :py:obj:`pyepo.model.bases.knapsackBase`, :py:obj:`pyepo.model.grb.grbmodel.optGrbModel`
 
 
-   This class is an optimization model for the knapsack problem
+   Gurobi-backed knapsack.
 
    :ivar _model: Gurobi model
    :vartype _model: GurobiPy model
    :ivar weights: Weights of items
-   :vartype weights: np.ndarray / list
+   :vartype weights: np.ndarray
    :ivar capacity: Total capacity
-   :vartype capacity: np.ndarray / list
+   :vartype capacity: np.ndarray
    :ivar items: List of item index
 
    :vartype items: list
-
-
-   .. py:attribute:: weights
-
-
-   .. py:attribute:: capacity
-
-
-   .. py:attribute:: items
 
 
    .. py:method:: relax() -> knapsackModelRel
@@ -62,12 +53,12 @@ Module Contents
 
 
 
-.. py:class:: knapsackModelRel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list)
+.. py:class:: knapsackModelRel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
    Bases: :py:obj:`knapsackModel`
 
 
-   This class is relaxed optimization model for knapsack problem.
+   LP relaxation of the Gurobi knapsack.
 
 
    .. py:method:: relax() -> knapsackModelRel

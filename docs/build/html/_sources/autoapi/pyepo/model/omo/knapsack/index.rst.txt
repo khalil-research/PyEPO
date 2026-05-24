@@ -31,10 +31,10 @@ Module Contents
 
 .. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, solver: str = 'glpk')
 
-   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+   Bases: :py:obj:`pyepo.model.bases.knapsackBase`, :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
 
-   This class is an optimization model for the knapsack problem
+   Pyomo-backed knapsack.
 
    :ivar _model: Pyomo model
    :vartype _model: Pyomo model
@@ -49,15 +49,6 @@ Module Contents
    :vartype items: list
 
 
-   .. py:attribute:: weights
-
-
-   .. py:attribute:: capacity
-
-
-   .. py:attribute:: items
-
-
    .. py:method:: relax() -> knapsackModelRel
 
       A method to get linear relaxation model
@@ -69,7 +60,7 @@ Module Contents
    Bases: :py:obj:`knapsackModel`
 
 
-   This class is relaxed optimization model for knapsack problem.
+   LP relaxation of the Pyomo knapsack.
 
 
    .. py:method:: relax() -> knapsackModelRel

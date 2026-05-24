@@ -24,7 +24,7 @@ Users can define custom optimization problems with linear objective functions. `
 2. **Pyomo-based**: Inherit from ``optOmoModel`` and implement ``_getModel``.
 3. **COPT-based**: Inherit from ``optCoptModel`` and implement ``_getModel``.
 4. **OR-Tools-based**: Inherit from ``optOrtModel`` (pywraplp) or ``optOrtCpModel`` (CP-SAT) and implement ``_getModel``.
-5. **MPAX-based**: Inherit from ``optMpaxModel`` and provide constraint matrices ``A``, ``b``, ``G``, ``h``.
+5. **MPAX-based**: Inherit from ``optMpaxModel`` and implement ``_getModel`` to populate constraint matrices ``self.A``, ``self.b``, ``self.G``, ``self.h``, ``self.l``, ``self.u``.
 6. **From scratch**: Inherit from ``optModel`` and implement ``_getModel``, ``setObj``, ``solve``, and ``num_cost``.
 
 The ``optModel`` interface consists of:
@@ -252,24 +252,43 @@ User-defined MPAX Models
 
 MPAX (Mathematical Programming in JAX) is a hardware-accelerated mathematical programming framework based on the PDHG (Primal-Dual Hybrid Gradient) algorithm, designed for large-scale LP problems.
 
-``optMpaxModel`` is a ``PyEPO`` model that uses MPAX to solve LP relaxations via PDHG. It accepts constraints in matrix/vector form:
+To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and populate the constraint matrices inside ``_getModel``:
 
-   - ``A``, ``b``: Equality constraints :math:`Ax = b`. Omit if there are no equality constraints.
-   - ``G``, ``h``: Inequality constraints :math:`Gx \leq h`. Omit if there are no inequality constraints.
-   - ``l``: Lower bounds (default: 0, i.e., non-negative variables).
-   - ``u``: Upper bounds (default: infinity, i.e., unbounded).
-   - ``use_sparse_matrix`` (default: ``True``): Whether to use sparse matrix storage.
-   - ``minimize`` (default: ``True``): Whether to minimize the objective.
+   - ``self.A``, ``self.b``: Equality constraints :math:`Ax = b`. Use ``jnp.zeros((0, n))`` / ``jnp.zeros((0,))`` for none.
+   - ``self.G``, ``self.h``: Inequality constraints :math:`Gx \geq h`. Use ``jnp.zeros((0, n))`` / ``jnp.zeros((0,))`` for none.
+   - ``self.l``: Lower bounds (typically zeros for non-negative variables).
+   - ``self.u``: Upper bounds (use ``jnp.full(n, jnp.inf)`` for unbounded).
+
+``_getModel`` should return ``(None, [])`` — MPAX has no explicit model object, the matrices are the model. Sparse-matrix format can be toggled by overriding the class attribute ``use_sparse_matrix`` (default ``True``). Sense follows ``self.modelSense`` (set ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for a maximization problem; defaults to minimization).
 
 .. autoclass:: pyepo.model.mpax.optMpaxModel
   :noindex:
-  :members: __init__, _getModel, setObj, solve, num_cost, relax
+  :members: __init__, _getModel, setObj, solve, num_cost
 
 .. code-block:: python
 
-   from pyepo.model.mpax import optMpaxModel
-   optmodel = optMpaxModel(A=A, b=b, G=G, h=h, use_sparse_matrix=False, minimize=True)
+   import jax.numpy as jnp
 
+   from pyepo.model.mpax import optMpaxModel
+
+   class myLpModel(optMpaxModel):
+
+       use_sparse_matrix = False  # dense matrices
+
+       def _getModel(self):
+           # equality A x = b
+           self.A = jnp.array(A)
+           self.b = jnp.array(b)
+           # inequality G x >= h
+           self.G = jnp.array(G)
+           self.h = jnp.array(h)
+           # variable bounds x in [0, 1]
+           n = self.A.shape[1]
+           self.l = jnp.zeros(n, dtype=jnp.float32)
+           self.u = jnp.ones(n, dtype=jnp.float32)
+           return None, []
+
+   optmodel = myLpModel()
    optmodel.setObj(cost) # set objective function
    optmodel.solve() # solve
 
@@ -283,7 +302,7 @@ For complete flexibility, ``pyepo.model.opt.optModel`` allows users to build mod
     :noindex:
     :members: __init__, _getModel, setObj, solve, num_cost
 
-.. warning::  ``optModel`` requires setting ``modelSense`` in ``_getModel``. If not set, the default is minimization.
+.. note::  For maximization problems, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__`` or ``_getModel``. Otherwise the default is minimization.
 
 The following example uses ``networkx`` with the Dijkstra algorithm to solve a shortest path problem:
 
