@@ -202,7 +202,8 @@ class regularizedFrankWolfeOptFunc(Function):
         # project grad_output onto row space of V_centered via (K+1, K+1) Gram matrix
         M = V_centered @ V_centered.transpose(-1, -2)            # (batch, K+1, K+1)
         h = V_centered @ grad_output.unsqueeze(-1)               # (batch, K+1, 1)
-        alpha = torch.linalg.pinv(M, rtol=1e-6) @ h              # (batch, K+1, 1)
+        M.diagonal(dim1=-2, dim2=-1).add_(1e-6)                  # ridge for rank-deficient M
+        alpha = torch.linalg.solve(M, h)                         # (batch, K+1, 1)
         grad = (V_centered.transpose(-1, -2) @ alpha).squeeze(-1)
         # chain rule for pred_cost
         return scale * grad, None
