@@ -48,11 +48,20 @@ class optOrtModel(optModel):
         super().__init__()
         # suppress output
         self._model.SuppressOutput()
+        self._set_obj_sense()
         # cache ordered Var list once for setCoefficient/solution_value loops
         self._vars_list = list(self.x.values())
 
     def __repr__(self) -> str:
         return "optOrtModel " + self.__class__.__name__
+
+    def _set_obj_sense(self) -> None:
+        """Set objective sense on ``self._model.Objective()`` based on ``self.modelSense``."""
+        obj = self._model.Objective()
+        if self.modelSense == EPO.MAXIMIZE:
+            obj.SetMaximization()
+        else:
+            obj.SetMinimization()
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
@@ -67,10 +76,6 @@ class optOrtModel(optModel):
         obj = self._model.Objective()
         for v, coef in zip(self._vars_list, c.tolist()):
             obj.SetCoefficient(v, coef)
-        if self.modelSense == EPO.MAXIMIZE:
-            obj.SetMaximization()
-        else:
-            obj.SetMinimization()
 
     def solve(self) -> tuple[np.ndarray, float]:
         """
@@ -102,6 +107,7 @@ class optOrtModel(optModel):
         # rebuild model from scratch
         new_model._model, new_model.x = new_model._getModel()
         new_model._model.SuppressOutput()
+        new_model._set_obj_sense()
         new_model._vars_list = list(new_model.x.values())
         # replay extra constraints
         for coefs, rhs in new_model._extra_constrs:
