@@ -119,9 +119,7 @@ class optCoptModel(optModel):
             new_model._vars_list = list(new_model.x.values())
         return new_model
 
-    def addConstr(
-        self, coefs: np.ndarray | torch.Tensor | list, rhs: float
-    ) -> optCoptModel:
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optCoptModel:
         """
         A method to add a new constraint
 

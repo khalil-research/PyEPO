@@ -203,7 +203,8 @@ class perturbationGradient(optModule):
         if self.two_sides:
             # batch +sigma and -sigma into one solve
             combined_sol, _ = _solve_or_cache(
-                torch.cat([cp + self.sigma * c, cp - self.sigma * c], dim=0), self,
+                torch.cat([cp + self.sigma * c, cp - self.sigma * c], dim=0),
+                self,
             )
             wp, wm = combined_sol[:b], combined_sol[b:]
             # differentiable objective value
@@ -215,7 +216,8 @@ class perturbationGradient(optModule):
         else:
             # batch clean and -sigma into one solve
             combined_sol, _ = _solve_or_cache(
-                torch.cat([cp, cp - self.sigma * c], dim=0), self,
+                torch.cat([cp, cp - self.sigma * c], dim=0),
+                self,
             )
             w, wm = combined_sol[:b], combined_sol[b:]
             # differentiable objective value

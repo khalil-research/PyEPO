@@ -76,11 +76,12 @@ class regularizedFrankWolfeOpt(optModule):
         """
         L2 regularizer Omega(y) = (lambd / 2) ||y||^2 per instance
         """
-        return 0.5 * self.lambd * (y ** 2).sum(dim=-1)
+        return 0.5 * self.lambd * (y**2).sum(dim=-1)
 
     @torch.no_grad()
     def _frankWolfe(
-        self, theta: torch.Tensor,
+        self,
+        theta: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Batched Frank-Wolfe for argmin_mu 1/2 ||mu - theta||^2 over conv(V).
@@ -128,7 +129,7 @@ class regularizedFrankWolfeOpt(optModule):
             active = active_mask.to(dtype)
             # early break when all instances converged
             if not bool(active_mask.any()):
-                return mu, vertices[:, :k + 1], weights[:, :k + 1]
+                return mu, vertices[:, : k + 1], weights[:, : k + 1]
             # exact line search for the quadratic
             denom = (diff * diff).sum(dim=-1).clamp(min=1e-12)
             gamma = (gap / denom).clamp(0.0, 1.0) * active
@@ -136,14 +137,16 @@ class regularizedFrankWolfeOpt(optModule):
             mu.sub_(gamma.unsqueeze(-1) * diff)
             # vertex dedup via cached norms + inner products
             v_norm_sq = (v * v).sum(dim=-1)
-            inner = torch.einsum("bnv,bv->bn", vertices[:, :k + 1], v)
-            dist_sq = vertex_norms[:, :k + 1] - 2 * inner + v_norm_sq.unsqueeze(-1)
+            inner = torch.einsum("bnv,bv->bn", vertices[:, : k + 1], v)
+            dist_sq = vertex_norms[:, : k + 1] - 2 * inner + v_norm_sq.unsqueeze(-1)
             match_mask = dist_sq < 1e-6
             has_match = match_mask.any(dim=-1)
             match_idx = match_mask.to(dtype).argmax(dim=-1)
             # in-place weight shrink
             weights.mul_((1.0 - gamma).unsqueeze(-1))
-            weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma * has_match.to(dtype)
+            weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma * has_match.to(
+                dtype
+            )
             vertices[:, k + 1] = v
             vertex_norms[:, k + 1] = v_norm_sq
             weights[:, k + 1] = gamma * (~has_match).to(dtype)
@@ -200,17 +203,17 @@ class regularizedFrankWolfeOptFunc(Function):
         scale = ctx.scale
         # batched orthogonal projector onto each instance's active hull
         dtype = vertices.dtype
-        s = (weights > 0).to(dtype)                                       # (batch, K+1)
+        s = (weights > 0).to(dtype)  # (batch, K+1)
         # active-only mean per instance
-        n_active = s.sum(dim=-1, keepdim=True).clamp(min=1.0)             # (batch, 1)
-        V_mean = (vertices * s.unsqueeze(-1)).sum(dim=-2) / n_active      # (batch, vars)
+        n_active = s.sum(dim=-1, keepdim=True).clamp(min=1.0)  # (batch, 1)
+        V_mean = (vertices * s.unsqueeze(-1)).sum(dim=-2) / n_active  # (batch, vars)
         # centered, with inactive rows kept at zero
         V_centered = (vertices - V_mean.unsqueeze(-2)) * s.unsqueeze(-1)
         # project grad_output onto row space of V_centered via (K+1, K+1) Gram matrix
-        M = V_centered @ V_centered.transpose(-1, -2)            # (batch, K+1, K+1)
-        h = V_centered @ grad_output.unsqueeze(-1)               # (batch, K+1, 1)
-        M.diagonal(dim1=-2, dim2=-1).add_(1e-6)                  # ridge for rank-deficient M
-        alpha = torch.linalg.solve(M, h)                         # (batch, K+1, 1)
+        M = V_centered @ V_centered.transpose(-1, -2)  # (batch, K+1, K+1)
+        h = V_centered @ grad_output.unsqueeze(-1)  # (batch, K+1, 1)
+        M.diagonal(dim1=-2, dim2=-1).add_(1e-6)  # ridge for rank-deficient M
+        alpha = torch.linalg.solve(M, h)  # (batch, K+1, 1)
         grad = (V_centered.transpose(-1, -2) @ alpha).squeeze(-1)
         # chain rule for pred_cost
         return scale * grad, None
@@ -276,7 +279,8 @@ class regularizedFrankWolfeFenchelYoung(optModule):
 
     @torch.no_grad()
     def _frankWolfe(
-        self, theta: torch.Tensor,
+        self,
+        theta: torch.Tensor,
     ) -> torch.Tensor:
         """
         Batched Frank-Wolfe for argmin_mu 1/2 ||mu - theta||^2 over conv(V).
@@ -360,8 +364,8 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # regularizers
-        omega_w = 0.5 * module.lambd * (w ** 2).sum(dim=-1)
-        omega_r = 0.5 * module.lambd * (r_sol ** 2).sum(dim=-1)
+        omega_w = 0.5 * module.lambd * (w**2).sum(dim=-1)
+        omega_r = 0.5 * module.lambd * (r_sol**2).sum(dim=-1)
         # Fenchel-Young loss
         loss = (omega_w - omega_r) + torch.einsum("bi,bi->b", cp, diff)
         # save solutions
@@ -373,6 +377,6 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
         """
         Backward pass for regularized Frank-Wolfe Fenchel-Young loss
         """
-        grad, = ctx.saved_tensors
+        (grad,) = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
         return grad * grad_output, None, None

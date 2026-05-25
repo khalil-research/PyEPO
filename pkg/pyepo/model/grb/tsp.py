@@ -198,9 +198,7 @@ class tspDFJModel(tspABModel):
         if where == GRB.Callback.MIPSOL:
             # selected edges
             xvals = model.cbGetSolution(model._x)
-            selected = gp.tuplelist(
-                (i, j) for i, j in model._x if xvals[i, j] > _EDGE_ACTIVE_TOL
-            )
+            selected = gp.tuplelist((i, j) for i, j in model._x if xvals[i, j] > _EDGE_ACTIVE_TOL)
             # check subcycle with unionfind
             uf = unionFind(model._n)
             for i, j in selected:

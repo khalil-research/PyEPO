@@ -127,7 +127,9 @@ class perturbedOptFunc(Function):
         gen = _torch_generator(module._gen_cache, device, module.seed)
         noises = torch.randn(
             (cp.shape[0], module.n_samples, cp.shape[1]),
-            device=device, dtype=cp.dtype, generator=gen,
+            device=device,
+            dtype=cp.dtype,
+            generator=gen,
         )
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
@@ -276,7 +278,9 @@ class perturbedFenchelYoungFunc(Function):
         gen = _torch_generator(module._gen_cache, device, module.seed)
         noises = torch.randn(
             (cp.shape[0], module.n_samples, cp.shape[1]),
-            device=device, dtype=cp.dtype, generator=gen,
+            device=device,
+            dtype=cp.dtype,
+            generator=gen,
         )
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
@@ -302,7 +306,7 @@ class perturbedFenchelYoungFunc(Function):
         """
         Backward pass for perturbed Fenchel-Young loss
         """
-        grad, = ctx.saved_tensors
+        (grad,) = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
         return grad * grad_output, None, None
 
@@ -453,7 +457,9 @@ class implicitMLEFunc(Function):
         if module.two_sides:
             # batch positive and negative perturbations into one solve
             n = module.n_samples
-            combined_sols = _solve_or_cache_3d(torch.cat([ptb_c + delta, ptb_c - delta], dim=1), module)
+            combined_sols = _solve_or_cache_3d(
+                torch.cat([ptb_c + delta, ptb_c - delta], dim=1), module
+            )
             ptb_sols_pos, ptb_sols_neg = combined_sols[:, :n], combined_sols[:, n:]
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + _EPS)
         else:
@@ -533,7 +539,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         """
         Backward pass for IMLE
         """
-        pred_cost, = ctx.saved_tensors
+        (pred_cost,) = ctx.saved_tensors
         ptb_c = ctx.ptb_c
         ptb_sols = ctx.ptb_sols
         module = ctx.module
@@ -549,7 +555,9 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         if module.two_sides:
             # batch positive and negative perturbations into one solve
             n = module.n_samples
-            combined_sols = _solve_or_cache_3d(torch.cat([ptb_c + delta, ptb_c - delta], dim=1), module)
+            combined_sols = _solve_or_cache_3d(
+                torch.cat([ptb_c + delta, ptb_c - delta], dim=1), module
+            )
             ptb_sols_pos, ptb_sols_neg = combined_sols[:, :n], combined_sols[:, n:]
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + _EPS)
         else:

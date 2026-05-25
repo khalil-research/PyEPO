@@ -95,7 +95,9 @@ def _solve_batch(
         obj = torch.from_dlpack(obj)
         if sol.device != device:
             logger.warning(
-                "MPAX solutions on %s differ from input device %s; copying", sol.device, device,
+                "MPAX solutions on %s differ from input device %s; copying",
+                sol.device,
+                device,
             )
             sol, obj = sol.to(device), obj.to(device)
         # obj sense

@@ -55,7 +55,10 @@ class tspABModel(tspABBase, optOmoModel):
         self._solverfac.solve(self._model)
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):
-            if pe.value(self.x[i, j]) > _EDGE_ACTIVE_TOL or pe.value(self.x[j, i]) > _EDGE_ACTIVE_TOL:
+            if (
+                pe.value(self.x[i, j]) > _EDGE_ACTIVE_TOL
+                or pe.value(self.x[j, i]) > _EDGE_ACTIVE_TOL
+            ):
                 sol[k] = 1
         return sol, pe.value(self._model.obj)
 

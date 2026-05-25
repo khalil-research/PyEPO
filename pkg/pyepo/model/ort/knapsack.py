@@ -120,9 +120,7 @@ class knapsackCpModel(knapsackBase, optOrtCpModel):
                 "Cast explicitly, e.g. np.round(weights).astype(int)."
             )
         if not np.array_equal(capacity, np.asarray(self.capacity)):
-            raise ValueError(
-                "CP-SAT knapsack requires integer capacity; got non-integer values."
-            )
+            raise ValueError("CP-SAT knapsack requires integer capacity; got non-integer values.")
         # create a model
         m = cp_model.CpModel()
         # variables
