@@ -273,7 +273,7 @@ Cone-Aligned Estimation
 =======================
 
 
-Cone-aligned Vector Estimation (CaVE)
+Cone-Aligned Vector Estimation (CaVE)
 -------------------------------------
 
 CaVE requires a dedicated dataset class that extracts binding-constraint normals at the optimum (``optDatasetConstrs``) and a custom collate function (``collate_tight_constraints``) to handle ragged per-instance constraint counts. The batch yields an extra ``tight_ctrs`` element on top of the usual ``(x, c, w, z)``.
