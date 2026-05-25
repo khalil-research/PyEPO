@@ -3,6 +3,7 @@ Pytorch autograd function for end-to-end training
 """
 
 from pyepo.func.blackbox import blackboxOpt, negativeIdentity
+from pyepo.func.cave import coneAlignedCosine
 from pyepo.func.contrastive import NCE, contrastiveMAP
 from pyepo.func.perturbed import (
     adaptiveImplicitMLE,
@@ -17,21 +18,22 @@ from pyepo.func.regularized import regularizedFrankWolfeFenchelYoung, regularize
 from pyepo.func.surrogate import SPOPlus, perturbationGradient
 
 __all__ = [
-    "NCE",
     "SPOPlus",
-    "adaptiveImplicitMLE",
     "blackboxOpt",
-    "contrastiveMAP",
-    "implicitMLE",
-    "listwiseLTR",
     "negativeIdentity",
-    "pairwiseLTR",
-    "perturbationGradient",
-    "perturbedFenchelYoung",
-    "perturbedFenchelYoungMul",
     "perturbedOpt",
     "perturbedOptMul",
-    "pointwiseLTR",
-    "regularizedFrankWolfeFenchelYoung",
+    "perturbedFenchelYoung",
+    "perturbedFenchelYoungMul",
     "regularizedFrankWolfeOpt",
+    "regularizedFrankWolfeFenchelYoung",
+    "NCE",
+    "contrastiveMAP",
+    "pointwiseLTR",
+    "pairwiseLTR",
+    "listwiseLTR",
+    "implicitMLE",
+    "adaptiveImplicitMLE",
+    "perturbationGradient",
+    "coneAlignedCosine",
 ]
