@@ -13,7 +13,7 @@ import numpy as np
 from gurobipy import GRB
 
 from pyepo.model.grb.grbmodel import optGrbModel
-from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
+from pyepo.model.utils import _EDGE_ACTIVE_TOL, _uf_components, unionFind
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
@@ -139,7 +139,7 @@ class vrpRCIModel(vrpABModel):
         # depot degree
         m.addConstr(x.sum(0, "*") <= 2 * self.num_vehicle)  # 2 per vehicle
         # customer 2-degree
-        m.addConstrs(x.sum(i, "*") == 2 for i in self.nodes if i != 0)
+        m.addConstrs(x.sum(i, "*") == 2 for i in self.nodes[1:])
         # callback state
         m._x = x
         m._n = self.num_nodes
@@ -237,11 +237,11 @@ class vrpMTZModel(vrpABModel):
         # customer assignment: one in, one out
         m.addConstrs(
             gp.quicksum(x[i, j] for j in self.nodes if j != i) == 1
-            for i in self.nodes if i != 0
+            for i in self.nodes[1:]
         )
         m.addConstrs(
             gp.quicksum(x[i, j] for i in self.nodes if i != j) == 1
-            for j in self.nodes if j != 0
+            for j in self.nodes[1:]
         )
         # depot vehicle count (out and in)
         m.addConstr(x.sum(0, "*") <= self.num_vehicle)
@@ -313,11 +313,11 @@ class vrpMTZModelRel(vrpMTZModel):
         # customer assignment: one in, one out
         m.addConstrs(
             gp.quicksum(x[i, j] for j in self.nodes if j != i) == 1
-            for i in self.nodes if i != 0
+            for i in self.nodes[1:]
         )
         m.addConstrs(
             gp.quicksum(x[i, j] for i in self.nodes if i != j) == 1
-            for j in self.nodes if j != 0
+            for j in self.nodes[1:]
         )
         # depot vehicle count (out and in)
         m.addConstr(x.sum(0, "*") <= self.num_vehicle)
@@ -351,9 +351,3 @@ class vrpMTZModelRel(vrpMTZModel):
         raise RuntimeError("Relaxation Model has no integer solution.")
 
 
-def _uf_components(uf: unionFind) -> list[list[int]]:
-    """Group elements of a union-find into their disjoint components."""
-    comps: dict[int, list[int]] = defaultdict(list)
-    for i in range(len(uf.parent)):
-        comps[uf.find(i)].append(i)
-    return list(comps.values())

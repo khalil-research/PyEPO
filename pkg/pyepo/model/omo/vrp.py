@@ -158,17 +158,13 @@ class vrpMTZModel(vrpABModel):
         # constraints
         m.cons = pe.ConstraintList()
         # customer assignment: one in, one out
-        for i in self.nodes:
-            if i == 0:
-                continue
+        for i in self.nodes[1:]:
             m.cons.add(sum(x[i, j] for j in self.nodes if j != i) == 1)
-        for j in self.nodes:
-            if j == 0:
-                continue
+        for j in self.nodes[1:]:
             m.cons.add(sum(x[i, j] for i in self.nodes if i != j) == 1)
         # depot vehicle count (out and in)
-        m.cons.add(sum(x[0, j] for j in self.nodes if j != 0) <= self.num_vehicle)
-        m.cons.add(sum(x[i, 0] for i in self.nodes if i != 0) <= self.num_vehicle)
+        m.cons.add(sum(x[0, j] for j in self.nodes[1:]) <= self.num_vehicle)
+        m.cons.add(sum(x[i, 0] for i in self.nodes[1:]) <= self.num_vehicle)
         # MTZ capacity / subtour-free load propagation
         for i, j in directed_edges:
             if i == 0 or j == 0:
@@ -231,17 +227,13 @@ class vrpMTZModelRel(vrpMTZModel):
         # constraints
         m.cons = pe.ConstraintList()
         # customer assignment: one in, one out
-        for i in self.nodes:
-            if i == 0:
-                continue
+        for i in self.nodes[1:]:
             m.cons.add(sum(x[i, j] for j in self.nodes if j != i) == 1)
-        for j in self.nodes:
-            if j == 0:
-                continue
+        for j in self.nodes[1:]:
             m.cons.add(sum(x[i, j] for i in self.nodes if i != j) == 1)
         # depot vehicle count (out and in)
-        m.cons.add(sum(x[0, j] for j in self.nodes if j != 0) <= self.num_vehicle)
-        m.cons.add(sum(x[i, 0] for i in self.nodes if i != 0) <= self.num_vehicle)
+        m.cons.add(sum(x[0, j] for j in self.nodes[1:]) <= self.num_vehicle)
+        m.cons.add(sum(x[i, 0] for i in self.nodes[1:]) <= self.num_vehicle)
         # MTZ capacity / subtour-free load propagation
         for i, j in directed_edges:
             if i == 0 or j == 0:

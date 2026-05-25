@@ -12,7 +12,7 @@ import numpy as np
 from coptpy import COPT, CallbackBase
 
 from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
-from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
+from pyepo.model.utils import _EDGE_ACTIVE_TOL, _uf_components, unionFind
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
@@ -168,11 +168,9 @@ class vrpRCIModel(vrpABModel):
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # depot degree
-        m.addConstr(sum(x[0, j] for j in self.nodes if j != 0) <= 2 * self.num_vehicle)
+        m.addConstr(sum(x[0, j] for j in self.nodes[1:]) <= 2 * self.num_vehicle)
         # customer 2-degree
-        for i in self.nodes:
-            if i == 0:
-                continue
+        for i in self.nodes[1:]:
             m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 2)
         # one unique Var per undirected edge (x[j,i] aliases x[i,j])
         self._cost_vars: list = [x[e] for e in self.edges]
@@ -237,17 +235,13 @@ class vrpMTZModel(vrpABModel):
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # customer assignment: one in, one out
-        for i in self.nodes:
-            if i == 0:
-                continue
+        for i in self.nodes[1:]:
             m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
-        for j in self.nodes:
-            if j == 0:
-                continue
+        for j in self.nodes[1:]:
             m.addConstr(sum(x[i, j] for i in self.nodes if i != j) == 1)
         # depot vehicle count (out and in)
-        m.addConstr(sum(x[0, j] for j in self.nodes if j != 0) <= self.num_vehicle)
-        m.addConstr(sum(x[i, 0] for i in self.nodes if i != 0) <= self.num_vehicle)
+        m.addConstr(sum(x[0, j] for j in self.nodes[1:]) <= self.num_vehicle)
+        m.addConstr(sum(x[i, 0] for i in self.nodes[1:]) <= self.num_vehicle)
         # MTZ capacity / subtour-free load propagation
         for i, j in directed_edges:
             if i == 0 or j == 0:
@@ -316,17 +310,13 @@ class vrpMTZModelRel(vrpMTZModel):
         # sense
         m.setObjSense(COPT.MINIMIZE)
         # customer assignment: one in, one out
-        for i in self.nodes:
-            if i == 0:
-                continue
+        for i in self.nodes[1:]:
             m.addConstr(sum(x[i, j] for j in self.nodes if j != i) == 1)
-        for j in self.nodes:
-            if j == 0:
-                continue
+        for j in self.nodes[1:]:
             m.addConstr(sum(x[i, j] for i in self.nodes if i != j) == 1)
         # depot vehicle count (out and in)
-        m.addConstr(sum(x[0, j] for j in self.nodes if j != 0) <= self.num_vehicle)
-        m.addConstr(sum(x[i, 0] for i in self.nodes if i != 0) <= self.num_vehicle)
+        m.addConstr(sum(x[0, j] for j in self.nodes[1:]) <= self.num_vehicle)
+        m.addConstr(sum(x[i, 0] for i in self.nodes[1:]) <= self.num_vehicle)
         # MTZ capacity / subtour-free load propagation
         for i, j in directed_edges:
             if i == 0 or j == 0:
@@ -359,9 +349,3 @@ class vrpMTZModelRel(vrpMTZModel):
         raise RuntimeError("Relaxation Model has no integer solution.")
 
 
-def _uf_components(uf: unionFind) -> list[list[int]]:
-    """Group elements of a union-find into their disjoint components."""
-    comps: dict[int, list[int]] = defaultdict(list)
-    for i in range(len(uf.parent)):
-        comps[uf.find(i)].append(i)
-    return list(comps.values())

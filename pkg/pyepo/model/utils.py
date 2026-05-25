@@ -62,6 +62,14 @@ class unionFind:
         return False
 
 
+def _uf_components(uf: unionFind) -> list[list[int]]:
+    """Group elements of a union-find into their disjoint components."""
+    comps: dict[int, list[int]] = defaultdict(list)
+    for i in range(len(uf.parent)):
+        comps[uf.find(i)].append(i)
+    return list(comps.values())
+
+
 def getTspTour(
     edge_list: list[tuple[int, int]],
     num_nodes: int,
