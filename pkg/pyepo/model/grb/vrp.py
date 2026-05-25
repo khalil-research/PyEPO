@@ -231,7 +231,7 @@ class vrpMTZModel(vrpABModel):
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
         u = m.addVars(
             self.nodes, name="u",
-            lb=[0] + list(self.demands), ub=self.capacity, vtype=GRB.CONTINUOUS,
+            lb=[0, *list(self.demands)], ub=self.capacity, vtype=GRB.CONTINUOUS,
         )
         # sense
         m.modelSense = GRB.MINIMIZE
@@ -307,7 +307,7 @@ class vrpMTZModelRel(vrpMTZModel):
         x = m.addVars(directed_edges, name="x", vtype=GRB.CONTINUOUS)
         u = m.addVars(
             self.nodes, name="u",
-            lb=[0] + list(self.demands), ub=self.capacity, vtype=GRB.CONTINUOUS,
+            lb=[0, *list(self.demands)], ub=self.capacity, vtype=GRB.CONTINUOUS,
         )
         # sense
         m.modelSense = GRB.MINIMIZE
