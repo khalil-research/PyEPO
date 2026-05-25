@@ -1,0 +1,59 @@
+pyepo.func.cave
+===============
+
+.. py:module:: pyepo.func.cave
+
+.. autoapi-nested-parse::
+
+   Cone-aligned vector estimation (CaVE) loss for binary linear programs
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.cave.coneAlignedCosine
+
+
+Module Contents
+---------------
+
+.. py:class:: coneAlignedCosine(optmodel: pyepo.model.opt.optModel, max_iters: int | None = 20, tol_grad: float | None = None, processes: int = 1, reduction: pyepo.func.abcmodule.Reduction = 'mean')
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for the CaVE loss for binary linear programs. Projects
+   the sense-flipped predicted cost onto the polyhedral cone spanned by the
+   binding-constraint normals at the optimal vertex via batched dense
+   Nesterov APGD on GPU/CPU, then minimizes ``1 - cos(pred, proj)``.
+
+   Defaults reproduce the **CaVE+** preset from the paper (truncated APGD,
+   ``max_iters=20``, no convergence check), which lands strictly inside the
+   cone and avoids the boundary-stagnation that pure-exact APGD can hit. To
+   approach the original **CaVE** preset, set a non-trivial tolerance
+   (e.g. ``tol_grad=1e-4``) and remove the iteration cap (``max_iters=None``);
+   in practice this is slower without a regret improvement, so the truncated
+   default is recommended.
+
+   Reference: <https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>
+
+
+   .. py:attribute:: tol_grad
+      :value: None
+
+
+
+   .. py:attribute:: max_iters
+      :value: 20
+
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor, tight_ctrs: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+

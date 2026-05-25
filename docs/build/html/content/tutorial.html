@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.2.0 documentation</title>
+  <title>Tutorial &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,13 +49,17 @@
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/model.html">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/data.html">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html">Auto Grad Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/pool.html">Solution Pool</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html">Training</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/evaluation.html">Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#where-to-start">Where to start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference-pages">Reference pages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/model.html">Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/data.html">Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/twostage.html">Two-Stage Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/function.html">Auto Grad Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/pool.html">Solution Pool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/training.html">Training</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/evaluation.html">Evaluation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref.html">Reference</a></li>
@@ -89,6 +93,16 @@
   <section id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading"></a></h1>
 <p>This guide walks through the main <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> workflow for predict-then-optimize problems: define an optimization model, build an optimization-aware dataset, choose a training module, train a predictor, and evaluate decision quality.</p>
+<section id="where-to-start">
+<h2>Where to start<a class="headerlink" href="#where-to-start" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>New to PyEPO</strong> — read the pages below in order. <a class="reference internal" href="examples/model.html"><span class="doc">Model</span></a> and <a class="reference internal" href="examples/data.html"><span class="doc">Data</span></a> set up the modeling primitives; <a class="reference internal" href="examples/twostage.html"><span class="doc">Two-Stage Method</span></a> introduces the regression baseline; <a class="reference internal" href="examples/function.html"><span class="doc">Auto Grad Functions</span></a> and <a class="reference internal" href="examples/training.html"><span class="doc">Training</span></a> cover the end-to-end methods; <a class="reference internal" href="examples/evaluation.html"><span class="doc">Evaluation</span></a> defines the metrics.</p></li>
+<li><p><strong>Want to pick a method</strong> — jump to the <em>Choosing a Method</em> section of <a class="reference internal" href="examples/function.html"><span class="doc">Auto Grad Functions</span></a>. It poses three questions (what supervision you have, whether you want a loss or a solution, special constraints) and points you at the right module.</p></li>
+<li><p><strong>Prefer hands-on</strong> — open the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">03 Training and Testing</a> notebook. It compares every method family on the same shortest-path benchmark.</p></li>
+</ul>
+</section>
+<section id="reference-pages">
+<h2>Reference pages<a class="headerlink" href="#reference-pages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="examples/model.html">Model</a><ul>
@@ -100,42 +114,34 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/data.html#data-generator">Data Generator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/data.html#optdataset">optDataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/data.html#optdatasetknn">optDatasetKNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/data.html#optdatasetconstrs">optDatasetConstrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/twostage.html">Two-Stage Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/function.html">Auto Grad Functions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#choosing-a-training-module">Choosing a Training Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#smart-predict-then-optimize-loss-spo">Smart Predict-then-Optimize Loss+ (SPO+)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#differentiable-black-box-optimizer-dbb">Differentiable Black-box Optimizer (DBB)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#negative-identity-backpropagation-nid">Negative Identity Backpropagation (NID)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#differentiable-perturbed-optimizer-dpo">Differentiable Perturbed Optimizer (DPO)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#perturbed-fenchel-young-loss-pfyl">Perturbed Fenchel-Young Loss (PFYL)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#l2-regularized-frank-wolfe-rfwo">L2 Regularized Frank-Wolfe (RFWO)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#l2-regularized-frank-wolfe-fenchel-young-loss-rfyl">L2 Regularized Frank-Wolfe Fenchel-Young Loss (RFYL)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#noise-contrastive-estimation-nce">Noise Contrastive Estimation (NCE)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#contrastive-map-cmap">Contrastive MAP (CMAP)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#learning-to-rank-ltr">Learning to Rank (LTR)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#implicit-maximum-likelihood-estimator-i-mle">Implicit Maximum Likelihood Estimator (I-MLE)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#adaptive-implicit-maximum-likelihood-estimator-ai-mle">Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html#perturbation-gradient-pg">Perturbation Gradient (PG)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#choosing-a-method">Choosing a Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#surrogate-losses">Surrogate Losses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#perturbed-methods">Perturbed Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#regularized-methods">Regularized Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#black-box-methods">Black-Box Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#cone-aligned-estimation">Cone-Aligned Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#contrastive-methods">Contrastive Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html#learning-to-rank">Learning to Rank</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#parallel-computation">Parallel Computation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/pool.html">Solution Pool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/training.html">Training</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/training.html#common-setup">Common Setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-spo">Training with SPO+</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-dbb">Training with DBB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-nid">Training with NID</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-dpo">Training with DPO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-pfyl">Training with PFYL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-rfwo">Training with RFWO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-rfyl">Training with RFYL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-nce">Training with NCE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-ltr">Training with LTR</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-i-mle">Training with I-MLE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-ai-mle">Training with AI-MLE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/training.html#training-with-pg">Training with PG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#two-training-patterns">Two Training Patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#surrogate-losses">Surrogate Losses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#perturbed-methods">Perturbed Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#regularized-methods">Regularized Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#black-box-methods">Black-Box Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#cone-aligned-estimation">Cone-Aligned Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#contrastive-methods">Contrastive Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/training.html#learning-to-rank">Learning to Rank</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/evaluation.html">Evaluation</a><ul>
@@ -145,6 +151,7 @@
 </li>
 </ul>
 </div>
+</section>
 </section>
 
 

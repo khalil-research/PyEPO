@@ -20,5 +20,6 @@ Submodules
    /autoapi/pyepo/model/copt/portfolio/index
    /autoapi/pyepo/model/copt/shortestpath/index
    /autoapi/pyepo/model/copt/tsp/index
+   /autoapi/pyepo/model/copt/vrp/index
 
 

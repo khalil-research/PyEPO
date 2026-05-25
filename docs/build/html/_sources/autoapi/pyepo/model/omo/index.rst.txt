@@ -20,5 +20,6 @@ Submodules
    /autoapi/pyepo/model/omo/portfolio/index
    /autoapi/pyepo/model/omo/shortestpath/index
    /autoapi/pyepo/model/omo/tsp/index
+   /autoapi/pyepo/model/omo/vrp/index
 
 

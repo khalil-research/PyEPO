@@ -1,0 +1,173 @@
+pyepo.model.copt.vrp
+====================
+
+.. py:module:: pyepo.model.copt.vrp
+
+.. autoapi-nested-parse::
+
+   Capacitated vehicle routing problem
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.copt.vrp.vrpABModel
+   pyepo.model.copt.vrp.vrpRCIModel
+   pyepo.model.copt.vrp.vrpMTZModel
+   pyepo.model.copt.vrp.vrpMTZModelRel
+
+
+Module Contents
+---------------
+
+.. py:class:: vrpABModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int)
+
+   Bases: :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
+
+
+   Abstract COPT-backed model for the capacitated vehicle routing problem.
+
+   A single-customer route is excluded so all edge variables stay strictly
+   binary; if a single-stop route is actually needed, duplicate the depot.
+
+   :ivar num_nodes: number of nodes (including depot at index 0)
+   :ivar nodes: list of node indices
+   :ivar edges: undirected edges as (i, j) with i < j
+   :ivar demands: customer demands (excluding depot)
+   :ivar capacity: per-vehicle capacity
+   :ivar num_vehicle: number of vehicles
+
+
+
+   .. py:attribute:: num_nodes
+
+
+   .. py:attribute:: nodes
+
+
+   .. py:attribute:: edges
+
+
+   .. py:attribute:: demands
+
+
+   .. py:attribute:: capacity
+
+
+   .. py:attribute:: num_vehicle
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+   .. py:method:: getTour(sol: numpy.ndarray | torch.Tensor | list) -> list[list[int]]
+
+      Reconstruct vehicle tours from an undirected edge-selection vector.
+
+      :param sol: per-edge selection values aligned with ``self.edges``
+
+      :returns: list of tours; each tour is a node sequence starting and ending at the depot
+
+
+
+   .. py:method:: copy() -> vrpABModel
+
+      A method to copy the model
+
+
+
+.. py:class:: vrpRCIModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int)
+
+   Bases: :py:obj:`vrpABModel`
+
+
+   CVRP formulation with 2-degree constraints and lazy rounded-capacity cuts.
+
+   Uses one undirected Var per edge (``x[j,i]`` aliases ``x[i,j]``). Subtour
+   elimination and rounded capacity inequalities are added lazily during
+   branch-and-cut via a COPT callback.
+
+
+   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
+
+      A method to set the objective function
+
+      :param c: cost vector aligned with ``self.edges``
+
+
+
+   .. py:method:: solve() -> tuple[numpy.ndarray, float]
+
+      A method to solve the model
+
+      :returns: edge-selection vector (uint8) and objective value (float)
+      :rtype: tuple
+
+
+
+.. py:class:: vrpMTZModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int)
+
+   Bases: :py:obj:`vrpABModel`
+
+
+   CVRP formulation on a directed graph with MTZ-style capacity constraints
+   (no lazy cuts). Cost vector is per undirected edge: cost ``c[k]`` is
+   assigned to both ``x[i,j]`` and ``x[j,i]``.
+
+
+   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
+
+      A method to set the objective function
+
+      :param c: cost vector aligned with ``self.edges`` (one cost per undirected edge)
+
+
+
+   .. py:method:: solve() -> tuple[numpy.ndarray, float]
+
+      A method to solve the model
+
+      :returns: edge-selection vector (uint8) and objective value (float)
+      :rtype: tuple
+
+
+
+   .. py:method:: relax() -> vrpMTZModelRel
+
+      A method to get linear relaxation model
+
+
+
+.. py:class:: vrpMTZModelRel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int)
+
+   Bases: :py:obj:`vrpMTZModel`
+
+
+   LP relaxation of :class:`vrpMTZModel`.
+
+
+   .. py:method:: solve() -> tuple[numpy.ndarray, float]
+
+      A method to solve the model — returns fractional edge selections
+
+
+
+   .. py:method:: relax() -> vrpMTZModel
+
+      A forbidden method to relax MIP model
+
+
+
+   .. py:method:: getTour(sol: numpy.ndarray | torch.Tensor | list) -> list[list[int]]
+
+      A forbidden method to get a tour from solution
+
+
+

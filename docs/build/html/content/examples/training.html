@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Training &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.2.0 documentation</title>
+  <title>Training &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -15,9 +15,10 @@
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -49,28 +50,28 @@
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Training</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#common-setup">Common Setup</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-spo">Training with SPO+</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-dbb">Training with DBB</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-nid">Training with NID</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-dpo">Training with DPO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-pfyl">Training with PFYL</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-rfwo">Training with RFWO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-rfyl">Training with RFYL</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-nce">Training with NCE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-ltr">Training with LTR</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-i-mle">Training with I-MLE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-ai-mle">Training with AI-MLE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#training-with-pg">Training with PG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#where-to-start">Where to start</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../tutorial.html#reference-pages">Reference pages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="model.html">Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html">Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pool.html">Solution Pool</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Training</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#common-setup">Common Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#two-training-patterns">Two Training Patterns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#surrogate-losses">Surrogate Losses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#perturbed-methods">Perturbed Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#regularized-methods">Regularized Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#black-box-methods">Black-Box Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cone-aligned-estimation">Cone-Aligned Estimation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#contrastive-methods">Contrastive Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#learning-to-rank">Learning to Rank</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
@@ -104,368 +105,287 @@
              
   <section id="training">
 <h1>Training<a class="headerlink" href="#training" title="Link to this heading"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> extends PyTorch autograd modules to support automatic differentiation through optimization. This enables end-to-end training of neural networks for predict-then-optimize problems.</p>
-<p>For more details, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">03 Training and Testing</a> notebook.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> extends PyTorch autograd modules to support automatic differentiation through optimization. This page collects training-loop templates for each method. See <a class="reference internal" href="function.html"><span class="doc">Auto Grad Functions</span></a> for the method API and selection guide.</p>
+<p>For a runnable walkthrough, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">03 Training and Testing</a> notebook.</p>
 <section id="common-setup">
 <h2>Common Setup<a class="headerlink" href="#common-setup" title="Link to this heading"></a></h2>
-<p>All training examples below share the same setup: a linear prediction model trained on shortest path data. The setup code is shown once here and omitted in subsequent sections.</p>
+<p>All examples below share the same setup: a linear prediction model trained on shortest-path data.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="c1"># model for shortest path</span>
-<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
 
 <span class="c1"># generate data</span>
-<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
-<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
-<span class="n">deg</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># polynomial degree</span>
-<span class="n">noise_width</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># noise width</span>
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">deg</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">noise_width</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">noise_width</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
 
-<span class="c1"># build dataset</span>
+<span class="c1"># dataset and data loader</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDataset</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-
-<span class="c1"># get data loader</span>
 <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># build linear prediction model</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LinearRegression</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
-
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<span class="c1"># init</span>
 <span class="n">predmodel</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
-<span class="c1"># set optimizer</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">predmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-spo">
-<h2>Training with SPO+<a class="headerlink" href="#training-with-spo" title="Link to this heading"></a></h2>
-<p>SPO+ is a surrogate loss that directly measures decision quality. It takes predicted costs, true costs, optimal solutions, and optimal objective values.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init SPO+ loss</span>
-<span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
+<section id="two-training-patterns">
+<h2>Two Training Patterns<a class="headerlink" href="#two-training-patterns" title="Link to this heading"></a></h2>
+<p>PyEPO methods fall into two interaction patterns. Both share the same outer loop; they differ in how the inner block computes the loss.</p>
+<section id="pattern-a-loss-returning-methods">
+<h3>Pattern A — Loss-returning methods<a class="headerlink" href="#pattern-a-loss-returning-methods" title="Link to this heading"></a></h3>
+<p>Methods that return a scalar loss directly (SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE) plug straight into <code class="docutils literal notranslate"><span class="pre">.backward()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># SPO+ loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">spo</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>  <span class="c1"># method-specific call: see recipes below</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-dbb">
-<h2>Training with DBB<a class="headerlink" href="#training-with-dbb" title="Link to this heading"></a></h2>
-<p>The differentiable black-box optimizer replaces zero gradients with interpolated gradients. It returns predicted solutions, which are then used to compute an objective-value-based loss.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init black-box optimizer</span>
-<span class="n">dbb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">blackboxOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="c1"># init loss</span>
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
+<section id="pattern-b-solution-returning-methods">
+<h3>Pattern B — Solution-returning methods<a class="headerlink" href="#pattern-b-solution-returning-methods" title="Link to this heading"></a></h3>
+<p>Methods that return predicted, expected, or regularized solutions (DPO, DBB, NID, RFWO, I-MLE, AI-MLE) require the user to define a task loss on the output:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>  <span class="c1"># or nn.L1Loss(), or an objective-value loss</span>
 
-<span class="c1"># training</span>
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># black-box optimizer</span>
-        <span class="n">wp</span> <span class="o">=</span> <span class="n">dbb</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="c1"># objective value</span>
-        <span class="n">zp</span> <span class="o">=</span> <span class="p">(</span><span class="n">wp</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># regret loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">zp</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
+        <span class="n">wp</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+        <span class="c1"># solution-level loss (vs. true optimal solution):</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">wp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+        <span class="c1"># or objective-value loss (vs. true optimal value):</span>
+        <span class="c1"># zp = (wp * c).sum(1).view(-1, 1)</span>
+        <span class="c1"># loss = criterion(zp, z)</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
+<p>The recipes below give each method’s initialization and call signature. Drop them into the corresponding pattern.</p>
 </section>
-<section id="training-with-nid">
-<h2>Training with NID<a class="headerlink" href="#training-with-nid" title="Link to this heading"></a></h2>
-<p>Negative Identity Backpropagation treats the solver as a negative identity during backpropagation. The training loop follows the same pattern as DBB.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init NID optimizer</span>
-<span class="n">nid</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">negativeIdentity</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="c1"># init loss</span>
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
+</section>
+<section id="surrogate-losses">
+<h2>Surrogate Losses<a class="headerlink" href="#surrogate-losses" title="Link to this heading"></a></h2>
+<p>Both surrogate losses follow <strong>Pattern A</strong>.</p>
+<section id="spo">
+<h3>SPO+<a class="headerlink" href="#spo" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># NID optimizer</span>
-        <span class="n">wp</span> <span class="o">=</span> <span class="n">nid</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="c1"># objective value</span>
-        <span class="n">zp</span> <span class="o">=</span> <span class="p">(</span><span class="n">wp</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># regret loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">zp</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="c1"># inner call: SPO+ takes (cp, c, w, z)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">spo</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-dpo">
-<h2>Training with DPO<a class="headerlink" href="#training-with-dpo" title="Link to this heading"></a></h2>
-<p>The differentiable perturbed optimizer (DPO) returns the expected solution under a perturbed distribution, so the training loop must choose a task loss, such as MSE between the expected solution and the true optimal solution. <code class="docutils literal notranslate"><span class="pre">perturbedOpt</span></code> is the additive Gaussian version. <code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code> uses multiplicative perturbations and is useful when the oracle is sign-sensitive and cost entries must keep their signs. The multiplicative variant assumes predicted costs already have the intended nonzero sign; for nonnegative-cost problems, use a positive-output predictor such as Softplus plus a small epsilon.</p>
-<p>Additive perturbation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init additive DPO optimizer</span>
+<section id="pg">
+<h3>PG<a class="headerlink" href="#pg" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbationGradient</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># inner call: PG takes (cp, c)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">pg</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="perturbed-methods">
+<h2>Perturbed Methods<a class="headerlink" href="#perturbed-methods" title="Link to this heading"></a></h2>
+<section id="dpo-additive-and-multiplicative">
+<h3>DPO — additive and multiplicative<a class="headerlink" href="#dpo-additive-and-multiplicative" title="Link to this heading"></a></h3>
+<p><strong>Pattern B.</strong> <code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code> requires a positive-output predictor (e.g., <code class="docutils literal notranslate"><span class="pre">nn.Softplus()</span></code> plus a small epsilon, denoted <code class="docutils literal notranslate"><span class="pre">positive_predmodel</span></code> below) so that predicted costs keep their sign.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># additive</span>
 <span class="n">ptb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbedOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="c1"># init loss</span>
+<span class="c1"># multiplicative — use positive_predmodel for cp</span>
+<span class="c1"># ptb = pyepo.func.perturbedOptMul(optmodel, n_samples=10, sigma=0.5, processes=2)</span>
+
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
 
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># perturbed optimizer</span>
-        <span class="n">we</span> <span class="o">=</span> <span class="n">ptb</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="c1"># MSE loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Multiplicative perturbation:</p>
-<p>Here <code class="docutils literal notranslate"><span class="pre">positive_predmodel</span></code> denotes a predictor whose output is constrained to the valid cost sign, for example by applying <code class="docutils literal notranslate"><span class="pre">nn.Softplus()</span></code> and adding a small epsilon.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init multiplicative DPO optimizer</span>
-<span class="n">ptb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbedOptMul</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="c1"># init loss</span>
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
-
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">positive_predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># perturbed optimizer</span>
-        <span class="n">we</span> <span class="o">=</span> <span class="n">ptb</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="c1"># MSE loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="c1"># inner block</span>
+<span class="n">we</span> <span class="o">=</span> <span class="n">ptb</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-pfyl">
-<h2>Training with PFYL<a class="headerlink" href="#training-with-pfyl" title="Link to this heading"></a></h2>
-<p>Perturbed Fenchel-Young loss (PFYL) uses the same perturbed expected solution internally, but returns the Fenchel-Young loss directly from predicted costs and true optimal solutions. It does not require a separate task loss. <code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code> is the additive Gaussian version. <code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoungMul</span></code> is the multiplicative sign-preserving variant of PFYL. Like <code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code>, it assumes predicted costs already have the intended nonzero sign.</p>
-<p>Additive perturbation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init additive PFYL loss</span>
+<section id="pfyl-additive-and-multiplicative">
+<h3>PFYL — additive and multiplicative<a class="headerlink" href="#pfyl-additive-and-multiplicative" title="Link to this heading"></a></h3>
+<p><strong>Pattern A.</strong> The multiplicative variant shares the sign convention of <code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># additive</span>
 <span class="n">pfy</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbedFenchelYoung</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># multiplicative — use positive_predmodel for cp</span>
+<span class="c1"># pfy = pyepo.func.perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=0.5, processes=2)</span>
 
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># Fenchel-Young loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">pfy</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Multiplicative perturbation:</p>
-<p>Here <code class="docutils literal notranslate"><span class="pre">positive_predmodel</span></code> denotes a predictor whose output is constrained to the valid cost sign, for example by applying <code class="docutils literal notranslate"><span class="pre">nn.Softplus()</span></code> and adding a small epsilon.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init multiplicative PFYL loss</span>
-<span class="n">pfy</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbedFenchelYoungMul</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">positive_predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># Fenchel-Young loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">pfy</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="c1"># inner call: PFYL takes (cp, w)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">pfy</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-rfwo">
-<h2>Training with RFWO<a class="headerlink" href="#training-with-rfwo" title="Link to this heading"></a></h2>
-<p>The regularized Frank-Wolfe optimizer returns a smooth solution in the convex hull of feasible solutions. Since it returns a solution rather than a loss, define a task loss explicitly, for example MSE between the regularized solution and the true optimal solution.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfwo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">regularizedFrankWolfeOpt</span><span class="p">(</span>
-    <span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<section id="i-mle">
+<h3>I-MLE<a class="headerlink" href="#i-mle" title="Link to this heading"></a></h3>
+<p><strong>Pattern B.</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">imle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">implicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
+
+<span class="c1"># inner block</span>
+<span class="n">we</span> <span class="o">=</span> <span class="n">imle</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="ai-mle">
+<h3>AI-MLE<a class="headerlink" href="#ai-mle" title="Link to this heading"></a></h3>
+<p><strong>Pattern B.</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aimle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">adaptiveImplicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
+
+<span class="c1"># inner block</span>
+<span class="n">we</span> <span class="o">=</span> <span class="n">aimle</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="regularized-methods">
+<h2>Regularized Methods<a class="headerlink" href="#regularized-methods" title="Link to this heading"></a></h2>
+<section id="rfwo">
+<h3>RFWO<a class="headerlink" href="#rfwo" title="Link to this heading"></a></h3>
+<p><strong>Pattern B.</strong> Solution-level MSE matches the imitation setting in the paper.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfwo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">regularizedFrankWolfeOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">rfwomse</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
-    <span class="n">wr</span> <span class="o">=</span> <span class="n">rfwo</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">criterion</span><span class="p">(</span><span class="n">wr</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+<span class="c1"># inner block</span>
+<span class="n">wr</span> <span class="o">=</span> <span class="n">rfwo</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">wr</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-rfyl">
-<h2>Training with RFYL<a class="headerlink" href="#training-with-rfyl" title="Link to this heading"></a></h2>
-<p>Regularized Frank-Wolfe Fenchel-Young loss computes the L2 regularized Fenchel-Young objective directly from predicted costs and true optimal solutions.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfyl</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">regularizedFrankWolfeFenchelYoung</span><span class="p">(</span>
-    <span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<section id="rfyl">
+<h3>RFYL<a class="headerlink" href="#rfyl" title="Link to this heading"></a></h3>
+<p><strong>Pattern A.</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfyl</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">regularizedFrankWolfeFenchelYoung</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
+<span class="c1"># inner call: RFYL takes (cp, w)</span>
 <span class="n">loss</span> <span class="o">=</span> <span class="n">rfyl</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-nce">
-<h2>Training with NCE<a class="headerlink" href="#training-with-nce" title="Link to this heading"></a></h2>
-<p>Noise Contrastive Estimation uses a set of non-optimal solutions as negative samples. It takes predicted costs and true costs as input.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init NCE loss</span>
-<span class="n">nce</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">NCE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
-
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># NCE loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">nce</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
 </section>
-<section id="training-with-ltr">
-<h2>Training with LTR<a class="headerlink" href="#training-with-ltr" title="Link to this heading"></a></h2>
-<p>Learning-to-Rank methods learn a scoring function that ranks feasible solutions. Three variants are available: pointwise, pairwise, and listwise.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init LTR loss (choose one)</span>
-<span class="c1"># pointwise</span>
-<span class="c1">#ltr = pyepo.func.pointwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)</span>
-<span class="c1"># pairwise</span>
-<span class="c1">#ltr = pyepo.func.pairwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)</span>
-<span class="c1"># listwise</span>
-<span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">listwiseLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+<section id="black-box-methods">
+<h2>Black-Box Methods<a class="headerlink" href="#black-box-methods" title="Link to this heading"></a></h2>
+<p>Both follow <strong>Pattern B</strong> with an objective-value loss (<span class="math notranslate nohighlight">\(|\langle \mathbf{c}, \hat{\mathbf{w}} \rangle - z^*|\)</span>).</p>
+<section id="dbb">
+<h3>DBB<a class="headerlink" href="#dbb" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dbb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">blackboxOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># LTR loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">ltr</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="training-with-i-mle">
-<h2>Training with I-MLE<a class="headerlink" href="#training-with-i-mle" title="Link to this heading"></a></h2>
-<p>I-MLE uses the perturb-and-MAP framework with Sum-of-Gamma noise. It returns perturbed solutions and uses loss interpolation to approximate gradients.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init I-MLE optimizer</span>
-<span class="n">imle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">implicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="c1"># init loss</span>
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
 
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># I-MLE optimizer</span>
-        <span class="n">we</span> <span class="o">=</span> <span class="n">imle</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="c1"># L1 loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="c1"># inner block</span>
+<span class="n">wp</span> <span class="o">=</span> <span class="n">dbb</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+<span class="n">zp</span> <span class="o">=</span> <span class="p">(</span><span class="n">wp</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">zp</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-ai-mle">
-<h2>Training with AI-MLE<a class="headerlink" href="#training-with-ai-mle" title="Link to this heading"></a></h2>
-<p>AI-MLE extends I-MLE with an adaptive interpolation step for better gradient estimates.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init AI-MLE optimizer</span>
-<span class="n">aimle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">adaptiveImplicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="c1"># init loss</span>
+<section id="nid">
+<h3>NID<a class="headerlink" href="#nid" title="Link to this heading"></a></h3>
+<p>Hyperparameter-free; same inner block as DBB.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nid</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">negativeIdentity</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
 
-<span class="c1"># training</span>
+<span class="c1"># inner block</span>
+<span class="n">wp</span> <span class="o">=</span> <span class="n">nid</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+<span class="n">zp</span> <span class="o">=</span> <span class="p">(</span><span class="n">wp</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">zp</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="cone-aligned-estimation">
+<h2>Cone-Aligned Estimation<a class="headerlink" href="#cone-aligned-estimation" title="Link to this heading"></a></h2>
+<section id="cave">
+<h3>CaVE<a class="headerlink" href="#cave" title="Link to this heading"></a></h3>
+<p>CaVE requires a dedicated dataset class that extracts binding-constraint normals at the optimum (<code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code>) and a custom collate function (<code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>) to handle ragged per-instance constraint counts. The batch yields an extra <code class="docutils literal notranslate"><span class="pre">tight_ctrs</span></code> element on top of the usual <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDatasetConstrs</span><span class="p">,</span> <span class="n">collate_tight_constraints</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">optDatasetConstrs</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">c_train</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_tight_constraints</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">cave</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">coneAlignedCosine</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">tight_ctrs</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># AI-MLE optimizer</span>
-        <span class="n">we</span> <span class="o">=</span> <span class="n">aimle</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="c1"># L1 loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
+        <span class="c1"># inner call: CaVE takes (cp, tight_ctrs)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">cave</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">tight_ctrs</span><span class="p">)</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
-<section id="training-with-pg">
-<h2>Training with PG<a class="headerlink" href="#training-with-pg" title="Link to this heading"></a></h2>
-<p>Perturbation Gradient uses zeroth-order gradient approximation via finite differences along the true cost direction. It takes predicted costs and true costs as input.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># init PG loss</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbationGradient</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</section>
+<section id="contrastive-methods">
+<h2>Contrastive Methods<a class="headerlink" href="#contrastive-methods" title="Link to this heading"></a></h2>
+<p>NCE and CMAP both follow <strong>Pattern A</strong> and use a cached solution pool: <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls how often new instances are solved exactly during training, and <code class="docutils literal notranslate"><span class="pre">dataset</span></code> seeds the pool with optimal solutions.</p>
+<section id="nce">
+<h3>NCE<a class="headerlink" href="#nce" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nce</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">NCE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 
-<span class="c1"># training</span>
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="c1"># forward pass</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="c1"># PG loss</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">pg</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-        <span class="c1"># backward pass</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="c1"># inner call: NCE takes (cp, w)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">nce</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<section id="cmap">
+<h3>CMAP<a class="headerlink" href="#cmap" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">contrastiveMAP</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+
+<span class="c1"># inner call: CMAP takes (cp, w)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="learning-to-rank">
+<h2>Learning to Rank<a class="headerlink" href="#learning-to-rank" title="Link to this heading"></a></h2>
+<p>All three LTR variants follow <strong>Pattern A</strong> and share the same pool configuration. Pick one based on how it scores the ranking.</p>
+<section id="pointwise-pairwise-listwise">
+<h3>Pointwise / Pairwise / Listwise<a class="headerlink" href="#pointwise-pairwise-listwise" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># pick one</span>
+<span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">pointwiseLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+<span class="c1"># ltr = pyepo.func.pairwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)</span>
+<span class="c1"># ltr = pyepo.func.listwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)</span>
+
+<span class="c1"># inner call: LTR takes (cp, c)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">ltr</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 

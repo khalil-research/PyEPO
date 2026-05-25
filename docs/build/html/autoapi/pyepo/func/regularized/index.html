@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyepo.func.regularized &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.2.0 documentation</title>
+  <title>pyepo.func.regularized &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../../../../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -112,7 +112,7 @@
 <td><p>An autograd module for the Fenchel-Young loss paired with regularized</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc" title="pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regularizedFrankWolfeFenchelYoungFunc</span></code></a></p></td>
-<td><p>An autograd function for regularized Frank-Wolfe Fenchel-Young loss</p></td>
+<td><p>An autograd function for regularized Frank-Wolfe with Fenchel-Young loss</p></td>
 </tr>
 </tbody>
 </table>
@@ -200,7 +200,7 @@ based on stochastic gradient descent.</p>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
 <p>An autograd module for the Fenchel-Young loss paired with regularized
 Frank-Wolfe.</p>
-<p>For regularized Frank-Wolfe Fenchel-Young loss, the objective function is
+<p>For regularized Frank-Wolfe with Fenchel-Young loss, the objective function is
 linear and constraints are known and fixed, but the cost vector needs to be
 predicted from contextual data.</p>
 <p>The custom backward pass returns the Danskin subgradient y_hat - w directly,
@@ -235,11 +235,11 @@ descent.</p>
 <dt class="sig sig-object py" id="pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.regularized.</span></span><span class="sig-name descname"><span class="pre">regularizedFrankWolfeFenchelYoungFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.pytorch.org/docs/stable/autograd.html#torch.autograd.Function" title="(in PyTorch v2.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code></a></p>
-<p>An autograd function for regularized Frank-Wolfe Fenchel-Young loss</p>
+<p>An autograd function for regularized Frank-Wolfe with Fenchel-Young loss</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc.forward">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyepo.func.regularized.regularizedFrankWolfeFenchelYoung" title="pyepo.func.regularized.regularizedFrankWolfeFenchelYoung"><span class="pre">regularizedFrankWolfeFenchelYoung</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></span><a class="headerlink" href="#pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc.forward" title="Link to this definition"></a></dt>
-<dd><p>Forward pass for regularized Frank-Wolfe Fenchel-Young loss</p>
+<dd><p>Forward pass for regularized Frank-Wolfe with Fenchel-Young loss</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -260,7 +260,7 @@ descent.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc.backward">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc.backward" title="Link to this definition"></a></dt>
-<dd><p>Backward pass for regularized Frank-Wolfe Fenchel-Young loss</p>
+<dd><p>Backward pass for regularized Frank-Wolfe with Fenchel-Young loss</p>
 </dd></dl>
 
 </dd></dl>

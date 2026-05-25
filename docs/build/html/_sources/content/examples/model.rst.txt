@@ -1,16 +1,17 @@
 Model
 +++++
 
-``PyEPO`` supports end-to-end predict-then-optimize with linear objective functions and unknown cost coefficients. At its core is the differentiable optimization solver, which computes gradients of the cost coefficients with respect to the optimal solution.
+``PyEPO`` supports end-to-end predict-then-optimize with linear objective functions and unknown cost coefficients. At its core is the differentiable optimization solver, which computes gradients of the loss with respect to the cost coefficients.
 
-``optModel`` is the base abstraction in ``PyEPO``. It wraps an optimization solver or algorithm as a container, providing a unified interface for training and evaluation. ``PyEPO`` provides several pre-defined models using GurobiPy, Pyomo, COPT, OR-Tools, and MPAX:
+``optModel`` is the base abstraction in ``PyEPO``. It wraps an optimization solver or algorithm with a unified interface for training and evaluation. ``PyEPO`` provides several pre-defined models using GurobiPy, Pyomo, COPT, OR-Tools, and MPAX:
 
 * **Shortest path** (GurobiPy, Pyomo, COPT, OR-Tools & MPAX)
 * **Knapsack** (GurobiPy, Pyomo, COPT, OR-Tools & MPAX)
 * **Traveling salesman** (GurobiPy, Pyomo & COPT)
+* **Capacitated vehicle routing** (GurobiPy, COPT & Pyomo)
 * **Portfolio optimization** (GurobiPy, Pyomo & COPT)
 
-When building models with ``PyEPO``, users do **not** need to specify the cost coefficients, since they are unknown and will be predicted from data.
+When building models with ``PyEPO``, users do **not** need to specify the cost coefficients -- they are predicted from data at training time.
 
 For more details, see the `01 Optimization Model <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_ notebook.
 
@@ -259,7 +260,10 @@ To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and popu
    - ``self.l``: Lower bounds (typically zeros for non-negative variables).
    - ``self.u``: Upper bounds (use ``jnp.full(n, jnp.inf)`` for unbounded).
 
-``_getModel`` should return ``(None, [])`` -- MPAX has no explicit model object, the matrices are the model. Sparse-matrix format can be toggled by overriding the class attribute ``use_sparse_matrix`` (default ``True``). Sense follows ``self.modelSense`` (set ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for a maximization problem; defaults to minimization).
+``_getModel`` returns ``(None, [])`` -- MPAX has no explicit model object; the matrices are the model. Additional knobs:
+
+* **Sparse vs dense**: override the class attribute ``use_sparse_matrix`` (default ``True``).
+* **Model sense**: set ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for a maximization problem; defaults to minimization.
 
 .. autoclass:: pyepo.model.mpax.optMpaxModel
   :noindex:
@@ -410,121 +414,91 @@ The following example uses ``networkx`` with the Dijkstra algorithm to solve a s
 Pre-defined Models
 ==================
 
-``PyEPO`` includes pre-defined models for several classic optimization problems.
+``PyEPO`` includes pre-defined models for several classic optimization problems. Each problem ships with multiple solver backends; the ``setObj`` / ``solve`` / ``num_cost`` interface is identical across them, so you can swap backends without changing the surrounding training code.
 
 
 Shortest Path
 -------------
 
-The shortest path problem finds the minimum-cost path from the northwest corner to the southeast corner of an (h, w) grid network. The default grid size is (5, 5).
+The shortest path problem finds the minimum-cost path from the northwest corner to the southeast corner of an ``(h, w)`` grid network. The default grid size is ``(5, 5)``. The problem is formulated as a minimum cost flow linear program.
 
 .. image:: ../../images/shortestpath.png
   :width: 300
   :alt: Shortest Path on the Grid Graph
 
-The problem is formulated as a minimum cost flow linear program.
+Available backends:
 
-GurobiPy
-^^^^^^^^
+.. list-table::
+   :header-rows: 1
+   :widths: 22 38 40
+
+   * - Backend
+     - Class
+     - Notes
+   * - GurobiPy
+     - ``pyepo.model.grb.shortestPathModel``
+     -
+   * - Pyomo
+     - ``pyepo.model.omo.shortestPathModel``
+     - pick solver via ``solver=`` (e.g. ``"glpk"``, ``"gurobi"``)
+   * - COPT
+     - ``pyepo.model.copt.shortestPathModel``
+     -
+   * - OR-Tools (pywraplp)
+     - ``pyepo.model.ort.shortestPathModel``
+     - pick solver via ``solver=`` (default ``"glop"``, also ``"scip"``)
+   * - OR-Tools (CP-SAT)
+     - ``pyepo.model.ort.shortestPathCpModel``
+     - constraint programming
+   * - MPAX
+     - ``pyepo.model.mpax.shortestPathModel``
+     - LP on GPU via PDHG
 
 .. autoclass:: pyepo.model.grb.shortestPathModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-.. code-block:: python
-
-   import pyepo
-
-   grid = (5,5) # network grid
-   optmodel = pyepo.model.grb.shortestPathModel(grid) # build model
-
-The ``setObj`` and ``solve`` methods can be called manually, but they are invoked automatically during training.
-
-.. code-block:: python
-
-   import random
-   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
-
-Pyomo
-^^^^^
-
 .. autoclass:: pyepo.model.omo.shortestPathModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
-
-Pyomo supports multiple backend solvers (e.g., BARON, CBC, CPLEX, Gurobi). Specify the solver via the ``solver`` parameter:
-
-.. code-block:: python
-
-   import pyepo
-
-   grid = (5,5) # network grid
-   optmodel = pyepo.model.omo.shortestPathModel(grid, solver="glpk") # build model with GLPK
-   optmodel = pyepo.model.omo.shortestPathModel(grid, solver="gurobi") # build model with Gurobi
-
-To list available solvers:
-
-.. code-block:: bash
-
-   pyomo help --solvers
-
-COPT
-^^^^
 
 .. autoclass:: pyepo.model.copt.shortestPathModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-.. code-block:: python
-
-   import pyepo
-
-   grid = (5,5) # network grid
-   optmodel = pyepo.model.copt.shortestPathModel(grid) # build model
-
-OR-Tools
-^^^^^^^^
-
-OR-Tools provides two approaches: pywraplp (LP/MIP) and CP-SAT (constraint programming).
-
 .. autoclass:: pyepo.model.ort.shortestPathModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
-
-.. code-block:: python
-
-   import pyepo
-
-   grid = (5,5) # network grid
-   optmodel = pyepo.model.ort.shortestPathModel(grid) # pywraplp with GLOP (default)
-   optmodel = pyepo.model.ort.shortestPathModel(grid, solver="scip") # pywraplp with SCIP
 
 .. autoclass:: pyepo.model.ort.shortestPathCpModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-.. code-block:: python
-
-   import pyepo
-
-   grid = (5,5) # network grid
-   optmodel = pyepo.model.ort.shortestPathCpModel(grid) # CP-SAT
-
-MPAX
-^^^^
-
 .. autoclass:: pyepo.model.mpax.shortestPathModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
+Example. The ``setObj`` and ``solve`` calls below are invoked automatically during training; the manual form is shown here only for illustration.
+
 .. code-block:: python
 
    import pyepo
+   import random
 
-   grid = (5,5) # network grid
-   optmodel = pyepo.model.mpax.shortestPathModel(grid) # build model
+   grid = (5, 5)
+
+   # pick a backend (default = GurobiPy)
+   optmodel = pyepo.model.grb.shortestPathModel(grid)
+   # alternatives:
+   # optmodel = pyepo.model.omo.shortestPathModel(grid, solver="glpk")
+   # optmodel = pyepo.model.copt.shortestPathModel(grid)
+   # optmodel = pyepo.model.ort.shortestPathModel(grid)            # pywraplp, GLOP default
+   # optmodel = pyepo.model.ort.shortestPathCpModel(grid)          # CP-SAT
+   # optmodel = pyepo.model.mpax.shortestPathModel(grid)
+
+   cost = [random.random() for _ in range(optmodel.num_cost)]
+   optmodel.setObj(cost)
+   sol, obj = optmodel.solve()
 
 
 Knapsack
@@ -545,125 +519,86 @@ The constraint coefficients **weights** and right-hand sides **capacities** defi
 
 .. note:: The number of dimensions and items are determined by the shape of **weights** and **capacities**.
 
-GurobiPy
-^^^^^^^^
+Available backends:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 38 40
+
+   * - Backend
+     - Class
+     - Notes
+   * - GurobiPy
+     - ``pyepo.model.grb.knapsackModel``
+     - supports LP relaxation via ``relax()``
+   * - Pyomo
+     - ``pyepo.model.omo.knapsackModel``
+     - pick solver via ``solver=``; supports ``relax()``
+   * - COPT
+     - ``pyepo.model.copt.knapsackModel``
+     - supports ``relax()``
+   * - OR-Tools (pywraplp)
+     - ``pyepo.model.ort.knapsackModel``
+     - default solver ``"scip"``; supports ``relax()``
+   * - OR-Tools (CP-SAT)
+     - ``pyepo.model.ort.knapsackCpModel``
+     - requires integer coefficients (floats are truncated)
+   * - MPAX
+     - ``pyepo.model.mpax.knapsackModel``
+     - solves the LP relaxation on GPU via PDHG
 
 .. autoclass:: pyepo.model.grb.knapsackModel
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
 
-.. code-block:: python
-
-   import pyepo
-
-   weights = [[3, 4, 3, 6, 4],
-              [4, 5, 2, 3, 5],
-              [5, 4, 6, 2, 3]] # constraints coefficients
-   capacities = [12, 10, 15] # constraints rhs
-   optmodel = pyepo.model.grb.knapsackModel(weights, capacities) # build model
-
-.. code-block:: python
-
-   import random
-   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
-
-The ``relax`` method returns an LP relaxation by removing integrality constraints:
-
-.. code-block:: python
-
-   optmodel_rel = optmodel.relax() # relax
-
-Pyomo
-^^^^^
-
 .. autoclass:: pyepo.model.omo.knapsackModel
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
-
-.. code-block:: python
-
-   import pyepo
-
-   weights = [[3, 4, 3, 6, 4],
-              [4, 5, 2, 3, 5],
-              [5, 4, 6, 2, 3]] # constraints coefficients
-   capacities = [12, 10, 15] # constraints rhs
-   # build model with GLPK
-   optmodel = pyepo.model.omo.knapsackModel(weights, capacities, solver="glpk")
-   # build model with Gurobi
-   optmodel = pyepo.model.omo.knapsackModel(weights, capacities, solver="gurobi")
-
-COPT
-^^^^
 
 .. autoclass:: pyepo.model.copt.knapsackModel
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
 
-.. code-block:: python
-
-   import pyepo
-
-   weights = [[3, 4, 3, 6, 4],
-              [4, 5, 2, 3, 5],
-              [5, 4, 6, 2, 3]] # constraints coefficients
-   capacities = [12, 10, 15] # constraints rhs
-   optmodel = pyepo.model.copt.knapsackModel(weights, capacities) # build model
-
-OR-Tools
-^^^^^^^^
-
 .. autoclass:: pyepo.model.ort.knapsackModel
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
-
-.. code-block:: python
-
-   import pyepo
-
-   weights = [[3, 4, 3, 6, 4],
-              [4, 5, 2, 3, 5],
-              [5, 4, 6, 2, 3]] # constraints coefficients
-   capacities = [12, 10, 15] # constraints rhs
-   optmodel = pyepo.model.ort.knapsackModel(weights, capacities) # pywraplp with SCIP (default)
 
 .. autoclass:: pyepo.model.ort.knapsackCpModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-.. code-block:: python
-
-   import pyepo
-
-   weights = [[3, 4, 3, 6, 4],
-              [4, 5, 2, 3, 5],
-              [5, 4, 6, 2, 3]] # integer coefficients for CP-SAT
-   capacities = [12, 10, 15] # constraints rhs
-   optmodel = pyepo.model.ort.knapsackCpModel(weights, capacities) # CP-SAT
-
-.. note::  CP-SAT requires integer coefficients. Float weights will be truncated to integers.
-
-MPAX
-^^^^
-
-MPAX solves the LP relaxation of the knapsack problem using the PDHG algorithm.
-
 .. autoclass:: pyepo.model.mpax.knapsackModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
+Example:
+
 .. code-block:: python
 
    import pyepo
-   import numpy as np
+   import random
 
-   weights = np.array([[3, 4, 3, 6, 4],
-                        [4, 5, 2, 3, 5],
-                        [5, 4, 6, 2, 3]]) # constraints coefficients
-   capacities = [12, 10, 15] # constraints rhs
-   optmodel = pyepo.model.mpax.knapsackModel(weights, capacities) # build model
+   weights = [[3, 4, 3, 6, 4],
+              [4, 5, 2, 3, 5],
+              [5, 4, 6, 2, 3]]  # constraint coefficients
+   capacities = [12, 10, 15]    # constraint right-hand sides
+
+   # pick a backend (default = GurobiPy)
+   optmodel = pyepo.model.grb.knapsackModel(weights, capacities)
+   # alternatives:
+   # optmodel = pyepo.model.omo.knapsackModel(weights, capacities, solver="glpk")
+   # optmodel = pyepo.model.copt.knapsackModel(weights, capacities)
+   # optmodel = pyepo.model.ort.knapsackModel(weights, capacities)         # pywraplp
+   # optmodel = pyepo.model.ort.knapsackCpModel(weights, capacities)       # CP-SAT
+   # import numpy as np
+   # optmodel = pyepo.model.mpax.knapsackModel(np.array(weights), capacities)
+
+   cost = [random.random() for _ in range(optmodel.num_cost)]
+   optmodel.setObj(cost)
+   sol, obj = optmodel.solve()
+
+   # LP relaxation (unavailable for CP-SAT and MPAX backends)
+   optmodel_rel = optmodel.relax()
 
 
 Traveling Salesman
@@ -673,81 +608,62 @@ The traveling salesman problem (TSP) seeks the shortest route that visits each c
 
 Three ILP formulations are available: Dantzig-Fulkerson-Johnson (DFJ), Gavish-Graves (GG), and Miller-Tucker-Zemlin (MTZ).
 
-.. note:: The DFJ formulation uses lazy constraints and is available with GurobiPy and COPT. The GG and MTZ formulations are available with GurobiPy, Pyomo, and COPT.
+Available formulations and backends:
 
-GurobiPy
-^^^^^^^^
+.. list-table::
+   :header-rows: 1
+   :widths: 16 16 38 30
 
-DFJ Formulation
-""""""""""""""""
+   * - Formulation
+     - Backend
+     - Class
+     - Notes
+   * - DFJ
+     - GurobiPy
+     - ``pyepo.model.grb.tspDFJModel``
+     - lazy subtour-elimination constraints; no ``relax()``
+   * - DFJ
+     - COPT
+     - ``pyepo.model.copt.tspDFJModel``
+     - lazy subtour-elimination constraints; no ``relax()``
+   * - GG
+     - GurobiPy
+     - ``pyepo.model.grb.tspGGModel``
+     - supports ``relax()``
+   * - GG
+     - Pyomo
+     - ``pyepo.model.omo.tspGGModel``
+     - supports ``relax()``
+   * - GG
+     - COPT
+     - ``pyepo.model.copt.tspGGModel``
+     - supports ``relax()``
+   * - MTZ
+     - GurobiPy
+     - ``pyepo.model.grb.tspMTZModel``
+     - supports ``relax()``
+   * - MTZ
+     - Pyomo
+     - ``pyepo.model.omo.tspMTZModel``
+     - supports ``relax()``
+   * - MTZ
+     - COPT
+     - ``pyepo.model.copt.tspMTZModel``
+     - supports ``relax()``
+
+.. note:: DFJ relies on solver callbacks and is therefore unavailable in Pyomo. It also has exponentially many subtour-elimination constraints and does not support LP relaxation.
 
 .. autoclass:: pyepo.model.grb.tspDFJModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-The DFJ formulation has exponentially many subtour elimination constraints, solved via column generation. LP relaxation is **not** supported.
-
-.. code-block:: python
-
-   import pyepo
-   import random
-
-   num_nodes = 20 # number of nodes
-   optmodel = pyepo.model.grb.tspDFJModel(num_nodes) # build model
-
-   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
-
-
-GG Formulation
-"""""""""""""""
-
 .. autoclass:: pyepo.model.grb.tspGGModel
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
 
-.. code-block:: python
-
-   import pyepo
-   import random
-
-   num_nodes = 20 # number of nodes
-   optmodel = pyepo.model.grb.tspGGModel(num_nodes) # build model
-
-   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
-
-   optmodel.relax() # relax
-
-
-MTZ Formulation
-""""""""""""""""
-
 .. autoclass:: pyepo.model.grb.tspMTZModel
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
-
-.. code-block:: python
-
-   import pyepo
-   import random
-
-   num_nodes = 20 # number of nodes
-   optmodel = pyepo.model.grb.tspMTZModel(num_nodes) # build model
-
-   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
-
-   optmodel.relax() # relax
-
-
-Pyomo
-^^^^^
-
-The GG and MTZ formulations are available with Pyomo. The DFJ formulation is not supported in Pyomo due to the lack of a native callback API.
 
 .. autoclass:: pyepo.model.omo.tspGGModel
     :noindex:
@@ -756,28 +672,6 @@ The GG and MTZ formulations are available with Pyomo. The DFJ formulation is not
 .. autoclass:: pyepo.model.omo.tspMTZModel
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
-
-.. code-block:: python
-
-   import pyepo
-   import random
-
-   num_nodes = 20 # number of nodes
-
-   # GG formulation with Gurobi solver
-   optmodel = pyepo.model.omo.tspGGModel(num_nodes, solver="gurobi")
-   # MTZ formulation with GLPK solver
-   optmodel = pyepo.model.omo.tspMTZModel(num_nodes, solver="glpk")
-
-   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
-
-
-COPT
-^^^^
-
-All three formulations (DFJ, GG, MTZ) are available with COPT. The DFJ formulation uses COPT's callback API for lazy subtour elimination constraints.
 
 .. autoclass:: pyepo.model.copt.tspDFJModel
     :noindex:
@@ -791,23 +685,114 @@ All three formulations (DFJ, GG, MTZ) are available with COPT. The DFJ formulati
     :noindex:
     :members: __init__, setObj, solve, num_cost, relax
 
+Example:
+
 .. code-block:: python
 
    import pyepo
    import random
 
-   num_nodes = 20 # number of nodes
+   num_nodes = 20
 
-   # DFJ formulation
-   optmodel = pyepo.model.copt.tspDFJModel(num_nodes)
-   # GG formulation
-   optmodel = pyepo.model.copt.tspGGModel(num_nodes)
-   # MTZ formulation
-   optmodel = pyepo.model.copt.tspMTZModel(num_nodes)
+   # pick a formulation × backend (default = GurobiPy DFJ)
+   optmodel = pyepo.model.grb.tspDFJModel(num_nodes)
+   # alternatives:
+   # optmodel = pyepo.model.grb.tspGGModel(num_nodes)
+   # optmodel = pyepo.model.grb.tspMTZModel(num_nodes)
+   # optmodel = pyepo.model.copt.tspDFJModel(num_nodes)
+   # optmodel = pyepo.model.copt.tspGGModel(num_nodes)
+   # optmodel = pyepo.model.copt.tspMTZModel(num_nodes)
+   # optmodel = pyepo.model.omo.tspGGModel(num_nodes, solver="gurobi")
+   # optmodel = pyepo.model.omo.tspMTZModel(num_nodes, solver="glpk")
 
-   cost = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(cost) # set objective function
-   optmodel.solve() # solve
+   cost = [random.random() for _ in range(optmodel.num_cost)]
+   optmodel.setObj(cost)
+   sol, obj = optmodel.solve()
+
+
+Capacitated Vehicle Routing
+---------------------------
+
+The capacitated vehicle routing problem (CVRP) seeks the shortest set of vehicle routes that serves every customer exactly once and respects per-vehicle capacity. Each route starts and ends at the depot (node 0), and the depot has degree :math:`2 k` where :math:`k` is the number of routes used.
+
+Two ILP formulations are available:
+
+* **Rounded Capacity Inequalities (RCI)**: undirected 2-degree formulation with lazy rounded-capacity cuts. Requires solver callbacks.
+* **Miller-Tucker-Zemlin (MTZ)**: directed formulation with per-node load auxiliaries; no callbacks required.
+
+.. note:: Single-customer routes are excluded so that all edge variables stay strictly binary. If a single-stop route is genuinely required, duplicate the depot node.
+
+Available formulations and backends:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 16 16 38 30
+
+   * - Formulation
+     - Backend
+     - Class
+     - Notes
+   * - RCI
+     - GurobiPy
+     - ``pyepo.model.grb.vrpRCIModel``
+     - lazy rounded-capacity cuts
+   * - RCI
+     - COPT
+     - ``pyepo.model.copt.vrpRCIModel``
+     - lazy rounded-capacity cuts
+   * - MTZ
+     - GurobiPy
+     - ``pyepo.model.grb.vrpMTZModel``
+     - supports ``relax()``
+   * - MTZ
+     - COPT
+     - ``pyepo.model.copt.vrpMTZModel``
+     - supports ``relax()``
+   * - MTZ
+     - Pyomo
+     - ``pyepo.model.omo.vrpMTZModel``
+     - supports ``relax()``
+
+.. note:: Pyomo lacks a native callback API, so only the MTZ formulation is provided.
+
+.. autoclass:: pyepo.model.grb.vrpRCIModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, getTour
+
+.. autoclass:: pyepo.model.grb.vrpMTZModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, getTour, relax
+
+.. autoclass:: pyepo.model.copt.vrpRCIModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, getTour
+
+.. autoclass:: pyepo.model.copt.vrpMTZModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, getTour, relax
+
+.. autoclass:: pyepo.model.omo.vrpMTZModel
+    :noindex:
+    :members: __init__, setObj, solve, num_cost, getTour, relax
+
+Example:
+
+.. code-block:: python
+
+   import pyepo
+
+   num_nodes = 10                       # depot + 9 customers
+   demands = [2, 1, 3, 2, 1, 2, 1, 3, 2]
+   capacity = 5.0
+   num_vehicle = 3
+
+   # pick a formulation × backend (default = GurobiPy RCI)
+   optmodel = pyepo.model.grb.vrpRCIModel(num_nodes, demands, capacity, num_vehicle)
+   # alternatives:
+   # optmodel = pyepo.model.grb.vrpMTZModel(num_nodes, demands, capacity, num_vehicle)
+   # optmodel = pyepo.model.copt.vrpRCIModel(num_nodes, demands, capacity, num_vehicle)
+   # optmodel = pyepo.model.copt.vrpMTZModel(num_nodes, demands, capacity, num_vehicle)
+   # optmodel = pyepo.model.omo.vrpMTZModel(num_nodes, demands, capacity, num_vehicle)
 
 
 Portfolio
@@ -823,58 +808,54 @@ Portfolio optimization selects an asset allocation that maximizes expected retur
   & \forall x_i \geq 0
   \end{aligned}
 
+Available backends:
 
-GurobiPy
-^^^^^^^^
+.. list-table::
+   :header-rows: 1
+   :widths: 22 38 40
+
+   * - Backend
+     - Class
+     - Notes
+   * - GurobiPy
+     - ``pyepo.model.grb.portfolioModel``
+     -
+   * - Pyomo
+     - ``pyepo.model.omo.portfolioModel``
+     - pick solver via ``solver=``
+   * - COPT
+     - ``pyepo.model.copt.portfolioModel``
+     -
 
 .. autoclass:: pyepo.model.grb.portfolioModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-.. code-block:: python
-
-   import pyepo
-   import numpy as np
-
-   m = 50 # number of assets
-   cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
-   optmodel = pyepo.model.grb.portfolioModel(m, cov) # build model
-
-.. code-block:: python
-
-   import random
-   revenue = [random.random() for _ in range(optmodel.num_cost)] # random cost vector
-   optmodel.setObj(revenue) # set objective function
-   optmodel.solve() # solve
-
-Pyomo
-^^^^^
-
 .. autoclass:: pyepo.model.omo.portfolioModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
-
-.. code-block:: python
-
-   import pyepo
-   import numpy as np
-
-   m = 50 # number of assets
-   cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
-   optmodel = pyepo.model.omo.portfolioModel(m, cov, solver="gurobi") # build model
-
-COPT
-^^^^
 
 .. autoclass:: pyepo.model.copt.portfolioModel
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
+Example:
+
 .. code-block:: python
 
    import pyepo
    import numpy as np
+   import random
 
-   m = 50 # number of assets
-   cov = np.cov(np.random.randn(10, m), rowvar=False) # covariance matrix
-   optmodel = pyepo.model.copt.portfolioModel(m, cov) # build model
+   m = 50  # number of assets
+   cov = np.cov(np.random.randn(10, m), rowvar=False)
+
+   # pick a backend (default = GurobiPy)
+   optmodel = pyepo.model.grb.portfolioModel(m, cov)
+   # alternatives:
+   # optmodel = pyepo.model.omo.portfolioModel(m, cov, solver="gurobi")
+   # optmodel = pyepo.model.copt.portfolioModel(m, cov)
+
+   revenue = [random.random() for _ in range(optmodel.num_cost)]
+   optmodel.setObj(revenue)
+   sol, obj = optmodel.solve()

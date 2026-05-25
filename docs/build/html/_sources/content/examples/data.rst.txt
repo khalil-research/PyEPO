@@ -11,7 +11,7 @@ Data Generator
 
 ``pyepo.data`` includes synthetic data generators for four optimization problems: shortest path, multi-dimensional knapsack, traveling salesperson, and portfolio optimization.
 
-Each generator produces feature-cost pairs :math:`(\mathbf{x}, \mathbf{c})`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the cost :math:`\mathbf{c}_i \in \mathbb{R}^d` is computed from a polynomial function :math:`f(\mathbf{x}_i)` multiplied by random noise :math:`\mathbf{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
+Each generator produces feature-cost pairs :math:`(\mathbf{x}, \mathbf{c})`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the cost :math:`\mathbf{c}_i \in \mathbb{R}^d` is computed from a polynomial function :math:`f(\mathbf{x}_i)` multiplied by a multiplicative noise factor :math:`\mathbf{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
 
 Common parameters across all generators:
 
@@ -138,7 +138,7 @@ The following example shows how to use ``optDataset`` with a PyTorch ``DataLoade
 optDatasetKNN
 =============
 
-``pyepo.data.optDatasetKNN`` is a PyTorch ``Dataset`` for k-nearest neighbors (kNN) robust loss [#f1]_ in decision-focused learning. It stores features and cost coefficients, and computes **mean kNN solutions and optimal objective values**.
+``pyepo.data.optDatasetKNN`` is a PyTorch ``Dataset`` that implements the k-nearest neighbors (kNN) robust loss [#f1]_ for decision-focused learning. It stores features and cost coefficients, and computes the **mean k-nearest-neighbor solutions and the corresponding optimal objective values**.
 
 .. autoclass:: pyepo.data.dataset.optDatasetKNN
     :noindex:
@@ -165,4 +165,38 @@ optDatasetKNN
   # get data loader
   dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 
+optDatasetConstrs
+=================
+
+``pyepo.data.dataset.optDatasetConstrs`` is a PyTorch ``Dataset`` for the CaVE [#f2]_ cone-aligned loss. In addition to the features, costs, optimal solutions, and objective values stored by ``optDataset``, it also extracts the **normals of the binding constraints at the optimal vertex** for each instance. CaVE then projects the sense-flipped predicted cost vector onto the cone spanned by these normals.
+
+Because the binding-constraint extraction relies on Gurobi's sparse-matrix and constraint-sense APIs, ``optDatasetConstrs`` currently requires a Gurobi-backed ``optModel``. The dataset also enforces that the optimal vertex is binary — CaVE is defined for binary linear programs.
+
+.. autoclass:: pyepo.data.dataset.optDatasetConstrs
+    :noindex:
+
+Per-instance constraint matrices have different row counts (different sets of constraints are tight at different vertices), so batching requires a custom ``collate_fn``:
+
+.. autofunction:: pyepo.data.dataset.collate_tight_constraints
+    :noindex:
+
+.. code-block:: python
+
+  import pyepo
+  from torch.utils.data import DataLoader
+  from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
+
+  # model for TSP (Gurobi backend required)
+  model = pyepo.model.grb.tspDFJModel(num_nodes=10)
+
+  # generate data
+  x, c = pyepo.data.tsp.genData(num_data=1000, num_features=5, num_nodes=10, deg=4, seed=135)
+
+  # build CaVE dataset (extracts tight binding-constraint normals at the optimum)
+  dataset = optDatasetConstrs(model, x, c)
+
+  # collate_fn pads ragged per-instance constraint matrices
+  dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=collate_tight_constraints)
+
 .. [#f1] Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.
+.. [#f2] Tang, B., & Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).

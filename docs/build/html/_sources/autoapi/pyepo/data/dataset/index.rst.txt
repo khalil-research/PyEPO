@@ -25,6 +25,15 @@ Classes
 
    pyepo.data.dataset.optDataset
    pyepo.data.dataset.optDatasetKNN
+   pyepo.data.dataset.optDatasetConstrs
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.data.dataset.collate_tight_constraints
 
 
 Module Contents
@@ -120,5 +129,58 @@ Module Contents
 
 
    .. py:attribute:: objs
+
+
+.. py:class:: optDatasetConstrs(model: pyepo.model.opt.optModel, feats: numpy.ndarray | torch.Tensor, costs: numpy.ndarray | torch.Tensor, skip_infeas: bool = False)
+
+   Bases: :py:obj:`optDataset`
+
+
+   This class is a Torch Dataset for optimization problems with the normals
+   of binding constraints at the optimum, consumed by the CaVE loss.
+
+   Reference: <https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>
+
+   :ivar model: Optimization model (Gurobi-backed)
+   :vartype model: optModel
+   :ivar feats: Data features
+   :vartype feats: torch.Tensor
+   :ivar costs: Cost vectors
+   :vartype costs: torch.Tensor
+   :ivar sols: Optimal solutions
+   :vartype sols: torch.Tensor
+   :ivar objs: Optimal objective values
+   :vartype objs: torch.Tensor
+   :ivar ctrs: Per-instance binding-constraint normals
+
+   :vartype ctrs: list[torch.Tensor]
+
+
+   .. py:attribute:: model
+
+
+   .. py:attribute:: skip_infeas
+      :value: False
+
+
+
+   .. py:attribute:: feats
+
+
+   .. py:attribute:: costs
+
+
+   .. py:attribute:: sols
+
+
+   .. py:attribute:: objs
+
+
+   .. py:attribute:: ctrs
+
+
+.. py:function:: collate_tight_constraints(batch)
+
+   A custom collate function for PyTorch DataLoader that pads binding-constraint matrices
 
 

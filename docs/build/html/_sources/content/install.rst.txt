@@ -1,13 +1,17 @@
 Installation
 ++++++++++++
 
+
+Install from Source
+===================
+
 You can download ``PyEPO`` from our `GitHub repository <https://github.com/khalil-research/PyEPO>`_.
 
 .. code-block:: console
 
    git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
 
-And install it.
+Then install it.
 
 .. code-block:: console
 

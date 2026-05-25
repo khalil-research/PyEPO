@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyepo.data.dataset &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.2.0 documentation</title>
+  <title>pyepo.data.dataset &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../../../../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -120,6 +120,19 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDatasetKNN" title="pyepo.data.dataset.optDatasetKNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDatasetKNN</span></code></a></p></td>
 <td><p>This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDatasetConstrs" title="pyepo.data.dataset.optDatasetConstrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code></a></p></td>
+<td><p>This class is a Torch Dataset for optimization problems with the normals</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.dataset.collate_tight_constraints" title="pyepo.data.dataset.collate_tight_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code></a>(batch)</p></td>
+<td><p>A custom collate function for PyTorch DataLoader that pads binding-constraint matrices</p></td>
 </tr>
 </tbody>
 </table>
@@ -233,6 +246,68 @@
 <span class="sig-name descname"><span class="pre">objs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN.objs" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetConstrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_infeas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p>
+<p>This class is a Torch Dataset for optimization problems with the normals
+of binding constraints at the optimum, consumed by the CaVE loss.</p>
+<p>Reference: &lt;<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12">https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12</a>&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Optimization model (Gurobi-backed)</p></li>
+<li><p><strong>feats</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Data features</p></li>
+<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cost vectors</p></li>
+<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal solutions</p></li>
+<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal objective values</p></li>
+<li><p><strong>ctrs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a><em>]</em>) – Per-instance binding-constraint normals</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs.model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs.skip_infeas">
+<span class="sig-name descname"><span class="pre">skip_infeas</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs.skip_infeas" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs.feats">
+<span class="sig-name descname"><span class="pre">feats</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs.feats" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs.costs">
+<span class="sig-name descname"><span class="pre">costs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs.costs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs.sols">
+<span class="sig-name descname"><span class="pre">sols</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs.sols" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs.objs">
+<span class="sig-name descname"><span class="pre">objs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs.objs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs.ctrs">
+<span class="sig-name descname"><span class="pre">ctrs</span></span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs.ctrs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.data.dataset.collate_tight_constraints">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">collate_tight_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.collate_tight_constraints" title="Link to this definition"></a></dt>
+<dd><p>A custom collate function for PyTorch DataLoader that pads binding-constraint matrices</p>
 </dd></dl>
 
 </section>

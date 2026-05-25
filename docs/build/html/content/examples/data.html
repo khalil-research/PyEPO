@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.2.0 documentation</title>
+  <title>Data &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
@@ -50,24 +50,23 @@
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Data</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#data-generator">Data Generator</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#shortest-path">Shortest Path</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#knapsack">Knapsack</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#traveling-salesperson">Traveling Salesperson</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#portfolio">Portfolio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#where-to-start">Where to start</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../tutorial.html#reference-pages">Reference pages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="model.html">Model</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Data</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data-generator">Data Generator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optdataset">optDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optdatasetknn">optDatasetKNN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optdatasetconstrs">optDatasetConstrs</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#optdataset">optDataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#optdatasetknn">optDatasetKNN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pool.html">Solution Pool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="training.html">Training</a></li>
+<li class="toctree-l3"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
-<li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
-<li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
@@ -106,7 +105,7 @@
 <section id="data-generator">
 <h2>Data Generator<a class="headerlink" href="#data-generator" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> includes synthetic data generators for four optimization problems: shortest path, multi-dimensional knapsack, traveling salesperson, and portfolio optimization.</p>
-<p>Each generator produces feature-cost pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{c})\)</span>. The feature vector <span class="math notranslate nohighlight">\(\mathbf{x}_i \in \mathbb{R}^p\)</span> follows a standard multivariate Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>, and the cost <span class="math notranslate nohighlight">\(\mathbf{c}_i \in \mathbb{R}^d\)</span> is computed from a polynomial function <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span> multiplied by random noise <span class="math notranslate nohighlight">\(\mathbf{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})\)</span>.</p>
+<p>Each generator produces feature-cost pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{c})\)</span>. The feature vector <span class="math notranslate nohighlight">\(\mathbf{x}_i \in \mathbb{R}^p\)</span> follows a standard multivariate Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>, and the cost <span class="math notranslate nohighlight">\(\mathbf{c}_i \in \mathbb{R}^d\)</span> is computed from a polynomial function <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span> multiplied by a multiplicative noise factor <span class="math notranslate nohighlight">\(\mathbf{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})\)</span>.</p>
 <p>Common parameters across all generators:</p>
 <ul class="simple">
 <li><p><strong>num_data</strong> (<span class="math notranslate nohighlight">\(n\)</span>): number of data samples</p></li>
@@ -308,7 +307,7 @@
 </section>
 <section id="optdatasetknn">
 <h2>optDatasetKNN<a class="headerlink" href="#optdatasetknn" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDatasetKNN</span></code> is a PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for k-nearest neighbors (kNN) robust loss <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> in decision-focused learning. It stores features and cost coefficients, and computes <strong>mean kNN solutions and optimal objective values</strong>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDatasetKNN</span></code> is a PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> that implements the k-nearest neighbors (kNN) robust loss <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for decision-focused learning. It stores features and cost coefficients, and computes the <strong>mean k-nearest-neighbor solutions and the corresponding optimal objective values</strong>.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetKNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span></dt>
@@ -350,10 +349,63 @@
 <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<section id="optdatasetconstrs">
+<h2>optDatasetConstrs<a class="headerlink" href="#optdatasetconstrs" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code> is a PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for the CaVE <a class="footnote-reference brackets" href="#f2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> cone-aligned loss. In addition to the features, costs, optimal solutions, and objective values stored by <code class="docutils literal notranslate"><span class="pre">optDataset</span></code>, it also extracts the <strong>normals of the binding constraints at the optimal vertex</strong> for each instance. CaVE then projects the sense-flipped predicted cost vector onto the cone spanned by these normals.</p>
+<p>Because the binding-constraint extraction relies on Gurobi’s sparse-matrix and constraint-sense APIs, <code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code> currently requires a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code>. The dataset also enforces that the optimal vertex is binary — CaVE is defined for binary linear programs.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetConstrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_infeas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>This class is a Torch Dataset for optimization problems with the normals
+of binding constraints at the optimum, consumed by the CaVE loss.</p>
+<p>Reference: &lt;<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12">https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12</a>&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Optimization model (Gurobi-backed)</p></li>
+<li><p><strong>feats</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Data features</p></li>
+<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cost vectors</p></li>
+<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal solutions</p></li>
+<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal objective values</p></li>
+<li><p><strong>ctrs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a><em>]</em>) – Per-instance binding-constraint normals</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Per-instance constraint matrices have different row counts (different sets of constraints are tight at different vertices), so batching requires a custom <code class="docutils literal notranslate"><span class="pre">collate_fn</span></code>:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">collate_tight_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>A custom collate function for PyTorch DataLoader that pads binding-constraint matrices</p>
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDatasetConstrs</span><span class="p">,</span> <span class="n">collate_tight_constraints</span>
+
+<span class="c1"># model for TSP (Gurobi backend required)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">tspDFJModel</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># generate data</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tsp</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+
+<span class="c1"># build CaVE dataset (extracts tight binding-constraint normals at the optimum)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">optDatasetConstrs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+<span class="c1"># collate_fn pads ragged per-instance constraint matrices</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_tight_constraints</span><span class="p">)</span>
+</pre></div>
+</div>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="f1" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Schutte, N., Postek, K., &amp; Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.</p>
+</aside>
+<aside class="footnote brackets" id="f2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Tang, B., &amp; Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).</p>
 </aside>
 </aside>
 </section>

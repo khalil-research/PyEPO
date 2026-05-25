@@ -17,6 +17,7 @@ Submodules
 
    /autoapi/pyepo/func/abcmodule/index
    /autoapi/pyepo/func/blackbox/index
+   /autoapi/pyepo/func/cave/index
    /autoapi/pyepo/func/contrastive/index
    /autoapi/pyepo/func/perturbed/index
    /autoapi/pyepo/func/rank/index

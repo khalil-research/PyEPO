@@ -20,5 +20,6 @@ Submodules
    /autoapi/pyepo/model/grb/portfolio/index
    /autoapi/pyepo/model/grb/shortestpath/index
    /autoapi/pyepo/model/grb/tsp/index
+   /autoapi/pyepo/model/grb/vrp/index
 
 

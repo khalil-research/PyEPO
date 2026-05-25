@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.2.0 documentation</title>
+  <title>Index &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="_static/favicon.ico"/>
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=6efca38a"></script>
+      <script src="_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -176,8 +176,20 @@
       <li><a href="autoapi/pyepo/metric/unambregret/index.html#pyepo.metric.unambregret.calUnambRegret">calUnambRegret() (in module pyepo.metric.unambregret)</a>
 </li>
       <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.knapsackBase.capacity">capacity (pyepo.model.bases.knapsackBase attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.capacity">(pyepo.model.copt.vrp.vrpABModel attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.capacity">(pyepo.model.grb.vrp.vrpABModel attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.capacity">(pyepo.model.omo.vrp.vrpABModel attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.collate_tight_constraints">collate_tight_constraints() (in module pyepo.data.dataset)</a>
 </li>
       <li><a href="autoapi/pyepo/func/regularized/index.html#pyepo.func.regularized.regularizedFrankWolfeOpt.compute_regularization">compute_regularization() (pyepo.func.regularized.regularizedFrankWolfeOpt method)</a>
+</li>
+      <li><a href="autoapi/pyepo/func/cave/index.html#pyepo.func.cave.coneAlignedCosine">coneAlignedCosine (class in pyepo.func.cave)</a>
 </li>
       <li><a href="autoapi/pyepo/func/contrastive/index.html#pyepo.func.contrastive.contrastiveMAP">contrastiveMAP (class in pyepo.func.contrastive)</a>
 </li>
@@ -186,11 +198,17 @@
       <ul>
         <li><a href="autoapi/pyepo/model/copt/coptmodel/index.html#pyepo.model.copt.coptmodel.optCoptModel.copy">(pyepo.model.copt.coptmodel.optCoptModel method)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.copy">(pyepo.model.copt.vrp.vrpABModel method)</a>
+</li>
         <li><a href="autoapi/pyepo/model/grb/grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel.copy">(pyepo.model.grb.grbmodel.optGrbModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.copy">(pyepo.model.grb.vrp.vrpABModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/mpax/mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel.copy">(pyepo.model.mpax.mpaxmodel.optMpaxModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/omo/omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel.copy">(pyepo.model.omo.omomodel.optOmoModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.copy">(pyepo.model.omo.vrp.vrpABModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel.copy">(pyepo.model.opt.optModel method)</a>
 </li>
@@ -226,6 +244,8 @@
       <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDataset.costs">costs (pyepo.data.dataset.optDataset attribute)</a>
 
       <ul>
+        <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs.costs">(pyepo.data.dataset.optDatasetConstrs attribute)</a>
+</li>
         <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetKNN.costs">(pyepo.data.dataset.optDatasetKNN attribute)</a>
 </li>
       </ul></li>
@@ -233,16 +253,26 @@
 </li>
       <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.portfolioBase.covariance">covariance (pyepo.model.bases.portfolioBase attribute)</a>
 </li>
+      <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs.ctrs">ctrs (pyepo.data.dataset.optDatasetConstrs attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/pyepo/model/mpax/mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel.device">device (pyepo.model.mpax.mpaxmodel.optMpaxModel attribute)</a>
+      <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.demands">demands (pyepo.model.copt.vrp.vrpABModel attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.demands">(pyepo.model.grb.vrp.vrpABModel attribute)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.demands">(pyepo.model.omo.vrp.vrpABModel attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/pyepo/model/mpax/mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel.device">device (pyepo.model.mpax.mpaxmodel.optMpaxModel attribute)</a>
+</li>
       <li><a href="autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.adaptiveImplicitMLE.distribution">distribution (pyepo.func.perturbed.adaptiveImplicitMLE attribute)</a>
 
       <ul>
@@ -256,7 +286,15 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.tspABBase.edges">edges (pyepo.model.bases.tspABBase attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.edges">(pyepo.model.copt.vrp.vrpABModel attribute)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.edges">(pyepo.model.grb.vrp.vrpABModel attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.edges">(pyepo.model.omo.vrp.vrpABModel attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -266,6 +304,8 @@
       <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDataset.feats">feats (pyepo.data.dataset.optDataset attribute)</a>
 
       <ul>
+        <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs.feats">(pyepo.data.dataset.optDatasetConstrs attribute)</a>
+</li>
         <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetKNN.feats">(pyepo.data.dataset.optDatasetKNN attribute)</a>
 </li>
       </ul></li>
@@ -283,6 +323,8 @@
         <li><a href="autoapi/pyepo/func/blackbox/index.html#pyepo.func.blackbox.negativeIdentity.forward">(pyepo.func.blackbox.negativeIdentity method)</a>
 </li>
         <li><a href="autoapi/pyepo/func/blackbox/index.html#pyepo.func.blackbox.negativeIdentityFunc.forward">(pyepo.func.blackbox.negativeIdentityFunc static method)</a>
+</li>
+        <li><a href="autoapi/pyepo/func/cave/index.html#pyepo.func.cave.coneAlignedCosine.forward">(pyepo.func.cave.coneAlignedCosine method)</a>
 </li>
         <li><a href="autoapi/pyepo/func/contrastive/index.html#pyepo.func.contrastive.contrastiveMAP.forward">(pyepo.func.contrastive.contrastiveMAP method)</a>
 </li>
@@ -352,13 +394,25 @@
 </li>
         <li><a href="autoapi/pyepo/model/copt/tsp/index.html#pyepo.model.copt.tsp.tspMTZModelRel.getTour">(pyepo.model.copt.tsp.tspMTZModelRel method)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.getTour">(pyepo.model.copt.vrp.vrpABModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpMTZModelRel.getTour">(pyepo.model.copt.vrp.vrpMTZModelRel method)</a>
+</li>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#pyepo.model.grb.tsp.tspGGModelRel.getTour">(pyepo.model.grb.tsp.tspGGModelRel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#pyepo.model.grb.tsp.tspMTZModelRel.getTour">(pyepo.model.grb.tsp.tspMTZModelRel method)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.getTour">(pyepo.model.grb.vrp.vrpABModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpMTZModelRel.getTour">(pyepo.model.grb.vrp.vrpMTZModelRel method)</a>
+</li>
         <li><a href="autoapi/pyepo/model/omo/tsp/index.html#pyepo.model.omo.tsp.tspGGModelRel.getTour">(pyepo.model.omo.tsp.tspGGModelRel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/omo/tsp/index.html#pyepo.model.omo.tsp.tspMTZModelRel.getTour">(pyepo.model.omo.tsp.tspMTZModelRel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.getTour">(pyepo.model.omo.vrp.vrpABModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpMTZModelRel.getTour">(pyepo.model.omo.vrp.vrpMTZModelRel method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -467,6 +521,8 @@
         <li><a href="autoapi/pyepo/func/regularized/index.html#pyepo.func.regularized.regularizedFrankWolfeOpt.max_iter">(pyepo.func.regularized.regularizedFrankWolfeOpt attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/pyepo/func/cave/index.html#pyepo.func.cave.coneAlignedCosine.max_iters">max_iters (pyepo.func.cave.coneAlignedCosine attribute)</a>
+</li>
       <li><a href="autoapi/pyepo/EPO/index.html#pyepo.EPO.MAXIMIZE">MAXIMIZE (in module pyepo.EPO)</a>
 
       <ul>
@@ -482,6 +538,8 @@
       <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDataset.model">model (pyepo.data.dataset.optDataset attribute)</a>
 
       <ul>
+        <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs.model">(pyepo.data.dataset.optDatasetConstrs attribute)</a>
+</li>
         <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetKNN.model">(pyepo.data.dataset.optDatasetKNN attribute)</a>
 </li>
       </ul></li>
@@ -521,6 +579,8 @@
 </li>
         <li><a href="autoapi/pyepo/func/blackbox/index.html#module-pyepo.func.blackbox">pyepo.func.blackbox</a>
 </li>
+        <li><a href="autoapi/pyepo/func/cave/index.html#module-pyepo.func.cave">pyepo.func.cave</a>
+</li>
         <li><a href="autoapi/pyepo/func/contrastive/index.html#module-pyepo.func.contrastive">pyepo.func.contrastive</a>
 </li>
         <li><a href="autoapi/pyepo/func/perturbed/index.html#module-pyepo.func.perturbed">pyepo.func.perturbed</a>
@@ -559,6 +619,8 @@
 </li>
         <li><a href="autoapi/pyepo/model/copt/tsp/index.html#module-pyepo.model.copt.tsp">pyepo.model.copt.tsp</a>
 </li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#module-pyepo.model.copt.vrp">pyepo.model.copt.vrp</a>
+</li>
         <li><a href="autoapi/pyepo/model/grb/index.html#module-pyepo.model.grb">pyepo.model.grb</a>
 </li>
         <li><a href="autoapi/pyepo/model/grb/grbmodel/index.html#module-pyepo.model.grb.grbmodel">pyepo.model.grb.grbmodel</a>
@@ -570,6 +632,8 @@
         <li><a href="autoapi/pyepo/model/grb/shortestpath/index.html#module-pyepo.model.grb.shortestpath">pyepo.model.grb.shortestpath</a>
 </li>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#module-pyepo.model.grb.tsp">pyepo.model.grb.tsp</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#module-pyepo.model.grb.vrp">pyepo.model.grb.vrp</a>
 </li>
         <li><a href="autoapi/pyepo/model/mpax/index.html#module-pyepo.model.mpax">pyepo.model.mpax</a>
 </li>
@@ -590,6 +654,8 @@
         <li><a href="autoapi/pyepo/model/omo/shortestpath/index.html#module-pyepo.model.omo.shortestpath">pyepo.model.omo.shortestpath</a>
 </li>
         <li><a href="autoapi/pyepo/model/omo/tsp/index.html#module-pyepo.model.omo.tsp">pyepo.model.omo.tsp</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#module-pyepo.model.omo.vrp">pyepo.model.omo.vrp</a>
 </li>
         <li><a href="autoapi/pyepo/model/opt/index.html#module-pyepo.model.opt">pyepo.model.opt</a>
 </li>
@@ -643,13 +709,19 @@
       <li><a href="autoapi/pyepo/func/blackbox/index.html#pyepo.func.blackbox.negativeIdentityFunc">negativeIdentityFunc (class in pyepo.func.blackbox)</a>
 </li>
       <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.tspABBase.nodes">nodes (pyepo.model.bases.tspABBase attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.nodes">(pyepo.model.copt.vrp.vrpABModel attribute)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.nodes">(pyepo.model.grb.vrp.vrpABModel attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.nodes">(pyepo.model.omo.vrp.vrpABModel attribute)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/pyepo/twostage/autosklearnpred/index.html#pyepo.twostage.autosklearnpred.NoPreprocessing">NoPreprocessing (class in pyepo.twostage.autosklearnpred)</a>
 </li>
       <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.portfolioBase.num_assets">num_assets (pyepo.model.bases.portfolioBase attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.knapsackBase.num_cost">num_cost (pyepo.model.bases.knapsackBase property)</a>
 
       <ul>
@@ -659,13 +731,21 @@
 </li>
         <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.tspABBase.num_cost">(pyepo.model.bases.tspABBase property)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.num_cost">(pyepo.model.copt.vrp.vrpABModel property)</a>
+</li>
         <li><a href="autoapi/pyepo/model/grb/grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel.num_cost">(pyepo.model.grb.grbmodel.optGrbModel property)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.num_cost">(pyepo.model.grb.vrp.vrpABModel property)</a>
+</li>
         <li><a href="autoapi/pyepo/model/mpax/mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel.num_cost">(pyepo.model.mpax.mpaxmodel.optMpaxModel property)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.num_cost">(pyepo.model.omo.vrp.vrpABModel property)</a>
 </li>
         <li><a href="autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel.num_cost">(pyepo.model.opt.optModel property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/pyepo/model/copt/tsp/index.html#pyepo.model.copt.tsp.num_nodes">num_nodes (in module pyepo.model.copt.tsp)</a>
 
       <ul>
@@ -673,9 +753,23 @@
 </li>
         <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.tspABBase.num_nodes">(pyepo.model.bases.tspABBase attribute)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.num_nodes">(pyepo.model.copt.vrp.vrpABModel attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.num_nodes">(pyepo.model.grb.vrp.vrpABModel attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.num_nodes">(pyepo.model.omo.vrp.vrpABModel attribute)</a>
+</li>
       </ul></li>
       <li><a href="autoapi/pyepo/model/ort/ortmodel/index.html#pyepo.model.ort.ortmodel.num_vars">num_vars (in module pyepo.model.ort.ortmodel)</a>
 </li>
+      <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel.num_vehicle">num_vehicle (pyepo.model.copt.vrp.vrpABModel attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel.num_vehicle">(pyepo.model.grb.vrp.vrpABModel attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel.num_vehicle">(pyepo.model.omo.vrp.vrpABModel attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -685,6 +779,8 @@
       <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDataset.objs">objs (pyepo.data.dataset.optDataset attribute)</a>
 
       <ul>
+        <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs.objs">(pyepo.data.dataset.optDatasetConstrs attribute)</a>
+</li>
         <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetKNN.objs">(pyepo.data.dataset.optDatasetKNN attribute)</a>
 </li>
       </ul></li>
@@ -692,12 +788,16 @@
 </li>
       <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDataset">optDataset (class in pyepo.data.dataset)</a>
 </li>
+      <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs">optDatasetConstrs (class in pyepo.data.dataset)</a>
+</li>
       <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetKNN">optDatasetKNN (class in pyepo.data.dataset)</a>
 </li>
       <li><a href="autoapi/pyepo/model/grb/grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel">optGrbModel (class in pyepo.model.grb.grbmodel)</a>
 </li>
       <li><a href="autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel">optModel (class in pyepo.model.opt)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/pyepo/model/copt/portfolio/index.html#pyepo.model.copt.portfolio.optmodel">optmodel (in module pyepo.model.copt.portfolio)</a>
 
       <ul>
@@ -708,8 +808,6 @@
         <li><a href="autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.optModule.optmodel">(pyepo.func.abcmodule.optModule attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.optModule">optModule (class in pyepo.func.abcmodule)</a>
 </li>
       <li><a href="autoapi/pyepo/model/mpax/mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel">optMpaxModel (class in pyepo.model.mpax.mpaxmodel)</a>
@@ -840,6 +938,13 @@
 </li>
       </ul></li>
       <li>
+    pyepo.func.cave
+
+      <ul>
+        <li><a href="autoapi/pyepo/func/cave/index.html#module-pyepo.func.cave">module</a>
+</li>
+      </ul></li>
+      <li>
     pyepo.func.contrastive
 
       <ul>
@@ -937,8 +1042,6 @@
         <li><a href="autoapi/pyepo/model/copt/index.html#module-pyepo.model.copt">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     pyepo.model.copt.coptmodel
 
@@ -946,6 +1049,8 @@
         <li><a href="autoapi/pyepo/model/copt/coptmodel/index.html#module-pyepo.model.copt.coptmodel">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     pyepo.model.copt.knapsack
 
@@ -972,6 +1077,13 @@
 
       <ul>
         <li><a href="autoapi/pyepo/model/copt/tsp/index.html#module-pyepo.model.copt.tsp">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyepo.model.copt.vrp
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#module-pyepo.model.copt.vrp">module</a>
 </li>
       </ul></li>
       <li>
@@ -1014,6 +1126,13 @@
 
       <ul>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#module-pyepo.model.grb.tsp">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyepo.model.grb.vrp
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#module-pyepo.model.grb.vrp">module</a>
 </li>
       </ul></li>
       <li>
@@ -1084,6 +1203,13 @@
 
       <ul>
         <li><a href="autoapi/pyepo/model/omo/tsp/index.html#module-pyepo.model.omo.tsp">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyepo.model.omo.vrp
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#module-pyepo.model.omo.vrp">module</a>
 </li>
       </ul></li>
       <li>
@@ -1196,6 +1322,10 @@
 </li>
         <li><a href="autoapi/pyepo/model/copt/tsp/index.html#pyepo.model.copt.tsp.tspMTZModelRel.relax">(pyepo.model.copt.tsp.tspMTZModelRel method)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpMTZModel.relax">(pyepo.model.copt.vrp.vrpMTZModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpMTZModelRel.relax">(pyepo.model.copt.vrp.vrpMTZModelRel method)</a>
+</li>
         <li><a href="autoapi/pyepo/model/grb/knapsack/index.html#pyepo.model.grb.knapsack.knapsackModel.relax">(pyepo.model.grb.knapsack.knapsackModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/grb/knapsack/index.html#pyepo.model.grb.knapsack.knapsackModelRel.relax">(pyepo.model.grb.knapsack.knapsackModelRel method)</a>
@@ -1208,6 +1338,10 @@
 </li>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#pyepo.model.grb.tsp.tspMTZModelRel.relax">(pyepo.model.grb.tsp.tspMTZModelRel method)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpMTZModel.relax">(pyepo.model.grb.vrp.vrpMTZModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpMTZModelRel.relax">(pyepo.model.grb.vrp.vrpMTZModelRel method)</a>
+</li>
         <li><a href="autoapi/pyepo/model/omo/knapsack/index.html#pyepo.model.omo.knapsack.knapsackModel.relax">(pyepo.model.omo.knapsack.knapsackModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/omo/knapsack/index.html#pyepo.model.omo.knapsack.knapsackModelRel.relax">(pyepo.model.omo.knapsack.knapsackModelRel method)</a>
@@ -1219,6 +1353,10 @@
         <li><a href="autoapi/pyepo/model/omo/tsp/index.html#pyepo.model.omo.tsp.tspMTZModel.relax">(pyepo.model.omo.tsp.tspMTZModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/omo/tsp/index.html#pyepo.model.omo.tsp.tspMTZModelRel.relax">(pyepo.model.omo.tsp.tspMTZModelRel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpMTZModel.relax">(pyepo.model.omo.vrp.vrpMTZModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpMTZModelRel.relax">(pyepo.model.omo.vrp.vrpMTZModelRel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel.relax">(pyepo.model.opt.optModel method)</a>
 </li>
@@ -1260,11 +1398,19 @@
 </li>
         <li><a href="autoapi/pyepo/model/copt/tsp/index.html#pyepo.model.copt.tsp.tspDFJModel.setObj">(pyepo.model.copt.tsp.tspDFJModel method)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpMTZModel.setObj">(pyepo.model.copt.vrp.vrpMTZModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpRCIModel.setObj">(pyepo.model.copt.vrp.vrpRCIModel method)</a>
+</li>
         <li><a href="autoapi/pyepo/model/grb/grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel.setObj">(pyepo.model.grb.grbmodel.optGrbModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#pyepo.model.grb.tsp.tspABModel.setObj">(pyepo.model.grb.tsp.tspABModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#pyepo.model.grb.tsp.tspDFJModel.setObj">(pyepo.model.grb.tsp.tspDFJModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpMTZModel.setObj">(pyepo.model.grb.vrp.vrpMTZModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpRCIModel.setObj">(pyepo.model.grb.vrp.vrpRCIModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/mpax/mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel.setObj">(pyepo.model.mpax.mpaxmodel.optMpaxModel method)</a>
 </li>
@@ -1305,18 +1451,22 @@
         <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.perturbationGradient.sigma">(pyepo.func.surrogate.perturbationGradient attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs.skip_infeas">skip_infeas (pyepo.data.dataset.optDatasetConstrs attribute)</a>
+</li>
       <li><a href="autoapi/pyepo/twostage/sklearnpred/index.html#pyepo.twostage.sklearnpred.sklearnPred">sklearnPred() (in module pyepo.twostage.sklearnpred)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.optModule.solpool">solpool (pyepo.func.abcmodule.optModule attribute)</a>
 </li>
       <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDataset.sols">sols (pyepo.data.dataset.optDataset attribute)</a>
 
       <ul>
+        <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs.sols">(pyepo.data.dataset.optDatasetConstrs attribute)</a>
+</li>
         <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetKNN.sols">(pyepo.data.dataset.optDatasetKNN attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/pyepo/model/copt/coptmodel/index.html#pyepo.model.copt.coptmodel.optCoptModel.solve">solve() (pyepo.model.copt.coptmodel.optCoptModel method)</a>
 
       <ul>
@@ -1328,6 +1478,12 @@
 </li>
         <li><a href="autoapi/pyepo/model/copt/tsp/index.html#pyepo.model.copt.tsp.tspMTZModelRel.solve">(pyepo.model.copt.tsp.tspMTZModelRel method)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpMTZModel.solve">(pyepo.model.copt.vrp.vrpMTZModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpMTZModelRel.solve">(pyepo.model.copt.vrp.vrpMTZModelRel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpRCIModel.solve">(pyepo.model.copt.vrp.vrpRCIModel method)</a>
+</li>
         <li><a href="autoapi/pyepo/model/grb/grbmodel/index.html#pyepo.model.grb.grbmodel.optGrbModel.solve">(pyepo.model.grb.grbmodel.optGrbModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#pyepo.model.grb.tsp.tspABModel.solve">(pyepo.model.grb.tsp.tspABModel method)</a>
@@ -1338,6 +1494,12 @@
 </li>
         <li><a href="autoapi/pyepo/model/grb/tsp/index.html#pyepo.model.grb.tsp.tspMTZModelRel.solve">(pyepo.model.grb.tsp.tspMTZModelRel method)</a>
 </li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpMTZModel.solve">(pyepo.model.grb.vrp.vrpMTZModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpMTZModelRel.solve">(pyepo.model.grb.vrp.vrpMTZModelRel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpRCIModel.solve">(pyepo.model.grb.vrp.vrpRCIModel method)</a>
+</li>
         <li><a href="autoapi/pyepo/model/mpax/mpaxmodel/index.html#pyepo.model.mpax.mpaxmodel.optMpaxModel.solve">(pyepo.model.mpax.mpaxmodel.optMpaxModel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/omo/omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel.solve">(pyepo.model.omo.omomodel.optOmoModel method)</a>
@@ -1347,6 +1509,10 @@
         <li><a href="autoapi/pyepo/model/omo/tsp/index.html#pyepo.model.omo.tsp.tspGGModelRel.solve">(pyepo.model.omo.tsp.tspGGModelRel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/omo/tsp/index.html#pyepo.model.omo.tsp.tspMTZModelRel.solve">(pyepo.model.omo.tsp.tspMTZModelRel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpMTZModel.solve">(pyepo.model.omo.vrp.vrpMTZModel method)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpMTZModelRel.solve">(pyepo.model.omo.vrp.vrpMTZModelRel method)</a>
 </li>
         <li><a href="autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel.solve">(pyepo.model.opt.optModel method)</a>
 </li>
@@ -1387,6 +1553,8 @@
         <li><a href="autoapi/pyepo/func/regularized/index.html#pyepo.func.regularized.regularizedFrankWolfeOpt.tol">(pyepo.func.regularized.regularizedFrankWolfeOpt attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/pyepo/func/cave/index.html#pyepo.func.cave.coneAlignedCosine.tol_grad">tol_grad (pyepo.func.cave.coneAlignedCosine attribute)</a>
+</li>
       <li><a href="autoapi/pyepo/twostage/autosklearnpred/index.html#pyepo.twostage.autosklearnpred.NoPreprocessing.transform">transform() (pyepo.twostage.autosklearnpred.NoPreprocessing method)</a>
 </li>
       <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.tspABBase">tspABBase (class in pyepo.model.bases)</a>
@@ -1477,6 +1645,38 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.perturbedOpt.variance_reduction">variance_reduction (pyepo.func.perturbed.perturbedOpt attribute)</a>
 </li>
+      <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpABModel">vrpABModel (class in pyepo.model.copt.vrp)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpABModel">(class in pyepo.model.grb.vrp)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpABModel">(class in pyepo.model.omo.vrp)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpMTZModel">vrpMTZModel (class in pyepo.model.copt.vrp)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpMTZModel">(class in pyepo.model.grb.vrp)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpMTZModel">(class in pyepo.model.omo.vrp)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpMTZModelRel">vrpMTZModelRel (class in pyepo.model.copt.vrp)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpMTZModelRel">(class in pyepo.model.grb.vrp)</a>
+</li>
+        <li><a href="autoapi/pyepo/model/omo/vrp/index.html#pyepo.model.omo.vrp.vrpMTZModelRel">(class in pyepo.model.omo.vrp)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/pyepo/model/copt/vrp/index.html#pyepo.model.copt.vrp.vrpRCIModel">vrpRCIModel (class in pyepo.model.copt.vrp)</a>
+
+      <ul>
+        <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpRCIModel">(class in pyepo.model.grb.vrp)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
