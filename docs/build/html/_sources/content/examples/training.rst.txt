@@ -44,130 +44,100 @@ All examples below share the same setup: a linear prediction model trained on sh
    predmodel = LinearRegression()
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
-
-Two Training Patterns
-=====================
-
-PyEPO methods fall into two interaction patterns. Both share the same outer loop; they differ in how the inner block computes the loss.
-
-
-Pattern A — Loss-returning methods
-----------------------------------
-
-Methods that return a scalar loss directly (SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE) plug straight into ``.backward()``:
-
-.. code-block:: python
-
-   num_epochs = 20
-   for epoch in range(num_epochs):
-       for data in dataloader:
-           x, c, w, z = data
-           cp = predmodel(x)
-           loss = method(cp, ...)  # method-specific call: see recipes below
-           optimizer.zero_grad()
-           loss.backward()
-           optimizer.step()
-
-
-Pattern B — Solution-returning methods
---------------------------------------
-
-Methods that return predicted, expected, or regularized solutions (DPO, DBB, NID, RFWO, I-MLE, AI-MLE) require the user to define a task loss on the output:
-
-.. code-block:: python
-
-   criterion = nn.MSELoss()  # or nn.L1Loss(), or an objective-value loss
-
-   num_epochs = 20
-   for epoch in range(num_epochs):
-       for data in dataloader:
-           x, c, w, z = data
-           cp = predmodel(x)
-           wp = method(cp)
-           # solution-level loss (vs. true optimal solution):
-           loss = criterion(wp, w)
-           # or objective-value loss (vs. true optimal value):
-           # zp = (wp * c).sum(1).view(-1, 1)
-           # loss = criterion(zp, z)
-           optimizer.zero_grad()
-           loss.backward()
-           optimizer.step()
-
-
-The recipes below give each method's initialization and call signature. Drop them into the corresponding pattern.
+Each recipe below is a self-contained training loop: pick the method you want and copy its block as-is.
 
 
 Surrogate Losses
 ================
 
-Both surrogate losses follow **Pattern A**.
 
-
-SPO+
-----
+Smart Predict-then-Optimize+ Loss (SPO+)
+----------------------------------------
 
 .. code-block:: python
 
    spo = pyepo.func.SPOPlus(optmodel, processes=2)
 
-   # inner call: SPO+ takes (cp, c, w, z)
-   loss = spo(cp, c, w, z)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = spo(cp, c, w, z)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-PG
---
+Perturbation Gradient (PG)
+--------------------------
 
 .. code-block:: python
 
    pg = pyepo.func.perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=2)
 
-   # inner call: PG takes (cp, c)
-   loss = pg(cp, c)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = pg(cp, c)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 Perturbed Methods
 =================
 
 
-DPO — additive and multiplicative
----------------------------------
+Differentiable Perturbed Optimizer (DPO)
+----------------------------------------
 
-**Pattern B.** ``perturbedOptMul`` requires a positive-output predictor (e.g., ``nn.Softplus()`` plus a small epsilon, denoted ``positive_predmodel`` below) so that predicted costs keep their sign.
+``perturbedOpt`` is the additive Gaussian version. ``perturbedOptMul`` is the multiplicative version for sign-sensitive oracles; it requires a positive-output predictor (e.g., ``nn.Softplus()`` plus a small epsilon, ``positive_predmodel`` below) so that predicted costs keep their sign.
 
 .. code-block:: python
 
    # additive
    ptb = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
-   # multiplicative — use positive_predmodel for cp
+   # multiplicative — swap predmodel for positive_predmodel below
    # ptb = pyepo.func.perturbedOptMul(optmodel, n_samples=10, sigma=0.5, processes=2)
 
    criterion = nn.MSELoss()
 
-   # inner block
-   we = ptb(cp)
-   loss = criterion(we, w)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           we = ptb(cp)
+           loss = criterion(we, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-PFYL — additive and multiplicative
-----------------------------------
+Perturbed Fenchel-Young Loss (PFYL)
+-----------------------------------
 
-**Pattern A.** The multiplicative variant shares the sign convention of ``perturbedOptMul``.
+The multiplicative variant ``perturbedFenchelYoungMul`` shares the sign convention of ``perturbedOptMul`` and requires a positive-output predictor.
 
 .. code-block:: python
 
    # additive
    pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
-   # multiplicative — use positive_predmodel for cp
+   # multiplicative — swap predmodel for positive_predmodel below
    # pfy = pyepo.func.perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=0.5, processes=2)
 
-   # inner call: PFYL takes (cp, w)
-   loss = pfy(cp, w)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = pfy(cp, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-I-MLE
------
-
-**Pattern B.**
+Implicit Maximum Likelihood Estimator (I-MLE)
+---------------------------------------------
 
 .. code-block:: python
 
@@ -175,15 +145,19 @@ I-MLE
 
    criterion = nn.L1Loss()
 
-   # inner block
-   we = imle(cp)
-   loss = criterion(we, w)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           we = imle(cp)
+           loss = criterion(we, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-AI-MLE
-------
-
-**Pattern B.**
+Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)
+-------------------------------------------------------
 
 .. code-block:: python
 
@@ -191,19 +165,25 @@ AI-MLE
 
    criterion = nn.L1Loss()
 
-   # inner block
-   we = aimle(cp)
-   loss = criterion(we, w)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           we = aimle(cp)
+           loss = criterion(we, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 Regularized Methods
 ===================
 
 
-RFWO
-----
+L2 Regularized Frank-Wolfe (RFWO)
+---------------------------------
 
-**Pattern B.** Solution-level MSE matches the imitation setting in the paper.
+RFWO returns a regularized solution; solution-level MSE against :math:`\mathbf{w}^*(\mathbf{c})` matches the imitation setting in the paper.
 
 .. code-block:: python
 
@@ -211,32 +191,42 @@ RFWO
 
    criterion = nn.MSELoss()
 
-   # inner block
-   wr = rfwo(cp)
-   loss = criterion(wr, w)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           wr = rfwo(cp)
+           loss = criterion(wr, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-RFYL
-----
-
-**Pattern A.**
+L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)
+---------------------------------------------------------
 
 .. code-block:: python
 
    rfyl = pyepo.func.regularizedFrankWolfeFenchelYoung(optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
 
-   # inner call: RFYL takes (cp, w)
-   loss = rfyl(cp, w)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = rfyl(cp, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 Black-Box Methods
 =================
 
-Both follow **Pattern B** with an objective-value loss (:math:`|\langle \mathbf{c}, \hat{\mathbf{w}} \rangle - z^*|`).
+Black-box methods return a predicted solution. An objective-value loss :math:`|\langle \mathbf{c}, \hat{\mathbf{w}} \rangle - z^*|` is the standard pairing.
 
 
-DBB
----
+Differentiable Black-Box Optimizer (DBB)
+----------------------------------------
 
 .. code-block:: python
 
@@ -244,16 +234,22 @@ DBB
 
    criterion = nn.L1Loss()
 
-   # inner block
-   wp = dbb(cp)
-   zp = (wp * c).sum(1).view(-1, 1)
-   loss = criterion(zp, z)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           wp = dbb(cp)
+           zp = (wp * c).sum(1).view(-1, 1)
+           loss = criterion(zp, z)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-NID
----
+Negative Identity Backpropagation (NID)
+---------------------------------------
 
-Hyperparameter-free; same inner block as DBB.
+NID is hyperparameter-free and uses the same training loop as DBB.
 
 .. code-block:: python
 
@@ -261,18 +257,24 @@ Hyperparameter-free; same inner block as DBB.
 
    criterion = nn.L1Loss()
 
-   # inner block
-   wp = nid(cp)
-   zp = (wp * c).sum(1).view(-1, 1)
-   loss = criterion(zp, z)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           wp = nid(cp)
+           zp = (wp * c).sum(1).view(-1, 1)
+           loss = criterion(zp, z)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 Cone-Aligned Estimation
 =======================
 
 
-CaVE
-----
+Cone-aligned Vector Estimation (CaVE)
+-------------------------------------
 
 CaVE requires a dedicated dataset class that extracts binding-constraint normals at the optimum (``optDatasetConstrs``) and a custom collate function (``collate_tight_constraints``) to handle ragged per-instance constraint counts. The batch yields an extra ``tight_ctrs`` element on top of the usual ``(x, c, w, z)``.
 
@@ -291,7 +293,6 @@ CaVE requires a dedicated dataset class that extracts binding-constraint normals
    for epoch in range(num_epochs):
        for x, c, w, z, tight_ctrs in dataloader:
            cp = predmodel(x)
-           # inner call: CaVE takes (cp, tight_ctrs)
            loss = cave(cp, tight_ctrs)
            optimizer.zero_grad()
            loss.backward()
@@ -301,46 +302,95 @@ CaVE requires a dedicated dataset class that extracts binding-constraint normals
 Contrastive Methods
 ===================
 
-NCE and CMAP both follow **Pattern A** and use a cached solution pool: ``solve_ratio`` controls how often new instances are solved exactly during training, and ``dataset`` seeds the pool with optimal solutions.
+Contrastive methods train against a cached pool of solutions. ``solve_ratio`` controls how often new instances are solved exactly during training, and ``dataset`` seeds the pool with optimal solutions. See :doc:`pool` for details on the solution-pool mechanism.
 
 
-NCE
----
+Noise Contrastive Estimation (NCE)
+----------------------------------
 
 .. code-block:: python
 
    nce = pyepo.func.noiseContrastiveEstimation(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
-   # inner call: NCE takes (cp, w)
-   loss = nce(cp, w)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = nce(cp, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-CMAP
-----
+Contrastive MAP (CMAP)
+----------------------
 
 .. code-block:: python
 
    cmap = pyepo.func.contrastiveMAP(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
-   # inner call: CMAP takes (cp, w)
-   loss = cmap(cp, w)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = cmap(cp, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-Learning to Rank
-================
+Learning to Rank (LTR)
+======================
 
-All three LTR variants follow **Pattern A** and share the same pool configuration. Pick one based on how it scores the ranking.
+LTR variants share the same pool configuration as the contrastive methods (``solve_ratio``, ``dataset``). Pick one based on how it scores the ranking.
 
 
-Pointwise / Pairwise / Listwise
--------------------------------
+Pointwise LTR
+-------------
 
 .. code-block:: python
 
-   # pick one
    ltr = pyepo.func.pointwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
-   # ltr = pyepo.func.pairwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
-   # ltr = pyepo.func.listwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
-   # inner call: LTR takes (cp, c)
-   loss = ltr(cp, c)
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = ltr(cp, c)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
+
+Pairwise LTR
+------------
+
+.. code-block:: python
+
+   ltr = pyepo.func.pairwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = ltr(cp, c)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
+
+Listwise LTR
+------------
+
+.. code-block:: python
+
+   ltr = pyepo.func.listwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = ltr(cp, c)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
