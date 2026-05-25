@@ -56,7 +56,7 @@ Module Contents
 
 
 
-   .. py:method:: copy() -> optGrbModel
+   .. py:method:: copy() -> Self
 
       A method to copy the model
 
@@ -65,7 +65,7 @@ Module Contents
 
 
 
-   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optGrbModel
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> Self
 
       A method to add a new constraint
 

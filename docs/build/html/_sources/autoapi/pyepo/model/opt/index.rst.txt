@@ -36,6 +36,12 @@ Module Contents
       :type:  pyepo.EPO.ModelSense
 
 
+   .. py:attribute:: arcs
+      :type:  list
+      :value: []
+
+
+
    .. py:property:: num_cost
       :type: int
 
@@ -64,7 +70,7 @@ Module Contents
 
 
 
-   .. py:method:: copy() -> optModel
+   .. py:method:: copy() -> Self
 
       A method to copy the model
 
@@ -73,7 +79,7 @@ Module Contents
 
 
 
-   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optModel
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> Self
       :abstractmethod:
 
 

@@ -77,7 +77,7 @@ Module Contents
 
 
 
-   .. py:method:: copy() -> vrpABModel
+   .. py:method:: copy() -> Self
 
       A method to copy the model
 
@@ -159,7 +159,7 @@ Module Contents
 
 
 
-   .. py:method:: relax() -> vrpMTZModel
+   .. py:method:: relax() -> NoReturn
 
       A forbidden method to relax MIP model
 

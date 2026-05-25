@@ -64,7 +64,7 @@ Module Contents
 
 
 
-   .. py:method:: copy() -> optOrtModel
+   .. py:method:: copy() -> Self
 
       A method to copy the model
 
@@ -73,7 +73,7 @@ Module Contents
 
 
 
-   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optOrtModel
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> Self
 
       A method to add a new constraint
 

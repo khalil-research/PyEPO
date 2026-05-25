@@ -175,13 +175,13 @@ Module Contents
 
 
 
-   .. py:method:: copy() -> tspABBase
+   .. py:method:: copy() -> Self
 
       Return a fresh model with all extra constraints replayed onto it.
 
 
 
-   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> tspABBase
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> Self
 
       Return a new model with one extra linear constraint added.
 

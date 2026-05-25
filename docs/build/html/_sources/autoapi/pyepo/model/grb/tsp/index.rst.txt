@@ -76,7 +76,7 @@ Module Contents
 
 
 
-   .. py:method:: relax() -> tspABModel
+   .. py:method:: relax() -> NoReturn
 
       A forbidden method to relax MIP model
 
@@ -142,7 +142,7 @@ Module Contents
 
 
 
-   .. py:method:: relax() -> tspABModel
+   .. py:method:: relax() -> NoReturn
 
       A forbidden method to relax MIP model
 

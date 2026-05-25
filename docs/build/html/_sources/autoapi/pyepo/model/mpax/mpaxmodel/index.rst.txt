@@ -96,7 +96,7 @@ Module Contents
 
 
 
-   .. py:method:: copy() -> optMpaxModel
+   .. py:method:: copy() -> Self
 
       A method to copy the model
 
@@ -105,7 +105,7 @@ Module Contents
 
 
 
-   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> optMpaxModel
+   .. py:method:: addConstr(coefs: numpy.ndarray | torch.Tensor | list, rhs: float) -> Self
 
       A method to add a new constraint
 
