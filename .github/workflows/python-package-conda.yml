@@ -20,10 +20,12 @@ jobs:
         python-version: 3.9
         auto-activate: false
         conda-remove-defaults: true
+        channels: conda-forge,pytorch,gurobi
+        channel-priority: strict
     - name: Install Conda-Build and Anaconda-Client
       run: conda install conda-build anaconda-client
     - name: Build Conda Package
-      run: conda build ./pkg -c conda-forge -c pytorch -c gurobi -c default
+      run: conda build ./pkg -c conda-forge -c pytorch -c gurobi
     - name: Extract Package Version
       run: |
         PACKAGE_VERSION=$(conda search --json -c local pyepo | jq -r '.pyepo[-1].version')
@@ -32,7 +34,7 @@ jobs:
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
       run: |
-        PKG_PATH=$(conda build --output ./pkg -c conda-forge -c pytorch -c gurobi -c default)
+        PKG_PATH=$(conda build --output ./pkg -c conda-forge -c pytorch -c gurobi)
         echo "Package path: $PKG_PATH"
         conda install -n pyepo-build anaconda-client --yes
         conda run -n pyepo-build anaconda upload --user pyepo $PKG_PATH
