@@ -217,8 +217,14 @@ def _apgd_iterate(
     x_prev: torch.Tensor,
     momenta: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Wrapper: mark batch dim symbolic so the compiled chunk is built once"""
-    # momenta[0] (= n_inner) must stay static — it bounds the python loop
+    """Wrapper: mark variable dims symbolic so the compiled chunk is built once"""
+    # batch dim varies via the tail batch (drop_last=False)
     for t in (A, AT, y, step_size, x_curr, x_prev):
         torch._dynamo.maybe_mark_dynamic(t, 0)
+    # constraint-row dim varies per batch via collate_tight_constraints (pad to batch max)
+    torch._dynamo.maybe_mark_dynamic(A, 1)
+    torch._dynamo.maybe_mark_dynamic(AT, 2)
+    torch._dynamo.maybe_mark_dynamic(x_curr, 1)
+    torch._dynamo.maybe_mark_dynamic(x_prev, 1)
+    # momenta[0] (= n_inner) must stay static — it bounds the python loop
     return _apgd_iterate_compiled(A, AT, y, step_size, x_curr, x_prev, momenta)
