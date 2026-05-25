@@ -477,10 +477,10 @@ class TestCaVE:
         self._train_loop_cave(loss_fn, loader, predmodel)
 
     def test_exact_preset_train(self):
-        # closer-to-exact CaVE preset
+        # closer-to-exact CaVE preset (raise the Clarabel iteration cap)
         optmodel, loader = self._setup()
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
         loss_fn = pyepo.func.coneAlignedCosine(
-            optmodel, max_iters=None, tol_grad=1e-4, processes=1,
+            optmodel, max_iter=200, processes=1,
         )
         self._train_loop_cave(loss_fn, loader, predmodel)

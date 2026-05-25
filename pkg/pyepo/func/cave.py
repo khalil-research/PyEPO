@@ -5,13 +5,22 @@ Cone-aligned vector estimation (CaVE) loss for binary linear programs
 
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
+import numpy as np
 import torch
 from torch.nn import functional as F
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
+
+try:
+    import clarabel
+    from scipy import sparse
+    _HAS_CLARABEL = True
+except ImportError:
+    _HAS_CLARABEL = False
 
 if TYPE_CHECKING:
     from pyepo.func.abcmodule import Reduction
@@ -31,14 +40,22 @@ class coneAlignedCosine(optModule):
     without requiring a perturbation or solution pool. Defined for
     **binary linear programs** only.
 
-    PyEPO ships a pure-torch APGD (Nesterov-accelerated projected gradient
-    descent) batched cone-projection solver, ``torch.compile``-fused and
-    CUDA-graph friendly. Defaults (``max_iters=20``, ``tol_grad=None``)
-    reproduce the **CaVE+** preset from the paper: a truncated APGD that
-    lands strictly inside the cone and avoids boundary stagnation. To
-    approach the original **CaVE** preset, drop the iteration cap and add
-    a non-trivial tolerance (``max_iters=None, tol_grad=1e-4``); in
-    practice the truncated default is faster without losing regret quality.
+    PyEPO uses Clarabel as the interior-point QP solver for the cone
+    projection.
+
+    .. note::
+       The default ``max_iter=3`` is intentional — it is the **CaVE+**
+       preset from the paper. Three IPM steps under-converge the QP on
+       purpose so the projection stays interior to the cone, yielding a
+       richer gradient than a fully converged boundary projection.
+       Raising ``max_iter`` changes the loss behavior.
+
+    For larger problems, set ``solve_ratio < 1`` to enable the **CaVE
+    Hybrid** preset from the paper: each batch goes through the QP
+    projection with probability ``solve_ratio`` and through a cheap
+    heuristic (normalized predicted cost blended with the average
+    binding-constraint normal) with probability ``1 - solve_ratio``,
+    cutting the per-epoch cost without measurable regret loss.
 
     Training data must come from ``pyepo.data.dataset.optDatasetConstrs``
     (Gurobi-backed) and be collated with ``collate_tight_constraints``.
@@ -50,25 +67,38 @@ class coneAlignedCosine(optModule):
     def __init__(
         self,
         optmodel: optModel,
-        max_iters: int | None = 20,
-        tol_grad: float | None = None,
+        max_iter: int = 3,
+        solve_ratio: float = 1.0,
+        inner_ratio: float = 0.2,
         processes: int = 1,
         reduction: Reduction = "mean",
     ) -> None:
         """
         Args:
             optmodel: a PyEPO optimization model (Gurobi-backed)
-            max_iters: APGD iteration cap. Default ``20`` (CaVE+ truncated);
-                ``None`` falls back to a 10k safety bound for closer-to-exact behavior.
-            tol_grad: L-inf tolerance on the projected gradient. Default ``None``
-                skips the convergence check (pure fixed-iter, no per-chunk sync).
-                Set ``1e-4`` to converge to the cone boundary.
+            max_iter: Clarabel iteration cap. Default ``3`` is the paper's
+                CaVE+ preset; raising it changes the loss (see class note).
+            solve_ratio: per-batch probability of running the QP projection.
+                ``< 1`` activates the CaVE Hybrid heuristic branch.
+            inner_ratio: weight on the average binding-constraint normal in
+                the heuristic branch (only used when ``solve_ratio < 1``).
             processes: number of solver processes (1 = single-core, 0 = all cores)
             reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
         """
         super().__init__(optmodel, processes, solve_ratio=1.0, reduction=reduction)
-        self.tol_grad = tol_grad
-        self.max_iters = max_iters
+        if not _HAS_CLARABEL:
+            raise ImportError(
+                "clarabel is required for the CaVE cone projection. "
+                "Install with `pip install clarabel`."
+            )
+        if not 0.0 <= solve_ratio <= 1.0:
+            raise ValueError(f"Invalid solve_ratio {solve_ratio}; must be in [0, 1].")
+        if not 0.0 <= inner_ratio <= 1.0:
+            raise ValueError(f"Invalid inner_ratio {inner_ratio}; must be in [0, 1].")
+        self.max_iter = int(max_iter)
+        # override parent's solve_ratio: ours gates the QP-vs-heuristic branch
+        self.solve_ratio = float(solve_ratio)
+        self.inner_ratio = float(inner_ratio)
         # sense-aware sign (constant once optmodel is fixed)
         if optmodel.modelSense == EPO.MINIMIZE:
             self._sign = -1.0
@@ -86,145 +116,90 @@ class coneAlignedCosine(optModule):
         Forward pass
         """
         signed_cost = self._sign * pred_cost
-        # fixed projection target (F.cosine_similarity normalizes internally)
+        # tight_ctrs only consumed on CPU (Clarabel + avg both CPU-bound); avoid a GPU round-trip
+        tight_ctrs_cpu = tight_ctrs.detach().cpu()
+        # fixed projection target; gradient flows only through signed_cost below
         with torch.no_grad():
-            proj, _ = _apgd_project(
-                tight_ctrs,
-                signed_cost,
-                tol_grad=self.tol_grad,
-                max_iters=self.max_iters,
-            )
+            # per-batch coin flip: QP branch or cheap heuristic branch
+            if self._branch_rng.uniform() <= self.solve_ratio:
+                # QP branch: truncated Clarabel projection inside the cone
+                proj = _clarabel_project_batch(signed_cost, tight_ctrs_cpu, max_iter=self.max_iter)
+            else:
+                # heuristic branch: blend normalized pred with avg binding-constraint normal
+                pred_n = signed_cost / signed_cost.norm(dim=1, keepdim=True).clamp(min=1e-8)
+                avg = _average_ctrs(tight_ctrs_cpu).to(signed_cost.device, signed_cost.dtype)
+                proj = (1 - self.inner_ratio) * pred_n + self.inner_ratio * avg
         loss = F.cosine_similarity(signed_cost, proj, dim=1).neg().add(1.0)
         return self._reduce(loss)
 
 
-def _apgd_project(
-    tight_ctrs: torch.Tensor,
-    signed_cost: torch.Tensor,
-    tol_grad: float | None = 1e-4,
-    max_iters: int | None = None,
-    check_frequency: int = 200,
-    power_iter: int = 8,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """
-    A function to batch-project onto the binding-constraint cone via Nesterov APGD
-    """
-    # iteration cap
-    cap = max_iters if max_iters is not None else 10_000
-    # pre-transpose
-    A = tight_ctrs.contiguous()
-    AT = A.transpose(1, 2).contiguous()
-    # per-instance step size
-    step_size = _apgd_step_size(A, AT, power_iter)
-    # Nesterov momentum schedule
-    ks = torch.arange(cap, device=A.device, dtype=A.dtype)
-    momenta = (ks - 2.0) / (ks + 1.0)
-    momenta[0] = 0.0
-    # cold-start state
-    B, m, _ = A.shape
-    x_curr = torch.zeros(B, m, device=A.device, dtype=A.dtype)
-    x_prev = x_curr.clone()
-    # chunked compiled loop with outer convergence check
-    K = check_frequency
-    for k_start in range(0, cap, K):
-        K_actual = min(K, cap - k_start)
-        # compiled chunk
-        x_curr, x_prev = _apgd_iterate(
-            A,
-            AT,
-            signed_cost,
-            step_size,
-            x_curr,
-            x_prev,
-            momenta[k_start : k_start + K_actual],
-        )
-        # clone breaks cudagraphs output-reuse aliasing
-        x_curr = x_curr.clone()
-        x_prev = x_prev.clone()
-        # tol_grad=None: skip convergence check
-        if tol_grad is None:
-            continue
-        # projected-gradient L-inf norm
-        res = torch.bmm(AT, x_curr.unsqueeze(-1)).squeeze(-1) - signed_cost
-        grad = torch.bmm(A, res.unsqueeze(-1)).squeeze(-1)
-        active = x_curr > 0
-        proj_grad = torch.where(active, grad.abs(), torch.clamp(-grad, min=0))
-        # convergence check
-        if proj_grad.max().item() <= tol_grad:
-            break
-    # final projection
-    proj = torch.bmm(AT, x_curr.unsqueeze(-1)).squeeze(-1)
-    # squared residual
-    rnorm = (signed_cost - proj).pow(2).sum(dim=1)
-    return proj, rnorm
+def _average_ctrs(tight_ctrs: torch.Tensor) -> torch.Tensor:
+    """Per-instance average of unit-normalized binding-constraint normals (zero-padded rows skipped)."""
+    # unit-normalize each row
+    norms = tight_ctrs.norm(dim=2, keepdim=True)
+    valid = (norms > 1e-7).to(tight_ctrs.dtype)
+    unit = tight_ctrs / norms.clamp(min=1e-8) * valid
+    # average over valid rows
+    n_valid = valid.sum(dim=1).clamp(min=1.0)
+    return unit.sum(dim=1) / n_valid
+    
+
+@lru_cache(maxsize=None)
+def _neg_eye_csc(m: int):
+    """Cached ``-I`` (CSC). Encodes ``lam >= 0`` as Clarabel ``A lam + s = b, s in cone`` with ``A = -I``, ``b = 0``."""
+    return (-sparse.eye(m, format="csc")).tocsc()
 
 
-def _apgd_step_size(
-    A: torch.Tensor,
-    AT: torch.Tensor,
-    n_iter: int,
+@lru_cache(maxsize=None)
+def _clarabel_settings(max_iter: int):
+    """Cached Clarabel settings; treat as immutable across calls."""
+    s = clarabel.DefaultSettings()
+    s.max_iter = int(max_iter)
+    s.verbose = False
+    # single-threaded for tiny per-instance QPs
+    s.max_threads = 1
+    # skip presolve / equilibrate
+    s.presolve_enable = False
+    s.equilibrate_enable = False
+    return s
+
+
+def _project_one(cp: np.ndarray, ctr: np.ndarray, max_iter: int) -> np.ndarray:
+    """Project ``cp`` onto cone{lam @ ctr : lam >= 0} via one Clarabel solve."""
+    # drop padded rows
+    ctr = ctr[np.abs(ctr).sum(axis=1) > 1e-7]
+    # no binding constraints
+    if len(ctr) == 0:
+        return cp.astype(np.float32)
+    m = ctr.shape[0]
+    # quadratic term
+    P = sparse.triu(sparse.csc_matrix(2.0 * (ctr @ ctr.T))).tocsc()
+    # linear term
+    q = -2.0 * (ctr @ cp)
+    # lam >= 0
+    A = _neg_eye_csc(m)
+    b = np.zeros(m)
+    cones = [clarabel.NonnegativeConeT(m)]
+    # build + solve
+    solver = clarabel.DefaultSolver(P, q, A, b, cones, _clarabel_settings(max_iter))
+    sol = solver.solve()
+    # proj = lam @ ctr
+    lam = np.asarray(sol.x)
+    return (lam @ ctr).astype(np.float32)
+
+
+def _clarabel_project_batch(
+    signed_cost: torch.Tensor, tight_ctrs: torch.Tensor, max_iter: int,
 ) -> torch.Tensor:
-    """A function to estimate per-instance 1/lambda_max(A A^T) via power iteration"""
-    B, m, _ = A.shape
-    # deterministic unit-norm init for reproducibility
-    v = torch.full((B, m), 1.0 / (m**0.5), device=A.device, dtype=A.dtype)
-    # power iteration: v <- (A A^T) v
-    for _ in range(n_iter):
-        u = torch.bmm(AT, v.unsqueeze(-1)).squeeze(-1)
-        v = torch.bmm(A, u.unsqueeze(-1)).squeeze(-1)
-        # re-normalize
-        v = v / v.norm(dim=1, keepdim=True).clamp(min=1e-8)
-    # Rayleigh quotient lambda = ||A^T v||^2
-    u = torch.bmm(AT, v.unsqueeze(-1)).squeeze(-1)
-    lam = (u * u).sum(dim=1)
-    # invert for step size
-    return (1.0 / lam.clamp(min=1e-8)).view(-1, 1)
-
-
-@torch.compile(mode="reduce-overhead", dynamic=False)
-def _apgd_iterate_compiled(
-    A: torch.Tensor,
-    AT: torch.Tensor,
-    y: torch.Tensor,
-    step_size: torch.Tensor,
-    x_curr: torch.Tensor,
-    x_prev: torch.Tensor,
-    momenta: torch.Tensor,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """A fused chunk of Nesterov-accelerated PGD iterations"""
-    n_iter = momenta.shape[0]
-    for i in range(n_iter):
-        # Nesterov extrapolation
-        momentum = momenta[i]
-        y_k = x_curr + momentum * (x_curr - x_prev)
-        # residual A^T y_k - y
-        res = torch.bmm(AT, y_k.unsqueeze(-1)).squeeze(-1) - y
-        # gradient A (A^T y_k - y)
-        grad = torch.bmm(A, res.unsqueeze(-1)).squeeze(-1)
-        # save previous iterate
-        x_prev = x_curr
-        # projected gradient step onto x >= 0
-        x_curr = torch.clamp(y_k - step_size * grad, min=0.0)
-    return x_curr, x_prev
-
-
-def _apgd_iterate(
-    A: torch.Tensor,
-    AT: torch.Tensor,
-    y: torch.Tensor,
-    step_size: torch.Tensor,
-    x_curr: torch.Tensor,
-    x_prev: torch.Tensor,
-    momenta: torch.Tensor,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """Wrapper: mark variable dims symbolic so the compiled chunk is built once"""
-    # batch dim varies via the tail batch (drop_last=False)
-    for t in (A, AT, y, step_size, x_curr, x_prev):
-        torch._dynamo.maybe_mark_dynamic(t, 0)
-    # constraint-row dim varies per batch via collate_tight_constraints (pad to batch max)
-    torch._dynamo.maybe_mark_dynamic(A, 1)
-    torch._dynamo.maybe_mark_dynamic(AT, 2)
-    torch._dynamo.maybe_mark_dynamic(x_curr, 1)
-    torch._dynamo.maybe_mark_dynamic(x_prev, 1)
-    # momenta[0] (= n_inner) must stay static — it bounds the python loop
-    return _apgd_iterate_compiled(A, AT, y, step_size, x_curr, x_prev, momenta)
+    """
+    A function to project each instance's signed cost onto its tight-constraint cone via Clarabel
+    """
+    # device / dtype of the gradient-carrying input
+    device, dtype = signed_cost.device, signed_cost.dtype
+    # to float64 numpy (tight_ctrs already on CPU per forward)
+    cp_np = signed_cost.detach().cpu().numpy().astype(np.float64)
+    ctrs_np = tight_ctrs.numpy().astype(np.float64)
+    # per-instance solve
+    projs = [_project_one(cp, ctr, max_iter) for cp, ctr in zip(cp_np, ctrs_np)]
+    # stack + back to torch
+    return torch.as_tensor(np.stack(projs), dtype=dtype, device=device)

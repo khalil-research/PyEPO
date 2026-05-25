@@ -465,7 +465,7 @@ class TestCaVEForward:
 
     def test_default_returns_scalar_mean(self, setup):
         model, pred_cost, ctrs = setup
-        # default (max_iters=20, tol_grad=None) = truncated CaVE+
+        # default (max_iter=3) = truncated CaVE+ via Clarabel
         loss = coneAlignedCosine(model, processes=1, reduction="mean")(pred_cost, ctrs)
         assert loss.dim() == 0
         # cosine-distance is in [0, 2]
@@ -483,10 +483,10 @@ class TestCaVEForward:
         np.testing.assert_allclose(total.item(), mean.item() * 2, atol=1e-5)
 
     def test_exact_preset(self, setup):
-        # closer-to-exact CaVE: tol_grad=1e-4, no truncation
+        # closer-to-exact CaVE: raise the Clarabel iteration cap
         model, pred_cost, ctrs = setup
         loss = coneAlignedCosine(
-            model, max_iters=None, tol_grad=1e-4, processes=1, reduction="mean",
+            model, max_iter=200, processes=1, reduction="mean",
         )(pred_cost, ctrs)
         assert loss.dim() == 0
         assert 0.0 - 1e-6 <= loss.item() <= 2.0 + 1e-6
