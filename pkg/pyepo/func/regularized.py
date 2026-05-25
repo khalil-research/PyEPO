@@ -224,7 +224,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
     An autograd module for the Fenchel-Young loss paired with regularized
     Frank-Wolfe.
 
-    For regularized Frank-Wolfe Fenchel-Young loss, the objective function is
+    For regularized Frank-Wolfe with Fenchel-Young loss, the objective function is
     linear and constraints are known and fixed, but the cost vector needs to be
     predicted from contextual data.
 
@@ -330,7 +330,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
 
 class regularizedFrankWolfeFenchelYoungFunc(Function):
     """
-    An autograd function for regularized Frank-Wolfe Fenchel-Young loss
+    An autograd function for regularized Frank-Wolfe with Fenchel-Young loss
     """
 
     @staticmethod
@@ -341,7 +341,7 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
         module: regularizedFrankWolfeFenchelYoung,
     ) -> torch.Tensor:
         """
-        Forward pass for regularized Frank-Wolfe Fenchel-Young loss
+        Forward pass for regularized Frank-Wolfe with Fenchel-Young loss
 
         Args:
             pred_cost: a batch of predicted values of the cost
@@ -375,7 +375,7 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
     @staticmethod
     def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, ...]:
         """
-        Backward pass for regularized Frank-Wolfe Fenchel-Young loss
+        Backward pass for regularized Frank-Wolfe with Fenchel-Young loss
         """
         (grad,) = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
