@@ -5,6 +5,7 @@ Utility function
 
 from __future__ import annotations
 
+import logging
 import math
 from typing import TYPE_CHECKING
 
@@ -18,6 +19,8 @@ from pyepo.utils import costToNumpy
 if TYPE_CHECKING:
     from pyepo.func.abcmodule import optModule
     from pyepo.model.opt import optModel
+
+logger = logging.getLogger(__name__)
 
 
 def _close_pool(pool) -> None:
@@ -88,8 +91,13 @@ def _solve_batch(
         # batch solving
         sol, obj = optmodel.batch_optimize(cp)
         # convert to torch
-        sol = torch.from_dlpack(sol).to(device)
-        obj = torch.from_dlpack(obj).to(device)
+        sol = torch.from_dlpack(sol)
+        obj = torch.from_dlpack(obj)
+        if sol.device != device:
+            logger.warning(
+                "MPAX solutions on %s differ from input device %s; copying", sol.device, device,
+            )
+            sol, obj = sol.to(device), obj.to(device)
         # obj sense
         if optmodel.modelSense == EPO.MINIMIZE:
             pass
