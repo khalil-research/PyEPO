@@ -181,7 +181,7 @@ def _apgd_step_size(
     return (1.0 / lam.clamp(min=1e-8)).view(-1, 1)
 
 
-@torch.compile(mode="reduce-overhead", dynamic=False)
+@torch.compile(mode="reduce-overhead", dynamic=None)
 def _apgd_iterate(
     A: torch.Tensor,
     AT: torch.Tensor,
