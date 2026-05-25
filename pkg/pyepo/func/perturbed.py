@@ -83,8 +83,8 @@ class perturbedOpt(optModule):
         return cast("torch.Tensor", perturbedOptFunc.apply(pred_cost, self))
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        """Perturbed cost from clean cost and noises."""
-        return cp + self.sigma * noises
+        """Perturbed cost from clean cost (b, d) and noises (b, n, d)."""
+        return cp.unsqueeze(1) + self.sigma * noises
 
     def _grad_scale(self, cp: torch.Tensor) -> torch.Tensor | float:
         """Divisor for the backward estimator."""
@@ -126,7 +126,8 @@ class perturbedOptFunc(Function):
         # sample perturbations on-device
         gen = _torch_generator(module._gen_cache, device, module.seed)
         noises = torch.randn(
-            (module.n_samples, *cp.shape), device=device, dtype=cp.dtype, generator=gen,
+            (cp.shape[0], module.n_samples, cp.shape[1]),
+            device=device, dtype=cp.dtype, generator=gen,
         )
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
@@ -146,7 +147,7 @@ class perturbedOptFunc(Function):
         cp, ptb_sols, noises = ctx.saved_tensors
         reward = torch.einsum("bnd,bd->bn", ptb_sols, grad_output)
         reward = ctx.module._apply_variance_reduction(reward)
-        grad = torch.einsum("nbd,bn->bd", noises, reward)
+        grad = torch.einsum("bnd,bn->bd", noises, reward)
         return grad / ctx.module._grad_scale(cp), None
 
 
@@ -164,7 +165,7 @@ class perturbedOptMul(perturbedOpt):
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        return cp * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        return cp.unsqueeze(1) * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
 
     def _grad_scale(self, cp: torch.Tensor) -> torch.Tensor:
         denom = self.sigma * cp
@@ -229,8 +230,8 @@ class perturbedFenchelYoung(optModule):
         return self._reduce(loss)
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        """Perturbed cost from clean cost and noises."""
-        return cp + self.sigma * noises
+        """Perturbed cost from clean cost (b, d) and noises (b, n, d)."""
+        return cp.unsqueeze(1) + self.sigma * noises
 
     def _calculate_expected_solution(
         self,
@@ -274,7 +275,8 @@ class perturbedFenchelYoungFunc(Function):
         # sample perturbations on-device
         gen = _torch_generator(module._gen_cache, device, module.seed)
         noises = torch.randn(
-            (module.n_samples, *cp.shape), device=device, dtype=cp.dtype, generator=gen,
+            (cp.shape[0], module.n_samples, cp.shape[1]),
+            device=device, dtype=cp.dtype, generator=gen,
         )
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
@@ -288,7 +290,7 @@ class perturbedFenchelYoungFunc(Function):
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # Fenchel-Young loss: F(theta) - <theta, true_sol>
-        f_theta = torch.einsum("nbd,bnd->bn", ptb_c, ptb_sols).mean(dim=1)
+        f_theta = torch.einsum("bnd,bnd->bn", ptb_c, ptb_sols).mean(dim=1)
         target_obj = (cp * w).sum(dim=-1)
         loss = sign * (f_theta - target_obj)
         # save solutions
@@ -317,7 +319,7 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        return cp * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        return cp.unsqueeze(1) * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
 
     def _calculate_expected_solution(
         self,
@@ -327,7 +329,7 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
         noises: torch.Tensor,
     ) -> torch.Tensor:
         factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
-        return (ptb_sols * factor.permute(1, 0, 2)).mean(dim=1)
+        return (ptb_sols * factor).mean(dim=1)
 
 
 class implicitMLE(optModule):
@@ -419,14 +421,14 @@ class implicitMLEFunc(Function):
         # convert tensor
         cp = pred_cost.detach()
         # sample perturbations; fall back to H2D for custom distributions
-        size = (module.n_samples, *cp.shape)
+        size = (cp.shape[0], module.n_samples, cp.shape[1])
         try:
             noises = module.distribution.sample(size=size, device=device, dtype=cp.dtype)
         except TypeError:
             noises = module.distribution.sample(size=size)
         if isinstance(noises, np.ndarray):
             noises = torch.from_numpy(noises).to(device, dtype=cp.dtype)
-        ptb_c = cp + module.sigma * noises
+        ptb_c = cp.unsqueeze(1) + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
         # solution average
@@ -447,11 +449,11 @@ class implicitMLEFunc(Function):
         ptb_c = ctx.ptb_c
         ptb_sols = ctx.ptb_sols
         module = ctx.module
-        delta = module.lambd * grad_output.detach()
+        delta = module.lambd * grad_output.detach().unsqueeze(1)
         if module.two_sides:
             # batch positive and negative perturbations into one solve
             n = module.n_samples
-            combined_sols = _solve_or_cache_3d(torch.cat([ptb_c + delta, ptb_c - delta], dim=0), module)
+            combined_sols = _solve_or_cache_3d(torch.cat([ptb_c + delta, ptb_c - delta], dim=1), module)
             ptb_sols_pos, ptb_sols_neg = combined_sols[:, :n], combined_sols[:, n:]
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + _EPS)
         else:
@@ -543,11 +545,11 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             lambd = module.alpha * torch.norm(cp) / dl_norm
         else:
             lambd = 0.0
-        delta = lambd * dl
+        delta = (lambd * dl).unsqueeze(1)
         if module.two_sides:
             # batch positive and negative perturbations into one solve
             n = module.n_samples
-            combined_sols = _solve_or_cache_3d(torch.cat([ptb_c + delta, ptb_c - delta], dim=0), module)
+            combined_sols = _solve_or_cache_3d(torch.cat([ptb_c + delta, ptb_c - delta], dim=1), module)
             ptb_sols_pos, ptb_sols_neg = combined_sols[:, :n], combined_sols[:, n:]
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + _EPS)
         else:
@@ -594,7 +596,7 @@ def _solve_in_pass_3d(
     Solve optimization for perturbed 3D costs and update solution pool.
 
     Args:
-        ptb_c: perturbed costs, shape (n_samples, batch, vars)
+        ptb_c: perturbed costs, shape (batch, n_samples, vars)
         optmodel: optimization model
         processes: number of processors
         pool: process pool
@@ -603,8 +605,8 @@ def _solve_in_pass_3d(
     Returns:
         tuple: (solutions shape (batch, n_samples, vars), updated solpool)
     """
-    n_samples, ins_num, num_vars = ptb_c.shape
-    # flatten (n_samples, batch, vars) → (n_samples * batch, vars)
+    ins_num, n_samples, num_vars = ptb_c.shape
+    # flatten (batch, n_samples, vars) → (batch * n_samples, vars)
     flat_c = ptb_c.reshape(-1, num_vars)
     # solve using shared 2D function
     flat_sols, _ = _solve_batch_2d(flat_c, optmodel, processes, pool)
@@ -613,8 +615,8 @@ def _solve_in_pass_3d(
         solpool = _update_solution_pool(flat_sols, solpool)
         if solpool.device != ptb_c.device:
             solpool = solpool.to(ptb_c.device)
-    # reshape (n_samples * batch, vars) → (batch, n_samples, vars)
-    ptb_sols = flat_sols.reshape(n_samples, ins_num, num_vars).permute(1, 0, 2)
+    # reshape (batch * n_samples, vars) → (batch, n_samples, vars)
+    ptb_sols = flat_sols.reshape(ins_num, n_samples, num_vars)
     return ptb_sols, solpool
 
 
@@ -624,14 +626,14 @@ def _cache_in_pass_3d(
     solpool: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """
-    Use solution pool for perturbed 3D costs (n_samples × batch × vars).
+    Use solution pool for perturbed 3D costs (batch × n_samples × vars).
     Unlike the 2D version in utils, this handles the extra sample dimension.
     """
     # move solpool to the correct device
     if solpool.device != ptb_c.device:
         solpool = solpool.to(ptb_c.device)
     # compute objective values: (batch, n_samples, pool_size)
-    solpool_obj = torch.einsum("nbd,sd->bns", ptb_c, solpool)
+    solpool_obj = torch.einsum("bnd,sd->bns", ptb_c, solpool)
     # best solution in pool
     if optmodel.modelSense == EPO.MINIMIZE:
         best_inds = torch.argmin(solpool_obj, dim=2)

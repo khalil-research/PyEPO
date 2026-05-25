@@ -183,8 +183,8 @@ def test_perturbed_fenchel_young_mul_uses_weighted_expected_solution():
     pfy = pyepo.func.perturbedFenchelYoungMul.__new__(pyepo.func.perturbedFenchelYoungMul)
     pfy.sigma = 0.5
     noises = torch.tensor([
-        [[0.0, 1.0, -1.0]],
-        [[0.5, -0.5, 0.25]],
+        [[0.0, 1.0, -1.0],
+         [0.5, -0.5, 0.25]],
     ])
     ptb_sols = torch.tensor([
         [[1.0, 0.0, 1.0],
@@ -192,7 +192,7 @@ def test_perturbed_fenchel_young_mul_uses_weighted_expected_solution():
     ])
 
     factor = torch.exp(pfy.sigma * noises - 0.5 * pfy.sigma**2)
-    expected = (ptb_sols * factor.permute(1, 0, 2)).mean(dim=1)
+    expected = (ptb_sols * factor).mean(dim=1)
     actual = pfy._calculate_expected_solution(None, None, ptb_sols, noises)
 
     assert torch.allclose(actual, expected)
