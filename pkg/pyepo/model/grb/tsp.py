@@ -185,6 +185,7 @@ class tspDFJModel(tspABModel):
         # activate lazy constraints
         m._x = x
         m._n = len(self.nodes)
+        m._lazy_constrs = []
         m.Params.lazyConstraints = 1
         # one unique Var per undirected edge (x[j,i] aliases x[i,j])
         self._cost_vars: list = [x[e] for e in self.edges]
@@ -211,6 +212,8 @@ class tspDFJModel(tspABModel):
                             <= len(cycle) - 1
                         )
                         model.cbLazy(constr)
+                        # track for downstream binding-constraint extraction
+                        model._lazy_constrs.append(constr)
                     break
 
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:

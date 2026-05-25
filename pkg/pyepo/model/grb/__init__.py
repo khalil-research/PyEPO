@@ -7,6 +7,7 @@ from pyepo.model.grb.knapsack import knapsackModel
 from pyepo.model.grb.portfolio import portfolioModel
 from pyepo.model.grb.shortestpath import shortestPathModel
 from pyepo.model.grb.tsp import tspDFJModel, tspGGModel, tspMTZModel
+from pyepo.model.grb.vrp import vrpMTZModel, vrpRCIModel
 
 __all__ = [
     "knapsackModel",
@@ -16,4 +17,6 @@ __all__ = [
     "tspDFJModel",
     "tspGGModel",
     "tspMTZModel",
+    "vrpMTZModel",
+    "vrpRCIModel",
 ]
