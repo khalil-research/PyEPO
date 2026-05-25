@@ -22,18 +22,24 @@ if TYPE_CHECKING:
 
 class regularizedFrankWolfeOpt(optModule):
     """
-    An autograd module for a regularized differentiable optimizer, which yields
-    a smooth combination of vertices on the convex hull of feasible solutions.
+    L2-Regularized Frank-Wolfe Optimizer (RFWO) -- differentiable smoothed solver.
 
-    For regularized Frank-Wolfe, the objective function is linear and constraints
-    are known and fixed, but the cost vector needs to be predicted from contextual
-    data.
+    Adds an L2 regularizer :math:`\\tfrac{\\lambda}{2}\\|\\mathbf{w}\\|_2^2`
+    to the linear objective and returns the regularized minimizer
+    :math:`\\hat{\\mathbf{w}}_\\lambda(\\hat{\\mathbf{c}}) =
+    \\arg\\min_{\\mathbf{w} \\in \\mathrm{conv}(\\mathcal{S})}
+    \\hat{\\mathbf{c}}^\\top \\mathbf{w} + \\tfrac{\\lambda}{2}\\|\\mathbf{w}\\|_2^2`,
+    which is unique, lies inside :math:`\\mathrm{conv}(\\mathcal{S})`, and
+    varies continuously with :math:`\\hat{\\mathbf{c}}`. The program is
+    solved by batched Frank-Wolfe iteration; the only oracle needed is the
+    underlying linear solver (PyEPO's standard ``optModel.solve``).
 
-    The custom backward pass applies implicit differentiation on the active set
-    found by Frank-Wolfe iterations. Thus, it allows us to design an algorithm
-    based on stochastic gradient descent.
+    Returns a regularized solution -- not a loss. Pair with a user-defined
+    task loss (MSE against :math:`\\mathbf{w}^*(\\mathbf{c})` matches the
+    imitation setting in the paper), or use ``regularizedFrankWolfeFenchelYoung``
+    for the loss-returning variant.
 
-    Reference: <https://arxiv.org/abs/2207.13513>
+    Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
     """
 
     def __init__(
@@ -49,12 +55,12 @@ class regularizedFrankWolfeOpt(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            lambd: a hyperparameter for regularized Frank-Wolfe to control the L2 regularization strength
-            max_iter: number of Frank-Wolfe iterations
+            lambd: L2 regularization strength :math:`\\lambda`
+            max_iter: Frank-Wolfe iteration cap
             tol: per-instance Frank-Wolfe gap convergence tolerance
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            dataset: the training data
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: fraction of LMO calls solved exactly each step (1.0 = no caching)
+            dataset: training dataset used to seed the LMO pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # regularization strength
@@ -212,7 +218,9 @@ class regularizedFrankWolfeOptFunc(Function):
         # project grad_output onto row space of V_centered via (K+1, K+1) Gram matrix
         M = V_centered @ V_centered.transpose(-1, -2)  # (batch, K+1, K+1)
         h = V_centered @ grad_output.unsqueeze(-1)  # (batch, K+1, 1)
-        M.diagonal(dim1=-2, dim2=-1).add_(1e-6)  # ridge for rank-deficient M
+        # rtol-style ridge scaled to M
+        ridge = M.diagonal(dim1=-2, dim2=-1).amax(dim=-1, keepdim=True).clamp(min=1.0) * 1e-6
+        M.diagonal(dim1=-2, dim2=-1).add_(ridge)  # ridge for rank-deficient M
         alpha = torch.linalg.solve(M, h)  # (batch, K+1, 1)
         grad = (V_centered.transpose(-1, -2) @ alpha).squeeze(-1)
         # chain rule for pred_cost
@@ -221,19 +229,22 @@ class regularizedFrankWolfeOptFunc(Function):
 
 class regularizedFrankWolfeFenchelYoung(optModule):
     """
-    An autograd module for the Fenchel-Young loss paired with regularized
-    Frank-Wolfe.
+    L2-Regularized Frank-Wolfe with Fenchel-Young loss (RFYL).
 
-    For regularized Frank-Wolfe with Fenchel-Young loss, the objective function is
-    linear and constraints are known and fixed, but the cost vector needs to be
-    predicted from contextual data.
+    Pairs the RFWO regularized solver with the Fenchel-Young loss of the L2
+    regularizer, returning a convex scalar loss that compares the predicted
+    cost :math:`\\hat{\\mathbf{c}}` to the true optimum
+    :math:`\\mathbf{w}^*(\\mathbf{c})` directly -- no user-defined task loss
+    needed. Specialized to :math:`\\Omega(\\mathbf{w}) =
+    \\tfrac{\\lambda}{2}\\|\\mathbf{w}\\|_2^2`, the loss collapses to a
+    transparent "compare regularizers + linear residual" form.
 
-    The custom backward pass returns the Danskin subgradient y_hat - w directly,
-    skipping the implicit-differentiation chain through the Frank-Wolfe iterate.
-    Thus, it allows us to design an algorithm based on stochastic gradient
-    descent.
+    By Danskin's theorem the gradient is the simple residual
+    :math:`\\mathbf{w}^*(\\mathbf{c}) - \\hat{\\mathbf{w}}_\\lambda
+    (\\hat{\\mathbf{c}})`, so the backward path skips implicit
+    differentiation through the Frank-Wolfe iterate.
 
-    Reference: <https://arxiv.org/abs/2207.13513>
+    Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
     """
 
     def __init__(
@@ -250,13 +261,13 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            lambd: a hyperparameter for regularized Frank-Wolfe to control the L2 regularization strength
-            max_iter: number of Frank-Wolfe iterations
+            lambd: L2 regularization strength :math:`\\lambda`
+            max_iter: Frank-Wolfe iteration cap
             tol: per-instance Frank-Wolfe gap convergence tolerance
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            reduction: the reduction to apply to the output
-            dataset: the training data
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: fraction of LMO calls solved exactly each step (1.0 = no caching)
+            reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
+            dataset: training dataset used to seed the LMO pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, reduction=reduction, dataset=dataset)
         # regularization strength
