@@ -215,7 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="function.html">Autograd Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
@@ -348,7 +348,7 @@
         <article role="main" id="furo-main-content">
           <section id="training">
 <h1>Training<a class="headerlink" href="#training" title="Link to this heading">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> extends PyTorch autograd modules to support automatic differentiation through optimization. This page collects training-loop templates for each method. See <a class="reference internal" href="function.html"><span class="doc">Auto Grad Functions</span></a> for the method API and selection guide.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> extends PyTorch autograd modules to support automatic differentiation through optimization. This page collects training-loop templates for each method. See <a class="reference internal" href="function.html"><span class="doc">Autograd Functions</span></a> for the method API and selection guide.</p>
 <p>For a runnable walkthrough, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">03 Training and Testing</a> notebook.</p>
 <section id="common-setup">
 <h2>Common Setup<a class="headerlink" href="#common-setup" title="Link to this heading">¶</a></h2>
@@ -583,7 +583,7 @@
 <section id="cone-aligned-estimation">
 <h2>Cone-Aligned Estimation<a class="headerlink" href="#cone-aligned-estimation" title="Link to this heading">¶</a></h2>
 <section id="cone-aligned-vector-estimation-cave">
-<h3>Cone-aligned Vector Estimation (CaVE)<a class="headerlink" href="#cone-aligned-vector-estimation-cave" title="Link to this heading">¶</a></h3>
+<h3>Cone-Aligned Vector Estimation (CaVE)<a class="headerlink" href="#cone-aligned-vector-estimation-cave" title="Link to this heading">¶</a></h3>
 <p>CaVE requires a dedicated dataset class that extracts binding-constraint normals at the optimum (<code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code>) and a custom collate function (<code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>) to handle ragged per-instance constraint counts. The batch yields an extra <code class="docutils literal notranslate"><span class="pre">tight_ctrs</span></code> element on top of the usual <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDatasetConstrs</span><span class="p">,</span> <span class="n">collate_tight_constraints</span>
 
@@ -771,7 +771,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#cone-aligned-estimation">Cone-Aligned Estimation</a><ul>
-<li><a class="reference internal" href="#cone-aligned-vector-estimation-cave">Cone-aligned Vector Estimation (CaVE)</a></li>
+<li><a class="reference internal" href="#cone-aligned-vector-estimation-cave">Cone-Aligned Vector Estimation (CaVE)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#contrastive-methods">Contrastive Methods</a><ul>

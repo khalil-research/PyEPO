@@ -33,7 +33,7 @@ The package is now available on `PyPI <https://pypi.org/project/pyepo>`_ for ins
 Conda Install
 =============
 
-``PyEPO`` is also available on `Anaconda Cloud <https://anaconda.org/pyepo/pyepo>`_. If you prefer to use conda for installation, you can install `PyEPO` with the following command:
+``PyEPO`` is also available on `Anaconda Cloud <https://anaconda.org/pyepo/pyepo>`_. If you prefer to use conda for installation, you can install ``PyEPO`` with the following command:
 
 .. code-block:: console
 

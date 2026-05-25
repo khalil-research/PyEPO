@@ -215,7 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html">Auto Grad Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html">Autograd Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/training.html">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/evaluation.html">Evaluation</a></li>
@@ -351,7 +351,7 @@
 <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python library for modeling and solving predict-then-optimize problems with linear objective functions.</p>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> builds optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, or any custom solver, and embeds them into neural networks for end-to-end training. All decision-focused learning methods are implemented as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd modules, grouped into the following families:</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> builds optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, or any custom solver or algorithm, and embeds them into neural networks for end-to-end training. All decision-focused learning methods are implemented as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd modules, grouped into the following families:</p>
 <ul class="simple">
 <li><p><strong>Surrogate losses</strong> – SPO+, perturbation gradient (PG)</p></li>
 <li><p><strong>Perturbed methods</strong> – differentiable perturbed optimizers (DPO), perturbed Fenchel-Young loss (PFYL), I-MLE / AI-MLE</p></li>
@@ -361,11 +361,42 @@
 <li><p><strong>Contrastive methods</strong> – noise contrastive estimation (NCE), contrastive MAP (CMAP)</p></li>
 <li><p><strong>Learning to rank</strong> – pointwise, pairwise, listwise LTR</p></li>
 </ul>
+<p>For end-to-end learning on <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges), <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> ships <strong>CaVE</strong>, a first-order, GPU-native cone-projection solver written in pure PyTorch. Each backward pass becomes a handful of accelerated APGD iterations instead of a combinatorial solve – typically training an order of magnitude faster than SPO+ on TSP-scale instances.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> also integrates <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, a JAX-based mathematical programming solver using the PDHG (Primal-Dual Hybrid Gradient) algorithm for GPU-accelerated optimization. MPAX brings three key advantages for end-to-end training: (1) <strong>GPU-native solving</strong> – the first-order PDHG method is inherently parallelizable and runs efficiently on GPU; (2) <strong>batch solving</strong> – an entire mini-batch of optimization instances is solved simultaneously via vectorization; (3) <strong>no GPU-CPU data transfer overhead</strong> – both the neural network and the solver stay on GPU, eliminating the data-transfer bottleneck of CPU-side solvers like Gurobi.</p>
 <section id="end-to-end-predict-then-optimize-framework">
 <h2>End-to-End Predict-then-Optimize Framework<a class="headerlink" href="#end-to-end-predict-then-optimize-framework" title="Link to this heading">¶</a></h2>
 <p>Given a labeled dataset <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> of feature-cost pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{c})\)</span> or feature-solution pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{w})\)</span>, a neural network is trained to directly minimize the decision error, rather than the prediction error of cost coefficients.</p>
 <a class="reference internal image-reference" href="../_images/e2e.png"><img alt="../_images/e2e.png" src="../_images/e2e.png" width="900" />
 </a>
+</section>
+<section id="publication">
+<h2>Publication<a class="headerlink" href="#publication" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> is the official implementation of the paper <a class="reference external" href="https://link.springer.com/article/10.1007/s12532-024-00255-x">PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming</a> (Mathematical Programming Computation, 2024).</p>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Link to this heading">¶</a></h2>
+<p>If you use <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> in your research, please cite:</p>
+<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@article</span><span class="p">{</span><span class="nl">tang2024</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="p">=</span><span class="s">{PyEPO: a PyTorch-based end-to-end predict-then-optimize library for linear and integer programming}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="p">=</span><span class="s">{Tang, Bo and Khalil, Elias B}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">journal</span><span class="p">=</span><span class="s">{Mathematical Programming Computation}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">issn</span><span class="p">=</span><span class="s">{1867-2957}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">doi</span><span class="p">=</span><span class="s">{10.1007/s12532-024-00255-x}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="p">=</span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">month</span><span class="p">=</span><span class="s">{July}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">publisher</span><span class="p">=</span><span class="s">{Springer}</span>
+<span class="p">}</span>
+
+<span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">tang2024cave</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="p">=</span><span class="s">{CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="p">=</span><span class="s">{Tang, Bo and Khalil, Elias B}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">booktitle</span><span class="p">=</span><span class="s">{Integration of Constraint Programming, Artificial Intelligence, and Operations Research}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">pages</span><span class="p">=</span><span class="s">{193--210}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="p">=</span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">publisher</span><span class="p">=</span><span class="s">{Springer}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -426,6 +457,8 @@
             <ul>
 <li><a class="reference internal" href="#">Introduction</a><ul>
 <li><a class="reference internal" href="#end-to-end-predict-then-optimize-framework">End-to-End Predict-then-Optimize Framework</a></li>
+<li><a class="reference internal" href="#publication">Publication</a></li>
+<li><a class="reference internal" href="#citation">Citation</a></li>
 </ul>
 </li>
 </ul>

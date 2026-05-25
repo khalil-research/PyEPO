@@ -215,7 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/function.html">Auto Grad Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/function.html">Autograd Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/training.html">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/evaluation.html">Evaluation</a></li>
@@ -350,20 +350,53 @@
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading">¶</a></h1>
 <p>This guide walks through the main <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> workflow for predict-then-optimize problems: define an optimization model, build an optimization-aware dataset, choose a training module, train a predictor, and evaluate decision quality.</p>
 <section id="where-to-start">
-<h2>Where to start<a class="headerlink" href="#where-to-start" title="Link to this heading">¶</a></h2>
+<h2>Where to Start<a class="headerlink" href="#where-to-start" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>New to PyEPO</strong> — read the pages below in order. <a class="reference internal" href="examples/model.html"><span class="doc">Model</span></a> and <a class="reference internal" href="examples/data.html"><span class="doc">Data</span></a> set up the modeling primitives; <a class="reference internal" href="examples/twostage.html"><span class="doc">Two-Stage Method</span></a> introduces the regression baseline; <a class="reference internal" href="examples/function.html"><span class="doc">Auto Grad Functions</span></a> and <a class="reference internal" href="examples/training.html"><span class="doc">Training</span></a> cover the end-to-end methods; <a class="reference internal" href="examples/evaluation.html"><span class="doc">Evaluation</span></a> defines the metrics.</p></li>
-<li><p><strong>Want to pick a method</strong> — jump to the <em>Choosing a Method</em> section of <a class="reference internal" href="examples/function.html"><span class="doc">Auto Grad Functions</span></a>. It poses three questions (what supervision you have, whether you want a loss or a solution, special constraints) and points you at the right module.</p></li>
-<li><p><strong>Prefer hands-on</strong> — open the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">03 Training and Testing</a> notebook. It compares every method family on the same shortest-path benchmark.</p></li>
+<li><p><strong>New to PyEPO</strong> — read the pages below in order. <a class="reference internal" href="examples/model.html"><span class="doc">Model</span></a> and <a class="reference internal" href="examples/data.html"><span class="doc">Data</span></a> set up the modeling primitives; <a class="reference internal" href="examples/twostage.html"><span class="doc">Two-Stage Method</span></a> introduces the regression baseline; <a class="reference internal" href="examples/function.html"><span class="doc">Autograd Functions</span></a> and <a class="reference internal" href="examples/training.html"><span class="doc">Training</span></a> cover the end-to-end methods; <a class="reference internal" href="examples/pool.html"><span class="doc">Solution Pool</span></a> explains the cached solution pool shared by the contrastive and learning-to-rank methods; <a class="reference internal" href="examples/evaluation.html"><span class="doc">Evaluation</span></a> defines the metrics.</p></li>
+<li><p><strong>Want to pick a method</strong> — jump to the <em>Choosing a Method</em> section of <a class="reference internal" href="examples/function.html"><span class="doc">Autograd Functions</span></a>. It poses three questions (what supervision you have, whether you want a loss or a solution, special constraints) and points you at the right module.</p></li>
+<li><p><strong>Prefer hands-on</strong> — jump to the <em>Notebooks</em> section below for runnable Colab examples grouped by purpose.</p></li>
 </ul>
 </section>
+<section id="notebooks">
+<h2>Notebooks<a class="headerlink" href="#notebooks" title="Link to this heading">¶</a></h2>
+<p>Each notebook is a self-contained Colab walkthrough. They are grouped by purpose, and most entries link back to the docs section that explains the underlying API.</p>
+<section id="getting-started">
+<h3>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb">01 Optimization Model</a> — build an <code class="docutils literal notranslate"><span class="pre">optModel</span></code> from a Gurobi / Pyomo / COPT / OR-Tools / MPAX backend. Pairs with <a class="reference internal" href="examples/model.html"><span class="doc">Model</span></a>.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb">02 Optimization Dataset</a> — generate synthetic data and wrap it in <code class="docutils literal notranslate"><span class="pre">optDataset</span></code>. Pairs with <a class="reference internal" href="examples/data.html"><span class="doc">Data</span></a>.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">03 Training and Testing</a> — train and compare every method family on the same shortest-path benchmark. Pairs with <a class="reference internal" href="examples/training.html"><span class="doc">Training</span></a> and <a class="reference internal" href="examples/evaluation.html"><span class="doc">Evaluation</span></a>.</p></li>
+</ul>
+</section>
+<section id="method-deep-dives">
+<h3>Method Deep Dives<a class="headerlink" href="#method-deep-dives" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb">04 CaVE for Binary Linear Programs</a> — train with the cone-aligned CaVE loss on TSP and compare against SPO+. Pairs with the <em>Cone-Aligned Estimation</em> section of <a class="reference internal" href="examples/function.html"><span class="doc">Autograd Functions</span></a>.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb">08 kNN Robust Losses</a> — train with the kNN robust loss via <code class="docutils literal notranslate"><span class="pre">optDatasetKNN</span></code>. Pairs with the <em>optDatasetKNN</em> section of <a class="reference internal" href="examples/data.html"><span class="doc">Data</span></a>.</p></li>
+</ul>
+</section>
+<section id="gpu-acceleration">
+<h3>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb">09 Solving on MPAX with PDHG</a> — batch-solve LPs on GPU via MPAX, end-to-end without CPU round-trips. Pairs with the <em>User-Defined MPAX Models</em> section of <a class="reference internal" href="examples/model.html"><span class="doc">Model</span></a>.</p></li>
+</ul>
+</section>
+<section id="real-world-applications">
+<h3>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%202D%20knapsack%20Solution%20Visualization.ipynb">05 2D Knapsack Solution Visualization</a> — visualize selected items for a 2D knapsack instance to inspect what the trained predictor is doing.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Warcraft%20Shortest%20Path.ipynb">06 Warcraft Shortest Path</a> — train an image-based shortest-path predictor on the Warcraft terrain dataset, using a CNN encoder feeding into PyEPO.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20Real-World%20Energy%20Scheduling.ipynb">07 Real-World Energy Scheduling</a> — apply PyEPO to a real-world energy scheduling benchmark with measured demand data.</p></li>
+</ul>
+</section>
+</section>
 <section id="reference-pages">
-<h2>Reference pages<a class="headerlink" href="#reference-pages" title="Link to this heading">¶</a></h2>
+<h2>Reference Pages<a class="headerlink" href="#reference-pages" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="examples/model.html">Model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/model.html#user-defined-models">User-defined Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/model.html#pre-defined-models">Pre-defined Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/model.html#user-defined-models">User-Defined Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/model.html#pre-defined-models">Pre-Defined Models</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/data.html">Data</a><ul>
@@ -374,7 +407,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples/function.html">Auto Grad Functions</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/function.html">Autograd Functions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#choosing-a-method">Choosing a Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/function.html#surrogate-losses">Surrogate Losses</a></li>
@@ -465,8 +498,15 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Tutorial</a><ul>
-<li><a class="reference internal" href="#where-to-start">Where to start</a></li>
-<li><a class="reference internal" href="#reference-pages">Reference pages</a></li>
+<li><a class="reference internal" href="#where-to-start">Where to Start</a></li>
+<li><a class="reference internal" href="#notebooks">Notebooks</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#method-deep-dives">Method Deep Dives</a></li>
+<li><a class="reference internal" href="#gpu-acceleration">GPU Acceleration</a></li>
+<li><a class="reference internal" href="#real-world-applications">Real-World Applications</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reference-pages">Reference Pages</a></li>
 </ul>
 </li>
 </ul>

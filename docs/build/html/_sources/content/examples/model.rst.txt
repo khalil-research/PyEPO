@@ -16,7 +16,7 @@ When building models with ``PyEPO``, users do **not** need to specify the cost c
 For more details, see the `01 Optimization Model <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_ notebook.
 
 
-User-defined Models
+User-Defined Models
 ===================
 
 Users can define custom optimization problems with linear objective functions. ``PyEPO`` provides several ways to do this:
@@ -36,7 +36,7 @@ The ``optModel`` interface consists of:
 * ``num_cost``: Number of cost coefficients (length of the cost vector).
 
 
-User-defined GurobiPy Models
+User-Defined GurobiPy Models
 ----------------------------
 
 To define a GurobiPy model, inherit from ``pyepo.model.grb.optGrbModel`` and implement the ``_getModel`` method. The model sense (minimize/maximize) is automatically detected from the GurobiPy model.
@@ -89,7 +89,7 @@ Users only need to implement the ``_getModel`` method:
    myoptmodel.solve() # solve
 
 
-User-defined Pyomo Models
+User-Defined Pyomo Models
 -------------------------
 
 To define a Pyomo model, inherit from ``pyepo.model.omo.optOmoModel`` and implement the ``_getModel`` method.
@@ -134,7 +134,7 @@ Here is the same problem implemented with Pyomo:
    myoptmodel.solve() # solve
 
 
-User-defined COPT Models
+User-Defined COPT Models
 -------------------------
 
 To define a COPT model, inherit from ``pyepo.model.copt.optCoptModel`` and implement the ``_getModel`` method. The model sense (minimize/maximize) is automatically detected from the COPT model.
@@ -174,7 +174,7 @@ Here is the same problem implemented with COPT:
    myoptmodel.solve() # solve
 
 
-User-defined OR-Tools Models
+User-Defined OR-Tools Models
 -----------------------------
 
 OR-Tools provides two solving paradigms: pywraplp (LP/MIP solvers) and CP-SAT (constraint programming). ``PyEPO`` provides base classes for both.
@@ -249,10 +249,12 @@ OR-Tools provides two solving paradigms: pywraplp (LP/MIP solvers) and CP-SAT (c
 .. note::  CP-SAT does not support LP relaxation. Calling ``relax()`` will raise a ``RuntimeError``.
 
 
-User-defined MPAX Models
+User-Defined MPAX Models
 ------------------------
 
 MPAX (Mathematical Programming in JAX) is a hardware-accelerated mathematical programming framework based on the PDHG (Primal-Dual Hybrid Gradient) algorithm, designed for large-scale LP problems.
+
+For a runnable walkthrough that batch-solves LPs on GPU end-to-end with MPAX, see the `09 Solving on MPAX with PDHG <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb>`_ notebook.
 
 To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and populate the constraint matrices inside ``_getModel``:
 
@@ -299,7 +301,7 @@ To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and popu
    optmodel.solve() # solve
 
 
-User-defined Models from Scratch
+User-Defined Models from Scratch
 --------------------------------
 
 For complete flexibility, inherit directly from ``pyepo.model.opt.optModel`` to integrate any solver or algorithm. Override ``_getModel``, ``setObj``, ``solve``, and ``num_cost`` to provide the same interface as the built-in model wrappers.
@@ -413,7 +415,7 @@ The following example uses ``networkx`` with the Dijkstra algorithm to solve a s
        if sol[i] > 1e-3:
            print(e)
 
-Pre-defined Models
+Pre-Defined Models
 ==================
 
 ``PyEPO`` includes pre-defined models for several classic optimization problems. Each problem ships with multiple solver backends; the ``setObj`` / ``solve`` / ``num_cost`` interface is identical across them, so you can swap backends without changing the surrounding training code.
@@ -606,8 +608,8 @@ Example:
    optmodel_rel = optmodel.relax()
 
 
-Traveling Salesman
-------------------
+Traveling Salesperson
+---------------------
 
 The traveling salesman problem (TSP) seeks the shortest route that visits each city exactly once and returns to the origin. We consider the symmetric TSP with 20 nodes.
 

@@ -142,6 +142,8 @@ optDatasetKNN
 
 ``pyepo.data.optDatasetKNN`` is a PyTorch ``Dataset`` that implements the k-nearest neighbors (kNN) robust loss [#f1]_ for decision-focused learning. It stores features and cost coefficients, and computes the **mean k-nearest-neighbor solutions and the corresponding optimal objective values**.
 
+For a runnable walkthrough, see the `08 kNN Robust Losses <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb>`_ notebook.
+
 .. autoclass:: pyepo.data.dataset.optDatasetKNN
     :noindex:
 
@@ -173,6 +175,8 @@ optDatasetConstrs
 ``pyepo.data.dataset.optDatasetConstrs`` is a PyTorch ``Dataset`` for the CaVE [#f2]_ cone-aligned loss. In addition to the features, costs, optimal solutions, and objective values stored by ``optDataset``, it also extracts the **normals of the binding constraints at the optimal vertex** for each instance. CaVE then projects the sense-flipped predicted cost vector onto the cone spanned by these normals.
 
 Because the binding-constraint extraction relies on Gurobi's sparse-matrix and constraint-sense APIs, ``optDatasetConstrs`` currently requires a Gurobi-backed ``optModel``. The dataset also enforces that the optimal vertex is binary — CaVE is defined for binary linear programs.
+
+For a runnable walkthrough that uses ``optDatasetConstrs`` end-to-end with the CaVE loss, see the `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_ notebook.
 
 .. autoclass:: pyepo.data.dataset.optDatasetConstrs
     :noindex:

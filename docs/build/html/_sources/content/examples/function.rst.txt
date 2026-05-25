@@ -1,5 +1,5 @@
-Auto Grad Functions
-+++++++++++++++++++
+Autograd Functions
+++++++++++++++++++
 
 Overview
 ========
@@ -21,6 +21,7 @@ Choosing a Method
 
 * When :math:`\mathbf{w}^*` labels are available, start with **SPO+**: convex, has a nonzero subgradient, and is well-studied as a baseline.
 * When the loss-returning style is preferred and labels include :math:`\mathbf{w}^*`, **PFYL** avoids the extra task loss.
+* For **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), use **CaVE**: a GPU-native cone projection replaces the combinatorial solve in each backward pass, typically training an order of magnitude faster than SPO+ on TSP-scale instances.
 * For very large LPs on GPU, combine **MPAX** models with **SPO+** or **PFYL**.
 
 For finer choices, the right method depends on three questions.
@@ -377,10 +378,12 @@ Cone-Aligned Estimation
 Cone-aligned losses supervise the *predicted cost vector* directly by aligning it with the polyhedral cone of binding-constraint normals at the true optimum, rather than supervising on the optimal solution itself.
 
 
-Cone-aligned Vector Estimation (CaVE)
+Cone-Aligned Vector Estimation (CaVE)
 -------------------------------------
 
 CaVE [#f12]_ is a surrogate loss for **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges, etc.). For each instance, it projects the sense-flipped predicted cost vector onto the polyhedral cone spanned by the binding-constraint normals at the true optimal vertex, then minimizes ``1 - cos(pred, proj)``. Because the supervision is the cone of binding-constraint normals at the optimum — not the optimal solution itself — CaVE side-steps the zero-gradient pathology of solver layers without requiring a Monte Carlo perturbation or a solution pool.
+
+For a runnable walkthrough that compares CaVE against SPO+ on TSP, see the `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_ notebook.
 
 Let :math:`K(\mathbf{w}^*(\mathbf{c}))` be the polyhedral cone spanned by the constraint normals that bind at the true optimal vertex. For a minimization problem, the KKT conditions require :math:`-\hat{\mathbf{c}} \in K(\mathbf{w}^*(\mathbf{c}))` for :math:`\mathbf{w}^*(\mathbf{c})` to remain optimal under the predicted cost. CaVE measures this alignment via a cosine loss against the cone projection :math:`\mathbf{p} = \mathrm{proj}_{K}(-\hat{\mathbf{c}})`,
 

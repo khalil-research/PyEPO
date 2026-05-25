@@ -215,7 +215,7 @@
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="function.html">Autograd Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
@@ -360,7 +360,7 @@
 <p>When building models with <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code>, users do <strong>not</strong> need to specify the cost coefficients – they are predicted from data at training time.</p>
 <p>For more details, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb">01 Optimization Model</a> notebook.</p>
 <section id="user-defined-models">
-<h2>User-defined Models<a class="headerlink" href="#user-defined-models" title="Link to this heading">¶</a></h2>
+<h2>User-Defined Models<a class="headerlink" href="#user-defined-models" title="Link to this heading">¶</a></h2>
 <p>Users can define custom optimization problems with linear objective functions. <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> provides several ways to do this:</p>
 <ol class="arabic simple">
 <li><p><strong>GurobiPy-based</strong>: Inherit from <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code> and implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>.</p></li>
@@ -378,7 +378,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">num_cost</span></code>: Number of cost coefficients (length of the cost vector).</p></li>
 </ul>
 <section id="user-defined-gurobipy-models">
-<h3>User-defined GurobiPy Models<a class="headerlink" href="#user-defined-gurobipy-models" title="Link to this heading">¶</a></h3>
+<h3>User-Defined GurobiPy Models<a class="headerlink" href="#user-defined-gurobipy-models" title="Link to this heading">¶</a></h3>
 <p>To define a GurobiPy model, inherit from <code class="docutils literal notranslate"><span class="pre">pyepo.model.grb.optGrbModel</span></code> and implement the <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> method. The model sense (minimize/maximize) is automatically detected from the GurobiPy model.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
@@ -494,7 +494,7 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </div>
 </section>
 <section id="user-defined-pyomo-models">
-<h3>User-defined Pyomo Models<a class="headerlink" href="#user-defined-pyomo-models" title="Link to this heading">¶</a></h3>
+<h3>User-Defined Pyomo Models<a class="headerlink" href="#user-defined-pyomo-models" title="Link to this heading">¶</a></h3>
 <p>To define a Pyomo model, inherit from <code class="docutils literal notranslate"><span class="pre">pyepo.model.omo.optOmoModel</span></code> and implement the <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> method.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
@@ -617,7 +617,7 @@ argument (e.g., <code class="docutils literal notranslate"><span class="pre">&qu
 </div>
 </section>
 <section id="user-defined-copt-models">
-<h3>User-defined COPT Models<a class="headerlink" href="#user-defined-copt-models" title="Link to this heading">¶</a></h3>
+<h3>User-Defined COPT Models<a class="headerlink" href="#user-defined-copt-models" title="Link to this heading">¶</a></h3>
 <p>To define a COPT model, inherit from <code class="docutils literal notranslate"><span class="pre">pyepo.model.copt.optCoptModel</span></code> and implement the <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> method. The model sense (minimize/maximize) is automatically detected from the COPT model.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
@@ -717,7 +717,7 @@ license and worker threads on every model build.</p>
 </div>
 </section>
 <section id="user-defined-or-tools-models">
-<h3>User-defined OR-Tools Models<a class="headerlink" href="#user-defined-or-tools-models" title="Link to this heading">¶</a></h3>
+<h3>User-Defined OR-Tools Models<a class="headerlink" href="#user-defined-or-tools-models" title="Link to this heading">¶</a></h3>
 <p>OR-Tools provides two solving paradigms: pywraplp (LP/MIP solvers) and CP-SAT (constraint programming). <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> provides base classes for both.</p>
 <p><strong>pywraplp</strong> – Inherit from <code class="docutils literal notranslate"><span class="pre">pyepo.model.ort.optOrtModel</span></code> and implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>. The <code class="docutils literal notranslate"><span class="pre">solver</span></code> parameter selects the backend (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;scip&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;glop&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;cbc&quot;</span></code>).</p>
 <dl class="py class">
@@ -928,8 +928,9 @@ relaxation, so <code class="docutils literal notranslate"><span class="pre">rela
 </div>
 </section>
 <section id="user-defined-mpax-models">
-<h3>User-defined MPAX Models<a class="headerlink" href="#user-defined-mpax-models" title="Link to this heading">¶</a></h3>
+<h3>User-Defined MPAX Models<a class="headerlink" href="#user-defined-mpax-models" title="Link to this heading">¶</a></h3>
 <p>MPAX (Mathematical Programming in JAX) is a hardware-accelerated mathematical programming framework based on the PDHG (Primal-Dual Hybrid Gradient) algorithm, designed for large-scale LP problems.</p>
+<p>For a runnable walkthrough that batch-solves LPs on GPU end-to-end with MPAX, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb">09 Solving on MPAX with PDHG</a> notebook.</p>
 <p>To define an MPAX model, inherit from <code class="docutils literal notranslate"><span class="pre">pyepo.model.mpax.optMpaxModel</span></code> and populate the constraint matrices inside <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -1066,7 +1067,7 @@ class attribute <code class="docutils literal notranslate"><span class="pre">use
 </div>
 </section>
 <section id="user-defined-models-from-scratch">
-<h3>User-defined Models from Scratch<a class="headerlink" href="#user-defined-models-from-scratch" title="Link to this heading">¶</a></h3>
+<h3>User-Defined Models from Scratch<a class="headerlink" href="#user-defined-models-from-scratch" title="Link to this heading">¶</a></h3>
 <p>For complete flexibility, inherit directly from <code class="docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code> to integrate any solver or algorithm. Override <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>, <code class="docutils literal notranslate"><span class="pre">setObj</span></code>, <code class="docutils literal notranslate"><span class="pre">solve</span></code>, and <code class="docutils literal notranslate"><span class="pre">num_cost</span></code> to provide the same interface as the built-in model wrappers.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
@@ -1251,7 +1252,7 @@ automatically from the underlying solver model).</p>
 </section>
 </section>
 <section id="pre-defined-models">
-<h2>Pre-defined Models<a class="headerlink" href="#pre-defined-models" title="Link to this heading">¶</a></h2>
+<h2>Pre-Defined Models<a class="headerlink" href="#pre-defined-models" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> includes pre-defined models for several classic optimization problems. Each problem ships with multiple solver backends; the <code class="docutils literal notranslate"><span class="pre">setObj</span></code> / <code class="docutils literal notranslate"><span class="pre">solve</span></code> / <code class="docutils literal notranslate"><span class="pre">num_cost</span></code> interface is identical across them, so you can swap backends without changing the surrounding training code.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -2143,8 +2144,8 @@ s.t. \quad &amp; 3 x_0 + 4 x_1 + 3 x_2 + 6 x_3 + 4 x_4 \leq 12 \\
 </pre></div>
 </div>
 </section>
-<section id="traveling-salesman">
-<h3>Traveling Salesman<a class="headerlink" href="#traveling-salesman" title="Link to this heading">¶</a></h3>
+<section id="traveling-salesperson">
+<h3>Traveling Salesperson<a class="headerlink" href="#traveling-salesperson" title="Link to this heading">¶</a></h3>
 <p>The traveling salesman problem (TSP) seeks the shortest route that visits each city exactly once and returns to the origin. We consider the symmetric TSP with 20 nodes.</p>
 <p>Three ILP formulations are available: Dantzig-Fulkerson-Johnson (DFJ), Gavish-Graves (GG), and Miller-Tucker-Zemlin (MTZ).</p>
 <p>Available formulations and backends:</p>
@@ -3341,19 +3342,19 @@ s.t. \quad &amp; \sum_{i} x_i = 1 \\
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Model</a><ul>
-<li><a class="reference internal" href="#user-defined-models">User-defined Models</a><ul>
-<li><a class="reference internal" href="#user-defined-gurobipy-models">User-defined GurobiPy Models</a></li>
-<li><a class="reference internal" href="#user-defined-pyomo-models">User-defined Pyomo Models</a></li>
-<li><a class="reference internal" href="#user-defined-copt-models">User-defined COPT Models</a></li>
-<li><a class="reference internal" href="#user-defined-or-tools-models">User-defined OR-Tools Models</a></li>
-<li><a class="reference internal" href="#user-defined-mpax-models">User-defined MPAX Models</a></li>
-<li><a class="reference internal" href="#user-defined-models-from-scratch">User-defined Models from Scratch</a></li>
+<li><a class="reference internal" href="#user-defined-models">User-Defined Models</a><ul>
+<li><a class="reference internal" href="#user-defined-gurobipy-models">User-Defined GurobiPy Models</a></li>
+<li><a class="reference internal" href="#user-defined-pyomo-models">User-Defined Pyomo Models</a></li>
+<li><a class="reference internal" href="#user-defined-copt-models">User-Defined COPT Models</a></li>
+<li><a class="reference internal" href="#user-defined-or-tools-models">User-Defined OR-Tools Models</a></li>
+<li><a class="reference internal" href="#user-defined-mpax-models">User-Defined MPAX Models</a></li>
+<li><a class="reference internal" href="#user-defined-models-from-scratch">User-Defined Models from Scratch</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pre-defined-models">Pre-defined Models</a><ul>
+<li><a class="reference internal" href="#pre-defined-models">Pre-Defined Models</a><ul>
 <li><a class="reference internal" href="#shortest-path">Shortest Path</a></li>
 <li><a class="reference internal" href="#knapsack">Knapsack</a></li>
-<li><a class="reference internal" href="#traveling-salesman">Traveling Salesman</a></li>
+<li><a class="reference internal" href="#traveling-salesperson">Traveling Salesperson</a></li>
 <li><a class="reference internal" href="#capacitated-vehicle-routing">Capacitated Vehicle Routing</a></li>
 <li><a class="reference internal" href="#portfolio">Portfolio</a></li>
 </ul>
