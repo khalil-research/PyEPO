@@ -58,6 +58,13 @@ class coneAlignedCosine(optModule):
         super().__init__(optmodel, processes, solve_ratio=1.0, reduction=reduction)
         self.tol_grad = tol_grad
         self.max_iters = max_iters
+        # sense-aware sign (constant once optmodel is fixed)
+        if optmodel.modelSense == EPO.MINIMIZE:
+            self._sign = -1.0
+        elif optmodel.modelSense == EPO.MAXIMIZE:
+            self._sign = 1.0
+        else:
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
 
     def forward(
         self, pred_cost: torch.Tensor, tight_ctrs: torch.Tensor,
@@ -65,21 +72,13 @@ class coneAlignedCosine(optModule):
         """
         Forward pass
         """
-        # sense-aware sign
-        if self.optmodel.modelSense == EPO.MINIMIZE:
-            sign = -1.0
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            sign = 1.0
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        signed_cost = sign * pred_cost
-        # fixed projection target
+        signed_cost = self._sign * pred_cost
+        # fixed projection target (F.cosine_similarity normalizes internally)
         with torch.no_grad():
             proj, _ = _apgd_project(
                 tight_ctrs, signed_cost,
                 tol_grad=self.tol_grad, max_iters=self.max_iters,
             )
-            proj = proj / proj.norm(dim=1, keepdim=True).clamp(min=1e-8)
         loss = 1.0 - F.cosine_similarity(signed_cost, proj, dim=1)
         return self._reduce(loss)
 
