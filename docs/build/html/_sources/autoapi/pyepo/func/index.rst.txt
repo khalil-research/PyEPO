@@ -20,6 +20,7 @@ Submodules
    /autoapi/pyepo/func/contrastive/index
    /autoapi/pyepo/func/perturbed/index
    /autoapi/pyepo/func/rank/index
+   /autoapi/pyepo/func/regularized/index
    /autoapi/pyepo/func/surrogate/index
    /autoapi/pyepo/func/utils/index
 

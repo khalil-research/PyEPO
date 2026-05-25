@@ -142,11 +142,13 @@ Negative Identity Backpropagation treats the solver as a negative identity durin
 Training with DPO
 =================
 
-The differentiable perturbed optimizer uses Monte-Carlo sampling with Gaussian perturbations. It returns expected solutions under the perturbed distribution, which are compared against the true optimal solutions.
+The differentiable perturbed optimizer (DPO) returns the expected solution under a perturbed distribution, so the training loop must choose a task loss, such as MSE between the expected solution and the true optimal solution. ``perturbedOpt`` is the additive Gaussian version. ``perturbedOptMul`` uses multiplicative perturbations and is useful when the oracle is sign-sensitive and cost entries must keep their signs. The multiplicative variant assumes predicted costs already have the intended nonzero sign; for nonnegative-cost problems, use a positive-output predictor such as Softplus plus a small epsilon.
+
+Additive perturbation:
 
 .. code-block:: python
 
-   # init perturbed optimizer
+   # init additive DPO optimizer
    ptb = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
    # init loss
    criterion = nn.MSELoss()
@@ -167,15 +169,44 @@ The differentiable perturbed optimizer uses Monte-Carlo sampling with Gaussian p
            loss.backward()
            optimizer.step()
 
+Multiplicative perturbation:
+
+Here ``positive_predmodel`` denotes a predictor whose output is constrained to the valid cost sign, for example by applying ``nn.Softplus()`` and adding a small epsilon.
+
+.. code-block:: python
+
+   # init multiplicative DPO optimizer
+   ptb = pyepo.func.perturbedOptMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+   # init loss
+   criterion = nn.MSELoss()
+
+   # training
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for data in dataloader:
+           x, c, w, z = data
+           # forward pass
+           cp = positive_predmodel(x)
+           # perturbed optimizer
+           we = ptb(cp)
+           # MSE loss
+           loss = criterion(we, w)
+           # backward pass
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Training with PFYL
 ==================
 
-Perturbed Fenchel-Young loss computes a loss directly between predicted costs and true optimal solutions, without requiring a separate loss function.
+Perturbed Fenchel-Young loss (PFYL) uses the same perturbed expected solution internally, but returns the Fenchel-Young loss directly from predicted costs and true optimal solutions. It does not require a separate task loss. ``perturbedFenchelYoung`` is the additive Gaussian version. ``perturbedFenchelYoungMul`` is the multiplicative sign-preserving variant of PFYL. Like ``perturbedOptMul``, it assumes predicted costs already have the intended nonzero sign.
+
+Additive perturbation:
 
 .. code-block:: python
 
-   # init Fenchel-Young loss
+   # init additive PFYL loss
    pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
 
    # training
@@ -187,6 +218,113 @@ Perturbed Fenchel-Young loss computes a loss directly between predicted costs an
            cp = predmodel(x)
            # Fenchel-Young loss
            loss = pfy(cp, w)
+           # backward pass
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
+Multiplicative perturbation:
+
+Here ``positive_predmodel`` denotes a predictor whose output is constrained to the valid cost sign, for example by applying ``nn.Softplus()`` and adding a small epsilon.
+
+.. code-block:: python
+
+   # init multiplicative PFYL loss
+   pfy = pyepo.func.perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+
+   # training
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for data in dataloader:
+           x, c, w, z = data
+           # forward pass
+           cp = positive_predmodel(x)
+           # Fenchel-Young loss
+           loss = pfy(cp, w)
+           # backward pass
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
+
+Training with RFWO
+==================
+
+The regularized Frank-Wolfe optimizer returns a smooth solution in the convex hull of feasible solutions. Since it returns a solution rather than a loss, define a task loss explicitly, for example MSE between the regularized solution and the true optimal solution.
+
+.. code-block:: python
+
+   rfwo = pyepo.func.regularizedFrankWolfeOpt(
+       optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
+   criterion = nn.MSELoss()
+
+   def rfwomse(cp, w):
+       wr = rfwo(cp)
+       return criterion(wr, w)
+
+
+Training with RFYL
+==================
+
+Regularized Frank-Wolfe Fenchel-Young loss computes the L2 regularized Fenchel-Young objective directly from predicted costs and true optimal solutions.
+
+.. code-block:: python
+
+   rfyl = pyepo.func.regularizedFrankWolfeFenchelYoung(
+       optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
+
+   loss = rfyl(cp, w)
+
+
+Training with NCE
+=================
+
+Noise Contrastive Estimation uses a set of non-optimal solutions as negative samples. It takes predicted costs and true costs as input.
+
+.. code-block:: python
+
+   # init NCE loss
+   nce = pyepo.func.NCE(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   # training
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for data in dataloader:
+           x, c, w, z = data
+           # forward pass
+           cp = predmodel(x)
+           # NCE loss
+           loss = nce(cp, c)
+           # backward pass
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
+
+Training with LTR
+=================
+
+Learning-to-Rank methods learn a scoring function that ranks feasible solutions. Three variants are available: pointwise, pairwise, and listwise.
+
+.. code-block:: python
+
+   # init LTR loss (choose one)
+   # pointwise
+   #ltr = pyepo.func.pointwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   # pairwise
+   #ltr = pyepo.func.pairwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   # listwise
+   ltr = pyepo.func.listwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   # training
+   num_epochs = 20
+   for epoch in range(num_epochs):
+       for data in dataloader:
+           x, c, w, z = data
+           # forward pass
+           cp = predmodel(x)
+           # LTR loss
+           loss = ltr(cp, c)
            # backward pass
            optimizer.zero_grad()
            loss.backward()
@@ -245,61 +383,6 @@ AI-MLE extends I-MLE with an adaptive interpolation step for better gradient est
            we = aimle(cp)
            # L1 loss
            loss = criterion(we, w)
-           # backward pass
-           optimizer.zero_grad()
-           loss.backward()
-           optimizer.step()
-
-
-Training with NCE
-=================
-
-Noise Contrastive Estimation uses a set of non-optimal solutions as negative samples. It takes predicted costs and true costs as input.
-
-.. code-block:: python
-
-   # init NCE loss
-   nce = pyepo.func.NCE(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
-
-   # training
-   num_epochs = 20
-   for epoch in range(num_epochs):
-       for data in dataloader:
-           x, c, w, z = data
-           # forward pass
-           cp = predmodel(x)
-           # NCE loss
-           loss = nce(cp, c)
-           # backward pass
-           optimizer.zero_grad()
-           loss.backward()
-           optimizer.step()
-
-
-Training with LTR
-=================
-
-Learning-to-Rank methods learn a scoring function that ranks feasible solutions. Three variants are available: pointwise, pairwise, and listwise.
-
-.. code-block:: python
-
-   # init LTR loss (choose one)
-   # pointwise
-   #ltr = pyepo.func.pointwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
-   # pairwise
-   #ltr = pyepo.func.pairwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
-   # listwise
-   ltr = pyepo.func.listwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
-
-   # training
-   num_epochs = 20
-   for epoch in range(num_epochs):
-       for data in dataloader:
-           x, c, w, z = data
-           # forward pass
-           cp = predmodel(x)
-           # LTR loss
-           loss = ltr(cp, c)
            # backward pass
            optimizer.zero_grad()
            loss.backward()

@@ -16,8 +16,10 @@ Classes
 
    pyepo.func.perturbed.perturbedOpt
    pyepo.func.perturbed.perturbedOptFunc
+   pyepo.func.perturbed.perturbedOptMul
    pyepo.func.perturbed.perturbedFenchelYoung
    pyepo.func.perturbed.perturbedFenchelYoungFunc
+   pyepo.func.perturbed.perturbedFenchelYoungMul
    pyepo.func.perturbed.implicitMLE
    pyepo.func.perturbed.implicitMLEFunc
    pyepo.func.perturbed.adaptiveImplicitMLE
@@ -27,20 +29,19 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: perturbedOpt(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, processes: int = 1, seed: int = 135, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+.. py:class:: perturbedOpt(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, processes: int = 1, seed: int = 135, variance_reduction: bool = True, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for Fenchel-Young loss using perturbation techniques. The
-   use of the loss improves the algorithm by the specific expression of the
-   gradients of the loss.
+   A differentiable perturbed optimizer that estimates the expected solution
+   by solving randomly perturbed cost vectors.
 
-   For the perturbed optimizer, the cost vector needs to be predicted from
-   contextual data and is perturbed with Gaussian noise.
+   For the perturbed optimizer, the cost vector is predicted from contextual
+   data and perturbed with Gaussian noise.
 
-   Thus, it allows us to design an algorithm based on stochastic gradient
-   descent.
+   The custom backward pass provides a Monte Carlo gradient estimator for
+   stochastic gradient descent.
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
@@ -57,6 +58,11 @@ Module Contents
 
    .. py:attribute:: seed
       :value: 135
+
+
+
+   .. py:attribute:: variance_reduction
+      :value: True
 
 
 
@@ -96,21 +102,34 @@ Module Contents
 
 
 
+.. py:class:: perturbedOptMul(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, processes: int = 1, seed: int = 135, variance_reduction: bool = True, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`perturbedOpt`
+
+
+   Multiplicative-perturbation variant of perturbedOpt.
+
+   The perturbation ``cp * exp(sigma * noise - sigma**2 / 2)`` preserves the
+   sign of each cost entry, which is useful for sign-sensitive oracles.
+   This estimator assumes predicted costs already have the intended nonzero
+   sign. For nonnegative-cost problems, use a positive-output prediction layer,
+   such as Softplus plus a small epsilon.
+
+   Reference: <https://arxiv.org/abs/2207.13513>
+
+
 .. py:class:: perturbedFenchelYoung(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, processes: int = 1, seed: int = 135, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for Fenchel-Young loss using perturbation techniques. The
-   use of the loss improves the algorithm by the specific expression of the
-   gradients of the loss.
+   A perturbed Fenchel-Young loss using Monte Carlo perturbations.
 
-   For the perturbed optimizer, the cost vector needs to be predicted from
-   contextual data and is perturbed with Gaussian noise.
+   The cost vector is predicted from contextual data and perturbed with
+   Gaussian noise.
 
-   The Fenchel-Young loss allows directly optimizing a loss between the features
-   and solutions with less computation. Thus, it allows us to design an algorithm
-   based on stochastic gradient descent.
+   This loss directly compares the expected perturbed solution with the true
+   optimal solution, avoiding the extra task loss needed by perturbedOpt.
 
    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
 
@@ -165,6 +184,20 @@ Module Contents
 
       Backward pass for perturbed Fenchel-Young loss
 
+
+
+.. py:class:: perturbedFenchelYoungMul(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, processes: int = 1, seed: int = 135, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`perturbedFenchelYoung`
+
+
+   Multiplicative-perturbation variant of perturbedFenchelYoung.
+
+   This variant preserves the sign of each predicted cost entry. It assumes
+   predicted costs already have the intended nonzero sign; for nonnegative-cost
+   problems, use a positive-output prediction layer.
+
+   Reference: <https://arxiv.org/abs/2207.13513>
 
 
 .. py:class:: implicitMLE(optmodel: pyepo.model.opt.optModel, n_samples: int = 10, sigma: float = 1.0, lambd: float = 10, distribution: pyepo.func.utils.sumGammaDistribution | None = None, two_sides: bool = False, processes: int = 1, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)

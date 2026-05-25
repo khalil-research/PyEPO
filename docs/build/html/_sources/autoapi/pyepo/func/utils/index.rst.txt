@@ -9,6 +9,14 @@ pyepo.func.utils
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.utils.logger
+
+
 Classes
 -------
 
@@ -19,6 +27,8 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: logger
 
 .. py:class:: sumGammaDistribution(kappa: float, n_iterations: int = 10, seed: int = 135)
 

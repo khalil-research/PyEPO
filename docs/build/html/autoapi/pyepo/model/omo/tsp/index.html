@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyepo.model.omo.tsp &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.1.3 documentation</title>
+  <title>pyepo.model.omo.tsp &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../../../../_static/favicon.ico"/>
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=cb7bf70b"></script>
+      <script src="../../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -114,7 +114,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.omo.tsp.tspABModel" title="pyepo.model.omo.tsp.tspABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABModel</span></code></a></p></td>
-<td><p>Pyomo-backed TSP abstract base. Provides paired-variable <code class="docutils literal notranslate"><span class="pre">setObj</span></code> /</p></td>
+<td><p>Pyomo-backed TSP abstract base. Provides paired-variable objective /</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.omo.tsp.tspGGModel" title="pyepo.model.omo.tsp.tspGGModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspGGModel</span></code></a></p></td>
 <td><p>Gavish-Graves (GG) formulation.</p></td>
@@ -137,20 +137,9 @@
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.omo.tsp.</span></span><span class="sig-name descname"><span class="pre">tspABModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'glpk'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.tspABBase" title="pyepo.model.bases.tspABBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.tspABBase</span></code></a>, <a class="reference internal" href="../omomodel/index.html#pyepo.model.omo.omomodel.optOmoModel" title="pyepo.model.omo.omomodel.optOmoModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.omo.omomodel.optOmoModel</span></code></a></p>
-<p>Pyomo-backed TSP abstract base. Provides paired-variable <code class="docutils literal notranslate"><span class="pre">setObj</span></code> /
+<p>Pyomo-backed TSP abstract base. Provides paired-variable objective /
 <code class="docutils literal notranslate"><span class="pre">solve</span></code> / <code class="docutils literal notranslate"><span class="pre">_addExtraConstr</span></code> shared by GG and MTZ. Pyomo lacks easy
 callback support, so no DFJ formulation exists for this backend.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.setObj">
-<span class="sig-name descname"><span class="pre">setObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.setObj" title="Link to this definition"></a></dt>
-<dd><p>A method to set the objective function</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>c</strong> – cost vector</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.omo.tsp.tspABModel.solve">
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.model.omo.tsp.tspABModel.solve" title="Link to this definition"></a></dt>

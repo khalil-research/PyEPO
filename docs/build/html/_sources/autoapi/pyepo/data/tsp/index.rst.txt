@@ -29,7 +29,7 @@ Module Contents
    :param num_nodes: number of nodes
    :param deg: data polynomial degree
    :param noise_width: half width of data random noise
-   :param seed: random seed
+   :param seed: random seed (default 135 for reproducibility)
 
    :returns: data features (np.ndarray), costs (np.ndarray)
    :rtype: tuple

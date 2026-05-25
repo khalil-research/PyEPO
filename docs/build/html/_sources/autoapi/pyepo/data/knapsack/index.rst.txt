@@ -30,7 +30,7 @@ Module Contents
    :param dim: dimension of multi-dimensional knapsack
    :param deg: data polynomial degree
    :param noise_width: half width of data random noise
-   :param seed: random state seed
+   :param seed: random state seed (default 135 for reproducibility)
 
    :returns: weights of items (np.ndarray), data features (np.ndarray), costs (np.ndarray)
    :rtype: tuple

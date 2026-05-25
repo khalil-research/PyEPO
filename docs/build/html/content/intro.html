@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.1.3 documentation</title>
+  <title>Introduction &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cb7bf70b"></script>
+      <script src="../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
@@ -86,7 +86,7 @@
 <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python library for modeling and solving predict-then-optimize problems with linear objective functions.</p>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> allows users to build optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, or any custom solver, and embed them into neural networks for end-to-end training. It provides a collection of decision-focused learning methods – including SPO+ loss, differentiable black-box optimizers, perturbed optimizers, Fenchel-Young loss, contrastive losses, learning-to-rank losses, and perturbation gradient – implemented as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd modules.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> builds optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, or any custom solver, and embeds them into neural networks for end-to-end training. It provides decision-focused learning methods – including SPO+ loss, differentiable black-box optimizers, perturbed optimizers, Fenchel-Young losses, regularized Frank-Wolfe layers, contrastive losses, learning-to-rank losses, and perturbation gradient – implemented as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd modules.</p>
 <section id="end-to-end-predict-then-optimize-framework">
 <h2>End-to-End Predict-then-Optimize Framework<a class="headerlink" href="#end-to-end-predict-then-optimize-framework" title="Link to this heading"></a></h2>
 <p>Given a labeled dataset <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> of feature-cost pairs <span class="math notranslate nohighlight">\((x,c)\)</span> or feature-solution pairs <span class="math notranslate nohighlight">\((x,w)\)</span>, a neural network is trained to directly minimize the decision error, rather than the prediction error of cost coefficients.</p>

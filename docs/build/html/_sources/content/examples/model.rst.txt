@@ -177,7 +177,7 @@ User-defined OR-Tools Models
 
 OR-Tools provides two solving paradigms: pywraplp (LP/MIP solvers) and CP-SAT (constraint programming). ``PyEPO`` provides base classes for both.
 
-**pywraplp** — Inherit from ``pyepo.model.ort.optOrtModel`` and implement ``_getModel``. The ``solver`` parameter selects the backend (e.g., ``"scip"``, ``"glop"``, ``"cbc"``).
+**pywraplp** -- Inherit from ``pyepo.model.ort.optOrtModel`` and implement ``_getModel``. The ``solver`` parameter selects the backend (e.g., ``"scip"``, ``"glop"``, ``"cbc"``).
 
 .. autoclass:: pyepo.model.ort.optOrtModel
     :noindex:
@@ -214,7 +214,7 @@ OR-Tools provides two solving paradigms: pywraplp (LP/MIP solvers) and CP-SAT (c
    myoptmodel.setObj(cost) # set objective function
    myoptmodel.solve() # solve
 
-**CP-SAT** — Inherit from ``pyepo.model.ort.optOrtCpModel`` and implement ``_getModel``. CP-SAT is an integer-only solver; float cost vectors are automatically scaled internally.
+**CP-SAT** -- Inherit from ``pyepo.model.ort.optOrtCpModel`` and implement ``_getModel``. CP-SAT is an integer-only solver; float cost vectors are automatically scaled internally.
 
 .. autoclass:: pyepo.model.ort.optOrtCpModel
     :noindex:
@@ -259,7 +259,7 @@ To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and popu
    - ``self.l``: Lower bounds (typically zeros for non-negative variables).
    - ``self.u``: Upper bounds (use ``jnp.full(n, jnp.inf)`` for unbounded).
 
-``_getModel`` should return ``(None, [])`` — MPAX has no explicit model object, the matrices are the model. Sparse-matrix format can be toggled by overriding the class attribute ``use_sparse_matrix`` (default ``True``). Sense follows ``self.modelSense`` (set ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for a maximization problem; defaults to minimization).
+``_getModel`` should return ``(None, [])`` -- MPAX has no explicit model object, the matrices are the model. Sparse-matrix format can be toggled by overriding the class attribute ``use_sparse_matrix`` (default ``True``). Sense follows ``self.modelSense`` (set ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for a maximization problem; defaults to minimization).
 
 .. autoclass:: pyepo.model.mpax.optMpaxModel
   :noindex:
@@ -296,7 +296,7 @@ To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and popu
 User-defined Models from Scratch
 --------------------------------
 
-For complete flexibility, ``pyepo.model.opt.optModel`` allows users to build models with any solver or algorithm. Override ``_getModel``, ``setObj``, ``solve``, and ``num_cost`` to integrate a custom solver.
+For complete flexibility, inherit directly from ``pyepo.model.opt.optModel`` to integrate any solver or algorithm. Override ``_getModel``, ``setObj``, ``solve``, and ``num_cost`` to provide the same interface as the built-in model wrappers.
 
 .. autoclass:: pyepo.model.opt.optModel
     :noindex:

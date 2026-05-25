@@ -37,17 +37,9 @@ Module Contents
    Bases: :py:obj:`pyepo.model.bases.tspABBase`, :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
 
-   Pyomo-backed TSP abstract base. Provides paired-variable ``setObj`` /
+   Pyomo-backed TSP abstract base. Provides paired-variable objective /
    ``solve`` / ``_addExtraConstr`` shared by GG and MTZ. Pyomo lacks easy
    callback support, so no DFJ formulation exists for this backend.
-
-
-   .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
-
-      A method to set the objective function
-
-      :param c: cost vector
-
 
 
    .. py:method:: solve() -> tuple[numpy.ndarray, float]

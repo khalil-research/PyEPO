@@ -1,0 +1,169 @@
+pyepo.func.regularized
+======================
+
+.. py:module:: pyepo.func.regularized
+
+.. autoapi-nested-parse::
+
+   Regularized differentiable optimization function
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.regularized.regularizedFrankWolfeOpt
+   pyepo.func.regularized.regularizedFrankWolfeOptFunc
+   pyepo.func.regularized.regularizedFrankWolfeFenchelYoung
+   pyepo.func.regularized.regularizedFrankWolfeFenchelYoungFunc
+
+
+Module Contents
+---------------
+
+.. py:class:: regularizedFrankWolfeOpt(optmodel: pyepo.model.opt.optModel, lambd: float = 1.0, max_iter: int = 20, tol: float = 1e-06, processes: int = 1, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for a regularized differentiable optimizer, which yields
+   a smooth combination of vertices on the convex hull of feasible solutions.
+
+   For regularized Frank-Wolfe, the objective function is linear and constraints
+   are known and fixed, but the cost vector needs to be predicted from contextual
+   data.
+
+   The custom backward pass applies implicit differentiation on the active set
+   found by Frank-Wolfe iterations. Thus, it allows us to design an algorithm
+   based on stochastic gradient descent.
+
+   Reference: <https://arxiv.org/abs/2207.13513>
+
+
+   .. py:attribute:: lambd
+
+
+   .. py:attribute:: max_iter
+      :value: 20
+
+
+
+   .. py:attribute:: tol
+      :value: 1e-06
+
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+   .. py:method:: compute_regularization(y: torch.Tensor) -> torch.Tensor
+
+      L2 regularizer Omega(y) = (lambd / 2) ||y||^2 per instance
+
+
+
+.. py:class:: regularizedFrankWolfeOptFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+
+   An autograd function for regularized Frank-Wolfe
+
+
+   .. py:method:: forward(ctx, pred_cost: torch.Tensor, module: regularizedFrankWolfeOpt) -> torch.Tensor
+      :staticmethod:
+
+
+      Forward pass for regularized Frank-Wolfe
+
+      :param pred_cost: a batch of predicted values of the cost
+      :param module: regularizedFrankWolfeOpt module
+
+      :returns: regularized solutions
+      :rtype: torch.tensor
+
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for regularized Frank-Wolfe
+
+
+
+.. py:class:: regularizedFrankWolfeFenchelYoung(optmodel: pyepo.model.opt.optModel, lambd: float = 1.0, max_iter: int = 20, tol: float = 1e-06, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+
+   Bases: :py:obj:`pyepo.func.abcmodule.optModule`
+
+
+   An autograd module for the Fenchel-Young loss paired with regularized
+   Frank-Wolfe.
+
+   For regularized Frank-Wolfe Fenchel-Young loss, the objective function is
+   linear and constraints are known and fixed, but the cost vector needs to be
+   predicted from contextual data.
+
+   The custom backward pass returns the Danskin subgradient y_hat - w directly,
+   skipping the implicit-differentiation chain through the Frank-Wolfe iterate.
+   Thus, it allows us to design an algorithm based on stochastic gradient
+   descent.
+
+   Reference: <https://arxiv.org/abs/2207.13513>
+
+
+   .. py:attribute:: lambd
+
+
+   .. py:attribute:: max_iter
+      :value: 20
+
+
+
+   .. py:attribute:: tol
+      :value: 1e-06
+
+
+
+   .. py:method:: forward(pred_cost: torch.Tensor, true_sol: torch.Tensor) -> torch.Tensor
+
+      Forward pass
+
+
+
+.. py:class:: regularizedFrankWolfeFenchelYoungFunc(*args, **kwargs)
+
+   Bases: :py:obj:`torch.autograd.Function`
+
+
+   An autograd function for regularized Frank-Wolfe Fenchel-Young loss
+
+
+   .. py:method:: forward(ctx, pred_cost: torch.Tensor, true_sol: torch.Tensor, module: regularizedFrankWolfeFenchelYoung) -> torch.Tensor
+      :staticmethod:
+
+
+      Forward pass for regularized Frank-Wolfe Fenchel-Young loss
+
+      :param pred_cost: a batch of predicted values of the cost
+      :param true_sol: a batch of true optimal solutions
+      :param module: regularizedFrankWolfeFenchelYoung module
+
+      :returns: Fenchel-Young loss
+      :rtype: torch.tensor
+
+
+
+   .. py:method:: backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor | None, Ellipsis]
+      :staticmethod:
+
+
+      Backward pass for regularized Frank-Wolfe Fenchel-Young loss
+
+
+

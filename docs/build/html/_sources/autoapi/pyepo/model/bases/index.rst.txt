@@ -77,6 +77,9 @@ Module Contents
    :vartype items: list
 
 
+   .. py:attribute:: modelSense
+
+
    .. py:attribute:: weights
 
 
@@ -84,9 +87,6 @@ Module Contents
 
 
    .. py:attribute:: items
-
-
-   .. py:attribute:: modelSense
 
 
    .. py:property:: num_cost
@@ -112,6 +112,9 @@ Module Contents
    :vartype risk_level: float
 
 
+   .. py:attribute:: modelSense
+
+
    .. py:attribute:: num_assets
 
 
@@ -119,9 +122,6 @@ Module Contents
 
 
    .. py:attribute:: risk_level
-
-
-   .. py:attribute:: modelSense
 
 
    .. py:property:: num_cost

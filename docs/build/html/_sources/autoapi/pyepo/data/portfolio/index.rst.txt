@@ -29,7 +29,7 @@ Module Contents
    :param num_assets: number of assets
    :param deg: data polynomial degree
    :param noise_level: level of data random noise
-   :param seed: random seed
+   :param seed: random seed (default 135 for reproducibility)
 
    :returns: covariance matrix (np.ndarray), data features (np.ndarray), mean returns (np.ndarray)
    :rtype: tuple
