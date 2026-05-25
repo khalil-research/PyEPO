@@ -19,21 +19,6 @@
 
 <p align="center"><img width="100%" src="images/learning_framework_e2e.png" /></p>
 
-
-## 🚀 What's New: CaVE for Binary Linear Programs
-
-PyEPO now ships **CaVE** (Cone-aligned Vector Estimation) — a fast surrogate loss tailored for **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges, ...). Instead of solving the optimization problem at every backward step (SPO+) or sampling perturbations (DPO/PFYL), CaVE projects the predicted cost vector onto the polyhedral cone of binding-constraint normals at the true optimal vertex and minimizes `1 - cos(pred, proj)`.
-
-* **Fast.** Backward = batched cone projection via a `torch.compile`-fused, CUDA-graph-friendly Nesterov APGD solver. No extra dependencies beyond PyTorch.
-* **Truncated APGD by default.** `pyepo.func.coneAlignedCosine` runs only 20 APGD iterations and lands the iterate *strictly inside* the cone rather than on its boundary. This avoids the boundary stagnation that pure-exact APGD hits, trains faster, and matches the boundary-converged variant on regret. Set `max_iters=None, tol_grad=1e-4` to switch to the boundary-converged preset.
-* **Drop-in supervision.** `pyepo.data.dataset.optDatasetConstrs` + `collate_tight_constraints` extract and batch the binding-constraint normals once at dataset-construction time.
-* **Tutorial.** See [Notebook 04: CaVE for Binary Linear Programs (vs SPO+)](notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb) for a head-to-head comparison on TSP-10 and TSP-20.
-
-Also new in this release: **capacitated vehicle routing (CVRP)** models for Gurobi, COPT, and Pyomo — see `pyepo.model.{grb,copt,omo}.vrpRCIModel` / `vrpMTZModel`.
-
-📄 **CaVE paper** (CPAIOR 2024): [CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12)
-
-
 ## Publication
 
 This repository is the official implementation of the paper:
