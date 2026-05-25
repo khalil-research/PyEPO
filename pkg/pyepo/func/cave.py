@@ -181,8 +181,8 @@ def _apgd_step_size(
     return (1.0 / lam.clamp(min=1e-8)).view(-1, 1)
 
 
-@torch.compile(mode="reduce-overhead", dynamic=None)
-def _apgd_iterate(
+@torch.compile(mode="reduce-overhead", dynamic=False)
+def _apgd_iterate_compiled(
     A: torch.Tensor,
     AT: torch.Tensor,
     y: torch.Tensor,
@@ -206,3 +206,19 @@ def _apgd_iterate(
         # projected gradient step onto x >= 0
         x_curr = torch.clamp(y_k - step_size * grad, min=0.0)
     return x_curr, x_prev
+
+
+def _apgd_iterate(
+    A: torch.Tensor,
+    AT: torch.Tensor,
+    y: torch.Tensor,
+    step_size: torch.Tensor,
+    x_curr: torch.Tensor,
+    x_prev: torch.Tensor,
+    momenta: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Wrapper: mark batch dim symbolic so the compiled chunk is built once"""
+    # momenta[0] (= n_inner) must stay static — it bounds the python loop
+    for t in (A, AT, y, step_size, x_curr, x_prev):
+        torch._dynamo.maybe_mark_dynamic(t, 0)
+    return _apgd_iterate_compiled(A, AT, y, step_size, x_curr, x_prev, momenta)
