@@ -1,114 +1,357 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Evaluation" href="evaluation.html"><link rel="prev" title="Solution Pool" href="pool.html">
+
+    <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Training - PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=222d9bf0" />
+    
+    
 
 
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Training &mdash; PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
-
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #B95B10;
+  --color-brand-content: #B95B10;
+  --color-admonition-title--tip: #1F8237;
+  --color-admonition-title-background--tip: #E8F5EA;
+  --color-api-name: #1F8237;
   
-    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-      <script src="../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=1f29e9d3"></script>
-      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
-    <script src="../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Evaluation" href="evaluation.html" />
-    <link rel="prev" title="Solution Pool" href="pool.html" /> 
-</head>
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #F4B452;
+  --color-brand-content: #F4B452;
+  --color-admonition-title--tip: #7CD688;
+  --color-admonition-title-background--tip: rgba(124, 214, 136, 0.12);
+  --color-api-name: #7CD688;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #F4B452;
+  --color-brand-content: #F4B452;
+  --color-admonition-title--tip: #7CD688;
+  --color-admonition-title-background--tip: rgba(124, 214, 136, 0.12);
+  --color-api-name: #7CD688;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
 
-          
-          
-          <a href="../../index.html" class="icon icon-home">
-            PyTorch-based End-to-End Predict-then-Optimize Tool
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#where-to-start">Where to start</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../tutorial.html#reference-pages">Reference pages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="model.html">Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l3"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pool.html">Solution Pool</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Training</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#common-setup">Common Setup</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#two-training-patterns">Two Training Patterns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#surrogate-losses">Surrogate Losses</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#perturbed-methods">Perturbed Methods</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#regularized-methods">Regularized Methods</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#black-box-methods">Black-Box Methods</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cone-aligned-estimation">Cone-Aligned Estimation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#contrastive-methods">Contrastive Methods</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#learning-to-rank">Learning to Rank</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../tutorial.html">Tutorial</a><input aria-label="Toggle navigation of Tutorial" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="function.html">Auto Grad Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/pyepo/index.html">pyepo</a><input aria-label="Toggle navigation of pyepo" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/pyepo/EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/data/index.html">pyepo.data</a><input aria-label="Toggle navigation of pyepo.data" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/dataset/index.html">pyepo.data.dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/knapsack/index.html">pyepo.data.knapsack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/portfolio/index.html">pyepo.data.portfolio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/shortestpath/index.html">pyepo.data.shortestpath</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/tsp/index.html">pyepo.data.tsp</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/abcmodule/index.html">pyepo.func.abcmodule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/blackbox/index.html">pyepo.func.blackbox</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/cave/index.html">pyepo.func.cave</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/contrastive/index.html">pyepo.func.contrastive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/perturbed/index.html">pyepo.func.perturbed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/rank/index.html">pyepo.func.rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/regularized/index.html">pyepo.func.regularized</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/surrogate/index.html">pyepo.func.surrogate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/utils/index.html">pyepo.func.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/metrics/index.html">pyepo.metric.metrics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/mse/index.html">pyepo.metric.mse</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/regret/index.html">pyepo.metric.regret</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/unambregret/index.html">pyepo.metric.unambregret</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/bases/index.html">pyepo.model.bases</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/knapsack/index.html">pyepo.model.copt.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/portfolio/index.html">pyepo.model.copt.portfolio</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/shortestpath/index.html">pyepo.model.copt.shortestpath</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/tsp/index.html">pyepo.model.copt.tsp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/vrp/index.html">pyepo.model.copt.vrp</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/grbmodel/index.html">pyepo.model.grb.grbmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/knapsack/index.html">pyepo.model.grb.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/portfolio/index.html">pyepo.model.grb.portfolio</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/shortestpath/index.html">pyepo.model.grb.shortestpath</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/tsp/index.html">pyepo.model.grb.tsp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/vrp/index.html">pyepo.model.grb.vrp</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/knapsack/index.html">pyepo.model.mpax.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/mpaxmodel/index.html">pyepo.model.mpax.mpaxmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/shortestpath/index.html">pyepo.model.mpax.shortestpath</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/knapsack/index.html">pyepo.model.omo.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/omomodel/index.html">pyepo.model.omo.omomodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/portfolio/index.html">pyepo.model.omo.portfolio</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/shortestpath/index.html">pyepo.model.omo.shortestpath</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/tsp/index.html">pyepo.model.omo.tsp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/vrp/index.html">pyepo.model.omo.vrp</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html">pyepo.model.opt</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/knapsack/index.html">pyepo.model.ort.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/ortcpmodel/index.html">pyepo.model.ort.ortcpmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/ortmodel/index.html">pyepo.model.ort.ortmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/shortestpath/index.html">pyepo.model.ort.shortestpath</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/utils/index.html">pyepo.model.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/pyepo/utils/index.html">pyepo.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">PyTorch-based End-to-End Predict-then-Optimize Tool</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../tutorial.html">Tutorial</a></li>
-      <li class="breadcrumb-item active">Training</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/content/examples/training.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <section id="training">
-<h1>Training<a class="headerlink" href="#training" title="Link to this heading"></a></h1>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/content/examples/training.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="training">
+<h1>Training<a class="headerlink" href="#training" title="Link to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> extends PyTorch autograd modules to support automatic differentiation through optimization. This page collects training-loop templates for each method. See <a class="reference internal" href="function.html"><span class="doc">Auto Grad Functions</span></a> for the method API and selection guide.</p>
 <p>For a runnable walkthrough, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">03 Training and Testing</a> notebook.</p>
 <section id="common-setup">
-<h2>Common Setup<a class="headerlink" href="#common-setup" title="Link to this heading"></a></h2>
+<h2>Common Setup<a class="headerlink" href="#common-setup" title="Link to this heading">¶</a></h2>
 <p>All examples below share the same setup: a linear prediction model trained on shortest-path data.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
@@ -144,10 +387,10 @@
 </div>
 </section>
 <section id="two-training-patterns">
-<h2>Two Training Patterns<a class="headerlink" href="#two-training-patterns" title="Link to this heading"></a></h2>
+<h2>Two Training Patterns<a class="headerlink" href="#two-training-patterns" title="Link to this heading">¶</a></h2>
 <p>PyEPO methods fall into two interaction patterns. Both share the same outer loop; they differ in how the inner block computes the loss.</p>
 <section id="pattern-a-loss-returning-methods">
-<h3>Pattern A — Loss-returning methods<a class="headerlink" href="#pattern-a-loss-returning-methods" title="Link to this heading"></a></h3>
+<h3>Pattern A — Loss-returning methods<a class="headerlink" href="#pattern-a-loss-returning-methods" title="Link to this heading">¶</a></h3>
 <p>Methods that return a scalar loss directly (SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE) plug straight into <code class="docutils literal notranslate"><span class="pre">.backward()</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -162,7 +405,7 @@
 </div>
 </section>
 <section id="pattern-b-solution-returning-methods">
-<h3>Pattern B — Solution-returning methods<a class="headerlink" href="#pattern-b-solution-returning-methods" title="Link to this heading"></a></h3>
+<h3>Pattern B — Solution-returning methods<a class="headerlink" href="#pattern-b-solution-returning-methods" title="Link to this heading">¶</a></h3>
 <p>Methods that return predicted, expected, or regularized solutions (DPO, DBB, NID, RFWO, I-MLE, AI-MLE) require the user to define a task loss on the output:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>  <span class="c1"># or nn.L1Loss(), or an objective-value loss</span>
 
@@ -186,10 +429,10 @@
 </section>
 </section>
 <section id="surrogate-losses">
-<h2>Surrogate Losses<a class="headerlink" href="#surrogate-losses" title="Link to this heading"></a></h2>
+<h2>Surrogate Losses<a class="headerlink" href="#surrogate-losses" title="Link to this heading">¶</a></h2>
 <p>Both surrogate losses follow <strong>Pattern A</strong>.</p>
 <section id="spo">
-<h3>SPO+<a class="headerlink" href="#spo" title="Link to this heading"></a></h3>
+<h3>SPO+<a class="headerlink" href="#spo" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># inner call: SPO+ takes (cp, c, w, z)</span>
@@ -198,7 +441,7 @@
 </div>
 </section>
 <section id="pg">
-<h3>PG<a class="headerlink" href="#pg" title="Link to this heading"></a></h3>
+<h3>PG<a class="headerlink" href="#pg" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbationGradient</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># inner call: PG takes (cp, c)</span>
@@ -208,9 +451,9 @@
 </section>
 </section>
 <section id="perturbed-methods">
-<h2>Perturbed Methods<a class="headerlink" href="#perturbed-methods" title="Link to this heading"></a></h2>
+<h2>Perturbed Methods<a class="headerlink" href="#perturbed-methods" title="Link to this heading">¶</a></h2>
 <section id="dpo-additive-and-multiplicative">
-<h3>DPO — additive and multiplicative<a class="headerlink" href="#dpo-additive-and-multiplicative" title="Link to this heading"></a></h3>
+<h3>DPO — additive and multiplicative<a class="headerlink" href="#dpo-additive-and-multiplicative" title="Link to this heading">¶</a></h3>
 <p><strong>Pattern B.</strong> <code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code> requires a positive-output predictor (e.g., <code class="docutils literal notranslate"><span class="pre">nn.Softplus()</span></code> plus a small epsilon, denoted <code class="docutils literal notranslate"><span class="pre">positive_predmodel</span></code> below) so that predicted costs keep their sign.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># additive</span>
 <span class="n">ptb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbedOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -226,7 +469,7 @@
 </div>
 </section>
 <section id="pfyl-additive-and-multiplicative">
-<h3>PFYL — additive and multiplicative<a class="headerlink" href="#pfyl-additive-and-multiplicative" title="Link to this heading"></a></h3>
+<h3>PFYL — additive and multiplicative<a class="headerlink" href="#pfyl-additive-and-multiplicative" title="Link to this heading">¶</a></h3>
 <p><strong>Pattern A.</strong> The multiplicative variant shares the sign convention of <code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># additive</span>
 <span class="n">pfy</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbedFenchelYoung</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -239,7 +482,7 @@
 </div>
 </section>
 <section id="i-mle">
-<h3>I-MLE<a class="headerlink" href="#i-mle" title="Link to this heading"></a></h3>
+<h3>I-MLE<a class="headerlink" href="#i-mle" title="Link to this heading">¶</a></h3>
 <p><strong>Pattern B.</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">imle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">implicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -252,7 +495,7 @@
 </div>
 </section>
 <section id="ai-mle">
-<h3>AI-MLE<a class="headerlink" href="#ai-mle" title="Link to this heading"></a></h3>
+<h3>AI-MLE<a class="headerlink" href="#ai-mle" title="Link to this heading">¶</a></h3>
 <p><strong>Pattern B.</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aimle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">adaptiveImplicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -266,9 +509,9 @@
 </section>
 </section>
 <section id="regularized-methods">
-<h2>Regularized Methods<a class="headerlink" href="#regularized-methods" title="Link to this heading"></a></h2>
+<h2>Regularized Methods<a class="headerlink" href="#regularized-methods" title="Link to this heading">¶</a></h2>
 <section id="rfwo">
-<h3>RFWO<a class="headerlink" href="#rfwo" title="Link to this heading"></a></h3>
+<h3>RFWO<a class="headerlink" href="#rfwo" title="Link to this heading">¶</a></h3>
 <p><strong>Pattern B.</strong> Solution-level MSE matches the imitation setting in the paper.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfwo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">regularizedFrankWolfeOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -281,7 +524,7 @@
 </div>
 </section>
 <section id="rfyl">
-<h3>RFYL<a class="headerlink" href="#rfyl" title="Link to this heading"></a></h3>
+<h3>RFYL<a class="headerlink" href="#rfyl" title="Link to this heading">¶</a></h3>
 <p><strong>Pattern A.</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfyl</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">regularizedFrankWolfeFenchelYoung</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -292,10 +535,10 @@
 </section>
 </section>
 <section id="black-box-methods">
-<h2>Black-Box Methods<a class="headerlink" href="#black-box-methods" title="Link to this heading"></a></h2>
+<h2>Black-Box Methods<a class="headerlink" href="#black-box-methods" title="Link to this heading">¶</a></h2>
 <p>Both follow <strong>Pattern B</strong> with an objective-value loss (<span class="math notranslate nohighlight">\(|\langle \mathbf{c}, \hat{\mathbf{w}} \rangle - z^*|\)</span>).</p>
 <section id="dbb">
-<h3>DBB<a class="headerlink" href="#dbb" title="Link to this heading"></a></h3>
+<h3>DBB<a class="headerlink" href="#dbb" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dbb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">blackboxOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
@@ -308,7 +551,7 @@
 </div>
 </section>
 <section id="nid">
-<h3>NID<a class="headerlink" href="#nid" title="Link to this heading"></a></h3>
+<h3>NID<a class="headerlink" href="#nid" title="Link to this heading">¶</a></h3>
 <p>Hyperparameter-free; same inner block as DBB.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nid</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">negativeIdentity</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -323,9 +566,9 @@
 </section>
 </section>
 <section id="cone-aligned-estimation">
-<h2>Cone-Aligned Estimation<a class="headerlink" href="#cone-aligned-estimation" title="Link to this heading"></a></h2>
+<h2>Cone-Aligned Estimation<a class="headerlink" href="#cone-aligned-estimation" title="Link to this heading">¶</a></h2>
 <section id="cave">
-<h3>CaVE<a class="headerlink" href="#cave" title="Link to this heading"></a></h3>
+<h3>CaVE<a class="headerlink" href="#cave" title="Link to this heading">¶</a></h3>
 <p>CaVE requires a dedicated dataset class that extracts binding-constraint normals at the optimum (<code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code>) and a custom collate function (<code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>) to handle ragged per-instance constraint counts. The batch yields an extra <code class="docutils literal notranslate"><span class="pre">tight_ctrs</span></code> element on top of the usual <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDatasetConstrs</span><span class="p">,</span> <span class="n">collate_tight_constraints</span>
 
@@ -350,10 +593,10 @@
 </section>
 </section>
 <section id="contrastive-methods">
-<h2>Contrastive Methods<a class="headerlink" href="#contrastive-methods" title="Link to this heading"></a></h2>
+<h2>Contrastive Methods<a class="headerlink" href="#contrastive-methods" title="Link to this heading">¶</a></h2>
 <p>NCE and CMAP both follow <strong>Pattern A</strong> and use a cached solution pool: <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls how often new instances are solved exactly during training, and <code class="docutils literal notranslate"><span class="pre">dataset</span></code> seeds the pool with optimal solutions.</p>
 <section id="nce">
-<h3>NCE<a class="headerlink" href="#nce" title="Link to this heading"></a></h3>
+<h3>NCE<a class="headerlink" href="#nce" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nce</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">noiseContrastiveEstimation</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="c1"># inner call: NCE takes (cp, w)</span>
@@ -362,7 +605,7 @@
 </div>
 </section>
 <section id="cmap">
-<h3>CMAP<a class="headerlink" href="#cmap" title="Link to this heading"></a></h3>
+<h3>CMAP<a class="headerlink" href="#cmap" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">contrastiveMAP</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="c1"># inner call: CMAP takes (cp, w)</span>
@@ -372,10 +615,10 @@
 </section>
 </section>
 <section id="learning-to-rank">
-<h2>Learning to Rank<a class="headerlink" href="#learning-to-rank" title="Link to this heading"></a></h2>
+<h2>Learning to Rank<a class="headerlink" href="#learning-to-rank" title="Link to this heading">¶</a></h2>
 <p>All three LTR variants follow <strong>Pattern A</strong> and share the same pool configuration. Pick one based on how it scores the ranking.</p>
 <section id="pointwise-pairwise-listwise">
-<h3>Pointwise / Pairwise / Listwise<a class="headerlink" href="#pointwise-pairwise-listwise" title="Link to this heading"></a></h3>
+<h3>Pointwise / Pairwise / Listwise<a class="headerlink" href="#pointwise-pairwise-listwise" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># pick one</span>
 <span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">pointwiseLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 <span class="c1"># ltr = pyepo.func.pairwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)</span>
@@ -389,35 +632,118 @@
 </section>
 </section>
 
-
-           </div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="evaluation.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Evaluation</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="pool.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Solution Pool</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021, Bo Tang
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pool.html" class="btn btn-neutral float-left" title="Solution Pool" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="evaluation.html" class="btn btn-neutral float-right" title="Evaluation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
     </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Training</a><ul>
+<li><a class="reference internal" href="#common-setup">Common Setup</a></li>
+<li><a class="reference internal" href="#two-training-patterns">Two Training Patterns</a><ul>
+<li><a class="reference internal" href="#pattern-a-loss-returning-methods">Pattern A — Loss-returning methods</a></li>
+<li><a class="reference internal" href="#pattern-b-solution-returning-methods">Pattern B — Solution-returning methods</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#surrogate-losses">Surrogate Losses</a><ul>
+<li><a class="reference internal" href="#spo">SPO+</a></li>
+<li><a class="reference internal" href="#pg">PG</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#perturbed-methods">Perturbed Methods</a><ul>
+<li><a class="reference internal" href="#dpo-additive-and-multiplicative">DPO — additive and multiplicative</a></li>
+<li><a class="reference internal" href="#pfyl-additive-and-multiplicative">PFYL — additive and multiplicative</a></li>
+<li><a class="reference internal" href="#i-mle">I-MLE</a></li>
+<li><a class="reference internal" href="#ai-mle">AI-MLE</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#regularized-methods">Regularized Methods</a><ul>
+<li><a class="reference internal" href="#rfwo">RFWO</a></li>
+<li><a class="reference internal" href="#rfyl">RFYL</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#black-box-methods">Black-Box Methods</a><ul>
+<li><a class="reference internal" href="#dbb">DBB</a></li>
+<li><a class="reference internal" href="#nid">NID</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cone-aligned-estimation">Cone-Aligned Estimation</a><ul>
+<li><a class="reference internal" href="#cave">CaVE</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contrastive-methods">Contrastive Methods</a><ul>
+<li><a class="reference internal" href="#nce">NCE</a></li>
+<li><a class="reference internal" href="#cmap">CMAP</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#learning-to-rank">Learning to Rank</a><ul>
+<li><a class="reference internal" href="#pointwise-pairwise-listwise">Pointwise / Pairwise / Listwise</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2021, Bo Tang.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+          </div>
         </div>
       </div>
-    </section>
+      
+      
+    </aside>
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+</div><script src="../../_static/documentation_options.js?v=e3eff1ea"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
 </html>

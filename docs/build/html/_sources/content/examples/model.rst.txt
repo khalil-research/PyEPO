@@ -425,6 +425,7 @@ The shortest path problem finds the minimum-cost path from the northwest corner 
 .. image:: ../../images/shortestpath.png
   :width: 300
   :alt: Shortest Path on the Grid Graph
+  :class: light-bg
 
 Available backends:
 
