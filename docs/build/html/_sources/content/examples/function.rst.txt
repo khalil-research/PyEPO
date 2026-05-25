@@ -90,7 +90,7 @@ The table below summarizes inputs and return types.
      - loss
      - tight binding-constraint normals at the true optimum (``optDatasetConstrs``)
      - CaVE; binary linear programs only
-   * - ``NCE`` / ``contrastiveMAP``
+   * - ``noiseContrastiveEstimation`` / ``contrastiveMAP``
      - loss
      - true optimal solutions and a solution pool
      - contrastive training with cached negative solutions
@@ -426,7 +426,7 @@ Let :math:`\Gamma` be the cached pool of feasible solutions. For a minimization 
 
 For a fixed :math:`\Gamma` this update direction stays constant per instance, so periodically refreshing :math:`\Gamma` (controlled by ``solve_ratio``) is essential to keep the gradient signal informative.
 
-.. autoclass:: pyepo.func.NCE
+.. autoclass:: pyepo.func.noiseContrastiveEstimation
     :noindex:
     :members:
 

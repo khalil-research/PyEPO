@@ -309,7 +309,7 @@ NCE
 
 .. code-block:: python
 
-   nce = pyepo.func.NCE(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   nce = pyepo.func.noiseContrastiveEstimation(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
    # inner call: NCE takes (cp, w)
    loss = nce(cp, w)
