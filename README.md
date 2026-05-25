@@ -20,6 +20,20 @@
 <p align="center"><img width="100%" src="images/learning_framework_e2e.png" /></p>
 
 
+## 🚀 What's New: CaVE for Binary Linear Programs
+
+PyEPO now ships **CaVE** (Cone-aligned Vector Estimation) — a fast surrogate loss tailored for **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges, ...). Instead of solving the optimization problem at every backward step (SPO+) or sampling perturbations (DPO/PFYL), CaVE projects the predicted cost vector onto the polyhedral cone of binding-constraint normals at the true optimal vertex and minimizes `1 - cos(pred, proj)`.
+
+* **Fast.** Backward = batched cone projection via a `torch.compile`-fused, CUDA-graph-friendly Nesterov APGD solver. No extra dependencies beyond PyTorch.
+* **Truncated APGD by default.** `pyepo.func.coneAlignedCosine` runs only 20 APGD iterations and lands the iterate *strictly inside* the cone rather than on its boundary. This avoids the boundary stagnation that pure-exact APGD hits, trains faster, and matches the boundary-converged variant on regret. Set `max_iters=None, tol_grad=1e-4` to switch to the boundary-converged preset.
+* **Drop-in supervision.** `pyepo.data.dataset.optDatasetConstrs` + `collate_tight_constraints` extract and batch the binding-constraint normals once at dataset-construction time.
+* **Tutorial.** See [Notebook 09: CaVE for Binary Linear Programs (vs SPO+)](notebooks/09%20CaVE%20for%20Binary%20Linear%20Programs.ipynb) for a head-to-head comparison on TSP-10 and TSP-20.
+
+Also new in this release: **capacitated vehicle routing (CVRP)** models for Gurobi, COPT, and Pyomo — see `pyepo.model.{grb,copt,omo}.vrpRCIModel` / `vrpMTZModel`.
+
+📄 **CaVE paper** (CPAIOR 2024): [CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12)
+
+
 ## Publication
 
 This repository is the official implementation of the paper:
@@ -39,10 +53,24 @@ Citation:
 }
 ```
 
+If you use the **CaVE** loss, please also cite:
+```
+@inproceedings{tang2024cave,
+  title={CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs},
+  author={Tang, Bo and Khalil, Elias B},
+  booktitle={Integration of Constraint Programming, Artificial Intelligence, and Operations Research},
+  pages={193--210},
+  year={2024},
+  publisher={Springer}
+}
+```
+
 
 ## Introduction
 
 ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with linear objective functions. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), [MPAX](https://github.com/MIT-Lu-Lab/MPAX) or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules.
+
+For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, ...), ``PyEPO`` ships **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12). A **first-order, GPU-native cone-projection solver written in pure PyTorch** turns each backward pass into a handful of accelerated APGD iterations instead of a combinatorial solve — typically training an order of magnitude faster than SPO+ on TSP-scale instances.
 
 In particular, ``PyEPO`` integrates [MPAX](https://github.com/MIT-Lu-Lab/MPAX), a JAX-based mathematical programming solver using the PDHG (Primal-Dual Hybrid Gradient) algorithm for GPU-accelerated optimization. MPAX brings three key advantages for end-to-end training: (1) **GPU-native solving** — the first-order PDHG method is inherently parallelizable and runs efficiently on GPU; (2) **batch solving** — an entire mini-batch of optimization instances can be solved simultaneously on GPU via vectorization; and (3) **no GPU–CPU data transfer overhead** — traditional solvers (e.g., Gurobi) run on CPU, requiring costly data transfers between GPU and CPU at every training iteration, whereas MPAX keeps both the neural network and the solver on GPU, eliminating this bottleneck.
 
@@ -65,6 +93,7 @@ Our recent tutorial was at the ACC 2024 conference. You can view the talk slides
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Real-World%20Energy%20Scheduling.ipynb)**06 Real-World Energy Scheduling:** Apply PyEPO to real energy data
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20kNN%20Robust%20Losses.ipynb)**07 kNN Robust Losses:** Use optDatasetKNN for robust losses
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20Solving%20on%20MPAX%20with%20PDHG.ipynb)**08 Solving on MPAX with PDHG:** Use MPAX for GPU-accelerated batch solving
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20CaVE%20for%20Binary%20Linear%20Programs.ipynb)**09 CaVE for Binary Linear Programs:** Train with the cone-aligned CaVE loss vs SPO+ on TSP
 
 
 ## Experiments
@@ -74,7 +103,7 @@ To **reproduce the experiments** in the original paper, please use the code and 
 
 ## Features
 
-- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[4]](https://arxiv.org/abs/2205.15213), **DPO** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), **PFYL** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), L2-regularized **RFWO/RFYL** [[6]](https://arxiv.org/abs/2207.13513), **NCE** [[7]](https://www.ijcai.org/proceedings/2021/390), **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html), **I-MLE** [[9]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[10]](https://ojs.aaai.org/index.php/AAAI/article/view/26103), and **PG** [[11]](https://arxiv.org/abs/2402.03256).
+- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[4]](https://arxiv.org/abs/2205.15213), **DPO** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), **PFYL** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), L2-regularized **RFWO/RFYL** [[6]](https://arxiv.org/abs/2207.13513), **NCE** [[7]](https://www.ijcai.org/proceedings/2021/390), **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html), **I-MLE** [[9]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[10]](https://ojs.aaai.org/index.php/AAAI/article/view/26103), **PG** [[11]](https://arxiv.org/abs/2402.03256), and **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12) for binary linear programs.
 - Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization) and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
 - Support parallel computing for optimization solvers
 - Support solution caching [[7]](https://www.ijcai.org/proceedings/2021/390) to speed up training
@@ -231,3 +260,4 @@ if __name__ == "__main__":
 * [10] [Minervini, P., Franceschi, L., & Niepert, M. (2023, June). Adaptive perturbation-based gradient estimation for discrete latent variable models. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 8, pp. 9200-9208).](https://ojs.aaai.org/index.php/AAAI/article/view/26103)
 * [11] [Gupta, V., & Huang, M. (2024). Decision-Focused Learning with Directional Gradients. Training, 50(100), 150.](https://arxiv.org/abs/2402.03256)
 * [12] [Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.](https://arxiv.org/abs/2310.04328)
+* [13] [Tang, B., & Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12)
