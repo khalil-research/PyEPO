@@ -11,7 +11,7 @@ Data Generator
 
 ``pyepo.data`` includes synthetic data generators for four optimization problems: shortest path, multi-dimensional knapsack, traveling salesperson, and portfolio optimization.
 
-Each generator produces feature-cost pairs :math:`(\mathbf{x}, \mathbf{c})`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the cost :math:`\mathbf{c}_i \in \mathbb{R}^d` is computed from a polynomial function :math:`f(\mathbf{x}_i)` multiplied by a multiplicative noise factor :math:`\mathbf{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
+Each generator produces feature-cost pairs :math:`(\mathbf{x}, \mathbf{c})`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the cost :math:`\mathbf{c}_i \in \mathbb{R}^d` is computed from a polynomial function :math:`f(\mathbf{x}_i)` scaled by a multiplicative noise factor :math:`\boldsymbol{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
 
 Common parameters across all generators:
 
@@ -21,7 +21,7 @@ Common parameters across all generators:
 
 * **deg** (:math:`deg`): polynomial degree of the mapping :math:`f(\mathbf{x}_i)`
 
-* **noise_width** (:math:`\bar{\epsilon}`): noise half-width
+* **noise_width** (:math:`\bar{\epsilon}`): noise half-width (shortest path, knapsack, TSP; portfolio uses ``noise_level`` instead -- see below)
 
 * **seed**: random seed for reproducibility
 
@@ -29,7 +29,7 @@ Common parameters across all generators:
 Shortest Path
 -------------
 
-A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0.5) entries encodes the features. The cost coefficients are generated as :math:`c_i^j = [\frac{1}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j`.
+A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0.5) entries maps the feature vector into the cost coefficients: :math:`c_i^j = \big[\tfrac{1}{{3.5}^{deg}} \big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j`.
 
 .. autofunction:: pyepo.data.shortestpath.genData
     :noindex:
@@ -47,7 +47,7 @@ A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0
 Knapsack
 --------
 
-Since uncertain coefficients appear only in the objective function, item weights are fixed. Let :math:`m` be the number of items and :math:`k` the number of resource dimensions. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are sampled from 3 to 8 with one decimal place of precision. The cost coefficients are :math:`c_i^j = \lceil [\frac{5}{{3.5}^{deg}} (\frac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3)^{deg} + 1] \cdot \epsilon_i^j \rceil`.
+Only the cost coefficients are uncertain; item weights are fixed. Let :math:`m` be the number of items and :math:`k` the number of resource dimensions. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are sampled from 3 to 8 with one decimal place of precision. The cost coefficients are :math:`c_i^j = \big\lceil \big[\tfrac{5}{{3.5}^{deg}} \big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j \big\rceil`.
 
 .. autofunction:: pyepo.data.knapsack.genData
     :noindex:
@@ -66,7 +66,7 @@ Since uncertain coefficients appear only in the objective function, item weights
 Traveling Salesperson
 ---------------------
 
-The distance matrix has two components: a Euclidean distance term and a feature-encoded term. Coordinates are drawn from a mixture of Gaussian :math:`\mathcal{N}(0, I)` and uniform :math:`\textbf{U}(-2, 2)` distributions. The feature-encoded component is :math:`\frac{1}{{3}^{deg - 1}} (\frac{1}{\sqrt{p}} (\mathcal{B} x_i)_j + 3)^{deg} \cdot \epsilon_i`, where the elements of :math:`\mathcal{B}` are products of Bernoulli :math:`\textbf{B}(0.5)` and uniform :math:`\textbf{U}(-2, 2)` samples.
+The distance matrix has two components: a Euclidean distance term and a feature-encoded term. Coordinates are drawn from a mixture of a Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})` and a uniform distribution :math:`\mathbf{U}(-2, 2)`. The feature-encoded component is :math:`\tfrac{1}{{3}^{deg - 1}} \big(\tfrac{1}{\sqrt{p}} (\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} \cdot \boldsymbol{\epsilon}_i`, where the elements of :math:`\mathcal{B}` are products of Bernoulli :math:`\mathbf{B}(0.5)` and uniform :math:`\mathbf{U}(-2, 2)` samples.
 
 .. autofunction:: pyepo.data.tsp.genData
     :noindex:
@@ -84,7 +84,9 @@ The distance matrix has two components: a Euclidean distance term and a feature-
 Portfolio
 ---------
 
-Let :math:`\bar{r}_{ij} = (\frac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}})^{deg}`. The expected return is :math:`\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \mathbf{\epsilon}`, and the covariance matrix is :math:`\mathbf{\Sigma} = \mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}`, where :math:`\mathcal{B}` follows a Bernoulli distribution, :math:`\mathbf{L} \sim \textbf{U}(-0.0025\tau, 0.0025\tau)`, and :math:`\mathbf{f}, \mathbf{\epsilon} \sim \mathcal{N}(0, \mathbf{I})`.
+Let :math:`\bar{r}_{ij} = \big(\tfrac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}}\big)^{deg}`. The expected return is :math:`\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \boldsymbol{\epsilon}`, and the covariance matrix is :math:`\mathbf{\Sigma} = \mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}`, where :math:`\mathcal{B}` follows a Bernoulli distribution, :math:`\mathbf{L} \sim \mathbf{U}(-0.0025\tau, 0.0025\tau)`, and :math:`\mathbf{f}, \boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})`.
+
+Unlike the other generators, portfolio noise is controlled by **noise_level** (:math:`\tau`), which scales both the factor loadings :math:`\mathbf{L}` and the residual noise; ``noise_width`` does not apply here.
 
 .. autofunction:: pyepo.data.portfolio.genData
     :noindex:
@@ -105,7 +107,7 @@ optDataset
 
 ``pyepo.data.optDataset`` is a PyTorch ``Dataset`` that stores features and cost coefficients, and **solves the optimization problem to obtain optimal solutions and objective values**.
 
-``optDataset`` is **not** required for training with PyEPO, but it provides a convenient way to precompute optimal solutions and objective values when they are not available in the original data.
+``optDataset`` is the standard input format for end-to-end training in ``PyEPO``: it precomputes :math:`\mathbf{w}^*(\mathbf{c})` and :math:`z^*(\mathbf{c})` once at construction time, so the training loop does not pay solver cost for these label lookups. If those labels are already available from another source, ``optDataset`` can be skipped and batches fed directly to ``pyepo.func`` modules.
 
 .. autoclass:: pyepo.data.dataset.optDataset
     :noindex:

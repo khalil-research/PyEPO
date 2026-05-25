@@ -351,35 +351,40 @@
 <section id="welcome-to-pyepo-s-documentation">
 <h1>Welcome to PyEPO’s documentation!<a class="headerlink" href="#welcome-to-pyepo-s-documentation" title="Link to this heading">¶</a></h1>
 <p>This is the documentation of <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-then-Optimize Tool), which aims to provide end-to-end methods for predict-then-optimize tasks.</p>
-<section id="sample-code">
-<h2>Sample Code<a class="headerlink" href="#sample-code" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<section id="quick-example">
+<h2>Quick Example<a class="headerlink" href="#quick-example" title="Link to this heading">¶</a></h2>
+<p>End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ loss:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">gurobipy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gp</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">gurobipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">GRB</span>
+<span class="c1"># optimization model: 5x5 grid shortest path</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">grb</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.model.grb</span><span class="w"> </span><span class="kn">import</span> <span class="n">optGrbModel</span>
+<span class="c1"># synthetic data and dataset</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span>
+    <span class="n">num_data</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise_width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDataset</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">myModel</span><span class="p">(</span><span class="n">optGrbModel</span><span class="p">):</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># create a model</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
-        <span class="c1"># variables</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">addVars</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">vtype</span><span class="o">=</span><span class="n">GRB</span><span class="o">.</span><span class="n">BINARY</span><span class="p">)</span>
-        <span class="c1"># model sense</span>
-        <span class="n">m</span><span class="o">.</span><span class="n">modelSense</span> <span class="o">=</span> <span class="n">GRB</span><span class="o">.</span><span class="n">MAXIMIZE</span>
-        <span class="c1"># constraints</span>
-        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">)</span>
-        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">)</span>
-        <span class="n">m</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">m</span><span class="p">,</span> <span class="n">x</span>
-
-<span class="c1"># set optimization model</span>
-<span class="n">optmodel</span> <span class="o">=</span> <span class="n">myModel</span><span class="p">()</span>
-<span class="c1"># init SPO+ loss</span>
+<span class="c1"># linear predictor and SPO+ loss</span>
+<span class="n">predmodel</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
 <span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">predmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+
+<span class="c1"># end-to-end training</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">xb</span><span class="p">,</span> <span class="n">cb</span><span class="p">,</span> <span class="n">wb</span><span class="p">,</span> <span class="n">zb</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">spo</span><span class="p">(</span><span class="n">predmodel</span><span class="p">(</span><span class="n">xb</span><span class="p">),</span> <span class="n">cb</span><span class="p">,</span> <span class="n">wb</span><span class="p">,</span> <span class="n">zb</span><span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+<span class="c1"># decision quality</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Regret:&quot;</span><span class="p">,</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">regret</span><span class="p">(</span><span class="n">predmodel</span><span class="p">,</span> <span class="n">optmodel</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">
@@ -464,7 +469,7 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Welcome to PyEPO’s documentation!</a><ul>
-<li><a class="reference internal" href="#sample-code">Sample Code</a><ul>
+<li><a class="reference internal" href="#quick-example">Quick Example</a><ul>
 <li><a class="reference internal" href="#indices-and-tables">Indices and Tables</a></li>
 </ul>
 </li>

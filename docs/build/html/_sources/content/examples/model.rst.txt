@@ -33,6 +33,7 @@ The ``optModel`` interface consists of:
 * ``_getModel``: Build and return the optimization model and decision variables.
 * ``setObj``: Set the objective function with a given cost vector.
 * ``solve``: Solve the problem and return the optimal solution and objective value.
+* ``num_cost``: Number of cost coefficients (length of the cost vector).
 
 
 User-defined GurobiPy Models
@@ -280,19 +281,20 @@ To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and popu
        use_sparse_matrix = False  # dense matrices
 
        def _getModel(self):
+           n = 5  # number of variables
            # equality A x = b
-           self.A = jnp.array(A)
-           self.b = jnp.array(b)
+           self.A = jnp.array([[1.0, 1.0, 1.0, 1.0, 1.0]])
+           self.b = jnp.array([2.0])
            # inequality G x >= h
-           self.G = jnp.array(G)
-           self.h = jnp.array(h)
+           self.G = jnp.array([[1.0, 0.0, 1.0, 0.0, 1.0]])
+           self.h = jnp.array([1.0])
            # variable bounds x in [0, 1]
-           n = self.A.shape[1]
            self.l = jnp.zeros(n, dtype=jnp.float32)
            self.u = jnp.ones(n, dtype=jnp.float32)
            return None, []
 
    optmodel = myLpModel()
+   cost = [0.1, 0.4, 0.2, 0.3, 0.5]
    optmodel.setObj(cost) # set objective function
    optmodel.solve() # solve
 
@@ -416,6 +418,8 @@ Pre-defined Models
 
 ``PyEPO`` includes pre-defined models for several classic optimization problems. Each problem ships with multiple solver backends; the ``setObj`` / ``solve`` / ``num_cost`` interface is identical across them, so you can swap backends without changing the surrounding training code.
 
+.. note::  In end-to-end training, ``setObj`` and ``solve`` are invoked automatically inside the ``pyepo.func`` modules. The manual ``setObj`` / ``solve`` calls shown in each example below are for illustration only.
+
 
 Shortest Path
 -------------
@@ -479,7 +483,7 @@ Available backends:
     :noindex:
     :members: __init__, setObj, solve, num_cost
 
-Example. The ``setObj`` and ``solve`` calls below are invoked automatically during training; the manual form is shown here only for illustration.
+Example:
 
 .. code-block:: python
 

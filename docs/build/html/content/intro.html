@@ -351,10 +351,19 @@
 <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python library for modeling and solving predict-then-optimize problems with linear objective functions.</p>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> builds optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, or any custom solver, and embeds them into neural networks for end-to-end training. It provides decision-focused learning methods – including SPO+ loss, differentiable black-box optimizers, perturbed optimizers, Fenchel-Young losses, regularized Frank-Wolfe layers, contrastive losses, learning-to-rank losses, perturbation gradient, and the cone-aligned CaVE loss for binary linear programs – implemented as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd modules.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> builds optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, or any custom solver, and embeds them into neural networks for end-to-end training. All decision-focused learning methods are implemented as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd modules, grouped into the following families:</p>
+<ul class="simple">
+<li><p><strong>Surrogate losses</strong> – SPO+, perturbation gradient (PG)</p></li>
+<li><p><strong>Perturbed methods</strong> – differentiable perturbed optimizers (DPO), perturbed Fenchel-Young loss (PFYL), I-MLE / AI-MLE</p></li>
+<li><p><strong>Regularized methods</strong> – L2-regularized Frank-Wolfe (RFWO), regularized Frank-Wolfe with Fenchel-Young loss (RFYL)</p></li>
+<li><p><strong>Black-box methods</strong> – differentiable black-box optimizer (DBB), negative identity backpropagation (NID)</p></li>
+<li><p><strong>Cone-aligned estimation</strong> – CaVE (binary linear programs only)</p></li>
+<li><p><strong>Contrastive methods</strong> – noise contrastive estimation (NCE), contrastive MAP (CMAP)</p></li>
+<li><p><strong>Learning to rank</strong> – pointwise, pairwise, listwise LTR</p></li>
+</ul>
 <section id="end-to-end-predict-then-optimize-framework">
 <h2>End-to-End Predict-then-Optimize Framework<a class="headerlink" href="#end-to-end-predict-then-optimize-framework" title="Link to this heading">¶</a></h2>
-<p>Given a labeled dataset <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> of feature-cost pairs <span class="math notranslate nohighlight">\((x,c)\)</span> or feature-solution pairs <span class="math notranslate nohighlight">\((x,w)\)</span>, a neural network is trained to directly minimize the decision error, rather than the prediction error of cost coefficients.</p>
+<p>Given a labeled dataset <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> of feature-cost pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{c})\)</span> or feature-solution pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{w})\)</span>, a neural network is trained to directly minimize the decision error, rather than the prediction error of cost coefficients.</p>
 <a class="reference internal image-reference" href="../_images/e2e.png"><img alt="../_images/e2e.png" src="../_images/e2e.png" width="900" />
 </a>
 </section>

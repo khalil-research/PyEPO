@@ -5,7 +5,7 @@ End-to-end predict-then-optimize training involves repeated solving of optimizat
 
 The algorithm is shown below.
 
-**Algorithm 2** — Gradient-descent with inner approximation
+**Algorithm** — Gradient descent with inner approximation (numbering follows [#f1]_)
 
 **Input:** :math:`A, b`; training data :math:`\mathcal{D} \equiv \{(x_i, c_i)\}_{i=1}^n`
 

@@ -360,7 +360,13 @@
 </section>
 <section id="choosing-a-method">
 <h2>Choosing a Method<a class="headerlink" href="#choosing-a-method" title="Link to this heading">¶</a></h2>
-<p>The right method depends on three questions.</p>
+<p><strong>Strong defaults (when in doubt)</strong></p>
+<ul class="simple">
+<li><p>When <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span> labels are available, start with <strong>SPO+</strong>: convex, has a nonzero subgradient, and is well-studied as a baseline.</p></li>
+<li><p>When the loss-returning style is preferred and labels include <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span>, <strong>PFYL</strong> avoids the extra task loss.</p></li>
+<li><p>For very large LPs on GPU, combine <strong>MPAX</strong> models with <strong>SPO+</strong> or <strong>PFYL</strong>.</p></li>
+</ul>
+<p>For finer choices, the right method depends on three questions.</p>
 <p><strong>1. What supervision do you have at training time?</strong></p>
 <ul class="simple">
 <li><p><strong>True optimal solutions</strong> <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span> — SPO+, PFYL, RFYL, DPO+MSE, RFWO+MSE, I-MLE+L1, AI-MLE+L1, NCE, CMAP</p></li>
@@ -379,12 +385,6 @@
 <li><p><strong>Large LP on GPU</strong> — pair an <code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code> with SPO+ or PFYL.</p></li>
 <li><p><strong>Cached negative pool</strong> — NCE / CMAP.</p></li>
 <li><p><strong>Ranking interpretation</strong> — LTR variants.</p></li>
-</ul>
-<p><strong>Strong defaults</strong></p>
-<ul class="simple">
-<li><p>When <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span> labels are available, start with <strong>SPO+</strong>: convex, has a nonzero subgradient, and is well-studied as a baseline.</p></li>
-<li><p>When the loss-returning style is preferred and labels include <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span>, <strong>PFYL</strong> avoids the extra task loss.</p></li>
-<li><p>For very large LPs on GPU, combine <strong>MPAX</strong> models with <strong>SPO+</strong> or <strong>PFYL</strong>.</p></li>
 </ul>
 <p>The table below summarizes inputs and return types.</p>
 <div class="table-wrapper colwidths-given docutils container">
