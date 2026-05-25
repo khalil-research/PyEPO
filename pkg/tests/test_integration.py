@@ -436,3 +436,51 @@ class TestTspDFJIntegration:
         dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=1)
         _train_loop(dbb, loader, predmodel,
                     lambda fn, cp, c, w, z: (fn(cp) * c).sum(1).mean())
+
+
+# ============================================================
+# CaVE end-to-end: TSP-DFJ + optDatasetConstrs + cone-aligned cosine
+# ============================================================
+
+@requires_gurobi
+class TestCaVE:
+    """End-to-end CaVE training on a tiny TSP-DFJ instance."""
+
+    def _setup(self, num_nodes: int = 5):
+        from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
+        from pyepo.model.grb.tsp import tspDFJModel
+        x, c = pyepo.data.tsp.genData(8, NUM_FEAT, num_nodes, deg=1, seed=42)
+        optmodel = tspDFJModel(num_nodes=num_nodes)
+        dataset = optDatasetConstrs(optmodel, x, c)
+        loader = DataLoader(
+            dataset, batch_size=4, shuffle=False,
+            collate_fn=collate_tight_constraints,
+        )
+        return optmodel, loader
+
+    def _train_loop_cave(self, loss_fn, loader, predmodel):
+        opt = torch.optim.SGD(predmodel.parameters(), lr=1e-2)
+        for i, (x, c, w, z, ctrs) in enumerate(loader):
+            if i >= _STEPS:
+                break
+            cp = predmodel(x)
+            loss = loss_fn(cp, ctrs)
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+
+    def test_default_train(self):
+        # default truncated CaVE+ preset
+        optmodel, loader = self._setup()
+        predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
+        loss_fn = pyepo.func.coneAlignedCosine(optmodel, processes=1)
+        self._train_loop_cave(loss_fn, loader, predmodel)
+
+    def test_exact_preset_train(self):
+        # closer-to-exact CaVE preset
+        optmodel, loader = self._setup()
+        predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
+        loss_fn = pyepo.func.coneAlignedCosine(
+            optmodel, max_iters=None, tol_grad=1e-4, processes=1,
+        )
+        self._train_loop_cave(loss_fn, loader, predmodel)

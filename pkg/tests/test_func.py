@@ -25,6 +25,9 @@ except (ImportError, NameError, Exception):
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
 
 
+from pyepo.func.cave import coneAlignedCosine
+
+
 # ============================================================
 # _cache_in_pass tests
 # ============================================================
@@ -444,3 +447,59 @@ class TestRegularizedFrankWolfeFenchelYoung:
             expected = (r_sol - w) / cp.shape[0]
 
         assert torch.allclose(cp.grad, expected, atol=1e-5)
+
+
+# ============================================================
+# CaVE (cone-aligned cosine) losses
+# ============================================================
+
+@requires_gurobi
+class TestCaVEForward:
+    """Forward-pass shape / range / reduction tests."""
+
+    @pytest.fixture
+    def setup(self):
+        # tiny synthetic batch: 2 instances, 4-dim cost, 3 binding-constraint normals each
+        model = shortestPathModel(grid=(2, 3))  # num_cost = 7 edges
+        d = model.num_cost
+        torch.manual_seed(0)
+        pred_cost = torch.randn(2, d, requires_grad=True)
+        tight_ctrs = torch.randn(2, 3, d)
+        return model, pred_cost, tight_ctrs
+
+    def test_default_returns_scalar_mean(self, setup):
+        model, pred_cost, ctrs = setup
+        # default (max_iters=20, tol_grad=None) = truncated CaVE+
+        loss = coneAlignedCosine(model, processes=1, reduction="mean")(pred_cost, ctrs)
+        assert loss.dim() == 0
+        # cosine-distance is in [0, 2]
+        assert 0.0 - 1e-6 <= loss.item() <= 2.0 + 1e-6
+
+    def test_reduction_none(self, setup):
+        model, pred_cost, ctrs = setup
+        loss = coneAlignedCosine(model, processes=1, reduction="none")(pred_cost, ctrs)
+        assert loss.shape == (2,)
+
+    def test_reduction_sum(self, setup):
+        model, pred_cost, ctrs = setup
+        mean = coneAlignedCosine(model, processes=1, reduction="mean")(pred_cost, ctrs)
+        total = coneAlignedCosine(model, processes=1, reduction="sum")(pred_cost, ctrs)
+        np.testing.assert_allclose(total.item(), mean.item() * 2, atol=1e-5)
+
+    def test_exact_preset(self, setup):
+        # closer-to-exact CaVE: tol_grad=1e-4, no truncation
+        model, pred_cost, ctrs = setup
+        loss = coneAlignedCosine(
+            model, max_iters=None, tol_grad=1e-4, processes=1, reduction="mean",
+        )(pred_cost, ctrs)
+        assert loss.dim() == 0
+        assert 0.0 - 1e-6 <= loss.item() <= 2.0 + 1e-6
+
+    def test_gradient_flows_to_pred_cost(self, setup):
+        model, pred_cost, ctrs = setup
+        loss = coneAlignedCosine(model, processes=1, reduction="mean")(pred_cost, ctrs)
+        loss.backward()
+        assert pred_cost.grad is not None
+        assert pred_cost.grad.shape == pred_cost.shape
+        # projection is treated as a fixed target — grad should be finite, not all-zero
+        assert torch.isfinite(pred_cost.grad).all()

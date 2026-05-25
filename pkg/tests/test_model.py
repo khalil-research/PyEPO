@@ -24,6 +24,9 @@ try:
         tspGGModel, tspGGModelRel, tspDFJModel,
         tspMTZModel, tspMTZModelRel,
     )
+    from pyepo.model.grb.vrp import (
+        vrpRCIModel, vrpMTZModel, vrpMTZModelRel,
+    )
     from pyepo.model.grb.portfolio import portfolioModel
     _HAS_GUROBI = True
 except (ImportError, NameError):
@@ -41,6 +44,10 @@ try:
         tspGGModel as omoTspGGModel, tspGGModelRel as omoTspGGModelRel,
         tspMTZModel as omoTspMTZModel, tspMTZModelRel as omoTspMTZModelRel,
     )
+    from pyepo.model.omo.vrp import (
+        vrpMTZModel as omoVrpMTZModel,
+        vrpMTZModelRel as omoVrpMTZModelRel,
+    )
     from pyepo.model.omo.portfolio import portfolioModel as omoPortfolioModel
     _HAS_PYOMO = True
 except (ImportError, NameError):
@@ -56,6 +63,11 @@ try:
         tspGGModel as coptTspGGModel, tspGGModelRel as coptTspGGModelRel,
         tspDFJModel as coptTspDFJModel,
         tspMTZModel as coptTspMTZModel, tspMTZModelRel as coptTspMTZModelRel,
+    )
+    from pyepo.model.copt.vrp import (
+        vrpRCIModel as coptVrpRCIModel,
+        vrpMTZModel as coptVrpMTZModel,
+        vrpMTZModelRel as coptVrpMTZModelRel,
     )
     from pyepo.model.copt.portfolio import portfolioModel as coptPortfolioModel
     _HAS_COPT = True
@@ -1969,3 +1981,283 @@ class TestCrossBackendMpax:
         mpax_model.setObj(cost)
         _, mpax_obj = mpax_model.solve()
         np.testing.assert_allclose(grb_obj, mpax_obj, atol=1e-2)
+
+
+# ============================================================
+# CVRP shared fixture data (5 nodes, 2 vehicles, capacity 5)
+# ============================================================
+
+_VRP_NUM_NODES = 5
+_VRP_DEMANDS = [2.0, 1.0, 3.0, 2.0]
+_VRP_CAPACITY = 5.0
+_VRP_NUM_VEHICLES = 2
+_VRP_NUM_EDGES = _VRP_NUM_NODES * (_VRP_NUM_NODES - 1) // 2
+_VRP_COST = np.random.RandomState(0).rand(_VRP_NUM_EDGES)
+
+
+# ============================================================
+# CVRP: Gurobi RCI (lazy rounded-capacity cuts)
+# ============================================================
+
+@requires_gurobi
+class TestVrpRCIModel:
+
+    @pytest.fixture
+    def model(self):
+        return vrpRCIModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+
+    def test_init(self, model):
+        assert model.num_nodes == _VRP_NUM_NODES
+        assert model.modelSense == EPO.MINIMIZE
+        assert model.capacity == _VRP_CAPACITY
+
+    def test_num_cost(self, model):
+        assert model.num_cost == _VRP_NUM_EDGES
+
+    def test_setObj_and_solve(self, model):
+        model.setObj(_VRP_COST)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert len(sol) == model.num_cost
+        assert isinstance(obj, float)
+        # vertex must be binary
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_lazy_constrs_tracked(self, model):
+        # _lazy_constrs attribute exists after build, populated after solve if cuts fire
+        model.setObj(_VRP_COST)
+        model.solve()
+        assert hasattr(model._model, "_lazy_constrs")
+        assert isinstance(model._model._lazy_constrs, list)
+
+    def test_getTour_depot_anchored(self, model):
+        model.setObj(_VRP_COST)
+        sol, _ = model.solve()
+        tours = model.getTour(sol)
+        # every tour must start and end at depot 0
+        assert all(t[0] == 0 and t[-1] == 0 for t in tours)
+        # all customers covered exactly once across tours
+        visited = [v for t in tours for v in t[1:-1]]
+        assert sorted(visited) == list(range(1, _VRP_NUM_NODES))
+
+    def test_setObj_wrong_size(self, model):
+        with pytest.raises(ValueError):
+            model.setObj(np.ones(3))
+
+    def test_copy(self, model):
+        model.setObj(_VRP_COST)
+        _, obj1 = model.solve()
+        m2 = model.copy()
+        m2.setObj(_VRP_COST)
+        _, obj2 = m2.solve()
+        np.testing.assert_allclose(obj1, obj2, atol=1e-6)
+
+
+# ============================================================
+# CVRP: Gurobi MTZ (directed, no lazy cuts)
+# ============================================================
+
+@requires_gurobi
+class TestVrpMTZModel:
+
+    @pytest.fixture
+    def model(self):
+        return vrpMTZModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+
+    def test_init(self, model):
+        assert model.num_nodes == _VRP_NUM_NODES
+        assert model.modelSense == EPO.MINIMIZE
+
+    def test_num_cost(self, model):
+        # one cost per undirected edge (NOT per directed Var)
+        assert model.num_cost == _VRP_NUM_EDGES
+
+    def test_setObj_and_solve(self, model):
+        model.setObj(_VRP_COST)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert len(sol) == model.num_cost
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_relax_is_lp(self, model):
+        rel = model.relax()
+        assert isinstance(rel, vrpMTZModelRel)
+        rel.setObj(_VRP_COST)
+        _, obj_rel = rel.solve()
+        model.setObj(_VRP_COST)
+        _, obj_int = model.solve()
+        # MINIMIZE: LP bound <= IP optimum
+        assert obj_rel <= obj_int + 1e-6
+
+    def test_relax_cannot_relax_again(self, model):
+        rel = model.relax()
+        with pytest.raises(RuntimeError):
+            rel.relax()
+
+    def test_relax_no_getTour(self, model):
+        rel = model.relax()
+        with pytest.raises(RuntimeError):
+            rel.getTour([0] * model.num_cost)
+
+
+# ============================================================
+# CVRP: RCI vs MTZ formulation consistency (Gurobi)
+# ============================================================
+
+@requires_gurobi
+class TestVrpCrossFormulation:
+
+    def test_rci_vs_mtz_objective(self):
+        rci = vrpRCIModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+        rci.setObj(_VRP_COST)
+        _, obj_rci = rci.solve()
+        mtz = vrpMTZModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+        mtz.setObj(_VRP_COST)
+        _, obj_mtz = mtz.solve()
+        np.testing.assert_allclose(obj_rci, obj_mtz, atol=1e-4)
+
+
+# ============================================================
+# CVRP: COPT RCI (lazy cuts via CallbackBase)
+# ============================================================
+
+@requires_copt
+class TestCoptVrpRCIModel:
+
+    @pytest.fixture
+    def model(self):
+        return coptVrpRCIModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+
+    def test_num_cost(self, model):
+        assert model.num_cost == _VRP_NUM_EDGES
+
+    def test_setObj_and_solve(self, model):
+        model.setObj(_VRP_COST)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_getTour_depot_anchored(self, model):
+        model.setObj(_VRP_COST)
+        sol, _ = model.solve()
+        tours = model.getTour(sol)
+        assert all(t[0] == 0 and t[-1] == 0 for t in tours)
+
+
+# ============================================================
+# CVRP: COPT MTZ
+# ============================================================
+
+@requires_copt
+class TestCoptVrpMTZModel:
+
+    @pytest.fixture
+    def model(self):
+        return coptVrpMTZModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+
+    def test_setObj_and_solve(self, model):
+        model.setObj(_VRP_COST)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_relax_is_lp(self, model):
+        rel = model.relax()
+        assert isinstance(rel, coptVrpMTZModelRel)
+        rel.setObj(_VRP_COST)
+        _, obj_rel = rel.solve()
+        model.setObj(_VRP_COST)
+        _, obj_int = model.solve()
+        assert obj_rel <= obj_int + 1e-6
+
+
+# ============================================================
+# CVRP: Pyomo MTZ (no RCI: Pyomo lacks lazy callbacks)
+# ============================================================
+
+@requires_pyomo
+class TestOmoVrpMTZModel:
+
+    @pytest.fixture
+    def model(self):
+        return omoVrpMTZModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+            solver="gurobi",
+        )
+
+    def test_setObj_and_solve(self, model):
+        model.setObj(_VRP_COST)
+        sol, obj = model.solve()
+        sol = np.array(sol)
+        assert np.allclose(sol, np.round(sol), atol=1e-6)
+
+    def test_relax_is_lp(self, model):
+        rel = model.relax()
+        assert isinstance(rel, omoVrpMTZModelRel)
+        rel.setObj(_VRP_COST)
+        _, obj_rel = rel.solve()
+        model.setObj(_VRP_COST)
+        _, obj_int = model.solve()
+        assert obj_rel <= obj_int + 1e-6
+
+
+# ============================================================
+# CVRP: Cross-backend consistency (grb / copt / omo)
+# ============================================================
+
+@pytest.mark.skipif(not (_HAS_GUROBI and _HAS_COPT), reason="Gurobi or COPT not installed")
+class TestVrpCrossBackendCopt:
+
+    def test_mtz_grb_vs_copt(self):
+        grb = vrpMTZModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+        grb.setObj(_VRP_COST)
+        _, obj_grb = grb.solve()
+        copt = coptVrpMTZModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+        copt.setObj(_VRP_COST)
+        _, obj_copt = copt.solve()
+        np.testing.assert_allclose(obj_grb, obj_copt, atol=1e-4)
+
+
+@requires_pyomo
+class TestVrpCrossBackendOmo:
+
+    def test_mtz_grb_vs_omo(self):
+        grb = vrpMTZModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+        )
+        grb.setObj(_VRP_COST)
+        _, obj_grb = grb.solve()
+        omo = omoVrpMTZModel(
+            num_nodes=_VRP_NUM_NODES, demands=_VRP_DEMANDS,
+            capacity=_VRP_CAPACITY, num_vehicle=_VRP_NUM_VEHICLES,
+            solver="gurobi",
+        )
+        omo.setObj(_VRP_COST)
+        _, obj_omo = omo.solve()
+        np.testing.assert_allclose(obj_grb, obj_omo, atol=1e-4)

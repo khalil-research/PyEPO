@@ -10,7 +10,20 @@ import torch
 from unittest.mock import MagicMock, patch
 
 from pyepo.data import knapsack, shortestpath, tsp, portfolio
-from pyepo.data.dataset import optDataset, optDatasetKNN
+from pyepo.data.dataset import (
+    optDataset, optDatasetKNN, optDatasetConstrs, collate_tight_constraints,
+)
+
+try:
+    from pyepo.model.grb.shortestpath import shortestPathModel
+    from pyepo.model.grb.tsp import tspDFJModel
+    # verify Gurobi actually works (import succeeds even without a valid license)
+    shortestPathModel(grid=(3, 3))
+    _HAS_GUROBI = True
+except (ImportError, NameError, Exception):
+    _HAS_GUROBI = False
+
+requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
 
 
 # ============================================================
@@ -292,3 +305,71 @@ class TestOptDatasetKNN:
         result1 = ds._getKNN()
         result2 = ds._getKNN()
         np.testing.assert_array_equal(result1, result2)
+
+
+# ============================================================
+# optDatasetConstrs (CaVE binding-constraint dataset)
+# ============================================================
+
+@requires_gurobi
+class TestOptDatasetConstrs:
+    """Covers the binary-vertex guard and binding-constraint extraction."""
+
+    def test_rejects_non_optmodel(self):
+        x = np.random.randn(5, 3).astype(np.float32)
+        c = np.random.randn(5, 12).astype(np.float32)
+        with pytest.raises(TypeError):
+            optDatasetConstrs("not_a_model", x, c)
+
+    def test_rejects_non_binary_vertex(self):
+        # shortestPath LP gives binary sols, but use a portfolio-style continuous
+        # problem to trigger the binary-vertex check. Simpler: monkeypatch solve
+        # to return a fractional vertex on the shortestPathModel.
+        model = shortestPathModel(grid=(3, 3))
+        num_cost = model.num_cost
+        # override solve to return a fractional vertex
+        def fake_solve():
+            return np.full(num_cost, 0.5, dtype=np.float64), 0.0
+        # patch the copy() returned model so each instance sees the fake
+        original_copy = model.copy
+        def patched_copy():
+            m = original_copy()
+            m.solve = fake_solve
+            # bypass infeasibility check by stubbing optimize status
+            m._model.optimize = lambda *a, **kw: None
+            m._model.Status = 2  # GRB.OPTIMAL
+            return m
+        model.copy = patched_copy
+        x = np.random.randn(2, 3).astype(np.float32)
+        c = np.random.randn(2, num_cost).astype(np.float32)
+        with pytest.raises(ValueError, match="binary"):
+            optDatasetConstrs(model, x, c)
+
+    def test_construct_with_shortestpath(self):
+        # shortest-path is a BLP with binary vertices: should construct cleanly
+        model = shortestPathModel(grid=(3, 3))
+        x, c = shortestpath.genData(num_data=4, num_features=3, grid=(3, 3), seed=42)
+        ds = optDatasetConstrs(model, x, c)
+        assert len(ds) == 4
+        # each instance carries a tight-constraint matrix
+        assert len(ds.ctrs) == 4
+        for ctrs_i in ds.ctrs:
+            assert ctrs_i.shape[1] == model.num_cost
+
+    def test_collate_pads_to_max_rows(self):
+        # craft a tiny batch with ragged ctrs shapes
+        x = torch.randn(2, 3)
+        c = torch.randn(2, 4)
+        w = torch.randn(2, 4)
+        z = torch.randn(2, 1)
+        ctrs0 = torch.randn(2, 4)
+        ctrs1 = torch.randn(5, 4)
+        batch = [
+            (x[0], c[0], w[0], z[0], ctrs0),
+            (x[1], c[1], w[1], z[1], ctrs1),
+        ]
+        feats, costs, sols, objs, padded = collate_tight_constraints(batch)
+        # pad_sequence stacks to (B, max_rows, num_cost)
+        assert padded.shape == (2, 5, 4)
+        # short row is zero-padded at the tail
+        assert torch.allclose(padded[0, 2:], torch.zeros(3, 4))
