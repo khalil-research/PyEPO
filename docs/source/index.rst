@@ -11,38 +11,44 @@ Welcome to PyEPO's documentation!
 This is the documentation of ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool), which aims to provide end-to-end methods for predict-then-optimize tasks.
 
 
-Sample Code
-+++++++++++
+Quick Example
++++++++++++++
+
+End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ loss:
 
 .. code-block:: python
 
-   import random
-
    import pyepo
-   import gurobipy as gp
-   from gurobipy import GRB
+   import torch
+   from torch import nn
+   from torch.utils.data import DataLoader
 
-   from pyepo.model.grb import optGrbModel
+   # optimization model: 5x5 grid shortest path
+   grid = (5, 5)
+   optmodel = pyepo.model.grb.shortestPathModel(grid)
 
-   class myModel(optGrbModel):
+   # synthetic data and dataset
+   x, c = pyepo.data.shortestpath.genData(
+       num_data=1000, num_features=5, grid=grid, deg=4, noise_width=0.5, seed=135,
+   )
+   dataset = pyepo.data.dataset.optDataset(optmodel, x, c)
+   dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-       def _getModel(self):
-           # create a model
-           m = gp.Model()
-           # variables
-           x = m.addVars(5, name="x", vtype=GRB.BINARY)
-           # model sense
-           m.modelSense = GRB.MAXIMIZE
-           # constraints
-           m.addConstr(3 * x[0] + 4 * x[1] + 3 * x[2] + 6 * x[3] + 4 * x[4] <= 12)
-           m.addConstr(4 * x[0] + 5 * x[1] + 2 * x[2] + 3 * x[3] + 5 * x[4] <= 10)
-           m.addConstr(5 * x[0] + 4 * x[1] + 6 * x[2] + 2 * x[3] + 3 * x[4] <= 15)
-           return m, x
-
-   # set optimization model
-   optmodel = myModel()
-   # init SPO+ loss
+   # linear predictor and SPO+ loss
+   predmodel = nn.Linear(5, 40)
    spo = pyepo.func.SPOPlus(optmodel, processes=1)
+   optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
+
+   # end-to-end training
+   for epoch in range(10):
+       for xb, cb, wb, zb in dataloader:
+           loss = spo(predmodel(xb), cb, wb, zb)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
+   # decision quality
+   print("Regret:", pyepo.metric.regret(predmodel, optmodel, dataloader))
 
 
 .. toctree::

@@ -17,7 +17,13 @@ For training-loop templates, see :doc:`training`.
 Choosing a Method
 =================
 
-The right method depends on three questions.
+**Strong defaults (when in doubt)**
+
+* When :math:`\mathbf{w}^*` labels are available, start with **SPO+**: convex, has a nonzero subgradient, and is well-studied as a baseline.
+* When the loss-returning style is preferred and labels include :math:`\mathbf{w}^*`, **PFYL** avoids the extra task loss.
+* For very large LPs on GPU, combine **MPAX** models with **SPO+** or **PFYL**.
+
+For finer choices, the right method depends on three questions.
 
 **1. What supervision do you have at training time?**
 
@@ -37,12 +43,6 @@ The right method depends on three questions.
 * **Large LP on GPU** — pair an ``optMpaxModel`` with SPO+ or PFYL.
 * **Cached negative pool** — NCE / CMAP.
 * **Ranking interpretation** — LTR variants.
-
-**Strong defaults**
-
-* When :math:`\mathbf{w}^*` labels are available, start with **SPO+**: convex, has a nonzero subgradient, and is well-studied as a baseline.
-* When the loss-returning style is preferred and labels include :math:`\mathbf{w}^*`, **PFYL** avoids the extra task loss.
-* For very large LPs on GPU, combine **MPAX** models with **SPO+** or **PFYL**.
 
 The table below summarizes inputs and return types.
 
