@@ -5,7 +5,7 @@ Cone-aligned vector estimation (CaVE) loss for binary linear programs
 
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -142,15 +142,15 @@ def _average_ctrs(tight_ctrs: torch.Tensor) -> torch.Tensor:
     # average over valid rows
     n_valid = valid.sum(dim=1).clamp(min=1.0)
     return unit.sum(dim=1) / n_valid
-    
 
-@lru_cache(maxsize=None)
+
+@cache
 def _neg_eye_csc(m: int):
     """Cached ``-I`` (CSC). Encodes ``lam >= 0`` as Clarabel ``A lam + s = b, s in cone`` with ``A = -I``, ``b = 0``."""
     return (-sparse.eye(m, format="csc")).tocsc()
 
 
-@lru_cache(maxsize=None)
+@cache
 def _clarabel_settings(max_iter: int):
     """Cached Clarabel settings; treat as immutable across calls."""
     s = clarabel.DefaultSettings()
