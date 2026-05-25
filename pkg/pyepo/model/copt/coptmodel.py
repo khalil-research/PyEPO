@@ -48,10 +48,18 @@ def _get_envr():
 
 class optCoptModel(optModel):
     """
-    This is an abstract class for a Cardinal Optimizer optimization model
+    Abstract base class for Cardinal Optimizer (COPT) backed models.
+
+    Subclasses implement ``_getModel`` to build a COPT ``Model`` and return
+    ``(model, variables)``. The objective sense is auto-detected from the
+    underlying COPT model (no need to set ``modelSense`` manually); solver
+    logging is silenced by default. Cost-vector updates use the C-level
+    ``setInfo("Obj", ...)`` batch path for efficiency. A process-local COPT
+    ``Envr`` singleton is reused across instances to avoid re-booting the
+    license and worker threads on every model build.
 
     Attributes:
-        _model (COPT model): COPT model
+        _model (coptpy.Model): underlying COPT model
     """
 
     def __init__(self) -> None:

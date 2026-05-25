@@ -21,15 +21,20 @@ if TYPE_CHECKING:
 
 class noiseContrastiveEstimation(optModule):
     """
-    An autograd module for noise contrastive estimation as surrogate loss
-    functions, based on viewing suboptimal solutions as negative examples.
+    Noise Contrastive Estimation (NCE) -- contrastive loss against a cached solution pool.
 
-    The cost vector needs to be predicted from contextual data and
-    maximizes the separation of the probability of the optimal solution.
+    Averages the predicted-cost margin between the true optimum and every
+    member of the cached pool :math:`\\Gamma`:
+    :math:`\\mathcal{L} = \\tfrac{1}{|\\Gamma|}\\sum_{\\mathbf{w} \\in \\Gamma}
+    (\\hat{\\mathbf{c}}^\\top \\mathbf{w}^*(\\mathbf{c}) -
+    \\hat{\\mathbf{c}}^\\top \\mathbf{w})`. The gradient has a closed form
+    (no solver call in the backward pass), so per-step cost is dominated by
+    occasional pool refreshes rather than by solver work. Pass
+    ``solve_ratio < 1`` to control refresh frequency; the pool is seeded
+    from ``dataset`` at construction.
 
-    This allows us to design an algorithm based on stochastic gradient descent.
-
-    Reference: <https://www.ijcai.org/proceedings/2021/390>
+    Reference: Mulamba et al. (2021)
+    `<https://www.ijcai.org/proceedings/2021/390>`_
     """
 
     def __init__(
@@ -43,10 +48,10 @@ class noiseContrastiveEstimation(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            reduction: the reduction to apply to the output
-            dataset: the training data, usually this is simply the training set
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: probability of refreshing the pool each batch (1.0 = always solve)
+            reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
+            dataset: training dataset used to seed the solution pool (required)
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 
@@ -82,15 +87,17 @@ class noiseContrastiveEstimation(optModule):
 
 class contrastiveMAP(optModule):
     """
-    An autograd module for Maximum A Posterior contrastive estimation as
-    surrogate loss functions, which is an efficient self-contrastive algorithm.
+    Contrastive Maximum-a-Posteriori (CMAP) -- max-margin special case of NCE.
 
-    For the MAP, the cost vector needs to be predicted from contextual data and
-    maximizes the separation of the probability of the optimal solution.
+    Keeps only the most-violating member of the cached pool :math:`\\Gamma`
+    (the one with the smallest predicted-cost objective) as the negative:
+    :math:`\\mathcal{L} = \\hat{\\mathbf{c}}^\\top \\mathbf{w}^*(\\mathbf{c}) -
+    \\min_{\\mathbf{w} \\in \\Gamma} \\hat{\\mathbf{c}}^\\top \\mathbf{w}`.
+    Simpler than NCE and often equally effective. Pool semantics
+    (``solve_ratio``, ``dataset``) are identical to NCE.
 
-    Thus, it allows us to design an algorithm based on stochastic gradient descent.
-
-    Reference: <https://www.ijcai.org/proceedings/2021/390>
+    Reference: Mulamba et al. (2021)
+    `<https://www.ijcai.org/proceedings/2021/390>`_
     """
 
     def __init__(
@@ -104,10 +111,10 @@ class contrastiveMAP(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            reduction: the reduction to apply to the output
-            dataset: the training data, usually this is simply the training set
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: probability of refreshing the pool each batch (1.0 = always solve)
+            reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
+            dataset: training dataset used to seed the solution pool (required)
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, require_solpool=True)
 

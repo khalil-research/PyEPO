@@ -28,17 +28,25 @@ if TYPE_CHECKING:
 
 class optOrtModel(optModel):
     """
-    This is an abstract class for an OR-Tools pywraplp optimization model
+    Abstract base class for OR-Tools pywraplp (LP/MIP) models.
+
+    Subclasses implement ``_getModel`` to build a ``pywraplp.Solver`` and
+    return ``(model, variables)``. Unlike ``optGrbModel``, the objective
+    sense is **not** detected automatically -- set ``self.modelSense =
+    EPO.MAXIMIZE`` in ``_getModel`` for maximization problems (default is
+    minimization). Solver output is silenced by default. The backend solver
+    is selected at construction time via the ``solver`` argument (e.g.,
+    ``"scip"``, ``"glop"``, ``"cbc"``).
 
     Attributes:
-        _model (pywraplp.Solver): OR-Tools linear solver
-        solver (str): solver backend (e.g. "scip", "glop", "cbc")
+        _model (pywraplp.Solver): underlying OR-Tools linear solver
+        solver (str): pywraplp backend name
     """
 
     def __init__(self, solver: str = "scip") -> None:
         """
         Args:
-            solver: solver backend for pywraplp
+            solver: pywraplp backend (e.g. ``"scip"``, ``"glop"``, ``"cbc"``)
         """
         if not _HAS_ORTOOLS:
             raise ImportError(

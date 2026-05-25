@@ -29,17 +29,28 @@ if TYPE_CHECKING:
 
 class optOmoModel(optModel):
     """
-    This is an abstract class for a Pyomo-based optimization model
+    Abstract base class for Pyomo-backed optimization models.
+
+    Subclasses implement ``_getModel`` to build a Pyomo ``ConcreteModel``
+    and return ``(model, variables)``. Unlike ``optGrbModel``, the objective
+    sense is **not** detected automatically -- set ``self.modelSense =
+    EPO.MAXIMIZE`` in ``_getModel`` for maximization problems (default is
+    minimization). The cost vector is wired into the model as a mutable
+    ``Param`` so that ``setObj`` only updates parameter values rather than
+    rebuilding the objective expression.
+
+    Any solver supported by Pyomo can be plugged in via the ``solver``
+    argument (e.g., ``"glpk"``, ``"gurobi"``, ``"cbc"``).
 
     Attributes:
-        _model (Pyomo model): Pyomo model
-        solver (str): optimization solver in the background
+        _model (pyomo.ConcreteModel): underlying Pyomo model
+        solver (str): name of the Pyomo solver backend
     """
 
     def __init__(self, solver: str = "glpk") -> None:
         """
         Args:
-            solver: optimization solver in the background
+            solver: name of the Pyomo solver backend (e.g. ``"glpk"``, ``"gurobi"``)
         """
         # error
         if not _HAS_PYOMO:

@@ -31,16 +31,22 @@ if TYPE_CHECKING:
 
 class perturbedOpt(optModule):
     """
-    A differentiable perturbed optimizer that estimates the expected solution
-    by solving randomly perturbed cost vectors.
+    Differentiable Perturbed Optimizer (DPO) -- additive-Gaussian variant.
 
-    For the perturbed optimizer, the cost vector is predicted from contextual
-    data and perturbed with Gaussian noise.
+    Estimates the **expected solution**
+    :math:`\\mathbb{E}_{\\boldsymbol{\\xi}}[\\mathbf{w}^*(\\hat{\\mathbf{c}} +
+    \\sigma\\boldsymbol{\\xi})]` by Monte Carlo averaging over
+    ``n_samples`` Gaussian perturbations of the predicted cost vector. The
+    smoothed map varies continuously with :math:`\\hat{\\mathbf{c}}` -- small
+    perturbations only re-weight the distribution over active vertices --
+    giving an informative gradient where the bare LP solver gives zero.
 
-    The custom backward pass provides a Monte Carlo gradient estimator for
-    stochastic gradient descent.
+    Returns a solution, not a loss: the user supplies a task loss (MSE
+    against :math:`\\mathbf{w}^*(\\mathbf{c})` is the standard choice).
+    For sign-sensitive oracles, use ``perturbedOptMul`` instead.
 
-    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
+    Reference: Berthet et al. (2020)
+    `<https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>`_
     """
 
     def __init__(
@@ -57,13 +63,13 @@ class perturbedOpt(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            n_samples: number of Monte Carlo samples
-            sigma: the amplitude of the perturbation
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            seed: random seed
-            variance_reduction: use a leave-one-out baseline for the Monte Carlo backward estimator
-            solve_ratio: the ratio of new solutions computed during training
-            dataset: the training data
+            n_samples: number of Monte Carlo perturbation samples per instance
+            sigma: perturbation amplitude (Gaussian standard deviation)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            seed: random seed for the perturbation generator
+            variance_reduction: apply a leave-one-out baseline to the backward estimator
+            solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
+            dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset, seed=seed)
         # number of samples
@@ -155,15 +161,17 @@ class perturbedOptFunc(Function):
 
 class perturbedOptMul(perturbedOpt):
     """
-    Multiplicative-perturbation variant of perturbedOpt.
+    Multiplicative-perturbation variant of ``perturbedOpt`` for sign-sensitive oracles.
 
-    The perturbation ``cp * exp(sigma * noise - sigma**2 / 2)`` preserves the
-    sign of each cost entry, which is useful for sign-sensitive oracles.
-    This estimator assumes predicted costs already have the intended nonzero
-    sign. For nonnegative-cost problems, use a positive-output prediction layer,
-    such as Softplus plus a small epsilon.
+    Replaces additive noise with the multiplicative perturbation
+    :math:`\\hat{\\mathbf{c}} \\odot \\exp(\\sigma\\boldsymbol{\\xi} -
+    \\tfrac{1}{2}\\sigma^2)`, which preserves the sign of each cost entry --
+    required when the solver expects, e.g., strictly nonnegative edge costs.
+    Predicted costs must already carry the intended nonzero sign; for
+    nonnegative problems pair this module with a positive-output prediction
+    layer (e.g. ``nn.Softplus()`` plus a small epsilon).
 
-    Reference: <https://arxiv.org/abs/2207.13513>
+    Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
@@ -182,15 +190,19 @@ class perturbedOptMul(perturbedOpt):
 
 class perturbedFenchelYoung(optModule):
     """
-    A perturbed Fenchel-Young loss using Monte Carlo perturbations.
+    Perturbed Fenchel-Young loss (PFYL) -- additive-Gaussian variant.
 
-    The cost vector is predicted from contextual data and perturbed with
-    Gaussian noise.
+    Pairs the same Monte-Carlo expected perturbed solution as ``perturbedOpt``
+    with the Fenchel-Young loss against the true optimum
+    :math:`\\mathbf{w}^*(\\mathbf{c})`, returning a scalar loss directly --
+    no user-defined task loss needed. The gradient collapses to the simple
+    residual :math:`\\mathbf{w}^*(\\mathbf{c}) - \\mathbb{E}_{\\boldsymbol{\\xi}}
+    [\\mathbf{w}^*(\\hat{\\mathbf{c}} + \\sigma\\boldsymbol{\\xi})]`, so no
+    explicit Jacobian through the solver is required. For sign-sensitive
+    oracles, use ``perturbedFenchelYoungMul``.
 
-    This loss directly compares the expected perturbed solution with the true
-    optimal solution, avoiding the extra task loss needed by perturbedOpt.
-
-    Reference: <https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>
+    Reference: Berthet et al. (2020)
+    `<https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>`_
     """
 
     def __init__(
@@ -207,13 +219,13 @@ class perturbedFenchelYoung(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            n_samples: number of Monte Carlo samples
-            sigma: the amplitude of the perturbation
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            seed: random seed
-            solve_ratio: the ratio of new solutions computed during training
-            reduction: the reduction to apply to the output
-            dataset: the training data
+            n_samples: number of Monte Carlo perturbation samples per instance
+            sigma: perturbation amplitude (Gaussian standard deviation)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            seed: random seed for the perturbation generator
+            solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
+            reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
+            dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, seed=seed)
         # number of samples
@@ -313,13 +325,16 @@ class perturbedFenchelYoungFunc(Function):
 
 class perturbedFenchelYoungMul(perturbedFenchelYoung):
     """
-    Multiplicative-perturbation variant of perturbedFenchelYoung.
+    Multiplicative-perturbation variant of ``perturbedFenchelYoung`` for sign-sensitive oracles.
 
-    This variant preserves the sign of each predicted cost entry. It assumes
-    predicted costs already have the intended nonzero sign; for nonnegative-cost
-    problems, use a positive-output prediction layer.
+    Uses the same sign-preserving multiplicative perturbation
+    :math:`\\hat{\\mathbf{c}} \\odot \\exp(\\sigma\\boldsymbol{\\xi} -
+    \\tfrac{1}{2}\\sigma^2)` as ``perturbedOptMul``. Predicted costs must
+    carry the intended nonzero sign; for nonnegative problems pair this
+    module with a positive-output prediction layer (e.g. ``nn.Softplus()``
+    plus a small epsilon).
 
-    Reference: <https://arxiv.org/abs/2207.13513>
+    Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
@@ -338,18 +353,21 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
 
 class implicitMLE(optModule):
     """
-    An autograd module for Implicit Maximum Likelihood Estimator, which yields
-    an optimal solution in a constrained exponential family distribution via
-    Perturb-and-MAP.
+    Implicit Maximum Likelihood Estimator (I-MLE) via perturb-and-MAP.
 
-    For I-MLE, it works as black-box combinatorial solvers, in which constraints
-    are known and fixed, but the cost vector needs to be predicted from
-    contextual data.
+    Frames decision-focused learning as imitation: an upstream task gradient
+    :math:`\\mathbf{d}` induces a virtual update
+    :math:`\\hat{\\mathbf{c}}' = \\hat{\\mathbf{c}} + \\lambda \\mathbf{d}`,
+    and the gradient is estimated by a directional finite difference between
+    smoothed solutions at :math:`\\hat{\\mathbf{c}}'` and :math:`\\hat{\\mathbf{c}}`,
+    sharing the same Sum-of-Gamma noise realization across the two evaluations
+    to reduce variance.
 
-    The I-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
-    design an algorithm based on stochastic gradient descent.
+    Returns the (perturbation-smoothed) predicted solution; the user supplies
+    a task loss (L1 against :math:`\\mathbf{w}^*(\\mathbf{c})` is standard).
 
-    Reference: <https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>
+    Reference: Niepert, Minervini & Franceschi (2021)
+    `<https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>`_
     """
 
     def __init__(
@@ -367,14 +385,14 @@ class implicitMLE(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            n_samples: number of Monte Carlo samples
-            sigma: noise temperature for the input distribution
-            lambd: a hyperparameter for differentiable black-box to control interpolation degree
-            distribution: noise distribution
-            two_sides: approximate gradient by two-sided perturbation or not
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            dataset: the training data
+            n_samples: number of Monte Carlo perturbation samples per instance
+            sigma: noise temperature (perturbation amplitude)
+            lambd: finite-difference step for the directional gradient estimator
+            distribution: noise distribution (defaults to ``sumGammaDistribution(kappa=5)``)
+            two_sides: use central differencing instead of backward
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
+            dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
@@ -470,18 +488,18 @@ class implicitMLEFunc(Function):
 
 class adaptiveImplicitMLE(optModule):
     """
-    An autograd module for Adaptive Implicit Maximum Likelihood Estimator, which
-    adaptively chooses hyperparameter λ and yields an optimal solution in a
-    constrained exponential family distribution via Perturb-and-MAP.
+    Adaptive Implicit MLE (AI-MLE): I-MLE with an adaptive interpolation step.
 
-    For AI-MLE, it works as black-box combinatorial solvers, in which constraints
-    are known and fixed, but the cost vector needs to be predicted from
-    contextual data.
+    Replaces I-MLE's fixed finite-difference step :math:`\\lambda` with the
+    data-dependent choice :math:`\\lambda_t = \\alpha_t \\cdot \\|\\hat{\\mathbf{c}}\\|
+    / \\|\\mathbf{d}\\|`, where the magnitude :math:`\\alpha_t` is tuned online
+    from a moving average of gradient sparsity. The rescaling keeps the
+    perturbation commensurate with :math:`\\hat{\\mathbf{c}}` and removes the
+    need to tune :math:`\\lambda` by hand, while the rest of the forward /
+    backward path is identical to ``implicitMLE``.
 
-    The AI-MLE approximates the gradient of the optimizer smoothly. Thus, it allows us to
-    design an algorithm based on stochastic gradient descent.
-
-    Reference: <https://ojs.aaai.org/index.php/AAAI/article/view/26103>
+    Reference: Minervini, Franceschi & Niepert (2023)
+    `<https://ojs.aaai.org/index.php/AAAI/article/view/26103>`_
     """
 
     def __init__(
@@ -498,13 +516,13 @@ class adaptiveImplicitMLE(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            n_samples: number of Monte Carlo samples
-            sigma: noise temperature for the input distribution
-            distribution: noise distribution
-            two_sides: approximate gradient by two-sided perturbation or not
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            dataset: the training data
+            n_samples: number of Monte Carlo perturbation samples per instance
+            sigma: noise temperature (perturbation amplitude)
+            distribution: noise distribution (defaults to ``sumGammaDistribution(kappa=5)``)
+            two_sides: use central differencing instead of backward
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
+            dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples

@@ -30,10 +30,15 @@ if TYPE_CHECKING:
 
 class optMpaxModel(optModel):
     """
-    This is an abstract class for an MPAX-based optimization model.
+    Abstract base class for MPAX-backed (JAX) linear-program models.
 
-    Concrete subclasses populate the constraint matrices and bounds inside
-    ``_getModel``:
+    MPAX is a JAX implementation of the PDHG (Primal-Dual Hybrid Gradient)
+    first-order LP solver, designed for large-scale linear programs that
+    benefit from GPU acceleration and vmap-batched solving. Unlike the
+    Gurobi / COPT / Pyomo / OR-Tools backends, an MPAX model has **no
+    explicit solver model object** -- the constraint matrices and bounds
+    *are* the model. Subclasses populate them inside ``_getModel`` and
+    return ``(None, [])``::
 
         def _getModel(self):
             self.A = jnp.array(...)   # equality A x = b
@@ -44,19 +49,23 @@ class optMpaxModel(optModel):
             self.u = jnp.array(...)   # variable upper bound
             return None, []
 
-    Sense (MIN / MAX) follows ``self.modelSense`` (set by a problem-level base
-    such as ``knapsackBase`` before this ``__init__`` runs; defaults to MIN).
-    Sparse-matrix format can be toggled by overriding the class attribute
-    ``use_sparse_matrix`` on the concrete subclass.
+    Objective sense follows ``self.modelSense`` (set by a problem-level base
+    such as ``knapsackBase`` or directly in ``_getModel``; defaults to
+    minimization). Dense vs sparse matrices can be toggled by overriding the
+    class attribute ``use_sparse_matrix`` (default ``True``).
+
+    A jitted single-instance solver and a ``vmap``-batched solver
+    (``batch_optimize``) are pre-compiled on construction, so
+    ``optDataset`` can solve every training instance in a single dispatch.
 
     Attributes:
-        A (jnp.ndarray): The matrix of equality constraints.
-        b (jnp.ndarray): The right hand side of equality constraints.
-        G (jnp.ndarray): The matrix for inequality constraints.
-        h (jnp.ndarray): The right hand side of inequality constraints.
-        l (jnp.ndarray): The lower bound of the variables.
-        u (jnp.ndarray): The upper bound of the variables.
-        use_sparse_matrix (bool): Whether to use sparse matrix format.
+        A (jnp.ndarray): equality-constraint matrix (Ax = b)
+        b (jnp.ndarray): equality-constraint right-hand side
+        G (jnp.ndarray): inequality-constraint matrix (Gx >= h)
+        h (jnp.ndarray): inequality-constraint right-hand side
+        l (jnp.ndarray): variable lower bounds
+        u (jnp.ndarray): variable upper bounds
+        use_sparse_matrix (bool): whether to use sparse matrices
     """
 
     use_sparse_matrix: bool = True

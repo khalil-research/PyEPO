@@ -27,15 +27,25 @@ def regret(
     dataloader: DataLoader,
 ) -> float:
     """
-    A function to evaluate model performance with normalized true regret
+    Normalized true regret (SPO loss) of a trained predictor.
+
+    Solves the optimization problem on the predicted cost vector
+    :math:`\\hat{\\mathbf{c}}`, then measures the excess true objective
+    incurred by that decision:
+    :math:`\\sum_i (\\mathbf{c}_i^\\top \\mathbf{w}^*(\\hat{\\mathbf{c}}_i) -
+    z^*(\\mathbf{c}_i)) / \\sum_i |z^*(\\mathbf{c}_i)|`. The result is
+    dimensionless and comparable across problem scales. The predictor is
+    automatically put into ``eval()`` for the call and restored to
+    ``train()`` afterwards.
 
     Args:
         predmodel: a regression neural network for cost prediction
         optmodel: a PyEPO optimization model
-        dataloader: Torch dataloader from optDataSet
+        dataloader: PyTorch DataLoader over an ``optDataset`` (yielding
+            ``(x, c, w, z)`` tuples)
 
     Returns:
-        float: true regret loss
+        float: normalized true regret
     """
     # evaluate
     predmodel.eval()

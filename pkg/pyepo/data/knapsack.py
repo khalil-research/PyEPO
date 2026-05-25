@@ -18,15 +18,22 @@ def genData(
     seed: int = 135,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    A function to generate synthetic data and features for knapsack
+    Generate synthetic feature-cost pairs for the multi-dimensional knapsack.
+
+    Item weights are fixed across instances; only the value (cost) of each
+    item depends on features. Features are sampled from a standard Gaussian
+    :math:`\\mathcal{N}(0, \\mathbf{I})`, mapped through a random Bernoulli(0.5)
+    matrix :math:`\\mathcal{B}` and a polynomial of degree ``deg``, then
+    scaled by multiplicative uniform noise of half-width ``noise_width`` and
+    rounded up to the nearest integer.
 
     Args:
         num_data: number of data points
         num_features: dimension of features
         num_items: number of items
         dim: dimension of multi-dimensional knapsack
-        deg: data polynomial degree
-        noise_width: half width of data random noise
+        deg: polynomial degree of the feature-to-cost mapping
+        noise_width: half-width of the multiplicative uniform noise
         seed: random state seed (default 135 for reproducibility)
 
     Returns:

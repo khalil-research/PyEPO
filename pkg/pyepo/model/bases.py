@@ -32,15 +32,21 @@ class shortestPathBase(optModel):
     """
     Problem-level base for grid shortest path.
 
+    Finds the minimum-cost path from the northwest corner to the southeast
+    corner of an ``(h, w)`` grid network. The problem is formulated as a
+    minimum-cost flow LP with arc-incidence equality constraints; arcs are
+    enumerated automatically from the grid dimensions and stored on
+    ``self.arcs``.
+
     Attributes:
         grid (tuple of int): grid dimensions (rows, cols)
-        arcs (list): list of (source, target) arcs in the grid
+        arcs (list): ordered list of (source, target) arcs in the grid
     """
 
     def __init__(self, grid: tuple[int, int], *args, **kwargs) -> None:
         """
         Args:
-            grid: grid dimensions (rows, cols)
+            grid: grid dimensions ``(rows, cols)``
         """
         self.grid = grid
         self.arcs = _get_grid_arcs(grid)
@@ -53,12 +59,18 @@ class shortestPathBase(optModel):
 
 class knapsackBase(optModel):
     """
-    Problem-level base for multi-dim knapsack.
+    Problem-level base for the multi-dimensional knapsack.
+
+    Selects a subset of items that maximizes total value subject to
+    per-resource capacity constraints. Items, dimensions, and capacities are
+    inferred from the shapes of ``weights`` and ``capacity``: ``weights``
+    has shape ``(dim, n_items)`` and ``capacity`` has length ``dim``. Item
+    values are the predicted cost coefficients ``c`` set via ``setObj``.
 
     Attributes:
-        weights (np.ndarray): item weights, shape (dim, n_items)
-        capacity (np.ndarray): per-dimension capacity
-        items (list): item indices
+        weights (np.ndarray): item weights, shape ``(dim, n_items)``
+        capacity (np.ndarray): per-dimension capacity, shape ``(dim,)``
+        items (list): item indices ``0 .. n_items - 1``
     """
 
     modelSense = EPO.MAXIMIZE
@@ -72,8 +84,8 @@ class knapsackBase(optModel):
     ) -> None:
         """
         Args:
-            weights: weights of items
-            capacity: total capacity
+            weights: item weights with shape ``(dim, n_items)``
+            capacity: per-dimension capacity with length ``dim``
         """
         self.weights = np.asarray(weights)
         self.capacity = np.asarray(capacity)
@@ -87,12 +99,20 @@ class knapsackBase(optModel):
 
 class portfolioBase(optModel):
     """
-    Problem-level base for Markowitz portfolio.
+    Problem-level base for Markowitz mean-variance portfolio optimization.
+
+    Allocates a unit budget across ``num_assets`` to maximize predicted
+    expected return subject to a quadratic risk budget
+    :math:`\\mathbf{x}^\\top \\boldsymbol{\\Sigma} \\mathbf{x} \\le \\gamma\\,
+    \\overline{\\boldsymbol{\\Sigma}}`, where :math:`\\overline{\\boldsymbol{\\Sigma}}`
+    is the mean covariance entry. Predicted asset returns are the cost
+    coefficients ``c`` set via ``setObj``; the covariance and risk budget
+    are fixed across instances.
 
     Attributes:
         num_assets (int): number of assets
-        covariance (np.ndarray): asset return covariance matrix
-        risk_level (float): risk budget = gamma * mean(covariance)
+        covariance (np.ndarray): asset-return covariance matrix
+        risk_level (float): risk budget = ``gamma * mean(covariance)``
     """
 
     modelSense = EPO.MAXIMIZE
@@ -108,8 +128,8 @@ class portfolioBase(optModel):
         """
         Args:
             num_assets: number of assets
-            covariance: covariance matrix of the returns
-            gamma: risk level parameter
+            covariance: covariance matrix of the asset returns
+            gamma: risk tolerance multiplier on the mean covariance
         """
         self.num_assets = num_assets
         self.covariance = np.asarray(covariance)
@@ -123,22 +143,34 @@ class portfolioBase(optModel):
 
 class tspABBase(optModel):
     """
-    Problem-level base for TSP (formulation-independent state and helpers).
+    Problem-level base for the symmetric traveling-salesperson problem.
 
-    Concrete formulations (GG, MTZ, DFJ) only need to implement
-    ``_getModel`` (build the solver model) and ``_addExtraConstr``
-    (add a single linear extra constraint to ``self._model``).
+    Finds the shortest tour visiting each of ``num_nodes`` cities exactly
+    once and returning to the origin. Three concrete ILP formulations are
+    supplied per backend:
+
+    * **DFJ** (Dantzig-Fulkerson-Johnson) -- lazy subtour-elimination
+      constraints via solver callbacks (no LP relaxation).
+    * **GG** (Gavish-Graves) -- flow-based formulation with auxiliary
+      flow variables.
+    * **MTZ** (Miller-Tucker-Zemlin) -- compact formulation with per-node
+      potential auxiliaries.
+
+    The base only manages formulation-independent state (nodes, edges,
+    extra-constraint replay) and the ``getTour`` helper. Concrete
+    formulations implement ``_getModel`` (build the solver model) and
+    ``_addExtraConstr`` (add a single linear extra constraint).
 
     Attributes:
         num_nodes (int): number of nodes
-        nodes (list): node indices 0..num_nodes-1
-        edges (list): undirected edges as (i, j) with i < j
+        nodes (list): node indices ``0 .. num_nodes - 1``
+        edges (list): undirected edges as ``(i, j)`` with ``i < j``
     """
 
     def __init__(self, num_nodes: int, *args, **kwargs) -> None:
         """
         Args:
-            num_nodes: number of nodes
+            num_nodes: number of nodes (cities)
         """
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))

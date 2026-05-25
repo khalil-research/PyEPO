@@ -21,10 +21,24 @@ if TYPE_CHECKING:
 
 class optModel(ABC):
     """
-    This is an abstract class for an optimization model
+    Abstract base class for predict-then-optimize models.
+
+    Subclasses wrap an optimization solver or algorithm with a unified
+    ``_getModel`` / ``setObj`` / ``solve`` / ``num_cost`` interface that
+    ``pyepo.func`` modules call during training. Concrete backends are
+    provided for GurobiPy (``optGrbModel``), Pyomo (``optOmoModel``),
+    COPT (``optCoptModel``), OR-Tools (``optOrtModel`` / ``optOrtCpModel``),
+    and MPAX (``optMpaxModel``); subclass ``optModel`` directly to integrate
+    any other solver or algorithm.
+
+    The default objective sense is minimization; set
+    ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for
+    maximization problems (some backends, e.g. Gurobi and COPT, detect this
+    automatically from the underlying solver model).
 
     Attributes:
         _model (optimization model): underlying solver model object
+        modelSense (ModelSense): EPO.MINIMIZE (default) or EPO.MAXIMIZE
     """
 
     modelSense: ModelSense = EPO.MINIMIZE

@@ -23,17 +23,23 @@ if TYPE_CHECKING:
 
 class SPOPlus(optModule):
     """
-    An autograd module for SPO+ Loss, as a surrogate loss function of SPO
-    (regret) Loss, which measures the decision error of the optimization problem.
+    SPO+ loss: a convex surrogate for the SPO regret of a linear-objective LP.
 
-    For SPO/SPO+ Loss, the objective function is linear and constraints are
-    known and fixed, but the cost vector needs to be predicted from contextual
-    data.
+    SPO+ upper-bounds the SPO regret with a convex function of the predicted
+    cost vector and provides an informative subgradient (via Danskin's
+    theorem) for end-to-end training. It is the strong default for
+    predict-then-optimize when true optimal solutions
+    :math:`\\mathbf{w}^*(\\mathbf{c})` are available as supervision.
 
-    The SPO+ Loss is convex with subgradient. Thus, it allows us to design an
-    algorithm based on stochastic gradient descent.
+    The forward pass solves the perturbed problem with cost
+    :math:`2\\hat{\\mathbf{c}} - \\mathbf{c}` once per training instance and
+    returns a scalar loss; the backward pass uses the cached solution to form
+    the subgradient :math:`2(\\mathbf{w}^*(\\mathbf{c}) -
+    \\mathbf{w}^*(2\\hat{\\mathbf{c}} - \\mathbf{c}))` without any extra
+    solver call.
 
-    Reference: <https://doi.org/10.1287/mnsc.2020.3922>
+    Reference: Elmachtoub & Grigas (2022)
+    `<https://doi.org/10.1287/mnsc.2020.3922>`_
     """
 
     def __init__(
@@ -47,10 +53,10 @@ class SPOPlus(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            reduction: the reduction to apply to the output
-            dataset: the training data
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
+            reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
+            dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
 
@@ -137,18 +143,19 @@ class SPOPlusFunc(Function):
 
 class perturbationGradient(optModule):
     """
-    An autograd module for PG Loss, as a surrogate loss function of objective
-    value, which measures the decision quality of the optimization problem.
+    Perturbation Gradient (PG): zeroth-order surrogate of the objective-value loss.
 
-    For PG Loss, the objective function is linear, and constraints are
-    known and fixed, but the cost vector needs to be predicted from contextual
-    data.
+    PG approximates the directional derivative of :math:`z^*(\\hat{\\mathbf{c}})`
+    along the true cost :math:`\\mathbf{c}` with a finite difference, yielding
+    an informative gradient through the otherwise piecewise-constant solver
+    layer. Two variants are exposed via ``two_sides``: backward differencing
+    (``False``, one extra solve per step) and central differencing (``True``,
+    two extra solves but more accurate gradients).
 
-    According to Danskin’s Theorem, the PG Loss is derived from different zeroth
-    order approximations and has the informative gradient. Thus, it allows us to
-    design an algorithm based on stochastic gradient descent.
+    Unlike SPO+, PG does **not** require true optimal solutions -- it only
+    needs the true cost vector :math:`\\mathbf{c}`.
 
-    Reference: <https://arxiv.org/abs/2402.03256>
+    Reference: Gupta & Huang (2024) `<https://arxiv.org/abs/2402.03256>`_
     """
 
     def __init__(
@@ -164,12 +171,12 @@ class perturbationGradient(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            sigma: the amplitude of the finite difference width used for loss approximation
-            two_sides: approximate gradient by two-sided perturbation or not
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            reduction: the reduction to apply to the output
-            dataset: the training data
+            sigma: finite-difference width (perturbation amplitude)
+            two_sides: use central differencing (True) instead of backward (False)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
+            reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
+            dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # finite difference width

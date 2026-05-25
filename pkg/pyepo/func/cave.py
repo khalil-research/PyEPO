@@ -20,20 +20,31 @@ if TYPE_CHECKING:
 
 class coneAlignedCosine(optModule):
     """
-    An autograd module for the CaVE loss for binary linear programs. Projects
-    the sense-flipped predicted cost onto the polyhedral cone spanned by the
-    binding-constraint normals at the optimal vertex via batched dense
-    Nesterov APGD on GPU/CPU, then minimizes ``1 - cos(pred, proj)``.
+    Cone-Aligned Vector Estimation (CaVE) loss for binary linear programs.
 
-    Defaults reproduce the **CaVE+** preset from the paper (truncated APGD,
-    ``max_iters=20``, no convergence check), which lands strictly inside the
-    cone and avoids the boundary-stagnation that pure-exact APGD can hit. To
-    approach the original **CaVE** preset, set a non-trivial tolerance
-    (e.g. ``tol_grad=1e-4``) and remove the iteration cap (``max_iters=None``);
-    in practice this is slower without a regret improvement, so the truncated
-    default is recommended.
+    For each training instance, the sense-flipped predicted cost vector
+    :math:`-\\hat{\\mathbf{c}}` is projected onto the polyhedral cone spanned
+    by the binding-constraint normals at the true optimal vertex; the loss
+    is :math:`1 - \\cos(-\\hat{\\mathbf{c}}, \\mathrm{proj})`. Because the
+    supervision is the cone of binding normals (not the optimal solution
+    itself), CaVE side-steps the zero-gradient pathology of solver layers
+    without requiring a perturbation or solution pool. Defined for
+    **binary linear programs** only.
 
-    Reference: <https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>
+    PyEPO ships a pure-torch APGD (Nesterov-accelerated projected gradient
+    descent) batched cone-projection solver, ``torch.compile``-fused and
+    CUDA-graph friendly. Defaults (``max_iters=20``, ``tol_grad=None``)
+    reproduce the **CaVE+** preset from the paper: a truncated APGD that
+    lands strictly inside the cone and avoids boundary stagnation. To
+    approach the original **CaVE** preset, drop the iteration cap and add
+    a non-trivial tolerance (``max_iters=None, tol_grad=1e-4``); in
+    practice the truncated default is faster without losing regret quality.
+
+    Training data must come from ``pyepo.data.dataset.optDatasetConstrs``
+    (Gurobi-backed) and be collated with ``collate_tight_constraints``.
+
+    Reference: Tang & Khalil (2024)
+    `<https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>`_
     """
 
     def __init__(
@@ -46,14 +57,14 @@ class coneAlignedCosine(optModule):
     ) -> None:
         """
         Args:
-            optmodel: a PyEPO optimization model
+            optmodel: a PyEPO optimization model (Gurobi-backed)
             max_iters: APGD iteration cap. Default ``20`` (CaVE+ truncated);
-                set to ``None`` to defer to a 10k safety bound for closer-to-exact behavior.
+                ``None`` falls back to a 10k safety bound for closer-to-exact behavior.
             tol_grad: L-inf tolerance on the projected gradient. Default ``None``
-                skips the convergence check (pure fixed-iter, no sync per chunk).
-                Set a non-trivial value (e.g. ``1e-4``) to converge to the cone boundary.
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            reduction: the reduction to apply to the output
+                skips the convergence check (pure fixed-iter, no per-chunk sync).
+                Set ``1e-4`` to converge to the cone boundary.
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
         """
         super().__init__(optmodel, processes, solve_ratio=1.0, reduction=reduction)
         self.tol_grad = tol_grad

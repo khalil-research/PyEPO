@@ -28,10 +28,21 @@ if TYPE_CHECKING:
 
 class optOrtCpModel(optModel):
     """
-    This is an abstract class for an OR-Tools CP-SAT optimization model
+    Abstract base class for OR-Tools CP-SAT (constraint programming) models.
+
+    Subclasses implement ``_getModel`` to build a ``cp_model.CpModel`` and
+    return ``(model, variables)``. CP-SAT is an **integer-only** solver, so
+    float cost vectors are scaled internally (multiplied by ``_OBJ_SCALE``
+    and cast to int) before being passed to the solver; the objective value
+    returned by ``solve`` is rescaled back to the original units.
+
+    As with the other non-Gurobi/non-COPT backends, ``modelSense`` is not
+    auto-detected -- set ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel``
+    for maximization (default is minimization). CP-SAT does not support LP
+    relaxation, so ``relax()`` raises ``RuntimeError``.
 
     Attributes:
-        _model (cp_model.CpModel): OR-Tools CP-SAT model
+        _model (cp_model.CpModel): underlying OR-Tools CP-SAT model
     """
 
     _OBJ_SCALE = 1_000_000

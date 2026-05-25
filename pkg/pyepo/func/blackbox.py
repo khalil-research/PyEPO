@@ -23,18 +23,21 @@ if TYPE_CHECKING:
 
 class blackboxOpt(optModule):
     """
-    An autograd module for differentiable black-box optimizer, which yields
-    an optimal solution and derive a gradient.
+    Differentiable Black-Box Optimizer (DBB) -- gradient via solution interpolation.
 
-    For differentiable black-box, the objective function is linear and
-    constraints are known and fixed, but the cost vector needs to be predicted
-    from contextual data.
+    Replaces the zero gradient of the combinatorial solver with an
+    interpolation-based estimate: given an upstream gradient
+    :math:`\\mathbf{d}`, DBB approximates the vector-Jacobian product as
+    :math:`(\\mathbf{w}^*(\\hat{\\mathbf{c}} + \\lambda \\mathbf{d}) -
+    \\mathbf{w}^*(\\hat{\\mathbf{c}})) / \\lambda`. Larger ``lambd`` smooths
+    more aggressively; the recommended range is **10-20**. The resulting
+    surrogate is nonconvex in :math:`\\hat{\\mathbf{c}}`, so convergence
+    guarantees are weaker than SPO+.
 
-    The black-box approximates the gradient of the optimizer by interpolating
-    the loss function. Thus, it allows us to design an algorithm based on
-    stochastic gradient descent.
+    Returns a predicted solution -- pair with an objective-value task loss
+    such as L1 against :math:`z^*(\\mathbf{c})`.
 
-    Reference: <https://arxiv.org/abs/1912.02175>
+    Reference: Vlastelica et al. (2019) `<https://arxiv.org/abs/1912.02175>`_
     """
 
     def __init__(
@@ -48,10 +51,10 @@ class blackboxOpt(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            lambd: a hyperparameter for differentiable black-box to control interpolation degree
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            dataset: the training data
+            lambd: interpolation smoothing strength :math:`\\lambda` (recommended 10-20)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
+            dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # smoothing parameter
@@ -121,19 +124,21 @@ class blackboxOptFunc(Function):
 
 class negativeIdentity(optModule):
     """
-    An autograd module for the differentiable optimizer, which yields an optimal
-    solution and uses negative identity as a gradient on the backward pass.
+    Negative Identity Backpropagation (NID) -- hyperparameter-free DBB.
 
-    For negative identity backpropagation, the objective function is linear and
-    constraints are known and fixed, but the cost vector needs to be predicted
-    from contextual data.
+    Treats the solver Jacobian as a (signed) identity:
+    :math:`\\partial \\mathbf{w}^* / \\partial \\hat{\\mathbf{c}} \\approx
+    -\\mathbf{I}` for minimization (and :math:`+\\mathbf{I}` for
+    maximization), yielding a straight-through gradient estimator. This is
+    the special case of DBB where :math:`\\lambda` is chosen so the
+    interpolated solution coincides with the negative-identity update --
+    with the bonus that no extra solver call is needed on the backward
+    pass.
 
-    If the interpolation hyperparameter λ aligns with an appropriate step size,
-    then the identity update is equivalent to DBB. However, the identity update
-    does not require an additional call to the solver during the backward pass
-    and tuning an additional hyperparameter λ.
+    Returns a predicted solution; pair with an objective-value task loss
+    (e.g., L1 against :math:`z^*(\\mathbf{c})`).
 
-    Reference: <https://arxiv.org/abs/2205.15213>
+    Reference: Sahoo et al. (2022) `<https://arxiv.org/abs/2205.15213>`_
     """
 
     def __init__(
@@ -146,9 +151,9 @@ class negativeIdentity(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of processors, 1 for single-core, 0 for all of cores
-            solve_ratio: the ratio of new solutions computed during training
-            dataset: the training data
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
+            dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
 

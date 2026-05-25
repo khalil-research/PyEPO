@@ -29,10 +29,16 @@ if TYPE_CHECKING:
 
 class optGrbModel(optModel):
     """
-    This is an abstract class for a Gurobi-based optimization model
+    Abstract base class for GurobiPy-backed optimization models.
+
+    Subclasses implement ``_getModel`` to build a ``gurobipy.Model`` and
+    return ``(model, variables)``. The objective sense is auto-detected
+    from the underlying Gurobi model -- ``modelSense`` does not need to be
+    set manually. Solver output is silenced by default; cost-vector updates
+    use the C-level ``setAttr("Obj", ...)`` batch path for efficiency.
 
     Attributes:
-        _model (GurobiPy model): Gurobi model
+        _model (gurobipy.Model): underlying Gurobi model
     """
 
     def __init__(self) -> None:

@@ -30,14 +30,22 @@ logger = logging.getLogger(__name__)
 
 class optDataset(Dataset):
     """
-    This class is a Torch Dataset for optimization problems.
+    PyTorch ``Dataset`` for predict-then-optimize problems.
+
+    At construction time it solves the optimization problem for every cost
+    vector and caches the optimal solution :math:`\\mathbf{w}^*(\\mathbf{c})`
+    and objective value :math:`z^*(\\mathbf{c})`. This precomputation removes
+    solver overhead from the training loop, making ``optDataset`` the standard
+    input format for end-to-end training in PyEPO. When labels are already
+    available from another source, ``optDataset`` can be skipped and batches
+    fed directly to ``pyepo.func`` modules.
 
     Attributes:
         model (optModel): Optimization model
         feats (torch.Tensor): Data features
         costs (torch.Tensor): Cost vectors
-        sols (torch.Tensor): Optimal solutions
-        objs (torch.Tensor): Optimal objective values
+        sols (torch.Tensor): Cached optimal solutions w*(c)
+        objs (torch.Tensor): Cached optimal objective values z*(c)
     """
 
     def __init__(
@@ -47,7 +55,7 @@ class optDataset(Dataset):
         costs: np.ndarray | torch.Tensor,
     ) -> None:
         """
-        A method to create an optDataset from optModel
+        Build the dataset and precompute optimal labels.
 
         Args:
             model: an instance of optModel
@@ -156,18 +164,24 @@ class optDataset(Dataset):
 
 class optDatasetKNN(optDataset):
     """
-    This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.
+    PyTorch ``Dataset`` for the kNN-robust decision-focused loss.
 
-    Reference: <https://arxiv.org/abs/2310.04328>
+    For each instance the cost vector is replaced with a convex combination of
+    its k nearest neighbours in feature space, and the optimization problem is
+    solved on the smoothed costs. The mean kNN solutions and objective values
+    are cached for training, providing a robust supervision signal under noisy
+    or out-of-distribution feature observations.
+
+    Reference: Schutte et al. (2023) `<https://arxiv.org/abs/2310.04328>`_
 
     Attributes:
         model (optModel): Optimization model
         k (int): number of nearest neighbours selected
-        weight (float): weight of kNN-loss
+        weight (float): self-weight in the kNN convex combination (1.0 = no smoothing)
         feats (torch.Tensor): Data features
-        costs (torch.Tensor): Cost vectors
-        sols (torch.Tensor): Optimal solutions
-        objs (torch.Tensor): Optimal objective values
+        costs (torch.Tensor): kNN-smoothed cost vectors
+        sols (torch.Tensor): Mean kNN optimal solutions
+        objs (torch.Tensor): Mean kNN optimal objective values
     """
 
     def __init__(
@@ -179,14 +193,14 @@ class optDatasetKNN(optDataset):
         weight: float = 0.5,
     ) -> None:
         """
-        A method to create an optDataset from optModel
+        Build the dataset and precompute mean kNN optimal labels.
 
         Args:
             model: an instance of optModel
             feats: data features
             costs: costs of objective function
             k: number of nearest neighbours selected
-            weight: weight of kNN-loss
+            weight: self-weight in the kNN convex combination (1.0 = no smoothing)
         """
         if not isinstance(model, optModel):
             raise TypeError("arg model is not an optModel")
@@ -256,18 +270,34 @@ class optDatasetKNN(optDataset):
 
 class optDatasetConstrs(optDataset):
     """
-    This class is a Torch Dataset for optimization problems with the normals
-    of binding constraints at the optimum, consumed by the CaVE loss.
+    PyTorch ``Dataset`` for the CaVE cone-aligned loss.
 
-    Reference: <https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>
+    Stores features and cost coefficients, solves each instance with a fresh
+    copy of the Gurobi model, and extracts the **normals of the binding
+    constraints at the optimal vertex** in canonical ``<=`` orientation.
+    These normals span the polyhedral cone onto which ``coneAlignedCosine``
+    projects the predicted cost vector during training.
+
+    CaVE is defined for binary linear programs only, so the optimal vertex
+    must be binary; instances that are infeasible or have non-binary optima
+    raise (or are skipped when ``skip_infeas=True``). Binding-constraint
+    extraction uses Gurobi's sparse-matrix API, which is why this dataset
+    currently requires a Gurobi-backed ``optModel``.
+
+    Per-instance row counts differ (different constraints bind at different
+    vertices), so batches must be assembled with ``collate_tight_constraints``.
+
+    Reference: Tang & Khalil (2024)
+    `<https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>`_
 
     Attributes:
-        model (optModel): Optimization model (Gurobi-backed)
+        model (optModel): Gurobi-backed optimization model
         feats (torch.Tensor): Data features
         costs (torch.Tensor): Cost vectors
         sols (torch.Tensor): Optimal solutions
         objs (torch.Tensor): Optimal objective values
         ctrs (list[torch.Tensor]): Per-instance binding-constraint normals
+            in canonical ``<=`` orientation (ragged row counts)
     """
 
     def __init__(
@@ -278,10 +308,10 @@ class optDatasetConstrs(optDataset):
         skip_infeas: bool = False,
     ) -> None:
         """
-        A method to create an optDatasetConstrs from optModel
+        Build the dataset and extract binding-constraint normals at each optimum.
 
         Args:
-            model: an instance of optModel
+            model: an instance of optModel (Gurobi-backed)
             feats: data features
             costs: costs of objective function
             skip_infeas: if True, drop infeasible instances instead of raising
@@ -371,7 +401,12 @@ class optDatasetConstrs(optDataset):
 
 def collate_tight_constraints(batch):
     """
-    A custom collate function for PyTorch DataLoader that pads binding-constraint matrices
+    Collate function for ``optDatasetConstrs`` batches.
+
+    Stacks the standard ``(x, c, w, z)`` tensors and zero-pads the ragged
+    per-instance binding-constraint matrices to a common row count so they
+    can be assembled into a single ``(batch, max_rows, num_cost)`` tensor
+    for ``coneAlignedCosine``.
     """
     from torch.nn.utils.rnn import pad_sequence
 

@@ -23,16 +23,17 @@ if TYPE_CHECKING:
 
 class listwiseLTR(optModule):
     """
-    An autograd module for listwise learning to rank, where the goal is to learn
-    an objective function that ranks a pool of feasible solutions correctly.
+    Listwise Learning-to-Rank loss over a cached solution pool.
 
-    For the listwise LTR, the cost vector needs to be predicted from the
-    contextual data and the loss measures the scores of the whole ranked lists.
+    Models the ranking distribution over the cached pool :math:`\\Gamma` as
+    SoftMax of predicted-cost scores and minimizes its cross-entropy against
+    the true ranking distribution. The full-list formulation captures
+    interactions between every pair of solutions in :math:`\\Gamma`.
+    Pool semantics (``solve_ratio``, ``dataset``) are shared with the other
+    LTR variants and with the contrastive methods.
 
-    Thus, it allows us to design an algorithm based on stochastic gradient
-    descent.
-
-    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
+    Reference: Mandi et al. (2022)
+    `<https://proceedings.mlr.press/v162/mandi22a.html>`_
     """
 
     def __init__(
@@ -86,16 +87,17 @@ class listwiseLTR(optModule):
 
 class pairwiseLTR(optModule):
     """
-    An autograd module for pairwise learning to rank, where the goal is to learn
-    an objective function that ranks a pool of feasible solutions correctly.
+    Pairwise Learning-to-Rank loss over a cached solution pool.
 
-    For the pairwise LTR, the cost vector needs to be predicted from the
-    contextual data and the loss learns the relative ordering of pairs of items.
+    Enforces a margin between the true optimum (the best member of
+    :math:`\\Gamma`) and each suboptimal solution via a ReLU hinge on the
+    predicted-cost difference. Lighter than the listwise variant
+    (no SoftMax over the full pool) and often a good first choice when the
+    pool is large. Pool semantics (``solve_ratio``, ``dataset``) are shared
+    with the other LTR variants and with the contrastive methods.
 
-    Thus, it allows us to design an algorithm based on stochastic gradient
-    descent.
-
-    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
+    Reference: Mandi et al. (2022)
+    `<https://proceedings.mlr.press/v162/mandi22a.html>`_
     """
 
     def __init__(
@@ -158,17 +160,18 @@ class pairwiseLTR(optModule):
 
 class pointwiseLTR(optModule):
     """
-    An autograd module for pointwise learning to rank, where the goal is to
-    learn an objective function that ranks a pool of feasible solutions
-    correctly.
+    Pointwise Learning-to-Rank loss over a cached solution pool.
 
-    For the pointwise LTR, the cost vector needs to be predicted from contextual
-    data, and calculates the ranking scores of the items.
+    Treats each cached solution :math:`\\mathbf{w} \\in \\Gamma` as an
+    independent regression target: the predicted score
+    :math:`\\hat{\\mathbf{c}}^\\top \\mathbf{w}` is fit toward the true
+    score :math:`\\mathbf{c}^\\top \\mathbf{w}` via squared error, averaged
+    over the pool. Cheapest of the three LTR variants -- no cross-pool
+    interactions. Pool semantics (``solve_ratio``, ``dataset``) are shared
+    with the other LTR variants and with the contrastive methods.
 
-    Thus, it allows us to design an algorithm based on stochastic gradient
-    descent.
-
-    Reference: <https://proceedings.mlr.press/v162/mandi22a.html>
+    Reference: Mandi et al. (2022)
+    `<https://proceedings.mlr.press/v162/mandi22a.html>`_
     """
 
     def __init__(
