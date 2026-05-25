@@ -460,7 +460,7 @@ if __name__ == "__main__":
     train_and_eval("adaptiveImplicitMLE", aimle, task_loss)
 
     # 9. NCE (contrastive)
-    nce = pyepo.func.NCE(optmodel, processes=4, solve_ratio=1, dataset=dataset)
+    nce = pyepo.func.noiseContrastiveEstimation(optmodel, processes=4, solve_ratio=1, dataset=dataset)
     train_and_eval("NCE", nce,
                    lambda fn, cp, c, w, z: fn(cp, w))
 

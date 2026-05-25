@@ -253,7 +253,7 @@ class TestNCE:
     def test_train(self, sp_data):
         optmodel, dataset, loader = sp_data
         predmodel = _fresh_predmodel()
-        nce = pyepo.func.NCE(optmodel, processes=1, solve_ratio=1, dataset=dataset)
+        nce = pyepo.func.noiseContrastiveEstimation(optmodel, processes=1, solve_ratio=1, dataset=dataset)
         _train_loop(nce, loader, predmodel,
                     lambda fn, cp, c, w, z: fn(cp, w))
 

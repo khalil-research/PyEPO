@@ -237,7 +237,7 @@ class TestNCECUDA:
         x, c, w, z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
-        nce = pyepo.func.NCE(optmodel, processes=1, solve_ratio=1, dataset=dataset)
+        nce = pyepo.func.noiseContrastiveEstimation(optmodel, processes=1, solve_ratio=1, dataset=dataset)
         loss = nce(cp, w)
         _assert_cuda(loss, "NCE loss")
         loss.backward()

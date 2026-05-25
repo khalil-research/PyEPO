@@ -19,12 +19,12 @@ if TYPE_CHECKING:
     from pyepo.model.opt import optModel
 
 
-class NCE(optModule):
+class noiseContrastiveEstimation(optModule):
     """
     An autograd module for noise contrastive estimation as surrogate loss
     functions, based on viewing suboptimal solutions as negative examples.
 
-    For the NCE, the cost vector needs to be predicted from contextual data and
+    The cost vector needs to be predicted from contextual data and
     maximizes the separation of the probability of the optimal solution.
 
     This allows us to design an algorithm based on stochastic gradient descent.

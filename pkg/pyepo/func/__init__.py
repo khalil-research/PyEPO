@@ -4,7 +4,7 @@ Pytorch autograd function for end-to-end training
 
 from pyepo.func.blackbox import blackboxOpt, negativeIdentity
 from pyepo.func.cave import coneAlignedCosine
-from pyepo.func.contrastive import NCE, contrastiveMAP
+from pyepo.func.contrastive import contrastiveMAP, noiseContrastiveEstimation
 from pyepo.func.perturbed import (
     adaptiveImplicitMLE,
     implicitMLE,
@@ -27,7 +27,7 @@ __all__ = [
     "perturbedFenchelYoungMul",
     "regularizedFrankWolfeOpt",
     "regularizedFrankWolfeFenchelYoung",
-    "NCE",
+    "noiseContrastiveEstimation",
     "contrastiveMAP",
     "pointwiseLTR",
     "pairwiseLTR",
