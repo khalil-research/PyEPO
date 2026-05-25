@@ -28,18 +28,24 @@ Module Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for a regularized differentiable optimizer, which yields
-   a smooth combination of vertices on the convex hull of feasible solutions.
+   L2-Regularized Frank-Wolfe Optimizer (RFWO) -- differentiable smoothed solver.
 
-   For regularized Frank-Wolfe, the objective function is linear and constraints
-   are known and fixed, but the cost vector needs to be predicted from contextual
-   data.
+   Adds an L2 regularizer :math:`\tfrac{\lambda}{2}\|\mathbf{w}\|_2^2`
+   to the linear objective and returns the regularized minimizer
+   :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}}) =
+   \arg\min_{\mathbf{w} \in \mathrm{conv}(\mathcal{S})}
+   \hat{\mathbf{c}}^\top \mathbf{w} + \tfrac{\lambda}{2}\|\mathbf{w}\|_2^2`,
+   which is unique, lies inside :math:`\mathrm{conv}(\mathcal{S})`, and
+   varies continuously with :math:`\hat{\mathbf{c}}`. The program is
+   solved by batched Frank-Wolfe iteration; the only oracle needed is the
+   underlying linear solver (PyEPO's standard ``optModel.solve``).
 
-   The custom backward pass applies implicit differentiation on the active set
-   found by Frank-Wolfe iterations. Thus, it allows us to design an algorithm
-   based on stochastic gradient descent.
+   Returns a regularized solution -- not a loss. Pair with a user-defined
+   task loss (MSE against :math:`\mathbf{w}^*(\mathbf{c})` matches the
+   imitation setting in the paper), or use ``regularizedFrankWolfeFenchelYoung``
+   for the loss-returning variant.
 
-   Reference: <https://arxiv.org/abs/2207.13513>
+   Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
 
 
    .. py:attribute:: lambd
@@ -102,19 +108,22 @@ Module Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for the Fenchel-Young loss paired with regularized
-   Frank-Wolfe.
+   L2-Regularized Frank-Wolfe with Fenchel-Young loss (RFYL).
 
-   For regularized Frank-Wolfe with Fenchel-Young loss, the objective function is
-   linear and constraints are known and fixed, but the cost vector needs to be
-   predicted from contextual data.
+   Pairs the RFWO regularized solver with the Fenchel-Young loss of the L2
+   regularizer, returning a convex scalar loss that compares the predicted
+   cost :math:`\hat{\mathbf{c}}` to the true optimum
+   :math:`\mathbf{w}^*(\mathbf{c})` directly -- no user-defined task loss
+   needed. Specialized to :math:`\Omega(\mathbf{w}) =
+   \tfrac{\lambda}{2}\|\mathbf{w}\|_2^2`, the loss collapses to a
+   transparent "compare regularizers + linear residual" form.
 
-   The custom backward pass returns the Danskin subgradient y_hat - w directly,
-   skipping the implicit-differentiation chain through the Frank-Wolfe iterate.
-   Thus, it allows us to design an algorithm based on stochastic gradient
-   descent.
+   By Danskin's theorem the gradient is the simple residual
+   :math:`\mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{w}}_\lambda
+   (\hat{\mathbf{c}})`, so the backward path skips implicit
+   differentiation through the Frank-Wolfe iterate.
 
-   Reference: <https://arxiv.org/abs/2207.13513>
+   Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
 
 
    .. py:attribute:: lambd
