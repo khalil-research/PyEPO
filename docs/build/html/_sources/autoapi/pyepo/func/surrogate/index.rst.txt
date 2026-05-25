@@ -27,17 +27,23 @@ Module Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for SPO+ Loss, as a surrogate loss function of SPO
-   (regret) Loss, which measures the decision error of the optimization problem.
+   SPO+ loss: a convex surrogate for the SPO regret of a linear-objective LP.
 
-   For SPO/SPO+ Loss, the objective function is linear and constraints are
-   known and fixed, but the cost vector needs to be predicted from contextual
-   data.
+   SPO+ upper-bounds the SPO regret with a convex function of the predicted
+   cost vector and provides an informative subgradient (via Danskin's
+   theorem) for end-to-end training. It is the strong default for
+   predict-then-optimize when true optimal solutions
+   :math:`\mathbf{w}^*(\mathbf{c})` are available as supervision.
 
-   The SPO+ Loss is convex with subgradient. Thus, it allows us to design an
-   algorithm based on stochastic gradient descent.
+   The forward pass solves the perturbed problem with cost
+   :math:`2\hat{\mathbf{c}} - \mathbf{c}` once per training instance and
+   returns a scalar loss; the backward pass uses the cached solution to form
+   the subgradient :math:`2(\mathbf{w}^*(\mathbf{c}) -
+   \mathbf{w}^*(2\hat{\mathbf{c}} - \mathbf{c}))` without any extra
+   solver call.
 
-   Reference: <https://doi.org/10.1287/mnsc.2020.3922>
+   Reference: Elmachtoub & Grigas (2022)
+   `<https://doi.org/10.1287/mnsc.2020.3922>`_
 
 
    .. py:method:: forward(pred_cost: torch.Tensor, true_cost: torch.Tensor, true_sol: torch.Tensor, true_obj: torch.Tensor) -> torch.Tensor
@@ -84,18 +90,19 @@ Module Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   An autograd module for PG Loss, as a surrogate loss function of objective
-   value, which measures the decision quality of the optimization problem.
+   Perturbation Gradient (PG): zeroth-order surrogate of the objective-value loss.
 
-   For PG Loss, the objective function is linear, and constraints are
-   known and fixed, but the cost vector needs to be predicted from contextual
-   data.
+   PG approximates the directional derivative of :math:`z^*(\hat{\mathbf{c}})`
+   along the true cost :math:`\mathbf{c}` with a finite difference, yielding
+   an informative gradient through the otherwise piecewise-constant solver
+   layer. Two variants are exposed via ``two_sides``: backward differencing
+   (``False``, one extra solve per step) and central differencing (``True``,
+   two extra solves but more accurate gradients).
 
-   According to Danskin’s Theorem, the PG Loss is derived from different zeroth
-   order approximations and has the informative gradient. Thus, it allows us to
-   design an algorithm based on stochastic gradient descent.
+   Unlike SPO+, PG does **not** require true optimal solutions -- it only
+   needs the true cost vector :math:`\mathbf{c}`.
 
-   Reference: <https://arxiv.org/abs/2402.03256>
+   Reference: Gupta & Huang (2024) `<https://arxiv.org/abs/2402.03256>`_
 
 
    .. py:attribute:: sigma

@@ -367,13 +367,13 @@ problem base listed first so its <code class="docutils literal notranslate"><spa
 <td><p>Problem-level base for grid shortest path.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.bases.knapsackBase" title="pyepo.model.bases.knapsackBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">knapsackBase</span></code></a></p></td>
-<td><p>Problem-level base for multi-dim knapsack.</p></td>
+<td><p>Problem-level base for the multi-dimensional knapsack.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.bases.portfolioBase" title="pyepo.model.bases.portfolioBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">portfolioBase</span></code></a></p></td>
-<td><p>Problem-level base for Markowitz portfolio.</p></td>
+<td><p>Problem-level base for Markowitz mean-variance portfolio optimization.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.bases.tspABBase" title="pyepo.model.bases.tspABBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tspABBase</span></code></a></p></td>
-<td><p>Problem-level base for TSP (formulation-independent state and helpers).</p></td>
+<td><p>Problem-level base for the symmetric traveling-salesperson problem.</p></td>
 </tr>
 </tbody>
 </table>
@@ -386,11 +386,16 @@ problem base listed first so its <code class="docutils literal notranslate"><spa
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.bases.</span></span><span class="sig-name descname"><span class="pre">shortestPathBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.bases.shortestPathBase" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
 <p>Problem-level base for grid shortest path.</p>
+<p>Finds the minimum-cost path from the northwest corner to the southeast
+corner of an <code class="docutils literal notranslate"><span class="pre">(h,</span> <span class="pre">w)</span></code> grid network. The problem is formulated as a
+minimum-cost flow LP with arc-incidence equality constraints; arcs are
+enumerated automatically from the grid dimensions and stored on
+<code class="docutils literal notranslate"><span class="pre">self.arcs</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – grid dimensions (rows, cols)</p></li>
-<li><p><strong>arcs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – list of (source, target) arcs in the grid</p></li>
+<li><p><strong>arcs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – ordered list of (source, target) arcs in the grid</p></li>
 </ul>
 </dd>
 </dl>
@@ -416,13 +421,18 @@ problem base listed first so its <code class="docutils literal notranslate"><spa
 <dt class="sig sig-object py" id="pyepo.model.bases.knapsackBase">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.bases.</span></span><span class="sig-name descname"><span class="pre">knapsackBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.bases.knapsackBase" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>Problem-level base for multi-dim knapsack.</p>
+<p>Problem-level base for the multi-dimensional knapsack.</p>
+<p>Selects a subset of items that maximizes total value subject to
+per-resource capacity constraints. Items, dimensions, and capacities are
+inferred from the shapes of <code class="docutils literal notranslate"><span class="pre">weights</span></code> and <code class="docutils literal notranslate"><span class="pre">capacity</span></code>: <code class="docutils literal notranslate"><span class="pre">weights</span></code>
+has shape <code class="docutils literal notranslate"><span class="pre">(dim,</span> <span class="pre">n_items)</span></code> and <code class="docutils literal notranslate"><span class="pre">capacity</span></code> has length <code class="docutils literal notranslate"><span class="pre">dim</span></code>. Item
+values are the predicted cost coefficients <code class="docutils literal notranslate"><span class="pre">c</span></code> set via <code class="docutils literal notranslate"><span class="pre">setObj</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weights</strong> (<em>np.ndarray</em>) – item weights, shape (dim, n_items)</p></li>
-<li><p><strong>capacity</strong> (<em>np.ndarray</em>) – per-dimension capacity</p></li>
-<li><p><strong>items</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – item indices</p></li>
+<li><p><strong>weights</strong> (<em>np.ndarray</em>) – item weights, shape <code class="docutils literal notranslate"><span class="pre">(dim,</span> <span class="pre">n_items)</span></code></p></li>
+<li><p><strong>capacity</strong> (<em>np.ndarray</em>) – per-dimension capacity, shape <code class="docutils literal notranslate"><span class="pre">(dim,)</span></code></p></li>
+<li><p><strong>items</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – item indices <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">..</span> <span class="pre">n_items</span> <span class="pre">-</span> <span class="pre">1</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -458,13 +468,20 @@ problem base listed first so its <code class="docutils literal notranslate"><spa
 <dt class="sig sig-object py" id="pyepo.model.bases.portfolioBase">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.bases.</span></span><span class="sig-name descname"><span class="pre">portfolioBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_assets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.25</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.bases.portfolioBase" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>Problem-level base for Markowitz portfolio.</p>
+<p>Problem-level base for Markowitz mean-variance portfolio optimization.</p>
+<p>Allocates a unit budget across <code class="docutils literal notranslate"><span class="pre">num_assets</span></code> to maximize predicted
+expected return subject to a quadratic risk budget
+<span class="math notranslate nohighlight">\(\mathbf{x}^\top \boldsymbol{\Sigma} \mathbf{x} \le \gamma\,
+\overline{\boldsymbol{\Sigma}}\)</span>, where <span class="math notranslate nohighlight">\(\overline{\boldsymbol{\Sigma}}\)</span>
+is the mean covariance entry. Predicted asset returns are the cost
+coefficients <code class="docutils literal notranslate"><span class="pre">c</span></code> set via <code class="docutils literal notranslate"><span class="pre">setObj</span></code>; the covariance and risk budget
+are fixed across instances.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_assets</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of assets</p></li>
-<li><p><strong>covariance</strong> (<em>np.ndarray</em>) – asset return covariance matrix</p></li>
-<li><p><strong>risk_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – risk budget = gamma * mean(covariance)</p></li>
+<li><p><strong>covariance</strong> (<em>np.ndarray</em>) – asset-return covariance matrix</p></li>
+<li><p><strong>risk_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – risk budget = <code class="docutils literal notranslate"><span class="pre">gamma</span> <span class="pre">*</span> <span class="pre">mean(covariance)</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -500,16 +517,28 @@ problem base listed first so its <code class="docutils literal notranslate"><spa
 <dt class="sig sig-object py" id="pyepo.model.bases.tspABBase">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.bases.</span></span><span class="sig-name descname"><span class="pre">tspABBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.bases.tspABBase" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>Problem-level base for TSP (formulation-independent state and helpers).</p>
-<p>Concrete formulations (GG, MTZ, DFJ) only need to implement
-<code class="docutils literal notranslate"><span class="pre">_getModel</span></code> (build the solver model) and <code class="docutils literal notranslate"><span class="pre">_addExtraConstr</span></code>
-(add a single linear extra constraint to <code class="docutils literal notranslate"><span class="pre">self._model</span></code>).</p>
+<p>Problem-level base for the symmetric traveling-salesperson problem.</p>
+<p>Finds the shortest tour visiting each of <code class="docutils literal notranslate"><span class="pre">num_nodes</span></code> cities exactly
+once and returning to the origin. Three concrete ILP formulations are
+supplied per backend:</p>
+<ul class="simple">
+<li><p><strong>DFJ</strong> (Dantzig-Fulkerson-Johnson) – lazy subtour-elimination
+constraints via solver callbacks (no LP relaxation).</p></li>
+<li><p><strong>GG</strong> (Gavish-Graves) – flow-based formulation with auxiliary
+flow variables.</p></li>
+<li><p><strong>MTZ</strong> (Miller-Tucker-Zemlin) – compact formulation with per-node
+potential auxiliaries.</p></li>
+</ul>
+<p>The base only manages formulation-independent state (nodes, edges,
+extra-constraint replay) and the <code class="docutils literal notranslate"><span class="pre">getTour</span></code> helper. Concrete
+formulations implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> (build the solver model) and
+<code class="docutils literal notranslate"><span class="pre">_addExtraConstr</span></code> (add a single linear extra constraint).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of nodes</p></li>
-<li><p><strong>nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – node indices 0..num_nodes-1</p></li>
-<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – undirected edges as (i, j) with i &lt; j</p></li>
+<li><p><strong>nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – node indices <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">..</span> <span class="pre">num_nodes</span> <span class="pre">-</span> <span class="pre">1</span></code></p></li>
+<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – undirected edges as <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code> with <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">&lt;</span> <span class="pre">j</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -677,5 +706,6 @@ problem base listed first so its <code class="docutils literal notranslate"><spa
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

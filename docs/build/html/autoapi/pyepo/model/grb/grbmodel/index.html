@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.grb.grbmodel.optGrbModel" title="pyepo.model.grb.grbmodel.optGrbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optGrbModel</span></code></a></p></td>
-<td><p>This is an abstract class for a Gurobi-based optimization model</p></td>
+<td><p>Abstract base class for GurobiPy-backed optimization models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -367,10 +367,15 @@
 <dt class="sig sig-object py" id="pyepo.model.grb.grbmodel.optGrbModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.grb.grbmodel.</span></span><span class="sig-name descname"><span class="pre">optGrbModel</span></span><a class="headerlink" href="#pyepo.model.grb.grbmodel.optGrbModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>This is an abstract class for a Gurobi-based optimization model</p>
+<p>Abstract base class for GurobiPy-backed optimization models.</p>
+<p>Subclasses implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> to build a <code class="docutils literal notranslate"><span class="pre">gurobipy.Model</span></code> and
+return <code class="docutils literal notranslate"><span class="pre">(model,</span> <span class="pre">variables)</span></code>. The objective sense is auto-detected
+from the underlying Gurobi model – <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> does not need to be
+set manually. Solver output is silenced by default; cost-vector updates
+use the C-level <code class="docutils literal notranslate"><span class="pre">setAttr(&quot;Obj&quot;,</span> <span class="pre">...)</span></code> batch path for efficiency.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>_model</strong> (<em>GurobiPy model</em>) – Gurobi model</p>
+<dd class="field-odd"><p><strong>_model</strong> (<em>gurobipy.Model</em>) – underlying Gurobi model</p>
 </dd>
 </dl>
 <dl class="py property">

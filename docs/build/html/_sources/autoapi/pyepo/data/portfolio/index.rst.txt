@@ -22,13 +22,23 @@ Module Contents
 
 .. py:function:: genData(num_data: int, num_features: int, num_assets: int, deg: int = 1, noise_level: float = 1, seed: int = 135) -> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]
 
-   A function to generate synthetic data and features for portfolio
+   Generate synthetic feature-cost pairs for portfolio optimization.
+
+   Returns the expected returns :math:`\mathbf{r}` (the per-instance cost
+   vectors) and a single shared covariance matrix :math:`\mathbf{\Sigma}`
+   used in the risk constraint of the predefined portfolio model. The mean
+   returns follow a factor-model structure
+   :math:`\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L}\mathbf{f}
+   + 0.01 \tau \boldsymbol{\epsilon}`, where the factor loadings
+   :math:`\mathbf{L}` and residual noise are both scaled by ``noise_level``
+   (:math:`\tau`). Unlike the other generators in ``pyepo.data``, portfolio
+   noise is controlled by ``noise_level`` rather than ``noise_width``.
 
    :param num_data: number of data points
    :param num_features: dimension of features
    :param num_assets: number of assets
-   :param deg: data polynomial degree
-   :param noise_level: level of data random noise
+   :param deg: polynomial degree of the feature-to-return mapping
+   :param noise_level: scales factor loadings L and residual noise (tau)
    :param seed: random seed (default 135 for reproducibility)
 
    :returns: covariance matrix (np.ndarray), data features (np.ndarray), mean returns (np.ndarray)

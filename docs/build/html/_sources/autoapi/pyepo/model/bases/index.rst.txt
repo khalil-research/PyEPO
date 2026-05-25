@@ -39,9 +39,15 @@ Module Contents
 
    Problem-level base for grid shortest path.
 
+   Finds the minimum-cost path from the northwest corner to the southeast
+   corner of an ``(h, w)`` grid network. The problem is formulated as a
+   minimum-cost flow LP with arc-incidence equality constraints; arcs are
+   enumerated automatically from the grid dimensions and stored on
+   ``self.arcs``.
+
    :ivar grid: grid dimensions (rows, cols)
    :vartype grid: tuple of int
-   :ivar arcs: list of (source, target) arcs in the grid
+   :ivar arcs: ordered list of (source, target) arcs in the grid
 
    :vartype arcs: list
 
@@ -66,13 +72,19 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   Problem-level base for multi-dim knapsack.
+   Problem-level base for the multi-dimensional knapsack.
 
-   :ivar weights: item weights, shape (dim, n_items)
+   Selects a subset of items that maximizes total value subject to
+   per-resource capacity constraints. Items, dimensions, and capacities are
+   inferred from the shapes of ``weights`` and ``capacity``: ``weights``
+   has shape ``(dim, n_items)`` and ``capacity`` has length ``dim``. Item
+   values are the predicted cost coefficients ``c`` set via ``setObj``.
+
+   :ivar weights: item weights, shape ``(dim, n_items)``
    :vartype weights: np.ndarray
-   :ivar capacity: per-dimension capacity
+   :ivar capacity: per-dimension capacity, shape ``(dim,)``
    :vartype capacity: np.ndarray
-   :ivar items: item indices
+   :ivar items: item indices ``0 .. n_items - 1``
 
    :vartype items: list
 
@@ -101,13 +113,21 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   Problem-level base for Markowitz portfolio.
+   Problem-level base for Markowitz mean-variance portfolio optimization.
+
+   Allocates a unit budget across ``num_assets`` to maximize predicted
+   expected return subject to a quadratic risk budget
+   :math:`\mathbf{x}^\top \boldsymbol{\Sigma} \mathbf{x} \le \gamma\,
+   \overline{\boldsymbol{\Sigma}}`, where :math:`\overline{\boldsymbol{\Sigma}}`
+   is the mean covariance entry. Predicted asset returns are the cost
+   coefficients ``c`` set via ``setObj``; the covariance and risk budget
+   are fixed across instances.
 
    :ivar num_assets: number of assets
    :vartype num_assets: int
-   :ivar covariance: asset return covariance matrix
+   :ivar covariance: asset-return covariance matrix
    :vartype covariance: np.ndarray
-   :ivar risk_level: risk budget = gamma * mean(covariance)
+   :ivar risk_level: risk budget = ``gamma * mean(covariance)``
 
    :vartype risk_level: float
 
@@ -136,17 +156,29 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   Problem-level base for TSP (formulation-independent state and helpers).
+   Problem-level base for the symmetric traveling-salesperson problem.
 
-   Concrete formulations (GG, MTZ, DFJ) only need to implement
-   ``_getModel`` (build the solver model) and ``_addExtraConstr``
-   (add a single linear extra constraint to ``self._model``).
+   Finds the shortest tour visiting each of ``num_nodes`` cities exactly
+   once and returning to the origin. Three concrete ILP formulations are
+   supplied per backend:
+
+   * **DFJ** (Dantzig-Fulkerson-Johnson) -- lazy subtour-elimination
+     constraints via solver callbacks (no LP relaxation).
+   * **GG** (Gavish-Graves) -- flow-based formulation with auxiliary
+     flow variables.
+   * **MTZ** (Miller-Tucker-Zemlin) -- compact formulation with per-node
+     potential auxiliaries.
+
+   The base only manages formulation-independent state (nodes, edges,
+   extra-constraint replay) and the ``getTour`` helper. Concrete
+   formulations implement ``_getModel`` (build the solver model) and
+   ``_addExtraConstr`` (add a single linear extra constraint).
 
    :ivar num_nodes: number of nodes
    :vartype num_nodes: int
-   :ivar nodes: node indices 0..num_nodes-1
+   :ivar nodes: node indices ``0 .. num_nodes - 1``
    :vartype nodes: list
-   :ivar edges: undirected edges as (i, j) with i < j
+   :ivar edges: undirected edges as ``(i, j)`` with ``i < j``
 
    :vartype edges: list
 

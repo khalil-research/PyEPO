@@ -33,14 +33,23 @@ Module Contents
 
 .. py:function:: unambRegret(predmodel: torch.nn.Module, optmodel: pyepo.model.opt.optModel, dataloader: torch.utils.data.DataLoader, tolerance: float = 1e-05) -> float
 
-   A function to evaluate model performance with normalized unambiguous regret
+   Normalized unambiguous regret (worst-case-tie SPO loss).
+
+   When the predicted cost vector :math:`\hat{\mathbf{c}}` yields multiple
+   optimal solutions, ``regret`` reports the realized one while
+   ``unambRegret`` reports the **worst case over all optima**:
+   :math:`l_{\mathrm{URegret}}(\hat{\mathbf{c}}, \mathbf{c}) =
+   \max_{\mathbf{w} \in W^*(\hat{\mathbf{c}})} \mathbf{c}^\top
+   \mathbf{w} - z^*(\mathbf{c})`. More theoretically rigorous than
+   ``regret``, but in practice the two are nearly identical and
+   ``unambRegret`` is rarely required.
 
    :param predmodel: a regression neural network for cost prediction
    :param optmodel: a PyEPO optimization model
-   :param dataloader: Torch dataloader from optDataSet
-   :param tolerance: tolerance for optimization
+   :param dataloader: PyTorch DataLoader over an ``optDataset``
+   :param tolerance: precision used when rounding predicted costs to find ties
 
-   :returns: unambiguous regret loss
+   :returns: normalized unambiguous regret
    :rtype: float
 
 

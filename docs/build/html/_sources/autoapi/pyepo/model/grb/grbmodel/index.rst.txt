@@ -25,11 +25,17 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for a Gurobi-based optimization model
+   Abstract base class for GurobiPy-backed optimization models.
 
-   :ivar _model: Gurobi model
+   Subclasses implement ``_getModel`` to build a ``gurobipy.Model`` and
+   return ``(model, variables)``. The objective sense is auto-detected
+   from the underlying Gurobi model -- ``modelSense`` does not need to be
+   set manually. Solver output is silenced by default; cost-vector updates
+   use the C-level ``setAttr("Obj", ...)`` batch path for efficiency.
 
-   :vartype _model: GurobiPy model
+   :ivar _model: underlying Gurobi model
+
+   :vartype _model: gurobipy.Model
 
 
    .. py:property:: num_cost

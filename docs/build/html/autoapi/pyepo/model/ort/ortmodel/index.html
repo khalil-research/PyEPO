@@ -367,7 +367,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.ortmodel.optOrtModel" title="pyepo.model.ort.ortmodel.optOrtModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optOrtModel</span></code></a></p></td>
-<td><p>This is an abstract class for an OR-Tools pywraplp optimization model</p></td>
+<td><p>Abstract base class for OR-Tools pywraplp (LP/MIP) models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -379,12 +379,19 @@
 <dt class="sig sig-object py" id="pyepo.model.ort.ortmodel.optOrtModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.ortmodel.</span></span><span class="sig-name descname"><span class="pre">optOrtModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'scip'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.ort.ortmodel.optOrtModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>This is an abstract class for an OR-Tools pywraplp optimization model</p>
+<p>Abstract base class for OR-Tools pywraplp (LP/MIP) models.</p>
+<p>Subclasses implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> to build a <code class="docutils literal notranslate"><span class="pre">pywraplp.Solver</span></code> and
+return <code class="docutils literal notranslate"><span class="pre">(model,</span> <span class="pre">variables)</span></code>. Unlike <code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code>, the objective
+sense is <strong>not</strong> detected automatically – set <code class="docutils literal notranslate"><span class="pre">self.modelSense</span> <span class="pre">=</span>
+<span class="pre">EPO.MAXIMIZE</span></code> in <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> for maximization problems (default is
+minimization). Solver output is silenced by default. The backend solver
+is selected at construction time via the <code class="docutils literal notranslate"><span class="pre">solver</span></code> argument (e.g.,
+<code class="docutils literal notranslate"><span class="pre">&quot;scip&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;glop&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;cbc&quot;</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>_model</strong> (<em>pywraplp.Solver</em>) – OR-Tools linear solver</p></li>
-<li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – solver backend (e.g. “scip”, “glop”, “cbc”)</p></li>
+<li><p><strong>_model</strong> (<em>pywraplp.Solver</em>) – underlying OR-Tools linear solver</p></li>
+<li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – pywraplp backend name</p></li>
 </ul>
 </dd>
 </dl>

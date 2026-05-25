@@ -352,13 +352,19 @@
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.twostage.</span></span><span class="sig-name descname"><span class="pre">sklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseEstimator</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MultiOutputRegressor</span></span></span></dt>
-<dd><p>Two-stage prediction and optimization with scikit-learn.</p>
+<dd><p>Wrap a scikit-learn estimator into a multi-output regressor for two-stage baselines.</p>
+<p>The two-stage approach trains a regression model to minimize prediction
+error (e.g. MSE on cost coefficients) and only afterwards plugs the
+predicted costs into the optimization solver. This helper turns any
+single-output scikit-learn estimator (<code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RandomForestRegressor</span></code>, <code class="docutils literal notranslate"><span class="pre">MLPRegressor</span></code>, …) into a multi-output
+regressor suitable for predicting the full cost vector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pmodel</strong> – scikit-learn regression model</p>
+<dd class="field-odd"><p><strong>pmodel</strong> – a scikit-learn single-output regression estimator</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>scikit-learn multi-output regression model</p>
+<dd class="field-even"><p>scikit-learn multi-output regression wrapper</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>MultiOutputRegressor</p>

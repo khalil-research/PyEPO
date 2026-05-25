@@ -22,13 +22,19 @@ Module Contents
 
 .. py:function:: genData(num_data: int, num_features: int, grid: tuple[int, int], deg: int = 1, noise_width: float = 0, seed: int = 135) -> tuple[numpy.ndarray, numpy.ndarray]
 
-   A function to generate synthetic data and features for shortest path
+   Generate synthetic feature-cost pairs for the shortest path problem.
+
+   Features are sampled from a standard multivariate Gaussian
+   :math:`\mathcal{N}(0, \mathbf{I})`. A random Bernoulli(0.5) matrix
+   :math:`\mathcal{B}` maps each feature vector into the edge-cost
+   coefficients via a polynomial of degree ``deg``, scaled by multiplicative
+   uniform noise of half-width ``noise_width``.
 
    :param num_data: number of data points
    :param num_features: dimension of features
    :param grid: size of grid network
-   :param deg: data polynomial degree
-   :param noise_width: half width of data random noise
+   :param deg: polynomial degree of the feature-to-cost mapping
+   :param noise_width: half-width of the multiplicative uniform noise
    :param seed: random seed (default 135 for reproducibility)
 
    :returns: data features (np.ndarray), costs (np.ndarray)

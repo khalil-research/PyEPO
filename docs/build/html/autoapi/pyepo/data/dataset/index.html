@@ -370,13 +370,13 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p></td>
-<td><p>This class is a Torch Dataset for optimization problems.</p></td>
+<td><p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for predict-then-optimize problems.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDatasetKNN" title="pyepo.data.dataset.optDatasetKNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDatasetKNN</span></code></a></p></td>
-<td><p>This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.</p></td>
+<td><p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for the kNN-robust decision-focused loss.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.dataset.optDatasetConstrs" title="pyepo.data.dataset.optDatasetConstrs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code></a></p></td>
-<td><p>This class is a Torch Dataset for optimization problems with the normals</p></td>
+<td><p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for the CaVE cone-aligned loss.</p></td>
 </tr>
 </tbody>
 </table>
@@ -388,7 +388,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.dataset.collate_tight_constraints" title="pyepo.data.dataset.collate_tight_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code></a>(batch)</p></td>
-<td><p>A custom collate function for PyTorch DataLoader that pads binding-constraint matrices</p></td>
+<td><p>Collate function for <code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code> batches.</p></td>
 </tr>
 </tbody>
 </table>
@@ -410,15 +410,22 @@
 <dt class="sig sig-object py" id="pyepo.data.dataset.optDataset">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDataset" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch v2.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a></p>
-<p>This class is a Torch Dataset for optimization problems.</p>
+<p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for predict-then-optimize problems.</p>
+<p>At construction time it solves the optimization problem for every cost
+vector and caches the optimal solution <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span>
+and objective value <span class="math notranslate nohighlight">\(z^*(\mathbf{c})\)</span>. This precomputation removes
+solver overhead from the training loop, making <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> the standard
+input format for end-to-end training in PyEPO. When labels are already
+available from another source, <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> can be skipped and batches
+fed directly to <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Optimization model</p></li>
 <li><p><strong>feats</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Data features</p></li>
 <li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cost vectors</p></li>
-<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal solutions</p></li>
-<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal objective values</p></li>
+<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cached optimal solutions w*(c)</p></li>
+<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cached optimal objective values z*(c)</p></li>
 </ul>
 </dd>
 </dl>
@@ -453,18 +460,23 @@
 <dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetKNN">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetKNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDatasetKNN" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p>
-<p>This class is a Torch Dataset for optimization problems, when using the robust kNN-loss.</p>
-<p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2310.04328">https://arxiv.org/abs/2310.04328</a>&gt;</p>
+<p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for the kNN-robust decision-focused loss.</p>
+<p>For each instance the cost vector is replaced with a convex combination of
+its k nearest neighbours in feature space, and the optimization problem is
+solved on the smoothed costs. The mean kNN solutions and objective values
+are cached for training, providing a robust supervision signal under noisy
+or out-of-distribution feature observations.</p>
+<p>Reference: Schutte et al. (2023) <a class="reference external" href="https://arxiv.org/abs/2310.04328">https://arxiv.org/abs/2310.04328</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Optimization model</p></li>
 <li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of nearest neighbours selected</p></li>
-<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – weight of kNN-loss</p></li>
+<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – self-weight in the kNN convex combination (1.0 = no smoothing)</p></li>
 <li><p><strong>feats</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Data features</p></li>
-<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cost vectors</p></li>
-<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal solutions</p></li>
-<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal objective values</p></li>
+<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – kNN-smoothed cost vectors</p></li>
+<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Mean kNN optimal solutions</p></li>
+<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Mean kNN optimal objective values</p></li>
 </ul>
 </dd>
 </dl>
@@ -509,18 +521,31 @@
 <dt class="sig sig-object py" id="pyepo.data.dataset.optDatasetConstrs">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetConstrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_infeas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.optDatasetConstrs" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optDataset</span></code></a></p>
-<p>This class is a Torch Dataset for optimization problems with the normals
-of binding constraints at the optimum, consumed by the CaVE loss.</p>
-<p>Reference: &lt;<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12">https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12</a>&gt;</p>
+<p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for the CaVE cone-aligned loss.</p>
+<p>Stores features and cost coefficients, solves each instance with a fresh
+copy of the Gurobi model, and extracts the <strong>normals of the binding
+constraints at the optimal vertex</strong> in canonical <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> orientation.
+These normals span the polyhedral cone onto which <code class="docutils literal notranslate"><span class="pre">coneAlignedCosine</span></code>
+projects the predicted cost vector during training.</p>
+<p>CaVE is defined for binary linear programs only, so the optimal vertex
+must be binary; instances that are infeasible or have non-binary optima
+raise (or are skipped when <code class="docutils literal notranslate"><span class="pre">skip_infeas=True</span></code>). Binding-constraint
+extraction uses Gurobi’s sparse-matrix API, which is why this dataset
+currently requires a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code>.</p>
+<p>Per-instance row counts differ (different constraints bind at different
+vertices), so batches must be assembled with <code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>.</p>
+<p>Reference: Tang &amp; Khalil (2024)
+<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12">https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Optimization model (Gurobi-backed)</p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Gurobi-backed optimization model</p></li>
 <li><p><strong>feats</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Data features</p></li>
 <li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cost vectors</p></li>
 <li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal solutions</p></li>
 <li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal objective values</p></li>
-<li><p><strong>ctrs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a><em>]</em>) – Per-instance binding-constraint normals</p></li>
+<li><p><strong>ctrs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a><em>]</em>) – Per-instance binding-constraint normals
+in canonical <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> orientation (ragged row counts)</p></li>
 </ul>
 </dd>
 </dl>
@@ -564,7 +589,11 @@ of binding constraints at the optimum, consumed by the CaVE loss.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.data.dataset.collate_tight_constraints">
 <span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">collate_tight_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.data.dataset.collate_tight_constraints" title="Link to this definition">¶</a></dt>
-<dd><p>A custom collate function for PyTorch DataLoader that pads binding-constraint matrices</p>
+<dd><p>Collate function for <code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code> batches.</p>
+<p>Stacks the standard <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code> tensors and zero-pads the ragged
+per-instance binding-constraint matrices to a common row count so they
+can be assembled into a single <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">max_rows,</span> <span class="pre">num_cost)</span></code> tensor
+for <code class="docutils literal notranslate"><span class="pre">coneAlignedCosine</span></code>.</p>
 </dd></dl>
 
 </section>
@@ -678,5 +707,6 @@ of binding constraints at the optimum, consumed by the CaVE loss.</p>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

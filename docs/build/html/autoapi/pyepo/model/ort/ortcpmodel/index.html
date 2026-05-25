@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.ortcpmodel.optOrtCpModel" title="pyepo.model.ort.ortcpmodel.optOrtCpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optOrtCpModel</span></code></a></p></td>
-<td><p>This is an abstract class for an OR-Tools CP-SAT optimization model</p></td>
+<td><p>Abstract base class for OR-Tools CP-SAT (constraint programming) models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -367,10 +367,19 @@
 <dt class="sig sig-object py" id="pyepo.model.ort.ortcpmodel.optOrtCpModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.ortcpmodel.</span></span><span class="sig-name descname"><span class="pre">optOrtCpModel</span></span><a class="headerlink" href="#pyepo.model.ort.ortcpmodel.optOrtCpModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>This is an abstract class for an OR-Tools CP-SAT optimization model</p>
+<p>Abstract base class for OR-Tools CP-SAT (constraint programming) models.</p>
+<p>Subclasses implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> to build a <code class="docutils literal notranslate"><span class="pre">cp_model.CpModel</span></code> and
+return <code class="docutils literal notranslate"><span class="pre">(model,</span> <span class="pre">variables)</span></code>. CP-SAT is an <strong>integer-only</strong> solver, so
+float cost vectors are scaled internally (multiplied by <code class="docutils literal notranslate"><span class="pre">_OBJ_SCALE</span></code>
+and cast to int) before being passed to the solver; the objective value
+returned by <code class="docutils literal notranslate"><span class="pre">solve</span></code> is rescaled back to the original units.</p>
+<p>As with the other non-Gurobi/non-COPT backends, <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> is not
+auto-detected – set <code class="docutils literal notranslate"><span class="pre">self.modelSense</span> <span class="pre">=</span> <span class="pre">EPO.MAXIMIZE</span></code> in <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>
+for maximization (default is minimization). CP-SAT does not support LP
+relaxation, so <code class="docutils literal notranslate"><span class="pre">relax()</span></code> raises <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>_model</strong> (<em>cp_model.CpModel</em>) – OR-Tools CP-SAT model</p>
+<dd class="field-odd"><p><strong>_model</strong> (<em>cp_model.CpModel</em>) – underlying OR-Tools CP-SAT model</p>
 </dd>
 </dl>
 <dl class="py method">

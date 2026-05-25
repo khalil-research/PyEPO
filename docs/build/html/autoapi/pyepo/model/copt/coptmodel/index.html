@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.copt.coptmodel.optCoptModel" title="pyepo.model.copt.coptmodel.optCoptModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optCoptModel</span></code></a></p></td>
-<td><p>This is an abstract class for a Cardinal Optimizer optimization model</p></td>
+<td><p>Abstract base class for Cardinal Optimizer (COPT) backed models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -367,10 +367,17 @@
 <dt class="sig sig-object py" id="pyepo.model.copt.coptmodel.optCoptModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.coptmodel.</span></span><span class="sig-name descname"><span class="pre">optCoptModel</span></span><a class="headerlink" href="#pyepo.model.copt.coptmodel.optCoptModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>This is an abstract class for a Cardinal Optimizer optimization model</p>
+<p>Abstract base class for Cardinal Optimizer (COPT) backed models.</p>
+<p>Subclasses implement <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> to build a COPT <code class="docutils literal notranslate"><span class="pre">Model</span></code> and return
+<code class="docutils literal notranslate"><span class="pre">(model,</span> <span class="pre">variables)</span></code>. The objective sense is auto-detected from the
+underlying COPT model (no need to set <code class="docutils literal notranslate"><span class="pre">modelSense</span></code> manually); solver
+logging is silenced by default. Cost-vector updates use the C-level
+<code class="docutils literal notranslate"><span class="pre">setInfo(&quot;Obj&quot;,</span> <span class="pre">...)</span></code> batch path for efficiency. A process-local COPT
+<code class="docutils literal notranslate"><span class="pre">Envr</span></code> singleton is reused across instances to avoid re-booting the
+license and worker threads on every model build.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>_model</strong> (<em>COPT model</em>) – COPT model</p>
+<dd class="field-odd"><p><strong>_model</strong> (<em>coptpy.Model</em>) – underlying COPT model</p>
 </dd>
 </dl>
 <dl class="py method">

@@ -25,11 +25,22 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for a Pyomo-based optimization model
+   Abstract base class for Pyomo-backed optimization models.
 
-   :ivar _model: Pyomo model
-   :vartype _model: Pyomo model
-   :ivar solver: optimization solver in the background
+   Subclasses implement ``_getModel`` to build a Pyomo ``ConcreteModel``
+   and return ``(model, variables)``. Unlike ``optGrbModel``, the objective
+   sense is **not** detected automatically -- set ``self.modelSense =
+   EPO.MAXIMIZE`` in ``_getModel`` for maximization problems (default is
+   minimization). The cost vector is wired into the model as a mutable
+   ``Param`` so that ``setObj`` only updates parameter values rather than
+   rebuilding the objective expression.
+
+   Any solver supported by Pyomo can be plugged in via the ``solver``
+   argument (e.g., ``"glpk"``, ``"gurobi"``, ``"cbc"``).
+
+   :ivar _model: underlying Pyomo model
+   :vartype _model: pyomo.ConcreteModel
+   :ivar solver: name of the Pyomo solver backend
 
    :vartype solver: str
 

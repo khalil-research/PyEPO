@@ -33,11 +33,19 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for an OR-Tools pywraplp optimization model
+   Abstract base class for OR-Tools pywraplp (LP/MIP) models.
 
-   :ivar _model: OR-Tools linear solver
+   Subclasses implement ``_getModel`` to build a ``pywraplp.Solver`` and
+   return ``(model, variables)``. Unlike ``optGrbModel``, the objective
+   sense is **not** detected automatically -- set ``self.modelSense =
+   EPO.MAXIMIZE`` in ``_getModel`` for maximization problems (default is
+   minimization). Solver output is silenced by default. The backend solver
+   is selected at construction time via the ``solver`` argument (e.g.,
+   ``"scip"``, ``"glop"``, ``"cbc"``).
+
+   :ivar _model: underlying OR-Tools linear solver
    :vartype _model: pywraplp.Solver
-   :ivar solver: solver backend (e.g. "scip", "glop", "cbc")
+   :ivar solver: pywraplp backend name
 
    :vartype solver: str
 

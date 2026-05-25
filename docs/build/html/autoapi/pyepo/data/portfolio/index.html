@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.portfolio.genData" title="pyepo.data.portfolio.genData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genData</span></code></a>(→ tuple[numpy.ndarray, numpy.ndarray, ...)</p></td>
-<td><p>A function to generate synthetic data and features for portfolio</p></td>
+<td><p>Generate synthetic feature-cost pairs for portfolio optimization.</p></td>
 </tr>
 </tbody>
 </table>
@@ -366,15 +366,24 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.data.portfolio.genData">
 <span class="sig-prename descclassname"><span class="pre">pyepo.data.portfolio.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_assets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.data.portfolio.genData" title="Link to this definition">¶</a></dt>
-<dd><p>A function to generate synthetic data and features for portfolio</p>
+<dd><p>Generate synthetic feature-cost pairs for portfolio optimization.</p>
+<p>Returns the expected returns <span class="math notranslate nohighlight">\(\mathbf{r}\)</span> (the per-instance cost
+vectors) and a single shared covariance matrix <span class="math notranslate nohighlight">\(\mathbf{\Sigma}\)</span>
+used in the risk constraint of the predefined portfolio model. The mean
+returns follow a factor-model structure
+<span class="math notranslate nohighlight">\(\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L}\mathbf{f}
++ 0.01 \tau \boldsymbol{\epsilon}\)</span>, where the factor loadings
+<span class="math notranslate nohighlight">\(\mathbf{L}\)</span> and residual noise are both scaled by <code class="docutils literal notranslate"><span class="pre">noise_level</span></code>
+(<span class="math notranslate nohighlight">\(\tau\)</span>). Unlike the other generators in <code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code>, portfolio
+noise is controlled by <code class="docutils literal notranslate"><span class="pre">noise_level</span></code> rather than <code class="docutils literal notranslate"><span class="pre">noise_width</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_data</strong> – number of data points</p></li>
 <li><p><strong>num_features</strong> – dimension of features</p></li>
 <li><p><strong>num_assets</strong> – number of assets</p></li>
-<li><p><strong>deg</strong> – data polynomial degree</p></li>
-<li><p><strong>noise_level</strong> – level of data random noise</p></li>
+<li><p><strong>deg</strong> – polynomial degree of the feature-to-return mapping</p></li>
+<li><p><strong>noise_level</strong> – scales factor loadings L and residual noise (tau)</p></li>
 <li><p><strong>seed</strong> – random seed (default 135 for reproducibility)</p></li>
 </ul>
 </dd>
@@ -466,5 +475,6 @@
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

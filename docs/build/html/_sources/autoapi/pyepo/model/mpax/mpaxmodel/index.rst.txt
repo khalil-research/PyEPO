@@ -25,10 +25,15 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   This is an abstract class for an MPAX-based optimization model.
+   Abstract base class for MPAX-backed (JAX) linear-program models.
 
-   Concrete subclasses populate the constraint matrices and bounds inside
-   ``_getModel``:
+   MPAX is a JAX implementation of the PDHG (Primal-Dual Hybrid Gradient)
+   first-order LP solver, designed for large-scale linear programs that
+   benefit from GPU acceleration and vmap-batched solving. Unlike the
+   Gurobi / COPT / Pyomo / OR-Tools backends, an MPAX model has **no
+   explicit solver model object** -- the constraint matrices and bounds
+   *are* the model. Subclasses populate them inside ``_getModel`` and
+   return ``(None, [])``::
 
        def _getModel(self):
            self.A = jnp.array(...)   # equality A x = b
@@ -39,24 +44,28 @@ Module Contents
            self.u = jnp.array(...)   # variable upper bound
            return None, []
 
-   Sense (MIN / MAX) follows ``self.modelSense`` (set by a problem-level base
-   such as ``knapsackBase`` before this ``__init__`` runs; defaults to MIN).
-   Sparse-matrix format can be toggled by overriding the class attribute
-   ``use_sparse_matrix`` on the concrete subclass.
+   Objective sense follows ``self.modelSense`` (set by a problem-level base
+   such as ``knapsackBase`` or directly in ``_getModel``; defaults to
+   minimization). Dense vs sparse matrices can be toggled by overriding the
+   class attribute ``use_sparse_matrix`` (default ``True``).
 
-   :ivar A: The matrix of equality constraints.
+   A jitted single-instance solver and a ``vmap``-batched solver
+   (``batch_optimize``) are pre-compiled on construction, so
+   ``optDataset`` can solve every training instance in a single dispatch.
+
+   :ivar A: equality-constraint matrix (Ax = b)
    :vartype A: jnp.ndarray
-   :ivar b: The right hand side of equality constraints.
+   :ivar b: equality-constraint right-hand side
    :vartype b: jnp.ndarray
-   :ivar G: The matrix for inequality constraints.
+   :ivar G: inequality-constraint matrix (Gx >= h)
    :vartype G: jnp.ndarray
-   :ivar h: The right hand side of inequality constraints.
+   :ivar h: inequality-constraint right-hand side
    :vartype h: jnp.ndarray
-   :ivar l: The lower bound of the variables.
+   :ivar l: variable lower bounds
    :vartype l: jnp.ndarray
-   :ivar u: The upper bound of the variables.
+   :ivar u: variable upper bounds
    :vartype u: jnp.ndarray
-   :ivar use_sparse_matrix: Whether to use sparse matrix format.
+   :ivar use_sparse_matrix: whether to use sparse matrices
 
    :vartype use_sparse_matrix: bool
 

@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optModel</span></code></a></p></td>
-<td><p>This is an abstract class for an optimization model</p></td>
+<td><p>Abstract base class for predict-then-optimize models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -367,10 +367,24 @@
 <dt class="sig sig-object py" id="pyepo.model.opt.optModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">optModel</span></span><a class="headerlink" href="#pyepo.model.opt.optModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
-<p>This is an abstract class for an optimization model</p>
+<p>Abstract base class for predict-then-optimize models.</p>
+<p>Subclasses wrap an optimization solver or algorithm with a unified
+<code class="docutils literal notranslate"><span class="pre">_getModel</span></code> / <code class="docutils literal notranslate"><span class="pre">setObj</span></code> / <code class="docutils literal notranslate"><span class="pre">solve</span></code> / <code class="docutils literal notranslate"><span class="pre">num_cost</span></code> interface that
+<code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules call during training. Concrete backends are
+provided for GurobiPy (<code class="docutils literal notranslate"><span class="pre">optGrbModel</span></code>), Pyomo (<code class="docutils literal notranslate"><span class="pre">optOmoModel</span></code>),
+COPT (<code class="docutils literal notranslate"><span class="pre">optCoptModel</span></code>), OR-Tools (<code class="docutils literal notranslate"><span class="pre">optOrtModel</span></code> / <code class="docutils literal notranslate"><span class="pre">optOrtCpModel</span></code>),
+and MPAX (<code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code>); subclass <code class="docutils literal notranslate"><span class="pre">optModel</span></code> directly to integrate
+any other solver or algorithm.</p>
+<p>The default objective sense is minimization; set
+<code class="docutils literal notranslate"><span class="pre">self.modelSense</span> <span class="pre">=</span> <span class="pre">EPO.MAXIMIZE</span></code> in <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> or <code class="docutils literal notranslate"><span class="pre">__init__</span></code> for
+maximization problems (some backends, e.g. Gurobi and COPT, detect this
+automatically from the underlying solver model).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>_model</strong> (<em>optimization model</em>) – underlying solver model object</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_model</strong> (<em>optimization model</em>) – underlying solver model object</p></li>
+<li><p><strong>modelSense</strong> (<a class="reference internal" href="../../EPO/index.html#pyepo.EPO.ModelSense" title="pyepo.EPO.ModelSense"><em>ModelSense</em></a>) – EPO.MINIMIZE (default) or EPO.MAXIMIZE</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py attribute">

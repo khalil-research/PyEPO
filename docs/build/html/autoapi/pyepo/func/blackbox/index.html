@@ -355,13 +355,13 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox.blackboxOpt" title="pyepo.func.blackbox.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
-<td><p>An autograd module for differentiable black-box optimizer, which yields</p></td>
+<td><p>Differentiable Black-Box Optimizer (DBB) -- gradient via solution interpolation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.blackbox.blackboxOptFunc" title="pyepo.func.blackbox.blackboxOptFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOptFunc</span></code></a></p></td>
 <td><p>An autograd function for differentiable black-box optimizer</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.blackbox.negativeIdentity" title="pyepo.func.blackbox.negativeIdentity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a></p></td>
-<td><p>An autograd module for the differentiable optimizer, which yields an optimal</p></td>
+<td><p>Negative Identity Backpropagation (NID) -- hyperparameter-free DBB.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.blackbox.negativeIdentityFunc" title="pyepo.func.blackbox.negativeIdentityFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negativeIdentityFunc</span></code></a></p></td>
 <td><p>An autograd function for negative identity optimizer</p></td>
@@ -376,15 +376,18 @@
 <dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../data/dataset/index.html#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><span class="pre">pyepo.data.dataset.optDataset</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for differentiable black-box optimizer, which yields
-an optimal solution and derive a gradient.</p>
-<p>For differentiable black-box, the objective function is linear and
-constraints are known and fixed, but the cost vector needs to be predicted
-from contextual data.</p>
-<p>The black-box approximates the gradient of the optimizer by interpolating
-the loss function. Thus, it allows us to design an algorithm based on
-stochastic gradient descent.</p>
-<p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/1912.02175">https://arxiv.org/abs/1912.02175</a>&gt;</p>
+<p>Differentiable Black-Box Optimizer (DBB) – gradient via solution interpolation.</p>
+<p>Replaces the zero gradient of the combinatorial solver with an
+interpolation-based estimate: given an upstream gradient
+<span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, DBB approximates the vector-Jacobian product as
+<span class="math notranslate nohighlight">\((\mathbf{w}^*(\hat{\mathbf{c}} + \lambda \mathbf{d}) -
+\mathbf{w}^*(\hat{\mathbf{c}})) / \lambda\)</span>. Larger <code class="docutils literal notranslate"><span class="pre">lambd</span></code> smooths
+more aggressively; the recommended range is <strong>10-20</strong>. The resulting
+surrogate is nonconvex in <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>, so convergence
+guarantees are weaker than SPO+.</p>
+<p>Returns a predicted solution – pair with an objective-value task loss
+such as L1 against <span class="math notranslate nohighlight">\(z^*(\mathbf{c})\)</span>.</p>
+<p>Reference: Vlastelica et al. (2019) <a class="reference external" href="https://arxiv.org/abs/1912.02175">https://arxiv.org/abs/1912.02175</a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.blackboxOpt.lambd">
 <span class="sig-name descname"><span class="pre">lambd</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></span><a class="headerlink" href="#pyepo.func.blackbox.blackboxOpt.lambd" title="Link to this definition">¶</a></dt>
@@ -435,16 +438,18 @@ stochastic gradient descent.</p>
 <dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentity">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.blackbox.</span></span><span class="sig-name descname"><span class="pre">negativeIdentity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../data/dataset/index.html#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><span class="pre">pyepo.data.dataset.optDataset</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentity" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for the differentiable optimizer, which yields an optimal
-solution and uses negative identity as a gradient on the backward pass.</p>
-<p>For negative identity backpropagation, the objective function is linear and
-constraints are known and fixed, but the cost vector needs to be predicted
-from contextual data.</p>
-<p>If the interpolation hyperparameter λ aligns with an appropriate step size,
-then the identity update is equivalent to DBB. However, the identity update
-does not require an additional call to the solver during the backward pass
-and tuning an additional hyperparameter λ.</p>
-<p>Reference: &lt;<a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a>&gt;</p>
+<p>Negative Identity Backpropagation (NID) – hyperparameter-free DBB.</p>
+<p>Treats the solver Jacobian as a (signed) identity:
+<span class="math notranslate nohighlight">\(\partial \mathbf{w}^* / \partial \hat{\mathbf{c}} \approx
+-\mathbf{I}\)</span> for minimization (and <span class="math notranslate nohighlight">\(+\mathbf{I}\)</span> for
+maximization), yielding a straight-through gradient estimator. This is
+the special case of DBB where <span class="math notranslate nohighlight">\(\lambda\)</span> is chosen so the
+interpolated solution coincides with the negative-identity update –
+with the bonus that no extra solver call is needed on the backward
+pass.</p>
+<p>Returns a predicted solution; pair with an objective-value task loss
+(e.g., L1 against <span class="math notranslate nohighlight">\(z^*(\mathbf{c})\)</span>).</p>
+<p>Reference: Sahoo et al. (2022) <a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.blackbox.negativeIdentity.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a></span></span><a class="headerlink" href="#pyepo.func.blackbox.negativeIdentity.forward" title="Link to this definition">¶</a></dt>
@@ -583,5 +588,6 @@ and tuning an additional hyperparameter λ.</p>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

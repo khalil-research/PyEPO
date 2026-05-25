@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.cave.coneAlignedCosine" title="pyepo.func.cave.coneAlignedCosine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coneAlignedCosine</span></code></a></p></td>
-<td><p>An autograd module for the CaVE loss for binary linear programs. Projects</p></td>
+<td><p>Cone-Aligned Vector Estimation (CaVE) loss for binary linear programs.</p></td>
 </tr>
 </tbody>
 </table>
@@ -367,18 +367,27 @@
 <dt class="sig sig-object py" id="pyepo.func.cave.coneAlignedCosine">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.cave.</span></span><span class="sig-name descname"><span class="pre">coneAlignedCosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_grad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.Reduction" title="pyepo.func.abcmodule.Reduction"><span class="pre">pyepo.func.abcmodule.Reduction</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.cave.coneAlignedCosine" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>An autograd module for the CaVE loss for binary linear programs. Projects
-the sense-flipped predicted cost onto the polyhedral cone spanned by the
-binding-constraint normals at the optimal vertex via batched dense
-Nesterov APGD on GPU/CPU, then minimizes <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">cos(pred,</span> <span class="pre">proj)</span></code>.</p>
-<p>Defaults reproduce the <strong>CaVE+</strong> preset from the paper (truncated APGD,
-<code class="docutils literal notranslate"><span class="pre">max_iters=20</span></code>, no convergence check), which lands strictly inside the
-cone and avoids the boundary-stagnation that pure-exact APGD can hit. To
-approach the original <strong>CaVE</strong> preset, set a non-trivial tolerance
-(e.g. <code class="docutils literal notranslate"><span class="pre">tol_grad=1e-4</span></code>) and remove the iteration cap (<code class="docutils literal notranslate"><span class="pre">max_iters=None</span></code>);
-in practice this is slower without a regret improvement, so the truncated
-default is recommended.</p>
-<p>Reference: &lt;<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12">https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12</a>&gt;</p>
+<p>Cone-Aligned Vector Estimation (CaVE) loss for binary linear programs.</p>
+<p>For each training instance, the sense-flipped predicted cost vector
+<span class="math notranslate nohighlight">\(-\hat{\mathbf{c}}\)</span> is projected onto the polyhedral cone spanned
+by the binding-constraint normals at the true optimal vertex; the loss
+is <span class="math notranslate nohighlight">\(1 - \cos(-\hat{\mathbf{c}}, \mathrm{proj})\)</span>. Because the
+supervision is the cone of binding normals (not the optimal solution
+itself), CaVE side-steps the zero-gradient pathology of solver layers
+without requiring a perturbation or solution pool. Defined for
+<strong>binary linear programs</strong> only.</p>
+<p>PyEPO ships a pure-torch APGD (Nesterov-accelerated projected gradient
+descent) batched cone-projection solver, <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>-fused and
+CUDA-graph friendly. Defaults (<code class="docutils literal notranslate"><span class="pre">max_iters=20</span></code>, <code class="docutils literal notranslate"><span class="pre">tol_grad=None</span></code>)
+reproduce the <strong>CaVE+</strong> preset from the paper: a truncated APGD that
+lands strictly inside the cone and avoids boundary stagnation. To
+approach the original <strong>CaVE</strong> preset, drop the iteration cap and add
+a non-trivial tolerance (<code class="docutils literal notranslate"><span class="pre">max_iters=None,</span> <span class="pre">tol_grad=1e-4</span></code>); in
+practice the truncated default is faster without losing regret quality.</p>
+<p>Training data must come from <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code>
+(Gurobi-backed) and be collated with <code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>.</p>
+<p>Reference: Tang &amp; Khalil (2024)
+<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12">https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12</a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.cave.coneAlignedCosine.tol_grad">
 <span class="sig-name descname"><span class="pre">tol_grad</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pyepo.func.cave.coneAlignedCosine.tol_grad" title="Link to this definition">¶</a></dt>
@@ -481,5 +490,6 @@ default is recommended.</p>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

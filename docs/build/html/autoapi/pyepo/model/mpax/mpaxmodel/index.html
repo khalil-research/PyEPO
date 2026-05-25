@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="pyepo.model.mpax.mpaxmodel.optMpaxModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optMpaxModel</span></code></a></p></td>
-<td><p>This is an abstract class for an MPAX-based optimization model.</p></td>
+<td><p>Abstract base class for MPAX-backed (JAX) linear-program models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -367,35 +367,41 @@
 <dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.mpaxmodel.</span></span><span class="sig-name descname"><span class="pre">optMpaxModel</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>This is an abstract class for an MPAX-based optimization model.</p>
-<p>Concrete subclasses populate the constraint matrices and bounds inside
-<code class="docutils literal notranslate"><span class="pre">_getModel</span></code>:</p>
-<blockquote>
-<div><dl class="simple">
-<dt>def _getModel(self):</dt><dd><p>self.A = jnp.array(…)   # equality A x = b
-self.b = jnp.array(…)
-self.G = jnp.array(…)   # inequality G x &gt;= h
-self.h = jnp.array(…)
-self.l = jnp.array(…)   # variable lower bound
-self.u = jnp.array(…)   # variable upper bound
-return None, []</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>Sense (MIN / MAX) follows <code class="docutils literal notranslate"><span class="pre">self.modelSense</span></code> (set by a problem-level base
-such as <code class="docutils literal notranslate"><span class="pre">knapsackBase</span></code> before this <code class="docutils literal notranslate"><span class="pre">__init__</span></code> runs; defaults to MIN).
-Sparse-matrix format can be toggled by overriding the class attribute
-<code class="docutils literal notranslate"><span class="pre">use_sparse_matrix</span></code> on the concrete subclass.</p>
+<p>Abstract base class for MPAX-backed (JAX) linear-program models.</p>
+<p>MPAX is a JAX implementation of the PDHG (Primal-Dual Hybrid Gradient)
+first-order LP solver, designed for large-scale linear programs that
+benefit from GPU acceleration and vmap-batched solving. Unlike the
+Gurobi / COPT / Pyomo / OR-Tools backends, an MPAX model has <strong>no
+explicit solver model object</strong> – the constraint matrices and bounds
+<em>are</em> the model. Subclasses populate them inside <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> and
+return <code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">[])</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>   <span class="c1"># equality A x = b</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>   <span class="c1"># inequality G x &gt;= h</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>   <span class="c1"># variable lower bound</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>   <span class="c1"># variable upper bound</span>
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<p>Objective sense follows <code class="docutils literal notranslate"><span class="pre">self.modelSense</span></code> (set by a problem-level base
+such as <code class="docutils literal notranslate"><span class="pre">knapsackBase</span></code> or directly in <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>; defaults to
+minimization). Dense vs sparse matrices can be toggled by overriding the
+class attribute <code class="docutils literal notranslate"><span class="pre">use_sparse_matrix</span></code> (default <code class="docutils literal notranslate"><span class="pre">True</span></code>).</p>
+<p>A jitted single-instance solver and a <code class="docutils literal notranslate"><span class="pre">vmap</span></code>-batched solver
+(<code class="docutils literal notranslate"><span class="pre">batch_optimize</span></code>) are pre-compiled on construction, so
+<code class="docutils literal notranslate"><span class="pre">optDataset</span></code> can solve every training instance in a single dispatch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<em>jnp.ndarray</em>) – The matrix of equality constraints.</p></li>
-<li><p><strong>b</strong> (<em>jnp.ndarray</em>) – The right hand side of equality constraints.</p></li>
-<li><p><strong>G</strong> (<em>jnp.ndarray</em>) – The matrix for inequality constraints.</p></li>
-<li><p><strong>h</strong> (<em>jnp.ndarray</em>) – The right hand side of inequality constraints.</p></li>
-<li><p><strong>l</strong> (<em>jnp.ndarray</em>) – The lower bound of the variables.</p></li>
-<li><p><strong>u</strong> (<em>jnp.ndarray</em>) – The upper bound of the variables.</p></li>
-<li><p><strong>use_sparse_matrix</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to use sparse matrix format.</p></li>
+<li><p><strong>A</strong> (<em>jnp.ndarray</em>) – equality-constraint matrix (Ax = b)</p></li>
+<li><p><strong>b</strong> (<em>jnp.ndarray</em>) – equality-constraint right-hand side</p></li>
+<li><p><strong>G</strong> (<em>jnp.ndarray</em>) – inequality-constraint matrix (Gx &gt;= h)</p></li>
+<li><p><strong>h</strong> (<em>jnp.ndarray</em>) – inequality-constraint right-hand side</p></li>
+<li><p><strong>l</strong> (<em>jnp.ndarray</em>) – variable lower bounds</p></li>
+<li><p><strong>u</strong> (<em>jnp.ndarray</em>) – variable upper bounds</p></li>
+<li><p><strong>use_sparse_matrix</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – whether to use sparse matrices</p></li>
 </ul>
 </dd>
 </dl>

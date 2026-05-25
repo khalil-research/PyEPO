@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.data.shortestpath.genData" title="pyepo.data.shortestpath.genData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">genData</span></code></a>(→ tuple[numpy.ndarray, numpy.ndarray])</p></td>
-<td><p>A function to generate synthetic data and features for shortest path</p></td>
+<td><p>Generate synthetic feature-cost pairs for the shortest path problem.</p></td>
 </tr>
 </tbody>
 </table>
@@ -366,15 +366,20 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.data.shortestpath.genData">
 <span class="sig-prename descclassname"><span class="pre">pyepo.data.shortestpath.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.data.shortestpath.genData" title="Link to this definition">¶</a></dt>
-<dd><p>A function to generate synthetic data and features for shortest path</p>
+<dd><p>Generate synthetic feature-cost pairs for the shortest path problem.</p>
+<p>Features are sampled from a standard multivariate Gaussian
+<span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>. A random Bernoulli(0.5) matrix
+<span class="math notranslate nohighlight">\(\mathcal{B}\)</span> maps each feature vector into the edge-cost
+coefficients via a polynomial of degree <code class="docutils literal notranslate"><span class="pre">deg</span></code>, scaled by multiplicative
+uniform noise of half-width <code class="docutils literal notranslate"><span class="pre">noise_width</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_data</strong> – number of data points</p></li>
 <li><p><strong>num_features</strong> – dimension of features</p></li>
 <li><p><strong>grid</strong> – size of grid network</p></li>
-<li><p><strong>deg</strong> – data polynomial degree</p></li>
-<li><p><strong>noise_width</strong> – half width of data random noise</p></li>
+<li><p><strong>deg</strong> – polynomial degree of the feature-to-cost mapping</p></li>
+<li><p><strong>noise_width</strong> – half-width of the multiplicative uniform noise</p></li>
 <li><p><strong>seed</strong> – random seed (default 135 for reproducibility)</p></li>
 </ul>
 </dd>
@@ -466,5 +471,6 @@
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

@@ -22,13 +22,20 @@ Module Contents
 
 .. py:function:: genData(num_data: int, num_features: int, num_nodes: int, deg: int = 1, noise_width: float = 0, seed: int = 135) -> tuple[numpy.ndarray, numpy.ndarray]
 
-   A function to generate synthetic data and features for traveling salesman
+   Generate synthetic feature-cost pairs for the traveling salesperson problem.
+
+   Edge costs combine a Euclidean component (node coordinates drawn from a
+   mixture of a Gaussian :math:`\mathcal{N}(0, \mathbf{I})` and a uniform
+   :math:`\mathbf{U}(-2, 2)` distribution) with a feature-encoded component
+   obtained by mapping the standard-Gaussian feature vector through a random
+   Bernoulli :math:`\times` uniform matrix :math:`\mathcal{B}` and a polynomial
+   of degree ``deg``, scaled by multiplicative noise of half-width ``noise_width``.
 
    :param num_data: number of data points
    :param num_features: dimension of features
    :param num_nodes: number of nodes
-   :param deg: data polynomial degree
-   :param noise_width: half width of data random noise
+   :param deg: polynomial degree of the feature-to-cost mapping
+   :param noise_width: half-width of the multiplicative uniform noise
    :param seed: random seed (default 135 for reproducibility)
 
    :returns: data features (np.ndarray), costs (np.ndarray)
