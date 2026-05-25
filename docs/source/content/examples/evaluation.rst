@@ -25,6 +25,7 @@ When a predicted cost vector :math:`\hat{c}` yields multiple optimal solutions f
 .. image:: ../../images/regret.png
   :width: 650
   :alt: learning curves
+  :class: light-bg
 
 As the figure shows, regret and unambiguous regret are nearly identical across all training procedures. While the unambiguous regret is more theoretically rigorous, it is rarely necessary in practice.
 

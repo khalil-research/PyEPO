@@ -63,7 +63,7 @@ dev = ["pytest", "ruff", "pyright"]
 docs = [
     "sphinx>=7",
     "sphinx-autoapi>=3",
-    "sphinx-rtd-theme>=2",
+    "furo>=2024.1",
 ]
 
 [project.urls]

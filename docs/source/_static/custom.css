@@ -1,0 +1,24 @@
+/* lock :visited links back to the brand link color so the browser default
+   purple cannot leak through (notably on Furo's prev/next pager). */
+a:visited {
+    color: var(--color-link);
+}
+a:visited:hover {
+    color: var(--color-link--hover);
+}
+
+/* In dark mode, render images flagged with :class: light-bg inside a white
+   card so their dark axis labels / line art / text stay legible. Applied to
+   colored framework figures whose authoring assumed a white page background. */
+body[data-theme="dark"] img.light-bg {
+    background: #ffffff;
+    padding: 0.75rem;
+    border-radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) img.light-bg {
+        background: #ffffff;
+        padding: 0.75rem;
+        border-radius: 6px;
+    }
+}

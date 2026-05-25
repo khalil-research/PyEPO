@@ -71,4 +71,28 @@ templates_path = ["_templates"]
 exclude_patterns = []
 
 html_favicon = "../../images/favicon.ico"
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
+html_theme_options = {
+    # palette derived from the PyEPO logo:
+    #   carrot-orange as the primary brand color (links, headings accents)
+    #   leaf-green appears on `.. tip::` admonitions and on autoapi signature names
+    "light_css_variables": {
+        "color-brand-primary": "#B95B10",
+        "color-brand-content": "#B95B10",
+        "color-admonition-title--tip": "#1F8237",
+        "color-admonition-title-background--tip": "#E8F5EA",
+        "color-api-name": "#1F8237",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#F4B452",
+        "color-brand-content": "#F4B452",
+        "color-admonition-title--tip": "#7CD688",
+        "color-admonition-title-background--tip": "rgba(124, 214, 136, 0.12)",
+        "color-api-name": "#7CD688",
+    },
+    "sidebar_hide_name": False,
+    "navigation_with_keys": True,
+}
+
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]

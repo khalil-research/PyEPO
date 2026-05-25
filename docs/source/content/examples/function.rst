@@ -512,6 +512,7 @@ All ``pyepo.func`` modules support parallel solving during training via the ``pr
 
 .. image:: ../../images/parallel-tsp.png
    :width: 650
+   :class: light-bg
 
 The figure shows that increasing the number of processes reduces runtime.
 
