@@ -16,7 +16,7 @@ Introduction
 * **Contrastive methods** -- noise contrastive estimation (NCE), contrastive MAP (CMAP)
 * **Learning to rank** -- pointwise, pairwise, listwise LTR
 
-For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), ``PyEPO`` ships **CaVE**, a first-order, GPU-native cone-projection solver written in pure PyTorch. Each backward pass becomes a handful of accelerated APGD iterations instead of a combinatorial solve -- typically training an order of magnitude faster than SPO+ on TSP-scale instances.
+For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), ``PyEPO`` ships **CaVE**, a cone-alignment loss that projects the predicted cost onto the cone of binding-constraint normals at the true optimum. Backed by an interior-point QP solver (Clarabel) with a low iteration cap, CaVE delivers paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.
 
 ``PyEPO`` also integrates `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, a JAX-based mathematical programming solver using the PDHG (Primal-Dual Hybrid Gradient) algorithm for GPU-accelerated optimization. MPAX brings three key advantages for end-to-end training: (1) **GPU-native solving** -- the first-order PDHG method is inherently parallelizable and runs efficiently on GPU; (2) **batch solving** -- an entire mini-batch of optimization instances is solved simultaneously via vectorization; (3) **no GPU-CPU data transfer overhead** -- both the neural network and the solver stay on GPU, eliminating the data-transfer bottleneck of CPU-side solvers like Gurobi.
 

@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Solution Pool" href="pool.html"><link rel="prev" title="Two-Stage Method" href="twostage.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Autograd Functions - PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.5 documentation</title>
+        <title>Autograd Functions - PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.5 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.6 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.5 documentation</span>
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.6 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -364,7 +364,7 @@
 <ul class="simple">
 <li><p>When <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span> labels are available, start with <strong>SPO+</strong>: convex, has a nonzero subgradient, and is well-studied as a baseline.</p></li>
 <li><p>When the loss-returning style is preferred and labels include <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span>, <strong>PFYL</strong> avoids the extra task loss.</p></li>
-<li><p>For <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges), use <strong>CaVE</strong>: a GPU-native cone projection replaces the combinatorial solve in each backward pass, typically training an order of magnitude faster than SPO+ on TSP-scale instances.</p></li>
+<li><p>For <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges), use <strong>CaVE</strong>: a cone-alignment loss whose projection (an interior-point QP via Clarabel) replaces the combinatorial solve in the loss, with paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.</p></li>
 <li><p>For very large LPs on GPU, combine <strong>MPAX</strong> models with <strong>SPO+</strong> or <strong>PFYL</strong>.</p></li>
 </ul>
 <p>For finer choices, the right method depends on three questions.</p>
@@ -909,12 +909,12 @@ pass.</p>
 \[\mathcal{L}_{\mathrm{CaVE}}(\hat{\mathbf{c}}, K) = 1 - \frac{(-\hat{\mathbf{c}})^\top \mathbf{p}}{\|\hat{\mathbf{c}}\|_2\, \|\mathbf{p}\|_2}.\]</div>
 </div>
 <p>When <span class="math notranslate nohighlight">\(-\hat{\mathbf{c}}\)</span> already lies inside the cone, <span class="math notranslate nohighlight">\(\mathbf{p} = -\hat{\mathbf{c}}\)</span> and the loss is zero; the further <span class="math notranslate nohighlight">\(-\hat{\mathbf{c}}\)</span> strays outside the cone, the larger the loss.</p>
-<p>PyEPO ships a pure-torch APGD (Nesterov-accelerated projected gradient descent) batched cone-projection solver, <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>-fused and CUDA-graph friendly.</p>
-<p>The defaults reproduce the <strong>CaVE+</strong> preset from the paper (<code class="docutils literal notranslate"><span class="pre">max_iters=20</span></code>, <code class="docutils literal notranslate"><span class="pre">tol_grad=None</span></code>): a truncated APGD that lands strictly inside the cone and avoids the boundary stagnation that pure-exact APGD suffers from. To approach the original <strong>CaVE</strong> preset, drop the iteration cap and add a non-trivial tolerance: <code class="docutils literal notranslate"><span class="pre">coneAlignedCosine(model,</span> <span class="pre">max_iters=None,</span> <span class="pre">tol_grad=1e-4)</span></code>. In practice the truncated default is faster without losing regret quality, so it is the recommended choice.</p>
+<p>PyEPO uses Clarabel as the interior-point QP solver for the cone projection. The default <code class="docutils literal notranslate"><span class="pre">max_iter=3</span></code> is the paper’s <strong>CaVE+</strong> preset — under-converging the QP on purpose keeps the projection interior to the cone and yields a richer gradient than the exact boundary projection.</p>
+<p>For larger problems, setting <code class="docutils literal notranslate"><span class="pre">solve_ratio</span> <span class="pre">&lt;</span> <span class="pre">1</span></code> enables the <strong>CaVE Hybrid</strong> preset: each batch goes through the QP projection with probability <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> and through a cheap heuristic (a blend of the normalized predicted cost and the average binding-constraint normal, controlled by <code class="docutils literal notranslate"><span class="pre">inner_ratio</span></code>) otherwise. This cuts the per-epoch QP cost without measurable regret loss in the paper’s experiments.</p>
 <p>Training data must come from <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code>, which extracts the binding-constraint normals at the optimum for each instance. Batches must be collated with <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.collate_tight_constraints</span></code> to zero-pad ragged per-instance constraint counts. CaVE currently requires a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code> (binding-constraint extraction relies on Gurobi’s sparse matrix API).</p>
 <dl class="py class">
 <dt class="sig sig-object py">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">coneAlignedCosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_grad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.Reduction" title="pyepo.func.abcmodule.Reduction"><span class="pre">Reduction</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">coneAlignedCosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.Reduction" title="pyepo.func.abcmodule.Reduction"><span class="pre">Reduction</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Cone-Aligned Vector Estimation (CaVE) loss for binary linear programs.</p>
 <p>For each training instance, the sense-flipped predicted cost vector
 <span class="math notranslate nohighlight">\(-\hat{\mathbf{c}}\)</span> is projected onto the polyhedral cone spanned
@@ -924,14 +924,22 @@ supervision is the cone of binding normals (not the optimal solution
 itself), CaVE side-steps the zero-gradient pathology of solver layers
 without requiring a perturbation or solution pool. Defined for
 <strong>binary linear programs</strong> only.</p>
-<p>PyEPO ships a pure-torch APGD (Nesterov-accelerated projected gradient
-descent) batched cone-projection solver, <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>-fused and
-CUDA-graph friendly. Defaults (<code class="docutils literal notranslate"><span class="pre">max_iters=20</span></code>, <code class="docutils literal notranslate"><span class="pre">tol_grad=None</span></code>)
-reproduce the <strong>CaVE+</strong> preset from the paper: a truncated APGD that
-lands strictly inside the cone and avoids boundary stagnation. To
-approach the original <strong>CaVE</strong> preset, drop the iteration cap and add
-a non-trivial tolerance (<code class="docutils literal notranslate"><span class="pre">max_iters=None,</span> <span class="pre">tol_grad=1e-4</span></code>); in
-practice the truncated default is faster without losing regret quality.</p>
+<p>PyEPO uses Clarabel as the interior-point QP solver for the cone
+projection.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The default <code class="docutils literal notranslate"><span class="pre">max_iter=3</span></code> is intentional — it is the <strong>CaVE+</strong>
+preset from the paper. Three IPM steps under-converge the QP on
+purpose so the projection stays interior to the cone, yielding a
+richer gradient than a fully converged boundary projection.
+Raising <code class="docutils literal notranslate"><span class="pre">max_iter</span></code> changes the loss behavior.</p>
+</div>
+<p>For larger problems, set <code class="docutils literal notranslate"><span class="pre">solve_ratio</span> <span class="pre">&lt;</span> <span class="pre">1</span></code> to enable the <strong>CaVE
+Hybrid</strong> preset from the paper: each batch goes through the QP
+projection with probability <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> and through a cheap
+heuristic (normalized predicted cost blended with the average
+binding-constraint normal) with probability <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">solve_ratio</span></code>,
+cutting the per-epoch cost without measurable regret loss.</p>
 <p>Training data must come from <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code>
 (Gurobi-backed) and be collated with <code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>.</p>
 <p>Reference: Tang &amp; Khalil (2024)
@@ -1285,7 +1293,7 @@ LTR variants and with the contrastive methods.</p>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=823d5ed7"></script>
+</div><script src="../../_static/documentation_options.js?v=a28cc43c"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

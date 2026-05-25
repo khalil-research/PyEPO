@@ -21,7 +21,7 @@ Choosing a Method
 
 * When :math:`\mathbf{w}^*` labels are available, start with **SPO+**: convex, has a nonzero subgradient, and is well-studied as a baseline.
 * When the loss-returning style is preferred and labels include :math:`\mathbf{w}^*`, **PFYL** avoids the extra task loss.
-* For **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), use **CaVE**: a GPU-native cone projection replaces the combinatorial solve in each backward pass, typically training an order of magnitude faster than SPO+ on TSP-scale instances.
+* For **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), use **CaVE**: a cone-alignment loss whose projection (an interior-point QP via Clarabel) replaces the combinatorial solve in the loss, with paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.
 * For very large LPs on GPU, combine **MPAX** models with **SPO+** or **PFYL**.
 
 For finer choices, the right method depends on three questions.
@@ -393,9 +393,9 @@ Let :math:`K(\mathbf{w}^*(\mathbf{c}))` be the polyhedral cone spanned by the co
 
 When :math:`-\hat{\mathbf{c}}` already lies inside the cone, :math:`\mathbf{p} = -\hat{\mathbf{c}}` and the loss is zero; the further :math:`-\hat{\mathbf{c}}` strays outside the cone, the larger the loss.
 
-PyEPO ships a pure-torch APGD (Nesterov-accelerated projected gradient descent) batched cone-projection solver, ``torch.compile``-fused and CUDA-graph friendly.
+PyEPO uses Clarabel as the interior-point QP solver for the cone projection. The default ``max_iter=3`` is the paper's **CaVE+** preset — under-converging the QP on purpose keeps the projection interior to the cone and yields a richer gradient than the exact boundary projection.
 
-The defaults reproduce the **CaVE+** preset from the paper (``max_iters=20``, ``tol_grad=None``): a truncated APGD that lands strictly inside the cone and avoids the boundary stagnation that pure-exact APGD suffers from. To approach the original **CaVE** preset, drop the iteration cap and add a non-trivial tolerance: ``coneAlignedCosine(model, max_iters=None, tol_grad=1e-4)``. In practice the truncated default is faster without losing regret quality, so it is the recommended choice.
+For larger problems, setting ``solve_ratio < 1`` enables the **CaVE Hybrid** preset: each batch goes through the QP projection with probability ``solve_ratio`` and through a cheap heuristic (a blend of the normalized predicted cost and the average binding-constraint normal, controlled by ``inner_ratio``) otherwise. This cuts the per-epoch QP cost without measurable regret loss in the paper's experiments.
 
 Training data must come from ``pyepo.data.dataset.optDatasetConstrs``, which extracts the binding-constraint normals at the optimum for each instance. Batches must be collated with ``pyepo.data.dataset.collate_tight_constraints`` to zero-pad ragged per-instance constraint counts. CaVE currently requires a Gurobi-backed ``optModel`` (binding-constraint extraction relies on Gurobi's sparse matrix API).
 

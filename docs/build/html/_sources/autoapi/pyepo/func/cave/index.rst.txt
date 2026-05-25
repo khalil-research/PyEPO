@@ -20,7 +20,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: coneAlignedCosine(optmodel: pyepo.model.opt.optModel, max_iters: int | None = 20, tol_grad: float | None = None, processes: int = 1, reduction: pyepo.func.abcmodule.Reduction = 'mean')
+.. py:class:: coneAlignedCosine(optmodel: pyepo.model.opt.optModel, max_iter: int = 3, solve_ratio: float = 1.0, inner_ratio: float = 0.2, processes: int = 1, reduction: pyepo.func.abcmodule.Reduction = 'mean')
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -36,14 +36,22 @@ Module Contents
    without requiring a perturbation or solution pool. Defined for
    **binary linear programs** only.
 
-   PyEPO ships a pure-torch APGD (Nesterov-accelerated projected gradient
-   descent) batched cone-projection solver, ``torch.compile``-fused and
-   CUDA-graph friendly. Defaults (``max_iters=20``, ``tol_grad=None``)
-   reproduce the **CaVE+** preset from the paper: a truncated APGD that
-   lands strictly inside the cone and avoids boundary stagnation. To
-   approach the original **CaVE** preset, drop the iteration cap and add
-   a non-trivial tolerance (``max_iters=None, tol_grad=1e-4``); in
-   practice the truncated default is faster without losing regret quality.
+   PyEPO uses Clarabel as the interior-point QP solver for the cone
+   projection.
+
+   .. note::
+      The default ``max_iter=3`` is intentional — it is the **CaVE+**
+      preset from the paper. Three IPM steps under-converge the QP on
+      purpose so the projection stays interior to the cone, yielding a
+      richer gradient than a fully converged boundary projection.
+      Raising ``max_iter`` changes the loss behavior.
+
+   For larger problems, set ``solve_ratio < 1`` to enable the **CaVE
+   Hybrid** preset from the paper: each batch goes through the QP
+   projection with probability ``solve_ratio`` and through a cheap
+   heuristic (normalized predicted cost blended with the average
+   binding-constraint normal) with probability ``1 - solve_ratio``,
+   cutting the per-epoch cost without measurable regret loss.
 
    Training data must come from ``pyepo.data.dataset.optDatasetConstrs``
    (Gurobi-backed) and be collated with ``collate_tight_constraints``.
@@ -52,14 +60,15 @@ Module Contents
    `<https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>`_
 
 
-   .. py:attribute:: tol_grad
-      :value: None
+   .. py:attribute:: max_iter
+      :value: 3
 
 
 
-   .. py:attribute:: max_iters
-      :value: 20
+   .. py:attribute:: solve_ratio
 
+
+   .. py:attribute:: inner_ratio
 
 
    .. py:method:: forward(pred_cost: torch.Tensor, tight_ctrs: torch.Tensor) -> torch.Tensor
