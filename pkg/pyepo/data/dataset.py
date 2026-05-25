@@ -387,9 +387,13 @@ def _extract_tight_normals(
     """
     A function to extract normals of binding constraints at sol in canonical <= orientation
     """
+    import gurobipy as gp
     from gurobipy import GRB
     grb = model._model
+    # TSP/VRP pre-cache _cost_vars; MVar / dict backends fall back to model.x
     cost_vars: list = model._cost_vars
+    if not cost_vars:
+        cost_vars = model.x.tolist() if isinstance(model.x, gp.MVar) else list(model.x.values())
     num_cost = len(cost_vars)
     sol_np = np.asarray(sol, dtype=np.float64)
     chunks: list[np.ndarray] = []
