@@ -310,6 +310,7 @@ class optDatasetConstrs(optDataset):
         """
         # lazy gurobipy import (only optDatasetConstrs needs it)
         from gurobipy import GRB
+
         sols: list[np.ndarray] = []
         objs: list[list[float]] = []
         ctrs: list[np.ndarray] = []
@@ -325,7 +326,8 @@ class optDatasetConstrs(optDataset):
                 if self.skip_infeas:
                     logger.warning(
                         "Instance %d non-optimal (Status=%d), skipping.",
-                        i, model._model.Status,
+                        i,
+                        model._model.Status,
                     )
                     continue
                 raise ValueError(
@@ -352,7 +354,8 @@ class optDatasetConstrs(optDataset):
         return len(self.feats)
 
     def __getitem__(  # type: ignore[override]
-        self, index: int,
+        self,
+        index: int,
     ) -> tuple[torch.Tensor, ...]:
         """
         A method to retrieve data
@@ -371,6 +374,7 @@ def collate_tight_constraints(batch):
     A custom collate function for PyTorch DataLoader that pads binding-constraint matrices
     """
     from torch.nn.utils.rnn import pad_sequence
+
     x, c, w, z, t_ctrs = zip(*batch)
     return (
         torch.stack(x, dim=0),
@@ -382,13 +386,16 @@ def collate_tight_constraints(batch):
 
 
 def _extract_tight_normals(
-    model: optModel, sol: np.ndarray, tol: float = 1e-5,
+    model: optModel,
+    sol: np.ndarray,
+    tol: float = 1e-5,
 ) -> np.ndarray:
     """
     A function to extract normals of binding constraints at sol in canonical <= orientation
     """
     import gurobipy as gp
     from gurobipy import GRB
+
     grb = model._model
     # TSP/VRP pre-cache _cost_vars; MVar / dict backends fall back to model.x
     cost_vars: list = model._cost_vars
@@ -461,6 +468,7 @@ def _extract_tight_normals(
 def _orient_constraint_row(row: np.ndarray, sense: str) -> list[np.ndarray]:
     """Return constraint rows in canonical ``<=`` orientation."""
     from gurobipy import GRB
+
     # <=
     if sense == GRB.LESS_EQUAL:
         return [row]
@@ -474,7 +482,9 @@ def _orient_constraint_row(row: np.ndarray, sense: str) -> list[np.ndarray]:
 
 
 def _parse_temp_constraint(
-    tc, var_to_cost: dict[str, int], num_cost: int,
+    tc,
+    var_to_cost: dict[str, int],
+    num_cost: int,
 ) -> tuple[np.ndarray, float, str] | None:
     """
     Parse a Gurobi TempConstr into (coefs, rhs, sense) over the cost-vector dim

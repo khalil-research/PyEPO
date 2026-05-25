@@ -67,7 +67,9 @@ class coneAlignedCosine(optModule):
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
 
     def forward(
-        self, pred_cost: torch.Tensor, tight_ctrs: torch.Tensor,
+        self,
+        pred_cost: torch.Tensor,
+        tight_ctrs: torch.Tensor,
     ) -> torch.Tensor:
         """
         Forward pass
@@ -76,8 +78,10 @@ class coneAlignedCosine(optModule):
         # fixed projection target (F.cosine_similarity normalizes internally)
         with torch.no_grad():
             proj, _ = _apgd_project(
-                tight_ctrs, signed_cost,
-                tol_grad=self.tol_grad, max_iters=self.max_iters,
+                tight_ctrs,
+                signed_cost,
+                tol_grad=self.tol_grad,
+                max_iters=self.max_iters,
             )
         loss = F.cosine_similarity(signed_cost, proj, dim=1).neg().add(1.0)
         return self._reduce(loss)
@@ -115,7 +119,13 @@ def _apgd_project(
         K_actual = min(K, cap - k_start)
         # compiled chunk
         x_curr, x_prev = _apgd_iterate(
-            A, AT, signed_cost, step_size, x_curr, x_prev, momenta[k_start:k_start + K_actual],
+            A,
+            AT,
+            signed_cost,
+            step_size,
+            x_curr,
+            x_prev,
+            momenta[k_start : k_start + K_actual],
         )
         # clone breaks cudagraphs output-reuse aliasing
         x_curr = x_curr.clone()
@@ -139,12 +149,14 @@ def _apgd_project(
 
 
 def _apgd_step_size(
-    A: torch.Tensor, AT: torch.Tensor, n_iter: int,
+    A: torch.Tensor,
+    AT: torch.Tensor,
+    n_iter: int,
 ) -> torch.Tensor:
     """A function to estimate per-instance 1/lambda_max(A A^T) via power iteration"""
     B, m, _ = A.shape
     # deterministic unit-norm init for reproducibility
-    v = torch.full((B, m), 1.0 / (m ** 0.5), device=A.device, dtype=A.dtype)
+    v = torch.full((B, m), 1.0 / (m**0.5), device=A.device, dtype=A.dtype)
     # power iteration: v <- (A A^T) v
     for _ in range(n_iter):
         u = torch.bmm(AT, v.unsqueeze(-1)).squeeze(-1)

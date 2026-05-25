@@ -199,7 +199,11 @@ class vrpRCIModel(vrpABModel):
         """
         # install lazy callback
         cb = self._RCICallback(
-            self.x, self.num_nodes, self.edges, self.demands, self.capacity,
+            self.x,
+            self.num_nodes,
+            self.edges,
+            self.demands,
+            self.capacity,
         )
         self._model.setCallback(cb, COPT.CBCONTEXT_MIPSOL)
         # optimize
@@ -248,8 +252,7 @@ class vrpMTZModel(vrpABModel):
             if i == 0 or j == 0:
                 continue
             m.addConstr(
-                u[i] - u[j] + self.capacity * x[i, j]
-                <= self.capacity - self.demands[j - 1]
+                u[i] - u[j] + self.capacity * x[i, j] <= self.capacity - self.demands[j - 1]
             )
         # cache (x[i,j], x[j,i]) pairs in cost-vector order for batched setInfo/getInfo
         self._cost_vars: list = []
@@ -323,8 +326,7 @@ class vrpMTZModelRel(vrpMTZModel):
             if i == 0 or j == 0:
                 continue
             m.addConstr(
-                u[i] - u[j] + self.capacity * x[i, j]
-                <= self.capacity - self.demands[j - 1]
+                u[i] - u[j] + self.capacity * x[i, j] <= self.capacity - self.demands[j - 1]
             )
         # cache (x[i,j], x[j,i]) pairs in cost-vector order for batched setInfo/getInfo
         self._cost_vars: list = []
@@ -348,5 +350,3 @@ class vrpMTZModelRel(vrpMTZModel):
     def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[list[int]]:
         """A forbidden method to get a tour from solution"""
         raise RuntimeError("Relaxation Model has no integer solution.")
-
-

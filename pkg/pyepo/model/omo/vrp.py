@@ -124,7 +124,11 @@ class vrpABModel(optOmoModel):
         """
         # fresh build keeps the parameterized objective consistent
         return type(self)(
-            self.num_nodes, self.demands, self.capacity, self.num_vehicle, self.solver,
+            self.num_nodes,
+            self.demands,
+            self.capacity,
+            self.num_vehicle,
+            self.solver,
         )
 
 
@@ -170,10 +174,7 @@ class vrpMTZModel(vrpABModel):
         for i, j in directed_edges:
             if i == 0 or j == 0:
                 continue
-            m.cons.add(
-                u[i] - u[j] + self.capacity * x[i, j]
-                <= self.capacity - self.demands[j - 1]
-            )
+            m.cons.add(u[i] - u[j] + self.capacity * x[i, j] <= self.capacity - self.demands[j - 1])
         return m, x
 
     def solve(self) -> tuple[np.ndarray, float]:
@@ -197,7 +198,11 @@ class vrpMTZModel(vrpABModel):
     def relax(self) -> vrpMTZModelRel:
         """A method to get linear relaxation model"""
         return vrpMTZModelRel(
-            self.num_nodes, self.demands, self.capacity, self.num_vehicle, self.solver,
+            self.num_nodes,
+            self.demands,
+            self.capacity,
+            self.num_vehicle,
+            self.solver,
         )
 
 
@@ -239,10 +244,7 @@ class vrpMTZModelRel(vrpMTZModel):
         for i, j in directed_edges:
             if i == 0 or j == 0:
                 continue
-            m.cons.add(
-                u[i] - u[j] + self.capacity * x[i, j]
-                <= self.capacity - self.demands[j - 1]
-            )
+            m.cons.add(u[i] - u[j] + self.capacity * x[i, j] <= self.capacity - self.demands[j - 1])
         return m, x
 
     def solve(self) -> tuple[np.ndarray, float]:

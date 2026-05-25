@@ -230,19 +230,20 @@ class vrpMTZModel(vrpABModel):
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.BINARY)
         u = m.addVars(
-            self.nodes, name="u",
-            lb=[0, *list(self.demands)], ub=self.capacity, vtype=GRB.CONTINUOUS,
+            self.nodes,
+            name="u",
+            lb=[0, *list(self.demands)],
+            ub=self.capacity,
+            vtype=GRB.CONTINUOUS,
         )
         # sense
         m.modelSense = GRB.MINIMIZE
         # customer assignment: one in, one out
         m.addConstrs(
-            gp.quicksum(x[i, j] for j in self.nodes if j != i) == 1
-            for i in self.nodes[1:]
+            gp.quicksum(x[i, j] for j in self.nodes if j != i) == 1 for i in self.nodes[1:]
         )
         m.addConstrs(
-            gp.quicksum(x[i, j] for i in self.nodes if i != j) == 1
-            for j in self.nodes[1:]
+            gp.quicksum(x[i, j] for i in self.nodes if i != j) == 1 for j in self.nodes[1:]
         )
         # depot vehicle count (out and in)
         m.addConstr(x.sum(0, "*") <= self.num_vehicle)
@@ -250,7 +251,8 @@ class vrpMTZModel(vrpABModel):
         # MTZ capacity / subtour-free load propagation
         m.addConstrs(
             u[i] - u[j] + self.capacity * x[i, j] <= self.capacity - self.demands[j - 1]
-            for i, j in directed_edges if i != 0 and j != 0
+            for i, j in directed_edges
+            if i != 0 and j != 0
         )
         # cache (x[i,j], x[j,i]) pairs in cost-vector order for batched setAttr/getAttr
         self._cost_vars: list = []
@@ -306,19 +308,20 @@ class vrpMTZModelRel(vrpMTZModel):
         directed_edges = self.edges + [(j, i) for (i, j) in self.edges]
         x = m.addVars(directed_edges, name="x", vtype=GRB.CONTINUOUS)
         u = m.addVars(
-            self.nodes, name="u",
-            lb=[0, *list(self.demands)], ub=self.capacity, vtype=GRB.CONTINUOUS,
+            self.nodes,
+            name="u",
+            lb=[0, *list(self.demands)],
+            ub=self.capacity,
+            vtype=GRB.CONTINUOUS,
         )
         # sense
         m.modelSense = GRB.MINIMIZE
         # customer assignment: one in, one out
         m.addConstrs(
-            gp.quicksum(x[i, j] for j in self.nodes if j != i) == 1
-            for i in self.nodes[1:]
+            gp.quicksum(x[i, j] for j in self.nodes if j != i) == 1 for i in self.nodes[1:]
         )
         m.addConstrs(
-            gp.quicksum(x[i, j] for i in self.nodes if i != j) == 1
-            for j in self.nodes[1:]
+            gp.quicksum(x[i, j] for i in self.nodes if i != j) == 1 for j in self.nodes[1:]
         )
         # depot vehicle count (out and in)
         m.addConstr(x.sum(0, "*") <= self.num_vehicle)
@@ -326,7 +329,8 @@ class vrpMTZModelRel(vrpMTZModel):
         # MTZ capacity / subtour-free load propagation
         m.addConstrs(
             u[i] - u[j] + self.capacity * x[i, j] <= self.capacity - self.demands[j - 1]
-            for i, j in directed_edges if i != 0 and j != 0
+            for i, j in directed_edges
+            if i != 0 and j != 0
         )
         # cache (x[i,j], x[j,i]) pairs in cost-vector order for batched setAttr/getAttr
         self._cost_vars: list = []
@@ -350,5 +354,3 @@ class vrpMTZModelRel(vrpMTZModel):
     def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[list[int]]:
         """A forbidden method to get a tour from solution"""
         raise RuntimeError("Relaxation Model has no integer solution.")
-
-
