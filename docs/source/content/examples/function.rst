@@ -397,6 +397,12 @@ PyEPO uses Clarabel as the interior-point QP solver for the cone projection. The
 
 For larger problems, setting ``solve_ratio < 1`` enables the **CaVE Hybrid** preset: each batch goes through the QP projection with probability ``solve_ratio`` and through a cheap heuristic (a blend of the normalized predicted cost and the average binding-constraint normal, controlled by ``inner_ratio``) otherwise. This cuts the per-epoch QP cost without measurable regret loss in the paper's experiments.
 
+.. figure:: ../../images/cave_vrp20.png
+    :width: 100%
+    :align: center
+
+    CVRP-20 head-to-head from notebook 04 (``num_data=1000``, 10 epochs, single-process). CaVE+ trains 8.2x faster than SPO+ at slightly lower final regret; CaVE-Hybrid (``solve_ratio=0.3``) is 10.5x faster, trading ~1.7 pp of regret.
+
 Training data must come from ``pyepo.data.dataset.optDatasetConstrs``, which extracts the binding-constraint normals at the optimum for each instance. Batches must be collated with ``pyepo.data.dataset.collate_tight_constraints`` to zero-pad ragged per-instance constraint counts. CaVE currently requires a Gurobi-backed ``optModel`` (binding-constraint extraction relies on Gurobi's sparse matrix API).
 
 .. autoclass:: pyepo.func.coneAlignedCosine
