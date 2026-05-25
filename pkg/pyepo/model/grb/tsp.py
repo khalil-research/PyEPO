@@ -174,6 +174,8 @@ class tspDFJModel(tspABModel):
         """
         # create a model
         m = gp.Model("tsp")
+        # silence param-setting output before any setParam call
+        m.Params.outputFlag = 0
         # variables
         x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:

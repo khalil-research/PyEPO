@@ -131,6 +131,8 @@ class vrpRCIModel(vrpABModel):
         """
         # create a model
         m = gp.Model("vrp")
+        # silence param-setting output before any setParam call
+        m.Params.outputFlag = 0
         # undirected edge variables, with x[j,i] aliasing x[i,j]
         x = m.addVars(self.edges, name="x", vtype=GRB.BINARY)
         for i, j in self.edges:
