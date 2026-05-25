@@ -6,7 +6,7 @@ optDataset class based on PyTorch Dataset
 from __future__ import annotations
 
 import logging
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import torch
@@ -16,6 +16,9 @@ from tqdm import tqdm
 
 from pyepo import EPO
 from pyepo.model.opt import optModel
+
+if TYPE_CHECKING:
+    from pyepo.model.mpax import optMpaxModel as _optMpaxModelT
 
 try:
     from pyepo.model.mpax import optMpaxModel
@@ -93,8 +96,9 @@ class optDataset(Dataset):
         A method to batch-solve every cost vector in one MPAX vmap call.
         """
         logger.info("Optimizing for optDataset (MPAX batched)...")
-        self.model.setObj(self.costs)
-        sols, objs = self.model.batch_optimize(self.model.c)
+        model = cast("_optMpaxModelT", self.model)
+        model.setObj(self.costs)
+        sols, objs = model.batch_optimize(model.c)
         # writable copy; torch.as_tensor warns on JAX read-only buffers
         sols_np = np.array(sols, dtype=np.float32)
         objs_np = np.array(objs, dtype=np.float32)
@@ -337,7 +341,7 @@ class optDatasetConstrs(optDataset):
                 )
             sols.append(sol_arr)
             objs.append([float(obj)])
-            ctrs.append(_extract_tight_normals(model, sol))
+            ctrs.append(_extract_tight_normals(model, sol_arr))
             valid.append(i)
         return np.stack(sols), np.asarray(objs), ctrs, valid
 
@@ -354,8 +358,8 @@ class optDatasetConstrs(optDataset):
         A method to retrieve data
         """
         return (
-            self.feats[index],
-            self.costs[index],
+            cast("torch.Tensor", self.feats[index]),
+            cast("torch.Tensor", self.costs[index]),
             self.sols[index],
             self.objs[index],
             self.ctrs[index],
@@ -373,7 +377,7 @@ def collate_tight_constraints(batch):
         torch.stack(c, dim=0),
         torch.stack(w, dim=0),
         torch.stack(z, dim=0),
-        pad_sequence(t_ctrs, batch_first=True, padding_value=0),
+        pad_sequence(list(t_ctrs), batch_first=True, padding_value=0),
     )
 
 
@@ -420,9 +424,10 @@ def _extract_tight_normals(
     var_to_cost: dict[str, int] = {v.VarName: k for k, v in enumerate(cost_vars)}
     lazy_rows: list[np.ndarray] = []
     for tc in getattr(grb, "_lazy_constrs", []):
-        coefs, rhs, sense = _parse_temp_constraint(tc, var_to_cost, num_cost)
-        if coefs is None:
+        parsed = _parse_temp_constraint(tc, var_to_cost, num_cost)
+        if parsed is None:
             continue
+        coefs, rhs, sense = parsed
         lhs_val = float(coefs @ sol_np)
         if abs(rhs - lhs_val) < tol:
             lazy_rows.extend(_orient_constraint_row(coefs, sense))
@@ -466,7 +471,7 @@ def _orient_constraint_row(row: np.ndarray, sense: str) -> list[np.ndarray]:
 
 def _parse_temp_constraint(
     tc, var_to_cost: dict[str, int], num_cost: int,
-) -> tuple[np.ndarray | None, float | None, str | None]:
+) -> tuple[np.ndarray, float, str] | None:
     """
     Parse a Gurobi TempConstr into (coefs, rhs, sense) over the cost-vector dim
     """
@@ -476,7 +481,7 @@ def _parse_temp_constraint(
     sense = getattr(tc, "_sense", None)
     # unparseable fallback
     if lhs is None or rhs is None or sense is None:
-        return None, None, None
+        return None
     # project LinExpr terms onto cost-vector dim
     coefs = np.zeros(num_cost, dtype=np.float64)
     for i in range(lhs.size()):

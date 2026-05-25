@@ -25,6 +25,7 @@ from pyepo.model.utils import _get_grid_arcs, getTspTour
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 
 class shortestPathBase(optModel):
@@ -159,7 +160,7 @@ class tspABBase(optModel):
         """
         return getTspTour(self.edges, self.num_nodes, sol)
 
-    def copy(self) -> tspABBase:
+    def copy(self) -> Self:
         """
         Return a fresh model with all extra constraints replayed onto it.
         """
@@ -167,7 +168,7 @@ class tspABBase(optModel):
         self._replay_extras(new_model)
         return new_model
 
-    def _new_instance(self) -> tspABBase:
+    def _new_instance(self) -> Self:
         """Construct a fresh instance with the same problem args. Override for backends with extra ctor args."""
         return type(self)(self.num_nodes)
 
@@ -180,7 +181,7 @@ class tspABBase(optModel):
         self,
         coefs: np.ndarray | torch.Tensor | list,
         rhs: float,
-    ) -> tspABBase:
+    ) -> Self:
         """
         Return a new model with one extra linear constraint added.
 

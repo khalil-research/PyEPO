@@ -102,7 +102,7 @@ def calUnambRegret(
     # MPAX backend may return a torch tensor; convert without dtype coercion
     if isinstance(sol, torch.Tensor):
         sol = sol.detach().cpu().numpy()
-    objp = np.ceil(np.dot(cp, sol.T))
+    objp = np.ceil(np.dot(cp, np.asarray(sol).T))
     # opt for pred cost
     if optmodel.modelSense == EPO.MINIMIZE:
         wst_optmodel = optmodel.addConstr(cp, objp + 1e-2)

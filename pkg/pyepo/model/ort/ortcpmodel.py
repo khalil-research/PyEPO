@@ -23,6 +23,7 @@ from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 
 class optOrtCpModel(optModel):
@@ -88,7 +89,7 @@ class optOrtCpModel(optModel):
         obj = solver.ObjectiveValue() / self._OBJ_SCALE
         return sol, obj
 
-    def copy(self) -> optOrtCpModel:
+    def copy(self) -> Self:
         """
         A method to copy the model
 
@@ -106,7 +107,7 @@ class optOrtCpModel(optModel):
             new_model._model.Add(lhs <= int(rhs))
         return new_model
 
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optOrtCpModel:
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
         A method to add a new constraint
 

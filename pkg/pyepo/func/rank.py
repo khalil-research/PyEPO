@@ -64,6 +64,8 @@ class listwiseLTR(optModule):
             _, _, self.solpool = _solve_in_pass(
                 cp, self.optmodel, self.processes, self.pool, self.solpool
             )
+        # require_solpool=True ensures the pool was populated in __init__
+        assert self.solpool is not None
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)
@@ -127,6 +129,8 @@ class pairwiseLTR(optModule):
             _, _, self.solpool = _solve_in_pass(
                 cp, self.optmodel, self.processes, self.pool, self.solpool
             )
+        # require_solpool=True ensures the pool was populated in __init__
+        assert self.solpool is not None
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)
@@ -196,6 +200,8 @@ class pointwiseLTR(optModule):
             _, _, self.solpool = _solve_in_pass(
                 cp, self.optmodel, self.processes, self.pool, self.solpool
             )
+        # require_solpool=True ensures the pool was populated in __init__
+        assert self.solpool is not None
         # to device
         if self.solpool.device != cp.device:
             self.solpool = self.solpool.to(cp.device)

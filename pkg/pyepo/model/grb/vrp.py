@@ -6,7 +6,7 @@ Capacitated vehicle routing problem with binding-constraint tracking for CaVE
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 import gurobipy as gp
 import numpy as np
@@ -18,6 +18,7 @@ from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 
 class vrpABModel(optGrbModel):
@@ -103,7 +104,7 @@ class vrpABModel(optGrbModel):
             routes.append(tour)
         return routes
 
-    def copy(self) -> vrpABModel:
+    def copy(self) -> Self:
         """
         A method to copy the model
         """
@@ -342,7 +343,7 @@ class vrpMTZModelRel(vrpMTZModel):
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
         return xvals.sum(axis=1), self._model.objVal
 
-    def relax(self) -> vrpMTZModel:
+    def relax(self) -> NoReturn:
         """A forbidden method to relax MIP model"""
         raise RuntimeError("Model has already been relaxed.")
 

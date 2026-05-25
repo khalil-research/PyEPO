@@ -6,7 +6,7 @@ Traveling salesman problem
 from __future__ import annotations
 
 from itertools import combinations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
 from coptpy import COPT, CallbackBase, LinExpr
@@ -154,7 +154,7 @@ class tspGGModelRel(tspGGModel):
         sol = xvals.sum(axis=1)
         return sol, self._model.objVal
 
-    def relax(self) -> tspABModel:
+    def relax(self) -> NoReturn:
         """
         A forbidden method to relax MIP model
         """
@@ -341,7 +341,7 @@ class tspMTZModelRel(tspMTZModel):
         sol = xvals.sum(axis=1)
         return sol, self._model.objVal
 
-    def relax(self) -> tspABModel:
+    def relax(self) -> NoReturn:
         """
         A forbidden method to relax MIP model
         """

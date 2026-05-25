@@ -24,6 +24,7 @@ from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 
 class optGrbModel(optModel):
@@ -97,7 +98,7 @@ class optGrbModel(optModel):
         obj = self._model.objVal
         return sol, obj
 
-    def copy(self) -> optGrbModel:
+    def copy(self) -> Self:
         """
         A method to copy the model
 
@@ -119,7 +120,7 @@ class optGrbModel(optModel):
             new_model._vars_list = list(new_model.x.values())
         return new_model
 
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optGrbModel:
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
         A method to add a new constraint
 

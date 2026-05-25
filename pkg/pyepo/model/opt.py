@@ -14,6 +14,7 @@ from pyepo import EPO
 if TYPE_CHECKING:
     import numpy as np
     import torch
+    from typing_extensions import Self
 
     from pyepo.EPO import ModelSense
 
@@ -27,6 +28,9 @@ class optModel(ABC):
     """
 
     modelSense: ModelSense = EPO.MINIMIZE
+    # populated by problem-level bases (shortestPathBase / tspABBase) or _getModel
+    arcs: list = []
+    _cost_vars: list = []
 
     def __init__(self) -> None:
         self._model, self.x = self._getModel()
@@ -71,7 +75,7 @@ class optModel(ABC):
         """
         raise NotImplementedError
 
-    def copy(self) -> optModel:
+    def copy(self) -> Self:
         """
         A method to copy the model
 
@@ -81,7 +85,7 @@ class optModel(ABC):
         new_model = deepcopy(self)
         return new_model
 
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optModel:
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
         A method to add a new constraint. Subclasses should override.
 

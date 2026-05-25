@@ -143,7 +143,7 @@ class regularizedFrankWolfeOpt(optModule):
             has_match = match_mask.any(dim=-1)
             match_idx = match_mask.to(dtype).argmax(dim=-1)
             # in-place weight shrink
-            weights.mul_((1.0 - gamma).unsqueeze(-1))
+            weights.mul_(gamma.neg().add(1.0).unsqueeze(-1))
             weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma * has_match.to(
                 dtype
             )

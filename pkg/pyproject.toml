@@ -89,6 +89,7 @@ filterwarnings = [
 [tool.pyright]
 include = ["pyepo"]
 exclude = ["**/__pycache__", "**/.pytest_cache", "tests", "test.py"]
+extraPaths = ["."]
 pythonVersion = "3.9"
 typeCheckingMode = "standard"
 # optional solver backends may be missing in some envs

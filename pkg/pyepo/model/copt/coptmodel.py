@@ -28,6 +28,7 @@ from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 
 def _is_mvar(x) -> bool:
@@ -101,7 +102,7 @@ class optCoptModel(optModel):
             sol = np.asarray(self._model.getInfo("Value", self._vars_list))
         return sol, self._model.objVal
 
-    def copy(self) -> optCoptModel:
+    def copy(self) -> Self:
         """
         A method to copy the model
 
@@ -119,7 +120,7 @@ class optCoptModel(optModel):
             new_model._vars_list = list(new_model.x.values())
         return new_model
 
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optCoptModel:
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
         A method to add a new constraint
 

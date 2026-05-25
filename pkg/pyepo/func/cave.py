@@ -79,7 +79,7 @@ class coneAlignedCosine(optModule):
                 tight_ctrs, signed_cost,
                 tol_grad=self.tol_grad, max_iters=self.max_iters,
             )
-        loss = 1.0 - F.cosine_similarity(signed_cost, proj, dim=1)
+        loss = F.cosine_similarity(signed_cost, proj, dim=1).neg().add(1.0)
         return self._reduce(loss)
 
 

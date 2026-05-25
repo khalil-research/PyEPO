@@ -188,6 +188,7 @@ def _init_worker_model(model_type: type, args: dict) -> None:
 
 def _solveWithObj4Par(cost: np.ndarray) -> tuple[np.ndarray, float]:
     """Solve a single instance in a pool worker using the pre-built optmodel."""
+    assert _worker_model is not None, "_init_worker_model must run before this"
     _worker_model.setObj(cost)
     sol, obj = _worker_model.solve()
     return np.asarray(sol, dtype=np.float32), obj

@@ -6,7 +6,7 @@ Capacitated vehicle routing problem
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
 
@@ -15,6 +15,7 @@ from pyepo.model.utils import _EDGE_ACTIVE_TOL
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 try:
     from pyomo import environ as pe
@@ -117,7 +118,7 @@ class vrpABModel(optOmoModel):
             routes.append(tour)
         return routes
 
-    def copy(self) -> vrpABModel:
+    def copy(self) -> Self:
         """
         A method to copy the model
         """
@@ -191,7 +192,7 @@ class vrpMTZModel(vrpABModel):
                 or pe.value(self.x[j, i]) > _EDGE_ACTIVE_TOL
             ):
                 sol[k] = 1
-        return sol, pe.value(self._model.obj)
+        return sol, float(pe.value(self._model.obj))
 
     def relax(self) -> vrpMTZModelRel:
         """A method to get linear relaxation model"""
@@ -252,10 +253,10 @@ class vrpMTZModelRel(vrpMTZModel):
         # sum directed pair to per-edge fractional value
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):
-            sol[k] = pe.value(self.x[i, j]) + pe.value(self.x[j, i])
-        return sol, pe.value(self._model.obj)
+            sol[k] = float(pe.value(self.x[i, j])) + float(pe.value(self.x[j, i]))
+        return sol, float(pe.value(self._model.obj))
 
-    def relax(self) -> vrpMTZModel:
+    def relax(self) -> NoReturn:
         """A forbidden method to relax MIP model"""
         raise RuntimeError("Model has already been relaxed.")
 

@@ -24,6 +24,7 @@ except ImportError:
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 
 class optOmoModel(optModel):
@@ -91,9 +92,9 @@ class optOmoModel(optModel):
             (pe.value(self.x[k]) for k in self.x),
             dtype=np.float32,
         )
-        return sol, pe.value(self._model.obj)
+        return sol, float(pe.value(self._model.obj))
 
-    def copy(self) -> optOmoModel:
+    def copy(self) -> Self:
         """
         A method to copy the model
 
@@ -107,7 +108,7 @@ class optOmoModel(optModel):
         new_model.x = new_model._model.x
         return new_model
 
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optOmoModel:
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
         A method to add a new constraint
 

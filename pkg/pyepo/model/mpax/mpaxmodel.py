@@ -25,6 +25,7 @@ from pyepo.model.opt import optModel
 
 if TYPE_CHECKING:
     import numpy as np
+    from typing_extensions import Self
 
 
 class optMpaxModel(optModel):
@@ -165,7 +166,7 @@ class optMpaxModel(optModel):
         obj = jnp.dot(c, result.primal_solution)
         return result.primal_solution, obj
 
-    def copy(self) -> optMpaxModel:
+    def copy(self) -> Self:
         """
         A method to copy the model
 
@@ -182,7 +183,7 @@ class optMpaxModel(optModel):
         new_model.device = device
         return new_model
 
-    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> optMpaxModel:
+    def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
         A method to add a new constraint
 

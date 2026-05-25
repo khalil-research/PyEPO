@@ -5,7 +5,7 @@ Traveling salesman problem
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
 
@@ -60,7 +60,7 @@ class tspABModel(tspABBase, optOmoModel):
                 or pe.value(self.x[j, i]) > _EDGE_ACTIVE_TOL
             ):
                 sol[k] = 1
-        return sol, pe.value(self._model.obj)
+        return sol, float(pe.value(self._model.obj))
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to ``self._model`` using paired (x[i,j] + x[j,i])."""
@@ -164,10 +164,10 @@ class tspGGModelRel(tspGGModel):
         self._solverfac.solve(self._model)
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):
-            sol[k] = pe.value(self.x[i, j]) + pe.value(self.x[j, i])
-        return sol, pe.value(self._model.obj)
+            sol[k] = float(pe.value(self.x[i, j])) + float(pe.value(self.x[j, i]))
+        return sol, float(pe.value(self._model.obj))
 
-    def relax(self) -> tspABModel:
+    def relax(self) -> NoReturn:
         """
         A forbidden method to relax MIP model
         """
@@ -264,10 +264,10 @@ class tspMTZModelRel(tspMTZModel):
         self._solverfac.solve(self._model)
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):
-            sol[k] = pe.value(self.x[i, j]) + pe.value(self.x[j, i])
-        return sol, pe.value(self._model.obj)
+            sol[k] = float(pe.value(self.x[i, j])) + float(pe.value(self.x[j, i]))
+        return sol, float(pe.value(self._model.obj))
 
-    def relax(self) -> tspABModel:
+    def relax(self) -> NoReturn:
         """
         A forbidden method to relax MIP model
         """
