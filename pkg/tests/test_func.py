@@ -16,7 +16,7 @@ from pyepo.func.utils import _cache_in_pass, _check_sol, _update_solution_pool, 
 try:
     from pyepo.model.grb.shortestpath import shortestPathModel
     from pyepo.model.grb.knapsack import knapsackModel
-    # verify Gurobi actually works (import may succeed without a valid license)
+    # probe instantiation: import alone passes even without a valid license
     shortestPathModel(grid=(3, 3))
     _HAS_GUROBI = True
 except (ImportError, NameError, Exception):
@@ -254,8 +254,7 @@ class TestSPOPlusGradient:
         return spo, model, c_true, w_true, z_true
 
     def test_subgradient_matches_closed_form(self):
-        # SPO+ subgradient: 2 * (w_true - w_spo) / batch_size, where
-        # w_spo = argmin (2*cp - c_true) for MINIMIZE
+        # subgradient = 2 * (w_true - argmin(2*cp - c_true)) / batch_size
         spo, model, c_true, w_true, z_true = self._setup(seed=0)
         cp = (c_true * 1.3).clone().detach().requires_grad_(True)
         loss = spo(cp, c_true, w_true, z_true)
@@ -271,7 +270,7 @@ class TestSPOPlusGradient:
         np.testing.assert_allclose(cp.grad.numpy(), expected, atol=1e-4)
 
     def test_gradient_step_decreases_loss(self):
-        # Sanity check: stepping against the autograd grad reduces SPO+ loss.
+        # one autograd step against the grad reduces SPO+ loss
         spo, _, c_true, w_true, z_true = self._setup(seed=1)
         cp = (c_true * 1.5).clone().detach().requires_grad_(True)
         loss0 = spo(cp, c_true, w_true, z_true)
@@ -361,12 +360,10 @@ class TestRegularizedFrankWolfe:
         assert torch.allclose(m.compute_regularization(y), torch.tensor([0.75]))
 
     def test_smaller_lambd_closer_to_IP_vertex(self):
-        # Small lambd makes mu approach a conv(V) vertex (= IP optimum for this
-        # Gurobi oracle); large lambd keeps mu inside conv(V).
+        # small lambd: mu approaches a conv(V) vertex; large lambd: mu stays interior
         from pyepo.func.regularized import regularizedFrankWolfeOpt
         opt = self._ks()
-        # MAXIMIZE knapsack: weights [3,4,2,5], cap 7, profits cp = [4,3,2,1].
-        # Gurobi binary IP optimum: items {0,1} (weight 7, value 7).
+        # weights=[3,4,2,5], cap=7, profits=[4,3,2,1] -> IP optimum picks items {0,1}
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0]])
         ip_sol = torch.tensor([[1.0, 1.0, 0.0, 0.0]])
         out_sharp = regularizedFrankWolfeOpt(opt, lambd=0.05, max_iter=30)(cp)
@@ -385,8 +382,7 @@ class TestRegularizedFrankWolfeGradient:
         opt = knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
         m = regularizedFrankWolfeOpt(opt, lambd=lambd, max_iter=30, tol=1e-8)
         torch.manual_seed(0)
-        # cp in [1, 3]: positive and away from 0 (avoids active-set boundary
-        # ambiguity in the projection)
+        # cp in [1, 3]: positive, away from active-set boundary
         cp = (torch.rand(1, 4) * 2 + 1.0).requires_grad_(True)
         target = torch.randn_like(cp)
         (target * m(cp)).sum().backward()
@@ -459,7 +455,7 @@ class TestCaVEForward:
 
     @pytest.fixture
     def setup(self):
-        # tiny synthetic batch: 2 instances, 4-dim cost, 3 binding-constraint normals each
+        # 2 instances, 4-dim cost, 3 binding-constraint normals each
         model = shortestPathModel(grid=(2, 3))  # num_cost = 7 edges
         d = model.num_cost
         torch.manual_seed(0)
@@ -501,5 +497,5 @@ class TestCaVEForward:
         loss.backward()
         assert pred_cost.grad is not None
         assert pred_cost.grad.shape == pred_cost.shape
-        # projection is treated as a fixed target — grad should be finite, not all-zero
+        # projection is a fixed target — grad finite, not all-zero
         assert torch.isfinite(pred_cost.grad).all()

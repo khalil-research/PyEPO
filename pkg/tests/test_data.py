@@ -17,7 +17,7 @@ from pyepo.data.dataset import (
 try:
     from pyepo.model.grb.shortestpath import shortestPathModel
     from pyepo.model.grb.tsp import tspDFJModel
-    # verify Gurobi actually works (import succeeds even without a valid license)
+    # probe instantiation: import alone passes even without a valid license
     shortestPathModel(grid=(3, 3))
     _HAS_GUROBI = True
 except (ImportError, NameError, Exception):
@@ -68,10 +68,9 @@ class TestKnapsackData:
         assert np.all(np.isfinite(c))
 
     def test_noise(self):
+        # noise_width=0 -> epsilon=uniform(1,1)=1 -> no noise
         _, _, c_no_noise = knapsack.genData(30, 3, 4, noise_width=0, seed=42)
         _, _, c_noise = knapsack.genData(30, 3, 4, noise_width=0.5, seed=42)
-        # with noise_width=0, epsilon is uniform(1,1)=1, so no noise
-        # values should differ when noise is added
         assert not np.array_equal(c_no_noise, c_noise)
 
 
@@ -322,22 +321,31 @@ class TestOptDatasetConstrs:
             optDatasetConstrs("not_a_model", x, c)
 
     def test_rejects_non_binary_vertex(self):
-        # shortestPath LP gives binary sols, but use a portfolio-style continuous
-        # problem to trigger the binary-vertex check. Simpler: monkeypatch solve
-        # to return a fractional vertex on the shortestPathModel.
         model = shortestPathModel(grid=(3, 3))
         num_cost = model.num_cost
-        # override solve to return a fractional vertex
+        # fake_solve returns a fractional vertex
         def fake_solve():
             return np.full(num_cost, 0.5, dtype=np.float64), 0.0
-        # patch the copy() returned model so each instance sees the fake
+        # gurobipy.Model.__setattr__ blocks method override; proxy fakes Status
+        class _StatusProxy:
+            def __init__(self, real, status):
+                object.__setattr__(self, "_real", real)
+                object.__setattr__(self, "_fake_status", status)
+            @property
+            def Status(self):
+                return self._fake_status
+            def optimize(self, *a, **kw):
+                pass
+            def __getattr__(self, name):
+                return getattr(self._real, name)
+            def __setattr__(self, name, value):
+                setattr(self._real, name, value)
+        # patch copy() so each iteration in _getSols sees the fake
         original_copy = model.copy
         def patched_copy():
             m = original_copy()
             m.solve = fake_solve
-            # bypass infeasibility check by stubbing optimize status
-            m._model.optimize = lambda *a, **kw: None
-            m._model.Status = 2  # GRB.OPTIMAL
+            m._model = _StatusProxy(m._model, 2)  # 2 == GRB.OPTIMAL
             return m
         model.copy = patched_copy
         x = np.random.randn(2, 3).astype(np.float32)
@@ -346,7 +354,6 @@ class TestOptDatasetConstrs:
             optDatasetConstrs(model, x, c)
 
     def test_construct_with_shortestpath(self):
-        # shortest-path is a BLP with binary vertices: should construct cleanly
         model = shortestPathModel(grid=(3, 3))
         x, c = shortestpath.genData(num_data=4, num_features=3, grid=(3, 3), seed=42)
         ds = optDatasetConstrs(model, x, c)
@@ -357,7 +364,7 @@ class TestOptDatasetConstrs:
             assert ctrs_i.shape[1] == model.num_cost
 
     def test_collate_pads_to_max_rows(self):
-        # craft a tiny batch with ragged ctrs shapes
+        # ragged ctrs shapes in one batch
         x = torch.randn(2, 3)
         c = torch.randn(2, 4)
         w = torch.randn(2, 4)
