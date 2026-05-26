@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../../../genindex.html"><link rel="search" title="Search" href="../../../../../search.html"><link rel="next" title="pyepo.model.mpax.shortestpath" href="../shortestpath/index.html"><link rel="prev" title="pyepo.model.mpax.knapsack" href="../knapsack/index.html">
 
     <link rel="shortcut icon" href="../../../../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>pyepo.model.mpax.mpaxmodel - PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.7 documentation</title>
+        <title>pyepo.model.mpax.mpaxmodel - PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.7 documentation</div></a>
+      <a href="../../../../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.7 documentation</span>
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -355,7 +355,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="pyepo.model.mpax.mpaxmodel.optMpaxModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optMpaxModel</span></code></a></p></td>
-<td><p>Abstract base class for MPAX-backed (JAX) linear-program models.</p></td>
+<td><p>Abstract base class for MPAX-backed (JAX) linear / quadratic program models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -367,9 +367,9 @@
 <dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.mpax.mpaxmodel.</span></span><span class="sig-name descname"><span class="pre">optMpaxModel</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.opt.optModel</span></code></a></p>
-<p>Abstract base class for MPAX-backed (JAX) linear-program models.</p>
+<p>Abstract base class for MPAX-backed (JAX) linear / quadratic program models.</p>
 <p>MPAX is a JAX implementation of the PDHG (Primal-Dual Hybrid Gradient)
-first-order LP solver, designed for large-scale linear programs that
+first-order solver, designed for large-scale continuous programs that
 benefit from GPU acceleration and vmap-batched solving. Unlike the
 Gurobi / COPT / Pyomo / OR-Tools backends, an MPAX model has <strong>no
 explicit solver model object</strong> – the constraint matrices and bounds
@@ -382,9 +382,16 @@ return <code class="docutils literal notranslate"><span class="pre">(None,</span
     <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>   <span class="c1"># variable lower bound</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>   <span class="c1"># variable upper bound</span>
+    <span class="c1"># optional: leave None for LP, set for convex QP</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>   <span class="c1"># PSD; objective is 0.5 xᵀQx + cᵀx</span>
     <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[]</span>
 </pre></div>
 </div>
+<p>LP vs QP is selected automatically from <code class="docutils literal notranslate"><span class="pre">self.Q</span></code>: <code class="docutils literal notranslate"><span class="pre">None</span></code> (default)
+keeps the LP code path via <code class="docutils literal notranslate"><span class="pre">create_lp</span></code>, any other value routes
+through <code class="docutils literal notranslate"><span class="pre">create_qp</span></code>. <code class="docutils literal notranslate"><span class="pre">Q</span></code> must be PSD; MPAX supports quadratic
+<em>objective only</em> – constraints stay linear (this is a hard MPAX
+limit; e.g. a quadratic risk-budget constraint cannot be expressed).</p>
 <p>Objective sense follows <code class="docutils literal notranslate"><span class="pre">self.modelSense</span></code> (set by a problem-level base
 such as <code class="docutils literal notranslate"><span class="pre">knapsackBase</span></code> or directly in <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>; defaults to
 minimization). Dense vs sparse matrices can be toggled by overriding the
@@ -401,6 +408,7 @@ class attribute <code class="docutils literal notranslate"><span class="pre">use
 <li><p><strong>h</strong> (<em>jnp.ndarray</em>) – inequality-constraint right-hand side</p></li>
 <li><p><strong>l</strong> (<em>jnp.ndarray</em>) – variable lower bounds</p></li>
 <li><p><strong>u</strong> (<em>jnp.ndarray</em>) – variable upper bounds</p></li>
+<li><p><strong>Q</strong> (<em>jnp.ndarray</em><em> | </em><em>None</em>) – PSD quadratic-objective matrix; <code class="docutils literal notranslate"><span class="pre">None</span></code> ⇒ LP</p></li>
 <li><p><strong>use_sparse_matrix</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – whether to use sparse matrices</p></li>
 </ul>
 </dd>
@@ -408,6 +416,11 @@ class attribute <code class="docutils literal notranslate"><span class="pre">use
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.use_sparse_matrix">
 <span class="sig-name descname"><span class="pre">use_sparse_matrix</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.use_sparse_matrix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.mpax.mpaxmodel.optMpaxModel.Q">
+<span class="sig-name descname"><span class="pre">Q</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.Q" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -545,6 +558,7 @@ class attribute <code class="docutils literal notranslate"><span class="pre">use
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel"><code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.use_sparse_matrix"><code class="docutils literal notranslate"><span class="pre">optMpaxModel.use_sparse_matrix</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.Q"><code class="docutils literal notranslate"><span class="pre">optMpaxModel.Q</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.device"><code class="docutils literal notranslate"><span class="pre">optMpaxModel.device</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.num_cost"><code class="docutils literal notranslate"><span class="pre">optMpaxModel.num_cost</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.mpax.mpaxmodel.optMpaxModel.setObj"><code class="docutils literal notranslate"><span class="pre">optMpaxModel.setObj()</span></code></a></li>
@@ -566,7 +580,7 @@ class attribute <code class="docutils literal notranslate"><span class="pre">use
       
     </aside>
   </div>
-</div><script src="../../../../../_static/documentation_options.js?v=0bccb05a"></script>
+</div><script src="../../../../../_static/documentation_options.js?v=a9bb411d"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/scripts/furo.js?v=46bd48cc"></script>

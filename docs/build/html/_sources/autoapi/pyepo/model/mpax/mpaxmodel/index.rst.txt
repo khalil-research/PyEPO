@@ -25,10 +25,10 @@ Module Contents
    Bases: :py:obj:`pyepo.model.opt.optModel`
 
 
-   Abstract base class for MPAX-backed (JAX) linear-program models.
+   Abstract base class for MPAX-backed (JAX) linear / quadratic program models.
 
    MPAX is a JAX implementation of the PDHG (Primal-Dual Hybrid Gradient)
-   first-order LP solver, designed for large-scale linear programs that
+   first-order solver, designed for large-scale continuous programs that
    benefit from GPU acceleration and vmap-batched solving. Unlike the
    Gurobi / COPT / Pyomo / OR-Tools backends, an MPAX model has **no
    explicit solver model object** -- the constraint matrices and bounds
@@ -42,7 +42,15 @@ Module Contents
            self.h = jnp.array(...)
            self.l = jnp.array(...)   # variable lower bound
            self.u = jnp.array(...)   # variable upper bound
+           # optional: leave None for LP, set for convex QP
+           self.Q = jnp.array(...)   # PSD; objective is 0.5 xᵀQx + cᵀx
            return None, []
+
+   LP vs QP is selected automatically from ``self.Q``: ``None`` (default)
+   keeps the LP code path via ``create_lp``, any other value routes
+   through ``create_qp``. ``Q`` must be PSD; MPAX supports quadratic
+   *objective only* -- constraints stay linear (this is a hard MPAX
+   limit; e.g. a quadratic risk-budget constraint cannot be expressed).
 
    Objective sense follows ``self.modelSense`` (set by a problem-level base
    such as ``knapsackBase`` or directly in ``_getModel``; defaults to
@@ -65,6 +73,8 @@ Module Contents
    :vartype l: jnp.ndarray
    :ivar u: variable upper bounds
    :vartype u: jnp.ndarray
+   :ivar Q: PSD quadratic-objective matrix; ``None`` ⇒ LP
+   :vartype Q: jnp.ndarray | None
    :ivar use_sparse_matrix: whether to use sparse matrices
 
    :vartype use_sparse_matrix: bool
@@ -73,6 +83,11 @@ Module Contents
    .. py:attribute:: use_sparse_matrix
       :type:  bool
       :value: True
+
+
+
+   .. py:attribute:: Q
+      :value: None
 
 
 

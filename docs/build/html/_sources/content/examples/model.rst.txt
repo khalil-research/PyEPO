@@ -252,7 +252,7 @@ OR-Tools provides two solving paradigms: pywraplp (LP/MIP solvers) and CP-SAT (c
 User-Defined MPAX Models
 ------------------------
 
-MPAX (Mathematical Programming in JAX) is a hardware-accelerated mathematical programming framework based on the PDHG (Primal-Dual Hybrid Gradient) algorithm, designed for large-scale LP problems.
+MPAX (Mathematical Programming in JAX) is a hardware-accelerated mathematical programming framework based on the PDHG (Primal-Dual Hybrid Gradient) algorithm, designed for large-scale linear and quadratic programs.
 
 For a runnable walkthrough that batch-solves LPs on GPU end-to-end with MPAX, see the `09 Solving on MPAX with PDHG <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb>`_ notebook.
 
@@ -262,11 +262,13 @@ To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and popu
    - ``self.G``, ``self.h``: Inequality constraints :math:`Gx \geq h`. Use ``jnp.zeros((0, n))`` / ``jnp.zeros((0,))`` for none.
    - ``self.l``: Lower bounds (typically zeros for non-negative variables).
    - ``self.u``: Upper bounds (use ``jnp.full(n, jnp.inf)`` for unbounded).
+   - ``self.Q`` *(optional)*: PSD quadratic-objective matrix for the QP path; default ``None`` keeps the LP path.
 
 ``_getModel`` returns ``(None, [])`` -- MPAX has no explicit model object; the matrices are the model. Additional knobs:
 
 * **Sparse vs dense**: override the class attribute ``use_sparse_matrix`` (default ``True``).
 * **Model sense**: set ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for a maximization problem; defaults to minimization.
+* **LP vs QP**: leave ``self.Q = None`` (default) for an LP routed through ``create_lp``; assign a PSD matrix to switch to a convex QP with objective :math:`\tfrac{1}{2} x^\top Q x + c^\top x` routed through ``create_qp``. Constraints stay linear -- MPAX only supports a quadratic objective. ``MAXIMIZE`` with a PSD ``Q`` is non-convex and rejected at construction; reformulate as ``MINIMIZE`` of the negated objective.
 
 .. autoclass:: pyepo.model.mpax.optMpaxModel
   :noindex:
@@ -299,6 +301,37 @@ To define an MPAX model, inherit from ``pyepo.model.mpax.optMpaxModel`` and popu
    cost = [0.1, 0.4, 0.2, 0.3, 0.5]
    optmodel.setObj(cost) # set objective function
    optmodel.solve() # solve
+
+For a QP, additionally assign ``self.Q`` to a PSD matrix; the same ``setObj`` / ``solve`` / ``batch_optimize`` interface then minimizes :math:`\tfrac{1}{2} x^\top Q x + c^\top x`:
+
+.. code-block:: python
+
+   import jax.numpy as jnp
+
+   from pyepo.model.mpax import optMpaxModel
+
+   class myQpModel(optMpaxModel):
+
+       use_sparse_matrix = False
+
+       def _getModel(self):
+           n = 4
+           # no equality
+           self.A = jnp.zeros((0, n), dtype=jnp.float32)
+           self.b = jnp.zeros((0,), dtype=jnp.float32)
+           # slack inequality so PDHG has a non-empty dual block
+           self.G = jnp.ones((1, n), dtype=jnp.float32)
+           self.h = jnp.array([-1000.0], dtype=jnp.float32)
+           # box bounds
+           self.l = jnp.full(n, -10.0, dtype=jnp.float32)
+           self.u = jnp.full(n,  10.0, dtype=jnp.float32)
+           # PSD quadratic objective -> routes to create_qp
+           self.Q = jnp.diag(jnp.array([2.0, 4.0, 6.0, 8.0], dtype=jnp.float32))
+           return None, []
+
+   optmodel = myQpModel()
+   optmodel.setObj([-2.0, -4.0, -6.0, -8.0])
+   optmodel.solve()
 
 
 User-Defined Models from Scratch
