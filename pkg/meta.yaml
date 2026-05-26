@@ -58,7 +58,7 @@ about:
     PyTorch autograd modules.
 
     Features:
-    - Implement SPO+, DBB, NID, DPO, PFYL, NCE, LTR, I-MLE, AI-MLE, and PG
+    - Implement SPO+, DBB, NID, DPO, PFYL, L2-regularized RFWO/RFYL, NCE, LTR, I-MLE, AI-MLE, PG, and CaVE for binary linear programs
     - Support Gurobi, COPT, Pyomo, Google OR-Tools, and MPAX API
     - Support parallel computing for optimization solvers
     - Support solution caching to speed up training

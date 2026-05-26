@@ -21,7 +21,7 @@ Choosing a Method
 
 * When :math:`\mathbf{w}^*` labels are available, start with **SPO+**: convex, has a nonzero subgradient, and is well-studied as a baseline.
 * When the loss-returning style is preferred and labels include :math:`\mathbf{w}^*`, **PFYL** avoids the extra task loss.
-* For **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), use **CaVE**: a cone-alignment loss whose projection (an interior-point QP via Clarabel) replaces the combinatorial solve in the loss, with paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.
+* For **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), use **CaVE**: a cone-alignment loss whose projection (an interior-point QP via Clarabel) replaces the per-step ILP solve, with paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.
 * For very large LPs on GPU, combine **MPAX** models with **SPO+** or **PFYL**.
 
 For finer choices, the right method depends on three questions.
@@ -408,6 +408,19 @@ Training data must come from ``pyepo.data.dataset.optDatasetConstrs``, which ext
 .. autoclass:: pyepo.func.coneAlignedCosine
     :noindex:
     :members:
+
+If you use the **CaVE** loss, please cite:
+
+.. code-block:: bibtex
+
+   @inproceedings{tang2024cave,
+     title={CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs},
+     author={Tang, Bo and Khalil, Elias B},
+     booktitle={Integration of Constraint Programming, Artificial Intelligence, and Operations Research},
+     pages={193--210},
+     year={2024},
+     publisher={Springer}
+   }
 
 
 Contrastive Methods
