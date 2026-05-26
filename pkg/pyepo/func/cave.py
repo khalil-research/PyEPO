@@ -5,7 +5,7 @@ Cone-aligned vector estimation (CaVE) loss for binary linear programs
 
 from __future__ import annotations
 
-from functools import cache
+from functools import cache, partial
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -123,7 +123,9 @@ class coneAlignedCosine(optModule):
             # per-batch coin flip: QP branch or cheap heuristic branch
             if self._branch_rng.uniform() <= self.solve_ratio:
                 # QP branch: truncated Clarabel projection inside the cone
-                proj = _clarabel_project_batch(signed_cost, tight_ctrs_cpu, max_iter=self.max_iter)
+                proj = _clarabel_project_batch(
+                    signed_cost, tight_ctrs_cpu, max_iter=self.max_iter, pool=self.pool,
+                )
             else:
                 # heuristic branch: blend normalized pred with avg binding-constraint normal
                 pred_n = signed_cost / signed_cost.norm(dim=1, keepdim=True).clamp(min=1e-8)
@@ -190,6 +192,7 @@ def _project_one(cp: np.ndarray, ctr: np.ndarray, max_iter: int) -> np.ndarray:
 
 def _clarabel_project_batch(
     signed_cost: torch.Tensor, tight_ctrs: torch.Tensor, max_iter: int,
+    pool=None,
 ) -> torch.Tensor:
     """
     A function to project each instance's signed cost onto its tight-constraint cone via Clarabel
@@ -200,6 +203,11 @@ def _clarabel_project_batch(
     cp_np = signed_cost.detach().cpu().numpy().astype(np.float64)
     ctrs_np = tight_ctrs.numpy().astype(np.float64)
     # per-instance solve
-    projs = [_project_one(cp, ctr, max_iter) for cp, ctr in zip(cp_np, ctrs_np)]
+    if pool is None:
+        # single-core
+        projs = [_project_one(cp, ctr, max_iter) for cp, ctr in zip(cp_np, ctrs_np)]
+    else:
+        # multi-core (pathos pool, pre-built per abcmodule.optModule)
+        projs = pool.amap(partial(_project_one, max_iter=max_iter), cp_np, ctrs_np).get()
     # stack + back to torch
     return torch.as_tensor(np.stack(projs), dtype=dtype, device=device)
