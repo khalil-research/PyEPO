@@ -1,33 +1,33 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Tests for pyepo.model: optimization models
 
 These tests require Gurobi. Skip gracefully if not installed.
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from pyepo import EPO
+from pyepo.data.portfolio import genData
 from pyepo.model.opt import optModel
 
-from pyepo.data.portfolio import genData
-
 try:
-    import gurobipy as gp
-    from gurobipy import GRB
-    from pyepo.model.grb.grbmodel import optGrbModel
     from pyepo.model.grb.knapsack import knapsackModel, knapsackModelRel
+    from pyepo.model.grb.portfolio import portfolioModel
     from pyepo.model.grb.shortestpath import shortestPathModel
     from pyepo.model.grb.tsp import (
-        tspGGModel, tspGGModelRel, tspDFJModel,
-        tspMTZModel, tspMTZModelRel,
+        tspDFJModel,
+        tspGGModel,
+        tspGGModelRel,
+        tspMTZModel,
+        tspMTZModelRel,
     )
     from pyepo.model.grb.vrp import (
-        vrpRCIModel, vrpMTZModel, vrpMTZModelRel,
+        vrpMTZModel,
+        vrpMTZModelRel,
+        vrpRCIModel,
     )
-    from pyepo.model.grb.portfolio import portfolioModel
     _HAS_GUROBI = True
 except (ImportError, NameError):
     _HAS_GUROBI = False
@@ -35,41 +35,70 @@ except (ImportError, NameError):
 try:
     # probe pyomo directly: `from pyepo.model.omo.*` succeeds even when pyomo is missing
     import pyomo.environ  # noqa: F401
-    from pyepo.model.omo.shortestpath import shortestPathModel as omoShortestPathModel
+
     from pyepo.model.omo.knapsack import (
         knapsackModel as omoKnapsackModel,
+    )
+    from pyepo.model.omo.knapsack import (
         knapsackModelRel as omoKnapsackModelRel,
     )
+    from pyepo.model.omo.portfolio import portfolioModel as omoPortfolioModel
+    from pyepo.model.omo.shortestpath import shortestPathModel as omoShortestPathModel
     from pyepo.model.omo.tsp import (
-        tspGGModel as omoTspGGModel, tspGGModelRel as omoTspGGModelRel,
-        tspMTZModel as omoTspMTZModel, tspMTZModelRel as omoTspMTZModelRel,
+        tspGGModel as omoTspGGModel,
+    )
+    from pyepo.model.omo.tsp import (
+        tspGGModelRel as omoTspGGModelRel,
+    )
+    from pyepo.model.omo.tsp import (
+        tspMTZModel as omoTspMTZModel,
+    )
+    from pyepo.model.omo.tsp import (
+        tspMTZModelRel as omoTspMTZModelRel,
     )
     from pyepo.model.omo.vrp import (
         vrpMTZModel as omoVrpMTZModel,
+    )
+    from pyepo.model.omo.vrp import (
         vrpMTZModelRel as omoVrpMTZModelRel,
     )
-    from pyepo.model.omo.portfolio import portfolioModel as omoPortfolioModel
     _HAS_PYOMO = True
 except (ImportError, NameError):
     _HAS_PYOMO = False
 
 try:
-    from pyepo.model.copt.shortestpath import shortestPathModel as coptShortestPathModel
     from pyepo.model.copt.knapsack import (
         knapsackModel as coptKnapsackModel,
+    )
+    from pyepo.model.copt.knapsack import (
         knapsackModelRel as coptKnapsackModelRel,
     )
+    from pyepo.model.copt.portfolio import portfolioModel as coptPortfolioModel
+    from pyepo.model.copt.shortestpath import shortestPathModel as coptShortestPathModel
     from pyepo.model.copt.tsp import (
-        tspGGModel as coptTspGGModel, tspGGModelRel as coptTspGGModelRel,
         tspDFJModel as coptTspDFJModel,
-        tspMTZModel as coptTspMTZModel, tspMTZModelRel as coptTspMTZModelRel,
+    )
+    from pyepo.model.copt.tsp import (
+        tspGGModel as coptTspGGModel,
+    )
+    from pyepo.model.copt.tsp import (
+        tspGGModelRel as coptTspGGModelRel,
+    )
+    from pyepo.model.copt.tsp import (
+        tspMTZModel as coptTspMTZModel,
+    )
+    from pyepo.model.copt.tsp import (
+        tspMTZModelRel as coptTspMTZModelRel,
+    )
+    from pyepo.model.copt.vrp import (
+        vrpMTZModel as coptVrpMTZModel,
+    )
+    from pyepo.model.copt.vrp import (
+        vrpMTZModelRel as coptVrpMTZModelRel,
     )
     from pyepo.model.copt.vrp import (
         vrpRCIModel as coptVrpRCIModel,
-        vrpMTZModel as coptVrpMTZModel,
-        vrpMTZModelRel as coptVrpMTZModelRel,
     )
-    from pyepo.model.copt.portfolio import portfolioModel as coptPortfolioModel
     _HAS_COPT = True
 except (ImportError, NameError):
     _HAS_COPT = False
@@ -77,22 +106,32 @@ except (ImportError, NameError):
 try:
     from pyepo.model.ort.ortmodel import _HAS_ORTOOLS
     if _HAS_ORTOOLS:
-        from pyepo.model.ort.shortestpath import shortestPathModel as ortShortestPathModel
-        from pyepo.model.ort.shortestpath import shortestPathCpModel as ortShortestPathCpModel
+        from pyepo.model.ort.knapsack import knapsackCpModel as ortKnapsackCpModel
         from pyepo.model.ort.knapsack import knapsackModel as ortKnapsackModel
         from pyepo.model.ort.knapsack import knapsackModelRel as ortKnapsackModelRel
-        from pyepo.model.ort.knapsack import knapsackCpModel as ortKnapsackCpModel
+        from pyepo.model.ort.shortestpath import shortestPathCpModel as ortShortestPathCpModel
+        from pyepo.model.ort.shortestpath import shortestPathModel as ortShortestPathModel
 except (ImportError, NameError):
     _HAS_ORTOOLS = False
 
 try:
     import jax  # noqa: F401
+    import jax.numpy as jnp
     import mpax  # noqa: F401
-    from pyepo.model.mpax.shortestpath import shortestPathModel as mpaxShortestPathModel
+
     from pyepo.model.mpax.knapsack import knapsackModel as mpaxKnapsackModel
+    from pyepo.model.mpax.mpaxmodel import optMpaxModel
+    from pyepo.model.mpax.shortestpath import shortestPathModel as mpaxShortestPathModel
     _HAS_MPAX = True
 except (ImportError, NameError):
     _HAS_MPAX = False
+
+
+def _sol_to_numpy(sol):
+    """MPAX returns a torch.Tensor (possibly on CUDA); normalize to CPU numpy."""
+    if hasattr(sol, "cpu"):
+        return sol.cpu().numpy()
+    return np.asarray(sol)
 
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
 requires_pyomo = pytest.mark.skipif(
@@ -167,7 +206,7 @@ class TestShortestPathModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -175,7 +214,7 @@ class TestShortestPathModel:
         # add a binding constraint
         model2 = model.addConstr(np.ones(model.num_cost), 5)
         model2.setObj(cost)
-        sol2, obj2 = model2.solve()
+        _sol2, obj2 = model2.solve()
         # original model
         model.setObj(cost)
         _, obj1 = model.solve()
@@ -186,7 +225,7 @@ class TestShortestPathModel:
         import torch
         cost = torch.rand(model.num_cost)
         model.setObj(cost)
-        sol, obj = model.solve()
+        _sol, obj = model.solve()
         assert isinstance(obj, float)
 
     def test_repr(self, model):
@@ -223,7 +262,7 @@ class TestKnapsackModel:
     def test_solve(self, model):
         cost = np.array([10.0, 6.0, 3.0, 2.0])
         model.setObj(cost)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         # check solution is binary
         assert np.allclose(sol, np.round(sol), atol=1e-6)
@@ -246,7 +285,7 @@ class TestKnapsackModel:
         assert isinstance(rel_model, knapsackModelRel)
         cost = np.array([10.0, 6.0, 3.0, 2.0])
         rel_model.setObj(cost)
-        sol, obj_rel = rel_model.solve()
+        _sol, obj_rel = rel_model.solve()
         # relaxed objective >= integer objective
         model.setObj(cost)
         _, obj_int = model.solve()
@@ -263,7 +302,7 @@ class TestKnapsackModel:
         model = knapsackModel(weights=weights, capacity=capacity)
         cost = np.array([5.0, 4.0, 3.0])
         model.setObj(cost)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.all(weights @ sol <= capacity + 1e-6)
 
@@ -355,7 +394,7 @@ class TestOmoKnapsackModel:
     def test_solve(self, model):
         cost = np.array([10.0, 6.0, 3.0, 2.0])
         model.setObj(cost)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.allclose(sol, np.round(sol), atol=1e-6)
 
@@ -462,7 +501,7 @@ class TestCoptKnapsackModel:
     def test_solve(self, model):
         cost = np.array([10.0, 6.0, 3.0, 2.0])
         model.setObj(cost)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.allclose(sol, np.round(sol), atol=1e-6)
 
@@ -553,7 +592,7 @@ class TestTspGGModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -579,7 +618,7 @@ class TestTspGGModel:
         assert isinstance(rel_model, tspGGModelRel)
         cost = np.random.RandomState(42).rand(model.num_cost)
         rel_model.setObj(cost)
-        sol, obj_rel = rel_model.solve()
+        _sol, obj_rel = rel_model.solve()
         model.setObj(cost)
         _, obj_int = model.solve()
         # relaxed objective <= integer objective (MINIMIZE)
@@ -642,7 +681,7 @@ class TestTspDFJModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -709,7 +748,7 @@ class TestTspMTZModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -734,7 +773,7 @@ class TestTspMTZModel:
         assert isinstance(rel_model, tspMTZModelRel)
         cost = np.random.RandomState(42).rand(model.num_cost)
         rel_model.setObj(cost)
-        sol, obj_rel = rel_model.solve()
+        _sol, obj_rel = rel_model.solve()
         model.setObj(cost)
         _, obj_int = model.solve()
         assert obj_rel <= obj_int + 1e-6
@@ -880,7 +919,7 @@ class TestPortfolioModel:
         assert model.num_cost == 10
 
     def test_solve(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         sol, obj = model.solve()
         sol = np.array(sol)
@@ -890,7 +929,7 @@ class TestPortfolioModel:
         np.testing.assert_allclose(np.sum(sol), 1.0, atol=1e-4)
 
     def test_copy(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         _, obj1 = model.solve()
         model_copy = model.copy()
@@ -899,7 +938,7 @@ class TestPortfolioModel:
         np.testing.assert_allclose(obj1, obj2, atol=1e-6)
 
     def test_addConstr(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         _, obj1 = model.solve()
         coefs = np.zeros(model.num_cost)
@@ -931,7 +970,7 @@ class TestCoptPortfolioModel:
         assert model.num_cost == 10
 
     def test_solve(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         sol, obj = model.solve()
         sol = np.array(sol)
@@ -940,7 +979,7 @@ class TestCoptPortfolioModel:
         np.testing.assert_allclose(np.sum(sol), 1.0, atol=1e-4)
 
     def test_copy(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         _, obj1 = model.solve()
         model_copy = model.copy()
@@ -949,7 +988,7 @@ class TestCoptPortfolioModel:
         np.testing.assert_allclose(obj1, obj2, atol=1e-6)
 
     def test_addConstr(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         _, obj1 = model.solve()
         coefs = np.zeros(model.num_cost)
@@ -980,7 +1019,7 @@ class TestOmoPortfolioModel:
         assert model.num_cost == 10
 
     def test_solve(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         sol, obj = model.solve()
         sol = np.array(sol)
@@ -989,7 +1028,7 @@ class TestOmoPortfolioModel:
         np.testing.assert_allclose(np.sum(sol), 1.0, atol=1e-4)
 
     def test_copy(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         _, obj1 = model.solve()
         model_copy = model.copy()
@@ -998,7 +1037,7 @@ class TestOmoPortfolioModel:
         np.testing.assert_allclose(obj1, obj2, atol=1e-6)
 
     def test_addConstr(self, model):
-        cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
+        _cov, _, revenue = genData(num_data=10, num_features=4, num_assets=10, deg=1)
         model.setObj(revenue[0])
         _, obj1 = model.solve()
         coefs = np.zeros(model.num_cost)
@@ -1058,7 +1097,7 @@ class TestCoptTspGGModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -1082,7 +1121,7 @@ class TestCoptTspGGModel:
         assert isinstance(rel_model, coptTspGGModelRel)
         cost = np.random.RandomState(42).rand(model.num_cost)
         rel_model.setObj(cost)
-        sol, obj_rel = rel_model.solve()
+        _sol, obj_rel = rel_model.solve()
         model.setObj(cost)
         _, obj_int = model.solve()
         assert obj_rel <= obj_int + 1e-6
@@ -1144,7 +1183,7 @@ class TestCoptTspDFJModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -1210,7 +1249,7 @@ class TestCoptTspMTZModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -1234,7 +1273,7 @@ class TestCoptTspMTZModel:
         assert isinstance(rel_model, coptTspMTZModelRel)
         cost = np.random.RandomState(42).rand(model.num_cost)
         rel_model.setObj(cost)
-        sol, obj_rel = rel_model.solve()
+        _sol, obj_rel = rel_model.solve()
         model.setObj(cost)
         _, obj_int = model.solve()
         assert obj_rel <= obj_int + 1e-6
@@ -1322,7 +1361,7 @@ class TestOmoTspGGModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -1346,7 +1385,7 @@ class TestOmoTspGGModel:
         assert isinstance(rel_model, omoTspGGModelRel)
         cost = np.random.RandomState(42).rand(model.num_cost)
         rel_model.setObj(cost)
-        sol, obj_rel = rel_model.solve()
+        _sol, obj_rel = rel_model.solve()
         model.setObj(cost)
         _, obj_int = model.solve()
         assert obj_rel <= obj_int + 1e-6
@@ -1408,7 +1447,7 @@ class TestOmoTspMTZModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -1432,7 +1471,7 @@ class TestOmoTspMTZModel:
         assert isinstance(rel_model, omoTspMTZModelRel)
         cost = np.random.RandomState(42).rand(model.num_cost)
         rel_model.setObj(cost)
-        sol, obj_rel = rel_model.solve()
+        _sol, obj_rel = rel_model.solve()
         model.setObj(cost)
         _, obj_int = model.solve()
         assert obj_rel <= obj_int + 1e-6
@@ -1567,7 +1606,7 @@ class TestOrtShortestPathModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -1583,7 +1622,7 @@ class TestOrtShortestPathModel:
         import torch
         cost = torch.rand(model.num_cost)
         model.setObj(cost)
-        sol, obj = model.solve()
+        _sol, obj = model.solve()
         assert isinstance(obj, float)
 
     def test_repr(self, model):
@@ -1620,7 +1659,7 @@ class TestOrtKnapsackModel:
     def test_solve(self, model):
         cost = np.array([10.0, 6.0, 3.0, 2.0])
         model.setObj(cost)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.allclose(sol, np.round(sol), atol=1e-6)
         assert np.all(model.weights @ sol <= model.capacity + 1e-6)
@@ -1657,7 +1696,7 @@ class TestOrtKnapsackModel:
         model = ortKnapsackModel(weights=weights, capacity=capacity)
         cost = np.array([5.0, 4.0, 3.0])
         model.setObj(cost)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.all(weights @ sol <= capacity + 1e-6)
 
@@ -1717,7 +1756,7 @@ class TestOrtCpShortestPathModel:
         cost = np.random.RandomState(42).rand(model.num_cost)
         model_copy = model.copy()
         model_copy.setObj(cost)
-        sol, obj = model_copy.solve()
+        _sol, obj = model_copy.solve()
         assert isinstance(obj, float)
 
     def test_addConstr(self, model):
@@ -1756,7 +1795,7 @@ class TestOrtCpKnapsackModel:
     def test_solve(self, model):
         cost = np.array([10.0, 6.0, 3.0, 2.0])
         model.setObj(cost)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.allclose(sol, np.round(sol), atol=1e-6)
 
@@ -1881,7 +1920,7 @@ class TestMpaxShortestPathModel:
         assert len(sol) == model.num_cost
         assert isinstance(obj, float)
         # sanity: objective equals c.T sol
-        np.testing.assert_allclose(obj, np.dot(cost, np.asarray(sol)), atol=1e-3)
+        np.testing.assert_allclose(obj, np.dot(cost, _sol_to_numpy(sol)), atol=1e-3)
 
     def test_setObj_wrong_size(self, model):
         with pytest.raises(ValueError):
@@ -1900,11 +1939,10 @@ class TestMpaxShortestPathModel:
         cost = np.random.RandomState(42).rand(12)
         model.setObj(cost)
         _, obj0 = model.solve()
-        # adding redundant constraint sum(x) >= 0 should not change optimum much
-        new_model = model.addConstr([1.0] * 12, 0.0)
+        # sum(x) <= 10 non-binding (3x3-grid SP uses at most 4 arcs)
+        new_model = model.addConstr([1.0] * 12, 10.0)
         new_model.setObj(cost)
         _, obj1 = new_model.solve()
-        # new constraint is non-binding, obj should be unchanged
         np.testing.assert_allclose(obj0, obj1, atol=1e-3)
 
     @requires_mpax_gurobi
@@ -1942,7 +1980,7 @@ class TestMpaxKnapsackModel:
         assert len(sol) == model.num_cost
         assert isinstance(obj, float)
         # LP relaxation: items can be fractional, but all in [0, 1]
-        sol_np = np.asarray(sol)
+        sol_np = _sol_to_numpy(sol)
         assert sol_np.min() >= -1e-3
         assert sol_np.max() <= 1.0 + 1e-3
 
@@ -1981,6 +2019,123 @@ class TestCrossBackendMpax:
         mpax_model.setObj(cost)
         _, mpax_obj = mpax_model.solve()
         np.testing.assert_allclose(grb_obj, mpax_obj, atol=1e-2)
+
+
+# ============================================================
+# MPAX QP path: optMpaxModel.Q routes to create_qp via raPDHG
+# ============================================================
+
+if _HAS_MPAX:
+    class _MpaxBoxQP(optMpaxModel):
+        """diagonal-Q QP with a slack `sum(x) >= -1000` inequality.
+
+        min 0.5 xᵀQx + cᵀx,  s.t.  sum(x) >= -1000,  l ≤ x ≤ u.
+
+        Unconstrained interior optimum x*_i = -c_i / Q_ii. The slack
+        inequality is non-binding by construction; it exists only to
+        give PDHG a non-empty dual block (purely-bounded QPs can
+        trigger pathological raPDHG behavior).
+        """
+        use_sparse_matrix = False
+
+        def __init__(self, Q_diag, lb=-10.0, ub=10.0):
+            self._Q_diag = np.asarray(Q_diag, dtype=np.float32)
+            self._lb = float(lb)
+            self._ub = float(ub)
+            super().__init__()
+
+        def _getModel(self):
+            n = self._Q_diag.shape[0]
+            # no equality
+            self.A = jnp.zeros((0, n), dtype=jnp.float32)
+            self.b = jnp.zeros((0,), dtype=jnp.float32)
+            # slack inequality (non-binding)
+            self.G = jnp.ones((1, n), dtype=jnp.float32)
+            self.h = jnp.array([-1000.0], dtype=jnp.float32)
+            # variable bounds
+            self.l = jnp.full(n, self._lb, dtype=jnp.float32)
+            self.u = jnp.full(n, self._ub, dtype=jnp.float32)
+            # quadratic objective
+            self.Q = jnp.diag(jnp.asarray(self._Q_diag, dtype=jnp.float32))
+            return None, []
+
+
+@requires_mpax
+class TestMpaxQP:
+    """QP path: self.Q triggers create_qp via raPDHG."""
+
+    @pytest.fixture
+    def model(self):
+        # x* = -c / Q_diag = [1, 1, 1, 1] inside [-10, 10] for c = -Q_diag
+        return _MpaxBoxQP(Q_diag=[2.0, 4.0, 6.0, 8.0])
+
+    def test_init_uses_qp_path(self, model):
+        assert model.Q is not None
+        assert model.Q.shape == (4, 4)
+        assert model.modelSense == EPO.MINIMIZE
+
+    def test_qp_closed_form(self, model):
+        # c = -Q_diag ⇒ x* = [1,1,1,1], obj* = 0.5·sum(Q_diag) - sum(Q_diag) = -10
+        cost = np.array([-2.0, -4.0, -6.0, -8.0])
+        model.setObj(cost)
+        sol, obj = model.solve()
+        sol_np = _sol_to_numpy(sol)
+        np.testing.assert_allclose(sol_np, [1.0, 1.0, 1.0, 1.0], atol=1e-2)
+        np.testing.assert_allclose(obj, -10.0, atol=1e-2)
+
+    def test_qp_lp_isolation(self, model):
+        # QP solve must not corrupt the LP path
+        cost_qp = np.array([-2.0, -4.0, -6.0, -8.0])
+        model.setObj(cost_qp)
+        model.solve()
+        # independent LP model still solves
+        sp = mpaxShortestPathModel(grid=(3, 3))
+        sp.setObj(np.random.RandomState(0).rand(12))
+        sol, obj = sp.solve()
+        assert isinstance(obj, float)
+        assert len(sol) == sp.num_cost
+
+    def test_qp_batch_optimize(self, model):
+        # vmap batch
+        C = jnp.array([
+            [-2.0, -4.0, -6.0, -8.0],   # x* = [1, 1, 1, 1], obj* = -10
+            [-1.0, -2.0, -3.0, -4.0],   # x* = [0.5, 0.5, 0.5, 0.5], obj* = -2.5
+        ], dtype=jnp.float32)
+        X, objs = model.batch_optimize(C)
+        np.testing.assert_allclose(_sol_to_numpy(X[0]), [1.0, 1.0, 1.0, 1.0], atol=1e-2)
+        np.testing.assert_allclose(_sol_to_numpy(X[1]), [0.5, 0.5, 0.5, 0.5], atol=1e-2)
+        np.testing.assert_allclose(float(objs[0]), -10.0, atol=1e-2)
+        np.testing.assert_allclose(float(objs[1]), -2.5, atol=1e-2)
+
+    def test_qp_addConstr_preserves_Q(self, model):
+        cost = np.array([-2.0, -4.0, -6.0, -8.0])
+        model.setObj(cost)
+        _, obj0 = model.solve()
+        # cap sum(x) <= 2; binding (unconstrained sum is 4)
+        new_model = model.addConstr([1.0, 1.0, 1.0, 1.0], 2.0)
+        # Q must survive addConstr → copy → _rebuild_jit
+        assert new_model.Q is not None
+        new_model.setObj(cost)
+        _, obj1 = new_model.solve()
+        # binding constraint on MINIMIZE ⇒ objective worsens (less negative)
+        assert obj1 > obj0 - 1e-3
+
+    def test_qp_rejects_maximize(self):
+        # MAXIMIZE with PSD Q is non-convex; constructor must reject
+        class _BadMaxQP(_MpaxBoxQP):
+            modelSense = EPO.MAXIMIZE
+        with pytest.raises(ValueError, match="MINIMIZE"):
+            _BadMaxQP(Q_diag=[1.0, 1.0])
+
+    def test_lp_path_still_works_no_Q(self):
+        # Q=None default ⇒ LP path unchanged
+        sp = mpaxShortestPathModel(grid=(3, 3))
+        assert sp.Q is None
+        cost = np.random.RandomState(42).rand(12)
+        sp.setObj(cost)
+        sol, obj = sp.solve()
+        assert len(sol) == sp.num_cost
+        assert isinstance(obj, float)
 
 
 # ============================================================
@@ -2080,7 +2235,7 @@ class TestVrpMTZModel:
 
     def test_setObj_and_solve(self, model):
         model.setObj(_VRP_COST)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert len(sol) == model.num_cost
         assert np.allclose(sol, np.round(sol), atol=1e-6)
@@ -2148,7 +2303,7 @@ class TestCoptVrpRCIModel:
 
     def test_setObj_and_solve(self, model):
         model.setObj(_VRP_COST)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.allclose(sol, np.round(sol), atol=1e-6)
 
@@ -2175,7 +2330,7 @@ class TestCoptVrpMTZModel:
 
     def test_setObj_and_solve(self, model):
         model.setObj(_VRP_COST)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.allclose(sol, np.round(sol), atol=1e-6)
 
@@ -2206,7 +2361,7 @@ class TestOmoVrpMTZModel:
 
     def test_setObj_and_solve(self, model):
         model.setObj(_VRP_COST)
-        sol, obj = model.solve()
+        sol, _obj = model.solve()
         sol = np.array(sol)
         assert np.allclose(sol, np.round(sol), atol=1e-6)
 

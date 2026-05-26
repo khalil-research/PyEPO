@@ -5,6 +5,7 @@ Abstract optimization model based on MPAX
 
 from __future__ import annotations
 
+import dataclasses
 from copy import deepcopy
 from functools import partial
 from typing import TYPE_CHECKING
@@ -14,7 +15,7 @@ import torch
 try:
     import jax
     from jax import numpy as jnp
-    from mpax import create_lp, raPDHG
+    from mpax import create_lp, create_qp, raPDHG
 
     _HAS_MPAX = True
 except ImportError:
@@ -30,10 +31,10 @@ if TYPE_CHECKING:
 
 class optMpaxModel(optModel):
     """
-    Abstract base class for MPAX-backed (JAX) linear-program models.
+    Abstract base class for MPAX-backed (JAX) linear / quadratic program models.
 
     MPAX is a JAX implementation of the PDHG (Primal-Dual Hybrid Gradient)
-    first-order LP solver, designed for large-scale linear programs that
+    first-order solver, designed for large-scale continuous programs that
     benefit from GPU acceleration and vmap-batched solving. Unlike the
     Gurobi / COPT / Pyomo / OR-Tools backends, an MPAX model has **no
     explicit solver model object** -- the constraint matrices and bounds
@@ -47,7 +48,15 @@ class optMpaxModel(optModel):
             self.h = jnp.array(...)
             self.l = jnp.array(...)   # variable lower bound
             self.u = jnp.array(...)   # variable upper bound
+            # optional: leave None for LP, set for convex QP
+            self.Q = jnp.array(...)   # PSD; objective is 0.5 xᵀQx + cᵀx
             return None, []
+
+    LP vs QP is selected automatically from ``self.Q``: ``None`` (default)
+    keeps the LP code path via ``create_lp``, any other value routes
+    through ``create_qp``. ``Q`` must be PSD; MPAX supports quadratic
+    *objective only* -- constraints stay linear (this is a hard MPAX
+    limit; e.g. a quadratic risk-budget constraint cannot be expressed).
 
     Objective sense follows ``self.modelSense`` (set by a problem-level base
     such as ``knapsackBase`` or directly in ``_getModel``; defaults to
@@ -65,39 +74,66 @@ class optMpaxModel(optModel):
         h (jnp.ndarray): inequality-constraint right-hand side
         l (jnp.ndarray): variable lower bounds
         u (jnp.ndarray): variable upper bounds
+        Q (jnp.ndarray | None): PSD quadratic-objective matrix; ``None`` ⇒ LP
         use_sparse_matrix (bool): whether to use sparse matrices
     """
 
     use_sparse_matrix: bool = True
+    # None ⇒ LP path; subclasses opt into QP by assigning self.Q in _getModel
+    Q = None
 
     def __init__(self) -> None:
         if not _HAS_MPAX:
             raise ImportError("MPAX is not installed. Please install MPAX to use this feature.")
-        super().__init__()  # → optModel.__init__ → self._getModel() populates A/b/G/h/l/u
+        super().__init__()
+        # MAXIMIZE with PSD Q is non-convex; reject early
+        if self.Q is not None and self.modelSense != EPO.MINIMIZE:
+            raise ValueError(
+                "MPAX QP path supports MINIMIZE sense only "
+                "(MAXIMIZE with PSD Q is non-convex). "
+                "Reformulate as MINIMIZE of -obj."
+            )
         # init device
         self.device = None
         # cache GPU availability
         self._has_jax_gpu = any(d.platform == "gpu" for d in jax.devices())
-        # JIT pre-compile
+        # JIT pre-compile (LP/QP dispatch on self.Q)
         self._rebuild_jit()
 
     def __repr__(self) -> str:
         return "optMpaxModel " + self.__class__.__name__
 
     def _rebuild_jit(self) -> None:
-        """Rebuild JIT-compiled solve functions with current constraints."""
-        self.jitted_solve = jax.jit(
-            partial(
-                self._jitted_solve,
-                A=self.A,
-                b=self.b,
-                G=self.G,
-                h=self.h,
-                l=self.l,
-                u=self.u,
+        """Rebuild solve functions; dispatches LP/QP from self.Q."""
+        # LP path: jit + vmap
+        if self.Q is None:
+            self.jitted_solve = jax.jit(
+                partial(
+                    self._jitted_solve_lp,
+                    A=self.A,
+                    b=self.b,
+                    G=self.G,
+                    h=self.h,
+                    l=self.l,
+                    u=self.u,
+                    use_sparse_matrix=self.use_sparse_matrix,
+                )
+            )
+        # QP path: jit + vmap (see _jitted_solve_qp)
+        else:
+            n = self.A.shape[1]
+            # placeholder c (replaced per call)
+            qp_template = create_qp(
+                self.Q,
+                jnp.zeros(n, dtype=jnp.float32),
+                self.A, self.b, self.G, self.h, self.l, self.u,
                 use_sparse_matrix=self.use_sparse_matrix,
             )
-        )
+            # Python bool keeps is_lp static under jit/vmap
+            qp_template = dataclasses.replace(qp_template, is_lp=False)
+            self.jitted_solve = jax.jit(
+                partial(self._jitted_solve_qp, qp_template=qp_template, Q=self.Q)
+            )
         self.batch_optimize = jax.vmap(self.jitted_solve)
 
     @property
@@ -136,6 +172,8 @@ class optMpaxModel(optModel):
                 self.h = jax.device_put(self.h, self.device)
                 self.l = jax.device_put(self.l, self.device)
                 self.u = jax.device_put(self.u, self.device)
+                if self.Q is not None:
+                    self.Q = jax.device_put(self.Q, self.device)
                 # rebuild JIT for new device
                 self._rebuild_jit()
         # c is already a NumPy array
@@ -165,15 +203,36 @@ class optMpaxModel(optModel):
         return sol, obj
 
     @staticmethod
-    def _jitted_solve(c, A, b, G, h, l, u, use_sparse_matrix):
-        """
-        A static method for JIT compile
-        """
+    def _jitted_solve_lp(c, A, b, G, h, l, u, use_sparse_matrix):
+        """JIT-compiled LP solve (cᵀx)."""
         lp = create_lp(c, A, b, G, h, l, u, use_sparse_matrix=use_sparse_matrix)
-        solver = raPDHG(eps_abs=1e-4, eps_rel=1e-4, verbose=False)
+        solver = raPDHG(
+            eps_abs=1e-4, eps_rel=1e-4, verbose=False, iteration_limit=50_000,
+        )
         result = solver.optimize(lp)
         obj = jnp.dot(c, result.primal_solution)
         return result.primal_solution, obj
+
+    @staticmethod
+    def _jitted_solve_qp(c, qp_template, Q):
+        """
+        JIT-compiled QP solve (0.5 xᵀQx + cᵀx).
+
+        ``qp_template`` must have ``is_lp = False`` (a Python bool, not a
+        jnp scalar) so JAX's pytree flatten keeps it as static metadata;
+        ``raPDHG.check_config`` then branches on a concrete value instead
+        of a tracer. Solver instance is built inline (not closed over) to
+        avoid cross-trace state leaks via raPDHG's internal mutation in
+        ``select_initial_primal_weight``.
+        """
+        qp = dataclasses.replace(qp_template, objective_vector=c)
+        solver = raPDHG(
+            eps_abs=1e-4, eps_rel=1e-4, verbose=False, iteration_limit=50_000,
+        )
+        result = solver.optimize(qp)
+        x = result.primal_solution
+        obj = 0.5 * jnp.dot(x, Q @ x) + jnp.dot(c, x)
+        return x, obj
 
     def copy(self) -> Self:
         """

@@ -1,32 +1,30 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Tests for pyepo.func: utility functions and abstract module
 
 Focuses on unit-level tests (solution pool, caching, helpers) without training.
 """
 
-import pytest
 import numpy as np
+import pytest
 import torch
 
 from pyepo import EPO
 from pyepo.func.utils import _cache_in_pass, _check_sol, _update_solution_pool, sumGammaDistribution
 
 try:
-    from pyepo.model.grb.shortestpath import shortestPathModel
     from pyepo.model.grb.knapsack import knapsackModel
+    from pyepo.model.grb.shortestpath import shortestPathModel
     # probe instantiation: import alone passes even without a valid license
     shortestPathModel(grid=(3, 3))
     _HAS_GUROBI = True
-except (ImportError, NameError, Exception):
+except Exception:
     _HAS_GUROBI = False
 
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
 
 
 from pyepo.func.cave import coneAlignedCosine
-
 
 # ============================================================
 # _cache_in_pass tests
@@ -54,7 +52,7 @@ class TestCacheInPass:
         # solution pool: 2 solutions
         solpool = torch.tensor([[1.0, 0.0, 0.0],
                                 [0.0, 0.0, 1.0]])
-        sol, obj, _ = _cache_in_pass(cp, model, solpool)
+        sol, _obj, _ = _cache_in_pass(cp, model, solpool)
         # instance 0: costs=[1,2,3], sol0 gives obj=1, sol1 gives obj=3 → pick sol0
         assert torch.allclose(sol[0], solpool[0])
         # instance 1: costs=[3,2,1], sol0 gives obj=3, sol1 gives obj=1 → pick sol1
@@ -66,7 +64,7 @@ class TestCacheInPass:
                            [3.0, 2.0, 1.0]])
         solpool = torch.tensor([[1.0, 0.0, 0.0],
                                 [0.0, 0.0, 1.0]])
-        sol, obj, _ = _cache_in_pass(cp, model, solpool)
+        sol, _obj, _ = _cache_in_pass(cp, model, solpool)
         # instance 0: sol0→1, sol1→3 → pick sol1 (max)
         assert torch.allclose(sol[0], solpool[1])
         # instance 1: sol0→3, sol1→1 → pick sol0 (max)
@@ -390,8 +388,10 @@ class TestRegularizedFrankWolfeGradient:
         eps = 5e-3
         fd = torch.zeros_like(cp)
         for j in range(cp.shape[1]):
-            cp_p = cp.detach().clone(); cp_p[0, j] += eps
-            cp_m = cp.detach().clone(); cp_m[0, j] -= eps
+            cp_p = cp.detach().clone()
+            cp_p[0, j] += eps
+            cp_m = cp.detach().clone()
+            cp_m[0, j] -= eps
             fd[0, j] = ((target * m(cp_p)).sum() - (target * m(cp_m)).sum()) / (2 * eps)
         np.testing.assert_allclose(analytic.numpy(), fd.numpy(), atol=5e-2,
             err_msg=f"lambd={lambd}")

@@ -1,15 +1,13 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Tests for pyepo.twostage: two-stage predict-then-optimize predictors
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from pyepo.twostage import sklearnPred
-from pyepo.twostage.autosklearnpred import autoSklearnPred, _HAS_AUTO
-
+from pyepo.twostage.autosklearnpred import _HAS_AUTO, autoSklearnPred
 
 try:
     from pyepo.model.grb.shortestpath import shortestPathModel
@@ -64,15 +62,16 @@ class TestSklearnPredIntegration:
     def test_end_to_end_pipeline(self):
         """Fit a two-stage model on synthetic data and evaluate regret."""
         from sklearn.linear_model import LinearRegression
+        from torch.utils.data import DataLoader
+
         import pyepo
         from pyepo.data.dataset import optDataset
-        from torch.utils.data import DataLoader
         # generate small dataset
         x, c = pyepo.data.shortestpath.genData(
             num_data=40, num_features=3, grid=(3, 3), deg=1, seed=42)
         optmodel = shortestPathModel(grid=(3, 3))
         dataset = optDataset(optmodel, x, c)
-        loader = DataLoader(dataset, batch_size=8, shuffle=False)
+        _ = DataLoader(dataset, batch_size=8, shuffle=False)
         # train two-stage predictor
         predictor = sklearnPred(LinearRegression())
         predictor.fit(x, c)

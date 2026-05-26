@@ -1,26 +1,28 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Tests for pyepo.data: data generation and dataset classes
 """
 
-import pytest
-import numpy as np
-import torch
 from unittest.mock import MagicMock, patch
 
-from pyepo.data import knapsack, shortestpath, tsp, portfolio
+import numpy as np
+import pytest
+import torch
+
+from pyepo.data import knapsack, portfolio, shortestpath, tsp
 from pyepo.data.dataset import (
-    optDataset, optDatasetKNN, optDatasetConstrs, collate_tight_constraints,
+    collate_tight_constraints,
+    optDataset,
+    optDatasetConstrs,
+    optDatasetKNN,
 )
 
 try:
     from pyepo.model.grb.shortestpath import shortestPathModel
-    from pyepo.model.grb.tsp import tspDFJModel
     # probe instantiation: import alone passes even without a valid license
     shortestPathModel(grid=(3, 3))
     _HAS_GUROBI = True
-except (ImportError, NameError, Exception):
+except Exception:
     _HAS_GUROBI = False
 
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
@@ -84,7 +86,7 @@ class TestShortestPathData:
 
     def test_edge_count(self):
         grid = (3, 5)
-        x, c = shortestpath.genData(10, 3, grid, seed=42)
+        _x, c = shortestpath.genData(10, 3, grid, seed=42)
         expected_edges = (grid[0] - 1) * grid[1] + (grid[1] - 1) * grid[0]
         assert c.shape[1] == expected_edges
 
@@ -113,7 +115,7 @@ class TestTSPData:
 
     def test_edge_count(self):
         n_nodes = 8
-        x, c = tsp.genData(10, 3, n_nodes, seed=42)
+        _x, c = tsp.genData(10, 3, n_nodes, seed=42)
         assert c.shape[1] == n_nodes * (n_nodes - 1) // 2
 
     def test_deterministic(self):
@@ -180,7 +182,7 @@ class TestOptDataset:
         feats = np.random.randn(10, 3).astype(np.float32)
         costs = np.random.randn(10, num_cost).astype(np.float32)
 
-        with patch("pyepo.data.dataset.optDataset.__init__", wraps=None) as mock_init:
+        with patch("pyepo.data.dataset.optDataset.__init__", wraps=None):
             # bypass isinstance check by directly setting attributes
             ds = object.__new__(optDataset)
             ds.model = model
@@ -232,7 +234,7 @@ class TestOptDataset:
         ds.sols = torch.randn(n, d)
         ds.objs = torch.randn(n, 1)
 
-        x, c, w, z = ds[0:4]
+        x, _c, _w, _z = ds[0:4]
         assert x.shape == (4, d)
 
     def test_len(self):
@@ -375,7 +377,7 @@ class TestOptDatasetConstrs:
             (x[0], c[0], w[0], z[0], ctrs0),
             (x[1], c[1], w[1], z[1], ctrs1),
         ]
-        feats, costs, sols, objs, padded = collate_tight_constraints(batch)
+        _feats, _costs, _sols, _objs, padded = collate_tight_constraints(batch)
         # pad_sequence stacks to (B, max_rows, num_cost)
         assert padded.shape == (2, 5, 4)
         # short row is zero-padded at the tail

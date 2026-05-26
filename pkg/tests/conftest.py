@@ -1,12 +1,10 @@
 #!/usr/bin/env python
-# coding: utf-8
 """Shared pytest fixtures and helpers for PyEPO tests."""
 
 import pytest
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-
 
 try:
     from pyepo.model.grb.shortestpath import shortestPathModel  # noqa: F401

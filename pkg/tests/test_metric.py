@@ -1,22 +1,21 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Tests for pyepo.metric: MSE, regret, unambiguous regret, SPOError
 
 Uses small models / mock to keep tests fast (no training).
 """
 
-import pytest
 import numpy as np
+import pytest
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from pyepo import EPO
+from pyepo.metric.metrics import SPOError
+from pyepo.metric.metrics import testMSE as _testMSE
 from pyepo.metric.mse import MSE
-from pyepo.metric.regret import calRegret, regret
+from pyepo.metric.regret import calRegret
 from pyepo.metric.unambregret import calUnambRegret
-from pyepo.metric.metrics import SPOError, testMSE as _testMSE
 
 try:
     from pyepo.model.grb.knapsack import knapsackModel

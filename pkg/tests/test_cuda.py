@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 CUDA device tests: verify tensors stay on the correct device throughout
 the predict-then-optimize pipeline (forward, loss, backward, metrics).
@@ -14,7 +13,7 @@ import torch
 
 import pyepo
 
-from .conftest import LinearPred, NUM_FEAT, _HAS_GUROBI
+from .conftest import _HAS_GUROBI, NUM_FEAT, LinearPred
 
 _HAS_CUDA = torch.cuda.is_available()
 _DEVICE = torch.device("cuda" if _HAS_CUDA else "cpu")
@@ -80,7 +79,7 @@ class TestModelDevice:
 class TestSPOPlusCUDA:
 
     def test_loss_and_grad_on_cuda(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         x, c, w, z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
@@ -92,7 +91,7 @@ class TestSPOPlusCUDA:
         _assert_grads_cuda(pred)
 
     def test_train_loop(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         pred = _fresh_predmodel(optmodel.num_cost)
         opt = torch.optim.SGD(pred.parameters(), lr=1e-2)
         spo = pyepo.func.SPOPlus(optmodel, processes=1)
@@ -110,8 +109,8 @@ class TestSPOPlusCUDA:
 class TestPerturbationGradientCUDA:
 
     def test_loss_and_grad_on_cuda(self, sp_data):
-        optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        optmodel, _dataset, loader = sp_data
+        x, c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         pg = pyepo.func.perturbationGradient(optmodel, processes=1, sigma=1.0)
@@ -129,8 +128,8 @@ class TestPerturbationGradientCUDA:
 class TestBlackboxOptCUDA:
 
     def test_output_and_grad_on_cuda(self, sp_data):
-        optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        optmodel, _dataset, loader = sp_data
+        x, _c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         bb = pyepo.func.blackboxOpt(optmodel, processes=1, lambd=10)
@@ -145,8 +144,8 @@ class TestBlackboxOptCUDA:
 class TestNegativeIdentityCUDA:
 
     def test_output_and_grad_on_cuda(self, sp_data):
-        optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        optmodel, _dataset, loader = sp_data
+        x, _c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         nid = pyepo.func.negativeIdentity(optmodel, processes=1)
@@ -166,8 +165,8 @@ class TestNegativeIdentityCUDA:
 class TestPerturbedOptCUDA:
 
     def test_output_and_grad_on_cuda(self, sp_data):
-        optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        optmodel, _dataset, loader = sp_data
+        x, _c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         ptb = pyepo.func.perturbedOpt(optmodel, processes=1, n_samples=3, sigma=1.0)
@@ -182,8 +181,8 @@ class TestPerturbedOptCUDA:
 class TestPerturbedFenchelYoungCUDA:
 
     def test_loss_and_grad_on_cuda(self, sp_data):
-        optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        optmodel, _dataset, loader = sp_data
+        x, _c, w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         pfy = pyepo.func.perturbedFenchelYoung(optmodel, processes=1, n_samples=3, sigma=1.0)
@@ -197,8 +196,8 @@ class TestPerturbedFenchelYoungCUDA:
 class TestImplicitMLECUDA:
 
     def test_output_and_grad_on_cuda(self, sp_data):
-        optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        optmodel, _dataset, loader = sp_data
+        x, _c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         imle = pyepo.func.implicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0)
@@ -213,8 +212,8 @@ class TestImplicitMLECUDA:
 class TestAdaptiveImplicitMLECUDA:
 
     def test_output_and_grad_on_cuda(self, sp_data):
-        optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        optmodel, _dataset, loader = sp_data
+        x, _c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         aimle = pyepo.func.adaptiveImplicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0)
@@ -234,7 +233,7 @@ class TestNCECUDA:
 
     def test_loss_and_grad_on_cuda(self, sp_data):
         optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        x, _c, w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         nce = pyepo.func.noiseContrastiveEstimation(optmodel, processes=1, solve_ratio=1, dataset=dataset)
@@ -249,7 +248,7 @@ class TestContrastiveMAPCUDA:
 
     def test_loss_and_grad_on_cuda(self, sp_data):
         optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        x, _c, w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         cmap = pyepo.func.contrastiveMAP(optmodel, processes=1, solve_ratio=1, dataset=dataset)
@@ -268,7 +267,7 @@ class TestListwiseLTRCUDA:
 
     def test_loss_and_grad_on_cuda(self, sp_data):
         optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        x, c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         lw = pyepo.func.listwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=dataset)
@@ -283,7 +282,7 @@ class TestPairwiseLTRCUDA:
 
     def test_loss_and_grad_on_cuda(self, sp_data):
         optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        x, c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         pw = pyepo.func.pairwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=dataset)
@@ -298,7 +297,7 @@ class TestPointwiseLTRCUDA:
 
     def test_loss_and_grad_on_cuda(self, sp_data):
         optmodel, dataset, loader = sp_data
-        x, c, w, z = _get_batch(loader)
+        x, c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         pt = pyepo.func.pointwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=dataset)
@@ -316,7 +315,7 @@ class TestPointwiseLTRCUDA:
 class TestKnapsackCUDA:
 
     def test_spo_plus(self, ks_data):
-        optmodel, dataset, loader = ks_data
+        optmodel, _dataset, loader = ks_data
         x, c, w, z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
@@ -327,8 +326,8 @@ class TestKnapsackCUDA:
         _assert_grads_cuda(pred)
 
     def test_blackbox_opt(self, ks_data):
-        optmodel, dataset, loader = ks_data
-        x, c, w, z = _get_batch(loader)
+        optmodel, _dataset, loader = ks_data
+        x, c, _w, _z = _get_batch(loader)
         pred = _fresh_predmodel(optmodel.num_cost)
         cp = pred(x)
         bb = pyepo.func.blackboxOpt(optmodel, processes=1, lambd=10)
@@ -347,27 +346,27 @@ class TestKnapsackCUDA:
 class TestMetricsCUDA:
 
     def test_regret(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         pred = _fresh_predmodel(optmodel.num_cost)
         reg = pyepo.metric.regret(pred, optmodel, loader)
         assert isinstance(reg, float)
         assert reg >= 0
 
     def test_mse(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         pred = _fresh_predmodel(optmodel.num_cost)
         mse = pyepo.metric.MSE(pred, loader)
         assert isinstance(mse, float)
         assert mse >= 0
 
     def test_unambiguous_regret(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         pred = _fresh_predmodel(optmodel.num_cost)
         unamb = pyepo.metric.unambRegret(pred, optmodel, loader)
         assert isinstance(unamb, float)
 
     def test_regret_knapsack(self, ks_data):
-        optmodel, dataset, loader = ks_data
+        optmodel, _dataset, loader = ks_data
         pred = _fresh_predmodel(optmodel.num_cost)
         reg = pyepo.metric.regret(pred, optmodel, loader)
         assert isinstance(reg, float)

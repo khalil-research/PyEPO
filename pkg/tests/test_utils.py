@@ -1,15 +1,14 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Tests for pyepo.utils: getArgs utility, and pyepo.model.opt helpers.
 """
 
-import pytest
 import numpy as np
+import pytest
 import torch
 
-from pyepo.utils import costToNumpy, getArgs
 from pyepo.model.utils import getTspTour, unionFind
+from pyepo.utils import costToNumpy, getArgs
 
 try:
     from pyepo.model.grb.knapsack import knapsackModel

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 """
 Lightweight integration tests: end-to-end training for a few steps.
 
@@ -17,7 +16,12 @@ import pyepo
 from pyepo.data.dataset import optDatasetKNN
 
 from .conftest import (
-    LinearPred, NUM_DATA, NUM_FEAT, GRID, BATCH, _HAS_GUROBI,
+    _HAS_GUROBI,
+    BATCH,
+    GRID,
+    NUM_DATA,
+    NUM_FEAT,
+    LinearPred,
 )
 
 try:
@@ -59,14 +63,14 @@ def _fresh_predmodel(num_cost=12):
 @requires_gurobi
 class TestSPOPlus:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         spo = pyepo.func.SPOPlus(optmodel, processes=1)
         _train_loop(spo, loader, predmodel,
                     lambda fn, cp, c, w, z: fn(cp, c, w, z))
 
     def test_regret_metric(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         reg = pyepo.metric.regret(predmodel, optmodel, loader)
         assert isinstance(reg, float) and reg >= 0
@@ -81,7 +85,7 @@ class TestSPOPlus:
 @requires_gurobi
 class TestPerturbationGradient:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         pg = pyepo.func.perturbationGradient(optmodel, processes=1, sigma=1.0)
         _train_loop(pg, loader, predmodel,
@@ -95,7 +99,7 @@ class TestPerturbationGradient:
 @requires_gurobi
 class TestBlackboxOpt:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         bb = pyepo.func.blackboxOpt(optmodel, processes=1, lambd=10)
         _train_loop(bb, loader, predmodel,
@@ -105,7 +109,7 @@ class TestBlackboxOpt:
 @requires_gurobi
 class TestNegativeIdentity:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         nid = pyepo.func.negativeIdentity(optmodel, processes=1)
         _train_loop(nid, loader, predmodel,
@@ -121,7 +125,7 @@ class TestNegativeIdentity:
 @requires_gurobi
 class TestPerturbedOpt:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         ptb = pyepo.func.perturbedOpt(optmodel, processes=1, n_samples=3, sigma=1.0)
         _train_loop(ptb, loader, predmodel,
@@ -131,7 +135,7 @@ class TestPerturbedOpt:
 @requires_gurobi
 class TestPerturbedOptMul:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         ptb = pyepo.func.perturbedOptMul(optmodel, processes=1, n_samples=3, sigma=0.5)
         _train_loop(ptb, loader, predmodel,
@@ -162,7 +166,7 @@ def test_perturbed_opt_variance_reduction_skips_single_sample():
 @requires_gurobi
 class TestPerturbedFenchelYoung:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         pfy = pyepo.func.perturbedFenchelYoung(optmodel, processes=1, n_samples=3, sigma=1.0)
         _train_loop(pfy, loader, predmodel,
@@ -172,7 +176,7 @@ class TestPerturbedFenchelYoung:
 @requires_gurobi
 class TestPerturbedFenchelYoungMul:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         pfy = pyepo.func.perturbedFenchelYoungMul(optmodel, processes=1, n_samples=3, sigma=0.5)
         _train_loop(pfy, loader, predmodel,
@@ -201,7 +205,7 @@ def test_perturbed_fenchel_young_mul_uses_weighted_expected_solution():
 @requires_gurobi
 class TestImplicitMLE:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         imle = pyepo.func.implicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0)
         _train_loop(imle, loader, predmodel,
@@ -211,7 +215,7 @@ class TestImplicitMLE:
 @requires_gurobi
 class TestAdaptiveImplicitMLE:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         aimle = pyepo.func.adaptiveImplicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0)
         _train_loop(aimle, loader, predmodel,
@@ -225,7 +229,7 @@ class TestAdaptiveImplicitMLE:
 @requires_gurobi
 class TestRegularizedFrankWolfe:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         rfw = pyepo.func.regularizedFrankWolfeOpt(optmodel, lambd=1.0, max_iter=10, processes=1)
         mse = torch.nn.MSELoss()
@@ -236,7 +240,7 @@ class TestRegularizedFrankWolfe:
 @requires_gurobi
 class TestRegularizedFrankWolfeFenchelYoung:
     def test_train(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         fy = pyepo.func.regularizedFrankWolfeFenchelYoung(
             optmodel, lambd=1.0, max_iter=10, processes=1)
@@ -310,21 +314,21 @@ class TestPointwiseLTR:
 class TestParallelSolving:
 
     def test_spo_plus_parallel(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         spo = pyepo.func.SPOPlus(optmodel, processes=2)
         _train_loop(spo, loader, predmodel,
                     lambda fn, cp, c, w, z: fn(cp, c, w, z))
 
     def test_blackbox_parallel(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         bb = pyepo.func.blackboxOpt(optmodel, processes=2, lambd=10)
         _train_loop(bb, loader, predmodel,
                     lambda fn, cp, c, w, z: fn(cp).mean())
 
     def test_perturbed_opt_parallel(self, sp_data):
-        optmodel, dataset, loader = sp_data
+        optmodel, _dataset, loader = sp_data
         predmodel = _fresh_predmodel()
         ptb = pyepo.func.perturbedOpt(optmodel, processes=2, n_samples=3, sigma=1.0)
         _train_loop(ptb, loader, predmodel,
@@ -339,14 +343,14 @@ class TestParallelSolving:
 class TestKnapsackIntegration:
 
     def test_spo_plus(self, ks_data):
-        optmodel, dataset, loader = ks_data
+        optmodel, _dataset, loader = ks_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
         spo = pyepo.func.SPOPlus(optmodel, processes=1)
         _train_loop(spo, loader, predmodel,
                     lambda fn, cp, c_b, w, z: fn(cp, c_b, w, z))
 
     def test_regret(self, ks_data):
-        optmodel, dataset, loader = ks_data
+        optmodel, _dataset, loader = ks_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
         reg = pyepo.metric.regret(predmodel, optmodel, loader)
         assert isinstance(reg, float)
@@ -447,7 +451,7 @@ class TestCaVE:
     """End-to-end CaVE training on a tiny TSP-DFJ instance."""
 
     def _setup(self, num_nodes: int = 5):
-        from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
+        from pyepo.data.dataset import collate_tight_constraints, optDatasetConstrs
         from pyepo.model.grb.tsp import tspDFJModel
         x, c = pyepo.data.tsp.genData(8, NUM_FEAT, num_nodes, deg=1, seed=42)
         optmodel = tspDFJModel(num_nodes=num_nodes)
@@ -460,7 +464,7 @@ class TestCaVE:
 
     def _train_loop_cave(self, loss_fn, loader, predmodel):
         opt = torch.optim.SGD(predmodel.parameters(), lr=1e-2)
-        for i, (x, c, w, z, ctrs) in enumerate(loader):
+        for i, (x, _c, _w, _z, ctrs) in enumerate(loader):
             if i >= _STEPS:
                 break
             cp = predmodel(x)
