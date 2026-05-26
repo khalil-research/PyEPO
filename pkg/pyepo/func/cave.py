@@ -18,6 +18,7 @@ from pyepo.func.abcmodule import optModule
 try:
     import clarabel
     from scipy import sparse
+
     _HAS_CLARABEL = True
 except ImportError:
     _HAS_CLARABEL = False
@@ -124,7 +125,10 @@ class coneAlignedCosine(optModule):
             if self._branch_rng.uniform() <= self.solve_ratio:
                 # QP branch: truncated Clarabel projection inside the cone
                 proj = _clarabel_project_batch(
-                    signed_cost, tight_ctrs_cpu, max_iter=self.max_iter, pool=self.pool,
+                    signed_cost,
+                    tight_ctrs_cpu,
+                    max_iter=self.max_iter,
+                    pool=self.pool,
                 )
             else:
                 # heuristic branch: blend normalized pred with avg binding-constraint normal
@@ -191,7 +195,9 @@ def _project_one(cp: np.ndarray, ctr: np.ndarray, max_iter: int) -> np.ndarray:
 
 
 def _clarabel_project_batch(
-    signed_cost: torch.Tensor, tight_ctrs: torch.Tensor, max_iter: int,
+    signed_cost: torch.Tensor,
+    tight_ctrs: torch.Tensor,
+    max_iter: int,
     pool=None,
 ) -> torch.Tensor:
     """
