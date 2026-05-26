@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Solution Pool" href="pool.html"><link rel="prev" title="Two-Stage Method" href="twostage.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Autograd Functions - PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.6 documentation</title>
+        <title>Autograd Functions - PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.6 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.7 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.6 documentation</span>
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.7 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -364,7 +364,7 @@
 <ul class="simple">
 <li><p>When <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span> labels are available, start with <strong>SPO+</strong>: convex, has a nonzero subgradient, and is well-studied as a baseline.</p></li>
 <li><p>When the loss-returning style is preferred and labels include <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span>, <strong>PFYL</strong> avoids the extra task loss.</p></li>
-<li><p>For <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges), use <strong>CaVE</strong>: a cone-alignment loss whose projection (an interior-point QP via Clarabel) replaces the combinatorial solve in the loss, with paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.</p></li>
+<li><p>For <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges), use <strong>CaVE</strong>: a cone-alignment loss whose projection (an interior-point QP via Clarabel) replaces the per-step ILP solve, with paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.</p></li>
 <li><p>For very large LPs on GPU, combine <strong>MPAX</strong> models with <strong>SPO+</strong> or <strong>PFYL</strong>.</p></li>
 </ul>
 <p>For finer choices, the right method depends on three questions.</p>
@@ -959,6 +959,17 @@ cutting the per-epoch cost without measurable regret loss.</p>
 
 </dd></dl>
 
+<p>If you use the <strong>CaVE</strong> loss, please cite:</p>
+<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">tang2024cave</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="p">=</span><span class="s">{CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="p">=</span><span class="s">{Tang, Bo and Khalil, Elias B}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">booktitle</span><span class="p">=</span><span class="s">{Integration of Constraint Programming, Artificial Intelligence, and Operations Research}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">pages</span><span class="p">=</span><span class="s">{193--210}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="p">=</span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">publisher</span><span class="p">=</span><span class="s">{Springer}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </section>
 </section>
 <section id="contrastive-methods">
@@ -1300,7 +1311,7 @@ LTR variants and with the contrastive methods.</p>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=a28cc43c"></script>
+</div><script src="../../_static/documentation_options.js?v=0bccb05a"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

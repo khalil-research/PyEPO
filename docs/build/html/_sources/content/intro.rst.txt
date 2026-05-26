@@ -50,12 +50,3 @@ If you use ``PyEPO`` in your research, please cite:
      month={July},
      publisher={Springer}
    }
-
-   @inproceedings{tang2024cave,
-     title={CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs},
-     author={Tang, Bo and Khalil, Elias B},
-     booktitle={Integration of Constraint Programming, Artificial Intelligence, and Operations Research},
-     pages={193--210},
-     year={2024},
-     publisher={Springer}
-   }
