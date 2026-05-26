@@ -88,11 +88,18 @@ To **reproduce the experiments** in the original paper, please use the code and 
 
 ## Features
 
-- Implement **SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922), **DBB** [[3]](https://arxiv.org/abs/1912.02175), **NID** [[4]](https://arxiv.org/abs/2205.15213), **DPO** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), **PFYL** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), L2-regularized **RFWO/RFYL** [[6]](https://arxiv.org/abs/2207.13513), **NCE** [[7]](https://www.ijcai.org/proceedings/2021/390), **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html), **I-MLE** [[9]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[10]](https://ojs.aaai.org/index.php/AAAI/article/view/26103), **PG** [[11]](https://arxiv.org/abs/2402.03256), and **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12) for binary linear programs.
-- Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization) and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
-- Support parallel computing for optimization solvers
-- Support solution caching [[7]](https://www.ijcai.org/proceedings/2021/390) to speed up training
-- Support kNN robust loss [[12]](https://arxiv.org/abs/2310.04328) to improve decision quality
+- **End-to-end gradient surrogates** for predict-then-optimize, covering the seven families in the docs:
+  - *Surrogate losses* — convex upper bound on regret (**SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922)) and finite-difference directional gradient (**PG** [[11]](https://arxiv.org/abs/2402.03256)).
+  - *Perturbed methods* — Monte-Carlo gradients over random cost perturbations: **DPO** and **PFYL** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), **I-MLE** [[9]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[10]](https://ojs.aaai.org/index.php/AAAI/article/view/26103).
+  - *Regularized methods* — L2-regularized Frank-Wolfe over the convex hull of feasible solutions: **RFWO** and **RFYL** [[6]](https://arxiv.org/abs/2207.13513).
+  - *Black-box methods* — informative gradient estimates that replace the solver's zero gradient: **DBB** [[3]](https://arxiv.org/abs/1912.02175) (interpolation) and **NID** [[4]](https://arxiv.org/abs/2205.15213) (signed identity).
+  - *Cone-aligned estimation* — supervise the predicted cost by projecting onto the binding-constraint normals at the true optimum; binary linear programs only: **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12) — an order of magnitude faster than SPO+ at TSP scale.
+  - *Contrastive methods* — margin against a cached pool of non-optimal solutions: **NCE** and **CMAP** [[7]](https://www.ijcai.org/proceedings/2021/390).
+  - *Learning to rank* — rank the true optimum highest among the pool: pointwise / pairwise / listwise **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html).
+- **Multi-solver backend** under a unified `optModel` API: [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and the GPU-native [MPAX](https://github.com/MIT-Lu-Lab/MPAX) PDHG solver.
+- **Parallel solving** via a Pathos worker pool to amortize per-instance ILP solves across a mini-batch.
+- **Solution caching** [[7]](https://www.ijcai.org/proceedings/2021/390) reuses previously computed optima to skip redundant solver calls in contrastive and ranking training.
+- **kNN-smoothed targets** [[12]](https://arxiv.org/abs/2310.04328) replace each label with a neighborhood aggregate for noise-robust regret.
 
 ## Installation
 
