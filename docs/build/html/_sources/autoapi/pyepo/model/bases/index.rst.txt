@@ -127,7 +127,9 @@ Module Contents
    :vartype num_assets: int
    :ivar covariance: asset-return covariance matrix
    :vartype covariance: np.ndarray
-   :ivar risk_level: risk budget = ``gamma * mean(covariance)``
+   :ivar gamma: risk tolerance multiplier
+   :vartype gamma: float
+   :ivar risk_level: derived risk budget = ``gamma * mean(covariance)``
 
    :vartype risk_level: float
 
@@ -141,7 +143,9 @@ Module Contents
    .. py:attribute:: covariance
 
 
-   .. py:attribute:: risk_level
+   .. py:attribute:: gamma
+      :value: 2.25
+
 
 
    .. py:property:: num_cost
@@ -149,6 +153,11 @@ Module Contents
 
 
       number of costs to be predicted
+
+
+   .. py:property:: risk_level
+      :type: float
+
 
 
 .. py:class:: tspABBase(num_nodes: int, *args, **kwargs)

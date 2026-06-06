@@ -481,7 +481,8 @@ are fixed across instances.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_assets</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of assets</p></li>
 <li><p><strong>covariance</strong> (<em>np.ndarray</em>) – asset-return covariance matrix</p></li>
-<li><p><strong>risk_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – risk budget = <code class="docutils literal notranslate"><span class="pre">gamma</span> <span class="pre">*</span> <span class="pre">mean(covariance)</span></code></p></li>
+<li><p><strong>gamma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – risk tolerance multiplier</p></li>
+<li><p><strong>risk_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – derived risk budget = <code class="docutils literal notranslate"><span class="pre">gamma</span> <span class="pre">*</span> <span class="pre">mean(covariance)</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -501,8 +502,8 @@ are fixed across instances.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.bases.portfolioBase.risk_level">
-<span class="sig-name descname"><span class="pre">risk_level</span></span><a class="headerlink" href="#pyepo.model.bases.portfolioBase.risk_level" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyepo.model.bases.portfolioBase.gamma">
+<span class="sig-name descname"><span class="pre">gamma</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.25</span></span><a class="headerlink" href="#pyepo.model.bases.portfolioBase.gamma" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -510,6 +511,11 @@ are fixed across instances.</p>
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">num_cost</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#pyepo.model.bases.portfolioBase.num_cost" title="Link to this definition">¶</a></dt>
 <dd><p>number of costs to be predicted</p>
 </dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyepo.model.bases.portfolioBase.risk_level">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">risk_level</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#pyepo.model.bases.portfolioBase.risk_level" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -675,8 +681,9 @@ formulations implement <code class="docutils literal notranslate"><span class="p
 <li><a class="reference internal" href="#pyepo.model.bases.portfolioBase.modelSense"><code class="docutils literal notranslate"><span class="pre">portfolioBase.modelSense</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.bases.portfolioBase.num_assets"><code class="docutils literal notranslate"><span class="pre">portfolioBase.num_assets</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.bases.portfolioBase.covariance"><code class="docutils literal notranslate"><span class="pre">portfolioBase.covariance</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.bases.portfolioBase.risk_level"><code class="docutils literal notranslate"><span class="pre">portfolioBase.risk_level</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.bases.portfolioBase.gamma"><code class="docutils literal notranslate"><span class="pre">portfolioBase.gamma</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.bases.portfolioBase.num_cost"><code class="docutils literal notranslate"><span class="pre">portfolioBase.num_cost</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.bases.portfolioBase.risk_level"><code class="docutils literal notranslate"><span class="pre">portfolioBase.risk_level</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pyepo.model.bases.tspABBase"><code class="docutils literal notranslate"><span class="pre">tspABBase</span></code></a><ul>
