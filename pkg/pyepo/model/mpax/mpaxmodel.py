@@ -106,21 +106,19 @@ class optMpaxModel(optModel):
 
     def _rebuild_jit(self) -> None:
         """Rebuild solve functions; dispatches LP/QP from self.Q."""
-        # LP path: jit + vmap
+        # LP path
         if self.Q is None:
-            self.jitted_solve = jax.jit(
-                partial(
-                    self._jitted_solve_lp,
-                    A=self.A,
-                    b=self.b,
-                    G=self.G,
-                    h=self.h,
-                    l=self.l,
-                    u=self.u,
-                    use_sparse_matrix=self.use_sparse_matrix,
-                )
+            solve_fn = partial(
+                self._jitted_solve_lp,
+                A=self.A,
+                b=self.b,
+                G=self.G,
+                h=self.h,
+                l=self.l,
+                u=self.u,
+                use_sparse_matrix=self.use_sparse_matrix,
             )
-        # QP path: jit + vmap (see _jitted_solve_qp)
+        # QP path (see _jitted_solve_qp)
         else:
             n = self.A.shape[1]
             # placeholder c (replaced per call)
@@ -132,10 +130,10 @@ class optMpaxModel(optModel):
             )
             # Python bool keeps is_lp static under jit/vmap
             qp_template = dataclasses.replace(qp_template, is_lp=False)
-            self.jitted_solve = jax.jit(
-                partial(self._jitted_solve_qp, qp_template=qp_template, Q=self.Q)
-            )
-        self.batch_optimize = jax.vmap(self.jitted_solve)
+            solve_fn = partial(self._jitted_solve_qp, qp_template=qp_template, Q=self.Q)
+        # single-instance jit; batch path keeps jit outermost for one fused executable
+        self.jitted_solve = jax.jit(solve_fn)
+        self.batch_optimize = jax.jit(jax.vmap(solve_fn))
 
     @property
     def num_cost(self) -> int:

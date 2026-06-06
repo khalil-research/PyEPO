@@ -7,7 +7,7 @@ Package-wide utility functions
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import torch
@@ -36,7 +36,7 @@ def getArgs(model: optModel) -> dict:
 
 def costToNumpy(
     c: np.ndarray | torch.Tensor | list,
-    dtype=np.float32,
+    dtype: Any = np.float32,
 ) -> np.ndarray:
     """
     Normalize a cost vector to a numpy array, detaching torch tensors as needed.
