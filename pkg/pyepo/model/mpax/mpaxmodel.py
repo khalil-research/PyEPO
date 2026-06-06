@@ -245,14 +245,15 @@ class optMpaxModel(optModel):
         Returns:
             optModel: new copied model
         """
-        # remove device to avoid error
-        device = self.device
+        # jax Device objects can't be deepcopied; stash and restore around the copy
+        device, gpu_device = self.device, self._gpu_device
         self.device = None
+        self._gpu_device = None
         # copy new model
         new_model = deepcopy(self)
         # restore device
-        self.device = device
-        new_model.device = device
+        self.device, self._gpu_device = device, gpu_device
+        new_model.device, new_model._gpu_device = device, gpu_device
         return new_model
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
