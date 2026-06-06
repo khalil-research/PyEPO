@@ -161,6 +161,8 @@ class optMpaxModel(optModel):
                 c = c.cpu().detach()
             else:
                 c = c.detach()
+            # match float32 constraints; no-op (no copy) if already float32
+            c = c.to(torch.float32)
             # convert PyTorch tensor to JAX array using DLPack
             self.c = jnp.from_dlpack(c)
             # move constraints and bounds to device
