@@ -97,9 +97,14 @@ class Problem:
 
     def compile(self, backend, **kwargs):
         """
-        Compile to a solver backend. Backend compilers are Phase 2.
+        Compile to a solver backend, returning an ``optModel``.
+
+        Args:
+            backend: native backend name (currently ``"gurobi"``); other names
+                are Phase 2/3.
         """
-        raise NotImplementedError(
-            "DSL backend compilers are not implemented yet (Phase 2); "
-            "the Phase 1 core builds and finalizes the IR only."
-        )
+        # native backend
+        if backend == "gurobi":
+            from pyepo.model.grb.compile import compileProblem
+            return compileProblem(self, **kwargs)
+        raise NotImplementedError(f"DSL backend {backend!r} is not implemented yet (Phase 2/3).")
