@@ -22,6 +22,9 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# guards the per-batch MPAX device-mismatch warning so it fires once
+_warned_mpax_device_mismatch = False
+
 
 def _close_pool(pool) -> None:
     """Best-effort shutdown of a pathos ProcessingPool; swallows shutdown errors."""
@@ -94,11 +97,15 @@ def _solve_batch(
         sol = torch.from_dlpack(sol)
         obj = torch.from_dlpack(obj)
         if sol.device != device:
-            logger.warning(
-                "MPAX solutions on %s differ from input device %s; copying",
-                sol.device,
-                device,
-            )
+            # warn once; a persistent mismatch would otherwise flood logs per batch
+            global _warned_mpax_device_mismatch
+            if not _warned_mpax_device_mismatch:
+                logger.warning(
+                    "MPAX solutions on %s differ from input device %s; copying",
+                    sol.device,
+                    device,
+                )
+                _warned_mpax_device_mismatch = True
             sol, obj = sol.to(device), obj.to(device)
         # obj sense
         if optmodel.modelSense == EPO.MINIMIZE:

@@ -95,8 +95,9 @@ class optMpaxModel(optModel):
             )
         # init device
         self.device = None
-        # cache GPU availability
-        self._has_jax_gpu = any(d.platform == "gpu" for d in jax.devices())
+        # cache JAX GPU device (None if CPU-only)
+        self._gpu_device = next((d for d in jax.devices() if d.platform == "gpu"), None)
+        self._has_jax_gpu = self._gpu_device is not None
         # JIT pre-compile (LP/QP dispatch on self.Q)
         self._rebuild_jit()
 
@@ -165,6 +166,9 @@ class optMpaxModel(optModel):
             c = c.to(torch.float32)
             # convert PyTorch tensor to JAX array using DLPack
             self.c = jnp.from_dlpack(c)
+            # keep solve on GPU even when cost came from a CPU tensor
+            if self._gpu_device is not None:
+                self.c = jax.device_put(self.c, self._gpu_device)
             # move constraints and bounds to device
             if self.device != self.c.device:
                 self.device = self.c.device
