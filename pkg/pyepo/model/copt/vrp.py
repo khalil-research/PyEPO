@@ -284,7 +284,7 @@ class vrpMTZModel(vrpABModel):
         self._model.solve()
         # collapse directed pair to undirected selection per edge
         xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
-        sol = (xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8)
+        sol = np.asarray((xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8))
         return sol, self._model.objVal
 
     def relax(self) -> vrpMTZModelRel:

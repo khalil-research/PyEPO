@@ -50,7 +50,7 @@ class tspABModel(tspABBase, optGrbModel):
         """
         self._model.optimize()
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
-        sol = (xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8)
+        sol = np.asarray((xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8))
         return sol, self._model.objVal
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
