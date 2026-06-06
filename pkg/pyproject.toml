@@ -82,6 +82,9 @@ pyepo = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "slow: tests dominated by multiprocessing/process-spawn; deselect with -m 'not slow'",
+]
 filterwarnings = [
     # SWIG-generated stubs from OR-Tools / similar trip these on Python 3.12+
     "ignore:builtin type \\S+ has no __module__ attribute:DeprecationWarning",
@@ -180,10 +183,9 @@ ignore = [
 "pyepo/model/__init__.py" = ["F401"]
 # tests intentionally use broad pytest.raises(Exception) for cross-solver
 # infeasibility assertions (Gurobi/COPT/Pyomo each raise distinct types)
-"tests/test_model.py" = ["B017"]
+"tests/test_30_model.py" = ["B017"]
 # optional-backend probes catch any setup failure (license errors, etc.)
-"tests/test_data.py" = ["BLE001"]
-"tests/test_func.py" = ["BLE001", "E402"]
+"tests/conftest.py" = ["BLE001"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["pyepo"]

@@ -1,19 +1,98 @@
 #!/usr/bin/env python
-"""Shared pytest fixtures and helpers for PyEPO tests."""
+"""Shared pytest fixtures, backend probes, and skip markers for PyEPO tests.
+
+Backend availability is probed once here and exposed as ``_HAS_*`` flags plus
+ready-made ``requires_*`` skip markers, so individual test modules never
+re-detect solvers. Optional backends (COPT, Pyomo, MPAX, auto-sklearn) that are
+absent simply skip rather than fail.
+
+The expensive ``optDataset`` fixtures are module-scoped: each solves one tiny
+optimization problem per sample at construction, so they are built once and
+shared across a whole test module.
+"""
 
 import pytest
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
+import pyepo.func as F
+
+# ============================================================
+# Backend probes (run once at import)
+# ============================================================
+
 try:
-    from pyepo.model.grb.shortestpath import shortestPathModel  # noqa: F401
+    # instantiate, not just import: a bare import succeeds without a license
+    from pyepo.model.grb.shortestpath import shortestPathModel
+    shortestPathModel(grid=(3, 3))
     _HAS_GUROBI = True
-except (ImportError, NameError):
+except Exception:
     _HAS_GUROBI = False
+
+try:
+    import pyomo.environ  # noqa: F401
+    _HAS_PYOMO = True
+except Exception:
+    _HAS_PYOMO = False
+
+try:
+    import coptpy  # noqa: F401
+    _HAS_COPT = True
+except Exception:
+    _HAS_COPT = False
+
+try:
+    from pyepo.model.ort.ortmodel import _HAS_ORTOOLS
+except Exception:
+    _HAS_ORTOOLS = False
+
+try:
+    import jax  # noqa: F401
+    import mpax  # noqa: F401
+    _HAS_MPAX = True
+except Exception:
+    _HAS_MPAX = False
+
+try:
+    from pyepo.twostage.autosklearnpred import _HAS_AUTO
+except Exception:
+    _HAS_AUTO = False
+
+try:
+    import clarabel  # noqa: F401
+    _HAS_CLARABEL = True
+except Exception:
+    _HAS_CLARABEL = False
 
 _HAS_CUDA = torch.cuda.is_available()
 
+# MPAX runs on JAX; the jax-gpu <-> torch-cuda dlpack path needs a GPU jax device
+try:
+    import jax as _jax
+    _HAS_JAX_GPU = any(d.platform == "gpu" for d in _jax.devices())
+except Exception:
+    _HAS_JAX_GPU = False
+
+
+# ============================================================
+# Skip markers
+# ============================================================
+
+requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
+requires_pyomo = pytest.mark.skipif(not _HAS_PYOMO, reason="Pyomo not installed")
+requires_copt = pytest.mark.skipif(not _HAS_COPT, reason="COPT not installed")
+requires_ortools = pytest.mark.skipif(not _HAS_ORTOOLS, reason="OR-Tools not installed")
+requires_mpax = pytest.mark.skipif(not _HAS_MPAX, reason="MPAX (jax + mpax) not installed")
+requires_clarabel = pytest.mark.skipif(not _HAS_CLARABEL, reason="Clarabel not installed")
+requires_cuda = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA not available")
+requires_jax_gpu = pytest.mark.skipif(
+    not (_HAS_CUDA and _HAS_JAX_GPU), reason="CUDA + jax-gpu not both available")
+
+
+# ============================================================
+# Shared constants and prediction model
+# ============================================================
 
 NUM_DATA = 32
 NUM_FEAT = 3
@@ -22,7 +101,7 @@ BATCH = 16
 
 
 class LinearPred(nn.Module):
-    """Minimal linear pred model: features -> per-edge cost."""
+    """Minimal linear predictor: features -> per-cost-coefficient vector."""
 
     def __init__(self, num_feat, num_cost):
         super().__init__()
@@ -32,9 +111,81 @@ class LinearPred(nn.Module):
         return self.linear(x)
 
 
+# ============================================================
+# Canonical loss/op registry (shared by the func / integration / cuda layers)
+# ============================================================
+# name -> (kind, build, sig)
+#   kind  : "solution" -> forward returns a predicted (batch, vars) tensor
+#           "loss"     -> forward returns a scalar and honours `reduction`
+#   build : (optmodel, dataset, reduction) -> module; reduction is ignored by
+#           solution-returning ops, which take no such argument
+#   sig   : forward-argument spec for call_op, e.g. "cp", "cp,c", "cp,c,w,z"
+LOSS_REGISTRY = {
+    "blackboxOpt":
+        ("solution", lambda om, ds, r: F.blackboxOpt(om, processes=1, lambd=10), "cp"),
+    "negativeIdentity":
+        ("solution", lambda om, ds, r: F.negativeIdentity(om, processes=1), "cp"),
+    "perturbedOpt":
+        ("solution", lambda om, ds, r: F.perturbedOpt(om, processes=1, n_samples=3, sigma=1.0), "cp"),
+    "perturbedOptMul":
+        ("solution", lambda om, ds, r: F.perturbedOptMul(om, processes=1, n_samples=3, sigma=0.5), "cp"),
+    "implicitMLE":
+        ("solution", lambda om, ds, r: F.implicitMLE(om, processes=1, n_samples=3, sigma=1.0), "cp"),
+    "adaptiveImplicitMLE":
+        ("solution", lambda om, ds, r: F.adaptiveImplicitMLE(om, processes=1, n_samples=3, sigma=1.0), "cp"),
+    "regularizedFrankWolfeOpt":
+        ("solution", lambda om, ds, r: F.regularizedFrankWolfeOpt(om, processes=1, lambd=1.0, max_iter=5), "cp"),
+    "SPOPlus":
+        ("loss", lambda om, ds, r: F.SPOPlus(om, processes=1, reduction=r), "cp,c,w,z"),
+    "perturbationGradient":
+        ("loss", lambda om, ds, r: F.perturbationGradient(om, processes=1, sigma=1.0, reduction=r), "cp,c"),
+    "perturbedFenchelYoung":
+        ("loss", lambda om, ds, r: F.perturbedFenchelYoung(om, processes=1, n_samples=3, sigma=1.0, reduction=r), "cp,w"),
+    "perturbedFenchelYoungMul":
+        ("loss", lambda om, ds, r: F.perturbedFenchelYoungMul(om, processes=1, n_samples=3, sigma=0.5, reduction=r), "cp,w"),
+    "regularizedFrankWolfeFenchelYoung":
+        ("loss", lambda om, ds, r: F.regularizedFrankWolfeFenchelYoung(om, processes=1, lambd=1.0, max_iter=5, reduction=r), "cp,w"),
+    "noiseContrastiveEstimation":
+        ("loss", lambda om, ds, r: F.noiseContrastiveEstimation(om, processes=1, solve_ratio=1, dataset=ds, reduction=r), "cp,w"),
+    "contrastiveMAP":
+        ("loss", lambda om, ds, r: F.contrastiveMAP(om, processes=1, solve_ratio=1, dataset=ds, reduction=r), "cp,w"),
+    "listwiseLTR":
+        ("loss", lambda om, ds, r: F.listwiseLTR(om, processes=1, solve_ratio=1, dataset=ds, reduction=r), "cp,c"),
+    "pairwiseLTR":
+        ("loss", lambda om, ds, r: F.pairwiseLTR(om, processes=1, solve_ratio=1, dataset=ds, reduction=r), "cp,c"),
+    "pointwiseLTR":
+        ("loss", lambda om, ds, r: F.pointwiseLTR(om, processes=1, solve_ratio=1, dataset=ds, reduction=r), "cp,c"),
+}
+
+SOLUTION_OPS = [n for n, (kind, _, _) in LOSS_REGISTRY.items() if kind == "solution"]
+LOSS_OPS = [n for n, (kind, _, _) in LOSS_REGISTRY.items() if kind == "loss"]
+
+
+def take_batch(loader, n=4):
+    """First n rows of the loader's first batch.
+
+    Returns the PyEPO sample tuple (x, c, w, z) = (features, true cost, optimal
+    solution, optimal objective). Throughout the tests `cp` denotes the predicted
+    cost that a loss differentiates w.r.t.
+    """
+    x, c, w, z = next(iter(loader))
+    return x[:n], c[:n], w[:n], z[:n]
+
+
+def call_op(fn, sig, cp, c, w, z):
+    """Call a loss/op module with the forward args named in `sig` (see take_batch
+    for the c/w/z naming; cp is the predicted cost)."""
+    args = {"cp": cp, "c": c, "w": w, "z": z}
+    return fn(*(args[a] for a in sig.split(",")))
+
+
+# ============================================================
+# Module-scoped datasets (built once per module; solve at construction)
+# ============================================================
+
 @pytest.fixture(scope="module")
 def sp_data():
-    """Shortest-path dataset + loader (CPU). Skipped if Gurobi missing."""
+    """Shortest-path optDataset + loader (CPU). Skipped if Gurobi missing."""
     if not _HAS_GUROBI:
         pytest.skip("Gurobi not installed")
     import pyepo
@@ -50,7 +201,7 @@ def sp_data():
 
 @pytest.fixture(scope="module")
 def ks_data():
-    """Knapsack dataset + loader (CPU). Skipped if Gurobi missing."""
+    """Knapsack optDataset + loader (CPU, MAXIMIZE). Skipped if Gurobi missing."""
     if not _HAS_GUROBI:
         pytest.skip("Gurobi not installed")
     import pyepo
@@ -62,4 +213,98 @@ def ks_data():
     optmodel = knapsackModel(weights=weights, capacity=[10.0])
     dataset = optDataset(optmodel, x, c)
     loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
+    return optmodel, dataset, loader
+
+
+# ------------------------------------------------------------
+# Cross-backend pipeline fixtures
+# ------------------------------------------------------------
+# Gurobi is already exhaustively covered (test_30/50/60/80), so the pipeline
+# targets the *other* backends: it drives a representative slice of the pipeline
+# (dataset -> loss -> metric -> train) once per non-Gurobi backend, covering the
+# predict->solve->loss path — including MPAX's batched dlpack bridge and the
+# MAXIMIZE sign flip — that a Gurobi-only suite never reaches.
+
+_PIPELINE_BACKENDS = [
+    pytest.param("copt", marks=requires_copt),
+    pytest.param("ort", marks=requires_ortools),
+    pytest.param("mpax", marks=requires_mpax),
+]
+
+
+def _sp_optmodel(backend):
+    """Build a shortest-path optModel (LP) on the given backend."""
+    if backend == "grb":
+        from pyepo.model.grb.shortestpath import shortestPathModel
+    elif backend == "copt":
+        from pyepo.model.copt.shortestpath import shortestPathModel
+    elif backend == "ort":
+        from pyepo.model.ort.shortestpath import shortestPathModel
+    elif backend == "mpax":
+        from pyepo.model.mpax.shortestpath import shortestPathModel
+    else:
+        raise ValueError(backend)
+    return shortestPathModel(grid=GRID)
+
+
+def _ks_optmodel(backend, weights):
+    """Build a knapsack optModel (MAXIMIZE) on the given backend."""
+    if backend == "grb":
+        from pyepo.model.grb.knapsack import knapsackModel
+    elif backend == "copt":
+        from pyepo.model.copt.knapsack import knapsackModel
+    elif backend == "ort":
+        from pyepo.model.ort.knapsack import knapsackModel
+    elif backend == "mpax":
+        from pyepo.model.mpax.knapsack import knapsackModel
+    else:
+        raise ValueError(backend)
+    return knapsackModel(weights=weights, capacity=[10.0])
+
+
+@pytest.fixture(scope="module", params=_PIPELINE_BACKENDS)
+def sp_pipeline(request):
+    """Shortest-path optDataset + loader, one instance per installed backend."""
+    import pyepo
+    from pyepo.data.dataset import optDataset
+
+    optmodel = _sp_optmodel(request.param)
+    x, c = pyepo.data.shortestpath.genData(NUM_DATA, NUM_FEAT, GRID, seed=42)
+    dataset = optDataset(optmodel, x, c)
+    loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
+    return optmodel, dataset, loader
+
+
+@pytest.fixture(scope="module", params=_PIPELINE_BACKENDS)
+def ks_pipeline(request):
+    """Knapsack (MAXIMIZE) optDataset + loader, one instance per installed backend."""
+    import pyepo
+    from pyepo.data.dataset import optDataset
+
+    weights, x, c = pyepo.data.knapsack.genData(
+        NUM_DATA, NUM_FEAT, 4, dim=1, deg=1, seed=42)
+    optmodel = _ks_optmodel(request.param, weights)
+    dataset = optDataset(optmodel, x, c)
+    loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
+    return optmodel, dataset, loader
+
+
+@pytest.fixture(scope="module")
+def sp_constrs_data():
+    """Shortest-path optDatasetConstrs + collated loader for CaVE. Gurobi only.
+
+    Small (8 samples) because each sample triggers a Gurobi solve plus
+    binding-constraint extraction.
+    """
+    if not _HAS_GUROBI:
+        pytest.skip("Gurobi not installed")
+    import pyepo
+    from pyepo.data.dataset import collate_tight_constraints, optDatasetConstrs
+    from pyepo.model.grb.shortestpath import shortestPathModel
+
+    x, c = pyepo.data.shortestpath.genData(8, NUM_FEAT, GRID, seed=42)
+    optmodel = shortestPathModel(grid=GRID)
+    dataset = optDatasetConstrs(optmodel, x, c)
+    loader = DataLoader(
+        dataset, batch_size=4, shuffle=False, collate_fn=collate_tight_constraints)
     return optmodel, dataset, loader
