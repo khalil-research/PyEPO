@@ -112,7 +112,8 @@ class portfolioBase(optModel):
     Attributes:
         num_assets (int): number of assets
         covariance (np.ndarray): asset-return covariance matrix
-        risk_level (float): risk budget = ``gamma * mean(covariance)``
+        gamma (float): risk tolerance multiplier
+        risk_level (float): derived risk budget = ``gamma * mean(covariance)``
     """
 
     modelSense = EPO.MAXIMIZE
@@ -133,12 +134,17 @@ class portfolioBase(optModel):
         """
         self.num_assets = num_assets
         self.covariance = np.asarray(covariance)
-        self.risk_level = gamma * np.mean(self.covariance)
+        self.gamma = gamma
         super().__init__(*args, **kwargs)
 
     @property
     def num_cost(self) -> int:
         return self.num_assets
+
+    @property
+    def risk_level(self) -> float:
+        # risk budget the backends plug into x^T Σ x <= risk_level
+        return self.gamma * np.mean(self.covariance)
 
 
 class tspABBase(optModel):
