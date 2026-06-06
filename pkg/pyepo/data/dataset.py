@@ -205,6 +205,10 @@ class optDatasetKNN(optDataset):
         if not isinstance(model, optModel):
             raise TypeError("arg model is not an optModel")
         self.model = model
+        # at most num_data-1 neighbours exist (self excluded), so k must stay below it
+        num_data = len(feats)
+        if not 1 <= k < num_data:
+            raise ValueError(f"Invalid k={k}; must satisfy 1 <= k < num_data ({num_data}).")
         # kNN loss parameters
         self.k = k
         self.weight = weight
