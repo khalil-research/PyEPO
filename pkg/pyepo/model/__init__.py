@@ -3,8 +3,22 @@ Optimization Model based on solvers
 """
 
 from pyepo.model import opt
+from pyepo.model.predefined import (
+    knapsackModel,
+    portfolioModel,
+    shortestPathModel,
+    tspModel,
+    vrpModel,
+)
 
-__all__ = ["opt"]
+__all__ = [
+    "knapsackModel",
+    "opt",
+    "portfolioModel",
+    "shortestPathModel",
+    "tspModel",
+    "vrpModel",
+]
 
 try:
     from pyepo.model import grb
