@@ -179,6 +179,38 @@ def call_op(fn, sig, cp, c, w, z):
     return fn(*(args[a] for a in sig.split(",")))
 
 
+def finite_diff_grad(loss_fn, x, eps=1e-3):
+    """Central finite-difference gradient of a scalar loss at numpy `x`.
+
+    `loss_fn` maps a numpy array of x's shape to a python float; returns the
+    numerical gradient as a numpy array.
+    """
+    import numpy as np
+    grad = np.zeros_like(x)
+    it = np.nditer(x, flags=["multi_index"])
+    while not it.finished:
+        i = it.multi_index
+        xp = x.copy()
+        xm = x.copy()
+        xp[i] += eps
+        xm[i] -= eps
+        grad[i] = (loss_fn(xp) - loss_fn(xm)) / (2 * eps)
+        it.iternext()
+    return grad
+
+
+# losses gated by a finite difference of the loss value; the flag sets how to
+# keep that value deterministic across the FD evaluations:
+#   freeze_pool : set solve_ratio = 0 (freezes the cached pool)
+FD_TRUTH = {
+    "listwiseLTR":                ("freeze_pool",),
+    "pairwiseLTR":                ("freeze_pool",),
+    "pointwiseLTR":               ("freeze_pool",),
+    "noiseContrastiveEstimation": ("freeze_pool",),
+    "contrastiveMAP":             ("freeze_pool",),
+}
+
+
 # ============================================================
 # Module-scoped datasets (built once per module; solve at construction)
 # ============================================================
@@ -231,6 +263,9 @@ _PIPELINE_BACKENDS = [
     pytest.param("mpax", marks=requires_mpax),
 ]
 
+# backends for the gradient-truth gates: every installed backend, Gurobi included
+_SP_TRUTH_BACKENDS = [pytest.param("grb", marks=requires_gurobi), *_PIPELINE_BACKENDS]
+
 
 def _sp_optmodel(backend):
     """Build a shortest-path optModel (LP) on the given backend."""
@@ -245,6 +280,18 @@ def _sp_optmodel(backend):
     else:
         raise ValueError(backend)
     return shortestPathModel(grid=GRID)
+
+
+def _sp_dataset(backend):
+    """Shortest-path optDataset + loader on the given backend."""
+    import pyepo
+    from pyepo.data.dataset import optDataset
+
+    optmodel = _sp_optmodel(backend)
+    x, c = pyepo.data.shortestpath.genData(NUM_DATA, NUM_FEAT, GRID, seed=42)
+    dataset = optDataset(optmodel, x, c)
+    loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
+    return optmodel, dataset, loader
 
 
 def _ks_optmodel(backend, weights):
@@ -265,14 +312,13 @@ def _ks_optmodel(backend, weights):
 @pytest.fixture(scope="module", params=_PIPELINE_BACKENDS)
 def sp_pipeline(request):
     """Shortest-path optDataset + loader, one instance per installed backend."""
-    import pyepo
-    from pyepo.data.dataset import optDataset
+    return _sp_dataset(request.param)
 
-    optmodel = _sp_optmodel(request.param)
-    x, c = pyepo.data.shortestpath.genData(NUM_DATA, NUM_FEAT, GRID, seed=42)
-    dataset = optDataset(optmodel, x, c)
-    loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
-    return optmodel, dataset, loader
+
+@pytest.fixture(scope="module", params=_SP_TRUTH_BACKENDS)
+def sp_truth(request):
+    """Shortest-path optDataset on every installed backend (Gurobi included)."""
+    return _sp_dataset(request.param)
 
 
 @pytest.fixture(scope="module", params=_PIPELINE_BACKENDS)

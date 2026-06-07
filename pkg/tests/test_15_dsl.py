@@ -1,37 +1,51 @@
 #!/usr/bin/env python
-"""Tests for pyepo.dsl: the symbolic DSL core (Phase 1).
+"""Tests for pyepo.dsl: the symbolic IR core and the Gurobi backend.
 
-The DSL core is pure numpy/scipy and needs no solver backend. These tests
-check that the finalized IR (global sparse coefficient matrices, cost layout)
-matches hand-derived forms for the canonical problem shapes (knapsack,
-shortest path, portfolio, assignment, TSP-MTZ broadcast), that the expression
-operators are correct, and that the PyEPO-scope validation fires.
+The IR tests are solver-free (pure numpy/scipy): the finalized sparse matrices
+match hand-derived forms for the canonical shapes (knapsack, shortest path,
+portfolio, assignment), the operators are correct, and scope validation fires.
+The Gurobi-backend tests (skipped without Gurobi) check golden equivalence to
+the legacy hand-written classes.
 """
 
 import numpy as np
 import pytest
 
-from pyepo import dsl
+from pyepo import EPO, dsl
+from pyepo.model.opt import optModel
+
+from .conftest import requires_gurobi
 
 # ============================================================
 # Variable / Parameter construction
 # ============================================================
 
 def test_variable_binary_bounds():
-    x = dsl.Variable(4, binary=True)
-    assert x.size == 4 and x.binary
+    x = dsl.Variable(4, vtype=EPO.BINARY)
+    assert x.size == 4 and (x.vtype == EPO.BINARY).all()
     assert np.allclose(x.lb, 0) and np.allclose(x.ub, 1)
 
 
-def test_variable_integer_binary_exclusive():
+def test_variable_default_is_continuous():
+    x = dsl.Variable(3)
+    assert (x.vtype == EPO.CONTINUOUS).all()
+
+
+def test_variable_invalid_vtype_rejected():
     with pytest.raises(ValueError):
-        dsl.Variable(3, integer=True, binary=True)
+        dsl.Variable(3, vtype="B")                          # must be EPO.VarType, not a raw code
 
 
 def test_variable_multidim_and_bounds_broadcast():
     x = dsl.Variable((2, 3), lb=-1.0, ub=2.0)
     assert x.shape == (2, 3) and x.size == 6
     assert np.allclose(x.lb, -1.0) and np.allclose(x.ub, 2.0)
+
+
+def test_variable_mixed_vtype_per_entry():
+    x = dsl.Variable(4, vtype=[EPO.BINARY, EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS], lb=0, ub=7)
+    assert list(x.vtype) == [EPO.BINARY, EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS]
+    assert np.allclose(x.ub, [1, 1, 7, 7])                 # binary entries forced to [0, 1]
 
 
 # ============================================================
@@ -51,7 +65,7 @@ def test_matmul_and_const_constraint():
 
 def test_affine_offset_absorbed_into_rhs():
     x = dsl.Variable(3)
-    con = (x.sum() + 2.0 == 5.0)            # x0+x1+x2 + 2 == 5  ->  ... == 3
+    con = (x.sum() + 2.0 == 5.0)            # const folds into rhs (5 - 2)
     _, A, sense, b = con.finalize({x: slice(0, 3)}, 3)
     assert sense == "==" and np.allclose(A.toarray(), np.ones((1, 3)))
     assert np.allclose(b, 3.0)
@@ -87,16 +101,15 @@ def test_scalar_scale_and_subtract():
 def test_knapsack_ir():
     W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])
     cap = np.array([12.0, 10, 15])
-    x = dsl.Variable(5, binary=True)
+    x = dsl.Variable(5, vtype=EPO.BINARY)
     c = dsl.Parameter(5)
     prob = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap])
-    assert prob.n_total == 5 and prob.num_cost == 5
-    assert prob.objective.sense == "maximize"
-    Q, A, sense, b = prob.constraints_ir[0]
+    assert prob.num_vars == 5 and prob.num_cost == 5
+    assert prob.objective.modelSense == EPO.MAXIMIZE
+    Q, A, sense, b = prob.constrs[0]
     assert Q is None and sense == "<="
     assert np.allclose(A.toarray(), W) and np.allclose(b, cap)
-    assert prob.cost_gather is None                # 1:1 cost, no gather
-    assert prob.var_binary.all()
+    assert (prob.var_type == EPO.BINARY).all()
 
 
 def test_shortestpath_equality_ir():
@@ -106,22 +119,21 @@ def test_shortestpath_equality_ir():
     x = dsl.Variable(4)
     c = dsl.Parameter(4)
     prob = dsl.Problem(dsl.Minimize(c @ x), [A_eq @ x == b_eq])
-    _, A, sense, b = prob.constraints_ir[0]
+    _, A, sense, b = prob.constrs[0]
     assert sense == "==" and np.allclose(A.toarray(), A_eq) and np.allclose(b, b_eq)
-    assert prob.objective.epo_sense.name == "MINIMIZE"
+    assert prob.objective.modelSense == EPO.MINIMIZE
 
 
 def test_assignment_ir():
-    x = dsl.Variable((3, 3), binary=True)
+    x = dsl.Variable((3, 3), vtype=EPO.BINARY)
     c = dsl.Parameter((3, 3))
     prob = dsl.Problem(dsl.Minimize(dsl.sum(c * x)),
                        [x.sum(axis=1) == 1, x.sum(axis=0) == 1])
     assert prob.num_cost == 9
-    _, Ar, _, _ = prob.constraints_ir[0]
-    _, Ac, _, _ = prob.constraints_ir[1]
+    _, Ar, _, _ = prob.constrs[0]
+    _, Ac, _, _ = prob.constrs[1]
     assert np.allclose(Ar.toarray(), np.kron(np.eye(3), np.ones((1, 3))))
     assert np.allclose(Ac.toarray(), np.kron(np.ones((1, 3)), np.eye(3)))
-    assert prob.cost_gather is None               # 1:1 cost, no gather
 
 
 def test_portfolio_quadratic_constraint_ir():
@@ -131,9 +143,9 @@ def test_portfolio_quadratic_constraint_ir():
     x = dsl.Variable(5, lb=0)
     c = dsl.Parameter(5)
     prob = dsl.Problem(dsl.Maximize(c @ x),
-                       [x.sum() == 1, dsl.quadForm(x, cov) <= budget])
-    _, As, _, bs = prob.constraints_ir[0]
-    Qq, Aq, sq, bq = prob.constraints_ir[1]
+                       [x.sum() == 1, x @ cov @ x <= budget])
+    _, As, _, bs = prob.constrs[0]
+    Qq, Aq, sq, bq = prob.constrs[1]
     assert np.allclose(As.toarray(), np.ones((1, 5))) and np.allclose(bs, 1.0)
     assert sq == "<=" and Qq is not None
     assert np.allclose(Qq.toarray(), (cov + cov.T) / 2)     # symmetric quadratic part
@@ -142,16 +154,30 @@ def test_portfolio_quadratic_constraint_ir():
     assert np.allclose(prob.var_lb, 0.0)
 
 
-def test_quadform_equals_xQx():
+def test_quadratic_equality_constraint():
+    x = dsl.Variable(2)
+    c = dsl.Parameter(2)
+    cov = np.array([[1.0, 0.0], [0.0, 1.0]])
+    prob = dsl.Problem(dsl.Minimize(c @ x), [x @ cov @ x == 1.0])
+    Q, _, sense, b = prob.constrs[0]                        # `==` builds a real Constraint
+    assert sense == "==" and Q is not None
+    assert np.allclose(Q.toarray(), cov) and np.allclose(b, 1.0)
+
+
+def test_xQx_finalizes_symmetric():
     rng = np.random.default_rng(1)
     M = rng.standard_normal((4, 4))
     x = dsl.Variable(4)
-    fs = {x: slice(0, 4)}
-    q1 = dsl.quadForm(x, M).finalize_Q(fs, 4)
-    q2 = (x @ M @ x).finalize_Q(fs, 4)
-    sym = (M + M.T) / 2
-    assert np.allclose(q1.toarray(), sym)
-    assert np.allclose(q2.toarray(), sym)
+    q = (x @ M @ x).finalize_Q({x: slice(0, 4)}, 4)
+    assert np.allclose(q.toarray(), (M + M.T) / 2)          # x @ M @ x symmetrizes M
+
+
+def test_quadratic_scale_and_add():
+    x = dsl.Variable(2)
+    A = np.eye(2)
+    B = np.array([[0.0, 1.0], [1.0, 0.0]])
+    Q = (0.5 * (x @ A @ x) + x @ B @ x).finalize_Q({x: slice(0, 2)}, 2)
+    assert np.allclose(Q.toarray(), 0.5 * A + B)            # scalar scale + merge
 
 
 def test_qp_objective_offset():
@@ -160,36 +186,9 @@ def test_qp_objective_offset():
     Sig = Sig @ Sig.T                                        # PSD
     x = dsl.Variable(3)
     c = dsl.Parameter(3)
-    prob = dsl.Problem(dsl.Minimize(c @ x + dsl.quadForm(x, Sig)), [x.sum() == 1])
+    prob = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1])
     assert prob.obj_Q is not None
     assert np.allclose(prob.obj_Q.toarray(), Sig)            # already symmetric
-
-
-# ============================================================
-# Cost layout: symbolic gather (one predicted edge cost -> directed arcs)
-# ============================================================
-
-def test_tsp_gather_records_edge_to_arc():
-    # a 2-D arc->edge index must flatten to cost_gather in C-order (backend builds _cost_vars)
-    n, edges = 3, [(0, 1), (0, 2), (1, 2)]
-    emap = {e: i for i, e in enumerate(edges)}
-    a2e = np.array([[0 if i == j else emap[tuple(sorted((i, j)))]
-                     for j in range(n)] for i in range(n)])
-    x = dsl.Variable((n, n), binary=True)
-    c = dsl.Parameter(len(edges))
-    prob = dsl.Problem(dsl.Minimize(dsl.sum(c[a2e] * x)), [x.sum() == 1])
-    assert prob.num_cost == 3                        # predicted dimension = #edges
-    assert prob.cost_var is x and prob.cost_var.size == 9
-    assert np.array_equal(prob.cost_gather, a2e.reshape(-1))
-
-
-def test_unused_cost_entry_keeps_num_cost():
-    # Parameter(4) with only indices 0..2 used -> num_cost stays the declared size
-    x = dsl.Variable(3)
-    c = dsl.Parameter(4)
-    prob = dsl.Problem(dsl.Minimize(dsl.sum(c[[0, 1, 2]] * x)), [x.sum() == 1])
-    assert prob.num_cost == 4
-    assert np.array_equal(prob.cost_gather, np.array([0, 1, 2]))
 
 
 # ============================================================
@@ -197,13 +196,13 @@ def test_unused_cost_entry_keeps_num_cost():
 # ============================================================
 
 def test_relax_clears_vtypes_keeps_bounds():
-    x = dsl.Variable(4, binary=True)
+    x = dsl.Variable(4, vtype=EPO.BINARY)
     c = dsl.Parameter(4)
     prob = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 2])
     rel = prob.relax()
-    assert not rel.var_binary.any() and not rel.var_integer.any()
+    assert (rel.var_type == EPO.CONTINUOUS).all()
     assert np.allclose(rel.var_lb, 0.0) and np.allclose(rel.var_ub, 1.0)
-    assert prob.var_binary.all()                            # original unchanged
+    assert (prob.var_type == EPO.BINARY).all()              # original unchanged
 
 
 # ============================================================
@@ -236,10 +235,184 @@ def test_parameter_size_mismatch_rejected():
     x = dsl.Variable(4)
     c = dsl.Parameter(3)
     with pytest.raises(TypeError):
-        _ = c @ x                                           # 3 != 4, no gather
+        _ = c @ x                                           # 3 != 4
 
 
 def test_parameter_forbidden_ops():
     c = dsl.Parameter(3)
     with pytest.raises(TypeError):
         _ = c + 1
+    with pytest.raises(TypeError):
+        _ = (c == 5)                                        # comparison forbidden
+    with pytest.raises(TypeError):
+        _ = (c <= 5)
+
+
+def test_constraint_rhs_must_be_constant():
+    x = dsl.Variable(3)
+    c = dsl.Parameter(3)
+    with pytest.raises(TypeError):
+        _ = (x.sum() <= c)                                  # Parameter as rhs
+    with pytest.raises(TypeError):
+        _ = (x - c)                                         # Affine - Parameter
+
+
+def test_objective_rejects_fixed_linear_or_const():
+    x = dsl.Variable(3)
+    c = dsl.Parameter(3)
+    with pytest.raises(TypeError):
+        _ = c @ x + x.sum()                                 # parameter-free linear term
+    with pytest.raises(TypeError):
+        _ = c @ x + 5.0                                     # constant term
+
+
+def test_objective_rejects_shifted_quadratic():
+    Sig = np.eye(3)
+    mu = np.ones(3)
+    x = dsl.Variable(3)
+    c = dsl.Parameter(3)
+    with pytest.raises(ValueError):                         # shifted quadratic has a linear part
+        dsl.Problem(dsl.Minimize(c @ x + (x - mu) @ Sig @ (x - mu)), [x.sum() == 1])
+
+
+# ============================================================
+# Gurobi backend: golden equivalence to the legacy classes
+# ============================================================
+
+@requires_gurobi
+def test_knapsack_matches_legacy():
+    import pyepo.model.grb as grb
+    W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])
+    cap = np.array([12.0, 10, 15])
+    legacy = grb.knapsackModel(W, cap)
+
+    x = dsl.Variable(5, vtype=EPO.BINARY)
+    c = dsl.Parameter(5)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend="gurobi")
+
+    assert isinstance(comp, optModel) and comp.num_cost == 5
+    rng = np.random.default_rng(0)
+    for _ in range(50):
+        cost = rng.standard_normal(5)
+        legacy.setObj(cost)
+        sol_l, obj_l = legacy.solve()
+        comp.setObj(cost)
+        sol_d, obj_d = comp.solve()
+        assert obj_d == pytest.approx(obj_l, abs=1e-6)
+        assert np.allclose(np.asarray(sol_d), np.asarray(sol_l), atol=1e-6)
+
+
+@requires_gurobi
+def test_relax_matches_legacy_lp():
+    import pyepo.model.grb as grb
+    W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5]])
+    cap = np.array([9.0, 8.0])
+    legacy_lp = grb.knapsackModel(W, cap).relax()
+
+    x = dsl.Variable(5, vtype=EPO.BINARY)
+    c = dsl.Parameter(5)
+    comp_lp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend="gurobi").relax()
+
+    assert (comp_lp.problem.var_type == EPO.CONTINUOUS).all()   # relaxed to continuous
+    rng = np.random.default_rng(1)
+    for _ in range(20):
+        cost = rng.standard_normal(5)
+        legacy_lp.setObj(cost)
+        _, obj_l = legacy_lp.solve()
+        comp_lp.setObj(cost)
+        _, obj_d = comp_lp.solve()
+        assert obj_d == pytest.approx(obj_l, abs=1e-6)
+
+
+@requires_gurobi
+def test_portfolio_quadratic_constraint_solves():
+    rng = np.random.default_rng(2)
+    cov = np.cov(rng.standard_normal((60, 5)), rowvar=False)
+    budget = 2.25 * cov.mean()
+    x = dsl.Variable(5, lb=0)
+    c = dsl.Parameter(5)
+    comp = dsl.Problem(dsl.Maximize(c @ x),
+                       [x.sum() == 1, x @ cov @ x <= budget]).compile(backend="gurobi")
+    comp.setObj(rng.standard_normal(5))
+    sol, _ = comp.solve()
+    assert sol.sum() == pytest.approx(1.0, abs=1e-5)        # budget constraint
+    assert sol @ ((cov + cov.T) / 2) @ sol <= budget + 1e-6  # risk constraint
+    assert (sol >= -1e-6).all()                             # lb = 0
+
+
+@requires_gurobi
+def test_assignment_solves_to_permutation():
+    n = 4
+    x = dsl.Variable((n, n), vtype=EPO.BINARY)
+    c = dsl.Parameter((n, n))
+    comp = dsl.Problem(dsl.Minimize(dsl.sum(c * x)),
+                       [x.sum(axis=1) == 1, x.sum(axis=0) == 1]).compile(backend="gurobi")
+    rng = np.random.default_rng(3)
+    comp.setObj(rng.standard_normal(n * n))
+    sol, _ = comp.solve()
+    P = np.asarray(sol).reshape(n, n)
+    assert np.allclose(P.sum(axis=0), 1) and np.allclose(P.sum(axis=1), 1)   # permutation
+
+
+@requires_gurobi
+def test_qp_objective_solves():
+    # objective c @ x + xᵀ Sig x
+    Sig = np.array([[2.0, 0.5], [0.5, 1.0]])
+    x = dsl.Variable(2, lb=0)
+    c = dsl.Parameter(2)
+    comp = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1]).compile(backend="gurobi")
+    comp.setObj(np.zeros(2))                                # zero linear cost: pure quadratic
+    _, obj = comp.solve()
+    grid = np.linspace(0, 1, 2001)
+    brute = min(np.array([t, 1 - t]) @ Sig @ np.array([t, 1 - t]) for t in grid)
+    assert obj == pytest.approx(brute, abs=1e-3)
+    comp.setObj([1.0, 1.0])                                 # + linear term
+    _, obj2 = comp.solve()
+    assert obj2 == pytest.approx(obj + 1.0, abs=1e-3)
+
+
+@requires_gurobi
+def test_mixed_vtype_solves():
+    # mixed-type cost variable (still 1:1)
+    x = dsl.Variable(3, vtype=[EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS], lb=0, ub=10)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 4.5]).compile(backend="gurobi")
+    comp.setObj([1.0, 1.0, 1.0])
+    sol, _ = comp.solve()
+    assert sol[0] in (0.0, 1.0)                             # binary entry
+    assert abs(sol[1] - round(sol[1])) < 1e-6              # integer entry
+    assert sol.sum() <= 4.5 + 1e-6
+
+
+@requires_gurobi
+def test_addconstr_cost_space():
+    W = np.array([[3.0, 4, 3, 6, 4]])
+    cap = np.array([9.0])
+    x = dsl.Variable(5, vtype=EPO.BINARY)
+    c = dsl.Parameter(5)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend="gurobi")
+    # cost-space cut
+    comp2 = comp.addConstr([1, 1, 1, 0, 0], 1.0)
+    comp2.setObj(np.ones(5))
+    sol, _ = comp2.solve()
+    assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
+
+
+@requires_gurobi
+def test_solver_params_default_outputflag():
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 3)) @ x <= 2]).compile(
+        backend="gurobi", TimeLimit=12.5, Threads=1)
+    assert comp._model.Params.TimeLimit == 12.5
+    assert comp._model.Params.OutputFlag == 0              # default kept
+    assert comp.relax()._model.Params.TimeLimit == 12.5    # params survive relax
+
+
+@requires_gurobi
+def test_constraints_named():
+    x = dsl.Variable(2, vtype=EPO.BINARY)
+    c = dsl.Parameter(2)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 2)) @ x <= 1]).compile(backend="gurobi")
+    comp._model.update()
+    assert any(con.ConstrName.startswith("c0") for con in comp._model.getConstrs())

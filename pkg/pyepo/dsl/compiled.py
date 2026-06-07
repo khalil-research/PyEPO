@@ -5,18 +5,15 @@ Generic compiled-problem base for the PyEPO DSL.
 ``compiledBase`` is mixed with a backend base (``optXxxModel``) to form a
 concrete compiled problem, e.g. ``compiledGrbProblem(compiledBase,
 optGrbModel)`` — the same composition as ``knapsackModel(knapsackBase,
-optGrbModel)``. It carries the backend-agnostic contract: ``num_cost``,
-``setObj`` (broadcast the predicted cost onto its paired solver vars via
-``cost_gather``), ``solve`` (reduce each cost group back to cost space),
-``addConstr``, and ``relax``. The concrete subclass supplies ``_getModel``,
-the cost-paired read/write hooks (``_writeObj`` / ``_writeConstr`` /
-``_readCostSol``) over ``_cost_vars``, and ``copy``.
+optGrbModel)``. The DSL core targets problems whose predicted cost is 1:1 with
+the decision variables (``num_vars == num_cost``), so ``setObj`` / ``solve`` /
+``addConstr`` / ``copy`` are inherited from the backend base unchanged;
+``compiledBase`` only carries ``num_cost`` and ``relax``. Problems with
+auxiliary variables or cost broadcast (e.g. TSP/VRP) are hand-written as a
+backend subclass that overrides ``setObj`` / ``solve``.
 """
 
 from __future__ import annotations
-
-import numpy as np
-import torch
 
 from pyepo.model.opt import optModel
 from pyepo.utils import getArgs
@@ -24,42 +21,37 @@ from pyepo.utils import getArgs
 
 class compiledBase(optModel):
     """
-    Backend-agnostic compiled DSL problem. Mixed with an ``optXxxModel``.
+    Backend-agnostic compiled DSL problem (1:1 cost). Mixed with an
+    ``optXxxModel``; the concrete subclass supplies ``_getModel`` and
+    ``_apply_params``.
     """
+
+    def __init__(self, problem, params=None):
+        # the source DSL Problem and backend solver parameters
+        self.problem = problem
+        self.params = dict(params) if params else {}
+        # the predicted cost must cover every decision variable
+        if problem.num_vars != problem.num_cost:
+            raise ValueError(
+                f"The predicted cost must cover every decision variable, but this "
+                f"problem has {problem.num_vars} variable(s) and the cost covers "
+                f"{problem.num_cost}. Variables that appear only in constraints are "
+                f"not supported."
+            )
+        super().__init__()
+        self._apply_params()
+
+    def _apply_params(self):
+        # backend hook: push self.params to the solver
+        pass
 
     @property
     def num_cost(self) -> int:
         # predicted cost dimension = the unique Parameter's size
-        return self.problem.cost_param.size
-
-    def setObj(self, c) -> None:
-        # broadcast each cost to its paired solver var(s): c[gather] == np.repeat for TSP
-        c = c if isinstance(c, (np.ndarray, torch.Tensor)) else np.asarray(c, dtype=np.float32)
-        if c.shape[-1] != self.num_cost:
-            raise ValueError(f"setObj expected trailing dim {self.num_cost}, got {c.shape[-1]}.")
-        g = self.problem.cost_gather
-        self._writeObj(c if g is None else c[..., g])
-
-    def solve(self):
-        # read the cost-paired vars, then sum each cost group back to cost space
-        vals, obj = self._readCostSol()
-        g = self.problem.cost_gather
-        if g is None:
-            return vals, obj
-        sol = np.zeros(self.num_cost, dtype=np.float32)
-        np.add.at(sol, g, np.asarray(vals, dtype=np.float32))
-        return sol, obj
-
-    def addConstr(self, coefs, rhs):
-        # broadcast cost-space coefs to the paired vars, then add via the hook
-        coefs = np.asarray(coefs, dtype=np.float32).reshape(-1)
-        if coefs.size != self.num_cost:
-            raise ValueError(f"addConstr expected size {self.num_cost}, got {coefs.size}.")
-        g = self.problem.cost_gather
-        return self._writeConstr(coefs if g is None else coefs[g], rhs)
+        return self.problem.num_cost
 
     def relax(self):
-        # recompile the relaxed problem, preserving backend kwargs
+        # recompile the relaxed problem
         kwargs = getArgs(self)
         kwargs["problem"] = self.problem.relax()
         return type(self)(**kwargs)

@@ -3,9 +3,8 @@
 Objective nodes for the PyEPO DSL.
 
 ``Minimize`` / ``Maximize`` wrap a scalar ``ParametricBilinear`` (the predicted
-cost paired with a Variable, optionally plus a parameter-free quadratic /
-constant offset) and record both the string ``sense`` and the matching
-``EPO`` sense for the compiled backend.
+cost paired with a Variable, optionally plus a parameter-free quadratic term)
+and record the ``EPO`` model sense for the compiled backend.
 """
 
 from __future__ import annotations
@@ -19,19 +18,17 @@ class Objective:
 
     Attributes:
         expr (ParametricBilinear): the objective expression
-        sense (str): ``"minimize"`` or ``"maximize"``
-        epo_sense (EPO): matching ``EPO.MINIMIZE`` / ``EPO.MAXIMIZE``
+        modelSense (EPO): ``EPO.MINIMIZE`` or ``EPO.MAXIMIZE``
     """
 
-    sense = None
-    epo_sense = None
+    modelSense = None
 
     def __init__(self, expr):
         from pyepo.dsl.expression import ParametricBilinear
-        # promote a bare Variable/Affine objective would be parameter-free — reject early
+        # the objective must carry the predicted cost (a ParametricBilinear)
         if not isinstance(expr, ParametricBilinear):
             raise TypeError("Objective must be a ParametricBilinear (e.g. c @ x), optionally + a "
-                            "parameter-free quadratic / constant offset.")
+                            "parameter-free quadratic term.")
         self.expr = expr
 
     @property
@@ -45,11 +42,9 @@ class Objective:
 
 class Minimize(Objective):
     """Minimization objective."""
-    sense = "minimize"
-    epo_sense = EPO.MINIMIZE
+    modelSense = EPO.MINIMIZE
 
 
 class Maximize(Objective):
     """Maximization objective."""
-    sense = "maximize"
-    epo_sense = EPO.MAXIMIZE
+    modelSense = EPO.MAXIMIZE
