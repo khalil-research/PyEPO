@@ -3,10 +3,9 @@
 Gurobi compiler for the PyEPO DSL.
 
 ``compiledGrbProblem`` mixes the generic ``compiledBase`` with ``optGrbModel``
-to turn a finalized DSL ``Problem`` into a GurobiPy model. It supplies only
-``_getModel`` (and its builders); ``setObj`` / ``solve`` / ``addConstr`` /
-``copy`` are inherited from ``optGrbModel`` unchanged, because the predicted
-cost is 1:1 with the decision variables (``num_vars == num_cost``).
+to turn a finalized DSL ``Problem`` into a GurobiPy model. It builds the model
+and provides the Gurobi read / write hooks; the objective handling lives in
+``compiledBase``.
 """
 
 from __future__ import annotations
@@ -31,7 +30,7 @@ def compileProblem(problem, **params) -> compiledGrbProblem:
 
 class compiledGrbProblem(compiledBase, optGrbModel):
     """
-    Gurobi-backed compiled DSL problem (1:1 cost, single decision Variable).
+    Gurobi-backed compiled DSL problem.
     """
 
     def _getModel(self) -> tuple:
@@ -52,6 +51,22 @@ class compiledGrbProblem(compiledBase, optGrbModel):
         # apply the Gurobi solver parameters
         for key, value in self.params.items():
             self._model.setParam(key, value)
+
+    def _write_obj(self, coef):
+        # set the full-length objective coefficient on the MVar
+        self.x.Obj = coef
+
+    def _read_sol(self):
+        # optimize and read the full solution + objective value
+        self._model.optimize()
+        return np.asarray(self.x.x), self._model.objVal
+
+    def _add_cut(self, coef, rhs):
+        # add coef @ x <= rhs to a fresh copy
+        new_model = self.copy()
+        new_model._model.addConstr(coef @ new_model.x <= float(rhs))
+        new_model._model.update()
+        return new_model
 
     def _build_flat_vars(self, m):
         # one MVar with per-variable bounds and type

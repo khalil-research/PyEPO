@@ -5,9 +5,9 @@ sparse matrices, validates PyEPO scope, and compiles to a backend.
 
 At construction every referenced ``Variable`` is assigned a contiguous slice of
 a global flat index (encounter order: objective first, then each constraint in
-list order). Constraints finalize to ``(Q | None, A, sense, b_eff)`` and the
-objective records ``cost_param`` / ``cost_var`` plus an optional parameter-free
-quadratic offset. The DSL core targets 1:1 problems (``num_vars == num_cost``).
+list order). Constraints finalize to ``(Q | None, A, sense, b_eff)``; the
+objective finalizes to the predicted ``c_index``, a known ``fixed_c``
+linear part, and an optional parameter-free quadratic term ``obj_Q``.
 """
 
 from __future__ import annotations
@@ -19,6 +19,11 @@ import numpy as np
 from pyepo import EPO
 
 
+def _dense_row(A):
+    # a (1, n) sparse row -> flat (n,) array
+    return np.asarray(A.todense(), dtype=float).reshape(-1)
+
+
 class Problem:
     """
     A symbolic predict-then-optimize problem.
@@ -27,10 +32,12 @@ class Problem:
         objective (Minimize | Maximize): the objective
         constraints (list[Constraint]): the constraints
         cost_param (Parameter): the unique predicted-cost Parameter
-        cost_var (Variable): the Variable the cost pairs with (1:1)
+        cost_var (Variable): the Variable the predicted cost lands on
         num_cost (int): predicted dimension (``cost_param.size``)
         flat_slice (dict[Variable, slice]): global flat slice per Variable
         num_vars (int): total decision-variable count
+        c_index (np.ndarray): flat indices the predicted cost lands on
+        fixed_c (np.ndarray): known linear objective coefficients ``(num_vars,)``
         constrs (list[tuple]): finalized ``(Q, A, sense, b_eff)`` per constraint
         obj_Q (csr_matrix | None): finalized parameter-free quadratic objective term
     """
@@ -74,36 +81,36 @@ class Problem:
         self.var_type = np.concatenate([v.vtype for v in order])
 
     def _validate(self):
-        # objective is a Minimize / Maximize wrapping a 1:1 ParametricBilinear
+        # objective is a Minimize / Maximize carrying a predicted cost term
         from pyepo.dsl.expression import ParametricBilinear
         from pyepo.dsl.objective import Objective
         if not isinstance(self.objective, Objective):
             raise TypeError("Problem objective must be a Minimize / Maximize.")
-        obj = self.objective.expr
-        if not isinstance(obj, ParametricBilinear):
-            raise TypeError("Objective must be a ParametricBilinear (e.g. c @ x).")
-        if obj.cost_param.size != obj.cost_var.size:
-            raise ValueError(
-                f"cost_param size {obj.cost_param.size} != cost_var size {obj.cost_var.size}."
-            )
-        # a quadratic objective term must be pure (no fixed linear / constant part)
-        if obj.offset is not None:
-            has_linear = any(b.nnz > 0 for b in obj.offset.affine.blocks.values())
-            if has_linear or bool(obj.offset.affine.const.any()):
-                raise ValueError(
-                    "The objective's quadratic term must have no linear or constant part "
-                    "(only the predicted cost is linear)."
-                )
+        if not isinstance(self.objective.expr, ParametricBilinear):
+            raise TypeError("Objective must include a predicted cost term (e.g. c @ x).")
 
     def _finalize(self):
+        from pyepo.dsl.expression import Quadratic
+        expr = self.objective.expr
+        # predicted positions: the global flat indices the cost lands on
+        sl = self.flat_slice[expr.cost_var]
+        if expr.local_idx is None:
+            self.c_index = np.arange(sl.start, sl.stop)
+        else:
+            self.c_index = sl.start + np.asarray(expr.local_idx, dtype=int)
+        # known fixed linear coefficients over all variables
+        self.fixed_c = np.zeros(self.num_vars)
+        if expr.base is not None:
+            self.fixed_c[self.c_index] += expr.base
+        if expr.fixed is not None:
+            self.fixed_c += _dense_row(expr.fixed.finalize(self.flat_slice, self.num_vars))
+        # parameter-free quadratic term; its linear part folds into fixed_c
+        self.obj_Q = None
+        if isinstance(expr.offset, Quadratic):
+            self.obj_Q = expr.offset.finalize_Q(self.flat_slice, self.num_vars)
+            self.fixed_c += _dense_row(expr.offset.affine.finalize(self.flat_slice, self.num_vars))
         # constraints -> global (Q, A, sense, b_eff)
         self.constrs = [con.finalize(self.flat_slice, self.num_vars) for con in self.constraints]
-        # parameter-free quadratic objective offset (QP term), if any
-        offset = self.objective.expr.offset
-        self.obj_Q = None
-        from pyepo.dsl.expression import Quadratic
-        if isinstance(offset, Quadratic):
-            self.obj_Q = offset.finalize_Q(self.flat_slice, self.num_vars)
 
     def relax(self) -> Problem:
         """

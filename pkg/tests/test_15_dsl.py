@@ -240,12 +240,9 @@ def test_parameter_size_mismatch_rejected():
 
 def test_parameter_forbidden_ops():
     c = dsl.Parameter(3)
-    with pytest.raises(TypeError):
-        _ = c + 1
-    with pytest.raises(TypeError):
-        _ = (c == 5)                                        # comparison forbidden
-    with pytest.raises(TypeError):
-        _ = (c <= 5)
+    for bad in (lambda: c == 5, lambda: c <= 5, lambda: -c, lambda: c[0], lambda: 5 - c):
+        with pytest.raises(TypeError):
+            bad()
 
 
 def test_constraint_rhs_must_be_constant():
@@ -257,22 +254,45 @@ def test_constraint_rhs_must_be_constant():
         _ = (x - c)                                         # Affine - Parameter
 
 
-def test_objective_rejects_fixed_linear_or_const():
+def test_objective_rejects_constant():
     x = dsl.Variable(3)
     c = dsl.Parameter(3)
     with pytest.raises(TypeError):
-        _ = c @ x + x.sum()                                 # parameter-free linear term
-    with pytest.raises(TypeError):
-        _ = c @ x + 5.0                                     # constant term
+        _ = c @ x + 5.0                                     # a constant term has no effect
 
 
-def test_objective_rejects_shifted_quadratic():
-    Sig = np.eye(3)
-    mu = np.ones(3)
+# ============================================================
+# Partial prediction: known + predicted costs
+# ============================================================
+
+def test_partial_prediction_ir():
+    x = dsl.Variable(3)
+    y = dsl.Variable(2)
+    c = dsl.Parameter(3)
+    d = np.array([1.0, 2.0])
+    prob = dsl.Problem(dsl.Minimize(c @ x + d @ y), [x.sum() + y.sum() == 1])
+    assert prob.num_cost == 3 and prob.num_vars == 5
+    assert list(prob.c_index) == [0, 1, 2]          # x predicted
+    assert np.allclose(prob.fixed_c, [0, 0, 0, 1, 2])    # d fixed on y
+
+
+def test_slice_prediction_ir():
+    x = dsl.Variable(5)
+    c = dsl.Parameter(2)
+    d = np.array([3.0, 4.0, 5.0])
+    prob = dsl.Problem(dsl.Minimize(c @ x[:2] + d @ x[2:]), [x.sum() == 1])
+    assert list(prob.c_index) == [0, 1]             # first 2 of x predicted
+    assert np.allclose(prob.fixed_c, [0, 0, 3, 4, 5])    # rest of x fixed
+
+
+def test_base_offset_equals_two_terms():
     x = dsl.Variable(3)
     c = dsl.Parameter(3)
-    with pytest.raises(ValueError):                         # shifted quadratic has a linear part
-        dsl.Problem(dsl.Minimize(c @ x + (x - mu) @ Sig @ (x - mu)), [x.sum() == 1])
+    d = np.array([1.0, 2.0, 3.0])
+    combined = dsl.Problem(dsl.Minimize((d + c) @ x), [x.sum() == 1])      # (d + c) @ x
+    two_term = dsl.Problem(dsl.Minimize(c @ x + d @ x), [x.sum() == 1])    # c @ x + d @ x
+    assert np.allclose(combined.fixed_c, d) and np.allclose(two_term.fixed_c, d)
+    assert list(combined.c_index) == list(two_term.c_index) == [0, 1, 2]
 
 
 # ============================================================
@@ -416,3 +436,30 @@ def test_constraints_named():
     comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 2)) @ x <= 1]).compile(backend="gurobi")
     comp._model.update()
     assert any(con.ConstrName.startswith("c0") for con in comp._model.getConstrs())
+
+
+@requires_gurobi
+def test_partial_prediction_solves():
+    # predicted cost on x, known cost on y; y is expensive so x is used
+    x = dsl.Variable(2, lb=0, ub=1)
+    y = dsl.Variable(2, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    d = np.array([5.0, 5.0])
+    comp = dsl.Problem(dsl.Minimize(c @ x + d @ y),
+                       [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend="gurobi")
+    comp.setObj([1.0, 1.0])
+    w, obj = comp.solve()
+    assert len(w) == 2 and np.allclose(w, [1, 1])           # w is the predicted (x) part
+    assert obj == pytest.approx(2.0)                        # c @ w; known d @ y removed
+
+
+@requires_gurobi
+def test_aux_variable_solves():
+    # y appears only in a constraint (no objective cost) -> not in w
+    x = dsl.Variable(2, lb=0, ub=1)
+    y = dsl.Variable(1, lb=0, ub=1.5)
+    c = dsl.Parameter(2)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() - y <= 0]).compile(backend="gurobi")
+    comp.setObj([1.0, 1.0])
+    w, obj = comp.solve()
+    assert len(w) == 2 and obj == pytest.approx(1.5)        # x.sum() <= y <= 1.5

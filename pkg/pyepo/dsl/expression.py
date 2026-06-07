@@ -4,7 +4,7 @@ Symbolic expression nodes and algebra for the PyEPO DSL.
 
 Variables and Parameters compose through numpy-style operators into linear
 (``Affine``) and quadratic (``Quadratic``) nodes; comparisons produce a
-``Constraint``; a single ``Parameter`` pairs with a Variable into a
+``Constraint``; a single ``Parameter`` multiplies a Variable (or slice) into a
 ``ParametricBilinear`` objective. Each linear node carries per-Variable
 coefficient blocks (``dict[Variable, csr_matrix]``) plus a constant offset;
 ``Problem`` finalizes them into one global sparse matrix (see
@@ -337,12 +337,42 @@ class Quadratic:
         return (Q + Q.T) * 0.5
 
 
+def _is_row_selection(S, rows):
+    # one entry of value 1 per row, distinct columns (a plain index / slice pick)
+    return (S.nnz == rows and (S.data == 1).all()
+            and np.array_equal(S.indptr, np.arange(rows + 1))
+            and len(set(S.indices)) == S.nnz)
+
+
+def _as_selection(operand):
+    # a Variable (the whole thing), or a plain slice / index of one Variable
+    if isinstance(operand, Variable):
+        return operand, None
+    if isinstance(operand, Affine) and len(operand.blocks) == 1 and not operand.const.any():
+        (var, S), = operand.blocks.items()
+        S = S.tocsr()
+        if _is_row_selection(S, operand.size):
+            return var, S.indices.copy()                # selected columns of var
+    raise TypeError("A Parameter may only multiply a Variable or a plain slice / index "
+                    "of one (e.g. x, x[:k], x[idx]).")
+
+
+def _make_bilinear(param, base, sel):
+    # pair a predicted cost (param, optional known base) with a Variable / selection
+    var, local_idx = _as_selection(sel)
+    n = var.size if local_idx is None else len(local_idx)
+    if param.size != n:
+        raise TypeError(f"Parameter size {param.size} != selected size {n}.")
+    return ParametricBilinear(param, var, local_idx, base=base)
+
+
 class Parameter:
     """
     The runtime-bound predicted cost symbol (exactly one per Problem).
 
-    Restricted overloads: it pairs 1:1 with a Variable (``@`` or elementwise
-    ``*``) into a ``ParametricBilinear``. Any other use raises ``TypeError``.
+    It multiplies a Variable (or a plain slice / index of one) into a predicted
+    objective term: ``c @ x``, ``c @ x[:k]``. A known base may be added first:
+    ``(d + c) @ x`` predicts ``d + c`` on x. Any other use raises ``TypeError``.
 
     Attributes:
         shape (tuple): logical shape
@@ -357,71 +387,103 @@ class Parameter:
     __hash__ = object.__hash__
     __array_ufunc__ = None  # numpy defers @ / * / + to our reflected ops
 
-    def __matmul__(self, var):
-        return self._pair(var)
+    def _pair(self, sel):
+        # multiply a Variable / selection -> predicted objective term
+        return _make_bilinear(self, None, sel)
 
-    def __rmatmul__(self, var):
-        return self._pair(var)
+    __matmul__ = __rmatmul__ = __mul__ = __rmul__ = _pair
 
-    def __mul__(self, var):
-        return self._pair(var)
+    def __add__(self, base):
+        # (c + d): a predicted cost with a known base
+        if _is_num(base):
+            return ParametricCoef(self, base)
+        return self._forbid()
 
-    def __rmul__(self, var):
-        return self._pair(var)
+    def __radd__(self, base):
+        return self.__add__(base)
 
-    def _pair(self, var):
-        # pair 1:1 with a Variable -> ParametricBilinear (the only legal product)
-        if not isinstance(var, Variable):
-            raise TypeError("A Parameter may only pair with a Variable (param @ var / param * var).")
-        if var.size != self.size:
-            raise TypeError(f"Parameter size {self.size} != Variable size {var.size}.")
-        return ParametricBilinear(self, var)
+    def __sub__(self, base):
+        if _is_num(base):
+            return ParametricCoef(self, -np.asarray(base, dtype=float))
+        return self._forbid()
 
     def _forbid(self, *a, **k):
-        raise TypeError("Unsupported operation on Parameter (only param @ var / param * var).")
+        raise TypeError("Unsupported operation on Parameter (only c @ var / c * var, "
+                        "optionally with a known base: (d + c) @ var).")
 
-    __add__ = __radd__ = __sub__ = __rsub__ = __neg__ = __getitem__ = _forbid
-    __le__ = __ge__ = __eq__ = _forbid
+    __rsub__ = __neg__ = __getitem__ = __le__ = __ge__ = __eq__ = _forbid
 
     def __repr__(self):
         return f"Parameter(shape={self.shape}, name={self.name!r})"
 
 
+class ParametricCoef:
+    """
+    A predicted cost coefficient with a known base, ``base + param`` — the
+    transient result of ``c + d`` / ``d + c`` / ``c - d``. Pairs with a Variable
+    or selection like a Parameter.
+    """
+
+    def __init__(self, param, base):
+        self.param = param
+        self.base = np.broadcast_to(np.asarray(base, dtype=float), (param.size,)).copy()
+
+    __array_ufunc__ = None
+
+    def _pair(self, sel):
+        return _make_bilinear(self.param, self.base, sel)
+
+    __matmul__ = __rmatmul__ = __mul__ = __rmul__ = _pair
+
+
 class ParametricBilinear:
     """
-    The objective node ``cost_param · cost_var`` (1:1), optionally plus a
-    parameter-free quadratic term.
+    The objective: ``cost_param`` predicts the cost at ``cost_var``'s selected
+    positions (with an optional known ``base``), plus optional known fixed
+    linear (``fixed``) and parameter-free quadratic (``offset``) terms.
 
     Attributes:
-        cost_param (Parameter): the predicted symbol (size == num_cost)
-        cost_var (Variable): the paired Variable (same size)
+        cost_param (Parameter): the predicted cost (size == num_cost)
+        cost_var (Variable): the Variable the prediction lands on
+        local_idx (np.ndarray | None): predicted indices within cost_var (None = all)
+        base (np.ndarray | None): known offset added at the predicted positions
+        fixed (Affine | None): known linear term on other / overlapping positions
         offset (Quadratic | None): parameter-free quadratic term
     """
 
-    def __init__(self, cost_param, cost_var, offset=None):
+    def __init__(self, cost_param, cost_var, local_idx=None, base=None, fixed=None, offset=None):
         self.cost_param = cost_param
         self.cost_var = cost_var
+        self.local_idx = local_idx
+        self.base = base
+        self.fixed = fixed
         self.offset = offset
 
     __hash__ = object.__hash__
     __array_ufunc__ = None  # numpy defers @ / * / + to our reflected ops
 
+    def _with(self, fixed=None, offset=None):
+        # copy with a replaced fixed / offset term
+        return ParametricBilinear(self.cost_param, self.cost_var, self.local_idx, self.base,
+                                  self.fixed if fixed is None else fixed,
+                                  self.offset if offset is None else offset)
+
     def sum(self, axis=None):
-        # already a scalar pairing; sum is the identity here
+        # already a scalar; sum is the identity here
         return self
 
     def __add__(self, o):
-        # attach a parameter-free quadratic term (e.g. x @ Q @ x)
+        # attach a known linear (Affine / Variable) or quadratic (Quadratic) term
         if isinstance(o, ParametricBilinear):
-            raise TypeError("Cannot add two ParametricBilinear objectives.")
+            raise TypeError("Cannot add two predicted (Parameter) objective terms.")
         if isinstance(o, Quadratic):
-            off = o if self.offset is None else (self.offset + o)
-            return ParametricBilinear(self.cost_param, self.cost_var, off)
-        if isinstance(o, (Affine, Variable)) or _is_num(o):
-            raise TypeError(
-                "Objective may only add a parameter-free quadratic term (e.g. "
-                "x @ Q @ x); a fixed linear / constant term is not supported."
-            )
+            return self._with(offset=o if self.offset is None else self.offset + o)
+        if isinstance(o, Variable):
+            o = o._to_affine()
+        if isinstance(o, Affine):
+            return self._with(fixed=o if self.fixed is None else self.fixed + o)
+        if _is_num(o):
+            raise TypeError("A constant objective term has no effect; omit it.")
         return NotImplemented
 
     def __radd__(self, o):
