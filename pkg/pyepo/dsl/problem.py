@@ -147,7 +147,10 @@ class Problem:
         if backend == "ortools":
             from pyepo.model.ort.compile import compileProblem
             return compileProblem(self, **kwargs)
+        if backend == "mpax":
+            from pyepo.model.mpax.compile import compileProblem
+            return compileProblem(self, **kwargs)
         raise NotImplementedError(
             f"DSL backend {backend!r} is not supported "
-            "(available: 'gurobi', 'copt', 'pyomo', 'ortools')."
+            "(available: 'gurobi', 'copt', 'pyomo', 'ortools', 'mpax')."
         )

@@ -15,7 +15,7 @@ import pytest
 from pyepo import EPO, dsl
 from pyepo.model.opt import optModel
 
-from .conftest import requires_copt, requires_gurobi, requires_ortools
+from .conftest import requires_copt, requires_gurobi, requires_mpax, requires_ortools
 
 # ============================================================
 # Variable / Parameter construction
@@ -503,7 +503,7 @@ def test_constraints_named(backend):
 
 
 # ============================================================
-# Generic backends vs the native reference; OR-Tools quadratic rejection
+# Generic backends vs the native reference
 # ============================================================
 
 @requires_gurobi
@@ -528,11 +528,96 @@ def test_generic_matches_native(backend):
         assert np.allclose(sol_n, sol_g, atol=1e-6)
 
 
-@requires_ortools
-def test_ortools_rejects_quadratic():
+# ============================================================
+# MPAX backend (JAX PDHG; continuous LP / QP relaxation, vmap-batched on GPU).
+# Overrides setObj / solve to keep the cost a device tensor. Gurobi is the
+# native reference (continuous LP). First-order solver -> 1e-2 tolerance.
+# ============================================================
+
+@requires_mpax
+@requires_gurobi
+def test_mpax_matches_native_lp():
+    # continuous LP: MPAX (PDHG) matches the native Gurobi LP objective
+    W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5]])
+    cap = np.array([9.0, 8.0])
+    x = dsl.Variable(5, lb=0, ub=1)
+    c = dsl.Parameter(5)
+    prob = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap])
+    mpx = prob.compile(backend="mpax")
+    grb = prob.compile(backend="gurobi")
+    rng = np.random.default_rng(0)
+    for _ in range(8):
+        cost = rng.standard_normal(5).astype(np.float32)
+        mpx.setObj(cost)
+        _, obj_m = mpx.solve()
+        grb.setObj(cost)
+        _, obj_g = grb.solve()
+        assert obj_m == pytest.approx(obj_g, abs=1e-2)
+
+
+@requires_mpax
+def test_mpax_torch_cost_returns_tensor():
+    import torch
+    # the value: a torch cost stays a device tensor through solve (DLPack path)
+    x = dsl.Variable(3, lb=0, ub=1)
+    c = dsl.Parameter(3)
+    mpx = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 2.0]).compile(backend="mpax")
+    mpx.setObj(torch.ones(3))
+    w, _ = mpx.solve()
+    assert isinstance(w, torch.Tensor) and len(w) == 3
+
+
+@requires_mpax
+def test_mpax_partial_prediction_solves():
+    x = dsl.Variable(2, lb=0, ub=1)
+    y = dsl.Variable(2, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    d = np.array([5.0, 5.0])
+    mpx = dsl.Problem(dsl.Minimize(c @ x + d @ y),
+                      [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend="mpax")
+    mpx.setObj(np.array([1.0, 1.0], np.float32))
+    w, obj = mpx.solve()
+    assert np.allclose(np.asarray(w), [1, 1], atol=1e-2)    # predicted (x) part
+    assert obj == pytest.approx(2.0, abs=1e-2)              # c @ w; known d @ y removed
+
+
+@requires_mpax
+def test_mpax_qp_objective_solves():
+    Sig = np.array([[2.0, 0.5], [0.5, 1.0]], np.float32)
+    x = dsl.Variable(2, lb=0)
+    c = dsl.Parameter(2)
+    mpx = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1]).compile(backend="mpax")
+    mpx.setObj(np.zeros(2, np.float32))
+    _, obj = mpx.solve()
+    grid = np.linspace(0, 1, 2001)
+    brute = min(np.array([t, 1 - t]) @ Sig @ np.array([t, 1 - t]) for t in grid)
+    assert obj == pytest.approx(float(brute), abs=1e-2)     # xᵀQx (not ½xᵀQx)
+
+
+@requires_mpax
+def test_mpax_addconstr():
+    W = np.array([[3.0, 4, 3, 6, 4]])
+    x = dsl.Variable(5, lb=0, ub=1)
+    c = dsl.Parameter(5)
+    mpx = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= 9.0]).compile(backend="mpax")
+    cut = mpx.addConstr([1, 1, 1, 0, 0], 1.0)              # cost-space cut (copy + G/h row)
+    cut.setObj(np.ones(5, np.float32))
+    sol, _ = cut.solve()
+    assert np.asarray(sol)[:3].sum() <= 1 + 1e-2
+
+
+# ============================================================
+# Backends that cannot express a quadratic constraint
+# ============================================================
+
+@pytest.mark.parametrize("backend", [
+    pytest.param("ortools", marks=requires_ortools),       # pywraplp is LP / MIP only
+    pytest.param("mpax", marks=requires_mpax),             # MPAX: quadratic objective only
+])
+def test_rejects_quadratic_constraint(backend):
     x = dsl.Variable(3, lb=0)
     c = dsl.Parameter(3)
     cov = np.eye(3)
-    with pytest.raises(NotImplementedError):                # pywraplp is LP / MIP only
+    with pytest.raises(NotImplementedError):
         dsl.Problem(dsl.Maximize(c @ x), [x.sum() == 1, x @ cov @ x <= 1.0]).compile(
-            backend="ortools", solver=_ORTOOLS_SOLVER)
+            backend=backend, **_kw(backend))
