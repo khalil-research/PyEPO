@@ -57,7 +57,7 @@ If you use the **CaVE** loss, please also cite:
 
 For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, ...), ``PyEPO`` ships **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12). CaVE replaces the per-step ILP solve with a cone-alignment projection onto the binding-constraint normals at the true optimum; backed by an interior-point QP solver (Clarabel) with a low iteration cap, this delivers paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.
 
-In particular, ``PyEPO`` integrates [MPAX](https://github.com/MIT-Lu-Lab/MPAX), a JAX-based mathematical programming solver using the PDHG (Primal-Dual Hybrid Gradient) algorithm for GPU-accelerated optimization. MPAX brings three key advantages for end-to-end training: (1) **GPU-native solving** — the first-order PDHG method is inherently parallelizable and runs efficiently on GPU; (2) **batch solving** — an entire mini-batch of optimization instances can be solved simultaneously on GPU via vectorization; and (3) **no GPU–CPU data transfer overhead** — traditional solvers (e.g., Gurobi) run on CPU, requiring costly data transfers between GPU and CPU at every training iteration, whereas MPAX keeps both the neural network and the solver on GPU, eliminating this bottleneck.
+``PyEPO`` also integrates [MPAX](https://github.com/MIT-Lu-Lab/MPAX), a JAX solver that runs the first-order PDHG method on GPU. Because both the prediction network and the solver stay on the GPU, MPAX solves a whole mini-batch of instances at once and avoids the GPU-to-CPU transfer that CPU solvers like Gurobi pay at every training step.
 
 
 ## Documentation
@@ -97,6 +97,7 @@ To **reproduce the experiments** in the original paper, please use the code and 
   - *Contrastive methods* — margin against a cached pool of non-optimal solutions: **NCE** and **CMAP** [[7]](https://www.ijcai.org/proceedings/2021/390).
   - *Learning to rank* — rank the true optimum highest among the pool: pointwise / pairwise / listwise **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html).
 - **Multi-solver backend** under a unified `optModel` API: [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and the GPU-native [MPAX](https://github.com/MIT-Lu-Lab/MPAX) PDHG solver.
+- **Symbolic modeling** with `pyepo.dsl`: define an LP, MIP, or QP once with `Variable`, `Parameter`, and constraints, then compile it to any backend. The compiled model is a standard `optModel`, so every loss above works unchanged.
 - **Parallel solving** via a Pathos worker pool to amortize per-instance ILP solves across a mini-batch.
 - **Solution caching** [[7]](https://www.ijcai.org/proceedings/2021/390) reuses previously computed optima to skip redundant solver calls in contrastive and ranking training.
 - **kNN-smoothed targets** [[12]](https://arxiv.org/abs/2310.04328) replace each label with a neighborhood aggregate for noise-robust regret.
@@ -148,39 +149,18 @@ conda install -c pyepo pyepo
 
 ## Sample Code
 
+An end-to-end predict-then-optimize example. The optimization model is defined with `pyepo.dsl` and compiled to Gurobi; change `backend` to run the same model on COPT, Pyomo, OR-Tools, or MPAX.
+
 ```python
 #!/usr/bin/env python
 # coding: utf-8
 
-import gurobipy as gp
-from gurobipy import GRB
 import numpy as np
 import pyepo
-from pyepo.model.grb import optGrbModel
+from pyepo import EPO, dsl
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-
-
-# optimization model
-class myModel(optGrbModel):
-    def __init__(self, weights):
-        self.weights = np.array(weights)
-        self.num_item = len(weights[0])
-        super().__init__()
-
-    def _getModel(self):
-        # create a model
-        m = gp.Model()
-        # variables
-        x = m.addVars(self.num_item, name="x", vtype=GRB.BINARY)
-        # model sense
-        m.modelSense = GRB.MAXIMIZE
-        # constraints
-        m.addConstr(gp.quicksum([self.weights[0,i] * x[i] for i in range(self.num_item)]) <= 7)
-        m.addConstr(gp.quicksum([self.weights[1,i] * x[i] for i in range(self.num_item)]) <= 8)
-        m.addConstr(gp.quicksum([self.weights[2,i] * x[i] for i in range(self.num_item)]) <= 9)
-        return m, x
 
 
 # prediction model
@@ -204,8 +184,11 @@ if __name__ == "__main__":
     weights, x, c = pyepo.data.knapsack.genData(num_data, num_feat, num_item,
                                                 dim=3, deg=4, noise_width=0.5, seed=135)
 
-    # init optimization model
-    optmodel = myModel(weights)
+    # optimization model: define symbolically, compile to Gurobi
+    items = dsl.Variable(num_item, vtype=EPO.BINARY)
+    cost = dsl.Parameter(num_item)
+    optmodel = dsl.Problem(dsl.Maximize(cost @ items),
+                           [weights @ items <= np.array([7, 8, 9])]).compile(backend="gurobi")
 
     # init prediction model
     predmodel = LinearRegression()
