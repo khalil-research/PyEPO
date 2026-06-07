@@ -78,10 +78,8 @@ class noiseContrastiveEstimation(optModule):
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = (obj_cp - objpool_cp).mean(dim=1)
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = (objpool_cp - obj_cp).mean(dim=1)
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            loss = (objpool_cp - obj_cp).mean(dim=1)
         return self._reduce(loss)
 
 
@@ -141,8 +139,6 @@ class contrastiveMAP(optModule):
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss, _ = (obj_cp - objpool_cp).max(dim=1)
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            loss, _ = (objpool_cp - obj_cp).max(dim=1)
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            loss, _ = (objpool_cp - obj_cp).max(dim=1)
         return self._reduce(loss)

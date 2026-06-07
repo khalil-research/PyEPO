@@ -16,6 +16,7 @@ import torch
 from pathos.multiprocessing import ProcessingPool
 from torch import nn
 
+from pyepo import EPO
 from pyepo.data.dataset import optDataset
 from pyepo.func.utils import _close_pool, _init_worker_model
 from pyepo.model.mpax import optMpaxModel
@@ -58,6 +59,9 @@ class optModule(nn.Module):
         # optimization model
         if not isinstance(optmodel, optModel):
             raise TypeError("arg model is not an optModel")
+        # objective sense
+        if optmodel.modelSense not in (EPO.MINIMIZE, EPO.MAXIMIZE):
+            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         self.optmodel = optmodel
         # force processes to 1 for MPAX
         if isinstance(optmodel, optMpaxModel) and processes > 1:
@@ -95,6 +99,8 @@ class optModule(nn.Module):
         # per-instance RNG for the solve-vs-cache branch
         self._branch_rng = np.random.RandomState(seed)
         # reduction
+        if reduction not in ("mean", "sum", "none"):
+            raise ValueError(f"No reduction '{reduction}'.")
         self.reduction = reduction
 
     @abstractmethod
@@ -111,6 +117,4 @@ class optModule(nn.Module):
             return torch.mean(loss)
         if self.reduction == "sum":
             return torch.sum(loss)
-        if self.reduction == "none":
-            return loss
-        raise ValueError(f"No reduction '{self.reduction}'.")
+        return loss

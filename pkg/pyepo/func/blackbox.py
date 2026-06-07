@@ -202,6 +202,4 @@ class negativeIdentityFunc(Function):
         # negative identity gradient
         if optmodel.modelSense == EPO.MINIMIZE:
             return -grad_output, None
-        if optmodel.modelSense == EPO.MAXIMIZE:
-            return grad_output, None
-        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+        return grad_output, None

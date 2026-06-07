@@ -76,12 +76,10 @@ class listwiseLTR(optModule):
         # cross entropy loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = -(F.log_softmax(objpool_cp, dim=1) * F.softmax(objpool_c, dim=1).clamp(min=1e-8))
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
+        else:
             loss = -(
                 F.log_softmax(-objpool_cp, dim=1) * F.softmax(-objpool_c, dim=1).clamp(min=1e-8)
             )
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         return self._reduce(loss)
 
 
@@ -142,10 +140,8 @@ class pairwiseLTR(optModule):
         # best solutions for each instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
             best_inds = torch.argmin(objpool_c, dim=1)
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            best_inds = torch.argmax(objpool_c, dim=1)
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            best_inds = torch.argmax(objpool_c, dim=1)
         objpool_cp_best = objpool_cp.gather(1, best_inds.unsqueeze(1))
         # best-vs-rest diff
         solpool_size = objpool_cp.shape[1]

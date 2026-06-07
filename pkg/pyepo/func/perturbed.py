@@ -301,10 +301,8 @@ class perturbedFenchelYoungFunc(Function):
         e_sol = module._calculate_expected_solution(cp, ptb_c, ptb_sols, noises)
         if module.optmodel.modelSense == EPO.MINIMIZE:
             sign, diff = -1.0, w - e_sol
-        elif module.optmodel.modelSense == EPO.MAXIMIZE:
-            sign, diff = 1.0, e_sol - w
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            sign, diff = 1.0, e_sol - w
         # Fenchel-Young loss: F(theta) - <theta, true_sol>
         f_theta = torch.einsum("bnd,bnd->bn", ptb_c, ptb_sols).mean(dim=1)
         target_obj = (cp * w).sum(dim=-1)
@@ -663,9 +661,7 @@ def _cache_in_pass_3d(
     # best solution in pool
     if optmodel.modelSense == EPO.MINIMIZE:
         best_inds = torch.argmin(solpool_obj, dim=2)
-    elif optmodel.modelSense == EPO.MAXIMIZE:
-        best_inds = torch.argmax(solpool_obj, dim=2)
     else:
-        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+        best_inds = torch.argmax(solpool_obj, dim=2)
     ptb_sols = solpool[best_inds]
     return ptb_sols, solpool

@@ -102,10 +102,8 @@ class regularizedFrankWolfeOpt(optModule):
         # sense sign: flip so optmodel.solve runs as argmax
         if self.optmodel.modelSense == EPO.MINIMIZE:
             sense_sign = -1.0
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            sense_sign = 1.0
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            sense_sign = 1.0
         # initial vertex
         v0, _ = _solve_or_cache(sense_sign * theta, self)
         v0 = v0.to(device=device, dtype=dtype)
@@ -186,10 +184,8 @@ class regularizedFrankWolfeOptFunc(Function):
         # rescale by sense and lambd
         if module.optmodel.modelSense == EPO.MINIMIZE:
             sign = -1.0
-        elif module.optmodel.modelSense == EPO.MAXIMIZE:
-            sign = 1.0
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            sign = 1.0
         scale = sign / module.lambd
         theta = scale * cp
         # batched Frank-Wolfe
@@ -304,10 +300,8 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         # sense sign: flip so optmodel.solve runs as argmax
         if self.optmodel.modelSense == EPO.MINIMIZE:
             sense_sign = -1.0
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            sense_sign = 1.0
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            sense_sign = 1.0
         # initial vertex
         v0, _ = _solve_or_cache(sense_sign * theta, self)
         mu = v0.to(device=device, dtype=dtype)
@@ -369,11 +363,9 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
         if module.optmodel.modelSense == EPO.MINIMIZE:
             r_sol = module._frankWolfe(-cp / module.lambd)
             diff = w - r_sol
-        elif module.optmodel.modelSense == EPO.MAXIMIZE:
+        else:
             r_sol = module._frankWolfe(cp / module.lambd)
             diff = r_sol - w
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         # regularizers
         omega_w = 0.5 * module.lambd * (w**2).sum(dim=-1)
         omega_r = 0.5 * module.lambd * (r_sol**2).sum(dim=-1)
