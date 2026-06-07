@@ -105,7 +105,8 @@ class optCoptModel(optModel):
         """
         self._model.solve()
         if _is_mvar(self.x):
-            sol = np.asarray(self.x.x)
+            # MVar.x is a coptpy NdArray; tolist() flattens it to plain floats
+            sol = np.asarray(self.x.x.tolist())
         else:
             sol = np.asarray(self._model.getInfo("Value", self._vars_list))
         return sol, self._model.objVal
@@ -148,6 +149,6 @@ class optCoptModel(optModel):
         else:
             # LinExpr().addTerms builds the affine expression in one C call
             expr = LinExpr()
-            expr.addTerms(coefs.tolist(), new_model._vars_list)
+            expr.addTerms(new_model._vars_list, coefs.tolist())
             new_model._model.addConstr(expr <= rhs)
         return new_model
