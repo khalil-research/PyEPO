@@ -125,8 +125,14 @@ class Problem:
         """
         Compile to a solver backend, returning an ``optModel``.
 
+        A solver with a native backend (``"gurobi"`` / ``"copt"``) is reached
+        through it directly — the most efficient path. The generic backends
+        (``"pyomo"``, ``"ortools"``) are only for solvers without a native one
+        (HiGHS, GLPK, CBC, SCIP, Ipopt); routing a native solver through them is
+        wasteful indirection.
+
         Args:
-            backend: solver backend name (``"gurobi"``, ``"copt"``, or ``"pyomo"``).
+            backend: solver backend name (``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``).
         """
         # route to the backend compiler
         if backend == "gurobi":
@@ -138,6 +144,10 @@ class Problem:
         if backend == "pyomo":
             from pyepo.model.omo.compile import compileProblem
             return compileProblem(self, **kwargs)
+        if backend == "ortools":
+            from pyepo.model.ort.compile import compileProblem
+            return compileProblem(self, **kwargs)
         raise NotImplementedError(
-            f"DSL backend {backend!r} is not supported (available: 'gurobi', 'copt', 'pyomo')."
+            f"DSL backend {backend!r} is not supported "
+            "(available: 'gurobi', 'copt', 'pyomo', 'ortools')."
         )

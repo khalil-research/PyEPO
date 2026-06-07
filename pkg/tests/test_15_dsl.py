@@ -15,7 +15,7 @@ import pytest
 from pyepo import EPO, dsl
 from pyepo.model.opt import optModel
 
-from .conftest import requires_copt, requires_gurobi
+from .conftest import requires_copt, requires_gurobi, requires_ortools
 
 # ============================================================
 # Variable / Parameter construction
@@ -297,13 +297,30 @@ def test_base_offset_equals_two_terms():
 
 
 # ============================================================
-# Backend golden equivalence + solve properties (parametrized over backend)
+# Backend tests: native (Gurobi / COPT) and generic open-solver (Pyomo / OR-Tools)
 # ============================================================
 
-_BACKENDS = [
+_PYOMO_SOLVER = "appsi_highs"
+_ORTOOLS_SOLVER = "scip"
+
+try:
+    from pyomo.environ import SolverFactory as _SolverFactory
+except ImportError:
+    _HAS_HIGHS = False
+else:
+    _HAS_HIGHS = bool(_SolverFactory(_PYOMO_SOLVER).available())
+
+requires_pyomo_highs = pytest.mark.skipif(not _HAS_HIGHS, reason="Pyomo + HiGHS not available")
+
+_BACKENDS = [                                       # native: MVar, QP, introspection
     pytest.param("gurobi", marks=requires_gurobi),
     pytest.param("copt", marks=requires_copt),
 ]
+_GENERIC = [                                        # generic: open solvers only
+    pytest.param("pyomo", marks=requires_pyomo_highs),
+    pytest.param("ortools", marks=requires_ortools),
+]
+_ALL = _BACKENDS + _GENERIC                         # solver-agnostic property tests
 
 
 def _legacy(backend):
@@ -315,6 +332,11 @@ def _legacy(backend):
     return m
 
 
+def _kw(backend):
+    # generic backends need an open solver; native backends take none
+    return {"pyomo": {"solver": _PYOMO_SOLVER}, "ortools": {"solver": _ORTOOLS_SOLVER}}.get(backend, {})
+
+
 @pytest.mark.parametrize("backend", _BACKENDS)
 def test_knapsack_matches_legacy(backend):
     W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])
@@ -322,7 +344,7 @@ def test_knapsack_matches_legacy(backend):
     legacy = _legacy(backend).knapsackModel(W, cap)
     x = dsl.Variable(5, vtype=EPO.BINARY)
     c = dsl.Parameter(5)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend, **_kw(backend))
     assert isinstance(comp, optModel) and comp.num_cost == 5
     rng = np.random.default_rng(0)
     for _ in range(30):
@@ -341,7 +363,7 @@ def test_relax_matches_legacy_lp(backend):
     legacy_lp = _legacy(backend).knapsackModel(W, cap).relax()
     x = dsl.Variable(5, vtype=EPO.BINARY)
     c = dsl.Parameter(5)
-    comp_lp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend).relax()
+    comp_lp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend, **_kw(backend)).relax()
     assert (comp_lp.problem.var_type == EPO.CONTINUOUS).all()
     rng = np.random.default_rng(1)
     for _ in range(20):
@@ -361,7 +383,7 @@ def test_portfolio_quadratic_constraint_solves(backend):
     x = dsl.Variable(5, lb=0)
     c = dsl.Parameter(5)
     comp = dsl.Problem(dsl.Maximize(c @ x),
-                       [x.sum() == 1, x @ cov @ x <= budget]).compile(backend=backend)
+                       [x.sum() == 1, x @ cov @ x <= budget]).compile(backend=backend, **_kw(backend))
     comp.setObj(rng.standard_normal(5))
     sol, _ = comp.solve()
     assert sol.sum() == pytest.approx(1.0, abs=1e-5)        # budget constraint
@@ -369,13 +391,13 @@ def test_portfolio_quadratic_constraint_solves(backend):
     assert (sol >= -1e-6).all()                             # lb = 0
 
 
-@pytest.mark.parametrize("backend", _BACKENDS)
+@pytest.mark.parametrize("backend", _ALL)
 def test_assignment_solves_to_permutation(backend):
     n = 4
     x = dsl.Variable((n, n), vtype=EPO.BINARY)
     c = dsl.Parameter((n, n))
     comp = dsl.Problem(dsl.Minimize(dsl.sum(c * x)),
-                       [x.sum(axis=1) == 1, x.sum(axis=0) == 1]).compile(backend=backend)
+                       [x.sum(axis=1) == 1, x.sum(axis=0) == 1]).compile(backend=backend, **_kw(backend))
     rng = np.random.default_rng(3)
     comp.setObj(rng.standard_normal(n * n))
     sol, _ = comp.solve()
@@ -389,7 +411,7 @@ def test_qp_objective_solves(backend):
     Sig = np.array([[2.0, 0.5], [0.5, 1.0]])
     x = dsl.Variable(2, lb=0)
     c = dsl.Parameter(2)
-    comp = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1]).compile(backend=backend)
+    comp = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1]).compile(backend=backend, **_kw(backend))
     comp.setObj(np.zeros(2))                                # zero linear cost: pure quadratic
     _, obj = comp.solve()
     grid = np.linspace(0, 1, 2001)
@@ -400,12 +422,12 @@ def test_qp_objective_solves(backend):
     assert obj2 == pytest.approx(obj + 1.0, abs=1e-3)
 
 
-@pytest.mark.parametrize("backend", _BACKENDS)
+@pytest.mark.parametrize("backend", _ALL)
 def test_mixed_vtype_solves(backend):
     # mixed-type cost variable
     x = dsl.Variable(3, vtype=[EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS], lb=0, ub=10)
     c = dsl.Parameter(3)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 4.5]).compile(backend=backend)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 4.5]).compile(backend=backend, **_kw(backend))
     comp.setObj([1.0, 1.0, 1.0])
     sol, _ = comp.solve()
     assert sol[0] in (0.0, 1.0)                             # binary entry
@@ -413,20 +435,20 @@ def test_mixed_vtype_solves(backend):
     assert sol.sum() <= 4.5 + 1e-6
 
 
-@pytest.mark.parametrize("backend", _BACKENDS)
+@pytest.mark.parametrize("backend", _ALL)
 def test_addconstr_cost_space(backend):
     W = np.array([[3.0, 4, 3, 6, 4]])
     cap = np.array([9.0])
     x = dsl.Variable(5, vtype=EPO.BINARY)
     c = dsl.Parameter(5)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend, **_kw(backend))
     comp2 = comp.addConstr([1, 1, 1, 0, 0], 1.0)           # cost-space cut (copy + add)
     comp2.setObj(np.ones(5))
     sol, _ = comp2.solve()
     assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
 
 
-@pytest.mark.parametrize("backend", _BACKENDS)
+@pytest.mark.parametrize("backend", _ALL)
 def test_partial_prediction_solves(backend):
     # predicted cost on x, known cost on y; y is expensive so x is used
     x = dsl.Variable(2, lb=0, ub=1)
@@ -434,20 +456,20 @@ def test_partial_prediction_solves(backend):
     c = dsl.Parameter(2)
     d = np.array([5.0, 5.0])
     comp = dsl.Problem(dsl.Minimize(c @ x + d @ y),
-                       [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend=backend)
+                       [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend=backend, **_kw(backend))
     comp.setObj([1.0, 1.0])
     w, obj = comp.solve()
     assert len(w) == 2 and np.allclose(w, [1, 1])           # w is the predicted (x) part
     assert obj == pytest.approx(2.0)                        # c @ w; known d @ y removed
 
 
-@pytest.mark.parametrize("backend", _BACKENDS)
+@pytest.mark.parametrize("backend", _ALL)
 def test_aux_variable_solves(backend):
     # y appears only in a constraint (no objective cost) -> not in w
     x = dsl.Variable(2, lb=0, ub=1)
     y = dsl.Variable(1, lb=0, ub=1.5)
     c = dsl.Parameter(2)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() - y <= 0]).compile(backend=backend)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() - y <= 0]).compile(backend=backend, **_kw(backend))
     comp.setObj([1.0, 1.0])
     w, obj = comp.solve()
     assert len(w) == 2 and obj == pytest.approx(1.5)        # x.sum() <= y <= 1.5
@@ -473,7 +495,7 @@ def test_solver_params_silent_default(backend):
 def test_constraints_named(backend):
     x = dsl.Variable(2, vtype=EPO.BINARY)
     c = dsl.Parameter(2)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 2)) @ x <= 1]).compile(backend=backend)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 2)) @ x <= 1]).compile(backend=backend, **_kw(backend))
     comp._model.update()
     names = [con.ConstrName if backend == "gurobi" else con.name
              for con in comp._model.getConstrs()]
@@ -481,82 +503,36 @@ def test_constraints_named(backend):
 
 
 # ============================================================
-# Pyomo backend (for open solvers — tested with HiGHS, never gurobi/copt,
-# which have native backends). Gurobi is used only as the native reference.
+# Generic backends vs the native reference; OR-Tools quadratic rejection
 # ============================================================
 
-_PYOMO_SOLVER = "appsi_highs"
-
-try:
-    from pyomo.environ import SolverFactory as _SolverFactory
-except ImportError:
-    _HAS_HIGHS = False
-else:
-    _HAS_HIGHS = bool(_SolverFactory(_PYOMO_SOLVER).available())
-
-requires_pyomo_highs = pytest.mark.skipif(not _HAS_HIGHS, reason="Pyomo + HiGHS not available")
-
-
-@requires_pyomo_highs
 @requires_gurobi
-def test_pyomo_matches_native():
-    # the Pyomo (HiGHS) model solves the same MIP as the native Gurobi backend
+@pytest.mark.parametrize("backend", _GENERIC)
+def test_generic_matches_native(backend):
+    # the generic backend (open solver) solves the same MIP as native Gurobi
     W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])
     cap = np.array([12.0, 10, 15])
     x = dsl.Variable(5, vtype=EPO.BINARY)
     c = dsl.Parameter(5)
     prob = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap])
-    pyo = prob.compile(backend="pyomo", solver=_PYOMO_SOLVER)
+    gen = prob.compile(backend=backend, **_kw(backend))
     grb = prob.compile(backend="gurobi")
     rng = np.random.default_rng(0)
     for _ in range(20):
         cost = rng.standard_normal(5)
-        pyo.setObj(cost)
-        sol_p, obj_p = pyo.solve()
+        gen.setObj(cost)
+        sol_n, obj_n = gen.solve()
         grb.setObj(cost)
         sol_g, obj_g = grb.solve()
-        assert obj_p == pytest.approx(obj_g, abs=1e-6)
-        assert np.allclose(sol_p, sol_g, atol=1e-6)
+        assert obj_n == pytest.approx(obj_g, abs=1e-6)
+        assert np.allclose(sol_n, sol_g, atol=1e-6)
 
 
-@requires_pyomo_highs
-def test_pyomo_partial_prediction_solves():
-    x = dsl.Variable(2, lb=0, ub=1)
-    y = dsl.Variable(2, lb=0, ub=1)
-    c = dsl.Parameter(2)
-    d = np.array([5.0, 5.0])
-    comp = dsl.Problem(dsl.Minimize(c @ x + d @ y),
-                       [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend="pyomo", solver=_PYOMO_SOLVER)
-    comp.setObj([1.0, 1.0])
-    w, obj = comp.solve()
-    assert len(w) == 2 and np.allclose(w, [1, 1])           # predicted (x) part
-    assert obj == pytest.approx(2.0)                        # c @ w; known d @ y removed
-
-
-@requires_pyomo_highs
-def test_pyomo_mixed_vtype_solves():
-    x = dsl.Variable(3, vtype=[EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS], lb=0, ub=10)
+@requires_ortools
+def test_ortools_rejects_quadratic():
+    x = dsl.Variable(3, lb=0)
     c = dsl.Parameter(3)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 4.5]).compile(backend="pyomo", solver=_PYOMO_SOLVER)
-    comp.setObj([1.0, 1.0, 1.0])
-    sol, _ = comp.solve()
-    assert sol[0] in (0.0, 1.0)                             # binary entry (Pyomo domain rule)
-    assert abs(sol[1] - round(sol[1])) < 1e-6              # integer entry
-    assert sol.sum() <= 4.5 + 1e-6
-
-
-@requires_pyomo_highs
-def test_pyomo_addconstr_and_relax():
-    W = np.array([[3.0, 4, 3, 6, 4]])
-    cap = np.array([9.0])
-    x = dsl.Variable(5, vtype=EPO.BINARY)
-    c = dsl.Parameter(5)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend="pyomo", solver=_PYOMO_SOLVER)
-    cut = comp.addConstr([1, 1, 1, 0, 0], 1.0)             # cost-space cut (copy + add)
-    cut.setObj(np.ones(5))
-    sol, _ = cut.solve()
-    assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
-    relaxed = comp.relax()                                  # recompile via getArgs (solver round-trips)
-    assert (relaxed.problem.var_type == EPO.CONTINUOUS).all()
-    relaxed.setObj(np.ones(5))
-    relaxed.solve()
+    cov = np.eye(3)
+    with pytest.raises(NotImplementedError):                # pywraplp is LP / MIP only
+        dsl.Problem(dsl.Maximize(c @ x), [x.sum() == 1, x @ cov @ x <= 1.0]).compile(
+            backend="ortools", solver=_ORTOOLS_SOLVER)
