@@ -478,3 +478,85 @@ def test_constraints_named(backend):
     names = [con.ConstrName if backend == "gurobi" else con.name
              for con in comp._model.getConstrs()]
     assert any(n.startswith("c0") for n in names)          # constraints named c{i}
+
+
+# ============================================================
+# Pyomo backend (for open solvers — tested with HiGHS, never gurobi/copt,
+# which have native backends). Gurobi is used only as the native reference.
+# ============================================================
+
+_PYOMO_SOLVER = "appsi_highs"
+
+try:
+    from pyomo.environ import SolverFactory as _SolverFactory
+except ImportError:
+    _HAS_HIGHS = False
+else:
+    _HAS_HIGHS = bool(_SolverFactory(_PYOMO_SOLVER).available())
+
+requires_pyomo_highs = pytest.mark.skipif(not _HAS_HIGHS, reason="Pyomo + HiGHS not available")
+
+
+@requires_pyomo_highs
+@requires_gurobi
+def test_pyomo_matches_native():
+    # the Pyomo (HiGHS) model solves the same MIP as the native Gurobi backend
+    W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])
+    cap = np.array([12.0, 10, 15])
+    x = dsl.Variable(5, vtype=EPO.BINARY)
+    c = dsl.Parameter(5)
+    prob = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap])
+    pyo = prob.compile(backend="pyomo", solver=_PYOMO_SOLVER)
+    grb = prob.compile(backend="gurobi")
+    rng = np.random.default_rng(0)
+    for _ in range(20):
+        cost = rng.standard_normal(5)
+        pyo.setObj(cost)
+        sol_p, obj_p = pyo.solve()
+        grb.setObj(cost)
+        sol_g, obj_g = grb.solve()
+        assert obj_p == pytest.approx(obj_g, abs=1e-6)
+        assert np.allclose(sol_p, sol_g, atol=1e-6)
+
+
+@requires_pyomo_highs
+def test_pyomo_partial_prediction_solves():
+    x = dsl.Variable(2, lb=0, ub=1)
+    y = dsl.Variable(2, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    d = np.array([5.0, 5.0])
+    comp = dsl.Problem(dsl.Minimize(c @ x + d @ y),
+                       [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend="pyomo", solver=_PYOMO_SOLVER)
+    comp.setObj([1.0, 1.0])
+    w, obj = comp.solve()
+    assert len(w) == 2 and np.allclose(w, [1, 1])           # predicted (x) part
+    assert obj == pytest.approx(2.0)                        # c @ w; known d @ y removed
+
+
+@requires_pyomo_highs
+def test_pyomo_mixed_vtype_solves():
+    x = dsl.Variable(3, vtype=[EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS], lb=0, ub=10)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 4.5]).compile(backend="pyomo", solver=_PYOMO_SOLVER)
+    comp.setObj([1.0, 1.0, 1.0])
+    sol, _ = comp.solve()
+    assert sol[0] in (0.0, 1.0)                             # binary entry (Pyomo domain rule)
+    assert abs(sol[1] - round(sol[1])) < 1e-6              # integer entry
+    assert sol.sum() <= 4.5 + 1e-6
+
+
+@requires_pyomo_highs
+def test_pyomo_addconstr_and_relax():
+    W = np.array([[3.0, 4, 3, 6, 4]])
+    cap = np.array([9.0])
+    x = dsl.Variable(5, vtype=EPO.BINARY)
+    c = dsl.Parameter(5)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend="pyomo", solver=_PYOMO_SOLVER)
+    cut = comp.addConstr([1, 1, 1, 0, 0], 1.0)             # cost-space cut (copy + add)
+    cut.setObj(np.ones(5))
+    sol, _ = cut.solve()
+    assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
+    relaxed = comp.relax()                                  # recompile via getArgs (solver round-trips)
+    assert (relaxed.problem.var_type == EPO.CONTINUOUS).all()
+    relaxed.setObj(np.ones(5))
+    relaxed.solve()

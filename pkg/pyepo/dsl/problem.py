@@ -126,7 +126,7 @@ class Problem:
         Compile to a solver backend, returning an ``optModel``.
 
         Args:
-            backend: solver backend name (``"gurobi"`` or ``"copt"``).
+            backend: solver backend name (``"gurobi"``, ``"copt"``, or ``"pyomo"``).
         """
         # route to the backend compiler
         if backend == "gurobi":
@@ -135,6 +135,9 @@ class Problem:
         if backend == "copt":
             from pyepo.model.copt.compile import compileProblem
             return compileProblem(self, **kwargs)
+        if backend == "pyomo":
+            from pyepo.model.omo.compile import compileProblem
+            return compileProblem(self, **kwargs)
         raise NotImplementedError(
-            f"DSL backend {backend!r} is not supported (available: 'gurobi', 'copt')."
+            f"DSL backend {backend!r} is not supported (available: 'gurobi', 'copt', 'pyomo')."
         )
