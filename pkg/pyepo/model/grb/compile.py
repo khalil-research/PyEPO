@@ -69,7 +69,7 @@ class compiledGrbProblem(compiledBase, optGrbModel):
         return new_model
 
     def _build_flat_vars(self, m):
-        # one MVar with per-variable bounds and type
+        # one MVar with per-entry bounds and type
         prob = self.problem
         lb = np.where(np.isneginf(prob.var_lb), -GRB.INFINITY, prob.var_lb)
         ub = np.where(np.isposinf(prob.var_ub), GRB.INFINITY, prob.var_ub)

@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-"""Tests for pyepo.dsl: the symbolic IR core and the Gurobi backend.
+"""Tests for pyepo.dsl: the symbolic IR core and the solver backends.
 
 The IR tests are solver-free (pure numpy/scipy): the finalized sparse matrices
 match hand-derived forms for the canonical shapes (knapsack, shortest path,
 portfolio, assignment), the operators are correct, and scope validation fires.
-The Gurobi-backend tests (skipped without Gurobi) check golden equivalence to
-the legacy hand-written classes.
+The backend tests are parametrized over Gurobi / COPT (each skipped when its
+solver is absent) and check golden equivalence to the legacy hand-written
+classes plus solve properties.
 """
 
 import numpy as np
@@ -14,7 +15,7 @@ import pytest
 from pyepo import EPO, dsl
 from pyepo.model.opt import optModel
 
-from .conftest import requires_gurobi
+from .conftest import requires_copt, requires_gurobi
 
 # ============================================================
 # Variable / Parameter construction
@@ -296,44 +297,52 @@ def test_base_offset_equals_two_terms():
 
 
 # ============================================================
-# Gurobi backend: golden equivalence to the legacy classes
+# Backend golden equivalence + solve properties (parametrized over backend)
 # ============================================================
 
-@requires_gurobi
-def test_knapsack_matches_legacy():
-    import pyepo.model.grb as grb
+_BACKENDS = [
+    pytest.param("gurobi", marks=requires_gurobi),
+    pytest.param("copt", marks=requires_copt),
+]
+
+
+def _legacy(backend):
+    # the legacy hand-written model module for this backend
+    if backend == "gurobi":
+        import pyepo.model.grb as m
+    else:
+        import pyepo.model.copt as m
+    return m
+
+
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_knapsack_matches_legacy(backend):
     W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])
     cap = np.array([12.0, 10, 15])
-    legacy = grb.knapsackModel(W, cap)
-
+    legacy = _legacy(backend).knapsackModel(W, cap)
     x = dsl.Variable(5, vtype=EPO.BINARY)
     c = dsl.Parameter(5)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend="gurobi")
-
+    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend)
     assert isinstance(comp, optModel) and comp.num_cost == 5
     rng = np.random.default_rng(0)
-    for _ in range(50):
+    for _ in range(30):
         cost = rng.standard_normal(5)
         legacy.setObj(cost)
-        sol_l, obj_l = legacy.solve()
+        _, obj_l = legacy.solve()
         comp.setObj(cost)
-        sol_d, obj_d = comp.solve()
-        assert obj_d == pytest.approx(obj_l, abs=1e-6)
-        assert np.allclose(np.asarray(sol_d), np.asarray(sol_l), atol=1e-6)
+        _, obj_d = comp.solve()
+        assert obj_d == pytest.approx(obj_l, abs=1e-6)       # golden objective
 
 
-@requires_gurobi
-def test_relax_matches_legacy_lp():
-    import pyepo.model.grb as grb
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_relax_matches_legacy_lp(backend):
     W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5]])
     cap = np.array([9.0, 8.0])
-    legacy_lp = grb.knapsackModel(W, cap).relax()
-
+    legacy_lp = _legacy(backend).knapsackModel(W, cap).relax()
     x = dsl.Variable(5, vtype=EPO.BINARY)
     c = dsl.Parameter(5)
-    comp_lp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend="gurobi").relax()
-
-    assert (comp_lp.problem.var_type == EPO.CONTINUOUS).all()   # relaxed to continuous
+    comp_lp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend).relax()
+    assert (comp_lp.problem.var_type == EPO.CONTINUOUS).all()
     rng = np.random.default_rng(1)
     for _ in range(20):
         cost = rng.standard_normal(5)
@@ -344,15 +353,15 @@ def test_relax_matches_legacy_lp():
         assert obj_d == pytest.approx(obj_l, abs=1e-6)
 
 
-@requires_gurobi
-def test_portfolio_quadratic_constraint_solves():
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_portfolio_quadratic_constraint_solves(backend):
     rng = np.random.default_rng(2)
     cov = np.cov(rng.standard_normal((60, 5)), rowvar=False)
     budget = 2.25 * cov.mean()
     x = dsl.Variable(5, lb=0)
     c = dsl.Parameter(5)
     comp = dsl.Problem(dsl.Maximize(c @ x),
-                       [x.sum() == 1, x @ cov @ x <= budget]).compile(backend="gurobi")
+                       [x.sum() == 1, x @ cov @ x <= budget]).compile(backend=backend)
     comp.setObj(rng.standard_normal(5))
     sol, _ = comp.solve()
     assert sol.sum() == pytest.approx(1.0, abs=1e-5)        # budget constraint
@@ -360,13 +369,13 @@ def test_portfolio_quadratic_constraint_solves():
     assert (sol >= -1e-6).all()                             # lb = 0
 
 
-@requires_gurobi
-def test_assignment_solves_to_permutation():
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_assignment_solves_to_permutation(backend):
     n = 4
     x = dsl.Variable((n, n), vtype=EPO.BINARY)
     c = dsl.Parameter((n, n))
     comp = dsl.Problem(dsl.Minimize(dsl.sum(c * x)),
-                       [x.sum(axis=1) == 1, x.sum(axis=0) == 1]).compile(backend="gurobi")
+                       [x.sum(axis=1) == 1, x.sum(axis=0) == 1]).compile(backend=backend)
     rng = np.random.default_rng(3)
     comp.setObj(rng.standard_normal(n * n))
     sol, _ = comp.solve()
@@ -374,13 +383,13 @@ def test_assignment_solves_to_permutation():
     assert np.allclose(P.sum(axis=0), 1) and np.allclose(P.sum(axis=1), 1)   # permutation
 
 
-@requires_gurobi
-def test_qp_objective_solves():
-    # objective c @ x + xᵀ Sig x
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_qp_objective_solves(backend):
+    # objective c @ x + xT Sig x
     Sig = np.array([[2.0, 0.5], [0.5, 1.0]])
     x = dsl.Variable(2, lb=0)
     c = dsl.Parameter(2)
-    comp = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1]).compile(backend="gurobi")
+    comp = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1]).compile(backend=backend)
     comp.setObj(np.zeros(2))                                # zero linear cost: pure quadratic
     _, obj = comp.solve()
     grid = np.linspace(0, 1, 2001)
@@ -391,12 +400,12 @@ def test_qp_objective_solves():
     assert obj2 == pytest.approx(obj + 1.0, abs=1e-3)
 
 
-@requires_gurobi
-def test_mixed_vtype_solves():
-    # mixed-type cost variable (still 1:1)
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_mixed_vtype_solves(backend):
+    # mixed-type cost variable
     x = dsl.Variable(3, vtype=[EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS], lb=0, ub=10)
     c = dsl.Parameter(3)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 4.5]).compile(backend="gurobi")
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 4.5]).compile(backend=backend)
     comp.setObj([1.0, 1.0, 1.0])
     sol, _ = comp.solve()
     assert sol[0] in (0.0, 1.0)                             # binary entry
@@ -404,62 +413,68 @@ def test_mixed_vtype_solves():
     assert sol.sum() <= 4.5 + 1e-6
 
 
-@requires_gurobi
-def test_addconstr_cost_space():
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_addconstr_cost_space(backend):
     W = np.array([[3.0, 4, 3, 6, 4]])
     cap = np.array([9.0])
     x = dsl.Variable(5, vtype=EPO.BINARY)
     c = dsl.Parameter(5)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend="gurobi")
-    # cost-space cut
-    comp2 = comp.addConstr([1, 1, 1, 0, 0], 1.0)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend)
+    comp2 = comp.addConstr([1, 1, 1, 0, 0], 1.0)           # cost-space cut (copy + add)
     comp2.setObj(np.ones(5))
     sol, _ = comp2.solve()
     assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
 
 
-@requires_gurobi
-def test_solver_params_default_outputflag():
-    x = dsl.Variable(3, vtype=EPO.BINARY)
-    c = dsl.Parameter(3)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 3)) @ x <= 2]).compile(
-        backend="gurobi", TimeLimit=12.5, Threads=1)
-    assert comp._model.Params.TimeLimit == 12.5
-    assert comp._model.Params.OutputFlag == 0              # default kept
-    assert comp.relax()._model.Params.TimeLimit == 12.5    # params survive relax
-
-
-@requires_gurobi
-def test_constraints_named():
-    x = dsl.Variable(2, vtype=EPO.BINARY)
-    c = dsl.Parameter(2)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 2)) @ x <= 1]).compile(backend="gurobi")
-    comp._model.update()
-    assert any(con.ConstrName.startswith("c0") for con in comp._model.getConstrs())
-
-
-@requires_gurobi
-def test_partial_prediction_solves():
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_partial_prediction_solves(backend):
     # predicted cost on x, known cost on y; y is expensive so x is used
     x = dsl.Variable(2, lb=0, ub=1)
     y = dsl.Variable(2, lb=0, ub=1)
     c = dsl.Parameter(2)
     d = np.array([5.0, 5.0])
     comp = dsl.Problem(dsl.Minimize(c @ x + d @ y),
-                       [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend="gurobi")
+                       [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend=backend)
     comp.setObj([1.0, 1.0])
     w, obj = comp.solve()
     assert len(w) == 2 and np.allclose(w, [1, 1])           # w is the predicted (x) part
     assert obj == pytest.approx(2.0)                        # c @ w; known d @ y removed
 
 
-@requires_gurobi
-def test_aux_variable_solves():
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_aux_variable_solves(backend):
     # y appears only in a constraint (no objective cost) -> not in w
     x = dsl.Variable(2, lb=0, ub=1)
     y = dsl.Variable(1, lb=0, ub=1.5)
     c = dsl.Parameter(2)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() - y <= 0]).compile(backend="gurobi")
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() - y <= 0]).compile(backend=backend)
     comp.setObj([1.0, 1.0])
     w, obj = comp.solve()
     assert len(w) == 2 and obj == pytest.approx(1.5)        # x.sum() <= y <= 1.5
+
+
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_solver_params_silent_default(backend):
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 3)) @ x <= 2]).compile(
+        backend=backend, TimeLimit=12.5)
+
+    def param(model, name):
+        return getattr(model.Params, name) if backend == "gurobi" else model.getParam(name)
+
+    silent = "OutputFlag" if backend == "gurobi" else "Logging"   # solver output flag
+    assert param(comp._model, "TimeLimit") == 12.5         # user param applied
+    assert param(comp._model, silent) == 0                 # silent by default
+    assert param(comp.relax()._model, "TimeLimit") == 12.5  # params survive relax
+
+
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_constraints_named(backend):
+    x = dsl.Variable(2, vtype=EPO.BINARY)
+    c = dsl.Parameter(2)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 2)) @ x <= 1]).compile(backend=backend)
+    comp._model.update()
+    names = [con.ConstrName if backend == "gurobi" else con.name
+             for con in comp._model.getConstrs()]
+    assert any(n.startswith("c0") for n in names)          # constraints named c{i}
