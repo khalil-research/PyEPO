@@ -25,7 +25,7 @@ End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ los
 
    # optimization model: 5x5 grid shortest path
    grid = (5, 5)
-   optmodel = pyepo.model.grb.shortestPathModel(grid)
+   optmodel = pyepo.model.shortestPathModel(grid)
 
    # synthetic data and dataset
    x, c = pyepo.data.shortestpath.genData(

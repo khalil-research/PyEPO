@@ -15,28 +15,67 @@ For a runnable walkthrough, see the `01 Optimization Model <https://colab.resear
 Defining Models with the DSL
 ============================
 
-For most problems, define the model once with the symbolic ``pyepo.dsl`` frontend and compile it to a backend. Describe the variables with ``Variable``, the predicted cost with ``Parameter``, and the constraints, then call ``compile``. A multi-dimensional knapsack:
+Describe the problem once with ``Variable``, ``Parameter``, and constraints, then compile it to a backend. A binary program with a predicted cost and linear constraints:
 
 .. code-block:: python
 
    import numpy as np
    from pyepo import EPO, dsl
 
-   weights = np.array([[3, 4, 3, 6, 4],
-                       [4, 5, 2, 3, 5],
-                       [5, 4, 6, 2, 3]])
-   capacities = np.array([12, 10, 15])
+   A = np.array([[3, 4, 3, 6, 4],
+                 [4, 5, 2, 3, 5],
+                 [5, 4, 6, 2, 3]])
+   b = np.array([12, 10, 15])
 
    x = dsl.Variable(5, vtype=EPO.BINARY)          # decision variables
    c = dsl.Parameter(5)                           # the predicted cost
-   optmodel = dsl.Problem(dsl.Maximize(c @ x),
-                          [weights @ x <= capacities]).compile(backend="gurobi")
+   optmodel = dsl.Problem(dsl.Maximize(c @ x), [A @ x <= b]).compile(backend="gurobi")
 
-The compiled model is a standard ``optModel``. Set ``backend`` to ``"copt"``, ``"pyomo"``, ``"ortools"``, or ``"mpax"`` to use another solver; the generic backends take a ``solver=`` argument naming the open solver to run.
+The compiled model is a standard ``optModel`` that drops into ``pyepo.func`` unchanged; ``setObj`` and ``solve`` are called for you during training.
 
-Variables take multi-dimensional shapes with numpy-style indexing and reductions, and constraints can be linear or quadratic. The objective can also mix a predicted cost with a known one, for example ``dsl.Minimize(c @ x + d @ y)`` predicts the cost on ``x`` and keeps ``d`` fixed on ``y``.
+All backends share this interface, so you can switch with ``backend=``. Gurobi and COPT are commercial solvers; Pyomo and OR-Tools let you use open solvers such as HiGHS, GLPK, CBC, and SCIP without a license; MPAX solves linear and quadratic programs on the GPU and can batch-solve an entire mini-batch. The generic backends take a ``solver=`` argument naming the solver to run.
 
-For a linear or quadratic objective with fixed constraints, the DSL is all you need. The rest of this page covers the lower-level ``optModel`` interface, for cases the DSL cannot express.
+
+Variables
+---------
+
+.. code-block:: python
+
+   x = dsl.Variable(5)                            # continuous (the default)
+   x = dsl.Variable(5, vtype=EPO.BINARY)          # also INTEGER, CONTINUOUS, or a per-entry list
+   x = dsl.Variable((n, n))                       # multi-dimensional
+   x = dsl.Variable(5, lb=0, ub=1)                # bounds, scalar or array
+
+   c = dsl.Parameter(5)                           # the predicted cost (exactly one per problem)
+
+
+Objectives
+----------
+
+Whether a coefficient is predicted or known is decided by its type: a ``Parameter`` is predicted (``c``), while a numpy array is fixed (``d``, ``Q``). The predicted cost enters linearly; a known quadratic term may be added. Below, ``d`` is a numpy array, ``y`` another ``Variable``, ``Q`` a numpy matrix, and ``k`` an index.
+
+.. code-block:: python
+
+   dsl.Minimize(c @ x)                            # or dsl.Maximize(c @ x)
+   dsl.Minimize(c @ x + d @ y)                    # predict c on x, keep known d on y
+   dsl.Minimize(c @ x[:k] + d @ x[k:])            # predict part of one variable, fix the rest
+   dsl.Minimize((d + c) @ x)                      # a known base d plus the predicted c
+   dsl.Minimize(c @ x + x @ Q @ x)                # predicted linear plus a known quadratic
+
+
+Constraints
+-----------
+
+Constraints are fixed across instances; only the cost is predicted. Pass them as a list to ``Problem``.
+
+.. code-block:: python
+
+   A @ x <= b                                     # linear: <=, >=, ==
+   x.sum() == 1                                   # reduction
+   x.sum(axis=1) == 1                             # per-axis sums, e.g. an assignment
+   x @ Q @ x <= gamma                             # quadratic (Gurobi and COPT)
+
+For a 2-D objective, ``dsl.sum(c * x)`` reads more clearly than the flattened ``c @ x``. For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level ``optModel`` interface for cases it cannot express.
 
 
 The optModel Interface
@@ -45,8 +84,7 @@ The optModel Interface
 The DSL compiles to an ``optModel``. Implement one directly when you need:
 
 * a **custom solving algorithm**, for example a hand-written ADMM, a graph algorithm, or a heuristic, rather than a general solver;
-* **constraint generation** through solver callbacks (lazy constraints, cutting planes), which a one-shot model definition cannot express;
-* a structure the DSL does not model, such as a cost that broadcasts across several variables.
+* **constraint generation** through solver callbacks (lazy constraints, cutting planes), which a one-shot model definition cannot express.
 
 A subclass implements four methods:
 
@@ -108,7 +146,7 @@ The same pattern wraps any algorithm: build state in ``_getModel``, store the co
 Solver Backend Subclass
 -----------------------
 
-To use a solver's modeling API directly, inherit from a backend base class and implement ``_getModel``; ``setObj``, ``solve``, and ``num_cost`` come from the base. The base classes are ``optGrbModel`` (GurobiPy), ``optCoptModel`` (COPT), ``optOmoModel`` (Pyomo), ``optOrtModel`` or ``optOrtCpModel`` (OR-Tools), and ``optMpaxModel`` (MPAX). The GurobiPy version of the knapsack above:
+To use a solver's modeling API directly, inherit from a backend base class and implement ``_getModel``; ``setObj``, ``solve``, and ``num_cost`` come from the base. The GurobiPy version of the program above:
 
 .. code-block:: python
 
@@ -116,7 +154,7 @@ To use a solver's modeling API directly, inherit from a backend base class and i
    from gurobipy import GRB
    from pyepo.model.grb import optGrbModel
 
-   class myKnapsack(optGrbModel):
+   class myModel(optGrbModel):
 
        def _getModel(self):
            m = gp.Model()
@@ -127,31 +165,11 @@ To use a solver's modeling API directly, inherit from a backend base class and i
            m.addConstr(5*x[0] + 4*x[1] + 6*x[2] + 2*x[3] + 3*x[4] <= 15)
            return m, x
 
-COPT and Pyomo follow the same shape with their own APIs. Pyomo and OR-Tools take a ``solver=`` argument and require ``self.modelSense`` to be set in ``_getModel``; OR-Tools provides both ``optOrtModel`` (pywraplp, LP and MIP) and ``optOrtCpModel`` (CP-SAT). See the API reference for each base class.
+The other backends follow the same shape with their own APIs: ``optCoptModel`` (COPT), ``optOmoModel`` (Pyomo), and ``optOrtModel`` / ``optOrtCpModel`` (OR-Tools), which take a ``solver=`` argument. ``optMpaxModel`` is different: it has no solver model object, so ``_getModel`` fills the standard-form matrices ``A``, ``b``, ``G``, ``h``, ``l``, ``u`` (and an optional PSD ``Q``) and returns ``(None, [])``.
 
-MPAX has no solver model object, so ``_getModel`` fills the standard-form matrices and returns ``(None, [])``:
-
-.. code-block:: python
-
-   import jax.numpy as jnp
-   from pyepo import EPO
-   from pyepo.model.mpax import optMpaxModel
-
-   class myMpaxKnapsack(optMpaxModel):
-       use_sparse_matrix = False
-
-       def _getModel(self):
-           n = 5
-           self.A = jnp.zeros((0, n))                       # equality A x = b (none)
-           self.b = jnp.zeros((0,))
-           self.G = -jnp.array(weights, dtype=jnp.float32)  # inequality G x >= h
-           self.h = -jnp.array(capacities, dtype=jnp.float32)
-           self.l = jnp.zeros(n)                            # bounds x in [0, 1]
-           self.u = jnp.ones(n)
-           self.modelSense = EPO.MAXIMIZE
-           return None, []
-
-Assign ``self.Q`` a PSD matrix for a convex QP objective. See ``optMpaxModel`` for the full matrix contract.
+.. autoclass:: pyepo.model.mpax.optMpaxModel
+    :noindex:
+    :members: __init__, _getModel, setObj, solve, num_cost
 
 
 Constraint Generation

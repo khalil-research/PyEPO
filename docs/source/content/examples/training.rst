@@ -20,7 +20,7 @@ All examples below share the same setup: a linear prediction model trained on sh
 
    # model for shortest path
    grid = (5, 5)
-   optmodel = pyepo.model.grb.shortestPathModel(grid)
+   optmodel = pyepo.model.shortestPathModel(grid)
 
    # generate data
    num_data = 1000
