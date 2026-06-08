@@ -425,8 +425,8 @@ if __name__ == "__main__":
                    lambda fn, cp, c, w, z: fn(cp, c, w, z))
 
     # 2. Perturbation Gradient (surrogate)
-    pg = pyepo.func.perturbationGradient(optmodel, processes=1, sigma=0.1)
-    train_and_eval("perturbationGradient", pg,
+    pg = pyepo.func.PG(optmodel, processes=1, sigma=0.1)
+    train_and_eval("PG", pg,
                    lambda fn, cp, c, w, z: fn(cp, c))
 
     # task loss for methods that return solutions (MAXIMIZE: minimize -c^T w_hat)
@@ -435,53 +435,53 @@ if __name__ == "__main__":
         return -(c * w_hat).sum(dim=1).mean()
 
     # 3. Blackbox Differentiable Optimizer
-    bb = pyepo.func.blackboxOpt(optmodel, processes=4, lambd=10)
-    train_and_eval("blackboxOpt", bb, task_loss)
+    bb = pyepo.func.DBB(optmodel, processes=4, lambd=10)
+    train_and_eval("DBB", bb, task_loss)
 
     # 4. Negative Identity
-    nid = pyepo.func.negativeIdentity(optmodel, processes=1)
-    train_and_eval("negativeIdentity", nid, task_loss)
+    nid = pyepo.func.NID(optmodel, processes=1)
+    train_and_eval("NID", nid, task_loss)
 
     # 5. Perturbed Optimizer
-    ptb = pyepo.func.perturbedOpt(optmodel, processes=4, n_samples=5, sigma=1.0)
-    train_and_eval("perturbedOpt", ptb, task_loss)
+    ptb = pyepo.func.DPO(optmodel, processes=4, n_samples=5, sigma=1.0)
+    train_and_eval("DPO", ptb, task_loss)
 
     # 6. Perturbed Fenchel-Young
-    pfy = pyepo.func.perturbedFenchelYoung(optmodel, processes=1, n_samples=5, sigma=1.0)
-    train_and_eval("perturbedFenchelYoung", pfy,
+    pfy = pyepo.func.PFY(optmodel, processes=1, n_samples=5, sigma=1.0)
+    train_and_eval("PFY", pfy,
                    lambda fn, cp, c, w, z: fn(cp, w))
 
     # 7. Implicit MLE
-    imle = pyepo.func.implicitMLE(optmodel, processes=4, n_samples=5, sigma=1.0)
-    train_and_eval("implicitMLE", imle, task_loss)
+    imle = pyepo.func.IMLE(optmodel, processes=4, n_samples=5, sigma=1.0)
+    train_and_eval("IMLE", imle, task_loss)
 
     # 8. Adaptive Implicit MLE
-    aimle = pyepo.func.adaptiveImplicitMLE(optmodel, processes=1, n_samples=5, sigma=1.0)
-    train_and_eval("adaptiveImplicitMLE", aimle, task_loss)
+    aimle = pyepo.func.AIMLE(optmodel, processes=1, n_samples=5, sigma=1.0)
+    train_and_eval("AIMLE", aimle, task_loss)
 
     # 9. NCE (contrastive)
-    nce = pyepo.func.noiseContrastiveEstimation(optmodel, processes=4, solve_ratio=1, dataset=dataset)
+    nce = pyepo.func.NCE(optmodel, processes=4, solve_ratio=1, dataset=dataset)
     train_and_eval("NCE", nce,
                    lambda fn, cp, c, w, z: fn(cp, w))
 
     # 10. Contrastive MAP
-    cmap = pyepo.func.contrastiveMAP(optmodel, processes=1, solve_ratio=1, dataset=dataset)
-    train_and_eval("contrastiveMAP", cmap,
+    cmap = pyepo.func.CMAP(optmodel, processes=1, solve_ratio=1, dataset=dataset)
+    train_and_eval("CMAP", cmap,
                    lambda fn, cp, c, w, z: fn(cp, w))
 
     # 11. Listwise Learning-to-Rank
-    ltr = pyepo.func.listwiseLTR(optmodel, processes=4, solve_ratio=1, dataset=dataset)
-    train_and_eval("listwiseLTR", ltr,
+    ltr = pyepo.func.lsLTR(optmodel, processes=4, solve_ratio=1, dataset=dataset)
+    train_and_eval("lsLTR", ltr,
                    lambda fn, cp, c, w, z: fn(cp, c))
 
     # 12. Pairwise Learning-to-Rank
-    pw = pyepo.func.pairwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=dataset)
-    train_and_eval("pairwiseLTR", pw,
+    pw = pyepo.func.prLTR(optmodel, processes=1, solve_ratio=1, dataset=dataset)
+    train_and_eval("prLTR", pw,
                    lambda fn, cp, c, w, z: fn(cp, c))
 
     # 13. Pointwise Learning-to-Rank
-    pt = pyepo.func.pointwiseLTR(optmodel, processes=1, solve_ratio=1, dataset=dataset)
-    train_and_eval("pointwiseLTR", pt,
+    pt = pyepo.func.ptLTR(optmodel, processes=1, solve_ratio=1, dataset=dataset)
+    train_and_eval("ptLTR", pt,
                    lambda fn, cp, c, w, z: fn(cp, c))
 
     # ============================================================

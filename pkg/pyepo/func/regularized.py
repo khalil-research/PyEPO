@@ -258,7 +258,7 @@ class regularizedFrankWolfeOptFunc(Function):
 
 class regularizedFrankWolfeFenchelYoung(optModule):
     """
-    L2-Regularized Frank-Wolfe with Fenchel-Young loss (RFYL).
+    L2-Regularized Frank-Wolfe with Fenchel-Young loss (RFY).
 
     Pairs the RFWO regularized solver with the Fenchel-Young loss of the L2
     regularizer, returning a convex scalar loss that compares the predicted
@@ -382,3 +382,8 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
         (grad,) = ctx.saved_tensors
         grad_output = torch.unsqueeze(grad_output, dim=-1)
         return grad * grad_output, None, None
+
+
+# acronym aliases
+RFWO = regularizedFrankWolfeOpt
+RFY = regularizedFrankWolfeFenchelYoung

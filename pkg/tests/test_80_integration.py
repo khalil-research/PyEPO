@@ -78,7 +78,7 @@ class TestMaximizeEndToEnd:
     def test_blackbox_knapsack(self, ks_data):
         optmodel, _ds, loader = ks_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        _train_loop(F.blackboxOpt(optmodel, lambd=10, processes=1), loader, predmodel,
+        _train_loop(F.DBB(optmodel, lambd=10, processes=1), loader, predmodel,
                     lambda fn, cp, c, w, z: -(fn(cp) * c).sum(1).mean())
 
 
@@ -111,7 +111,7 @@ class TestSpecialDatasets:
         optmodel = tspDFJModel(num_nodes=5)
         loader = DataLoader(optDataset(optmodel, x, c), batch_size=BATCH, shuffle=False)
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        _train_loop(F.blackboxOpt(optmodel, lambd=10, processes=1), loader, predmodel,
+        _train_loop(F.DBB(optmodel, lambd=10, processes=1), loader, predmodel,
                     lambda fn, cp, c_b, w, z: (fn(cp) * c_b).sum(1).mean())
 
 
@@ -132,7 +132,7 @@ class TestCaVEEndToEnd:
     def test_default_preset(self, sp_constrs_data):
         optmodel, _ds, loader = sp_constrs_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        self._train(F.coneAlignedCosine(optmodel, processes=1), loader, predmodel)
+        self._train(F.CaVE(optmodel, processes=1), loader, predmodel)
 
 
 @requires_gurobi

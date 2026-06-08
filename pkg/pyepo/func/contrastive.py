@@ -146,3 +146,8 @@ class contrastiveMAP(optModule):
         else:
             loss, _ = (objpool_cp - obj_cp).max(dim=1)
         return self._reduce(loss)
+
+
+# acronym aliases
+NCE = noiseContrastiveEstimation
+CMAP = contrastiveMAP

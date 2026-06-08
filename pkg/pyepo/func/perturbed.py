@@ -195,7 +195,7 @@ class perturbedOptMul(perturbedOpt):
 
 class perturbedFenchelYoung(optModule):
     """
-    Perturbed Fenchel-Young loss (PFYL) -- additive-Gaussian variant.
+    Perturbed Fenchel-Young loss (PFY) -- additive-Gaussian variant.
 
     Pairs the same Monte-Carlo expected perturbed solution as ``perturbedOpt``
     with the Fenchel-Young loss against the true optimum
@@ -680,3 +680,12 @@ def _cache_in_pass_3d(
         best_inds = torch.argmax(solpool_obj, dim=2)
     ptb_sols = solpool[best_inds]
     return ptb_sols, solpool
+
+
+# acronym aliases
+DPO = perturbedOpt
+DPOMul = perturbedOptMul
+PFY = perturbedFenchelYoung
+PFYMul = perturbedFenchelYoungMul
+IMLE = implicitMLE
+AIMLE = adaptiveImplicitMLE

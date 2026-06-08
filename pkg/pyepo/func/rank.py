@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from pyepo.model.opt import optModel
 
 
-class listwiseLTR(optModule):
+class listwiseLearningToRank(optModule):
     """
     Listwise Learning-to-Rank loss over a cached solution pool.
 
@@ -86,7 +86,7 @@ class listwiseLTR(optModule):
         return self._reduce(loss)
 
 
-class pairwiseLTR(optModule):
+class pairwiseLearningToRank(optModule):
     """
     Pairwise Learning-to-Rank loss over a cached solution pool.
 
@@ -160,7 +160,7 @@ class pairwiseLTR(optModule):
         return self._reduce(loss)
 
 
-class pointwiseLTR(optModule):
+class pointwiseLearningToRank(optModule):
     """
     Pointwise Learning-to-Rank loss over a cached solution pool.
 
@@ -216,3 +216,9 @@ class pointwiseLTR(optModule):
         # squared loss
         loss = ((true_cost - pred_cost) @ self.solpool.T).square().mean(dim=1)
         return self._reduce(loss)
+
+
+# acronym aliases
+lsLTR = listwiseLearningToRank
+prLTR = pairwiseLearningToRank
+ptLTR = pointwiseLearningToRank

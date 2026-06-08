@@ -212,3 +212,7 @@ def _clarabel_project_batch(
         projs = pool.amap(partial(_project_one, max_iter=max_iter), cp_np, ctrs_np).get()
     # stack + back to torch
     return torch.as_tensor(np.stack(projs), dtype=dtype, device=device)
+
+
+# acronym aliases
+CaVE = coneAlignedCosine

@@ -207,3 +207,8 @@ class negativeIdentityFunc(Function):
         if optmodel.modelSense == EPO.MINIMIZE:
             return -grad_output, None
         return grad_output, None
+
+
+# acronym aliases
+DBB = blackboxOpt
+NID = negativeIdentity

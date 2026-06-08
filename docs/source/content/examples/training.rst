@@ -69,7 +69,7 @@ Perturbation Gradient (PG)
 
 .. code-block:: python
 
-   pg = pyepo.func.perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=2)
+   pg = pyepo.func.PG(optmodel, sigma=0.1, two_sides=False, processes=2)
 
    num_epochs = 20
    for epoch in range(num_epochs):
@@ -88,14 +88,14 @@ Perturbed Methods
 Differentiable Perturbed Optimizer (DPO)
 ----------------------------------------
 
-``perturbedOpt`` is the additive Gaussian version. ``perturbedOptMul`` is the multiplicative version for sign-sensitive oracles; it requires a positive-output predictor (``positive_predmodel`` in Common Setup, a linear layer followed by ``nn.Softplus()``) so that predicted costs keep their sign.
+``DPO`` is the additive Gaussian version. ``DPOMul`` is the multiplicative version for sign-sensitive oracles; it requires a positive-output predictor (``positive_predmodel`` in Common Setup, a linear layer followed by ``nn.Softplus()``) so that predicted costs keep their sign.
 
 .. code-block:: python
 
    # additive
-   ptb = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
+   ptb = pyepo.func.DPO(optmodel, n_samples=10, sigma=0.5, processes=2)
    # multiplicative: swap predmodel for positive_predmodel below
-   # ptb = pyepo.func.perturbedOptMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+   # ptb = pyepo.func.DPOMul(optmodel, n_samples=10, sigma=0.5, processes=2)
 
    criterion = nn.MSELoss()
 
@@ -113,14 +113,14 @@ Differentiable Perturbed Optimizer (DPO)
 Perturbed Fenchel-Young Loss (PFYL)
 -----------------------------------
 
-The multiplicative variant ``perturbedFenchelYoungMul`` shares the sign convention of ``perturbedOptMul`` and requires a positive-output predictor.
+The multiplicative variant ``PFYMul`` shares the sign convention of ``DPOMul`` and requires a positive-output predictor.
 
 .. code-block:: python
 
    # additive
-   pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
+   pfy = pyepo.func.PFY(optmodel, n_samples=10, sigma=0.5, processes=2)
    # multiplicative: swap predmodel for positive_predmodel below
-   # pfy = pyepo.func.perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+   # pfy = pyepo.func.PFYMul(optmodel, n_samples=10, sigma=0.5, processes=2)
 
    num_epochs = 20
    for epoch in range(num_epochs):
@@ -137,7 +137,7 @@ Implicit Maximum Likelihood Estimator (I-MLE)
 
 .. code-block:: python
 
-   imle = pyepo.func.implicitMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=2)
+   imle = pyepo.func.IMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=2)
 
    criterion = nn.L1Loss()
 
@@ -157,7 +157,7 @@ Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)
 
 .. code-block:: python
 
-   aimle = pyepo.func.adaptiveImplicitMLE(optmodel, n_samples=2, sigma=1.0, processes=2)
+   aimle = pyepo.func.AIMLE(optmodel, n_samples=2, sigma=1.0, processes=2)
 
    criterion = nn.L1Loss()
 
@@ -183,7 +183,7 @@ RFWO returns a regularized solution; solution-level MSE against :math:`\mathbf{w
 
 .. code-block:: python
 
-   rfwo = pyepo.func.regularizedFrankWolfeOpt(optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
+   rfwo = pyepo.func.RFWO(optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
 
    criterion = nn.MSELoss()
 
@@ -203,7 +203,7 @@ L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)
 
 .. code-block:: python
 
-   rfyl = pyepo.func.regularizedFrankWolfeFenchelYoung(optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
+   rfyl = pyepo.func.RFY(optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
 
    num_epochs = 20
    for epoch in range(num_epochs):
@@ -226,7 +226,7 @@ Differentiable Black-Box Optimizer (DBB)
 
 .. code-block:: python
 
-   dbb = pyepo.func.blackboxOpt(optmodel, lambd=10, processes=2)
+   dbb = pyepo.func.DBB(optmodel, lambd=10, processes=2)
 
    criterion = nn.L1Loss()
 
@@ -249,7 +249,7 @@ NID is hyperparameter-free and uses the same training loop as DBB.
 
 .. code-block:: python
 
-   nid = pyepo.func.negativeIdentity(optmodel, processes=2)
+   nid = pyepo.func.NID(optmodel, processes=2)
 
    criterion = nn.L1Loss()
 
@@ -283,7 +283,7 @@ CaVE requires a dedicated dataset class that extracts binding-constraint normals
        dataset, batch_size=32, shuffle=True, collate_fn=collate_tight_constraints,
    )
 
-   cave = pyepo.func.coneAlignedCosine(optmodel, processes=2)
+   cave = pyepo.func.CaVE(optmodel, processes=2)
 
    num_epochs = 20
    for epoch in range(num_epochs):
@@ -306,7 +306,7 @@ Noise Contrastive Estimation (NCE)
 
 .. code-block:: python
 
-   nce = pyepo.func.noiseContrastiveEstimation(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   nce = pyepo.func.NCE(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
    num_epochs = 20
    for epoch in range(num_epochs):
@@ -323,7 +323,7 @@ Contrastive MAP (CMAP)
 
 .. code-block:: python
 
-   cmap = pyepo.func.contrastiveMAP(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   cmap = pyepo.func.CMAP(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
    num_epochs = 20
    for epoch in range(num_epochs):
@@ -346,7 +346,7 @@ Pointwise LTR
 
 .. code-block:: python
 
-   ltr = pyepo.func.pointwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   ltr = pyepo.func.ptLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
    num_epochs = 20
    for epoch in range(num_epochs):
@@ -363,7 +363,7 @@ Pairwise LTR
 
 .. code-block:: python
 
-   ltr = pyepo.func.pairwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   ltr = pyepo.func.prLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
    num_epochs = 20
    for epoch in range(num_epochs):
@@ -380,7 +380,7 @@ Listwise LTR
 
 .. code-block:: python
 
-   ltr = pyepo.func.listwiseLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   ltr = pyepo.func.lsLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
 
    num_epochs = 20
    for epoch in range(num_epochs):

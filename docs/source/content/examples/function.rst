@@ -42,7 +42,7 @@ A combined name like ``DPO+MSE`` or ``NID+L1`` means a solution-returning module
 
 **3. Any special constraints?**
 
-* **Sign-sensitive oracle** (e.g., negative costs must stay negative): use ``perturbedOptMul`` or ``perturbedFenchelYoungMul`` with a positive-output predictor.
+* **Sign-sensitive oracle** (e.g., negative costs must stay negative): use ``DPOMul`` or ``PFYMul`` with a positive-output predictor.
 * **Large LP on GPU**: pair an ``optMpaxModel`` with SPO+ or PFYL.
 * **Cached negative pool**: NCE / CMAP.
 * **Ranking interpretation**: LTR variants.
@@ -61,43 +61,43 @@ The table below summarizes inputs and return types.
      - loss
      - true costs, true optimal solutions, true objective values
      - strong default for linear objectives
-   * - ``perturbationGradient``
+   * - ``PG``
      - loss
      - true costs
      - directional finite differences along the true cost
-   * - ``perturbedOpt`` / ``perturbedOptMul``
+   * - ``DPO`` / ``DPOMul``
      - expected perturbed solutions
      - task loss chosen by the user
      - DPO; use the multiplicative variant for sign-sensitive oracles
-   * - ``perturbedFenchelYoung`` / ``perturbedFenchelYoungMul``
+   * - ``PFY`` / ``PFYMul``
      - loss
      - true optimal solutions
      - PFYL; use the multiplicative variant for sign-sensitive oracles
-   * - ``implicitMLE`` / ``adaptiveImplicitMLE``
+   * - ``IMLE`` / ``AIMLE``
      - perturbed solutions
      - task loss chosen by the user
      - perturb-and-MAP with Sum-of-Gamma noise
-   * - ``regularizedFrankWolfeOpt``
+   * - ``RFWO``
      - regularized predicted solutions
      - task loss chosen by the user
      - L2-regularized smooth optimizer over the convex hull of feasible solutions
-   * - ``regularizedFrankWolfeFenchelYoung``
+   * - ``RFY``
      - loss
      - true optimal solutions
      - Fenchel-Young loss paired with L2-regularized Frank-Wolfe
-   * - ``blackboxOpt`` / ``negativeIdentity``
+   * - ``DBB`` / ``NID``
      - predicted solutions
      - task loss chosen by the user
      - direct solution-level or objective-level losses
-   * - ``coneAlignedCosine``
+   * - ``CaVE``
      - loss
      - tight binding-constraint normals at the true optimum (``optDatasetConstrs``)
      - CaVE; binary linear programs, Gurobi backend only
-   * - ``noiseContrastiveEstimation`` / ``contrastiveMAP``
+   * - ``NCE`` / ``CMAP``
      - loss
      - true optimal solutions and a solution pool
      - contrastive training with cached negative solutions
-   * - ``pointwiseLTR`` / ``pairwiseLTR`` / ``listwiseLTR``
+   * - ``ptLTR`` / ``prLTR`` / ``lsLTR``
      - loss
      - true costs and a solution pool
      - learning-to-rank formulations over feasible solutions
@@ -157,7 +157,7 @@ where :math:`\lambda > 0` is the finite-difference width (the ``sigma`` paramete
 
    \frac{\partial \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} \approx \frac{\mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{w}^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{\lambda}.
 
-.. autoclass:: pyepo.func.perturbationGradient
+.. autoclass:: pyepo.func.PG
     :noindex:
     :members:
 
@@ -173,7 +173,7 @@ Perturbed methods estimate gradients by Monte Carlo averaging over random pertur
 Differentiable Perturbed Optimizer (DPO)
 ----------------------------------------
 
-DPO [#f5]_ uses Monte Carlo sampling to estimate solutions by optimizing randomly perturbed costs. Its custom backward pass provides a gradient estimator for end-to-end training. ``perturbedOpt`` is the additive Gaussian version; ``perturbedOptMul`` is the multiplicative version for sign-sensitive oracles [#f6]_. The multiplicative variant assumes predicted costs already have the intended nonzero sign. For nonnegative-cost problems, use a positive-output predictor such as ``nn.Softplus()`` plus a small epsilon.
+DPO [#f5]_ uses Monte Carlo sampling to estimate solutions by optimizing randomly perturbed costs. Its custom backward pass provides a gradient estimator for end-to-end training. ``DPO`` is the additive Gaussian version; ``DPOMul`` is the multiplicative version for sign-sensitive oracles [#f6]_. The multiplicative variant assumes predicted costs already have the intended nonzero sign. For nonnegative-cost problems, use a positive-output predictor such as ``nn.Softplus()`` plus a small epsilon.
 
 DPO replaces the piecewise-constant solution map :math:`\hat{\mathbf{c}} \mapsto \mathbf{w}^*(\hat{\mathbf{c}})` with the expectation over a random perturbation,
 
@@ -183,7 +183,7 @@ DPO replaces the piecewise-constant solution map :math:`\hat{\mathbf{c}} \mapsto
 
 where :math:`\boldsymbol{\xi} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})` and :math:`K` is ``n_samples``. The expectation varies smoothly with :math:`\hat{\mathbf{c}}` because small perturbations only shift the sampling distribution over active vertices of the feasible polytope, analogous to the smoothing role of SoftMax in classification.
 
-The multiplicative variant ``perturbedOptMul`` perturbs each entry of :math:`\hat{\mathbf{c}}` as
+The multiplicative variant ``DPOMul`` perturbs each entry of :math:`\hat{\mathbf{c}}` as
 
 .. math::
 
@@ -191,11 +191,11 @@ The multiplicative variant ``perturbedOptMul`` perturbs each entry of :math:`\ha
 
 with :math:`\odot` the Hadamard product. The exponential factor preserves the sign of each cost entry, which is required when the solver expects (say) nonnegative edge costs.
 
-.. autoclass:: pyepo.func.perturbedOpt
+.. autoclass:: pyepo.func.DPO
     :noindex:
     :members:
 
-.. autoclass:: pyepo.func.perturbedOptMul
+.. autoclass:: pyepo.func.DPOMul
     :noindex:
     :members:
 
@@ -203,7 +203,7 @@ with :math:`\odot` the Hadamard product. The exponential factor preserves the si
 Perturbed Fenchel-Young Loss (PFYL)
 -----------------------------------
 
-PFYL [#f5]_ uses the same perturbed expected solution as DPO inside a Fenchel-Young loss, comparing it directly with the true optimal solution. It returns a loss, so no external task loss is needed. ``perturbedFenchelYoung`` is the additive Gaussian version; ``perturbedFenchelYoungMul`` is the multiplicative sign-preserving variant with the same sign convention as ``perturbedOptMul``.
+PFYL [#f5]_ uses the same perturbed expected solution as DPO inside a Fenchel-Young loss, comparing it directly with the true optimal solution. It returns a loss, so no external task loss is needed. ``PFY`` is the additive Gaussian version; ``PFYMul`` is the multiplicative sign-preserving variant with the same sign convention as ``DPOMul``.
 
 Let :math:`F(\hat{\mathbf{c}}) = \mathbb{E}_{\boldsymbol{\xi}}\big[ \min_{\mathbf{w} \in \mathcal{S}} (\hat{\mathbf{c}} + \sigma \boldsymbol{\xi})^\top \mathbf{w} \big]` be the expected perturbed minimum, and let :math:`\Omega(\mathbf{w}^*(\mathbf{c}))` be its Fenchel conjugate. The perturbed Fenchel-Young loss is
 
@@ -223,11 +223,11 @@ Compared with DPO, PFYL avoids an explicit Jacobian computation and yields a the
 
    \hat{\mathbf{c}} \odot \exp\!\big(\sigma \boldsymbol{\xi} - \tfrac{1}{2} \sigma^2\big).
 
-.. autoclass:: pyepo.func.perturbedFenchelYoung
+.. autoclass:: pyepo.func.PFY
     :noindex:
     :members:
 
-.. autoclass:: pyepo.func.perturbedFenchelYoungMul
+.. autoclass:: pyepo.func.PFYMul
     :noindex:
     :members:
 
@@ -245,7 +245,7 @@ I-MLE is framed as imitation learning: bring the model distribution :math:`p(\ma
 
 where :math:`\sigma` smooths the solution map and :math:`\lambda` (``lambd``) is the finite-difference step. The same noise realization :math:`\boldsymbol{\xi}_\kappa` is shared across the two perturbed evaluations to reduce variance.
 
-.. autoclass:: pyepo.func.implicitMLE
+.. autoclass:: pyepo.func.IMLE
     :noindex:
     :members:
 
@@ -263,7 +263,7 @@ AI-MLE uses the same finite-difference estimator as I-MLE but replaces the fixed
 
 where :math:`\mathbf{d}` is the upstream task gradient and :math:`\alpha_t > 0` is tuned online: when an exponential moving average of the gradient sparsity (fraction of nonzero entries) drops below one, :math:`\alpha_t` is increased; otherwise it is decreased. This rescaling keeps the perturbation magnitude commensurate with :math:`\hat{\mathbf{c}}` and decouples the step from the absolute scale of :math:`\mathbf{d}`, removing the need to tune :math:`\lambda` by hand.
 
-.. autoclass:: pyepo.func.adaptiveImplicitMLE
+.. autoclass:: pyepo.func.AIMLE
     :noindex:
     :members:
 
@@ -291,7 +291,7 @@ RFWO [#f6]_ exposes :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})` directly 
 
    \hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}}) = \arg\min_{\mathbf{w} \in \mathrm{conv}(\mathcal{S})} \hat{\mathbf{c}}^\top \mathbf{w} + \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2.
 
-.. autoclass:: pyepo.func.regularizedFrankWolfeOpt
+.. autoclass:: pyepo.func.RFWO
     :noindex:
     :members:
 
@@ -327,7 +327,7 @@ PyEPO specializes this to :math:`\Omega(\mathbf{w}) = \tfrac{\lambda}{2}\|\mathb
 
 a transparent "compare regularizers + linear residual" form. The gradient remains :math:`\mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})`.
 
-.. autoclass:: pyepo.func.regularizedFrankWolfeFenchelYoung
+.. autoclass:: pyepo.func.RFY
     :noindex:
     :members:
 
@@ -351,7 +351,7 @@ Given an upstream gradient :math:`\mathbf{d} = \nabla_{\mathbf{w}} \mathcal{L}(\
 
 Larger :math:`\lambda` smooths more aggressively. Unlike SPO+, the resulting surrogate is nonconvex in :math:`\hat{\mathbf{c}}`, which weakens convergence guarantees even when the predictor is convex in its parameters.
 
-.. autoclass:: pyepo.func.blackboxOpt
+.. autoclass:: pyepo.func.DBB
     :noindex:
     :members:
 
@@ -369,7 +369,7 @@ NID approximates the solver Jacobian by the (signed) identity, :math:`\partial \
 
 Intuitively, for minimization this rule decreases :math:`\hat{\mathbf{c}}` along directions where :math:`\mathbf{w}^*(\hat{\mathbf{c}})` tends to increase and vice versa, driving the predicted decision toward :math:`\mathbf{w}^*(\mathbf{c})`. NID is the special case of DBB in which :math:`\lambda` is chosen so that the interpolated solution coincides with the negative-identity update, but it saves the extra solver call required by DBB.
 
-.. autoclass:: pyepo.func.negativeIdentity
+.. autoclass:: pyepo.func.NID
     :noindex:
     :members:
 
@@ -407,7 +407,7 @@ For larger problems, setting ``solve_ratio < 1`` enables the **CaVE Hybrid** pre
 
 Training data must come from ``pyepo.data.dataset.optDatasetConstrs``, which extracts the binding-constraint normals at the optimum for each instance. Batches must be collated with ``pyepo.data.dataset.collate_tight_constraints`` to zero-pad ragged per-instance constraint counts. CaVE currently requires a Gurobi-backed ``optModel`` (binding-constraint extraction relies on Gurobi's sparse matrix API).
 
-.. autoclass:: pyepo.func.coneAlignedCosine
+.. autoclass:: pyepo.func.CaVE
     :noindex:
     :members:
 
@@ -450,7 +450,7 @@ Let :math:`\Gamma` be the cached pool of feasible solutions. For a minimization 
 
 For a fixed :math:`\Gamma` this update direction stays constant per instance, so periodically refreshing :math:`\Gamma` (controlled by ``solve_ratio``) is essential to keep the gradient signal informative.
 
-.. autoclass:: pyepo.func.noiseContrastiveEstimation
+.. autoclass:: pyepo.func.NCE
     :noindex:
     :members:
 
@@ -468,7 +468,7 @@ CMAP keeps only the most-violating member of the pool, the one with the smallest
 
 If :math:`\mathbf{w}^*(\mathbf{c}) \in \Gamma`, that entry contributes a zero margin, so the loss is non-negative and vanishes precisely when the predicted costs already make :math:`\mathbf{w}^*(\mathbf{c})` the minimizer over :math:`\Gamma`.
 
-.. autoclass:: pyepo.func.contrastiveMAP
+.. autoclass:: pyepo.func.CMAP
     :noindex:
     :members:
 
@@ -504,7 +504,7 @@ Pointwise LTR
 
 Pointwise loss computes ranking scores for individual solutions.
 
-.. autoclass:: pyepo.func.pointwiseLTR
+.. autoclass:: pyepo.func.ptLTR
     :noindex:
     :members:
 
@@ -514,7 +514,7 @@ Pairwise LTR
 
 Pairwise loss learns the relative ordering between pairs of solutions.
 
-.. autoclass:: pyepo.func.pairwiseLTR
+.. autoclass:: pyepo.func.prLTR
     :noindex:
     :members:
 
@@ -524,7 +524,7 @@ Listwise LTR
 
 Listwise loss evaluates scores over the entire ranked list.
 
-.. autoclass:: pyepo.func.listwiseLTR
+.. autoclass:: pyepo.func.lsLTR
     :noindex:
     :members:
 

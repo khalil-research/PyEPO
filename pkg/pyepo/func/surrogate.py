@@ -233,3 +233,8 @@ class perturbationGradient(optModule):
             # loss
             loss = sign * (obj - obj_minus) / (self.sigma + _EPS)
         return loss
+
+
+# aliases
+smartPredictThenOptimizePlus = SPOPlus
+PG = perturbationGradient

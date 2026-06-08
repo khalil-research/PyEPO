@@ -43,7 +43,7 @@ class TestBackendPipeline:
         optmodel, _ds, loader = sp_pipeline
         _x, c, _w, _z = take_batch(loader)
         cp = (c * 1.2).clone().detach().requires_grad_(True)
-        out = F.perturbedOpt(optmodel, processes=1, n_samples=3)(cp)
+        out = F.DPO(optmodel, processes=1, n_samples=3)(cp)
         assert out.shape == cp.shape
         out.sum().backward()
         assert torch.isfinite(cp.grad).all()
@@ -52,7 +52,7 @@ class TestBackendPipeline:
         optmodel, _ds, loader = sp_pipeline
         _x, c, w, _z = take_batch(loader)
         cp = (c * 1.2).clone().detach().requires_grad_(True)
-        loss = F.perturbedFenchelYoung(optmodel, processes=1, n_samples=3)(cp, w)
+        loss = F.PFY(optmodel, processes=1, n_samples=3)(cp, w)
         assert torch.isfinite(loss).all()
         loss.backward()
         assert torch.isfinite(cp.grad).all()
