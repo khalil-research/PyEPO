@@ -44,6 +44,9 @@ All examples below share the same setup: a linear prediction model trained on sh
    predmodel = LinearRegression()
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
+   # a positive-output predictor, for the multiplicative perturbed variants below
+   positive_predmodel = nn.Sequential(nn.Linear(5, 40), nn.Softplus())
+
 Each recipe below is a self-contained training loop: pick the method you want and copy its block as-is.
 
 
@@ -92,13 +95,13 @@ Perturbed Methods
 Differentiable Perturbed Optimizer (DPO)
 ----------------------------------------
 
-``perturbedOpt`` is the additive Gaussian version. ``perturbedOptMul`` is the multiplicative version for sign-sensitive oracles; it requires a positive-output predictor (e.g., ``nn.Softplus()`` plus a small epsilon, ``positive_predmodel`` below) so that predicted costs keep their sign.
+``perturbedOpt`` is the additive Gaussian version. ``perturbedOptMul`` is the multiplicative version for sign-sensitive oracles; it requires a positive-output predictor (``positive_predmodel`` in Common Setup, a linear layer followed by ``nn.Softplus()``) so that predicted costs keep their sign.
 
 .. code-block:: python
 
    # additive
    ptb = pyepo.func.perturbedOpt(optmodel, n_samples=10, sigma=0.5, processes=2)
-   # multiplicative — swap predmodel for positive_predmodel below
+   # multiplicative: swap predmodel for positive_predmodel below
    # ptb = pyepo.func.perturbedOptMul(optmodel, n_samples=10, sigma=0.5, processes=2)
 
    criterion = nn.MSELoss()
@@ -123,7 +126,7 @@ The multiplicative variant ``perturbedFenchelYoungMul`` shares the sign conventi
 
    # additive
    pfy = pyepo.func.perturbedFenchelYoung(optmodel, n_samples=10, sigma=0.5, processes=2)
-   # multiplicative — swap predmodel for positive_predmodel below
+   # multiplicative: swap predmodel for positive_predmodel below
    # pfy = pyepo.func.perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=0.5, processes=2)
 
    num_epochs = 20
@@ -282,7 +285,7 @@ CaVE requires a dedicated dataset class that extracts binding-constraint normals
 
    from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
 
-   dataset = optDatasetConstrs(optmodel, x_train, c_train)
+   dataset = optDatasetConstrs(optmodel, x, c)
    dataloader = DataLoader(
        dataset, batch_size=32, shuffle=True, collate_fn=collate_tight_constraints,
    )

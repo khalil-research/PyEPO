@@ -21,7 +21,7 @@ Common parameters across all generators:
 
 * **deg** (:math:`deg`): polynomial degree of the mapping :math:`f(\mathbf{x}_i)`
 
-* **noise_width** (:math:`\bar{\epsilon}`): noise half-width (shortest path, knapsack, TSP; portfolio uses ``noise_level`` instead -- see below)
+* **noise_width** (:math:`\bar{\epsilon}`): noise half-width (shortest path, knapsack, TSP; portfolio uses ``noise_level`` instead; see below)
 
 * **seed**: random seed for reproducibility
 
@@ -207,7 +207,7 @@ The following example shows how to use ``optDataset`` with a PyTorch ``DataLoade
 
    # model for shortest path
    grid = (5,5) # grid size
-   model = pyepo.model.grb.shortestPathModel(grid)
+   model = pyepo.model.shortestPathModel(grid)
 
    # generate data
    num_data = 1000 # number of data
@@ -240,7 +240,7 @@ For a runnable walkthrough, see the `08 kNN Robust Losses <https://colab.researc
 
   # model for shortest path
   grid = (5,5) # grid size
-  model = pyepo.model.grb.shortestPathModel(grid)
+  model = pyepo.model.shortestPathModel(grid)
 
   # generate data
   num_data = 1000 # number of data
@@ -279,7 +279,7 @@ Per-instance constraint matrices have different row counts (different sets of co
   from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
 
   # model for TSP (Gurobi backend required)
-  model = pyepo.model.grb.tspDFJModel(num_nodes=10)
+  model = pyepo.model.tspModel(num_nodes=10, formulation="DFJ")
 
   # generate data
   x, c = pyepo.data.tsp.genData(num_data=1000, num_features=5, num_nodes=10, deg=4, seed=135)

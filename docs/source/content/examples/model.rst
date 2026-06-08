@@ -39,14 +39,16 @@ All backends share this interface, so you can switch with ``backend=``. Gurobi a
 Variables
 ---------
 
+A ``Variable`` takes a shape (an integer or a tuple), an optional ``vtype``, and bounds. A problem declares exactly one ``Parameter``, the predicted cost.
+
 .. code-block:: python
 
    x = dsl.Variable(5)                            # continuous (the default)
    x = dsl.Variable(5, vtype=EPO.BINARY)          # also INTEGER, CONTINUOUS, or a per-entry list
-   x = dsl.Variable((n, n))                       # multi-dimensional
+   x = dsl.Variable((3, 3))                       # multi-dimensional (a tuple shape)
    x = dsl.Variable(5, lb=0, ub=1)                # bounds, scalar or array
 
-   c = dsl.Parameter(5)                           # the predicted cost (exactly one per problem)
+   c = dsl.Parameter(5)                           # the predicted cost
 
 
 Objectives
@@ -61,6 +63,8 @@ Whether a coefficient is predicted or known is decided by its type: a ``Paramete
    dsl.Minimize(c @ x[:k] + d @ x[k:])            # predict part of one variable, fix the rest
    dsl.Minimize((d + c) @ x)                      # a known base d plus the predicted c
    dsl.Minimize(c @ x + x @ Q @ x)                # predicted linear plus a known quadratic
+
+A quadratic objective term needs a backend with QP support (Gurobi, COPT, or MPAX).
 
 
 Constraints

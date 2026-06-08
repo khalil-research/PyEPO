@@ -5,7 +5,7 @@ End-to-end predict-then-optimize training involves repeated solving of optimizat
 
 The algorithm is shown below.
 
-**Algorithm** — Gradient descent with inner approximation (numbering follows [#f1]_)
+**Algorithm**: Gradient descent with inner approximation (numbering follows [#f1]_)
 
 **Input:** :math:`A, b`; training data :math:`\mathcal{D} \equiv \{(x_i, c_i)\}_{i=1}^n`
 
@@ -29,6 +29,8 @@ The algorithm is shown below.
    13: & \quad \textbf{end for} \\
    14: & \textbf{end for} \\
    \end{array}
+
+In the algorithm, :math:`\omega` are the predictor weights, :math:`m(\omega, x) = \hat{c}` the predicted cost, :math:`t(\cdot)` an optional cost transform, :math:`v^*(c)` the optimum for cost :math:`c`, :math:`S` the solution pool, :math:`f(v, \tilde{c}) = \tilde{c}^\top v` the objective value, Eq. (1) the optimization problem :math:`\min_{v} \tilde{c}^\top v` over :math:`\{v : A v \le b\}`, and :math:`p_{\text{solve}}` the ``solve_ratio``.
 
 The solution pool is integrated into all ``pyepo.func`` modules.
 
