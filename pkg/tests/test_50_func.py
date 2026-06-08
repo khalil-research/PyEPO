@@ -28,10 +28,12 @@ from pyepo.func.utils import (
 )
 
 from .conftest import (
+    FD_TRUTH,
     LOSS_OPS,
     LOSS_REGISTRY,
     SOLUTION_OPS,
     call_op,
+    finite_diff_grad,
     requires_clarabel,
     requires_gurobi,
     take_batch,
@@ -41,8 +43,8 @@ from .conftest import (
 # 1a. Pure helpers
 # ============================================================
 
-class TestCacheInPass:
 
+class TestCacheInPass:
     def _mock_model(self, sense):
         m = MagicMock()
         m.modelSense = sense
@@ -77,21 +79,21 @@ class TestCacheInPass:
 
 
 class TestCheckSol:
-
     def test_correct_passes(self):
-        _check_sol(torch.tensor([[1.0, 2.0, 3.0]]),
-                   torch.tensor([[1.0, 0.0, 1.0]]),
-                   torch.tensor([4.0]))
+        _check_sol(
+            torch.tensor([[1.0, 2.0, 3.0]]), torch.tensor([[1.0, 0.0, 1.0]]), torch.tensor([4.0])
+        )
 
     def test_incorrect_raises(self):
         with pytest.raises(AssertionError):
-            _check_sol(torch.tensor([[1.0, 2.0, 3.0]]),
-                       torch.tensor([[1.0, 0.0, 1.0]]),
-                       torch.tensor([999.0]))
+            _check_sol(
+                torch.tensor([[1.0, 2.0, 3.0]]),
+                torch.tensor([[1.0, 0.0, 1.0]]),
+                torch.tensor([999.0]),
+            )
 
 
 class TestSumGammaDistribution:
-
     def test_sample_shape(self):
         dist = sumGammaDistribution(kappa=1.0, n_iterations=10, seed=42)
         assert dist.sample((5, 3)).shape == (5, 3)
@@ -112,7 +114,6 @@ class TestSumGammaDistribution:
 
 
 class TestSolutionPool:
-
     def test_init_pool(self):
         pool = _update_solution_pool(torch.tensor([[1.0, 0.0], [0.0, 1.0]]), None)
         assert pool.shape == (2, 2)
@@ -138,31 +139,36 @@ class TestSolutionPool:
 # 1b. optModule init validation
 # ============================================================
 
+
 @requires_gurobi
 class TestOptModuleInit:
-
     def _model(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         return shortestPathModel(grid=(3, 3))
 
     def test_invalid_model_type_raises(self):
         from pyepo.func.surrogate import SPOPlus
+
         with pytest.raises(TypeError):
             SPOPlus("not_a_model")
 
     def test_invalid_processes_raises(self):
         from pyepo.func.surrogate import SPOPlus
+
         with pytest.raises(ValueError):
             SPOPlus(self._model(), processes=-1)
 
     @pytest.mark.parametrize("ratio", [1.5, -0.1])
     def test_invalid_solve_ratio_raises(self, ratio):
         from pyepo.func.surrogate import SPOPlus
+
         with pytest.raises(ValueError):
             SPOPlus(self._model(), solve_ratio=ratio)
 
     def test_solve_ratio_lt1_requires_dataset(self):
         from pyepo.func.surrogate import SPOPlus
+
         with pytest.raises(TypeError):
             SPOPlus(self._model(), solve_ratio=0.5, dataset=None)
 
@@ -173,6 +179,7 @@ class TestOptModuleInit:
 # Losses are constructed from the shared conftest.LOSS_REGISTRY; here we only
 # assert the forward/backward contract. Solution-returning ops yield (batch,
 # vars); loss-returning ops yield a scalar and honour reduction = mean/sum/none.
+
 
 @requires_gurobi
 class TestSolutionLossContract:
@@ -230,6 +237,7 @@ class TestMaximizeSense:
 
     def test_spoplus_nonnegative(self, ks_data):
         from pyepo.func.surrogate import SPOPlus
+
         optmodel, _dataset, loader = ks_data
         _x, c, w, z = take_batch(loader)
         cp = (c * 1.2).clone().detach().requires_grad_(True)
@@ -240,6 +248,7 @@ class TestMaximizeSense:
 
     def test_perturbed_opt_runs(self, ks_data):
         from pyepo.func.perturbed import perturbedOpt
+
         optmodel, _dataset, loader = ks_data
         _x, c, _w, _z = take_batch(loader)
         cp = (c * 1.2).clone().detach().requires_grad_(True)
@@ -255,6 +264,7 @@ class TestSolveRatioCaching:
 
     def test_spoplus_with_caching_runs(self, sp_data):
         from pyepo.func.surrogate import SPOPlus
+
         optmodel, dataset, loader = sp_data
         _x, c, w, z = take_batch(loader)
         spo = SPOPlus(optmodel, processes=1, solve_ratio=0.5, dataset=dataset)
@@ -269,6 +279,7 @@ class TestSolveRatioCaching:
 # 3. Deep correctness gates
 # ============================================================
 
+
 @requires_gurobi
 class TestSPOPlusGradient:
     """SPO+ autograd subgradient against its closed form 2·(w_true - w_spo)/n."""
@@ -276,6 +287,7 @@ class TestSPOPlusGradient:
     def _setup(self, seed=0):
         from pyepo.func.surrogate import SPOPlus
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         rng = np.random.RandomState(seed)
         model = shortestPathModel(grid=(3, 3))
         n, d = 4, model.num_cost
@@ -287,7 +299,13 @@ class TestSPOPlusGradient:
             sol, obj = model.solve()
             w_true[i] = np.asarray(sol, dtype=np.float32)
             z_true[i, 0] = obj
-        return SPOPlus(model, processes=1), model, c_true, torch.from_numpy(w_true), torch.from_numpy(z_true)
+        return (
+            SPOPlus(model, processes=1),
+            model,
+            c_true,
+            torch.from_numpy(w_true),
+            torch.from_numpy(z_true),
+        )
 
     def test_subgradient_matches_closed_form(self):
         spo, model, c_true, w_true, z_true = self._setup(0)
@@ -317,29 +335,33 @@ def _fw_knapsack():
     """Knapsack shared by the Frank-Wolfe tests: weights [3,4,2,5], capacity 7,
     so the IP optimum picks items {0, 1}."""
     from pyepo.model.grb.knapsack import knapsackModel
+
     return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
 
 
 @requires_gurobi
 class TestRegularizedFrankWolfe:
-
     def test_lambd_must_be_positive(self):
         from pyepo.func.regularized import regularizedFrankWolfeOpt
+
         for bad in (0.0, -1.0):
             with pytest.raises(ValueError):
                 regularizedFrankWolfeOpt(_fw_knapsack(), lambd=bad)
 
     def test_compute_regularization_includes_lambd(self):
         from pyepo.func.regularized import regularizedFrankWolfeOpt
+
         m = regularizedFrankWolfeOpt(_fw_knapsack(), lambd=3.0, max_iter=5)
         # Omega(y) = (lambd/2)||y||^2 = 1.5 * 0.5 = 0.75
         y = torch.tensor([[0.5, 0.5, 0.0, 0.0]])
         assert torch.allclose(m.compute_regularization(y), torch.tensor([0.75]))
 
-    def test_converged_instances_are_skipped(self, monkeypatch):
-        # an instance whose FW gap is already below tol drops out of the batch
+    def test_all_instances_solved_each_step(self, monkeypatch):
+        # away-step FW solves every instance each step: its FW gap is non-monotone,
+        # so a per-instance skip would stall convergence -- no batch is sliced down
         import pyepo.func.regularized as regularized
         from pyepo.func.regularized import regularizedFrankWolfeOpt
+
         batch_sizes = []
 
         def fake_solve_or_cache(cp, module):
@@ -351,10 +373,11 @@ class TestRegularizedFrankWolfe:
         m = regularizedFrankWolfeOpt(_fw_knapsack(), max_iter=3, tol=1e-6)
         theta = torch.tensor([[0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0]])
         m._frankWolfe(theta)
-        assert batch_sizes == [2, 2, 1]
+        assert batch_sizes and all(bs == 2 for bs in batch_sizes)
 
     def test_extreme_theta_collapses_to_vertex(self):
         from pyepo.func.regularized import regularizedFrankWolfeOpt
+
         m = regularizedFrankWolfeOpt(_fw_knapsack(), max_iter=10, tol=1e-6)
         mu, _vertices, weights = m._frankWolfe(torch.tensor([[100.0, -100.0, -100.0, -100.0]]))
         assert mu.shape == (1, 4)
@@ -363,6 +386,7 @@ class TestRegularizedFrankWolfe:
 
     def test_mu_equals_weighted_sum_of_vertices(self):
         from pyepo.func.regularized import regularizedFrankWolfeOpt
+
         m = regularizedFrankWolfeOpt(_fw_knapsack(), max_iter=12, tol=1e-6)
         theta = torch.tensor([[1.0, 1.5, 2.0, 0.5], [2.0, 1.0, 1.0, 2.0]])
         mu, V, w = m._frankWolfe(theta)
@@ -370,6 +394,7 @@ class TestRegularizedFrankWolfe:
 
     def test_smaller_lambd_closer_to_vertex(self):
         from pyepo.func.regularized import regularizedFrankWolfeOpt
+
         opt = _fw_knapsack()
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0]])
         ip_sol = torch.tensor([[1.0, 1.0, 0.0, 0.0]])
@@ -380,6 +405,7 @@ class TestRegularizedFrankWolfe:
     @pytest.mark.parametrize("lambd", [0.5, 1.0, 5.0])
     def test_backward_matches_finite_difference(self, lambd):
         from pyepo.func.regularized import regularizedFrankWolfeOpt
+
         m = regularizedFrankWolfeOpt(_fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8)
         torch.manual_seed(0)
         cp = (torch.rand(1, 4) * 2 + 1.0).requires_grad_(True)
@@ -393,29 +419,103 @@ class TestRegularizedFrankWolfe:
             cp_p[0, j] += eps
             cp_m[0, j] -= eps
             fd[0, j] = ((target * m(cp_p)).sum() - (target * m(cp_m)).sum()) / (2 * eps)
-        np.testing.assert_allclose(analytic.numpy(), fd.numpy(), atol=5e-2, err_msg=f"lambd={lambd}")
+        np.testing.assert_allclose(
+            analytic.numpy(), fd.numpy(), atol=5e-2, err_msg=f"lambd={lambd}"
+        )
+
+
+@requires_gurobi
+class TestAwayStepFrankWolfe:
+    def _sp_module(self, max_iter=10000, tol=1e-7, lambd=1.0):
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        return regularizedFrankWolfeOpt(
+            shortestPathModel(grid=(5, 5)), lambd=lambd, max_iter=max_iter, tol=tol
+        )
+
+    def test_converges_and_active_set_exact(self):
+        import pyepo
+        from pyepo.func import regularized
+
+        m = self._sp_module()
+        _, c = pyepo.data.shortestpath.genData(5, 5, (5, 5), seed=42)
+        theta = (-1.0 / m.lambd) * torch.tensor(np.asarray(c, np.float64) * 1.3)
+        mu, V, W = m._frankWolfe(theta)
+        # mu is exactly the weighted active set and the weights form a simplex
+        recon = torch.einsum("bc,bcv->bv", W, V)
+        assert float((recon - mu).norm(dim=-1).max()) < 1e-10
+        assert torch.allclose(W.sum(-1), torch.ones(W.shape[0], dtype=W.dtype), atol=1e-9)
+        # converged far past vanilla's ~2e-3 stall (a fresh-LMO gap re-measure is
+        # tie-break-noisy at the 1e-7 level, so check well above tol)
+        v_fw, _ = regularized._solve_or_cache(-1.0 * (theta - mu), m)
+        gap = ((mu - theta) * (mu - v_fw.to(mu))).sum(-1)
+        assert float(gap.max()) < 1e-5
+
+    def test_gradient_matches_true_face(self):
+        import pyepo
+        from pyepo.func.regularized import regularizedFrankWolfeOpt
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        model = shortestPathModel(grid=(5, 5))
+        _, c = pyepo.data.shortestpath.genData(5, 5, (5, 5), seed=42)
+        pred = torch.tensor(np.asarray(c, np.float64) * 1.3)
+        target = torch.tensor(np.random.RandomState(3).randn(*pred.shape))
+
+        def grad_at(max_iter):
+            m = regularizedFrankWolfeOpt(model, lambd=1.0, max_iter=max_iter, tol=1e-9)
+            p = pred.clone().requires_grad_(True)
+            (m(p) * target).sum().backward()
+            return p.grad, m
+
+        g_ref, _ = grad_at(10000)
+        g, m = grad_at(2000)
+        _, _, w = m._frankWolfe(-1.0 * pred)
+        # gradient is stable to the converged reference (vanilla floors ~3% off)
+        assert float((g - g_ref).norm() / g_ref.norm()) < 1e-4
+        # the active set is the true support, not a bloated one
+        assert int((w > 0).sum(-1).max()) <= pred.shape[1] + 1
+
+    def test_no_overflow_and_early_exit(self):
+        import pyepo
+        from pyepo.func import regularized
+
+        m = self._sp_module(max_iter=10000, tol=1e-7)
+        _, c = pyepo.data.shortestpath.genData(8, 5, (5, 5), seed=7)
+        theta = (-1.0 / m.lambd) * torch.tensor(np.asarray(c, np.float64) * 1.3)
+        mu, V, W = m._frankWolfe(theta)
+        # active set never spilled past the bounded buffer
+        assert int((W > 0).sum(-1).max()) < V.shape[1]
+        # converged well within the cap (early-exit fired, did not run 10000 iters)
+        v_fw, _ = regularized._solve_or_cache(-1.0 * (theta - mu), m)
+        assert float(((mu - theta) * (mu - v_fw.to(mu))).sum(-1).max()) < 1e-5
 
 
 @requires_gurobi
 class TestRegularizedFrankWolfeFenchelYoung:
-
     def test_forward_matches_formula(self):
         from pyepo.func.regularized import regularizedFrankWolfeFenchelYoung
+
         lambd = 1.7
-        fy = regularizedFrankWolfeFenchelYoung(_fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="none")
+        fy = regularizedFrankWolfeFenchelYoung(
+            _fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="none"
+        )
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]])
         w = torch.tensor([[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]])
         loss = fy(cp, w)
         r_sol = fy._frankWolfe(cp / lambd)
-        omega_w = 0.5 * lambd * (w ** 2).sum(dim=-1)
-        omega_r = 0.5 * lambd * (r_sol ** 2).sum(dim=-1)
+        omega_w = 0.5 * lambd * (w**2).sum(dim=-1)
+        omega_r = 0.5 * lambd * (r_sol**2).sum(dim=-1)
         expected = omega_w - omega_r + torch.sum(cp * (r_sol - w), dim=1)
         assert torch.allclose(loss, expected, atol=1e-5)
 
     def test_backward_matches_subgradient(self):
         from pyepo.func.regularized import regularizedFrankWolfeFenchelYoung
+
         lambd = 1.0
-        fy = regularizedFrankWolfeFenchelYoung(_fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="mean")
+        fy = regularizedFrankWolfeFenchelYoung(
+            _fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="mean"
+        )
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]], requires_grad=True)
         w = torch.tensor([[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]])
         fy(cp, w).backward()
@@ -424,18 +524,223 @@ class TestRegularizedFrankWolfeFenchelYoung:
         assert torch.allclose(cp.grad, expected, atol=1e-5)
 
 
+# ------------------------------------------------------------
+# Independent ground-truth gates for the remaining losses
+# ------------------------------------------------------------
+# Autograd gradient checked against an independent reference, per loss kind:
+#   - value-differentiable losses -> finite difference of the loss value
+#   - estimator-gradient ops       -> a separate re-solve of the estimator
+
+
+class TestGradientTruthFD:
+    """Autograd gradient == finite difference of the loss value."""
+
+    @pytest.mark.parametrize("name", list(FD_TRUTH))
+    def test_grad_matches_finite_difference(self, name, sp_truth):
+        optmodel, dataset, loader = sp_truth
+        _kind, build, sig = LOSS_REGISTRY[name]
+        flags = FD_TRUTH[name]
+        _x, c, w, z = take_batch(loader)
+        mod = build(optmodel, dataset, "mean")
+        # freeze the pool
+        if "freeze_pool" in flags:
+            mod.solve_ratio = 0.0
+
+        def value(cp_np):
+            with torch.no_grad():
+                return float(call_op(mod, sig, torch.tensor(cp_np, dtype=torch.float32), c, w, z))
+
+        cp0 = (c * 1.2).numpy()
+        cp = torch.tensor(cp0, dtype=torch.float32, requires_grad=True)
+        call_op(mod, sig, cp, c, w, z).backward()
+        np.testing.assert_allclose(cp.grad.numpy(), finite_diff_grad(value, cp0), atol=3e-2)
+
+
+def _gaussian_noise(mod, cp):
+    """Additive Gaussian noise for a perturbed* op (seeded from mod.seed)."""
+    gen = torch.Generator()
+    gen.manual_seed(mod.seed)
+    return torch.randn(
+        (cp.shape[0], mod.n_samples, cp.shape[1]), dtype=torch.float32, generator=gen
+    )
+
+
+def _solve_3d_batch(optmodel, ptb_c):
+    """Solve perturbed 3D costs (batch, n_samples, vars) via the shared solver."""
+    from pyepo.func.utils import _solve_batch
+
+    b, n, d = ptb_c.shape
+    sols, _ = _solve_batch(ptb_c.reshape(-1, d), optmodel, 1, None)
+    return sols.reshape(b, n, d)
+
+
+class TestSolutionGradientTruth:
+    """Estimator solution-ops: autograd gradient == an independent re-solve of the estimator."""
+
+    def _setup(self, sp_truth, name):
+        optmodel, dataset, loader = sp_truth
+        _kind, build, _sig = LOSS_REGISTRY[name]
+        _x, c, _w, _z = take_batch(loader)
+        mod = build(optmodel, dataset, None)
+        cp = (c * 1.2).clone().detach()
+        torch.manual_seed(0)
+        target = torch.randn_like(cp)
+        return optmodel, mod, cp, target
+
+    def test_negative_identity(self, sp_truth):
+        _om, mod, cp, target = self._setup(sp_truth, "negativeIdentity")
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        # MINIMIZE: signed-identity Jacobian
+        assert torch.allclose(cpg.grad, -target, atol=1e-5)
+
+    def test_blackbox_opt(self, sp_truth):
+        from pyepo.func.utils import _solve_batch
+
+        optmodel, mod, cp, target = self._setup(sp_truth, "blackboxOpt")
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        # interpolation gradient (w*(cp + lambd*d) - w*(cp)) / lambd
+        sol_p, _ = _solve_batch(cp, optmodel, 1, None)
+        sol_q, _ = _solve_batch(cp + mod.lambd * target, optmodel, 1, None)
+        expected = (sol_q - sol_p) / mod.lambd
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+    def test_perturbed_opt(self, sp_truth):
+        from pyepo.utils import _EPS
+
+        optmodel, mod, cp, target = self._setup(sp_truth, "perturbedOpt")
+        n, sigma = mod.n_samples, mod.sigma
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        noises = _gaussian_noise(mod, cp)
+        ptb_sols = _solve_3d_batch(optmodel, cp.unsqueeze(1) + sigma * noises)
+        reward = torch.einsum("bnd,bd->bn", ptb_sols, target)
+        if mod.variance_reduction and n > 1:  # leave-one-out baseline
+            reward = (reward - reward.mean(dim=1, keepdim=True)) * (n / (n - 1))
+        expected = torch.einsum("bnd,bn->bd", noises, reward) / (n * sigma + _EPS)
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+    def test_perturbed_opt_mul(self, sp_truth):
+        from pyepo.utils import _EPS
+
+        optmodel, mod, cp, target = self._setup(sp_truth, "perturbedOptMul")
+        n, sigma = mod.n_samples, mod.sigma
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        noises = _gaussian_noise(mod, cp)
+        factor = torch.exp(sigma * noises - 0.5 * sigma**2)
+        ptb_sols = _solve_3d_batch(optmodel, cp.unsqueeze(1) * factor)
+        reward = torch.einsum("bnd,bd->bn", ptb_sols, target)
+        if mod.variance_reduction and n > 1:  # leave-one-out baseline
+            reward = (reward - reward.mean(dim=1, keepdim=True)) * (n / (n - 1))
+        denom = sigma * cp
+        denom_safe = torch.where(
+            denom.abs() < _EPS,
+            torch.where(denom >= 0, torch.full_like(denom, _EPS), torch.full_like(denom, -_EPS)),
+            denom,
+        )
+        expected = torch.einsum("bnd,bn->bd", noises, reward) / (n * denom_safe)
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+    def test_implicit_mle(self, sp_truth):
+        from pyepo.func.utils import sumGammaDistribution
+        from pyepo.utils import _EPS
+
+        optmodel, mod, cp, target = self._setup(sp_truth, "implicitMLE")
+        n, sigma, lambd = mod.n_samples, mod.sigma, mod.lambd
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        # reproduce Sum-of-Gamma noise (fresh distribution, same default seed)
+        noises = sumGammaDistribution(kappa=5).sample(
+            size=(cp.shape[0], n, cp.shape[1]), device=torch.device("cpu"), dtype=torch.float32
+        )
+        ptb_c = cp.unsqueeze(1) + sigma * noises
+        ptb_sols = _solve_3d_batch(optmodel, ptb_c)
+        ptb_sols_pos = _solve_3d_batch(optmodel, ptb_c + lambd * target.unsqueeze(1))
+        expected = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+    def test_adaptive_implicit_mle(self, sp_truth):
+        from pyepo.func.utils import sumGammaDistribution
+        from pyepo.utils import _EPS
+
+        optmodel, mod, cp, target = self._setup(sp_truth, "adaptiveImplicitMLE")
+        n, sigma = mod.n_samples, mod.sigma
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        noises = sumGammaDistribution(kappa=5).sample(
+            size=(cp.shape[0], n, cp.shape[1]), device=torch.device("cpu"), dtype=torch.float32
+        )
+        ptb_c = cp.unsqueeze(1) + sigma * noises
+        ptb_sols = _solve_3d_batch(optmodel, ptb_c)
+        # adaptive lambda (alpha = 1.0)
+        lambd = cp.norm() / target.norm()
+        ptb_sols_pos = _solve_3d_batch(optmodel, ptb_c + lambd * target.unsqueeze(1))
+        expected = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+
+class TestLossGradientTruth:
+    """Solve-in-forward losses: autograd gradient == an independent re-solve of the subgradient."""
+
+    def _setup(self, sp_truth, name):
+        optmodel, dataset, loader = sp_truth
+        _kind, build, _sig = LOSS_REGISTRY[name]
+        _x, c, w, _z = take_batch(loader)
+        mod = build(optmodel, dataset, "mean")
+        cp = (c * 1.2).clone().detach()
+        return optmodel, mod, cp, c, w
+
+    def test_perturbation_gradient(self, sp_truth):
+        from pyepo.func.utils import _solve_batch
+        from pyepo.utils import _EPS
+
+        optmodel, mod, cp, c, _w = self._setup(sp_truth, "perturbationGradient")
+        b = cp.shape[0]
+        cpg = cp.clone().requires_grad_(True)
+        mod(cpg, c).backward()
+        # backward differencing: (w*(cp) - w*(cp - sigma*c)) / sigma, mean -> /b
+        w_sol, _ = _solve_batch(cp, optmodel, 1, None)
+        wm_sol, _ = _solve_batch(cp - mod.sigma * c, optmodel, 1, None)
+        expected = (w_sol - wm_sol) / (mod.sigma + _EPS) / b  # sign = +1 (MINIMIZE)
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+    def test_perturbed_fenchel_young(self, sp_truth):
+        optmodel, mod, cp, _c, w = self._setup(sp_truth, "perturbedFenchelYoung")
+        b = cp.shape[0]
+        cpg = cp.clone().requires_grad_(True)
+        mod(cpg, w).backward()
+        noises = _gaussian_noise(mod, cp)
+        e_sol = _solve_3d_batch(optmodel, cp.unsqueeze(1) + mod.sigma * noises).mean(dim=1)
+        expected = (w - e_sol) / b  # MINIMIZE residual w - E[sol]
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+    def test_perturbed_fenchel_young_mul(self, sp_truth):
+        optmodel, mod, cp, _c, w = self._setup(sp_truth, "perturbedFenchelYoungMul")
+        b = cp.shape[0]
+        cpg = cp.clone().requires_grad_(True)
+        mod(cpg, w).backward()
+        noises = _gaussian_noise(mod, cp)
+        factor = torch.exp(mod.sigma * noises - 0.5 * mod.sigma**2)
+        e_sol = (_solve_3d_batch(optmodel, cp.unsqueeze(1) * factor) * factor).mean(dim=1)
+        expected = (w - e_sol) / b
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+
 # ============================================================
 # CaVE (cone-aligned cosine) — needs binding constraints + Clarabel
 # ============================================================
 
+
 @requires_gurobi
 @requires_clarabel
 class TestCaVE:
-
     @pytest.fixture
     def setup(self):
         from pyepo.func.cave import coneAlignedCosine
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         model = shortestPathModel(grid=(2, 3))  # 7 edges
         d = model.num_cost
         torch.manual_seed(0)
@@ -464,15 +769,40 @@ class TestCaVE:
         assert pred.grad.shape == pred.shape
         assert torch.isfinite(pred.grad).all()
 
+    def test_grad_matches_fixed_proj_fd(self, setup):
+        # finite difference of 1 - cos(sign*pred, proj) with proj held fixed
+        from torch.nn import functional as F
+
+        from pyepo.func.cave import _clarabel_project_batch
+
+        cave_cls, model, pred, ctrs = setup
+        cave = cave_cls(model, processes=1, reduction="mean")
+        sign = cave._sign
+        cp0 = pred.detach().numpy().astype(np.float32)
+        # autograd gradient
+        cp = torch.tensor(cp0, requires_grad=True)
+        cave(cp, ctrs).backward()
+        # reproduce the (fixed) projection at the un-perturbed pred
+        proj = _clarabel_project_batch(
+            sign * torch.tensor(cp0), ctrs.detach().cpu(), max_iter=cave.max_iter
+        )
+
+        def value(p_np):
+            s = sign * torch.tensor(p_np, dtype=torch.float32)
+            return float((1.0 - F.cosine_similarity(s, proj, dim=1)).mean())
+
+        np.testing.assert_allclose(cp.grad.numpy(), finite_diff_grad(value, cp0), atol=3e-2)
+
 
 # ============================================================
 # perturbed internals (pure tensor math, no solver)
 # ============================================================
 
-class TestPerturbedInternals:
 
+class TestPerturbedInternals:
     def test_variance_reduction_leave_one_out(self):
         from pyepo.func.perturbed import perturbedOpt
+
         ptb = perturbedOpt.__new__(perturbedOpt)
         ptb.variance_reduction = True
         reward = torch.tensor([[1.0, 2.0, 4.0], [3.0, 3.0, 9.0]])
@@ -482,6 +812,7 @@ class TestPerturbedInternals:
 
     def test_variance_reduction_single_sample_noop(self):
         from pyepo.func.perturbed import perturbedOpt
+
         ptb = perturbedOpt.__new__(perturbedOpt)
         ptb.variance_reduction = True
         reward = torch.tensor([[1.0], [3.0]])
@@ -489,10 +820,13 @@ class TestPerturbedInternals:
 
     def test_mul_uses_weighted_expected_solution(self):
         from pyepo.func.perturbed import perturbedFenchelYoungMul
+
         pfy = perturbedFenchelYoungMul.__new__(perturbedFenchelYoungMul)
         pfy.sigma = 0.5
         noises = torch.tensor([[[0.0, 1.0, -1.0], [0.5, -0.5, 0.25]]])
         ptb_sols = torch.tensor([[[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]]])
-        factor = torch.exp(pfy.sigma * noises - 0.5 * pfy.sigma ** 2)
+        factor = torch.exp(pfy.sigma * noises - 0.5 * pfy.sigma**2)
         expected = (ptb_sols * factor).mean(dim=1)
-        assert torch.allclose(pfy._calculate_expected_solution(None, None, ptb_sols, noises), expected)
+        assert torch.allclose(
+            pfy._calculate_expected_solution(None, None, ptb_sols, noises), expected
+        )

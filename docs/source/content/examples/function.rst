@@ -28,22 +28,24 @@ For finer choices, the right method depends on three questions.
 
 **1. What supervision do you have at training time?**
 
-* **True optimal solutions** :math:`\mathbf{w}^*` — SPO+, PFYL, RFYL, DPO+MSE, RFWO+MSE, I-MLE+L1, AI-MLE+L1, NCE, CMAP
-* **Just true costs** :math:`\mathbf{c}` — PG, LTR variants
-* **True optimal objective values** :math:`z^*` — DBB+L1, NID+L1 (objective-value loss)
-* **Binding constraints at the optimum** — CaVE (binary linear programs only)
+* **True optimal solutions** :math:`\mathbf{w}^*`: SPO+, PFYL, RFYL, DPO+MSE, RFWO+MSE, I-MLE+L1, AI-MLE+L1; NCE and CMAP also need a solution pool
+* **Just true costs** :math:`\mathbf{c}`: PG, LTR variants
+* **True optimal objective values** :math:`z^*`: DBB+L1, NID+L1 (objective-value loss)
+* **Binding constraints at the optimum**: CaVE (binary linear programs, Gurobi backend only)
+
+A combined name like ``DPO+MSE`` or ``NID+L1`` means a solution-returning module (DPO, NID) followed by a task loss (here MSE or L1) that you add on its output.
 
 **2. Should the module return a loss or a solution?**
 
-* **A loss** (use directly in ``.backward()``) — SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE
-* **A solution** (define your own task loss) — DPO, DBB, NID, RFWO, I-MLE, AI-MLE
+* **A loss** (use directly in ``.backward()``): SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE
+* **A solution** (define your own task loss): DPO, DBB, NID, RFWO, I-MLE, AI-MLE
 
 **3. Any special constraints?**
 
-* **Sign-sensitive oracle** (e.g., negative costs must stay negative) — use ``perturbedOptMul`` or ``perturbedFenchelYoungMul`` with a positive-output predictor.
-* **Large LP on GPU** — pair an ``optMpaxModel`` with SPO+ or PFYL.
-* **Cached negative pool** — NCE / CMAP.
-* **Ranking interpretation** — LTR variants.
+* **Sign-sensitive oracle** (e.g., negative costs must stay negative): use ``perturbedOptMul`` or ``perturbedFenchelYoungMul`` with a positive-output predictor.
+* **Large LP on GPU**: pair an ``optMpaxModel`` with SPO+ or PFYL.
+* **Cached negative pool**: NCE / CMAP.
+* **Ranking interpretation**: LTR variants.
 
 The table below summarizes inputs and return types.
 
@@ -90,7 +92,7 @@ The table below summarizes inputs and return types.
    * - ``coneAlignedCosine``
      - loss
      - tight binding-constraint normals at the true optimum (``optDatasetConstrs``)
-     - CaVE; binary linear programs only
+     - CaVE; binary linear programs, Gurobi backend only
    * - ``noiseContrastiveEstimation`` / ``contrastiveMAP``
      - loss
      - true optimal solutions and a solution pool
@@ -142,7 +144,7 @@ Perturbation Gradient (PG)
 
 PG [#f11]_ is a surrogate loss based on zeroth-order gradient approximation via Danskin's theorem. It uses finite differences along the true cost direction to estimate informative gradients through the optimization solver.
 
-By Danskin's theorem, regret can be written as the directional derivative of :math:`z^*(\hat{\mathbf{c}})` along :math:`\mathbf{c}` (up to a constant independent of :math:`\hat{\mathbf{c}}`). PG approximates this directional derivative with finite differences. Two variants are available — backward (``two_sides=False``) and central (``two_sides=True``):
+By Danskin's theorem, regret can be written as the directional derivative of :math:`z^*(\hat{\mathbf{c}})` along :math:`\mathbf{c}` (up to a constant independent of :math:`\hat{\mathbf{c}}`). PG approximates this directional derivative with finite differences. Two variants are available, backward (``two_sides=False``) and central (``two_sides=True``):
 
 .. math::
 
@@ -171,7 +173,7 @@ Perturbed methods estimate gradients by Monte Carlo averaging over random pertur
 Differentiable Perturbed Optimizer (DPO)
 ----------------------------------------
 
-DPO [#f5]_ uses Monte Carlo sampling to estimate solutions by optimizing randomly perturbed costs. Its custom backward pass provides a gradient estimator for end-to-end training. ``perturbedOpt`` is the additive Gaussian version; ``perturbedOptMul`` is the multiplicative version for sign-sensitive oracles [#f6]_. The multiplicative variant assumes predicted costs already have the intended nonzero sign — for nonnegative-cost problems, use a positive-output predictor such as ``nn.Softplus()`` plus a small epsilon.
+DPO [#f5]_ uses Monte Carlo sampling to estimate solutions by optimizing randomly perturbed costs. Its custom backward pass provides a gradient estimator for end-to-end training. ``perturbedOpt`` is the additive Gaussian version; ``perturbedOptMul`` is the multiplicative version for sign-sensitive oracles [#f6]_. The multiplicative variant assumes predicted costs already have the intended nonzero sign. For nonnegative-cost problems, use a positive-output predictor such as ``nn.Softplus()`` plus a small epsilon.
 
 DPO replaces the piecewise-constant solution map :math:`\hat{\mathbf{c}} \mapsto \mathbf{w}^*(\hat{\mathbf{c}})` with the expectation over a random perturbation,
 
@@ -179,7 +181,7 @@ DPO replaces the piecewise-constant solution map :math:`\hat{\mathbf{c}} \mapsto
 
    \mathbb{E}_{\boldsymbol{\xi}} \big[ \mathbf{w}^*(\hat{\mathbf{c}} + \sigma \boldsymbol{\xi}) \big] \approx \frac{1}{K} \sum_{\kappa=1}^{K} \mathbf{w}^*(\hat{\mathbf{c}} + \sigma \boldsymbol{\xi}_\kappa),
 
-where :math:`\boldsymbol{\xi} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})` and :math:`K` is ``n_samples``. The expectation varies smoothly with :math:`\hat{\mathbf{c}}` because small perturbations only shift the sampling distribution over active vertices of the feasible polytope — analogous to the smoothing role of SoftMax in classification.
+where :math:`\boldsymbol{\xi} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})` and :math:`K` is ``n_samples``. The expectation varies smoothly with :math:`\hat{\mathbf{c}}` because small perturbations only shift the sampling distribution over active vertices of the feasible polytope, analogous to the smoothing role of SoftMax in classification.
 
 The multiplicative variant ``perturbedOptMul`` perturbs each entry of :math:`\hat{\mathbf{c}}` as
 
@@ -269,7 +271,7 @@ where :math:`\mathbf{d}` is the upstream task gradient and :math:`\alpha_t > 0` 
 Regularized Methods
 ===================
 
-A pure linear optimization layer is not differentiable: the optimal solution :math:`\mathbf{w}^*(\hat{\mathbf{c}}) = \arg\min_{\mathbf{w} \in \mathcal{S}} \hat{\mathbf{c}}^\top \mathbf{w}` is piecewise constant in :math:`\hat{\mathbf{c}}` — it jumps between vertices of :math:`\mathcal{S}` and its derivative is zero almost everywhere. Regularized methods fix this by adding a strongly convex regularizer :math:`\Omega` to the linear objective, yielding a regularized solution
+A pure linear optimization layer is not differentiable: the optimal solution :math:`\mathbf{w}^*(\hat{\mathbf{c}}) = \arg\min_{\mathbf{w} \in \mathcal{S}} \hat{\mathbf{c}}^\top \mathbf{w}` is piecewise constant in :math:`\hat{\mathbf{c}}`, it jumps between vertices of :math:`\mathcal{S}` and its derivative is zero almost everywhere. Regularized methods fix this by adding a strongly convex regularizer :math:`\Omega` to the linear objective, yielding a regularized solution
 
 .. math::
 
@@ -277,13 +279,13 @@ A pure linear optimization layer is not differentiable: the optimal solution :ma
 
 which is unique, lies inside :math:`\mathrm{conv}(\mathcal{S})`, and varies continuously with :math:`\hat{\mathbf{c}}`. This deterministic smoothing is dual to the stochastic smoothing of the perturbed methods above: both replace the piecewise-constant solution map with a continuous surrogate, the former via a convex regularizer and the latter via Monte Carlo averaging over a noise distribution [#f6]_.
 
-PyEPO implements the L2 special case :math:`\Omega(\mathbf{w}) = \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2` and solves the regularized program with batched Frank-Wolfe iteration. Frank-Wolfe is the natural choice here: it accesses :math:`\mathrm{conv}(\mathcal{S})` only through the original LP/ILP solver of :math:`\mathcal{S}` (a *linear minimization oracle*), so no explicit polytope representation is needed — the same Gurobi/COPT/OR-Tools/MPAX backend used elsewhere in PyEPO supplies the LMO. ``lambd`` is the L2 strength :math:`\lambda`; ``max_iter`` caps Frank-Wolfe iterations and ``tol`` is the convergence tolerance.
+PyEPO implements the L2 special case :math:`\Omega(\mathbf{w}) = \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2` and solves the regularized program with batched Frank-Wolfe iteration. Frank-Wolfe is the natural choice here: it accesses :math:`\mathrm{conv}(\mathcal{S})` only through the original LP/ILP solver of :math:`\mathcal{S}` (a *linear minimization oracle*), so no explicit polytope representation is needed; the same Gurobi/COPT/OR-Tools/MPAX backend used elsewhere in PyEPO supplies the LMO. ``lambd`` is the L2 strength :math:`\lambda`; ``max_iter`` caps Frank-Wolfe iterations and ``tol`` is the convergence tolerance.
 
 
 L2 Regularized Frank-Wolfe (RFWO)
 ---------------------------------
 
-RFWO [#f6]_ exposes :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})` directly as a differentiable layer. Since it returns a (regularized) solution rather than a loss, the user defines a task loss on the output — most commonly an MSE against :math:`\mathbf{w}^*(\mathbf{c})`, matching the imitation setting in the original paper.
+RFWO [#f6]_ exposes :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})` directly as a differentiable layer. Since it returns a (regularized) solution rather than a loss, the user defines a task loss on the output, most commonly an MSE against :math:`\mathbf{w}^*(\mathbf{c})`, matching the imitation setting in the original paper.
 
 .. math::
 
@@ -297,7 +299,7 @@ RFWO [#f6]_ exposes :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})` directly 
 L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)
 ---------------------------------------------------------
 
-RFYL [#f6]_ pairs the RFWO layer with the **Fenchel-Young loss** [#f13]_ of the regularizer :math:`\Omega`, returning a scalar loss that compares the predicted cost :math:`\hat{\mathbf{c}}` to the true optimum :math:`\mathbf{w}^*(\mathbf{c})` directly — no external task loss needed.
+RFYL [#f6]_ pairs the RFWO layer with the **Fenchel-Young loss** [#f13]_ of the regularizer :math:`\Omega`, returning a scalar loss that compares the predicted cost :math:`\hat{\mathbf{c}}` to the true optimum :math:`\mathbf{w}^*(\mathbf{c})` directly, with no external task loss needed.
 
 For any convex regularizer :math:`\Omega: \mathrm{conv}(\mathcal{S}) \to \mathbb{R}` with conjugate :math:`\Omega^*(\boldsymbol{\theta}) = \sup_{\mathbf{w}} \boldsymbol{\theta}^\top \mathbf{w} - \Omega(\mathbf{w})`, the Fenchel-Young loss is
 
@@ -365,7 +367,7 @@ NID approximates the solver Jacobian by the (signed) identity, :math:`\partial \
 
    \frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx -\mathbf{d} \quad (\text{minimization}), \qquad \frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx \mathbf{d} \quad (\text{maximization}).
 
-Intuitively, for minimization this rule decreases :math:`\hat{\mathbf{c}}` along directions where :math:`\mathbf{w}^*(\hat{\mathbf{c}})` tends to increase and vice versa, driving the predicted decision toward :math:`\mathbf{w}^*(\mathbf{c})`. NID is the special case of DBB in which :math:`\lambda` is chosen so that the interpolated solution coincides with the negative-identity update — but it saves the extra solver call required by DBB.
+Intuitively, for minimization this rule decreases :math:`\hat{\mathbf{c}}` along directions where :math:`\mathbf{w}^*(\hat{\mathbf{c}})` tends to increase and vice versa, driving the predicted decision toward :math:`\mathbf{w}^*(\mathbf{c})`. NID is the special case of DBB in which :math:`\lambda` is chosen so that the interpolated solution coincides with the negative-identity update, but it saves the extra solver call required by DBB.
 
 .. autoclass:: pyepo.func.negativeIdentity
     :noindex:
@@ -381,7 +383,7 @@ Cone-aligned losses supervise the *predicted cost vector* directly by aligning i
 Cone-Aligned Vector Estimation (CaVE)
 -------------------------------------
 
-CaVE [#f12]_ is a surrogate loss for **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges, etc.). For each instance, it projects the sense-flipped predicted cost vector onto the polyhedral cone spanned by the binding-constraint normals at the true optimal vertex, then minimizes ``1 - cos(pred, proj)``. Because the supervision is the cone of binding-constraint normals at the optimum — not the optimal solution itself — CaVE side-steps the zero-gradient pathology of solver layers without requiring a Monte Carlo perturbation or a solution pool.
+CaVE [#f12]_ is a surrogate loss for **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges, etc.). For each instance, it projects the sense-flipped predicted cost vector onto the polyhedral cone spanned by the binding-constraint normals at the true optimal vertex, then minimizes ``1 - cos(pred, proj)``. Because the supervision is the cone of binding-constraint normals at the optimum, not the optimal solution itself, CaVE side-steps the zero-gradient pathology of solver layers without requiring a Monte Carlo perturbation or a solution pool.
 
 For a runnable walkthrough that compares CaVE against SPO+ on TSP, see the `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_ notebook.
 
@@ -393,7 +395,7 @@ Let :math:`K(\mathbf{w}^*(\mathbf{c}))` be the polyhedral cone spanned by the co
 
 When :math:`-\hat{\mathbf{c}}` already lies inside the cone, :math:`\mathbf{p} = -\hat{\mathbf{c}}` and the loss is zero; the further :math:`-\hat{\mathbf{c}}` strays outside the cone, the larger the loss.
 
-PyEPO uses Clarabel as the interior-point QP solver for the cone projection. The default ``max_iter=3`` is the paper's **CaVE+** preset — under-converging the QP on purpose keeps the projection interior to the cone and yields a richer gradient than the exact boundary projection.
+CaVE relies on two solvers at different stages: a Gurobi-backed ``optModel`` extracts the binding-constraint normals once when the dataset is built, and Clarabel (an interior-point QP solver bundled with PyEPO) projects the predicted cost onto that cone during training. The default ``max_iter=3`` is the paper's **CaVE+** preset: under-converging the QP on purpose keeps the projection interior to the cone and yields a richer gradient than the exact boundary projection.
 
 For larger problems, setting ``solve_ratio < 1`` enables the **CaVE Hybrid** preset: each batch goes through the QP projection with probability ``solve_ratio`` and through a cheap heuristic (a blend of the normalized predicted cost and the average binding-constraint normal, controlled by ``inner_ratio``) otherwise. This cuts the per-epoch QP cost without measurable regret loss in the paper's experiments.
 
@@ -458,7 +460,7 @@ Contrastive MAP (CMAP)
 
 CMAP [#f7]_ is a special case of NCE that uses only the single best negative sample. It is simpler and often equally effective.
 
-CMAP keeps only the most-violating member of the pool — the one with the smallest predicted-cost objective — yielding a max-margin contrast against the true optimum. For a minimization problem,
+CMAP keeps only the most-violating member of the pool, the one with the smallest predicted-cost objective, yielding a max-margin contrast against the true optimum. For a minimization problem,
 
 .. math::
 

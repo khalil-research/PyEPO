@@ -61,10 +61,11 @@ def regret(
             # predict and batch-solve all instances in one call
             with torch.no_grad():
                 cp = predmodel(x)
-            sols, _ = _solve_batch(cp, optmodel, processes=1, pool=None)
+            # full cost so the MPAX backend can batch-set the objective in one call
+            sols, _ = _solve_batch(optmodel._fullCost(cp), optmodel, processes=1, pool=None)
             # vectorized regret accumulation (one host sync per batch)
             sols_np = costToNumpy(sols)
-            c_np = costToNumpy(c)
+            c_np = costToNumpy(optmodel._fullCost(c))
             z_np = costToNumpy(z).reshape(-1)
             obj = np.einsum("bi,bi->b", sols_np, c_np)
             if optmodel.modelSense == EPO.MINIMIZE:
@@ -106,8 +107,8 @@ def calRegret(
     # MPAX backend returns a torch tensor; convert without coercing dtype
     if isinstance(sol, torch.Tensor):
         sol = sol.detach().cpu().numpy()
-    # obj with true cost
-    obj = np.dot(sol, true_cost)
+    # full objective of the predicted decision at the true cost
+    obj = np.dot(sol, optmodel._fullCost(np.asarray(true_cost, dtype=float)))
     # loss
     if optmodel.modelSense == EPO.MINIMIZE:
         loss = obj - true_obj

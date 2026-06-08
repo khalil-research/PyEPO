@@ -17,13 +17,25 @@ except PackageNotFoundError:
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 from pyepo import EPO, data, func, metric, model, twostage
-from pyepo.EPO import MAXIMIZE, MINIMIZE, ModelSense
+from pyepo.EPO import (
+    BINARY,
+    CONTINUOUS,
+    INTEGER,
+    MAXIMIZE,
+    MINIMIZE,
+    ModelSense,
+    VarType,
+)
 
 __all__ = [
+    "BINARY",
+    "CONTINUOUS",
     "EPO",
+    "INTEGER",
     "MAXIMIZE",
     "MINIMIZE",
     "ModelSense",
+    "VarType",
     "__version__",
     "data",
     "func",

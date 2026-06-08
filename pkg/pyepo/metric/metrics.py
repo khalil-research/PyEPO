@@ -46,8 +46,8 @@ def SPOError(
         # opt sol for pred cost
         optmodel.setObj(cp)
         sol, _ = optmodel.solve()
-        # obj with true cost
-        obj = np.dot(sol, c)
+        # full objective of the predicted decision at the true cost
+        obj = np.dot(sol, optmodel._fullCost(np.asarray(c, dtype=float)))
         # opt obj for true cost
         optmodel.setObj(c)
         _, optobj = optmodel.solve()

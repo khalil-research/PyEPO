@@ -14,12 +14,13 @@ from torch.autograd import Function
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import (
-    _solve_batch as _solve_batch_2d,
-)
-from pyepo.func.utils import (
+    _mask_pred,
     _torch_generator,
     _update_solution_pool,
     sumGammaDistribution,
+)
+from pyepo.func.utils import (
+    _solve_batch as _solve_batch_2d,
 )
 from pyepo.utils import _EPS
 
@@ -86,6 +87,8 @@ class perturbedOpt(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", perturbedOptFunc.apply(pred_cost, self))
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
@@ -137,6 +140,8 @@ class perturbedOptFunc(Function):
             dtype=cp.dtype,
             generator=gen,
         )
+        # keep known fixed costs unperturbed under partial prediction
+        noises = _mask_pred(noises, module.optmodel)
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
@@ -240,6 +245,8 @@ class perturbedFenchelYoung(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         loss = cast("torch.Tensor", perturbedFenchelYoungFunc.apply(pred_cost, true_sol, self))
         return self._reduce(loss)
 
@@ -294,6 +301,8 @@ class perturbedFenchelYoungFunc(Function):
             dtype=cp.dtype,
             generator=gen,
         )
+        # keep known fixed costs unperturbed under partial prediction
+        noises = _mask_pred(noises, module.optmodel)
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
@@ -301,10 +310,8 @@ class perturbedFenchelYoungFunc(Function):
         e_sol = module._calculate_expected_solution(cp, ptb_c, ptb_sols, noises)
         if module.optmodel.modelSense == EPO.MINIMIZE:
             sign, diff = -1.0, w - e_sol
-        elif module.optmodel.modelSense == EPO.MAXIMIZE:
-            sign, diff = 1.0, e_sol - w
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            sign, diff = 1.0, e_sol - w
         # Fenchel-Young loss: F(theta) - <theta, true_sol>
         f_theta = torch.einsum("bnd,bnd->bn", ptb_c, ptb_sols).mean(dim=1)
         target_obj = (cp * w).sum(dim=-1)
@@ -414,6 +421,8 @@ class implicitMLE(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", implicitMLEFunc.apply(pred_cost, self))
 
 
@@ -450,6 +459,8 @@ class implicitMLEFunc(Function):
             noises = module.distribution.sample(size=size)
         if isinstance(noises, np.ndarray):
             noises = torch.from_numpy(noises).to(device, dtype=cp.dtype)
+        # keep known fixed costs unperturbed under partial prediction
+        noises = _mask_pred(noises, module.optmodel)
         ptb_c = cp.unsqueeze(1) + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
@@ -544,6 +555,8 @@ class adaptiveImplicitMLE(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", adaptiveImplicitMLEFunc.apply(pred_cost, self))
 
 
@@ -663,9 +676,7 @@ def _cache_in_pass_3d(
     # best solution in pool
     if optmodel.modelSense == EPO.MINIMIZE:
         best_inds = torch.argmin(solpool_obj, dim=2)
-    elif optmodel.modelSense == EPO.MAXIMIZE:
-        best_inds = torch.argmax(solpool_obj, dim=2)
     else:
-        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+        best_inds = torch.argmax(solpool_obj, dim=2)
     ptb_sols = solpool[best_inds]
     return ptb_sols, solpool

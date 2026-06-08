@@ -4,7 +4,7 @@ Constants
 
 from __future__ import annotations
 
-from enum import IntEnum
+from enum import Enum, IntEnum
 
 
 class ModelSense(IntEnum):
@@ -14,9 +14,28 @@ class ModelSense(IntEnum):
     MAXIMIZE = -1
 
 
+class VarType(Enum):
+    """Decision-variable type."""
+
+    BINARY = "B"
+    INTEGER = "I"
+    CONTINUOUS = "C"
+
+
 # IntEnum is int, so `EPO.MINIMIZE == 1` holds
 MINIMIZE = ModelSense.MINIMIZE
 MAXIMIZE = ModelSense.MAXIMIZE
+BINARY = VarType.BINARY
+INTEGER = VarType.INTEGER
+CONTINUOUS = VarType.CONTINUOUS
 
 
-__all__ = ["MAXIMIZE", "MINIMIZE", "ModelSense"]
+__all__ = [
+    "BINARY",
+    "CONTINUOUS",
+    "INTEGER",
+    "MAXIMIZE",
+    "MINIMIZE",
+    "ModelSense",
+    "VarType",
+]

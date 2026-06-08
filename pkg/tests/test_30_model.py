@@ -9,10 +9,13 @@ via per-param marks rather than failing. Formulation-specific behaviour
 explicitly, plus cross-backend objective parity against Gurobi.
 """
 
+import importlib
+
 import numpy as np
 import pytest
 
 from pyepo import EPO
+from pyepo.model import predefined
 from pyepo.model.opt import optModel
 
 from .conftest import (
@@ -752,3 +755,92 @@ class TestMpaxQP:
         sol, obj = sp.solve()
         assert isinstance(obj, float)
         assert len(sol) == sp.num_cost
+
+
+# backend-dispatching factories: pyepo.model.<problem>(..., backend=)
+
+_FAC_W = np.array([[3, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])
+_FAC_CAP = [12, 10, 15]
+_FAC_SUBMOD = {"gurobi": "grb", "copt": "copt", "pyomo": "omo", "ortools": "ort", "mpax": "mpax"}
+
+_FAC_BACKENDS = [
+    pytest.param("gurobi", marks=requires_gurobi),
+    pytest.param("copt", marks=requires_copt),
+    pytest.param("ortools", marks=requires_ortools),
+    pytest.param("mpax", marks=requires_mpax),
+]
+
+
+def _fac_submodule(backend):
+    # the backend submodule, for isinstance checks
+    return importlib.import_module(f"pyepo.model.{_FAC_SUBMOD[backend]}")
+
+
+class TestFactory:
+    """The backend-dispatching factories build the right per-backend class."""
+
+    @requires_gurobi
+    def test_default_backend_is_gurobi(self):
+        sp = predefined.shortestPathModel((5, 5))
+        assert isinstance(sp, _fac_submodule("gurobi").shortestPathModel)
+        assert sp.num_cost == 40
+
+    @pytest.mark.parametrize("backend", _FAC_BACKENDS)
+    def test_shortestpath_dispatch(self, backend):
+        sp = predefined.shortestPathModel((5, 5), backend=backend)
+        assert isinstance(sp, _fac_submodule(backend).shortestPathModel)
+
+    @pytest.mark.parametrize("backend", _FAC_BACKENDS)
+    def test_knapsack_dispatch(self, backend):
+        kp = predefined.knapsackModel(_FAC_W, _FAC_CAP, backend=backend)
+        assert isinstance(kp, _fac_submodule(backend).knapsackModel)
+        assert kp.num_cost == 5
+
+    @requires_omo
+    def test_solver_kwarg_forwarded(self):
+        kp = predefined.knapsackModel(_FAC_W, _FAC_CAP, backend="pyomo", solver="gurobi")
+        assert isinstance(kp, _fac_submodule("pyomo").knapsackModel)
+
+    @requires_gurobi
+    def test_tsp_formulation_dispatch(self):
+        grb = _fac_submodule("gurobi")
+        assert isinstance(predefined.tspModel(8, formulation="DFJ"), grb.tspDFJModel)
+        assert isinstance(predefined.tspModel(8, formulation="GG"), grb.tspGGModel)
+        assert isinstance(predefined.tspModel(8, formulation="MTZ"), grb.tspMTZModel)
+
+    @requires_gurobi
+    def test_vrp_formulation_dispatch(self):
+        grb = _fac_submodule("gurobi")
+        demands, cap, k = [1, 2, 1, 2, 1], 5.0, 2
+        assert isinstance(predefined.vrpModel(6, demands, cap, k, formulation="RCI"), grb.vrpRCIModel)
+        assert isinstance(predefined.vrpModel(6, demands, cap, k, formulation="MTZ"), grb.vrpMTZModel)
+
+    @requires_gurobi
+    def test_portfolio_dispatch(self):
+        cov = np.cov(np.random.RandomState(0).randn(20, 10), rowvar=False)
+        assert isinstance(predefined.portfolioModel(10, cov), _fac_submodule("gurobi").portfolioModel)
+
+    @requires_gurobi
+    def test_dispatched_instance_solves(self):
+        sp = predefined.shortestPathModel((5, 5))
+        sp.setObj(np.random.RandomState(0).random(sp.num_cost))
+        sol, obj = sp.solve()
+        assert len(sol) == sp.num_cost
+        assert np.isfinite(obj)
+
+    def test_unknown_backend(self):
+        with pytest.raises(ValueError, match="unknown backend"):
+            predefined.shortestPathModel((5, 5), backend="nope")
+
+    def test_unknown_tsp_formulation(self):
+        with pytest.raises(ValueError, match="unknown TSP formulation"):
+            predefined.tspModel(8, formulation="XYZ")
+
+    def test_unknown_vrp_formulation(self):
+        with pytest.raises(ValueError, match="unknown VRP formulation"):
+            predefined.vrpModel(6, [1, 2, 1, 2, 1], 5.0, 2, formulation="XYZ")
+
+    @requires_ortools
+    def test_problem_unavailable_on_backend(self):
+        with pytest.raises(ValueError, match="not available"):
+            predefined.portfolioModel(10, np.eye(10), backend="ortools")

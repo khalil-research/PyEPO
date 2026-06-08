@@ -70,6 +70,9 @@ class SPOPlus(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
+        true_cost = self.optmodel._fullCost(true_cost)
         loss = cast(
             "torch.Tensor", SPOPlusFunc.apply(pred_cost, true_cost, true_sol, true_obj, self)
         )
@@ -115,10 +118,8 @@ class SPOPlusFunc(Function):
         # calculate loss
         if module.optmodel.modelSense == EPO.MINIMIZE:
             loss = -obj + 2 * torch.einsum("bi,bi->b", cp, w) - z.squeeze(dim=-1)
-        elif module.optmodel.modelSense == EPO.MAXIMIZE:
-            loss = obj - 2 * torch.einsum("bi,bi->b", cp, w) + z.squeeze(dim=-1)
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            loss = obj - 2 * torch.einsum("bi,bi->b", cp, w) + z.squeeze(dim=-1)
         # save solutions
         ctx.save_for_backward(true_sol, sol)
         # add other objects to ctx
@@ -134,10 +135,8 @@ class SPOPlusFunc(Function):
         optmodel = ctx.optmodel
         if optmodel.modelSense == EPO.MINIMIZE:
             grad = 2 * (w - wq)
-        elif optmodel.modelSense == EPO.MAXIMIZE:
-            grad = 2 * (wq - w)
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            grad = 2 * (wq - w)
         return grad_output.unsqueeze(1) * grad, None, None, None, None
 
 
@@ -188,6 +187,9 @@ class perturbationGradient(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
+        true_cost = self.optmodel._fullCost(true_cost)
         loss = self._finiteDifference(pred_cost, true_cost)
         return self._reduce(loss)
 
@@ -201,10 +203,8 @@ class perturbationGradient(optModule):
         # sense-flipped loss sign: MAX problems become minimization
         if self.optmodel.modelSense == EPO.MINIMIZE:
             sign = 1.0
-        elif self.optmodel.modelSense == EPO.MAXIMIZE:
-            sign = -1.0
         else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+            sign = -1.0
         b = cp.shape[0]
         # central differencing
         if self.two_sides:

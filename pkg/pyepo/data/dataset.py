@@ -353,7 +353,7 @@ class optDatasetConstrs(optDataset):
         for i, c in enumerate(tqdm(self.costs)):
             # fresh per-instance copy keeps the lazy-constraint buffer clean
             model = self.model.copy()
-            model.setObj(c)
+            model.setObj(model._fullCost(c))
             sol, obj = model.solve()
             # infeasibility check
             if model._model.Status != GRB.OPTIMAL:

@@ -101,12 +101,7 @@ class coneAlignedCosine(optModule):
         self.solve_ratio = float(solve_ratio)
         self.inner_ratio = float(inner_ratio)
         # sense-aware sign (constant once optmodel is fixed)
-        if optmodel.modelSense == EPO.MINIMIZE:
-            self._sign = -1.0
-        elif optmodel.modelSense == EPO.MAXIMIZE:
-            self._sign = 1.0
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+        self._sign = -1.0 if optmodel.modelSense == EPO.MINIMIZE else 1.0
 
     def forward(
         self,
