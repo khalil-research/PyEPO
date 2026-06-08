@@ -395,7 +395,7 @@ Let :math:`K(\mathbf{w}^*(\mathbf{c}))` be the polyhedral cone spanned by the co
 
 When :math:`-\hat{\mathbf{c}}` already lies inside the cone, :math:`\mathbf{p} = -\hat{\mathbf{c}}` and the loss is zero; the further :math:`-\hat{\mathbf{c}}` strays outside the cone, the larger the loss.
 
-PyEPO uses Clarabel as the interior-point QP solver for the cone projection. The default ``max_iter=3`` is the paper's **CaVE+** preset: under-converging the QP on purpose keeps the projection interior to the cone and yields a richer gradient than the exact boundary projection.
+CaVE relies on two solvers at different stages: a Gurobi-backed ``optModel`` extracts the binding-constraint normals once when the dataset is built, and Clarabel (an interior-point QP solver bundled with PyEPO) projects the predicted cost onto that cone during training. The default ``max_iter=3`` is the paper's **CaVE+** preset: under-converging the QP on purpose keeps the projection interior to the cone and yields a richer gradient than the exact boundary projection.
 
 For larger problems, setting ``solve_ratio < 1`` enables the **CaVE Hybrid** preset: each batch goes through the QP projection with probability ``solve_ratio`` and through a cheap heuristic (a blend of the normalized predicted cost and the average binding-constraint normal, controlled by ``inner_ratio``) otherwise. This cuts the per-epoch QP cost without measurable regret loss in the paper's experiments.
 

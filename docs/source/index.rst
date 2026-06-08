@@ -50,6 +50,8 @@ End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ los
    # decision quality (on the training set here; split off a test set for real evaluation)
    print("Training regret:", pyepo.metric.regret(predmodel, optmodel, dataloader))
 
+New to PyEPO? Start with :doc:`content/intro` for the framework, then the *Where to Start* guide in :doc:`content/tutorial`.
+
 
 .. toctree::
    :maxdepth: 2

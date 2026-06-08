@@ -34,14 +34,7 @@ All examples below share the same setup: a linear prediction model trained on sh
    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 
    # build linear prediction model
-   class LinearRegression(nn.Module):
-       def __init__(self):
-           super().__init__()
-           self.linear = nn.Linear(5, 40)
-       def forward(self, x):
-           return self.linear(x)
-
-   predmodel = LinearRegression()
+   predmodel = nn.Linear(5, 40)
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
    # a positive-output predictor, for the multiplicative perturbed variants below
