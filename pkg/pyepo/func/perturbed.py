@@ -14,13 +14,13 @@ from torch.autograd import Function
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import (
-    _solve_batch as _solve_batch_2d,
-)
-from pyepo.func.utils import (
     _mask_pred,
     _torch_generator,
     _update_solution_pool,
     sumGammaDistribution,
+)
+from pyepo.func.utils import (
+    _solve_batch as _solve_batch_2d,
 )
 from pyepo.utils import _EPS
 
