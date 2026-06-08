@@ -20,6 +20,100 @@ if TYPE_CHECKING:
     from pyepo.model.opt import optModel
 
 
+@torch.no_grad()
+def _away_step_frank_wolfe(
+    module: optModule,
+    theta: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """
+    Batched away-step Frank-Wolfe for argmin_mu 1/2 ||mu - theta||^2 over conv(V).
+
+    Each step also considers the away direction from the worst active vertex and
+    drops it when its weight reaches zero, so the iterate reaches the optimal face
+    and the returned active set is its true support.
+
+    Returns:
+        tuple: final iterate mu (batch, vars), active vertices (batch, width, vars),
+        and their weights (batch, width)
+    """
+    batch, num_vars = theta.shape
+    device, dtype = theta.device, theta.dtype
+    # sense sign: flip so optmodel.solve runs as argmax
+    if module.optmodel.modelSense == EPO.MINIMIZE:
+        sense_sign = -1.0
+    else:
+        sense_sign = 1.0
+    # bounded active-set buffer (support <= num_vars + 1 by Caratheodory)
+    width = 2 * num_vars + 2
+    vertices = torch.zeros((batch, width, num_vars), device=device, dtype=dtype)
+    weights = torch.zeros((batch, width), device=device, dtype=dtype)
+    vertex_norms = torch.zeros((batch, width), device=device, dtype=dtype)
+    # initial vertex
+    v0, _ = _solve_or_cache(sense_sign * theta, module)
+    v0 = v0.to(device=device, dtype=dtype)
+    vertices[:, 0] = v0
+    weights[:, 0] = 1.0
+    vertex_norms[:, 0] = (v0 * v0).sum(dim=-1)
+    mu = v0.clone()
+    batch_idx = torch.arange(batch, device=device)
+    for _ in range(module.max_iter):
+        grad = mu - theta
+        # Frank-Wolfe vertex and gap, solved for every instance each step
+        v, _ = _solve_or_cache(sense_sign * (theta - mu), module)
+        v = v.to(device=device, dtype=dtype)
+        gap_fw = (grad * (mu - v)).sum(dim=-1)
+        # away vertex: active atom maximizing <grad, .>
+        scores = torch.einsum("bwv,bv->bw", vertices, grad).masked_fill(weights <= 0, float("-inf"))
+        away_idx = scores.argmax(dim=-1)
+        v_away = vertices[batch_idx, away_idx]
+        alpha_away = weights[batch_idx, away_idx]
+        gap_away = (grad * (v_away - mu)).sum(dim=-1)
+        # zero the step on converged instances per iteration (recoverable, not frozen)
+        unconverged = gap_fw >= module.tol
+        if not bool(unconverged.any()):
+            break
+        active = unconverged.to(dtype)
+        # choose Frank-Wolfe vs away direction per instance
+        use_fw = gap_fw >= gap_away
+        direction = torch.where(use_fw.unsqueeze(-1), v - mu, mu - v_away)
+        gap = torch.where(use_fw, gap_fw, gap_away)
+        gamma_max = torch.where(
+            use_fw, torch.ones_like(alpha_away), alpha_away / (1.0 - alpha_away).clamp(min=1e-12)
+        )
+        # exact line search for the quadratic, clamped to the step cap
+        denom = (direction * direction).sum(dim=-1).clamp(min=1e-12)
+        gamma = torch.minimum((gap / denom).clamp(min=0.0), gamma_max) * active
+        mu = mu + gamma.unsqueeze(-1) * direction
+        # shrink weights: Frank-Wolfe *(1 - gamma), away *(1 + gamma)
+        weights = weights * torch.where(use_fw, 1.0 - gamma, 1.0 + gamma).unsqueeze(-1)
+        gamma_fw = gamma * use_fw
+        gamma_away = gamma * (~use_fw)
+        # Frank-Wolfe add: dedup against active atoms, else fill a free slot
+        v_norm_sq = (v * v).sum(dim=-1)
+        inner = torch.einsum("bwv,bv->bw", vertices, v)
+        dist_sq = vertex_norms - 2 * inner + v_norm_sq.unsqueeze(-1)
+        match = (dist_sq < 1e-6) & (weights > 0)
+        has_match = match.any(dim=-1)
+        match_idx = match.to(dtype).argmax(dim=-1)
+        free_idx = (weights <= 1e-12).to(dtype).argmax(dim=-1)
+        add_new = (~has_match) & use_fw
+        weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma_fw * (
+            has_match & use_fw
+        ).to(dtype)
+        vertices[batch_idx, free_idx] = torch.where(
+            add_new.unsqueeze(-1), v, vertices[batch_idx, free_idx]
+        )
+        vertex_norms[batch_idx, free_idx] = torch.where(
+            add_new, v_norm_sq, vertex_norms[batch_idx, free_idx]
+        )
+        weights[batch_idx, free_idx] = torch.where(add_new, gamma_fw, weights[batch_idx, free_idx])
+        # away subtract, then clear FP residue so dropped atoms leave the active set
+        weights[batch_idx, away_idx] = weights[batch_idx, away_idx] - gamma_away
+        weights = weights.clamp(min=0.0)
+        weights = torch.where(weights < 1e-12, torch.zeros_like(weights), weights)
+    return mu, vertices, weights
+
+
 class regularizedFrankWolfeOpt(optModule):
     """
     L2-Regularized Frank-Wolfe Optimizer (RFWO) -- differentiable smoothed solver.
@@ -46,7 +140,7 @@ class regularizedFrankWolfeOpt(optModule):
         self,
         optmodel: optModel,
         lambd: float = 1.0,
-        max_iter: int = 1000,
+        max_iter: int = 10000,
         tol: float = 1e-6,
         processes: int = 1,
         solve_ratio: float = 1.0,
@@ -92,72 +186,9 @@ class regularizedFrankWolfeOpt(optModule):
         theta: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
-        Batched Frank-Wolfe for argmin_mu 1/2 ||mu - theta||^2 over conv(V).
-
-        All batch instances iterate in lockstep so each step is a single batched
-        LMO call. Converged instances (gap < tol) get gamma = 0 for the remaining
-        iterations. The active-set buffer has fixed shape (max_iter + 1, batch, vars).
+        Away-step Frank-Wolfe over conv(V); returns mu and its active set.
         """
-        # device, dtype, sizes
-        batch, num_vars = theta.shape
-        device, dtype = theta.device, theta.dtype
-        # sense sign: flip so optmodel.solve runs as argmax
-        if self.optmodel.modelSense == EPO.MINIMIZE:
-            sense_sign = -1.0
-        else:
-            sense_sign = 1.0
-        # initial vertex
-        v0, _ = _solve_or_cache(sense_sign * theta, self)
-        v0 = v0.to(device=device, dtype=dtype)
-        # active-set buffer
-        vertices = torch.zeros((batch, self.max_iter + 1, num_vars), device=device, dtype=dtype)
-        weights = torch.zeros((batch, self.max_iter + 1), device=device, dtype=dtype)
-        vertex_norms = torch.zeros((batch, self.max_iter + 1), device=device, dtype=dtype)
-        vertices[:, 0] = v0
-        weights[:, 0] = 1.0
-        vertex_norms[:, 0] = (v0 * v0).sum(dim=-1)
-        mu = v0.clone()
-        # Frank-Wolfe iterations
-        alive = torch.ones(batch, device=device, dtype=torch.bool)
-        # loop buffers
-        v = torch.zeros_like(mu)
-        gap = torch.zeros(batch, device=device, dtype=dtype)
-        batch_idx = torch.arange(batch, device=device)
-        for k in range(self.max_iter):
-            # Frank-Wolfe direction
-            grad = mu - theta
-            v_alive, _ = _solve_or_cache(sense_sign * (theta[alive] - mu[alive]), self)
-            v[alive] = v_alive.to(device=device, dtype=dtype)
-            diff = mu - v
-            # per-instance Frank-Wolfe gap
-            gap[alive] = (grad[alive] * diff[alive]).sum(dim=-1)
-            active_mask = alive & (gap >= self.tol)
-            active = active_mask.to(dtype)
-            # early break when all instances converged
-            if not bool(active_mask.any()):
-                return mu, vertices[:, : k + 1], weights[:, : k + 1]
-            # exact line search for the quadratic
-            denom = (diff * diff).sum(dim=-1).clamp(min=1e-12)
-            gamma = (gap / denom).clamp(0.0, 1.0) * active
-            # in-place update
-            mu.sub_(gamma.unsqueeze(-1) * diff)
-            # vertex dedup via cached norms + inner products
-            v_norm_sq = (v * v).sum(dim=-1)
-            inner = torch.einsum("bnv,bv->bn", vertices[:, : k + 1], v)
-            dist_sq = vertex_norms[:, : k + 1] - 2 * inner + v_norm_sq.unsqueeze(-1)
-            match_mask = dist_sq < 1e-6
-            has_match = match_mask.any(dim=-1)
-            match_idx = match_mask.to(dtype).argmax(dim=-1)
-            # in-place weight shrink
-            weights.mul_(gamma.neg().add(1.0).unsqueeze(-1))
-            weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma * has_match.to(
-                dtype
-            )
-            vertices[:, k + 1] = v
-            vertex_norms[:, k + 1] = v_norm_sq
-            weights[:, k + 1] = gamma * (~has_match).to(dtype)
-            alive = active_mask
-        return mu, vertices, weights
+        return _away_step_frank_wolfe(self, theta)
 
 
 class regularizedFrankWolfeOptFunc(Function):
@@ -249,7 +280,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         self,
         optmodel: optModel,
         lambd: float = 1.0,
-        max_iter: int = 1000,
+        max_iter: int = 10000,
         tol: float = 1e-6,
         processes: int = 1,
         solve_ratio: float = 1.0,
@@ -294,46 +325,10 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         theta: torch.Tensor,
     ) -> torch.Tensor:
         """
-        Batched Frank-Wolfe for argmin_mu 1/2 ||mu - theta||^2 over conv(V).
-
-        Returns the final iterate mu only; the active set is not needed for
-        the Danskin subgradient.
+        Away-step Frank-Wolfe over conv(V); returns mu (the active set is not
+        needed for the Danskin subgradient).
         """
-        # device, dtype
-        device, dtype = theta.device, theta.dtype
-        # sense sign: flip so optmodel.solve runs as argmax
-        if self.optmodel.modelSense == EPO.MINIMIZE:
-            sense_sign = -1.0
-        else:
-            sense_sign = 1.0
-        # initial vertex
-        v0, _ = _solve_or_cache(sense_sign * theta, self)
-        mu = v0.to(device=device, dtype=dtype)
-        # Frank-Wolfe iterations
-        batch = theta.shape[0]
-        alive = torch.ones(batch, device=device, dtype=torch.bool)
-        # loop buffers
-        v = torch.zeros_like(mu)
-        gap = torch.zeros(batch, device=device, dtype=dtype)
-        for _ in range(self.max_iter):
-            # Frank-Wolfe direction
-            grad = mu - theta
-            v_alive, _ = _solve_or_cache(sense_sign * (theta[alive] - mu[alive]), self)
-            v[alive] = v_alive.to(device=device, dtype=dtype)
-            diff = mu - v
-            # per-instance Frank-Wolfe gap
-            gap[alive] = (grad[alive] * diff[alive]).sum(dim=-1)
-            active_mask = alive & (gap >= self.tol)
-            active = active_mask.to(dtype)
-            # early break when all instances converged
-            if not bool(active_mask.any()):
-                break
-            # exact line search for the quadratic
-            denom = (diff * diff).sum(dim=-1).clamp(min=1e-12)
-            gamma = (gap / denom).clamp(0.0, 1.0) * active
-            # in-place update
-            mu.sub_(gamma.unsqueeze(-1) * diff)
-            alive = active_mask
+        mu, _, _ = _away_step_frank_wolfe(self, theta)
         return mu
 
 
