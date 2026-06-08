@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Solution Pool" href="pool.html"><link rel="prev" title="Autograd Functions" href="function.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Training - PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</title>
+        <title>Training - PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</span>
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -415,7 +415,7 @@
 </section>
 <section id="perturbation-gradient-pg">
 <h3>Perturbation Gradient (PG)<a class="headerlink" href="#perturbation-gradient-pg" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbationGradient</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">PG</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -433,11 +433,11 @@
 <h2>Perturbed Methods<a class="headerlink" href="#perturbed-methods" title="Link to this heading">¶</a></h2>
 <section id="differentiable-perturbed-optimizer-dpo">
 <h3>Differentiable Perturbed Optimizer (DPO)<a class="headerlink" href="#differentiable-perturbed-optimizer-dpo" title="Link to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">perturbedOpt</span></code> is the additive Gaussian version. <code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code> is the multiplicative version for sign-sensitive oracles; it requires a positive-output predictor (<code class="docutils literal notranslate"><span class="pre">positive_predmodel</span></code> in Common Setup, a linear layer followed by <code class="docutils literal notranslate"><span class="pre">nn.Softplus()</span></code>) so that predicted costs keep their sign.</p>
+<p><code class="docutils literal notranslate"><span class="pre">DPO</span></code> is the additive Gaussian version. <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code> is the multiplicative version for sign-sensitive oracles; it requires a positive-output predictor (<code class="docutils literal notranslate"><span class="pre">positive_predmodel</span></code> in Common Setup, a linear layer followed by <code class="docutils literal notranslate"><span class="pre">nn.Softplus()</span></code>) so that predicted costs keep their sign.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># additive</span>
-<span class="n">ptb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbedOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ptb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">DPO</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="c1"># multiplicative: swap predmodel for positive_predmodel below</span>
-<span class="c1"># ptb = pyepo.func.perturbedOptMul(optmodel, n_samples=10, sigma=0.5, processes=2)</span>
+<span class="c1"># ptb = pyepo.func.DPOMul(optmodel, n_samples=10, sigma=0.5, processes=2)</span>
 
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
 
@@ -455,11 +455,11 @@
 </section>
 <section id="perturbed-fenchel-young-loss-pfyl">
 <h3>Perturbed Fenchel-Young Loss (PFYL)<a class="headerlink" href="#perturbed-fenchel-young-loss-pfyl" title="Link to this heading">¶</a></h3>
-<p>The multiplicative variant <code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoungMul</span></code> shares the sign convention of <code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code> and requires a positive-output predictor.</p>
+<p>The multiplicative variant <code class="docutils literal notranslate"><span class="pre">PFYMul</span></code> shares the sign convention of <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code> and requires a positive-output predictor.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># additive</span>
-<span class="n">pfy</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">perturbedFenchelYoung</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">pfy</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">PFY</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="c1"># multiplicative: swap predmodel for positive_predmodel below</span>
-<span class="c1"># pfy = pyepo.func.perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=0.5, processes=2)</span>
+<span class="c1"># pfy = pyepo.func.PFYMul(optmodel, n_samples=10, sigma=0.5, processes=2)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -474,7 +474,7 @@
 </section>
 <section id="implicit-maximum-likelihood-estimator-i-mle">
 <h3>Implicit Maximum Likelihood Estimator (I-MLE)<a class="headerlink" href="#implicit-maximum-likelihood-estimator-i-mle" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">imle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">implicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">imle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">IMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
 
@@ -492,7 +492,7 @@
 </section>
 <section id="adaptive-implicit-maximum-likelihood-estimator-ai-mle">
 <h3>Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)<a class="headerlink" href="#adaptive-implicit-maximum-likelihood-estimator-ai-mle" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aimle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">adaptiveImplicitMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aimle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">AIMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
 
@@ -514,7 +514,7 @@
 <section id="l2-regularized-frank-wolfe-rfwo">
 <h3>L2 Regularized Frank-Wolfe (RFWO)<a class="headerlink" href="#l2-regularized-frank-wolfe-rfwo" title="Link to this heading">¶</a></h3>
 <p>RFWO returns a regularized solution; solution-level MSE against <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> matches the imitation setting in the paper.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfwo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">regularizedFrankWolfeOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfwo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">RFWO</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
 
@@ -532,7 +532,7 @@
 </section>
 <section id="l2-regularized-frank-wolfe-with-fenchel-young-loss-rfyl">
 <h3>L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)<a class="headerlink" href="#l2-regularized-frank-wolfe-with-fenchel-young-loss-rfyl" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfyl</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">regularizedFrankWolfeFenchelYoung</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfyl</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">RFY</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -551,7 +551,7 @@
 <p>Black-box methods return a predicted solution. An objective-value loss <span class="math notranslate nohighlight">\(|\langle \mathbf{c}, \hat{\mathbf{w}} \rangle - z^*|\)</span> is the standard pairing.</p>
 <section id="differentiable-black-box-optimizer-dbb">
 <h3>Differentiable Black-Box Optimizer (DBB)<a class="headerlink" href="#differentiable-black-box-optimizer-dbb" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dbb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">blackboxOpt</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dbb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">DBB</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
 
@@ -571,7 +571,7 @@
 <section id="negative-identity-backpropagation-nid">
 <h3>Negative Identity Backpropagation (NID)<a class="headerlink" href="#negative-identity-backpropagation-nid" title="Link to this heading">¶</a></h3>
 <p>NID is hyperparameter-free and uses the same training loop as DBB.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nid</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">negativeIdentity</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nid</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">NID</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
 
@@ -601,7 +601,7 @@
     <span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_tight_constraints</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">cave</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">coneAlignedCosine</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">cave</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">CaVE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -620,7 +620,7 @@
 <p>Contrastive methods train against a cached pool of solutions. <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls how often new instances are solved exactly during training, and <code class="docutils literal notranslate"><span class="pre">dataset</span></code> seeds the pool with optimal solutions. See <a class="reference internal" href="pool.html"><span class="doc">Solution Pool</span></a> for details on the solution-pool mechanism.</p>
 <section id="noise-contrastive-estimation-nce">
 <h3>Noise Contrastive Estimation (NCE)<a class="headerlink" href="#noise-contrastive-estimation-nce" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nce</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">noiseContrastiveEstimation</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nce</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">NCE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -635,7 +635,7 @@
 </section>
 <section id="contrastive-map-cmap">
 <h3>Contrastive MAP (CMAP)<a class="headerlink" href="#contrastive-map-cmap" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">contrastiveMAP</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">CMAP</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -654,7 +654,7 @@
 <p>LTR variants share the same pool configuration as the contrastive methods (<code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code>, <code class="docutils literal notranslate"><span class="pre">dataset</span></code>). Pick one based on how it scores the ranking.</p>
 <section id="pointwise-ltr">
 <h3>Pointwise LTR<a class="headerlink" href="#pointwise-ltr" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">pointwiseLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">ptLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -669,7 +669,7 @@
 </section>
 <section id="pairwise-ltr">
 <h3>Pairwise LTR<a class="headerlink" href="#pairwise-ltr" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">pairwiseLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">prLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -684,7 +684,7 @@
 </section>
 <section id="listwise-ltr">
 <h3>Listwise LTR<a class="headerlink" href="#listwise-ltr" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">listwiseLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">lsLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
@@ -805,7 +805,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=f0042b85"></script>
+</div><script src="../../_static/documentation_options.js?v=b47a612a"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

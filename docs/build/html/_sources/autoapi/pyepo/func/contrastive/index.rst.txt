@@ -9,6 +9,15 @@ pyepo.func.contrastive
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.contrastive.NCE
+   pyepo.func.contrastive.CMAP
+
+
 Classes
 -------
 
@@ -71,4 +80,8 @@ Module Contents
       Forward pass
 
 
+
+.. py:data:: NCE
+
+.. py:data:: CMAP
 

@@ -9,6 +9,15 @@ pyepo.func.blackbox
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.blackbox.DBB
+   pyepo.func.blackbox.NID
+
+
 Classes
 -------
 
@@ -143,4 +152,8 @@ Module Contents
       Backward pass for NID
 
 
+
+.. py:data:: DBB
+
+.. py:data:: NID
 

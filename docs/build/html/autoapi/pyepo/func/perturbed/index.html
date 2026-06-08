@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html"><link rel="next" title="pyepo.func.rank" href="../rank/index.html"><link rel="prev" title="pyepo.func.contrastive" href="../contrastive/index.html">
 
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>pyepo.func.perturbed - PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</title>
+        <title>pyepo.func.perturbed - PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</div></a>
+      <a href="../../../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</span>
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -362,6 +362,33 @@
           <section id="module-pyepo.func.perturbed">
 <span id="pyepo-func-perturbed"></span><h1>pyepo.func.perturbed<a class="headerlink" href="#module-pyepo.func.perturbed" title="Link to this heading">¶</a></h1>
 <p>Perturbed optimization function</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbed.DPO" title="pyepo.func.perturbed.DPO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DPO</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbed.DPOMul" title="pyepo.func.perturbed.DPOMul"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DPOMul</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbed.PFY" title="pyepo.func.perturbed.PFY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PFY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbed.PFYMul" title="pyepo.func.perturbed.PFYMul"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PFYMul</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbed.IMLE" title="pyepo.func.perturbed.IMLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IMLE</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbed.AIMLE" title="pyepo.func.perturbed.AIMLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AIMLE</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -377,7 +404,7 @@
 <td><p>Multiplicative-perturbation variant of <code class="docutils literal notranslate"><span class="pre">perturbedOpt</span></code> for sign-sensitive oracles.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.perturbed.perturbedFenchelYoung" title="pyepo.func.perturbed.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p></td>
-<td><p>Perturbed Fenchel-Young loss (PFYL) -- additive-Gaussian variant.</p></td>
+<td><p>Perturbed Fenchel-Young loss (PFY) -- additive-Gaussian variant.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.perturbed.perturbedFenchelYoungFunc" title="pyepo.func.perturbed.perturbedFenchelYoungFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoungFunc</span></code></a></p></td>
 <td><p>An autograd function for Fenchel-Young loss using perturbation techniques.</p></td>
@@ -500,7 +527,7 @@ layer (e.g. <code class="docutils literal notranslate"><span class="pre">nn.Soft
 <dt class="sig sig-object py" id="pyepo.func.perturbed.perturbedFenchelYoung">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">135</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.Reduction" title="pyepo.func.abcmodule.Reduction"><span class="pre">pyepo.func.abcmodule.Reduction</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../data/dataset/index.html#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><span class="pre">pyepo.data.dataset.optDataset</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.perturbed.perturbedFenchelYoung" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.abcmodule.optModule" title="pyepo.func.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.abcmodule.optModule</span></code></a></p>
-<p>Perturbed Fenchel-Young loss (PFYL) – additive-Gaussian variant.</p>
+<p>Perturbed Fenchel-Young loss (PFY) – additive-Gaussian variant.</p>
 <p>Pairs the same Monte-Carlo expected perturbed solution as <code class="docutils literal notranslate"><span class="pre">perturbedOpt</span></code>
 with the Fenchel-Young loss against the true optimum
 <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span>, returning a scalar loss directly –
@@ -734,6 +761,36 @@ backward path is identical to <code class="docutils literal notranslate"><span c
 
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.DPO">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">DPO</span></span><a class="headerlink" href="#pyepo.func.perturbed.DPO" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.DPOMul">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">DPOMul</span></span><a class="headerlink" href="#pyepo.func.perturbed.DPOMul" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.PFY">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">PFY</span></span><a class="headerlink" href="#pyepo.func.perturbed.PFY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.PFYMul">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">PFYMul</span></span><a class="headerlink" href="#pyepo.func.perturbed.PFYMul" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.IMLE">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">IMLE</span></span><a class="headerlink" href="#pyepo.func.perturbed.IMLE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.func.perturbed.AIMLE">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.perturbed.</span></span><span class="sig-name descname"><span class="pre">AIMLE</span></span><a class="headerlink" href="#pyepo.func.perturbed.AIMLE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 </section>
 
@@ -793,6 +850,7 @@ backward path is identical to <code class="docutils literal notranslate"><span c
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">pyepo.func.perturbed</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#pyepo.func.perturbed.perturbedOpt"><code class="docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a><ul>
@@ -851,6 +909,12 @@ backward path is identical to <code class="docutils literal notranslate"><span c
 <li><a class="reference internal" href="#pyepo.func.perturbed.adaptiveImplicitMLEFunc.backward"><code class="docutils literal notranslate"><span class="pre">adaptiveImplicitMLEFunc.backward()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#pyepo.func.perturbed.DPO"><code class="docutils literal notranslate"><span class="pre">DPO</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.perturbed.DPOMul"><code class="docutils literal notranslate"><span class="pre">DPOMul</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.perturbed.PFY"><code class="docutils literal notranslate"><span class="pre">PFY</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.perturbed.PFYMul"><code class="docutils literal notranslate"><span class="pre">PFYMul</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.perturbed.IMLE"><code class="docutils literal notranslate"><span class="pre">IMLE</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.perturbed.AIMLE"><code class="docutils literal notranslate"><span class="pre">AIMLE</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -864,7 +928,7 @@ backward path is identical to <code class="docutils literal notranslate"><span c
       
     </aside>
   </div>
-</div><script src="../../../../_static/documentation_options.js?v=f0042b85"></script>
+</div><script src="../../../../_static/documentation_options.js?v=b47a612a"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>

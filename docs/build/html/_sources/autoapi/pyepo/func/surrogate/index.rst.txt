@@ -9,6 +9,15 @@ pyepo.func.surrogate
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.surrogate.smartPredictThenOptimizePlus
+   pyepo.func.surrogate.PG
+
+
 Classes
 -------
 
@@ -120,4 +129,8 @@ Module Contents
       Forward pass
 
 
+
+.. py:data:: smartPredictThenOptimizePlus
+
+.. py:data:: PG
 

@@ -9,6 +9,15 @@ pyepo.func.regularized
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.regularized.RFWO
+   pyepo.func.regularized.RFY
+
+
 Classes
 -------
 
@@ -108,7 +117,7 @@ Module Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   L2-Regularized Frank-Wolfe with Fenchel-Young loss (RFYL).
+   L2-Regularized Frank-Wolfe with Fenchel-Young loss (RFY).
 
    Pairs the RFWO regularized solver with the Fenchel-Young loss of the L2
    regularizer, returning a convex scalar loss that compares the predicted
@@ -175,4 +184,8 @@ Module Contents
       Backward pass for regularized Frank-Wolfe with Fenchel-Young loss
 
 
+
+.. py:data:: RFWO
+
+.. py:data:: RFY
 

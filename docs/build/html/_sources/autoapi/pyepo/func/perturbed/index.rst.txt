@@ -9,6 +9,19 @@ pyepo.func.perturbed
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.perturbed.DPO
+   pyepo.func.perturbed.DPOMul
+   pyepo.func.perturbed.PFY
+   pyepo.func.perturbed.PFYMul
+   pyepo.func.perturbed.IMLE
+   pyepo.func.perturbed.AIMLE
+
+
 Classes
 -------
 
@@ -131,7 +144,7 @@ Module Contents
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
 
-   Perturbed Fenchel-Young loss (PFYL) -- additive-Gaussian variant.
+   Perturbed Fenchel-Young loss (PFY) -- additive-Gaussian variant.
 
    Pairs the same Monte-Carlo expected perturbed solution as ``perturbedOpt``
    with the Fenchel-Young loss against the true optimum
@@ -373,4 +386,16 @@ Module Contents
       Backward pass for IMLE
 
 
+
+.. py:data:: DPO
+
+.. py:data:: DPOMul
+
+.. py:data:: PFY
+
+.. py:data:: PFYMul
+
+.. py:data:: IMLE
+
+.. py:data:: AIMLE
 

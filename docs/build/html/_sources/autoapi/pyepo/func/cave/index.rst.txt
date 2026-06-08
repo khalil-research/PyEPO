@@ -9,6 +9,14 @@ pyepo.func.cave
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.cave.CaVE
+
+
 Classes
 -------
 
@@ -76,4 +84,6 @@ Module Contents
       Forward pass
 
 
+
+.. py:data:: CaVE
 

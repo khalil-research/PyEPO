@@ -9,20 +9,30 @@ pyepo.func.rank
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.rank.lsLTR
+   pyepo.func.rank.prLTR
+   pyepo.func.rank.ptLTR
+
+
 Classes
 -------
 
 .. autoapisummary::
 
-   pyepo.func.rank.listwiseLTR
-   pyepo.func.rank.pairwiseLTR
-   pyepo.func.rank.pointwiseLTR
+   pyepo.func.rank.listwiseLearningToRank
+   pyepo.func.rank.pairwiseLearningToRank
+   pyepo.func.rank.pointwiseLearningToRank
 
 
 Module Contents
 ---------------
 
-.. py:class:: listwiseLTR(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+.. py:class:: listwiseLearningToRank(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -46,7 +56,7 @@ Module Contents
 
 
 
-.. py:class:: pairwiseLTR(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+.. py:class:: pairwiseLearningToRank(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -73,7 +83,7 @@ Module Contents
 
 
 
-.. py:class:: pointwiseLTR(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+.. py:class:: pointwiseLearningToRank(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -97,4 +107,10 @@ Module Contents
       Forward pass
 
 
+
+.. py:data:: lsLTR
+
+.. py:data:: prLTR
+
+.. py:data:: ptLTR
 
