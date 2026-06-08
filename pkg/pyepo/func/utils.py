@@ -211,6 +211,22 @@ def _check_sol(c: torch.Tensor, w: torch.Tensor, z: torch.Tensor) -> None:
         raise AssertionError("Some solutions do not match the objective value.")
 
 
+def _mask_pred(noises: torch.Tensor, optmodel: optModel) -> torch.Tensor:
+    """
+    Zero a cost perturbation outside the predicted positions.
+
+    No-op when every variable carries a predicted cost (``c_pred_index`` is
+    ``None``); under partial prediction the known fixed costs are left
+    unperturbed.
+    """
+    idx = optmodel.c_pred_index
+    if idx is None:
+        return noises
+    mask = noises.new_zeros(noises.shape[-1])
+    mask[torch.as_tensor(idx, dtype=torch.long, device=noises.device)] = 1.0
+    return noises * mask
+
+
 def _torch_generator(
     cache: dict[str, torch.Generator],
     device: torch.device | str,

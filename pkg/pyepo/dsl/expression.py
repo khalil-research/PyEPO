@@ -5,7 +5,7 @@ Symbolic expression nodes and algebra for the PyEPO DSL.
 Variables and Parameters compose through numpy-style operators into linear
 (``Affine``) and quadratic (``Quadratic``) nodes; comparisons produce a
 ``Constraint``; a single ``Parameter`` multiplies a Variable (or slice) into a
-``ParametricBilinear`` objective. Each linear node carries per-Variable
+``ParametricObjective`` objective. Each linear node carries per-Variable
 coefficient blocks (``dict[Variable, csr_matrix]``) plus a constant offset;
 ``Problem`` finalizes them into one global sparse matrix (see
 ``pyepo.dsl.problem``).
@@ -137,10 +137,10 @@ class Affine:
         blocks[v] = blocks[v] + b if v in blocks else sp.csr_matrix(b)
 
     def __add__(self, o):
-        # Affine + (Affine | Quadratic | ParametricBilinear | const)
+        # Affine + (Affine | Quadratic | ParametricObjective | const)
         if isinstance(o, Quadratic):
             return o + self
-        if isinstance(o, ParametricBilinear):
+        if isinstance(o, ParametricObjective):
             return o + self
         if isinstance(o, Variable):
             o = o._to_affine()
@@ -175,7 +175,7 @@ class Affine:
 
     def __mul__(self, o):
         # elementwise scale by a scalar or shape-broadcast array
-        if isinstance(o, (Affine, Variable, Quadratic, Parameter, ParametricBilinear)):
+        if isinstance(o, (Affine, Variable, Quadratic, Parameter, ParametricObjective)):
             return NotImplemented  # expr*expr is nonlinear; use @ instead
         # diagonal scaling matrix applied to each block and the constant
         a = np.broadcast_to(np.asarray(o, dtype=float), self.shape).reshape(-1)
@@ -255,7 +255,7 @@ class Affine:
 def _bilinear(e1: Affine, e2: Affine) -> Quadratic:
     # inner product (A1 x + b1)·(A2 x + b2) of two equal-length affines -> scalar Quadratic
     if e1.size != e2.size:
-        raise ValueError("Bilinear product requires matching lengths.")
+        raise ValueError(f"Inner product requires equal lengths, got {e1.size} and {e2.size}.")
     quad = {}
     for vi, Ai in e1.blocks.items():
         for vj, Aj in e2.blocks.items():
@@ -357,21 +357,26 @@ def _as_selection(operand):
                     "of one (e.g. x, x[:k], x[idx]).")
 
 
-def _make_bilinear(param, base, sel):
+def _make_objective(param, base, sel, inner=False):
     # pair a predicted cost (param, optional known base) with a Variable / selection
     var, local_idx = _as_selection(sel)
+    # `@` is a 1-D inner product; a multi-dimensional cost must go through (c * x).sum()
+    if inner and len(getattr(sel, "shape", ())) > 1:
+        raise TypeError("c @ x is a 1-D inner product; for a multi-dimensional cost write (c * x).sum().")
     n = var.size if local_idx is None else len(local_idx)
     if param.size != n:
-        raise TypeError(f"Parameter size {param.size} != selected size {n}.")
-    return ParametricBilinear(param, var, local_idx, base=base)
+        raise TypeError(f"Parameter size {param.size} does not match the selected variable size {n}.")
+    return ParametricObjective(param, var, local_idx, base=base)
 
 
 class Parameter:
     """
     The runtime-bound predicted cost symbol (exactly one per Problem).
 
-    It multiplies a Variable (or a plain slice / index of one) into a predicted
-    objective term: ``c @ x``, ``c @ x[:k]``. A known base may be added first:
+    The inner product ``c @ x`` (or ``c @ x[:k]``) pairs the predicted cost with a
+    Variable (or a plain slice / index of one) into a scalar objective term. The
+    elementwise product ``c * x`` is a vector of predicted terms; reduce it to the
+    scalar objective with ``(c * x).sum()``. A known base may be added first:
     ``(d + c) @ x`` predicts ``d + c`` on x. Any other use raises ``TypeError``.
 
     Attributes:
@@ -387,11 +392,16 @@ class Parameter:
     __hash__ = object.__hash__
     __array_ufunc__ = None  # numpy defers @ / * / + to our reflected ops
 
-    def _pair(self, sel):
-        # multiply a Variable / selection -> predicted objective term
-        return _make_bilinear(self, None, sel)
+    def _inner(self, sel):
+        # c @ x : inner product -> scalar predicted objective term
+        return _make_objective(self, None, sel, inner=True)
 
-    __matmul__ = __rmatmul__ = __mul__ = __rmul__ = _pair
+    def _elem(self, sel):
+        # c * x : elementwise -> vector of predicted terms (reduce with .sum())
+        return ParametricVector(self, None, sel)
+
+    __matmul__ = __rmatmul__ = _inner
+    __mul__ = __rmul__ = _elem
 
     def __add__(self, base):
         # (c + d): a predicted cost with a known base
@@ -421,7 +431,8 @@ class ParametricCoef:
     """
     A predicted cost coefficient with a known base, ``base + param`` — the
     transient result of ``c + d`` / ``d + c`` / ``c - d``. Pairs with a Variable
-    or selection like a Parameter.
+    or selection like a Parameter: ``(d + c) @ x`` (scalar) or ``(d + c) * x``
+    (elementwise vector, reduce with ``.sum()``).
     """
 
     def __init__(self, param, base):
@@ -430,43 +441,87 @@ class ParametricCoef:
 
     __array_ufunc__ = None
 
-    def _pair(self, sel):
-        return _make_bilinear(self.param, self.base, sel)
+    def _inner(self, sel):
+        # (d + c) @ x : inner product -> scalar predicted objective term
+        return _make_objective(self.param, self.base, sel, inner=True)
 
-    __matmul__ = __rmatmul__ = __mul__ = __rmul__ = _pair
+    def _elem(self, sel):
+        # (d + c) * x : elementwise -> vector of predicted terms (reduce with .sum())
+        return ParametricVector(self.param, self.base, sel)
+
+    __matmul__ = __rmatmul__ = _inner
+    __mul__ = __rmul__ = _elem
 
 
-class ParametricBilinear:
+class ParametricVector:
+    """
+    The elementwise product ``c * x`` (optionally with a known base): a vector of
+    predicted terms, one per selected position. It is not yet a scalar objective;
+    reduce it with ``.sum()`` to form the objective term ``(c * x).sum()``.
+
+    Attributes:
+        param (Parameter): the predicted cost
+        base (np.ndarray | None): known offset added at the predicted positions
+        sel (Variable | Affine): the Variable / selection the cost lands on
+    """
+
+    def __init__(self, param, base, sel):
+        # validate the pairing eagerly so size errors fire at `c * x`, not at `.sum()`
+        var, local_idx = _as_selection(sel)
+        n = var.size if local_idx is None else len(local_idx)
+        if param.size != n:
+            raise TypeError(f"Parameter size {param.size} does not match the selected variable size {n}.")
+        self.param = param
+        self.base = base
+        self.sel = sel
+
+    __hash__ = object.__hash__
+    __array_ufunc__ = None  # numpy defers @ / * / + to our reflected ops
+
+    def sum(self, axis=None):
+        # reduce to the scalar predicted objective term
+        if axis is not None:
+            raise TypeError("A predicted objective must reduce to a scalar; use .sum() with no axis.")
+        return _make_objective(self.param, self.base, self.sel)
+
+    def __add__(self, o):
+        raise TypeError("c * x is an elementwise vector; reduce it with .sum() before adding "
+                        "other terms, e.g. (c * x).sum() + d @ y.")
+
+    __radd__ = __add__
+
+
+class ParametricObjective:
     """
     The objective: ``cost_param`` predicts the cost at ``cost_var``'s selected
     positions (with an optional known ``base``), plus optional known fixed
-    linear (``fixed``) and parameter-free quadratic (``offset``) terms.
+    linear (``fixed``) and parameter-free quadratic (``quad``) terms.
 
     Attributes:
         cost_param (Parameter): the predicted cost (size == num_cost)
         cost_var (Variable): the Variable the prediction lands on
         local_idx (np.ndarray | None): predicted indices within cost_var (None = all)
-        base (np.ndarray | None): known offset added at the predicted positions
+        base (np.ndarray | None): known cost added at the predicted positions
         fixed (Affine | None): known linear term on other / overlapping positions
-        offset (Quadratic | None): parameter-free quadratic term
+        quad (Quadratic | None): parameter-free quadratic term
     """
 
-    def __init__(self, cost_param, cost_var, local_idx=None, base=None, fixed=None, offset=None):
+    def __init__(self, cost_param, cost_var, local_idx=None, base=None, fixed=None, quad=None):
         self.cost_param = cost_param
         self.cost_var = cost_var
         self.local_idx = local_idx
         self.base = base
         self.fixed = fixed
-        self.offset = offset
+        self.quad = quad
 
     __hash__ = object.__hash__
     __array_ufunc__ = None  # numpy defers @ / * / + to our reflected ops
 
-    def _with(self, fixed=None, offset=None):
-        # copy with a replaced fixed / offset term
-        return ParametricBilinear(self.cost_param, self.cost_var, self.local_idx, self.base,
+    def _with(self, fixed=None, quad=None):
+        # copy with a replaced fixed / quad term
+        return ParametricObjective(self.cost_param, self.cost_var, self.local_idx, self.base,
                                   self.fixed if fixed is None else fixed,
-                                  self.offset if offset is None else offset)
+                                  self.quad if quad is None else quad)
 
     def sum(self, axis=None):
         # already a scalar; sum is the identity here
@@ -474,10 +529,10 @@ class ParametricBilinear:
 
     def __add__(self, o):
         # attach a known linear (Affine / Variable) or quadratic (Quadratic) term
-        if isinstance(o, ParametricBilinear):
-            raise TypeError("Cannot add two predicted (Parameter) objective terms.")
+        if isinstance(o, ParametricObjective):
+            raise TypeError("Cannot add two predicted cost terms; a problem has exactly one predicted cost.")
         if isinstance(o, Quadratic):
-            return self._with(offset=o if self.offset is None else self.offset + o)
+            return self._with(quad=o if self.quad is None else self.quad + o)
         if isinstance(o, Variable):
             o = o._to_affine()
         if isinstance(o, Affine):

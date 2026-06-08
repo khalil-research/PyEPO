@@ -89,6 +89,15 @@ class optModel(ABC):
         """
         raise NotImplementedError
 
+    @property
+    def c_pred_index(self) -> np.ndarray | None:
+        """Variable positions the predicted cost lands on, or ``None`` when every variable is predicted (the default)."""
+        return None
+
+    def _fullCost(self, pred_cost):
+        """The full objective coefficient for a predicted cost; identity by default, overridden under partial prediction."""
+        return pred_cost
+
     def copy(self) -> Self:
         """
         A method to copy the model

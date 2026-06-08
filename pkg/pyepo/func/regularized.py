@@ -76,6 +76,8 @@ class regularizedFrankWolfeOpt(optModule):
         """
         Forward pass
         """
+        # lift cost to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", regularizedFrankWolfeOptFunc.apply(pred_cost, self))
 
     def compute_regularization(self, y: torch.Tensor) -> torch.Tensor:
@@ -279,6 +281,8 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         """
         Forward pass
         """
+        # lift cost to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         loss = cast(
             "torch.Tensor", regularizedFrankWolfeFenchelYoungFunc.apply(pred_cost, true_sol, self)
         )

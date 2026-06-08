@@ -47,9 +47,9 @@ class compiledCoptProblem(compiledBase, optCoptModel):
         return m, x
 
     def _apply_params(self):
-        # apply the COPT solver parameters
+        # apply solver params; the canonical `timelimit` (seconds) maps to TimeLimit
         for key, value in self.params.items():
-            self._model.setParam(key, value)
+            self._model.setParam("TimeLimit" if key == "timelimit" else key, value)
 
     def _write_obj(self, coef):
         # set the full-length objective coefficient on the MVar

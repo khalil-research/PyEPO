@@ -58,6 +58,9 @@ class listwiseLTR(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
+        true_cost = self.optmodel._fullCost(true_cost)
         # convert tensor
         cp = pred_cost.detach()
         # solve and update pool
@@ -122,6 +125,9 @@ class pairwiseLTR(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
+        true_cost = self.optmodel._fullCost(true_cost)
         # convert tensor
         cp = pred_cost.detach()
         # solve and update pool
@@ -192,6 +198,9 @@ class pointwiseLTR(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
+        true_cost = self.optmodel._fullCost(true_cost)
         # convert tensor
         cp = pred_cost.detach()
         # solve and update pool

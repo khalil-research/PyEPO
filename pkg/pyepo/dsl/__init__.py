@@ -33,7 +33,7 @@ def sum(expr, axis=None):
     """
     Module-level reduction: dispatches to the expression's ``.sum(axis)``.
 
-    ``dsl.sum(c * x)`` returns the scalar ``ParametricBilinear``; ``dsl.sum`` of
+    ``dsl.sum(c * x)`` returns the scalar ``ParametricObjective``; ``dsl.sum`` of
     an ``Affine`` / ``Variable`` returns the reduced linear expression.
     """
     return expr.sum(axis)

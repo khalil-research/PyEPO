@@ -103,8 +103,8 @@ def calUnambRegret(
     """
     if max_iter <= 0:
         raise RuntimeError("Max iterations reached in calUnambRegret.")
-    # change precision
-    cp = np.around(pred_cost / tolerance).astype(int)
+    # change precision; lift to the full objective space
+    cp = optmodel._fullCost(np.around(pred_cost / tolerance).astype(float))
     # opt sol for pred cost
     optmodel.setObj(cp)
     sol, objp = optmodel.solve()
@@ -121,7 +121,7 @@ def calUnambRegret(
         raise ValueError("Invalid modelSense.")
     # opt model to find worst case
     try:
-        wst_optmodel.setObj(-true_cost)
+        wst_optmodel.setObj(optmodel._fullCost(-np.asarray(true_cost, dtype=float)))
         _, obj = wst_optmodel.solve()
     except Exception as e:  # noqa: BLE001  any solver failure triggers retry
         new_tolerance = tolerance * 10

@@ -29,11 +29,20 @@ Describe the problem once with ``Variable``, ``Parameter``, and constraints, the
 
    x = dsl.Variable(5, vtype=EPO.BINARY)          # decision variables
    c = dsl.Parameter(5)                           # the predicted cost
-   optmodel = dsl.Problem(dsl.Maximize(c @ x), [A @ x <= b]).compile(backend="gurobi")
+   prob = dsl.Problem(dsl.Maximize(c @ x), [A @ x <= b])
+   optmodel = prob.compile(backend="gurobi")      # compile to a solver backend
 
 The compiled model is a standard ``optModel`` that drops into ``pyepo.func`` unchanged; ``setObj`` and ``solve`` are called for you during training.
 
 All backends share this interface, so you can switch with ``backend=``. Gurobi and COPT are commercial solvers; Pyomo and OR-Tools let you use open solvers such as HiGHS, GLPK, CBC, and SCIP without a license; MPAX solves linear and quadratic programs on the GPU and can batch-solve an entire mini-batch. The generic backends take a ``solver=`` argument naming the solver to run.
+
+``compile`` forwards keyword arguments to the backend: ``solver=`` picks an open solver, ``timelimit=`` (seconds) sets a time limit on any backend, and native solver parameters pass through by name.
+
+.. code-block:: python
+
+   prob.compile(backend="pyomo", solver="appsi_highs")    # an open solver via Pyomo
+   prob.compile(backend="gurobi", timelimit=10)           # time limit (seconds)
+   prob.compile(backend="gurobi", MIPGap=0.01)            # native solver parameters pass through
 
 
 Variables
@@ -58,13 +67,14 @@ Whether a coefficient is predicted or known is decided by its type: a ``Paramete
 
 .. code-block:: python
 
-   dsl.Minimize(c @ x)                            # or dsl.Maximize(c @ x)
+   dsl.Minimize(c @ x)                            # inner product (scalar); or dsl.Maximize(c @ x)
+   dsl.Minimize((c * x).sum())                    # elementwise then reduce; same objective as c @ x
    dsl.Minimize(c @ x + d @ y)                    # predict c on x, keep known d on y
    dsl.Minimize(c @ x[:k] + d @ x[k:])            # predict part of one variable, fix the rest
    dsl.Minimize((d + c) @ x)                      # a known base d plus the predicted c
    dsl.Minimize(c @ x + x @ Q @ x)                # predicted linear plus a known quadratic
 
-A quadratic objective term needs a backend with QP support (Gurobi, COPT, or MPAX).
+``c @ x`` is a 1-D inner product; for a multi-dimensional cost use ``(c * x).sum()`` (elementwise, then reduced). A quadratic objective term needs a backend with QP support (Gurobi, COPT, or MPAX).
 
 
 Constraints
@@ -79,7 +89,7 @@ Constraints are fixed across instances; only the cost is predicted. Pass them as
    x.sum(axis=1) == 1                             # per-axis sums, e.g. an assignment
    x @ Q @ x <= gamma                             # quadratic (Gurobi and COPT)
 
-For a 2-D objective, ``dsl.sum(c * x)`` reads more clearly than the flattened ``c @ x``. For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level ``optModel`` interface for cases it cannot express.
+A 2-D objective uses ``dsl.sum(c * x)`` (``c @ x`` is a 1-D inner product, so it does not apply). For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level ``optModel`` interface for cases it cannot express.
 
 
 The optModel Interface

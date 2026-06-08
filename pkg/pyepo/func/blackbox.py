@@ -66,6 +66,8 @@ class blackboxOpt(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", blackboxOptFunc.apply(pred_cost, self))
 
 
@@ -161,6 +163,8 @@ class negativeIdentity(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", negativeIdentityFunc.apply(pred_cost, self))
 
 

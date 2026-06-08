@@ -70,6 +70,9 @@ class SPOPlus(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
+        true_cost = self.optmodel._fullCost(true_cost)
         loss = cast(
             "torch.Tensor", SPOPlusFunc.apply(pred_cost, true_cost, true_sol, true_obj, self)
         )
@@ -184,6 +187,9 @@ class perturbationGradient(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
+        true_cost = self.optmodel._fullCost(true_cost)
         loss = self._finiteDifference(pred_cost, true_cost)
         return self._reduce(loss)
 

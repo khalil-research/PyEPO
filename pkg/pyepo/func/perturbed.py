@@ -17,6 +17,7 @@ from pyepo.func.utils import (
     _solve_batch as _solve_batch_2d,
 )
 from pyepo.func.utils import (
+    _mask_pred,
     _torch_generator,
     _update_solution_pool,
     sumGammaDistribution,
@@ -86,6 +87,8 @@ class perturbedOpt(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", perturbedOptFunc.apply(pred_cost, self))
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
@@ -137,6 +140,8 @@ class perturbedOptFunc(Function):
             dtype=cp.dtype,
             generator=gen,
         )
+        # keep known fixed costs unperturbed under partial prediction
+        noises = _mask_pred(noises, module.optmodel)
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
@@ -240,6 +245,8 @@ class perturbedFenchelYoung(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         loss = cast("torch.Tensor", perturbedFenchelYoungFunc.apply(pred_cost, true_sol, self))
         return self._reduce(loss)
 
@@ -294,6 +301,8 @@ class perturbedFenchelYoungFunc(Function):
             dtype=cp.dtype,
             generator=gen,
         )
+        # keep known fixed costs unperturbed under partial prediction
+        noises = _mask_pred(noises, module.optmodel)
         ptb_c = module._perturb(cp, noises)
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
@@ -412,6 +421,8 @@ class implicitMLE(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", implicitMLEFunc.apply(pred_cost, self))
 
 
@@ -448,6 +459,8 @@ class implicitMLEFunc(Function):
             noises = module.distribution.sample(size=size)
         if isinstance(noises, np.ndarray):
             noises = torch.from_numpy(noises).to(device, dtype=cp.dtype)
+        # keep known fixed costs unperturbed under partial prediction
+        noises = _mask_pred(noises, module.optmodel)
         ptb_c = cp.unsqueeze(1) + module.sigma * noises
         # solve with perturbation
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
@@ -542,6 +555,8 @@ class adaptiveImplicitMLE(optModule):
         """
         Forward pass
         """
+        # lift costs to the full objective space (no-op without partial prediction)
+        pred_cost = self.optmodel._fullCost(pred_cost)
         return cast("torch.Tensor", adaptiveImplicitMLEFunc.apply(pred_cost, self))
 
 

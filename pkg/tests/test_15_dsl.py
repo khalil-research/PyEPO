@@ -220,7 +220,7 @@ def test_parameter_cannot_form_constraint():
     x = dsl.Variable(3)
     c = dsl.Parameter(3)
     with pytest.raises(TypeError):
-        _ = (c @ x <= 1.0)                                  # ParametricBilinear has no <=
+        _ = (c @ x <= 1.0)                                  # ParametricObjective has no <=
 
 
 def test_two_parameters_rejected():
@@ -229,7 +229,7 @@ def test_two_parameters_rejected():
     c1 = dsl.Parameter(3)
     c2 = dsl.Parameter(3)
     with pytest.raises(TypeError):
-        _ = c1 @ x + c2 @ y                                 # two ParametricBilinear
+        _ = c1 @ x + c2 @ y                                 # two ParametricObjective
 
 
 def test_parameter_size_mismatch_rejected():
@@ -273,8 +273,8 @@ def test_partial_prediction_ir():
     d = np.array([1.0, 2.0])
     prob = dsl.Problem(dsl.Minimize(c @ x + d @ y), [x.sum() + y.sum() == 1])
     assert prob.num_cost == 3 and prob.num_vars == 5
-    assert list(prob.c_index) == [0, 1, 2]          # x predicted
-    assert np.allclose(prob.fixed_c, [0, 0, 0, 1, 2])    # d fixed on y
+    assert list(prob.c_pred_index) == [0, 1, 2]          # x predicted
+    assert np.allclose(prob.fixed_cost, [0, 0, 0, 1, 2])    # d fixed on y
 
 
 def test_slice_prediction_ir():
@@ -282,8 +282,8 @@ def test_slice_prediction_ir():
     c = dsl.Parameter(2)
     d = np.array([3.0, 4.0, 5.0])
     prob = dsl.Problem(dsl.Minimize(c @ x[:2] + d @ x[2:]), [x.sum() == 1])
-    assert list(prob.c_index) == [0, 1]             # first 2 of x predicted
-    assert np.allclose(prob.fixed_c, [0, 0, 3, 4, 5])    # rest of x fixed
+    assert list(prob.c_pred_index) == [0, 1]             # first 2 of x predicted
+    assert np.allclose(prob.fixed_cost, [0, 0, 3, 4, 5])    # rest of x fixed
 
 
 def test_base_offset_equals_two_terms():
@@ -292,8 +292,8 @@ def test_base_offset_equals_two_terms():
     d = np.array([1.0, 2.0, 3.0])
     combined = dsl.Problem(dsl.Minimize((d + c) @ x), [x.sum() == 1])      # (d + c) @ x
     two_term = dsl.Problem(dsl.Minimize(c @ x + d @ x), [x.sum() == 1])    # c @ x + d @ x
-    assert np.allclose(combined.fixed_c, d) and np.allclose(two_term.fixed_c, d)
-    assert list(combined.c_index) == list(two_term.c_index) == [0, 1, 2]
+    assert np.allclose(combined.fixed_cost, d) and np.allclose(two_term.fixed_cost, d)
+    assert list(combined.c_pred_index) == list(two_term.c_pred_index) == [0, 1, 2]
 
 
 # ============================================================
@@ -457,22 +457,22 @@ def test_partial_prediction_solves(backend):
     d = np.array([5.0, 5.0])
     comp = dsl.Problem(dsl.Minimize(c @ x + d @ y),
                        [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend=backend, **_kw(backend))
-    comp.setObj([1.0, 1.0])
-    w, obj = comp.solve()
-    assert len(w) == 2 and np.allclose(w, [1, 1])           # w is the predicted (x) part
-    assert obj == pytest.approx(2.0)                        # c @ w; known d @ y removed
+    comp.setObj([1.0, 1.0])                                 # short predicted cost; setObj scatters it
+    sol, obj = comp.solve()                                 # full: [x0, x1, y0, y1]
+    assert len(sol) == 4 and np.allclose(np.asarray(sol), [1, 1, 0, 0])
+    assert obj == pytest.approx(2.0)                        # full objective c @ x + d @ y
 
 
 @pytest.mark.parametrize("backend", _ALL)
 def test_aux_variable_solves(backend):
-    # y appears only in a constraint (no objective cost) -> not in w
+    # y appears only in a constraint (no objective cost)
     x = dsl.Variable(2, lb=0, ub=1)
     y = dsl.Variable(1, lb=0, ub=1.5)
     c = dsl.Parameter(2)
     comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() - y <= 0]).compile(backend=backend, **_kw(backend))
     comp.setObj([1.0, 1.0])
-    w, obj = comp.solve()
-    assert len(w) == 2 and obj == pytest.approx(1.5)        # x.sum() <= y <= 1.5
+    sol, obj = comp.solve()                                 # full: [x0, x1, y]
+    assert len(sol) == 3 and obj == pytest.approx(1.5)      # x.sum() <= y <= 1.5
 
 
 @pytest.mark.parametrize("backend", _BACKENDS)
@@ -575,10 +575,10 @@ def test_mpax_partial_prediction_solves():
     d = np.array([5.0, 5.0])
     mpx = dsl.Problem(dsl.Minimize(c @ x + d @ y),
                       [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend="mpax")
-    mpx.setObj(np.array([1.0, 1.0], np.float32))
-    w, obj = mpx.solve()
-    assert np.allclose(np.asarray(w), [1, 1], atol=1e-2)    # predicted (x) part
-    assert obj == pytest.approx(2.0, abs=1e-2)              # c @ w; known d @ y removed
+    mpx.setObj(np.array([1.0, 1.0], np.float32))            # short predicted cost; setObj scatters it
+    sol, obj = mpx.solve()                                  # full: [x0, x1, y0, y1]
+    assert np.allclose(np.asarray(sol), [1, 1, 0, 0], atol=1e-2)
+    assert obj == pytest.approx(2.0, abs=1e-2)              # full objective c @ x + d @ y
 
 
 @requires_mpax
@@ -621,3 +621,81 @@ def test_rejects_quadratic_constraint(backend):
     with pytest.raises(NotImplementedError):
         dsl.Problem(dsl.Maximize(c @ x), [x.sum() == 1, x @ cov @ x <= 1.0]).compile(
             backend=backend, **_kw(backend))
+
+
+# ============================================================
+# Operators: inner product (@) vs elementwise (*), repr, params
+# ============================================================
+
+def test_inner_product_vs_elementwise():
+    from pyepo.dsl.expression import ParametricObjective, ParametricVector
+    x = dsl.Variable(4)
+    c = dsl.Parameter(4)
+    assert isinstance(c @ x, ParametricObjective)            # inner product -> scalar
+    assert isinstance(c * x, ParametricVector)             # elementwise -> vector
+    assert isinstance((c * x).sum(), ParametricObjective)   # reduced -> scalar
+
+
+def test_elementwise_is_not_an_objective():
+    x = dsl.Variable(4)
+    c = dsl.Parameter(4)
+    with pytest.raises(TypeError):
+        dsl.Minimize(c * x)                                # needs (c * x).sum() or c @ x
+
+
+def test_sum_of_elementwise_equals_inner_product():
+    x = dsl.Variable(4)
+    c = dsl.Parameter(4)
+    star = dsl.Problem(dsl.Minimize((c * x).sum()), [x.sum() == 1])
+    at = dsl.Problem(dsl.Minimize(c @ x), [x.sum() == 1])
+    assert list(star.c_pred_index) == list(at.c_pred_index) == [0, 1, 2, 3]
+
+
+def test_inner_product_rejects_multidim():
+    x = dsl.Variable((3, 3))
+    c = dsl.Parameter((3, 3))
+    with pytest.raises(TypeError):
+        _ = c @ x                                          # 2-D must use (c * x).sum()
+    prob = dsl.Problem(dsl.Minimize((c * x).sum()), [x.sum(axis=1) == 1])
+    assert prob.num_cost == 9                              # the reduce form works
+
+
+def test_problem_rejects_bare_constraint():
+    x = dsl.Variable(3)
+    c = dsl.Parameter(3)
+    with pytest.raises(TypeError):
+        dsl.Problem(dsl.Minimize(c @ x), x.sum() <= 1)     # constraints must be a list
+
+
+def test_problem_repr():
+    x = dsl.Variable(5, vtype=EPO.BINARY)
+    c = dsl.Parameter(5)
+    prob = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 5)) @ x <= 2])
+    text = repr(prob)
+    assert "max" in text and "5 vars" in text and "cost dim=5" in text
+
+
+@pytest.mark.parametrize("backend", _BACKENDS)
+def test_canonical_timelimit_param(backend):
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 3)) @ x <= 2]).compile(
+        backend=backend, timelimit=7.5)
+    tl = comp._model.Params.TimeLimit if backend == "gurobi" else comp._model.getParam("TimeLimit")
+    assert tl == 7.5                                        # canonical name maps to TimeLimit
+
+
+@pytest.mark.parametrize("backend", _ALL)
+def test_partial_prediction_regret_is_full_objective(backend):
+    # min c x + d y, x + y >= 1, binary; known d = 3, true c = 1, mispredict c_hat = 5
+    from pyepo.metric.regret import calRegret
+    x = dsl.Variable(1, lb=0, ub=1)
+    y = dsl.Variable(1, lb=0, ub=1)
+    c = dsl.Parameter(1)
+    d = np.array([3.0])
+    comp = dsl.Problem(dsl.Minimize(c @ x + d @ y),
+                       [x[0] + y[0] >= 1]).compile(backend=backend, **_kw(backend))
+    comp.setObj([1.0])                                      # true cost
+    _, z = comp.solve()                                    # full optimal objective = 1
+    reg = calRegret(comp, np.array([5.0]), np.array([1.0]), z)
+    assert reg == pytest.approx(2.0, abs=1e-4)             # full regret (cost-space would give -1)

@@ -52,6 +52,13 @@ class compiledOmoProblem(compiledBase, optOmoModel):
     Pyomo-backed compiled DSL problem, solved by ``solver``.
     """
 
+    # canonical `timelimit` (seconds) -> each solver's own option name
+    _TIMELIMIT_OPT = {
+        "glpk": "tmlim", "cbc": "seconds", "scip": "limits/time",
+        "highs": "time_limit", "appsi_highs": "time_limit",
+        "ipopt": "max_cpu_time", "gurobi": "TimeLimit", "cplex": "timelimit",
+    }
+
     def __init__(self, problem, params=None, solver="glpk"):
         # the source DSL Problem, solver options, and Pyomo solver name
         self.problem = problem
@@ -78,9 +85,16 @@ class compiledOmoProblem(compiledBase, optOmoModel):
         return m, x
 
     def _apply_params(self):
-        # apply solver options
+        # apply solver options; the canonical `timelimit` (seconds) maps per solver
         for key, value in self.params.items():
-            self._solverfac.options[key] = value
+            if key == "timelimit":
+                name = self._TIMELIMIT_OPT.get(self.solver)
+                if name is None:
+                    raise ValueError(f"Pyomo solver {self.solver!r} has no known 'timelimit' option "
+                                     "name; pass the solver's native option instead.")
+                self._solverfac.options[name] = value
+            else:
+                self._solverfac.options[key] = value
 
     def _write_obj(self, coef):
         # update the mutable objective coefficient Param

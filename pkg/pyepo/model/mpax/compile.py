@@ -75,36 +75,43 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
         self.h = jnp.asarray(np.concatenate(h) if h else np.zeros(0, np.float32))
 
     def _apply_params(self):
-        # MPAX takes no DSL-level solver params
-        if self.params:
+        # MPAX (first-order PDHG) has no time-limit knob; accept `timelimit` and ignore it
+        extra = {k: v for k, v in self.params.items() if k != "timelimit"}
+        if extra:
             raise ValueError("MPAX backend does not accept solver params.")
 
     def setObj(self, c):
-        # full coef = fixed_c + predicted c scattered at c_index, kept on device
+        # short cost scatters onto fixed_cost; full cost kept as-is
         prob = self.problem
+        is_full = c.shape[-1] == prob.num_vars
         if isinstance(c, torch.Tensor):
             c = (c.detach() if self._has_jax_gpu else c.detach().cpu()).to(torch.float32)
-            full = torch.as_tensor(prob.fixed_c, dtype=torch.float32, device=c.device).clone()
-            full.index_add_(0, torch.as_tensor(prob.c_index, dtype=torch.long, device=c.device), c)
-            self.c = jnp.from_dlpack(full)
+            if is_full:
+                coef = c.contiguous()
+            else:
+                coef = torch.as_tensor(prob.fixed_cost, dtype=torch.float32, device=c.device).clone()
+                coef.index_add_(0, torch.as_tensor(prob.c_pred_index, dtype=torch.long, device=c.device), c)
+            self.c = jnp.from_dlpack(coef)
             if self._gpu_device is not None:
                 self.c = jax.device_put(self.c, self._gpu_device)
             if self.device != self.c.device:
                 self._move_to_device(self.c.device)
         else:
-            full = prob.fixed_c.astype(np.float32)
-            np.add.at(full, prob.c_index, np.asarray(c, dtype=np.float32))
-            self.c = jnp.asarray(full)
+            arr = np.asarray(c, dtype=np.float32)
+            if is_full:
+                coef = arr
+            else:
+                coef = prob.fixed_cost.astype(np.float32)
+                np.add.at(coef, prob.c_pred_index, arr)
+            self.c = jnp.asarray(coef)
         if self.modelSense == EPO.MAXIMIZE:
             self.c = -self.c
 
     def solve(self):
-        # solve, project the solution onto the predicted positions, drop the fixed-cost part
+        # the full (relaxed) decision-variable solution and true objective value
         sol, obj = self.jitted_solve(self.c)
-        sol_np = np.asarray(sol)
         full_obj = float(obj) if self.modelSense == EPO.MINIMIZE else -float(obj)
-        w = torch.from_dlpack(sol)[self.problem.c_index]
-        return w, full_obj - float(self.problem.fixed_c @ sol_np)
+        return torch.from_dlpack(sol), full_obj
 
     def _add_cut(self, coef, rhs):
         # add coef @ x <= rhs  ->  -coef @ x >= -rhs  to a fresh copy

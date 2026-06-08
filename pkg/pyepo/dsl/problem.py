@@ -6,7 +6,7 @@ sparse matrices, validates PyEPO scope, and compiles to a backend.
 At construction every referenced ``Variable`` is assigned a contiguous slice of
 a global flat index (encounter order: objective first, then each constraint in
 list order). Constraints finalize to ``(Q | None, A, sense, b_eff)``; the
-objective finalizes to the predicted ``c_index``, a known ``fixed_c``
+objective finalizes to the predicted ``c_pred_index``, a known ``fixed_cost``
 linear part, and an optional parameter-free quadratic term ``obj_Q``.
 """
 
@@ -36,13 +36,17 @@ class Problem:
         num_cost (int): predicted dimension (``cost_param.size``)
         flat_slice (dict[Variable, slice]): global flat slice per Variable
         num_vars (int): total decision-variable count
-        c_index (np.ndarray): flat indices the predicted cost lands on
-        fixed_c (np.ndarray): known linear objective coefficients ``(num_vars,)``
+        c_pred_index (np.ndarray): flat indices the predicted cost lands on
+        fixed_cost (np.ndarray): known linear objective coefficients ``(num_vars,)``
         constrs (list[tuple]): finalized ``(Q, A, sense, b_eff)`` per constraint
         obj_Q (csr_matrix | None): finalized parameter-free quadratic objective term
     """
 
     def __init__(self, objective, constraints=None):
+        from pyepo.dsl.expression import Constraint
+        # a single bare constraint would hit Constraint.__bool__ via `if constraints`
+        if isinstance(constraints, Constraint):
+            raise TypeError("`constraints` must be a list; wrap it: [your_constraint].")
         self.objective = objective
         self.constraints = list(constraints) if constraints else []
         # PyEPO-scope checks
@@ -54,6 +58,15 @@ class Problem:
         self._assign_flat()
         # finalize IR
         self._finalize()
+
+    def __repr__(self) -> str:
+        # one-line summary of the finalized problem
+        sense = "min" if self.objective.modelSense == EPO.MINIMIZE else "max"
+        n_quad = sum(1 for Q, *_ in self.constrs if Q is not None)
+        quad = f" [{n_quad} quad]" if n_quad else ""
+        obj_q = " +quad obj" if self.obj_Q is not None else ""
+        return (f"Problem({sense}, {self.num_vars} vars, {len(self.constrs)} constrs"
+                f"{quad}, cost dim={self.num_cost}{obj_q})")
 
     @property
     def num_cost(self) -> int:
@@ -82,11 +95,11 @@ class Problem:
 
     def _validate(self):
         # objective is a Minimize / Maximize carrying a predicted cost term
-        from pyepo.dsl.expression import ParametricBilinear
+        from pyepo.dsl.expression import ParametricObjective
         from pyepo.dsl.objective import Objective
         if not isinstance(self.objective, Objective):
-            raise TypeError("Problem objective must be a Minimize / Maximize.")
-        if not isinstance(self.objective.expr, ParametricBilinear):
+            raise TypeError("Problem objective must be wrapped in Minimize(...) or Maximize(...).")
+        if not isinstance(self.objective.expr, ParametricObjective):
             raise TypeError("Objective must include a predicted cost term (e.g. c @ x).")
 
     def _finalize(self):
@@ -95,20 +108,20 @@ class Problem:
         # predicted positions: the global flat indices the cost lands on
         sl = self.flat_slice[expr.cost_var]
         if expr.local_idx is None:
-            self.c_index = np.arange(sl.start, sl.stop)
+            self.c_pred_index = np.arange(sl.start, sl.stop)
         else:
-            self.c_index = sl.start + np.asarray(expr.local_idx, dtype=int)
+            self.c_pred_index = sl.start + np.asarray(expr.local_idx, dtype=int)
         # known fixed linear coefficients over all variables
-        self.fixed_c = np.zeros(self.num_vars)
+        self.fixed_cost = np.zeros(self.num_vars)
         if expr.base is not None:
-            self.fixed_c[self.c_index] += expr.base
+            self.fixed_cost[self.c_pred_index] += expr.base
         if expr.fixed is not None:
-            self.fixed_c += _dense_row(expr.fixed.finalize(self.flat_slice, self.num_vars))
-        # parameter-free quadratic term; its linear part folds into fixed_c
+            self.fixed_cost += _dense_row(expr.fixed.finalize(self.flat_slice, self.num_vars))
+        # parameter-free quadratic term; its linear part folds into fixed_cost
         self.obj_Q = None
-        if isinstance(expr.offset, Quadratic):
-            self.obj_Q = expr.offset.finalize_Q(self.flat_slice, self.num_vars)
-            self.fixed_c += _dense_row(expr.offset.affine.finalize(self.flat_slice, self.num_vars))
+        if isinstance(expr.quad, Quadratic):
+            self.obj_Q = expr.quad.finalize_Q(self.flat_slice, self.num_vars)
+            self.fixed_cost += _dense_row(expr.quad.affine.finalize(self.flat_slice, self.num_vars))
         # constraints -> global (Q, A, sense, b_eff)
         self.constrs = [con.finalize(self.flat_slice, self.num_vars) for con in self.constraints]
 
@@ -132,7 +145,8 @@ class Problem:
         wasteful indirection.
 
         Args:
-            backend: solver backend name (``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``).
+            backend: solver backend name (``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``, ``"mpax"``).
+            **kwargs: backend options -- ``solver=`` (generic backends), ``timelimit=`` (seconds), or native solver parameters.
         """
         # route to the backend compiler
         if backend == "gurobi":

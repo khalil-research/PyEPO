@@ -60,12 +60,12 @@ class compiledOrtProblem(compiledBase, optOrtModel):
         return m, x
 
     def _apply_params(self):
-        # apply solver options (TimeLimit in seconds -> milliseconds)
+        # apply solver options; the canonical `timelimit` (seconds) -> milliseconds
         for key, value in self.params.items():
-            if key == "TimeLimit":
+            if key.lower() == "timelimit":
                 self._model.SetTimeLimit(int(value * 1000))
             else:
-                raise ValueError(f"OR-Tools backend does not support param {key!r}.")
+                raise ValueError(f"OR-Tools backend supports only the 'timelimit' param, got {key!r}.")
 
     def _write_obj(self, coef):
         # set the full-length objective coefficient

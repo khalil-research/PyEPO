@@ -4,15 +4,15 @@ Generic compiled-problem base for the PyEPO DSL.
 
 ``compiledBase`` is mixed with a backend base (``optXxxModel``) to form a
 concrete compiled problem, e.g. ``compiledGrbProblem(compiledBase,
-optGrbModel)``. It carries the backend-agnostic objective handling — binding
-the predicted cost onto its positions, solving, and projecting the solution
-back to cost space — while the concrete subclass builds the solver model and
-provides the read / write hooks.
+optGrbModel)``. It carries the backend-agnostic objective handling — scattering
+a predicted cost onto its variable positions and solving — while the concrete
+subclass builds the solver model and provides the read / write hooks.
 """
 
 from __future__ import annotations
 
 import numpy as np
+import torch
 
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy, getArgs
@@ -35,25 +35,44 @@ class compiledBase(optModel):
         # predicted cost dimension
         return self.problem.num_cost
 
-    def setObj(self, c):
-        # objective coef = known fixed base, plus the predicted cost at its positions
+    @property
+    def c_pred_index(self):
+        # predicted positions, or None when every variable carries a predicted cost
         prob = self.problem
-        coef = prob.fixed_c.copy()
-        coef[prob.c_index] += costToNumpy(c)
+        return prob.c_pred_index if prob.num_cost != prob.num_vars else None
+
+    def setObj(self, c):
+        """Set the objective from a predicted cost of length ``num_cost``, scattered onto the known fixed costs."""
+        # a full coefficient (length num_vars) is written as-is
+        prob = self.problem
+        coef = costToNumpy(c)
+        if coef.shape[-1] != prob.num_vars:
+            full = prob.fixed_cost.copy()
+            full[prob.c_pred_index] += coef
+            coef = full
         self._write_obj(coef)
 
+    def _fullCost(self, pred_cost):
+        # fixed_cost + the predicted cost scattered at its positions (differentiable for torch)
+        prob = self.problem
+        idx = prob.c_pred_index
+        if isinstance(pred_cost, torch.Tensor):
+            index = torch.as_tensor(idx, dtype=torch.long, device=pred_cost.device)
+            scattered = pred_cost.new_zeros((*pred_cost.shape[:-1], prob.num_vars)).index_add(-1, index, pred_cost)
+            return scattered + torch.as_tensor(prob.fixed_cost, dtype=pred_cost.dtype, device=pred_cost.device)
+        arr = np.asarray(pred_cost, dtype=float)
+        full = np.broadcast_to(prob.fixed_cost, (*arr.shape[:-1], prob.num_vars)).copy()
+        full[..., idx] += arr
+        return full
+
     def solve(self):
-        # solve, project onto the predicted positions, drop the fixed-cost part
+        """Solve and return the full decision-vector solution (length ``num_vars``) with its objective value."""
         sol, obj = self._read_sol()
-        sol = np.asarray(sol)
-        return sol[self.problem.c_index], obj - float(self.problem.fixed_c @ sol)
+        return np.asarray(sol), obj
 
     def addConstr(self, coefs, rhs):
-        # a cut over the predicted positions, scattered to the full variable vector
-        prob = self.problem
-        full = np.zeros(prob.num_vars)
-        full[prob.c_index] = np.asarray(coefs, dtype=float).reshape(-1)
-        return self._add_cut(full, rhs)
+        # add a cut coefs @ x <= rhs over the full variable vector
+        return self._add_cut(np.asarray(coefs, dtype=float).reshape(-1), rhs)
 
     def relax(self):
         # recompile the relaxed problem, preserving backend kwargs
