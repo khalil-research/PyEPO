@@ -1,0 +1,69 @@
+pyepo.model.mpax.compile
+========================
+
+.. py:module:: pyepo.model.mpax.compile
+
+.. autoapi-nested-parse::
+
+   MPAX (JAX PDHG) compiler for the PyEPO DSL.
+
+   ``compiledMpaxProblem`` mixes the generic ``compiledBase`` with ``optMpaxModel``
+   to turn a finalized DSL ``Problem`` into MPAX standard-form matrices
+   (``min cᵀx + ½xᵀQx`` s.t. ``Ax = b``, ``Gx ≥ h``, ``l ≤ x ≤ u``) solved by the
+   JAX first-order solver. Unlike the other backends it **overrides** ``setObj`` /
+   ``solve`` rather than using ``compiledBase``'s numpy hooks: the cost is kept as a
+   device tensor (DLPack) so vmap-batched GPU solving is preserved. MPAX is a
+   continuous LP / QP relaxation solver — integer / binary variables are relaxed to
+   their bounds, and quadratic *constraints* are not expressible.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.compile.compiledMpaxProblem
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.compile.compileProblem
+
+
+Module Contents
+---------------
+
+.. py:function:: compileProblem(problem, **params) -> compiledMpaxProblem
+
+   Instantiate the MPAX-compiled problem.
+
+
+.. py:class:: compiledMpaxProblem(problem, params=None)
+
+   Bases: :py:obj:`pyepo.dsl.compiled.compiledBase`, :py:obj:`pyepo.model.mpax.mpaxmodel.optMpaxModel`
+
+
+   MPAX-backed (JAX LP / QP) compiled DSL problem.
+
+
+   .. py:attribute:: use_sparse_matrix
+      :value: False
+
+
+
+   .. py:method:: setObj(c)
+
+      Set the objective from a predicted cost of length ``num_cost``, scattered onto the known fixed costs.
+
+
+
+   .. py:method:: solve()
+
+      Solve and return the full decision-vector solution (length ``num_vars``) with its objective value.
+
+
+

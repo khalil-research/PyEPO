@@ -16,6 +16,9 @@ Attributes
 
    pyepo.EPO.MINIMIZE
    pyepo.EPO.MAXIMIZE
+   pyepo.EPO.BINARY
+   pyepo.EPO.INTEGER
+   pyepo.EPO.CONTINUOUS
 
 
 Classes
@@ -24,6 +27,7 @@ Classes
 .. autoapisummary::
 
    pyepo.EPO.ModelSense
+   pyepo.EPO.VarType
 
 
 Module Contents
@@ -47,7 +51,36 @@ Module Contents
 
 
 
+.. py:class:: VarType(*args, **kwds)
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Decision-variable type.
+
+
+   .. py:attribute:: BINARY
+      :value: 'B'
+
+
+
+   .. py:attribute:: INTEGER
+      :value: 'I'
+
+
+
+   .. py:attribute:: CONTINUOUS
+      :value: 'C'
+
+
+
 .. py:data:: MINIMIZE
 
 .. py:data:: MAXIMIZE
+
+.. py:data:: BINARY
+
+.. py:data:: INTEGER
+
+.. py:data:: CONTINUOUS
 

@@ -1,0 +1,84 @@
+pyepo.dsl.compiled
+==================
+
+.. py:module:: pyepo.dsl.compiled
+
+.. autoapi-nested-parse::
+
+   Generic compiled-problem base for the PyEPO DSL.
+
+   ``compiledBase`` is mixed with a backend base (``optXxxModel``) to form a
+   concrete compiled problem, e.g. ``compiledGrbProblem(compiledBase,
+   optGrbModel)``. It carries the backend-agnostic objective handling — scattering
+   a predicted cost onto its variable positions and solving — while the concrete
+   subclass builds the solver model and provides the read / write hooks.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.dsl.compiled.compiledBase
+
+
+Module Contents
+---------------
+
+.. py:class:: compiledBase(problem, params=None)
+
+   Bases: :py:obj:`pyepo.model.opt.optModel`
+
+
+   Backend-agnostic compiled DSL problem. Mixed with an ``optXxxModel``.
+
+
+   .. py:attribute:: problem
+
+
+   .. py:attribute:: params
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+      number of costs to be predicted
+
+
+   .. py:property:: c_pred_index
+
+      Variable positions the predicted cost lands on, or ``None`` when every variable is predicted (the default).
+
+
+   .. py:method:: setObj(c)
+
+      Set the objective from a predicted cost of length ``num_cost``, scattered onto the known fixed costs.
+
+
+
+   .. py:method:: solve()
+
+      Solve and return the full decision-vector solution (length ``num_vars``) with its objective value.
+
+
+
+   .. py:method:: addConstr(coefs, rhs)
+
+      A method to add a new constraint. Subclasses should override.
+
+      :param coefs: coefficients of the new constraint
+      :param rhs: right-hand side of new constraint
+
+      :returns: new model with the added constraint
+      :rtype: optModel
+
+
+
+   .. py:method:: relax()
+
+      A method to relax the MIP model. Subclasses should override.
+
+
+

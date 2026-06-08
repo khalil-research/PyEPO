@@ -1,0 +1,48 @@
+pyepo.model.copt.compile
+========================
+
+.. py:module:: pyepo.model.copt.compile
+
+.. autoapi-nested-parse::
+
+   COPT compiler for the PyEPO DSL.
+
+   ``compiledCoptProblem`` mixes the generic ``compiledBase`` with ``optCoptModel``
+   to turn a finalized DSL ``Problem`` into a Cardinal Optimizer model. It builds
+   the model and provides the COPT read / write hooks; the objective handling lives
+   in ``compiledBase``.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.copt.compile.compiledCoptProblem
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.model.copt.compile.compileProblem
+
+
+Module Contents
+---------------
+
+.. py:function:: compileProblem(problem, **params) -> compiledCoptProblem
+
+   Instantiate the COPT-compiled problem; ``params`` are COPT parameters.
+
+
+.. py:class:: compiledCoptProblem(problem, params=None)
+
+   Bases: :py:obj:`pyepo.dsl.compiled.compiledBase`, :py:obj:`pyepo.model.copt.coptmodel.optCoptModel`
+
+
+   COPT-backed compiled DSL problem.
+
+

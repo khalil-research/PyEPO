@@ -1,0 +1,94 @@
+pyepo.model.predefined
+======================
+
+.. py:module:: pyepo.model.predefined
+
+.. autoapi-nested-parse::
+
+   Backend-dispatching factories for the built-in problems.
+
+   Each factory builds the requested problem on the chosen solver backend, selected
+   by the ``backend`` keyword (default Gurobi) rather than by importing a
+   backend-specific class.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.model.predefined.shortestPathModel
+   pyepo.model.predefined.knapsackModel
+   pyepo.model.predefined.portfolioModel
+   pyepo.model.predefined.tspModel
+   pyepo.model.predefined.vrpModel
+
+
+Module Contents
+---------------
+
+.. py:function:: shortestPathModel(grid, *, backend='gurobi', **kwargs)
+
+   Shortest path on a grid network.
+
+   :param grid: grid size ``(h, w)``
+   :type grid: tuple
+   :param backend: solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``, ``"mpax"``
+   :type backend: str
+
+
+.. py:function:: knapsackModel(weights, capacity, *, backend='gurobi', **kwargs)
+
+   Multi-dimensional knapsack.
+
+   :param weights: item weights with shape ``(dim, n_items)``
+   :type weights: ndarray
+   :param capacity: per-dimension capacity with length ``dim``
+   :type capacity: ndarray
+   :param backend: solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``, ``"mpax"``
+   :type backend: str
+
+
+.. py:function:: portfolioModel(num_assets, covariance, *, backend='gurobi', **kwargs)
+
+   Mean-variance portfolio optimization.
+
+   :param num_assets: number of assets
+   :type num_assets: int
+   :param covariance: covariance matrix of the asset returns
+   :type covariance: ndarray
+   :param backend: solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``
+   :type backend: str
+
+
+.. py:function:: tspModel(num_nodes, *, backend='gurobi', formulation='DFJ', **kwargs)
+
+   Traveling salesperson.
+
+   :param num_nodes: number of nodes
+   :type num_nodes: int
+   :param backend: solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``
+   :type backend: str
+   :param formulation: ILP formulation; one of ``"DFJ"``, ``"GG"``, ``"MTZ"`` (``"DFJ"`` on gurobi and copt only)
+   :type formulation: str
+
+
+.. py:function:: vrpModel(num_nodes, demands, capacity, num_vehicle, *, backend='gurobi', formulation='RCI', **kwargs)
+
+   Capacitated vehicle routing.
+
+   :param num_nodes: number of nodes, with the depot as node 0
+   :type num_nodes: int
+   :param demands: per-customer demands with length ``num_nodes - 1``
+   :type demands: list
+   :param capacity: vehicle capacity
+   :type capacity: float
+   :param num_vehicle: number of vehicles
+   :type num_vehicle: int
+   :param backend: solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``
+   :type backend: str
+   :param formulation: ILP formulation; ``"RCI"`` or ``"MTZ"`` (``"RCI"`` on gurobi and copt only)
+   :type formulation: str
+
+

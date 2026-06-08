@@ -19,6 +19,7 @@ Submodules
 
    /autoapi/pyepo/EPO/index
    /autoapi/pyepo/data/index
+   /autoapi/pyepo/dsl/index
    /autoapi/pyepo/func/index
    /autoapi/pyepo/metric/index
    /autoapi/pyepo/model/index

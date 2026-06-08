@@ -1,0 +1,97 @@
+pyepo.dsl.problem
+=================
+
+.. py:module:: pyepo.dsl.problem
+
+.. autoapi-nested-parse::
+
+   The DSL ``Problem``: collects variables, finalizes the symbolic IR into global
+   sparse matrices, validates PyEPO scope, and compiles to a backend.
+
+   At construction every referenced ``Variable`` is assigned a contiguous slice of
+   a global flat index (encounter order: objective first, then each constraint in
+   list order). Constraints finalize to ``(Q | None, A, sense, b_eff)``; the
+   objective finalizes to the predicted ``c_pred_index``, a known ``fixed_cost``
+   linear part, and an optional parameter-free quadratic term ``obj_Q``.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.dsl.problem.Problem
+
+
+Module Contents
+---------------
+
+.. py:class:: Problem(objective, constraints=None)
+
+   A symbolic predict-then-optimize problem.
+
+   :ivar objective: the objective
+   :vartype objective: Minimize | Maximize
+   :ivar constraints: the constraints
+   :vartype constraints: list[Constraint]
+   :ivar cost_param: the unique predicted-cost Parameter
+   :vartype cost_param: Parameter
+   :ivar cost_var: the Variable the predicted cost lands on
+   :vartype cost_var: Variable
+   :ivar num_cost: predicted dimension (``cost_param.size``)
+   :vartype num_cost: int
+   :ivar flat_slice: global flat slice per Variable
+   :vartype flat_slice: dict[Variable, slice]
+   :ivar num_vars: total decision-variable count
+   :vartype num_vars: int
+   :ivar c_pred_index: flat indices the predicted cost lands on
+   :vartype c_pred_index: np.ndarray
+   :ivar fixed_cost: known linear objective coefficients ``(num_vars,)``
+   :vartype fixed_cost: np.ndarray
+   :ivar constrs: finalized ``(Q, A, sense, b_eff)`` per constraint
+   :vartype constrs: list[tuple]
+   :ivar obj_Q: finalized parameter-free quadratic objective term
+
+   :vartype obj_Q: csr_matrix | None
+
+
+   .. py:attribute:: objective
+
+
+   .. py:attribute:: constraints
+
+
+   .. py:attribute:: cost_param
+
+
+   .. py:attribute:: cost_var
+
+
+   .. py:property:: num_cost
+      :type: int
+
+
+
+   .. py:method:: relax() -> Problem
+
+      Return a new Problem with all integer / binary variables continuous
+      (bounds preserved: binary ⇒ [0, 1]); objective and constraints unchanged.
+
+
+
+   .. py:method:: compile(backend, **kwargs)
+
+      Compile to a solver backend, returning an ``optModel``.
+
+      A solver with a native backend (``"gurobi"`` / ``"copt"``) is reached
+      through it directly — the most efficient path. The generic backends
+      (``"pyomo"``, ``"ortools"``) are only for solvers without a native one
+      (HiGHS, GLPK, CBC, SCIP, Ipopt); routing a native solver through them is
+      wasteful indirection.
+
+      :param backend: solver backend name (``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``, ``"mpax"``).
+      :param \*\*kwargs: backend options -- ``solver=`` (generic backends), ``timelimit=`` (seconds), or native solver parameters.
+
+
+

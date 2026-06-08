@@ -15,6 +15,7 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
+   /autoapi/pyepo/model/grb/compile/index
    /autoapi/pyepo/model/grb/grbmodel/index
    /autoapi/pyepo/model/grb/knapsack/index
    /autoapi/pyepo/model/grb/portfolio/index

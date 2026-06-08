@@ -85,6 +85,13 @@ Module Contents
 
 
 
+   .. py:property:: c_pred_index
+      :type: numpy.ndarray | None
+
+
+      Variable positions the predicted cost lands on, or ``None`` when every variable is predicted (the default).
+
+
    .. py:method:: copy() -> Self
 
       A method to copy the model

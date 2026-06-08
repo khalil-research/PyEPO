@@ -15,6 +15,7 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
+   /autoapi/pyepo/model/mpax/compile/index
    /autoapi/pyepo/model/mpax/knapsack/index
    /autoapi/pyepo/model/mpax/mpaxmodel/index
    /autoapi/pyepo/model/mpax/shortestpath/index

@@ -25,7 +25,7 @@ End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ los
 
    # optimization model: 5x5 grid shortest path
    grid = (5, 5)
-   optmodel = pyepo.model.grb.shortestPathModel(grid)
+   optmodel = pyepo.model.shortestPathModel(grid)
 
    # synthetic data and dataset
    x, c = pyepo.data.shortestpath.genData(
@@ -47,8 +47,10 @@ End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ los
            loss.backward()
            optimizer.step()
 
-   # decision quality
-   print("Regret:", pyepo.metric.regret(predmodel, optmodel, dataloader))
+   # decision quality (on the training set here; split off a test set for real evaluation)
+   print("Training regret:", pyepo.metric.regret(predmodel, optmodel, dataloader))
+
+New to PyEPO? Start with :doc:`content/intro` for the framework, then the *Where to Start* guide in :doc:`content/tutorial`.
 
 
 .. toctree::

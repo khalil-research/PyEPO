@@ -1,0 +1,60 @@
+pyepo.model.ort.compile
+=======================
+
+.. py:module:: pyepo.model.ort.compile
+
+.. autoapi-nested-parse::
+
+   OR-Tools (pywraplp) compiler for the PyEPO DSL.
+
+   ``compiledOrtProblem`` mixes the generic ``compiledBase`` with ``optOrtModel``
+   to turn a finalized DSL ``Problem`` into a pywraplp ``Solver`` running an open
+   solver (``solver=``, default SCIP). It builds the model and provides the OR-Tools
+   read / write hooks; the objective handling lives in ``compiledBase``. pywraplp is
+   LP / MIP only — quadratic objectives or constraints raise ``NotImplementedError``.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.ort.compile.compiledOrtProblem
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.model.ort.compile.compileProblem
+
+
+Module Contents
+---------------
+
+.. py:function:: compileProblem(problem, solver='scip', **params) -> compiledOrtProblem
+
+   Instantiate the OR-Tools-compiled problem; ``params`` are solver options.
+
+
+.. py:class:: compiledOrtProblem(problem, params=None, solver='scip')
+
+   Bases: :py:obj:`pyepo.dsl.compiled.compiledBase`, :py:obj:`pyepo.model.ort.ortmodel.optOrtModel`
+
+
+   OR-Tools (pywraplp) compiled DSL problem, solved by ``solver``.
+
+
+   .. py:attribute:: problem
+
+
+   .. py:attribute:: params
+
+
+   .. py:attribute:: solver
+      :value: 'scip'
+
+
+

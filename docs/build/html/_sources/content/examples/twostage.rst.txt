@@ -14,7 +14,7 @@ The two-stage approach trains a regression model :math:`\hat{\mathbf{c}} = g(\ma
 
    # model for shortest path
    grid = (5,5) # grid size
-   model = pyepo.model.grb.shortestPathModel(grid)
+   model = pyepo.model.shortestPathModel(grid)
 
    # generate data
    num_data = 1000 # number of data

@@ -22,6 +22,7 @@ Submodules
    /autoapi/pyepo/model/omo/index
    /autoapi/pyepo/model/opt/index
    /autoapi/pyepo/model/ort/index
+   /autoapi/pyepo/model/predefined/index
    /autoapi/pyepo/model/utils/index
 
 

@@ -1,0 +1,52 @@
+pyepo.dsl
+=========
+
+.. py:module:: pyepo.dsl
+
+.. autoapi-nested-parse::
+
+   PyEPO symbolic DSL: define an LP / MIP / QP once and compile it to any backend.
+
+   Public API::
+
+       from pyepo import EPO, dsl
+       x = dsl.Variable(5, vtype=EPO.BINARY)
+       c = dsl.Parameter(5)
+       prob = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap])
+
+   ``Problem`` finalizes the symbolic IR (sparse coefficient matrices) and
+   compiles it to a solver backend.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/dsl/compiled/index
+   /autoapi/pyepo/dsl/expression/index
+   /autoapi/pyepo/dsl/objective/index
+   /autoapi/pyepo/dsl/problem/index
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.dsl.sum
+
+
+Package Contents
+----------------
+
+.. py:function:: sum(expr, axis=None)
+
+   Module-level reduction: dispatches to the expression's ``.sum(axis)``.
+
+   ``dsl.sum(c * x)`` returns the scalar ``ParametricObjective``; ``dsl.sum`` of
+   an ``Affine`` / ``Variable`` returns the reduced linear expression.
+
+

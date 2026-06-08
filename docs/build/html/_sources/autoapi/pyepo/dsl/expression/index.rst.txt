@@ -1,0 +1,279 @@
+pyepo.dsl.expression
+====================
+
+.. py:module:: pyepo.dsl.expression
+
+.. autoapi-nested-parse::
+
+   Symbolic expression nodes and algebra for the PyEPO DSL.
+
+   Variables and Parameters compose through numpy-style operators into linear
+   (``Affine``) and quadratic (``Quadratic``) nodes; comparisons produce a
+   ``Constraint``; a single ``Parameter`` multiplies a Variable (or slice) into a
+   ``ParametricObjective`` objective. Each linear node carries per-Variable
+   coefficient blocks (``dict[Variable, csr_matrix]``) plus a constant offset;
+   ``Problem`` finalizes them into one global sparse matrix (see
+   ``pyepo.dsl.problem``).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.dsl.expression.Variable
+   pyepo.dsl.expression.Affine
+   pyepo.dsl.expression.Quadratic
+   pyepo.dsl.expression.Parameter
+   pyepo.dsl.expression.ParametricCoef
+   pyepo.dsl.expression.ParametricVector
+   pyepo.dsl.expression.ParametricObjective
+   pyepo.dsl.expression.Constraint
+
+
+Module Contents
+---------------
+
+.. py:class:: Variable(shape, *, vtype=EPO.CONTINUOUS, lb=None, ub=None, name=None)
+
+   A decision variable of a given shape and per-entry type.
+
+   ``vtype`` is a scalar ``EPO.VarType`` (uniform) or a per-entry array; binary
+   entries are forced to bounds ``[0, 1]``.
+
+   :ivar shape: logical shape
+   :vartype shape: tuple
+   :ivar size: number of scalar entries (``prod(shape)``)
+   :vartype size: int
+   :ivar vtype: per-entry ``EPO.VarType``, length ``size``
+   :vartype vtype: np.ndarray
+   :ivar lb / ub: flat C-order bounds, length ``size``
+
+   :vartype lb / ub: np.ndarray
+
+
+   .. py:attribute:: shape
+
+
+   .. py:attribute:: size
+
+
+   .. py:attribute:: vtype
+
+
+   .. py:attribute:: lb
+
+
+   .. py:attribute:: ub
+
+
+   .. py:attribute:: name
+      :value: None
+
+
+
+   .. py:method:: sum(axis=None)
+
+
+.. py:class:: Affine(blocks, const, shape)
+
+   Linear expression ``Σ_v A_v @ vec(v) + b`` of logical ``shape``.
+
+   :ivar blocks: per-Variable coefficient block ``(size, v.size)``
+   :vartype blocks: dict[Variable, csr_matrix]
+   :ivar const: constant offset ``(size,)``
+   :vartype const: np.ndarray
+   :ivar shape: logical shape; ``size == prod(shape)``
+
+   :vartype shape: tuple
+
+
+   .. py:attribute:: shape
+
+
+   .. py:attribute:: size
+
+
+   .. py:attribute:: const
+
+
+   .. py:attribute:: blocks
+
+
+   .. py:method:: sum(axis=None)
+
+
+   .. py:method:: finalize(flat_slice, num_vars)
+
+
+.. py:class:: Quadratic(quad, affine)
+
+   Scalar quadratic expression ``xᵀ Q x + (linear) + const``.
+
+   :ivar quad: symmetric-when-finalized blocks
+   :vartype quad: dict[(Variable, Variable), csr_matrix]
+   :ivar affine: scalar linear + constant part
+
+   :vartype affine: Affine
+
+
+   .. py:attribute:: quad
+
+
+   .. py:attribute:: affine
+
+
+   .. py:method:: finalize_Q(flat_slice, num_vars)
+
+
+.. py:class:: Parameter(shape, *, name=None)
+
+   The runtime-bound predicted cost symbol (exactly one per Problem).
+
+   The inner product ``c @ x`` (or ``c @ x[:k]``) pairs the predicted cost with a
+   Variable (or a plain slice / index of one) into a scalar objective term. The
+   elementwise product ``c * x`` is a vector of predicted terms; reduce it to the
+   scalar objective with ``(c * x).sum()``. A known base may be added first:
+   ``(d + c) @ x`` predicts ``d + c`` on x. Any other use raises ``TypeError``.
+
+   :ivar shape: logical shape
+   :vartype shape: tuple
+   :ivar size: number of predicted entries (``prod(shape)``)
+
+   :vartype size: int
+
+
+   .. py:attribute:: shape
+
+
+   .. py:attribute:: size
+
+
+   .. py:attribute:: name
+      :value: None
+
+
+
+.. py:class:: ParametricCoef(param, base)
+
+   A predicted cost coefficient with a known base, ``base + param`` — the
+   transient result of ``c + d`` / ``d + c`` / ``c - d``. Pairs with a Variable
+   or selection like a Parameter: ``(d + c) @ x`` (scalar) or ``(d + c) * x``
+   (elementwise vector, reduce with ``.sum()``).
+
+
+   .. py:attribute:: param
+
+
+   .. py:attribute:: base
+
+
+.. py:class:: ParametricVector(param, base, sel)
+
+   The elementwise product ``c * x`` (optionally with a known base): a vector of
+   predicted terms, one per selected position. It is not yet a scalar objective;
+   reduce it with ``.sum()`` to form the objective term ``(c * x).sum()``.
+
+   :ivar param: the predicted cost
+   :vartype param: Parameter
+   :ivar base: known offset added at the predicted positions
+   :vartype base: np.ndarray | None
+   :ivar sel: the Variable / selection the cost lands on
+
+   :vartype sel: Variable | Affine
+
+
+   .. py:attribute:: param
+
+
+   .. py:attribute:: base
+
+
+   .. py:attribute:: sel
+
+
+   .. py:method:: sum(axis=None)
+
+
+.. py:class:: ParametricObjective(cost_param, cost_var, local_idx=None, base=None, fixed=None, quad=None)
+
+   The objective: ``cost_param`` predicts the cost at ``cost_var``'s selected
+   positions (with an optional known ``base``), plus optional known fixed
+   linear (``fixed``) and parameter-free quadratic (``quad``) terms.
+
+   :ivar cost_param: the predicted cost (size == num_cost)
+   :vartype cost_param: Parameter
+   :ivar cost_var: the Variable the prediction lands on
+   :vartype cost_var: Variable
+   :ivar local_idx: predicted indices within cost_var (None = all)
+   :vartype local_idx: np.ndarray | None
+   :ivar base: known cost added at the predicted positions
+   :vartype base: np.ndarray | None
+   :ivar fixed: known linear term on other / overlapping positions
+   :vartype fixed: Affine | None
+   :ivar quad: parameter-free quadratic term
+
+   :vartype quad: Quadratic | None
+
+
+   .. py:attribute:: cost_param
+
+
+   .. py:attribute:: cost_var
+
+
+   .. py:attribute:: local_idx
+      :value: None
+
+
+
+   .. py:attribute:: base
+      :value: None
+
+
+
+   .. py:attribute:: fixed
+      :value: None
+
+
+
+   .. py:attribute:: quad
+      :value: None
+
+
+
+   .. py:method:: sum(axis=None)
+
+
+.. py:class:: Constraint(lhs, sense, rhs)
+
+   A relation ``lhs (<= | >= | ==) rhs`` between an expression and a constant.
+
+   :ivar lhs: left-hand side expression
+   :vartype lhs: Affine | Quadratic
+   :ivar sense: one of ``"<="`` / ``">="`` / ``"=="``
+   :vartype sense: str
+   :ivar rhs: right-hand side, broadcast to the LHS length
+
+   :vartype rhs: np.ndarray
+
+
+   .. py:attribute:: lhs
+
+
+   .. py:attribute:: sense
+
+
+   .. py:attribute:: rhs
+
+
+   .. py:method:: variables()
+
+
+   .. py:method:: finalize(flat_slice, num_vars)
+
+      Assemble the global form ``(Q | None, A, sense, b_eff)`` (``b_eff = rhs - const``).
+
+
+

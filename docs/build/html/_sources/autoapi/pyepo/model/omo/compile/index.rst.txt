@@ -1,0 +1,61 @@
+pyepo.model.omo.compile
+=======================
+
+.. py:module:: pyepo.model.omo.compile
+
+.. autoapi-nested-parse::
+
+   Pyomo compiler for the PyEPO DSL.
+
+   ``compiledOmoProblem`` mixes the generic ``compiledBase`` with ``optOmoModel``
+   to turn a finalized DSL ``Problem`` into a Pyomo ``ConcreteModel`` solved by any
+   Pyomo-supported ``solver``. It builds the model and provides the Pyomo read /
+   write hooks; the objective handling lives in ``compiledBase``. The objective
+   coefficient is a mutable ``Param`` so ``setObj`` updates values rather than
+   rebuilding the expression.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.model.omo.compile.compiledOmoProblem
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.model.omo.compile.compileProblem
+
+
+Module Contents
+---------------
+
+.. py:function:: compileProblem(problem, solver='glpk', **params) -> compiledOmoProblem
+
+   Instantiate the Pyomo-compiled problem; ``params`` are solver options.
+
+
+.. py:class:: compiledOmoProblem(problem, params=None, solver='glpk')
+
+   Bases: :py:obj:`pyepo.dsl.compiled.compiledBase`, :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+
+
+   Pyomo-backed compiled DSL problem, solved by ``solver``.
+
+
+   .. py:attribute:: problem
+
+
+   .. py:attribute:: params
+
+
+   .. py:attribute:: solver
+      :value: 'glpk'
+
+
+

@@ -21,7 +21,7 @@ Common parameters across all generators:
 
 * **deg** (:math:`deg`): polynomial degree of the mapping :math:`f(\mathbf{x}_i)`
 
-* **noise_width** (:math:`\bar{\epsilon}`): noise half-width (shortest path, knapsack, TSP; portfolio uses ``noise_level`` instead -- see below)
+* **noise_width** (:math:`\bar{\epsilon}`): noise half-width (shortest path, knapsack, TSP; portfolio uses ``noise_level`` instead; see below)
 
 * **seed**: random seed for reproducibility
 
@@ -101,6 +101,92 @@ Unlike the other generators, portfolio noise is controlled by **noise_level** (:
    cov, x, r = pyepo.data.portfolio.genData(num_data, num_feat, num_assets, deg=4, noise_level=1, seed=135)
 
 
+Built-in Problem Models
+=======================
+
+``PyEPO`` ships ready-made models for several classic problems, so you can run the full pipeline without writing one. Each is built by a factory that takes a ``backend`` keyword (default ``"gurobi"``). Pair one with generated data and an ``optDataset``:
+
+.. code-block:: python
+
+   import pyepo
+   from pyepo import model
+
+   grid = (5, 5)
+   x, c = pyepo.data.shortestpath.genData(1000, 5, grid, deg=4, seed=135)
+   optmodel = model.shortestPathModel(grid)                  # default Gurobi
+   dataset = pyepo.data.dataset.optDataset(optmodel, x, c)
+
+Switch the solver with ``backend``. The generic backends take a ``solver=`` argument naming the open solver to run:
+
+.. code-block:: python
+
+   model.shortestPathModel(grid, backend="copt")
+   model.shortestPathModel(grid, backend="pyomo", solver="glpk")
+   model.shortestPathModel(grid, backend="mpax")             # LP on GPU
+
+.. note:: In end-to-end training, ``setObj`` and ``solve`` run automatically inside the ``pyepo.func`` modules.
+
+
+Shortest Path Model
+-------------------
+
+Minimum-cost path from the northwest to the southeast corner of an ``(h, w)`` grid, formulated as a minimum-cost-flow LP. Backends: gurobi, copt, pyomo, ortools, mpax.
+
+.. autofunction:: pyepo.model.shortestPathModel
+
+
+Knapsack Model
+--------------
+
+Multi-dimensional 0/1 knapsack: maximize value subject to per-dimension capacities. ``weights`` has shape ``(dim, n_items)`` and ``capacity`` has length ``dim``. Backends: gurobi, copt, pyomo, ortools, mpax (LP relaxation).
+
+.. code-block:: python
+
+   weights = [[3, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]]
+   capacity = [12, 10, 15]
+   optmodel = model.knapsackModel(weights, capacity)
+
+.. autofunction:: pyepo.model.knapsackModel
+
+
+Traveling Salesperson Model
+---------------------------
+
+Shortest tour visiting each city once. ``formulation`` is ``"DFJ"`` (lazy subtour elimination), ``"GG"``, or ``"MTZ"``. Backends: gurobi and copt (all three); pyomo (GG, MTZ).
+
+.. code-block:: python
+
+   optmodel = model.tspModel(20, formulation="DFJ")
+
+.. autofunction:: pyepo.model.tspModel
+
+
+Capacitated Vehicle Routing Model
+---------------------------------
+
+Shortest vehicle routes from a depot that serve every customer within capacity. ``formulation`` is ``"RCI"`` (lazy rounded-capacity cuts) or ``"MTZ"``. Backends: gurobi and copt (both); pyomo (MTZ).
+
+.. code-block:: python
+
+   optmodel = model.vrpModel(10, demands=[2, 1, 3, 2, 1, 2, 1, 3, 2],
+                             capacity=5.0, num_vehicle=3, formulation="RCI")
+
+.. autofunction:: pyepo.model.vrpModel
+
+
+Portfolio Model
+---------------
+
+Mean-variance allocation that maximizes return under a risk budget. Backends: gurobi, copt, pyomo.
+
+.. code-block:: python
+
+   import numpy as np
+   covariance = np.cov(np.random.randn(10, 50), rowvar=False)
+   optmodel = model.portfolioModel(50, covariance)
+
+.. autofunction:: pyepo.model.portfolioModel
+
 
 optDataset
 ==========
@@ -121,7 +207,7 @@ The following example shows how to use ``optDataset`` with a PyTorch ``DataLoade
 
    # model for shortest path
    grid = (5,5) # grid size
-   model = pyepo.model.grb.shortestPathModel(grid)
+   model = pyepo.model.shortestPathModel(grid)
 
    # generate data
    num_data = 1000 # number of data
@@ -154,7 +240,7 @@ For a runnable walkthrough, see the `08 kNN Robust Losses <https://colab.researc
 
   # model for shortest path
   grid = (5,5) # grid size
-  model = pyepo.model.grb.shortestPathModel(grid)
+  model = pyepo.model.shortestPathModel(grid)
 
   # generate data
   num_data = 1000 # number of data
@@ -174,7 +260,7 @@ optDatasetConstrs
 
 ``pyepo.data.dataset.optDatasetConstrs`` is a PyTorch ``Dataset`` for the CaVE [#f2]_ cone-aligned loss. In addition to the features, costs, optimal solutions, and objective values stored by ``optDataset``, it also extracts the **normals of the binding constraints at the optimal vertex** for each instance. CaVE then projects the sense-flipped predicted cost vector onto the cone spanned by these normals.
 
-Because the binding-constraint extraction relies on Gurobi's sparse-matrix and constraint-sense APIs, ``optDatasetConstrs`` currently requires a Gurobi-backed ``optModel``. The dataset also enforces that the optimal vertex is binary — CaVE is defined for binary linear programs.
+Because the binding-constraint extraction relies on Gurobi's sparse-matrix and constraint-sense APIs, ``optDatasetConstrs`` currently requires a Gurobi-backed ``optModel``. The dataset also enforces that the optimal vertex is binary, since CaVE is defined for binary linear programs.
 
 For a runnable walkthrough that uses ``optDatasetConstrs`` end-to-end with the CaVE loss, see the `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_ notebook.
 
@@ -193,7 +279,7 @@ Per-instance constraint matrices have different row counts (different sets of co
   from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
 
   # model for TSP (Gurobi backend required)
-  model = pyepo.model.grb.tspDFJModel(num_nodes=10)
+  model = pyepo.model.tspModel(num_nodes=10, formulation="DFJ")
 
   # generate data
   x, c = pyepo.data.tsp.genData(num_data=1000, num_features=5, num_nodes=10, deg=4, seed=135)

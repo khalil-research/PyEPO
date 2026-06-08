@@ -23,7 +23,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: regularizedFrankWolfeOpt(optmodel: pyepo.model.opt.optModel, lambd: float = 1.0, max_iter: int = 20, tol: float = 1e-06, processes: int = 1, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
+.. py:class:: regularizedFrankWolfeOpt(optmodel: pyepo.model.opt.optModel, lambd: float = 1.0, max_iter: int = 10000, tol: float = 1e-06, processes: int = 1, solve_ratio: float = 1.0, dataset: pyepo.data.dataset.optDataset | None = None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -52,7 +52,7 @@ Module Contents
 
 
    .. py:attribute:: max_iter
-      :value: 20
+      :value: 10000
 
 
 
@@ -103,7 +103,7 @@ Module Contents
 
 
 
-.. py:class:: regularizedFrankWolfeFenchelYoung(optmodel: pyepo.model.opt.optModel, lambd: float = 1.0, max_iter: int = 20, tol: float = 1e-06, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
+.. py:class:: regularizedFrankWolfeFenchelYoung(optmodel: pyepo.model.opt.optModel, lambd: float = 1.0, max_iter: int = 10000, tol: float = 1e-06, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.abcmodule.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None)
 
    Bases: :py:obj:`pyepo.func.abcmodule.optModule`
 
@@ -130,7 +130,7 @@ Module Contents
 
 
    .. py:attribute:: max_iter
-      :value: 20
+      :value: 10000
 
 
 

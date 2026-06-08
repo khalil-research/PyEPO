@@ -1,0 +1,75 @@
+pyepo.dsl.objective
+===================
+
+.. py:module:: pyepo.dsl.objective
+
+.. autoapi-nested-parse::
+
+   Objective nodes for the PyEPO DSL.
+
+   ``Minimize`` / ``Maximize`` wrap a scalar ``ParametricObjective`` (the predicted
+   cost paired with a Variable, optionally plus a parameter-free quadratic term)
+   and record the ``EPO`` model sense for the compiled backend.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.dsl.objective.Objective
+   pyepo.dsl.objective.Minimize
+   pyepo.dsl.objective.Maximize
+
+
+Module Contents
+---------------
+
+.. py:class:: Objective(expr)
+
+   Base objective: a wrapped expression plus its sense.
+
+   :ivar expr: the objective expression
+   :vartype expr: ParametricObjective
+   :ivar modelSense: ``EPO.MINIMIZE`` or ``EPO.MAXIMIZE``
+
+   :vartype modelSense: EPO
+
+
+   .. py:attribute:: modelSense
+      :value: None
+
+
+
+   .. py:attribute:: expr
+
+
+   .. py:property:: cost_param
+
+
+   .. py:property:: cost_var
+
+
+.. py:class:: Minimize(expr)
+
+   Bases: :py:obj:`Objective`
+
+
+   Minimization objective.
+
+
+   .. py:attribute:: modelSense
+
+
+.. py:class:: Maximize(expr)
+
+   Bases: :py:obj:`Objective`
+
+
+   Maximization objective.
+
+
+   .. py:attribute:: modelSense
+
+

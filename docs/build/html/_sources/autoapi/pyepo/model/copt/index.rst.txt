@@ -15,6 +15,7 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
+   /autoapi/pyepo/model/copt/compile/index
    /autoapi/pyepo/model/copt/coptmodel/index
    /autoapi/pyepo/model/copt/knapsack/index
    /autoapi/pyepo/model/copt/portfolio/index

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html"><link rel="next" title="pyepo.twostage" href="../../twostage/index.html"><link rel="prev" title="pyepo.model.ort.shortestpath" href="../ort/shortestpath/index.html">
+<link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html"><link rel="next" title="pyepo.twostage" href="../../twostage/index.html"><link rel="prev" title="pyepo.model.predefined" href="../predefined/index.html">
 
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>pyepo.model.utils - PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.8 documentation</title>
+        <title>pyepo.model.utils - PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.8 documentation</div></a>
+      <a href="../../../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 1.3.8 documentation</span>
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.0.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -216,8 +216,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../content/examples/data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../content/examples/twostage.html">Two-Stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../content/examples/function.html">Autograd Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../content/examples/pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../content/examples/training.html">Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../content/examples/pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../content/examples/evaluation.html">Evaluation</a></li>
 </ul>
 </li>
@@ -233,7 +233,14 @@
 <li class="toctree-l4"><a class="reference internal" href="../../data/tsp/index.html">pyepo.data.tsp</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../dsl/index.html">pyepo.dsl</a><input aria-label="Toggle navigation of pyepo.dsl" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../dsl/compiled/index.html">pyepo.dsl.compiled</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dsl/expression/index.html">pyepo.dsl.expression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dsl/objective/index.html">pyepo.dsl.objective</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dsl/problem/index.html">pyepo.dsl.problem</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../func/abcmodule/index.html">pyepo.func.abcmodule</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../func/blackbox/index.html">pyepo.func.blackbox</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../func/cave/index.html">pyepo.func.cave</a></li>
@@ -245,16 +252,17 @@
 <li class="toctree-l4"><a class="reference internal" href="../../func/utils/index.html">pyepo.func.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../metric/metrics/index.html">pyepo.metric.metrics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../metric/mse/index.html">pyepo.metric.mse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../metric/regret/index.html">pyepo.metric.regret</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../metric/unambregret/index.html">pyepo.metric.unambregret</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current has-children"><a class="reference internal" href="../index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l3 current has-children"><a class="reference internal" href="../index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" checked="" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../bases/index.html">pyepo.model.bases</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../copt/compile/index.html">pyepo.model.copt.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../copt/coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../copt/knapsack/index.html">pyepo.model.copt.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../copt/portfolio/index.html">pyepo.model.copt.portfolio</a></li>
@@ -263,7 +271,8 @@
 <li class="toctree-l5"><a class="reference internal" href="../copt/vrp/index.html">pyepo.model.copt.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../grb/compile/index.html">pyepo.model.grb.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../grb/grbmodel/index.html">pyepo.model.grb.grbmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../grb/knapsack/index.html">pyepo.model.grb.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../grb/portfolio/index.html">pyepo.model.grb.portfolio</a></li>
@@ -272,13 +281,15 @@
 <li class="toctree-l5"><a class="reference internal" href="../grb/vrp/index.html">pyepo.model.grb.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../mpax/compile/index.html">pyepo.model.mpax.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../mpax/knapsack/index.html">pyepo.model.mpax.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../mpax/mpaxmodel/index.html">pyepo.model.mpax.mpaxmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../mpax/shortestpath/index.html">pyepo.model.mpax.shortestpath</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../omo/compile/index.html">pyepo.model.omo.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../omo/knapsack/index.html">pyepo.model.omo.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../omo/omomodel/index.html">pyepo.model.omo.omomodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../omo/portfolio/index.html">pyepo.model.omo.portfolio</a></li>
@@ -288,17 +299,19 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../opt/index.html">pyepo.model.opt</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../ort/compile/index.html">pyepo.model.ort.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../ort/knapsack/index.html">pyepo.model.ort.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../ort/ortcpmodel/index.html">pyepo.model.ort.ortcpmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../ort/ortmodel/index.html">pyepo.model.ort.ortmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../ort/shortestpath/index.html">pyepo.model.ort.shortestpath</a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="../predefined/index.html">pyepo.model.predefined</a></li>
 <li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pyepo.model.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../twostage/autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../twostage/sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
 </ul>
@@ -441,14 +454,14 @@ or the last visited node is not adjacent to 0).</p>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../ort/shortestpath/index.html">
+          <a class="prev-page" href="../predefined/index.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">pyepo.model.ort.shortestpath</div>
+                <div class="title">pyepo.model.predefined</div>
                 
               </div>
             </a>
@@ -506,7 +519,7 @@ or the last visited node is not adjacent to 0).</p>
       
     </aside>
   </div>
-</div><script src="../../../../_static/documentation_options.js?v=a9bb411d"></script>
+</div><script src="../../../../_static/documentation_options.js?v=f0042b85"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
