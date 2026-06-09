@@ -5,11 +5,11 @@ Capacitated vehicle routing problem
 
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
 
+from pyepo.model.bases import vrpABBase
 from pyepo.model.omo.omomodel import optOmoModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL
 
@@ -23,7 +23,7 @@ except ImportError:
     pass
 
 
-class vrpABModel(optOmoModel):
+class vrpABModel(vrpABBase, optOmoModel):
     """
     Abstract Pyomo-backed model for the capacitated vehicle routing problem.
 
@@ -33,12 +33,6 @@ class vrpABModel(optOmoModel):
     needed, duplicate the depot.
 
     Attributes:
-        num_nodes: number of nodes (including depot at index 0)
-        nodes: list of node indices
-        edges: undirected edges as (i, j) with i < j
-        demands: customer demands (excluding depot)
-        capacity: per-vehicle capacity
-        num_vehicle: number of vehicles
         solver: optimization solver in the background
     """
 
@@ -58,21 +52,7 @@ class vrpABModel(optOmoModel):
             num_vehicle: number of vehicles
             solver: optimization solver in the background
         """
-        # problem parameters
-        self.num_nodes = num_nodes
-        self.nodes = list(range(num_nodes))
-        self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
-        self.demands = demands
-        self.capacity = capacity
-        self.num_vehicle = num_vehicle
-        super().__init__(solver)
-
-    @property
-    def num_cost(self) -> int:
-        """
-        number of costs to be predicted
-        """
-        return len(self.edges)
+        super().__init__(num_nodes, demands, capacity, num_vehicle, solver)
 
     def _obj_expr(self):
         """Paired: each undirected edge cost weights x[i,j] + x[j,i]."""
@@ -81,55 +61,19 @@ class vrpABModel(optOmoModel):
             for k, (i, j) in enumerate(self.edges)
         )
 
-    def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[list[int]]:
-        """
-        Reconstruct vehicle tours from an undirected edge-selection vector.
-
-        Args:
-            sol: per-edge selection values aligned with ``self.edges``
-
-        Returns:
-            list of tours; each tour is a node sequence starting and ending at the depot
-        """
-        # active-edge adjacency
-        adj: dict[int, list[int]] = defaultdict(list)
-        for i, (u, v) in enumerate(self.edges):
-            if sol[i] > _EDGE_ACTIVE_TOL:
-                adj[u].append(v)
-                adj[v].append(u)
-        # peel one depot-anchored route at a time
-        routes = []
-        while adj[0]:
-            v_curr = 0
-            tour = [0]
-            v_next = adj[v_curr][0]
-            adj[v_curr].remove(v_next)
-            adj[v_next].remove(v_curr)
-            while v_next != 0:
-                tour.append(v_next)
-                # single-customer dead-end falls back to depot
-                if not adj[v_next]:
-                    v_curr, v_next = v_next, 0
-                else:
-                    v_curr, v_next = v_next, adj[v_next][0]
-                    adj[v_curr].remove(v_next)
-                    adj[v_next].remove(v_curr)
-            tour.append(0)
-            routes.append(tour)
-        return routes
-
-    def copy(self) -> Self:
-        """
-        A method to copy the model
-        """
-        # fresh build keeps the parameterized objective consistent
+    def _new_instance(self) -> Self:
+        # thread the solver through the fresh build
         return type(self)(
-            self.num_nodes,
-            self.demands,
-            self.capacity,
-            self.num_vehicle,
-            self.solver,
+            self.num_nodes, self.demands, self.capacity, self.num_vehicle, self.solver
         )
+
+    def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
+        # coefs @ paired edge-selection <= rhs
+        expr = (
+            sum(coefs[k] * (self.x[i, j] + self.x[j, i]) for k, (i, j) in enumerate(self.edges))
+            <= rhs
+        )
+        self._model.cons.add(expr)
 
 
 class vrpMTZModel(vrpABModel):
