@@ -388,13 +388,13 @@
 <h2>Solvers and Methods<a class="headerlink" href="#solvers-and-methods" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> builds optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, or any custom solver or algorithm, and embeds them into neural networks for end-to-end training. All decision-focused learning methods are implemented as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd modules, grouped into the following families:</p>
 <ul class="simple">
-<li><p><strong>Surrogate losses</strong>: SPO+, perturbation gradient (PG)</p></li>
-<li><p><strong>Perturbed methods</strong>: differentiable perturbed optimizers (DPO), perturbed Fenchel-Young loss (PFYL), I-MLE / AI-MLE</p></li>
-<li><p><strong>Regularized methods</strong>: L2-regularized Frank-Wolfe (RFWO), regularized Frank-Wolfe with Fenchel-Young loss (RFYL)</p></li>
+<li><p><strong>Surrogate losses</strong>: smart predict-then-optimize+ (SPO+), perturbation gradient (PG)</p></li>
+<li><p><strong>Perturbed methods</strong>: differentiable perturbed optimizer (DPO), perturbed Fenchel-Young loss (PFYL), implicit maximum likelihood estimator (I-MLE), adaptive implicit maximum likelihood estimator (AI-MLE)</p></li>
+<li><p><strong>Regularized methods</strong>: L2-regularized Frank-Wolfe (RFWO), L2-regularized Frank-Wolfe with Fenchel-Young loss (RFYL)</p></li>
 <li><p><strong>Black-box methods</strong>: differentiable black-box optimizer (DBB), negative identity backpropagation (NID)</p></li>
-<li><p><strong>Cone-aligned estimation</strong>: CaVE (binary linear programs only)</p></li>
+<li><p><strong>Cone-aligned estimation</strong>: cone-aligned vector estimation (CaVE), binary linear programs only</p></li>
 <li><p><strong>Contrastive methods</strong>: noise contrastive estimation (NCE), contrastive MAP (CMAP)</p></li>
-<li><p><strong>Learning to rank</strong>: pointwise, pairwise, listwise LTR</p></li>
+<li><p><strong>Learning to rank</strong>: pointwise, pairwise, and listwise learning to rank (LTR)</p></li>
 </ul>
 <p>For guidance on picking a method, see the <em>Choosing a Method</em> section of <a class="reference internal" href="examples/function.html"><span class="doc">Autograd Functions</span></a>.</p>
 </section>

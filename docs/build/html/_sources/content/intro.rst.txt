@@ -21,13 +21,13 @@ Solvers and Methods
 
 ``PyEPO`` builds optimization models with `GurobiPy <https://www.gurobi.com/>`_, `COPT <https://shanshu.ai/copt>`_, `Pyomo <http://www.pyomo.org/>`_, `Google OR-Tools <https://developers.google.com/optimization>`_, `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, or any custom solver or algorithm, and embeds them into neural networks for end-to-end training. All decision-focused learning methods are implemented as `PyTorch <https://pytorch.org/>`_ autograd modules, grouped into the following families:
 
-* **Surrogate losses**: SPO+, perturbation gradient (PG)
-* **Perturbed methods**: differentiable perturbed optimizers (DPO), perturbed Fenchel-Young loss (PFYL), I-MLE / AI-MLE
-* **Regularized methods**: L2-regularized Frank-Wolfe (RFWO), regularized Frank-Wolfe with Fenchel-Young loss (RFYL)
+* **Surrogate losses**: smart predict-then-optimize+ (SPO+), perturbation gradient (PG)
+* **Perturbed methods**: differentiable perturbed optimizer (DPO), perturbed Fenchel-Young loss (PFYL), implicit maximum likelihood estimator (I-MLE), adaptive implicit maximum likelihood estimator (AI-MLE)
+* **Regularized methods**: L2-regularized Frank-Wolfe (RFWO), L2-regularized Frank-Wolfe with Fenchel-Young loss (RFYL)
 * **Black-box methods**: differentiable black-box optimizer (DBB), negative identity backpropagation (NID)
-* **Cone-aligned estimation**: CaVE (binary linear programs only)
+* **Cone-aligned estimation**: cone-aligned vector estimation (CaVE), binary linear programs only
 * **Contrastive methods**: noise contrastive estimation (NCE), contrastive MAP (CMAP)
-* **Learning to rank**: pointwise, pairwise, listwise LTR
+* **Learning to rank**: pointwise, pairwise, and listwise learning to rank (LTR)
 
 For guidance on picking a method, see the *Choosing a Method* section of :doc:`examples/function`.
 
