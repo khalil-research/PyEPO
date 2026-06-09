@@ -389,9 +389,10 @@ def _implicit_mle_bwd(module, sigma, lambd, two_sides, res, g):
     # finite-difference re-solve along the upstream gradient
     delta = lambd * g[:, None, :]
     if two_sides:
-        grad = (
-            solve_or_cache_3d(ptb_c + delta, module) - solve_or_cache_3d(ptb_c - delta, module)
-        ).mean(axis=1) / (2 * lambd + _EPS)
+        # batch +delta and -delta into one solve
+        n = noises.shape[1]
+        both = solve_or_cache_3d(jnp.concatenate([ptb_c + delta, ptb_c - delta], axis=1), module)
+        grad = (both[:, :n] - both[:, n:]).mean(axis=1) / (2 * lambd + _EPS)
     else:
         grad = (solve_or_cache_3d(ptb_c + delta, module) - ptb_sols).mean(axis=1) / (lambd + _EPS)
     return (grad, jnp.zeros_like(noises))
@@ -490,9 +491,10 @@ def _adaptive_implicit_mle_bwd(module, res, g):
     )
     delta = lambd * g[:, None, :]
     if module.two_sides:
-        grad = (
-            solve_or_cache_3d(ptb_c + delta, module) - solve_or_cache_3d(ptb_c - delta, module)
-        ).mean(axis=1) / (2 * lambd + _EPS)
+        # batch +delta and -delta into one solve
+        n = noises.shape[1]
+        both = solve_or_cache_3d(jnp.concatenate([ptb_c + delta, ptb_c - delta], axis=1), module)
+        grad = (both[:, :n] - both[:, n:]).mean(axis=1) / (2 * lambd + _EPS)
     else:
         grad = (solve_or_cache_3d(ptb_c + delta, module) - ptb_sols).mean(axis=1) / (lambd + _EPS)
     # online alpha update
