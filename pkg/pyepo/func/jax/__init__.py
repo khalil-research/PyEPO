@@ -2,6 +2,8 @@
 JAX autograd function for end-to-end training
 """
 
+import importlib
+
 try:
     import jax  # noqa: F401
 
@@ -9,7 +11,47 @@ try:
 except ImportError:
     _HAS_JAX = False
 
-__all__ = ["SPOPlus", "smartPredictThenOptimizePlus"]
+# public name -> submodule that defines it (full names and acronym aliases)
+_EXPORTS = {
+    "SPOPlus": "surrogate",
+    "smartPredictThenOptimizePlus": "surrogate",
+    "perturbationGradient": "surrogate",
+    "PG": "surrogate",
+    "blackboxOpt": "blackbox",
+    "DBB": "blackbox",
+    "negativeIdentity": "blackbox",
+    "NID": "blackbox",
+    "perturbedOpt": "perturbed",
+    "DPO": "perturbed",
+    "perturbedOptMul": "perturbed",
+    "DPOMul": "perturbed",
+    "perturbedFenchelYoung": "perturbed",
+    "PFY": "perturbed",
+    "perturbedFenchelYoungMul": "perturbed",
+    "PFYMul": "perturbed",
+    "implicitMLE": "perturbed",
+    "IMLE": "perturbed",
+    "adaptiveImplicitMLE": "perturbed",
+    "AIMLE": "perturbed",
+    "regularizedFrankWolfeOpt": "regularized",
+    "RFWO": "regularized",
+    "regularizedFrankWolfeFenchelYoung": "regularized",
+    "RFY": "regularized",
+    "listwiseLearningToRank": "rank",
+    "lsLTR": "rank",
+    "pairwiseLearningToRank": "rank",
+    "prLTR": "rank",
+    "pointwiseLearningToRank": "rank",
+    "ptLTR": "rank",
+    "noiseContrastiveEstimation": "contrastive",
+    "NCE": "contrastive",
+    "contrastiveMAP": "contrastive",
+    "CMAP": "contrastive",
+    "coneAlignedCosine": "cave",
+    "CaVE": "cave",
+}
+
+__all__ = list(_EXPORTS)
 
 
 def __getattr__(name):
@@ -18,8 +60,7 @@ def __getattr__(name):
             "pyepo.func.jax requires JAX. Install with `pip install pyepo[mpax]` "
             "(MPAX), or any JAX install for the pure_callback path."
         )
-    if name in ("SPOPlus", "smartPredictThenOptimizePlus"):
-        from pyepo.func.jax.surrogate import SPOPlus
-
-        return SPOPlus
-    raise AttributeError(name)
+    mod = _EXPORTS.get(name)
+    if mod is None:
+        raise AttributeError(name)
+    return getattr(importlib.import_module(f"pyepo.func.jax.{mod}"), name)

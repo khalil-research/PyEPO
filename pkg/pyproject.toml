@@ -50,6 +50,7 @@ gurobi = ["gurobipy>=9.1.2"]
 copt = ["coptpy"]
 ortools = ["ortools>=9.6"]
 mpax = ["mpax", "jax>=0.4.1", "jaxlib>=0.4.1"]
+jaxdev = ["flax", "optax"]
 autosklearn = ["auto-sklearn", "configspace"]
 all = [
     "pyomo>=6.1.2",

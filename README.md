@@ -102,6 +102,19 @@ To **reproduce the experiments** in the original paper, please use the code and 
 - **Solution caching** [[7]](https://www.ijcai.org/proceedings/2021/390) reuses previously computed optima to skip redundant solver calls in contrastive and ranking training.
 - **kNN-smoothed targets** [[12]](https://arxiv.org/abs/2310.04328) replace each label with a neighborhood aggregate for noise-robust regret.
 
+## JAX frontend (`pyepo.func.jax`)
+
+`pyepo.func.jax` mirrors `pyepo.func` — same class names, constructor and call signatures, and acronym aliases — but is backed by `jax.custom_vjp`, so a JAX/Flax model can be trained end-to-end with `jax.grad`. It works with **any** PyEPO solver backend: MPAX is solved natively (jittable, GPU-capable); every other backend (Gurobi/COPT/Pyomo/OR-Tools) is reached through `jax.pure_callback`. Switch frameworks with a one-line import change:
+
+```python
+# torch:  from pyepo.func import SPOPlus
+# jax:    from pyepo.func.jax import SPOPlus
+spo = SPOPlus(optmodel, reduction="mean")             # same constructor kwargs
+loss = spo(pred_cost, true_cost, true_sol, true_obj)  # same call signature, use with jax.grad
+```
+
+All `pyepo.func` losses are ported (SPO+, PG, DBB/NID, DPO/DPOMul, PFY/PFYMul, I-MLE/AI-MLE, RFWO/RFY, listwise/pairwise/pointwise LTR, NCE/CMAP, CaVE). Install the loss frontend and the MPAX fast path with `pip install pyepo[mpax]`; the any-solver callback path needs only a JAX install.
+
 ## Installation
 
 ### Clone and Install from this Repo
