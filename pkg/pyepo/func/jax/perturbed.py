@@ -12,7 +12,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.solve import solve_or_cache
+from pyepo.func.jax.solve import _full_cost, solve_or_cache
 from pyepo.utils import _EPS
 
 
@@ -95,6 +95,8 @@ class perturbedFenchelYoung(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
         # explicit key -> jittable; None -> eager, advance the instance key
         if key is None:
             self._key, key = jax.random.split(self._key)
@@ -217,6 +219,8 @@ class perturbedOpt(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
         # explicit key -> jittable; None -> eager, advance the instance key
         if key is None:
             self._key, key = jax.random.split(self._key)
@@ -347,6 +351,8 @@ class implicitMLE(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
         # explicit key -> jittable; None -> eager, advance the instance key
         if key is None:
             self._key, key = jax.random.split(self._key)
@@ -450,6 +456,8 @@ class adaptiveImplicitMLE(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
         self._key, sub = jax.random.split(self._key)
         noises = _sum_gamma_sample(
             sub,

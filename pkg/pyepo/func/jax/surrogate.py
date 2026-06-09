@@ -12,7 +12,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.solve import solve_or_cache
+from pyepo.func.jax.solve import _full_cost, solve_or_cache
 from pyepo.utils import _EPS
 
 
@@ -45,6 +45,9 @@ class SPOPlus(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
+        true_cost = _full_cost(true_cost, self.optmodel)
         loss = _spoplus(pred_cost, true_cost, true_sol, true_obj, self)
         return self._reduce(loss)
 
@@ -130,6 +133,9 @@ class perturbationGradient(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
+        true_cost = _full_cost(true_cost, self.optmodel)
         sign = 1.0 if self.optmodel.modelSense == EPO.MINIMIZE else -1.0
         # stop the gradient into the solver
         cp = jax.lax.stop_gradient(pred_cost)

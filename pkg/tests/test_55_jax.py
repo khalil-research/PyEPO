@@ -763,3 +763,87 @@ class TestTorchJaxParity:
         cj, cc, ww, zz = _jx(torch.as_tensor(cp_np), c, w, z)
         g_j = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, sig, p, cc, ww, zz)))(cj))
         np.testing.assert_allclose(g_j, g_t, atol=1e-3)
+
+
+# ============================================================
+# Partial prediction: short predicted cost, full-dimension solution
+# ============================================================
+
+
+def _partial_model():
+    """DSL model with 3 predicted-cost vars and 2 fixed-cost vars (num_cost < num_vars)."""
+    from pyepo import EPO, dsl
+
+    items = dsl.Variable(3, vtype=EPO.BINARY)
+    extra = dsl.Variable(2, vtype=EPO.BINARY)
+    cost = dsl.Parameter(3)
+    dfix = np.array([1.0, 2.0])
+    prob = dsl.Problem(
+        dsl.Maximize(cost @ items + dfix @ extra), [items.sum() + extra.sum() <= 3]
+    )
+    return prob.compile(backend="gurobi")
+
+
+def _partial_data(n=4):
+    from pyepo.data.dataset import optDataset
+
+    model = _partial_model()
+    rng = np.random.RandomState(0)
+    c = (rng.rand(n, model.num_cost) + 0.5).astype(np.float32)
+    x = rng.rand(n, NUM_FEAT).astype(np.float32)
+    return model, optDataset(model, x, c), c
+
+
+@requires_gurobi
+class TestPartialPredictionJax:
+    """`_full_cost` lift parity for partial prediction (num_cost < num_vars).
+
+    Every other test uses full prediction, where the lift is a no-op, so a
+    missing lift in surrogate/perturbed/blackbox/regularized was invisible: the
+    short predicted cost would mismatch the full-dimension solution. The lifted
+    gradient must still map back to the short cost.
+    """
+
+    PARITY = ["SPOPlus", "PG", "DBB", "NID", "RFWO", "RFY"]
+    SMOKE = ["DPO", "DPOMul", "IMLE", "AIMLE", "PFY", "PFYMul"]
+
+    @pytest.mark.parametrize("name", PARITY)
+    def test_deterministic_grad_matches_torch(self, name):
+        import jax
+        import jax.numpy as jnp
+        import torch
+
+        model, ds, c = _partial_data()
+        cn = (c * 1.2).astype(np.float32)
+        ct, wt, zt = (np.asarray(a, np.float32) for a in (ds.costs, ds.sols, ds.objs))
+        _k, jbuild, sig = JAX_LOSS_REGISTRY[name]
+        _tk, tbuild, _ts = LOSS_REGISTRY[name]
+        # torch reference (lifts internally via _fullCost)
+        top = tbuild(model, ds, "mean")
+        cpt = torch.tensor(cn, requires_grad=True)
+        out_t = call_op(top, sig, cpt, torch.as_tensor(ct), torch.as_tensor(wt), torch.as_tensor(zt))
+        (out_t if out_t.dim() == 0 else out_t.sum()).backward()
+        g_t = cpt.grad.numpy()
+        # jax grad on the short predicted cost
+        jop = jbuild(model, ds, "mean")
+        cj, cc, ww, zz = (jnp.asarray(a) for a in (cn, ct, wt, zt))
+        g_j = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, sig, p, cc, ww, zz)))(cj))
+        assert g_j.shape == cn.shape
+        np.testing.assert_allclose(g_j, g_t, atol=1e-3)
+
+    @pytest.mark.parametrize("name", SMOKE)
+    def test_perturbed_lifts_and_grad_is_finite(self, name):
+        # independent per-framework RNG -> no torch parity; gate is the absence
+        # of a shape crash plus a finite gradient on the short predicted cost
+        import jax
+        import jax.numpy as jnp
+
+        model, ds, c = _partial_data()
+        cn = (c * 1.2).astype(np.float32)
+        args = (jnp.asarray(np.asarray(a, np.float32)) for a in (ds.costs, ds.sols, ds.objs))
+        cc, ww, zz = args
+        _k, jbuild, sig = JAX_LOSS_REGISTRY[name]
+        jop = jbuild(model, ds, "mean")
+        g = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, sig, p, cc, ww, zz)))(jnp.asarray(cn)))
+        assert g.shape == cn.shape
+        assert np.isfinite(g).all()

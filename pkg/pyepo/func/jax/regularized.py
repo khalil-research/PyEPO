@@ -13,7 +13,7 @@ from jax import lax
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.solve import batch_solve
+from pyepo.func.jax.solve import _full_cost, batch_solve
 
 
 def _sense_sign(optmodel):
@@ -143,6 +143,8 @@ class regularizedFrankWolfeOpt(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
         return _regularized_frank_wolfe_opt(
             pred_cost,
             self.optmodel,
@@ -230,6 +232,8 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
         # stop the gradient into the solver
         if self.optmodel.modelSense == EPO.MINIMIZE:
             theta = jax.lax.stop_gradient(-pred_cost / self.lambd)

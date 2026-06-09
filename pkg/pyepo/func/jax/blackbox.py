@@ -11,7 +11,7 @@ import jax
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.solve import solve_or_cache
+from pyepo.func.jax.solve import _full_cost, solve_or_cache
 from pyepo.utils import _EPS
 
 
@@ -41,6 +41,8 @@ class negativeIdentity(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
         return _negative_identity(pred_cost, self)
 
 
@@ -96,6 +98,8 @@ class blackboxOpt(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
         return _blackbox_opt(pred_cost, self, self.lambd)
 
 
