@@ -56,7 +56,8 @@ def _away_step_frank_wolfe(
     vertex_norms[:, 0] = (v0 * v0).sum(dim=-1)
     mu = v0.clone()
     batch_idx = torch.arange(batch, device=device)
-    for _ in range(module.max_iter):
+    max_iter, tol = cast("int", module.max_iter), cast("float", module.tol)
+    for _ in range(max_iter):
         grad = mu - theta
         # Frank-Wolfe vertex and gap, solved for every instance each step
         v, _ = _solve_or_cache(sense_sign * (theta - mu), module)
@@ -69,7 +70,7 @@ def _away_step_frank_wolfe(
         alpha_away = weights[batch_idx, away_idx]
         gap_away = (grad * (v_away - mu)).sum(dim=-1)
         # zero the step on converged instances per iteration (recoverable, not frozen)
-        unconverged = gap_fw >= module.tol
+        unconverged = gap_fw >= tol
         if not bool(unconverged.any()):
             break
         active = unconverged.to(dtype)

@@ -39,7 +39,7 @@ class Variable:
     """
 
     def __init__(self, shape, *, vtype=EPO.CONTINUOUS, lb=None, ub=None, name=None):
-        self.shape = (int(shape),) if np.isscalar(shape) else tuple(int(s) for s in shape)
+        self.shape = tuple(int(s) for s in np.atleast_1d(shape))
         self.size = int(np.prod(self.shape)) if self.shape else 1
         # per-entry type: a scalar EPO.VarType broadcast, or a per-entry array
         self.vtype = np.broadcast_to(np.asarray(vtype, dtype=object), self.shape).reshape(-1).copy()
@@ -322,6 +322,10 @@ class Quadratic:
         # reflected scale
         return self * o
 
+    def __neg__(self):
+        # negate the quadratic and its affine part
+        return self * -1.0
+
     # ---- quadratic constraints ----
     def __le__(self, rhs):
         return Constraint(self, "<=", rhs)
@@ -398,7 +402,7 @@ class Parameter:
     """
 
     def __init__(self, shape, *, name=None):
-        self.shape = (int(shape),) if np.isscalar(shape) else tuple(int(s) for s in shape)
+        self.shape = tuple(int(s) for s in np.atleast_1d(shape))
         self.size = int(np.prod(self.shape)) if self.shape else 1
         self.name = name
 
