@@ -291,11 +291,12 @@ def _regularized_frank_wolfe_fy_fwd(pred_cost, true_sol, module, use_cache):
     # exact pass refreshes the pool; cached pass leaves it untouched
     if not use_cache:
         _grow_pool_from_active(module, vertices, weights)
-    return loss, diff
+    return loss, (diff, true_sol)
 
 
-def _regularized_frank_wolfe_fy_bwd(module, use_cache, diff, g):
-    return (g[:, None] * diff, jnp.zeros_like(diff))
+def _regularized_frank_wolfe_fy_bwd(module, use_cache, res, g):
+    diff, true_sol = res
+    return (g[:, None] * diff, jnp.zeros_like(true_sol))
 
 
 _regularized_frank_wolfe_fy.defvjp(
