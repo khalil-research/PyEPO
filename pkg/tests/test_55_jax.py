@@ -733,6 +733,23 @@ class TestJitJax:
         g_jit = np.array(jax.jit(jax.grad(loss))(cj))
         np.testing.assert_allclose(g_jit, g_eager, atol=1e-4)
 
+    def test_jit_caching_raises_clear_error(self):
+        """A caching loss under jax.jit raises a clear error, not a cryptic tracer crash."""
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import noiseContrastiveEstimation
+
+        model, ds = _sp_mpax_ds(12)
+        ts = jnp.asarray(np.asarray(ds.sols, np.float32))
+        pred = jnp.asarray((np.asarray(ds.costs) * 1.2).astype(np.float32))
+        nce = noiseContrastiveEstimation(model, dataset=ds, solve_ratio=0.0)
+        # eager is fine
+        assert np.isfinite(np.array(jax.grad(lambda p: nce(p, ts))(pred))).all()
+        # jit raises a clear, actionable error
+        with pytest.raises(RuntimeError, match="jax.jit"):
+            jax.jit(jax.grad(lambda p: nce(p, ts)))(pred)
+
 
 # ============================================================
 # A1 hybrid infra: registry-driven contract tests + torch parity

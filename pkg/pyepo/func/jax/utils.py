@@ -13,6 +13,24 @@ from pyepo import EPO
 from pyepo.func.utils import _solve_batch
 from pyepo.model.mpax import optMpaxModel
 
+try:
+    from jax.extend.core import concrete_or_error as _concrete_or_error
+except ImportError:  # older jax
+    from jax.core import concrete_or_error as _concrete_or_error
+
+
+def _check_jit_caching(cost, module):
+    """Raise a clear error if a pool-caching side effect is traced under jax.jit."""
+    if module.solpool is None:
+        return
+    try:
+        _concrete_or_error(None, cost)
+    except jax.errors.ConcretizationTypeError:
+        raise RuntimeError(
+            "JAX pool caching is not supported under jax.jit; run the loss eagerly "
+            "(call jax.grad without wrapping it in jax.jit)."
+        ) from None
+
 
 def batch_solve(cost, optmodel, processes=1, pool=None):
     """
@@ -64,6 +82,7 @@ def solve_or_cache(cost, module):
     """
     A function to solve a batch or reuse the solution pool
     """
+    _check_jit_caching(cost, module)
     if module._branch_rng.uniform() <= module.solve_ratio:
         sol, obj = batch_solve(cost, module.optmodel, module.processes, module.pool)
         # grow the pool
@@ -121,6 +140,7 @@ def grow_solpool(module, pred_cost):
     """
     A function to re-solve the predicted cost and grow the module's solution pool
     """
+    _check_jit_caching(pred_cost, module)
     if module._branch_rng.uniform() <= module.solve_ratio:
         sol, _ = batch_solve(
             jax.lax.stop_gradient(pred_cost), module.optmodel, module.processes, module.pool
