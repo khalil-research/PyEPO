@@ -24,7 +24,7 @@ Module Contents
 
 .. py:class:: vrpABModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int, solver: str = 'glpk')
 
-   Bases: :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
+   Bases: :py:obj:`pyepo.model.bases.vrpABBase`, :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 
 
    Abstract Pyomo-backed model for the capacitated vehicle routing problem.
@@ -34,54 +34,7 @@ Module Contents
    edge variables stay strictly binary; if a single-stop route is actually
    needed, duplicate the depot.
 
-   :ivar num_nodes: number of nodes (including depot at index 0)
-   :ivar nodes: list of node indices
-   :ivar edges: undirected edges as (i, j) with i < j
-   :ivar demands: customer demands (excluding depot)
-   :ivar capacity: per-vehicle capacity
-   :ivar num_vehicle: number of vehicles
    :ivar solver: optimization solver in the background
-
-
-
-   .. py:attribute:: num_nodes
-
-
-   .. py:attribute:: nodes
-
-
-   .. py:attribute:: edges
-
-
-   .. py:attribute:: demands
-
-
-   .. py:attribute:: capacity
-
-
-   .. py:attribute:: num_vehicle
-
-
-   .. py:property:: num_cost
-      :type: int
-
-
-      number of costs to be predicted
-
-
-   .. py:method:: getTour(sol: numpy.ndarray | torch.Tensor | list) -> list[list[int]]
-
-      Reconstruct vehicle tours from an undirected edge-selection vector.
-
-      :param sol: per-edge selection values aligned with ``self.edges``
-
-      :returns: list of tours; each tour is a node sequence starting and ending at the depot
-
-
-
-   .. py:method:: copy() -> Self
-
-      A method to copy the model
 
 
 

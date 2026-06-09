@@ -1,0 +1,101 @@
+pyepo.func.jax.rank
+===================
+
+.. py:module:: pyepo.func.jax.rank
+
+.. autoapi-nested-parse::
+
+   Learning to rank Losses
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.jax.rank.lsLTR
+   pyepo.func.jax.rank.prLTR
+   pyepo.func.jax.rank.ptLTR
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.jax.rank.listwiseLearningToRank
+   pyepo.func.jax.rank.pairwiseLearningToRank
+   pyepo.func.jax.rank.pointwiseLearningToRank
+
+
+Module Contents
+---------------
+
+.. py:class:: listwiseLearningToRank(optmodel, processes=1, solve_ratio=1.0, reduction='mean', dataset=None)
+
+   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
+
+
+   Listwise Learning-to-Rank loss over a cached solution pool.
+
+   Models the ranking distribution over the pool as a SoftMax of
+   predicted-cost scores and minimizes its cross-entropy against the true
+   ranking distribution.
+
+   Reference: Mandi et al. (2022)
+   `<https://proceedings.mlr.press/v162/mandi22a.html>`_
+
+
+   .. py:method:: forward(pred_cost, true_cost)
+
+      Forward pass
+
+
+
+.. py:class:: pairwiseLearningToRank(optmodel, processes=1, solve_ratio=1.0, reduction='mean', dataset=None)
+
+   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
+
+
+   Pairwise Learning-to-Rank loss over a cached solution pool.
+
+   Enforces a margin between the true optimum (best pool member) and each
+   suboptimal solution via a ReLU hinge on the predicted-cost difference.
+
+   Reference: Mandi et al. (2022)
+   `<https://proceedings.mlr.press/v162/mandi22a.html>`_
+
+
+   .. py:method:: forward(pred_cost, true_cost)
+
+      Forward pass
+
+
+
+.. py:class:: pointwiseLearningToRank(optmodel, processes=1, solve_ratio=1.0, reduction='mean', dataset=None)
+
+   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
+
+
+   Pointwise Learning-to-Rank loss over a cached solution pool.
+
+   Fits the predicted score of each pool member toward its true score by
+   squared error, averaged over the pool.
+
+   Reference: Mandi et al. (2022)
+   `<https://proceedings.mlr.press/v162/mandi22a.html>`_
+
+
+   .. py:method:: forward(pred_cost, true_cost)
+
+      Forward pass
+
+
+
+.. py:data:: lsLTR
+
+.. py:data:: prLTR
+
+.. py:data:: ptLTR
+

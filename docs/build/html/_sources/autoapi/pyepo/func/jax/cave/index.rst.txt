@@ -1,0 +1,65 @@
+pyepo.func.jax.cave
+===================
+
+.. py:module:: pyepo.func.jax.cave
+
+.. autoapi-nested-parse::
+
+   Cone-aligned vector estimation (CaVE) loss for binary linear programs
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.jax.cave.CaVE
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.jax.cave.coneAlignedCosine
+
+
+Module Contents
+---------------
+
+.. py:class:: coneAlignedCosine(optmodel, max_iter=3, solve_ratio=1.0, inner_ratio=0.2, processes=1, reduction='mean')
+
+   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
+
+
+   Cone-Aligned Vector Estimation (CaVE) loss for binary linear programs.
+
+   Projects the sense-flipped predicted cost onto the polyhedral cone spanned
+   by the binding-constraint normals at the true optimal vertex (a Clarabel
+   QP) and minimizes :math:`1 - \cos(-\hat{\mathbf{c}}, \mathrm{proj})`.
+   The projection is detached, so the gradient flows only through the cosine.
+
+   Reference: Tang & Khalil (2024)
+   `<https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>`_
+
+
+   .. py:attribute:: max_iter
+      :value: 3
+
+
+
+   .. py:attribute:: solve_ratio
+
+
+   .. py:attribute:: inner_ratio
+
+
+   .. py:method:: forward(pred_cost, tight_ctrs)
+
+      Forward pass
+
+
+
+.. py:data:: CaVE
+

@@ -1,0 +1,28 @@
+pyepo.func.jax
+==============
+
+.. py:module:: pyepo.func.jax
+
+.. autoapi-nested-parse::
+
+   JAX autograd function for end-to-end training
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pyepo/func/jax/abcmodule/index
+   /autoapi/pyepo/func/jax/blackbox/index
+   /autoapi/pyepo/func/jax/cave/index
+   /autoapi/pyepo/func/jax/contrastive/index
+   /autoapi/pyepo/func/jax/perturbed/index
+   /autoapi/pyepo/func/jax/rank/index
+   /autoapi/pyepo/func/jax/regularized/index
+   /autoapi/pyepo/func/jax/surrogate/index
+   /autoapi/pyepo/func/jax/utils/index
+
+

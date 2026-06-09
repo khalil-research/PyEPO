@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../../../genindex.html"><link rel="search" title="Search" href="../../../../../search.html"><link rel="next" title="pyepo.model.grb" href="../../grb/index.html"><link rel="prev" title="pyepo.model.copt.tsp" href="../tsp/index.html">
 
     <link rel="shortcut icon" href="../../../../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>pyepo.model.copt.vrp - PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</title>
+        <title>pyepo.model.copt.vrp - PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</div></a>
+      <a href="../../../../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.1.1 documentation</span>
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -216,6 +216,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../content/examples/data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../content/examples/twostage.html">Two-Stage Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../content/examples/function.html">Autograd Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../content/examples/jax.html">JAX Frontend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../content/examples/training.html">Training</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../content/examples/pool.html">Solution Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../content/examples/evaluation.html">Evaluation</a></li>
@@ -245,6 +246,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../func/blackbox/index.html">pyepo.func.blackbox</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../func/cave/index.html">pyepo.func.cave</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../func/contrastive/index.html">pyepo.func.contrastive</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../func/jax/index.html">pyepo.func.jax</a><input aria-label="Toggle navigation of pyepo.func.jax" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/abcmodule/index.html">pyepo.func.jax.abcmodule</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/blackbox/index.html">pyepo.func.jax.blackbox</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/cave/index.html">pyepo.func.jax.cave</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/contrastive/index.html">pyepo.func.jax.contrastive</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/perturbed/index.html">pyepo.func.jax.perturbed</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/rank/index.html">pyepo.func.jax.rank</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/regularized/index.html">pyepo.func.jax.regularized</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/surrogate/index.html">pyepo.func.jax.surrogate</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../func/jax/utils/index.html">pyepo.func.jax.utils</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../func/perturbed/index.html">pyepo.func.perturbed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../func/rank/index.html">pyepo.func.rank</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../func/regularized/index.html">pyepo.func.regularized</a></li>
@@ -252,16 +265,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../func/utils/index.html">pyepo.func.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../metric/metrics/index.html">pyepo.metric.metrics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../metric/mse/index.html">pyepo.metric.mse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../metric/regret/index.html">pyepo.metric.regret</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../metric/unambregret/index.html">pyepo.metric.unambregret</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current has-children"><a class="reference internal" href="../../index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" checked="" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l3 current has-children"><a class="reference internal" href="../../index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../../bases/index.html">pyepo.model.bases</a></li>
-<li class="toctree-l4 current has-children"><a class="reference internal" href="../index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l4 current has-children"><a class="reference internal" href="../index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" checked="" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="../compile/index.html">pyepo.model.copt.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../knapsack/index.html">pyepo.model.copt.knapsack</a></li>
@@ -271,7 +284,7 @@
 <li class="toctree-l5 current current-page"><a class="current reference internal" href="#">pyepo.model.copt.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../grb/compile/index.html">pyepo.model.grb.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../grb/grbmodel/index.html">pyepo.model.grb.grbmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../grb/knapsack/index.html">pyepo.model.grb.knapsack</a></li>
@@ -281,14 +294,14 @@
 <li class="toctree-l5"><a class="reference internal" href="../../grb/vrp/index.html">pyepo.model.grb.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../mpax/compile/index.html">pyepo.model.mpax.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../mpax/knapsack/index.html">pyepo.model.mpax.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../mpax/mpaxmodel/index.html">pyepo.model.mpax.mpaxmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../mpax/shortestpath/index.html">pyepo.model.mpax.shortestpath</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../omo/compile/index.html">pyepo.model.omo.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../omo/knapsack/index.html">pyepo.model.omo.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../omo/omomodel/index.html">pyepo.model.omo.omomodel</a></li>
@@ -299,7 +312,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../opt/index.html">pyepo.model.opt</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../ort/compile/index.html">pyepo.model.ort.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../ort/knapsack/index.html">pyepo.model.ort.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../ort/ortcpmodel/index.html">pyepo.model.ort.ortcpmodel</a></li>
@@ -311,7 +324,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../utils/index.html">pyepo.model.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../twostage/autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../twostage/sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
 </ul>
@@ -387,84 +400,16 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.vrp.</span></span><span class="sig-name descname"><span class="pre">vrpABModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../coptmodel/index.html#pyepo.model.copt.coptmodel.optCoptModel" title="pyepo.model.copt.coptmodel.optCoptModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.copt.coptmodel.optCoptModel</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.vrp.</span></span><span class="sig-name descname"><span class="pre">vrpABModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../bases/index.html#pyepo.model.bases.vrpABBase" title="pyepo.model.bases.vrpABBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.bases.vrpABBase</span></code></a>, <a class="reference internal" href="../coptmodel/index.html#pyepo.model.copt.coptmodel.optCoptModel" title="pyepo.model.copt.coptmodel.optCoptModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.model.copt.coptmodel.optCoptModel</span></code></a></p>
 <p>Abstract COPT-backed model for the capacitated vehicle routing problem.</p>
 <p>A single-customer route is excluded so all edge variables stay strictly
 binary; if a single-stop route is actually needed, duplicate the depot.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_nodes</strong> – number of nodes (including depot at index 0)</p></li>
-<li><p><strong>nodes</strong> – list of node indices</p></li>
-<li><p><strong>edges</strong> – undirected edges as (i, j) with i &lt; j</p></li>
-<li><p><strong>demands</strong> – customer demands (excluding depot)</p></li>
-<li><p><strong>capacity</strong> – per-vehicle capacity</p></li>
-<li><p><strong>num_vehicle</strong> – number of vehicles</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.num_nodes">
-<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.num_nodes" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.nodes" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.edges">
-<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.edges" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.demands">
-<span class="sig-name descname"><span class="pre">demands</span></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.demands" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.capacity">
-<span class="sig-name descname"><span class="pre">capacity</span></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.capacity" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.num_vehicle">
-<span class="sig-name descname"><span class="pre">num_vehicle</span></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.num_vehicle" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.num_cost">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">num_cost</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.num_cost" title="Link to this definition">¶</a></dt>
-<dd><p>number of costs to be predicted</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.getTour">
-<span class="sig-name descname"><span class="pre">getTour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">torch.Tensor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.getTour" title="Link to this definition">¶</a></dt>
-<dd><p>Reconstruct vehicle tours from an undirected edge-selection vector.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sol</strong> – per-edge selection values aligned with <code class="docutils literal notranslate"><span class="pre">self.edges</span></code></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of tours; each tour is a node sequence starting and ending at the depot</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpABModel.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpABModel.copy" title="Link to this definition">¶</a></dt>
-<dd><p>A method to copy the model</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpRCIModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.vrp.</span></span><span class="sig-name descname"><span class="pre">vrpRCIModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpRCIModel" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.vrp.</span></span><span class="sig-name descname"><span class="pre">vrpRCIModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpRCIModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel" title="pyepo.model.copt.vrp.vrpABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vrpABModel</span></code></a></p>
 <p>CVRP formulation with 2-degree constraints and lazy rounded-capacity cuts.</p>
 <p>Uses one undirected Var per edge (<code class="docutils literal notranslate"><span class="pre">x[j,i]</span></code> aliases <code class="docutils literal notranslate"><span class="pre">x[i,j]</span></code>). Subtour
@@ -499,7 +444,7 @@ branch-and-cut via a COPT callback.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpMTZModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.vrp.</span></span><span class="sig-name descname"><span class="pre">vrpMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpMTZModel" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.vrp.</span></span><span class="sig-name descname"><span class="pre">vrpMTZModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpMTZModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel" title="pyepo.model.copt.vrp.vrpABModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vrpABModel</span></code></a></p>
 <p>CVRP formulation on a directed graph with MTZ-style capacity constraints
 (no lazy cuts). Cost vector is per undirected edge: cost <code class="docutils literal notranslate"><span class="pre">c[k]</span></code> is
@@ -539,7 +484,7 @@ assigned to both <code class="docutils literal notranslate"><span class="pre">x[
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.copt.vrp.vrpMTZModelRel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.vrp.</span></span><span class="sig-name descname"><span class="pre">vrpMTZModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpMTZModelRel" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.copt.vrp.</span></span><span class="sig-name descname"><span class="pre">vrpMTZModelRel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.copt.vrp.vrpMTZModelRel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyepo.model.copt.vrp.vrpMTZModel" title="pyepo.model.copt.vrp.vrpMTZModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vrpMTZModel</span></code></a></p>
 <p>LP relaxation of <a class="reference internal" href="#pyepo.model.copt.vrp.vrpMTZModel" title="pyepo.model.copt.vrp.vrpMTZModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vrpMTZModel</span></code></a>.</p>
 <dl class="py method">
@@ -623,18 +568,7 @@ assigned to both <code class="docutils literal notranslate"><span class="pre">x[
 <li><a class="reference internal" href="#">pyepo.model.copt.vrp</a><ul>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel"><code class="docutils literal notranslate"><span class="pre">vrpABModel</span></code></a><ul>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.num_nodes"><code class="docutils literal notranslate"><span class="pre">vrpABModel.num_nodes</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.nodes"><code class="docutils literal notranslate"><span class="pre">vrpABModel.nodes</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.edges"><code class="docutils literal notranslate"><span class="pre">vrpABModel.edges</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.demands"><code class="docutils literal notranslate"><span class="pre">vrpABModel.demands</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.capacity"><code class="docutils literal notranslate"><span class="pre">vrpABModel.capacity</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.num_vehicle"><code class="docutils literal notranslate"><span class="pre">vrpABModel.num_vehicle</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.num_cost"><code class="docutils literal notranslate"><span class="pre">vrpABModel.num_cost</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.getTour"><code class="docutils literal notranslate"><span class="pre">vrpABModel.getTour()</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel.copy"><code class="docutils literal notranslate"><span class="pre">vrpABModel.copy()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpABModel"><code class="docutils literal notranslate"><span class="pre">vrpABModel</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpRCIModel"><code class="docutils literal notranslate"><span class="pre">vrpRCIModel</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpRCIModel.setObj"><code class="docutils literal notranslate"><span class="pre">vrpRCIModel.setObj()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.copt.vrp.vrpRCIModel.solve"><code class="docutils literal notranslate"><span class="pre">vrpRCIModel.solve()</span></code></a></li>
@@ -665,7 +599,7 @@ assigned to both <code class="docutils literal notranslate"><span class="pre">x[
       
     </aside>
   </div>
-</div><script src="../../../../../_static/documentation_options.js?v=b47a612a"></script>
+</div><script src="../../../../../_static/documentation_options.js?v=b06a6580"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/scripts/furo.js?v=46bd48cc"></script>

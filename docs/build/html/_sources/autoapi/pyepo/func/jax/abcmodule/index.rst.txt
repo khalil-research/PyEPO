@@ -1,0 +1,71 @@
+pyepo.func.jax.abcmodule
+========================
+
+.. py:module:: pyepo.func.jax.abcmodule
+
+.. autoapi-nested-parse::
+
+   Abstract optimization module
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.jax.abcmodule.logger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.jax.abcmodule.optModule
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: optModule(optmodel, processes=1, solve_ratio=1.0, reduction='mean', dataset=None, require_solpool=False, seed=None)
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   An abstract module for differentiable optimization losses in end-to-end
+   predict-then-optimize. It provides shared init validation, loss reduction,
+   and the solution pool for all loss modules.
+
+
+   .. py:attribute:: optmodel
+
+
+   .. py:attribute:: processes
+
+
+   .. py:attribute:: solve_ratio
+      :value: 1.0
+
+
+
+   .. py:attribute:: solpool
+      :value: None
+
+
+
+   .. py:attribute:: reduction
+      :value: 'mean'
+
+
+
+   .. py:method:: forward(*args)
+      :abstractmethod:
+
+
+      Forward pass
+
+
+

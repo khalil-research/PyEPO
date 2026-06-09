@@ -9,6 +9,14 @@ pyepo.model.mpax.mpaxmodel
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.mpaxmodel.logger
+
+
 Classes
 -------
 
@@ -19,6 +27,8 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: logger
 
 .. py:class:: optMpaxModel
 

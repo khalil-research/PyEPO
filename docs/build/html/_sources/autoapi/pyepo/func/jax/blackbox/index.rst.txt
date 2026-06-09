@@ -1,0 +1,82 @@
+pyepo.func.jax.blackbox
+=======================
+
+.. py:module:: pyepo.func.jax.blackbox
+
+.. autoapi-nested-parse::
+
+   Differentiable Black-box optimization function
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.jax.blackbox.DBB
+   pyepo.func.jax.blackbox.NID
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.jax.blackbox.negativeIdentity
+   pyepo.func.jax.blackbox.blackboxOpt
+
+
+Module Contents
+---------------
+
+.. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1.0, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
+
+
+   Negative Identity Backpropagation (NID) -- hyperparameter-free DBB.
+
+   Treats the solver Jacobian as a signed identity:
+   :math:`\partial \mathbf{w}^* / \partial \hat{\mathbf{c}} \approx
+   -\mathbf{I}` for minimization (and :math:`+\mathbf{I}` for maximization),
+   a straight-through gradient estimator needing no extra solve.
+
+   Reference: Sahoo et al. (2022) `<https://arxiv.org/abs/2205.15213>`_
+
+
+   .. py:method:: forward(pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1.0, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
+
+
+   Differentiable Black-Box Optimizer (DBB) -- gradient via solution interpolation.
+
+   Replaces the solver's zero gradient with an interpolation estimate: for an
+   upstream gradient :math:`\mathbf{d}`, the vector-Jacobian product is
+   :math:`(\mathbf{w}^*(\hat{\mathbf{c}} + \lambda \mathbf{d}) -
+   \mathbf{w}^*(\hat{\mathbf{c}})) / \lambda`. Larger ``lambd`` smooths
+   more (recommended 10-20).
+
+   Reference: Vlastelica et al. (2019) `<https://arxiv.org/abs/1912.02175>`_
+
+
+   .. py:attribute:: lambd
+
+
+   .. py:method:: forward(pred_cost)
+
+      Forward pass
+
+
+
+.. py:data:: DBB
+
+.. py:data:: NID
+
