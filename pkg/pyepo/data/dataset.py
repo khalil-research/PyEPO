@@ -104,9 +104,12 @@ class optDataset(Dataset):
         A method to batch-solve every cost vector in one MPAX vmap call.
         """
         logger.info("Optimizing for optDataset (MPAX batched)...")
+        from pyepo.model.mpax.mpaxmodel import _warn_if_not_optimal
+
         model = cast("_optMpaxModelT", self.model)
         model.setObj(model._fullCost(self.costs))
-        sols, objs = model.batch_optimize(model.c)
+        sols, objs, status = model.batch_optimize(model.c)
+        _warn_if_not_optimal(status)
         # writable copy; torch.as_tensor warns on JAX read-only buffers
         sols_np = np.array(sols, dtype=np.float32)
         objs_np = np.array(objs, dtype=np.float32)

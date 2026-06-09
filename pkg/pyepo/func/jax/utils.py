@@ -48,8 +48,8 @@ def _batch_solve_mpax(cost, optmodel):
     """
     # change sign for maximization
     cc = -cost if optmodel.modelSense == EPO.MAXIMIZE else cost
-    # batch solving
-    sol, obj = optmodel.batch_optimize(cc)
+    # batch solving; status dropped (this path may run under jax.jit)
+    sol, obj, _ = optmodel.batch_optimize(cc)
     # obj in true sense
     if optmodel.modelSense == EPO.MAXIMIZE:
         obj = -obj
