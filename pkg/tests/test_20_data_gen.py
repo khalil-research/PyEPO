@@ -71,13 +71,28 @@ class TestShortestPathData:
         np.testing.assert_array_equal(x1, x2)
         np.testing.assert_array_equal(c1, c2)
 
+    def test_different_seeds(self):
+        _, c1 = shortestpath.genData(10, 3, (3, 3), seed=0)
+        _, c2 = shortestpath.genData(10, 3, (3, 3), seed=1)
+        assert not np.array_equal(c1, c2)
+
+    def test_cost_dtype_float32(self):
+        _, c = shortestpath.genData(10, 3, (3, 3))
+        assert c.dtype == np.float32
+
     def test_positive_costs(self):
         _, c = shortestpath.genData(20, 5, (3, 3), seed=42)
         assert np.all(c > 0)
 
-    def test_deg_invalid_raises(self):
+    def test_noise_changes_costs(self):
+        _, c0 = shortestpath.genData(20, 5, (3, 3), noise_width=0, seed=42)
+        _, c1 = shortestpath.genData(20, 5, (3, 3), noise_width=0.5, seed=42)
+        assert not np.array_equal(c0, c1)
+
+    @pytest.mark.parametrize("deg", [0, -1, 1.5])
+    def test_deg_invalid_raises(self, deg):
         with pytest.raises(ValueError):
-            shortestpath.genData(10, 3, (3, 3), deg=0)
+            shortestpath.genData(10, 3, (3, 3), deg=deg)
 
 
 class TestTSPData:
@@ -99,9 +114,24 @@ class TestTSPData:
         np.testing.assert_array_equal(x1, x2)
         np.testing.assert_array_equal(c1, c2)
 
-    def test_deg_invalid_raises(self):
+    def test_different_seeds(self):
+        _, c1 = tsp.genData(10, 3, 5, seed=0)
+        _, c2 = tsp.genData(10, 3, 5, seed=1)
+        assert not np.array_equal(c1, c2)
+
+    def test_cost_dtype_float32(self):
+        _, c = tsp.genData(10, 3, 5)
+        assert c.dtype == np.float32
+
+    def test_noise_changes_costs(self):
+        _, c0 = tsp.genData(20, 3, 5, noise_width=0, seed=42)
+        _, c1 = tsp.genData(20, 3, 5, noise_width=0.5, seed=42)
+        assert not np.array_equal(c0, c1)
+
+    @pytest.mark.parametrize("deg", [0, -1, 1.5])
+    def test_deg_invalid_raises(self, deg):
         with pytest.raises(ValueError):
-            tsp.genData(10, 3, 5, deg=-1)
+            tsp.genData(10, 3, 5, deg=deg)
 
 
 class TestPortfolioData:

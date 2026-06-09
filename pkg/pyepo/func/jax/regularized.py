@@ -199,7 +199,8 @@ def _regularized_frank_wolfe_opt_fwd(pred_cost, module, use_cache):
 def _regularized_frank_wolfe_opt_bwd(module, use_cache, res, g):
     vertices, weights, scale = res
     # project g onto the affine hull of the active vertices (Gram solve)
-    s = (weights > 0).astype(jnp.float32)
+    dtype = vertices.dtype
+    s = (weights > 0).astype(dtype)
     n_active = jnp.clip(s.sum(-1, keepdims=True), 1.0, None)
     v_mean = (vertices * s[..., None]).sum(-2) / n_active
     v_cent = (vertices - v_mean[:, None]) * s[..., None]
@@ -207,7 +208,7 @@ def _regularized_frank_wolfe_opt_bwd(module, use_cache, res, g):
     h = v_cent @ g[..., None]
     diag = jnp.diagonal(gram, axis1=-2, axis2=-1)
     ridge = jnp.clip(diag.max(-1, keepdims=True), 1.0, None) * 1e-6
-    gram = gram + ridge[..., None] * jnp.eye(gram.shape[-1])
+    gram = gram + ridge[..., None] * jnp.eye(gram.shape[-1], dtype=dtype)
     alpha = jnp.linalg.solve(gram, h)
     grad = jnp.squeeze(jnp.transpose(v_cent, (0, 2, 1)) @ alpha, -1)
     return (scale * grad,)
