@@ -23,8 +23,8 @@ from pyepo.func.rank import (
     listwiseLearningToRank,
     lsLTR,
     pairwiseLearningToRank,
-    prLTR,
     pointwiseLearningToRank,
+    prLTR,
     ptLTR,
 )
 from pyepo.func.regularized import (
