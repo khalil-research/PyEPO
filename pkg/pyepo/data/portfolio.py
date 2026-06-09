@@ -60,7 +60,7 @@ def genData(
     x = rnd.normal(0, 1, (n, p))
     # signal
     r = (0.05 * (x @ B.T) / np.sqrt(p) + 0.1 ** (1 / deg)) ** deg
-    # noise: (f, eps) per row drawn together to match the per-i loop's RNG order
+    # factor f and residual eps drawn in one call
     fe = rnd.randn(n, p + m)
     F, E = fe[:, :p], fe[:, p:]
     r += F @ L.T + 0.01 * noise_level * E
