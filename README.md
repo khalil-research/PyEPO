@@ -224,15 +224,6 @@ if __name__ == "__main__":
 
 ### JAX frontend (`pyepo.func.jax`)
 
-`pyepo.func.jax` mirrors `pyepo.func` — same class names, constructor and call signatures, and acronym aliases — but is backed by `jax.custom_vjp`, so a JAX/Flax model can be trained end-to-end with `jax.grad`. It works with **any** PyEPO solver backend: MPAX is solved natively (jittable, GPU-capable); every other backend (Gurobi/COPT/Pyomo/OR-Tools) is reached through `jax.pure_callback`. Switch frameworks with a one-line import change:
-
-```python
-# torch:  from pyepo.func import SPOPlus
-# jax:    from pyepo.func.jax import SPOPlus
-spo = SPOPlus(optmodel, reduction="mean")             # same constructor kwargs
-loss = spo(pred_cost, true_cost, true_sol, true_obj)  # same call signature, use with jax.grad
-```
-
 End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ loss (Flax + optax):
 
 ```python
