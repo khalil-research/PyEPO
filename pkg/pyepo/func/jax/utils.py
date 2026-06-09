@@ -125,15 +125,14 @@ def _full_cost(pred_cost, optmodel):
     """
     A function to lift a predicted cost to the full objective space
     """
-    idx = optmodel.c_pred_index
-    if idx is None:
+    prob = getattr(optmodel, "problem", None)
+    if prob is None:
         return pred_cost
-    prob = optmodel.problem
     full = jnp.broadcast_to(
         jnp.asarray(prob.fixed_cost, dtype=pred_cost.dtype),
         (*pred_cost.shape[:-1], prob.num_vars),
     )
-    return full.at[..., jnp.asarray(idx)].add(pred_cost)
+    return full.at[..., jnp.asarray(prob.c_pred_index)].add(pred_cost)
 
 
 def grow_solpool(module, pred_cost):
