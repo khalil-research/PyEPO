@@ -9,6 +9,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
+from pyepo.func.jax.solve import _full_cost, grow_solpool
 
 
 class noiseContrastiveEstimation(optModule):
@@ -25,7 +26,7 @@ class noiseContrastiveEstimation(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool
@@ -36,6 +37,10 @@ class noiseContrastiveEstimation(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
+        # solve and update pool
+        grow_solpool(self, pred_cost)
         # current obj and pool obj
         obj_cp = jnp.einsum("bd,bd->b", pred_cost, true_sol)[:, None]
         objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, self.solpool)
@@ -61,7 +66,7 @@ class contrastiveMAP(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool
@@ -72,6 +77,10 @@ class contrastiveMAP(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
+        # solve and update pool
+        grow_solpool(self, pred_cost)
         # current obj and pool obj
         obj_cp = jnp.einsum("bd,bd->b", pred_cost, true_sol)[:, None]
         objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, self.solpool)

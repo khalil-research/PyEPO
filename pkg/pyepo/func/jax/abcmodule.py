@@ -5,13 +5,22 @@ Abstract optimization module
 
 from __future__ import annotations
 
+import logging
+import multiprocessing as mp
+import weakref
 from abc import ABC, abstractmethod
 
 import jax.numpy as jnp
 import numpy as np
+from pathos.multiprocessing import ProcessingPool
 
 from pyepo import EPO
+from pyepo.func.utils import _close_pool, _init_worker_model
+from pyepo.model.mpax import optMpaxModel
 from pyepo.model.opt import optModel
+from pyepo.utils import getArgs
+
+logger = logging.getLogger(__name__)
 
 
 class optModule(ABC):
@@ -34,7 +43,7 @@ class optModule(ABC):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step (< 1 enables caching)
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
@@ -47,12 +56,23 @@ class optModule(ABC):
         if optmodel.modelSense not in (EPO.MINIMIZE, EPO.MAXIMIZE):
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         self.optmodel = optmodel
-        # multiprocessing not yet supported in the JAX frontend
-        if processes != 1:
-            raise NotImplementedError(
-                f"processes={processes} not supported in pyepo.func.jax yet (single-core only)"
+        # MPAX is GPU-batched; force single-core
+        if isinstance(optmodel, optMpaxModel) and processes > 1:
+            logger.warning("MPAX does not support multiprocessing. Setting `processes = 1`.")
+            processes = 1
+        if processes < 0 or processes > mp.cpu_count():
+            raise ValueError(f"Invalid processors number {processes}, only {mp.cpu_count()} cores.")
+        self.processes = mp.cpu_count() if processes == 0 else processes
+        # worker pool for parallel solves (each worker builds its own optmodel once)
+        if self.processes == 1:
+            self.pool = None
+        else:
+            self.pool = ProcessingPool(
+                self.processes,
+                initializer=_init_worker_model,
+                initargs=(type(optmodel), getArgs(optmodel)),
             )
-        self.processes = processes
+            weakref.finalize(self, _close_pool, self.pool)
         # solution-pool caching: the branch RNG decides solve-vs-cache each pass
         if not (0 <= solve_ratio <= 1):
             raise ValueError(f"Invalid solving ratio {solve_ratio}. It should be between 0 and 1.")

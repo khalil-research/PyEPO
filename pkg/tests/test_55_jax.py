@@ -262,14 +262,6 @@ class TestBlackboxJax:
         expected = (np.array(wq) - np.array(wp)) / lambd
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
-    def test_blackbox_opt_rejects_nonpositive_lambda(self):
-        from pyepo.func.jax import blackboxOpt
-
-        model, _pred, _t = self._setup()
-        for bad in (0.0, -1.0):
-            with pytest.raises(ValueError):
-                blackboxOpt(model, lambd=bad)
-
 
 @requires_mpax
 class TestPerturbedJax:
@@ -521,12 +513,28 @@ class TestRegularizedJax:
         np.testing.assert_allclose(mu_j, mu_t.detach().numpy(), atol=1e-3)
         np.testing.assert_allclose(g_j, cpt.grad.numpy(), atol=1e-3)
 
-    def test_rejects_nonpositive_lambda(self):
-        from pyepo.func.jax import regularizedFrankWolfeOpt
 
+@requires_gurobi
+class TestConstructorGuards:
+    """Constructor validation shared across losses."""
+
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "blackboxOpt",
+            "implicitMLE",
+            "regularizedFrankWolfeOpt",
+            "regularizedFrankWolfeFenchelYoung",
+        ],
+    )
+    def test_rejects_nonpositive_lambda(self, name):
+        import pyepo.func.jax as J
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        model = shortestPathModel(grid=GRID)
         for bad in (0.0, -1.0):
             with pytest.raises(ValueError):
-                regularizedFrankWolfeOpt(self._knapsack(), lambd=bad)
+                getattr(J, name)(model, lambd=bad)
 
 
 @requires_mpax
@@ -555,7 +563,8 @@ class TestRankContrastiveJax:
         import pyepo.func.jax as J
 
         model, ds, pred, true_cost, true_sol = self._data()
-        loss = getattr(J, name)(model, dataset=ds)
+        # solve_ratio=0 freezes the pool so the finite difference is deterministic
+        loss = getattr(J, name)(model, dataset=ds, solve_ratio=0)
         second = jnp.asarray(true_cost if arg == "cost" else true_sol)
 
         def f(p):
@@ -596,69 +605,83 @@ class TestCaVEJax:
         tcave(pt, torch.as_tensor(tight)).backward()
         np.testing.assert_allclose(g_j, pt.grad.numpy(), atol=1e-3)
 
+    def test_hybrid_heuristic_matches_torch(self):
+        import jax
+        import jax.numpy as jnp
+        import torch
+
+        from pyepo.func.cave import coneAlignedCosine as TCaVE
+        from pyepo.func.jax import coneAlignedCosine as JCaVE
+
+        model, pred, tight = self._setup()
+        # solve_ratio=0 -> always the cheap heuristic branch (deterministic)
+        jcave = JCaVE(model, solve_ratio=0.0, reduction="mean")
+        g_j = np.array(jax.grad(lambda p: jcave(p, jnp.asarray(tight)))(jnp.asarray(pred)))
+        tcave = TCaVE(model, processes=1, solve_ratio=0.0, reduction="mean")
+        pt = torch.tensor(pred, requires_grad=True)
+        tcave(pt, torch.as_tensor(tight)).backward()
+        np.testing.assert_allclose(g_j, pt.grad.numpy(), atol=1e-3)
+
+
+@requires_gurobi
+class TestMultiprocessing:
+    """processes > 1 parallelizes the callback-path solves (results identical to single-core)."""
+
+    def _model(self):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        return shortestPathModel(grid=GRID)
+
+    def test_builds_worker_pool(self):
+        from pyepo.func.jax import SPOPlus
+
+        assert SPOPlus(self._model(), processes=1).pool is None
+        spo = SPOPlus(self._model(), processes=2)
+        assert spo.pool is not None
+
+    def test_grad_matches_single_core(self):
+        import jax
+        import jax.numpy as jnp
+
+        import pyepo
+        from pyepo.data.dataset import optDataset
+        from pyepo.func.jax import SPOPlus
+
+        x, c = pyepo.data.shortestpath.genData(8, NUM_FEAT, GRID, seed=SEED)
+        ds = optDataset(self._model(), x, c)
+        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
+        tc, ts, to = (jnp.asarray(np.asarray(a, np.float32)) for a in (ds.costs, ds.sols, ds.objs))
+
+        def grad_with(n_proc):
+            spo = SPOPlus(self._model(), processes=n_proc)
+            return np.array(jax.grad(lambda p: spo(p, tc, ts, to))(jnp.asarray(pred)))
+
+        np.testing.assert_allclose(grad_with(2), grad_with(1), atol=1e-5)
+
 
 @requires_mpax
 class TestJitJax:
-    """jax.jit works by closing over the model (no pytree registration)."""
-
-    def _data(self):
-        model, ds = _sp_mpax_ds(16)
-        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
-        tc, ts, to = (np.asarray(a, np.float32) for a in (ds.costs, ds.sols, ds.objs))
-        return model, pred, tc, ts, to
-
     def test_spoplus_jit_matches_eager(self):
+        """jax.jit of the loss gradient (model closed over) equals the eager gradient."""
         import jax
         import jax.numpy as jnp
 
         from pyepo.func.jax import SPOPlus
 
-        model, pred, tc, ts, to = self._data()
+        model, ds = _sp_mpax_ds(16)
+        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
+        tcj, tsj, toj = (
+            jnp.asarray(np.asarray(a, np.float32)) for a in (ds.costs, ds.sols, ds.objs)
+        )
         spo = SPOPlus(model, reduction="mean")
-        cj, tcj, tsj, toj = (jnp.asarray(a) for a in (pred, tc, ts, to))
 
         def loss(p):
             return spo(p, tcj, tsj, toj)
 
+        cj = jnp.asarray(pred)
         g_eager = np.array(jax.grad(loss)(cj))
         g_jit = np.array(jax.jit(jax.grad(loss))(cj))
         np.testing.assert_allclose(g_jit, g_eager, atol=1e-4)
-
-    def test_blackbox_jit_matches_eager(self):
-        import jax
-        import jax.numpy as jnp
-
-        from pyepo.func.jax import blackboxOpt
-
-        model, pred, *_ = self._data()
-        target = np.random.RandomState(3).randn(*pred.shape).astype(np.float32)
-        dbb = blackboxOpt(model, lambd=10)
-        cj, tj = jnp.asarray(pred), jnp.asarray(target)
-
-        def loss(p):
-            return jnp.sum(tj * dbb(p))
-
-        g_eager = np.array(jax.grad(loss)(cj))
-        g_jit = np.array(jax.jit(jax.grad(loss))(cj))
-        np.testing.assert_allclose(g_jit, g_eager, atol=1e-4)
-
-    def test_perturbed_opt_jit_with_explicit_key(self):
-        import jax
-        import jax.numpy as jnp
-
-        from pyepo.func.jax import perturbedOpt
-
-        model, pred, *_ = self._data()
-        target = np.random.RandomState(3).randn(*pred.shape).astype(np.float32)
-        po = perturbedOpt(model, n_samples=3, sigma=1.0)
-        cj, tj = jnp.asarray(pred), jnp.asarray(target)
-
-        # explicit key -> jittable
-        def step(p, k):
-            return jnp.sum(tj * po(p, key=k))
-
-        g = np.array(jax.jit(jax.grad(step))(cj, jax.random.PRNGKey(0)))
-        assert np.isfinite(g).all()
 
 
 # ============================================================

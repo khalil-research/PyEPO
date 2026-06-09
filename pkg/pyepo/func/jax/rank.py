@@ -10,6 +10,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
+from pyepo.func.jax.solve import _full_cost, grow_solpool
 
 
 class listwiseLearningToRank(optModule):
@@ -28,7 +29,7 @@ class listwiseLearningToRank(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool
@@ -39,6 +40,11 @@ class listwiseLearningToRank(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
+        true_cost = _full_cost(true_cost, self.optmodel)
+        # solve and update pool
+        grow_solpool(self, pred_cost)
         # obj for solpool
         objpool_c = true_cost @ self.solpool.T
         objpool_cp = pred_cost @ self.solpool.T
@@ -71,7 +77,7 @@ class pairwiseLearningToRank(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool
@@ -82,6 +88,11 @@ class pairwiseLearningToRank(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
+        true_cost = _full_cost(true_cost, self.optmodel)
+        # solve and update pool
+        grow_solpool(self, pred_cost)
         # obj for solpool
         objpool_c = true_cost @ self.solpool.T
         objpool_cp = pred_cost @ self.solpool.T
@@ -116,7 +127,7 @@ class pointwiseLearningToRank(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool
@@ -127,6 +138,11 @@ class pointwiseLearningToRank(optModule):
         """
         Forward pass
         """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
+        true_cost = _full_cost(true_cost, self.optmodel)
+        # solve and update pool
+        grow_solpool(self, pred_cost)
         # squared loss over the pool
         loss = (((true_cost - pred_cost) @ self.solpool.T) ** 2).mean(axis=1)
         return self._reduce(loss)

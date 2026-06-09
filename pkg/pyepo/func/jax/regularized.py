@@ -128,7 +128,7 @@ class regularizedFrankWolfeOpt(optModule):
             lambd: L2 regularization strength
             max_iter: Frank-Wolfe iteration cap
             tol: per-instance Frank-Wolfe gap tolerance
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of LMO calls solved exactly each step
             dataset: training dataset used to seed the LMO pool when solve_ratio < 1
         """
@@ -214,7 +214,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
             lambd: L2 regularization strength
             max_iter: Frank-Wolfe iteration cap
             tol: per-instance Frank-Wolfe gap tolerance
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of LMO calls solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the LMO pool when solve_ratio < 1

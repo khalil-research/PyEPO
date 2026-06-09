@@ -34,7 +34,7 @@ class SPOPlus(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
@@ -117,7 +117,7 @@ class perturbationGradient(optModule):
             optmodel: a PyEPO optimization model
             sigma: finite-difference width
             two_sides: central differencing (True) instead of backward (False)
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool when solve_ratio < 1

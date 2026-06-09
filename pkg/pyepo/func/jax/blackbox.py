@@ -31,7 +31,7 @@ class negativeIdentity(optModule):
         """
         Args:
             optmodel: a PyEPO optimization model
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
@@ -83,7 +83,7 @@ class blackboxOpt(optModule):
         Args:
             optmodel: a PyEPO optimization model
             lambd: interpolation smoothing strength (recommended 10-20)
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """

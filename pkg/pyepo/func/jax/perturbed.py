@@ -80,7 +80,7 @@ class perturbedFenchelYoung(optModule):
             optmodel: a PyEPO optimization model
             n_samples: number of Monte Carlo perturbation samples per instance
             sigma: perturbation amplitude (Gaussian standard deviation)
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             seed: random seed for the perturbation generator
             solve_ratio: fraction of instances solved exactly each step
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
@@ -101,7 +101,7 @@ class perturbedFenchelYoung(optModule):
         noises = jax.random.normal(
             key, (pred_cost.shape[0], self.n_samples, pred_cost.shape[1]), dtype=pred_cost.dtype
         )
-        # keep known fixed costs unperturbed under partial prediction
+        # keep fixed costs unperturbed
         noises = _mask_pred(noises, self.optmodel)
         loss = _perturbed_fenchel_young(
             pred_cost, true_sol, noises, self, self.sigma, self._multiplicative
@@ -201,7 +201,7 @@ class perturbedOpt(optModule):
             optmodel: a PyEPO optimization model
             n_samples: number of Monte Carlo perturbation samples per instance
             sigma: perturbation amplitude (Gaussian standard deviation)
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             seed: random seed for the perturbation generator
             variance_reduction: apply a leave-one-out baseline in the backward estimator
             solve_ratio: fraction of instances solved exactly each step
@@ -223,7 +223,7 @@ class perturbedOpt(optModule):
         noises = jax.random.normal(
             key, (pred_cost.shape[0], self.n_samples, pred_cost.shape[1]), dtype=pred_cost.dtype
         )
-        # keep known fixed costs unperturbed under partial prediction
+        # keep fixed costs unperturbed
         noises = _mask_pred(noises, self.optmodel)
         return _perturbed_opt(
             pred_cost, noises, self, self.sigma, self.variance_reduction, self._multiplicative
@@ -328,7 +328,7 @@ class implicitMLE(optModule):
             n_iterations: Sum-of-Gamma summation length
             two_sides: use central differencing instead of backward
             seed: random seed for the perturbation generator
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
@@ -356,7 +356,7 @@ class implicitMLE(optModule):
             self.n_iterations,
             (pred_cost.shape[0], self.n_samples, pred_cost.shape[1]),
         )
-        # keep known fixed costs unperturbed under partial prediction
+        # keep fixed costs unperturbed
         noises = _mask_pred(noises, self.optmodel)
         return _implicit_mle(pred_cost, noises, self, self.sigma, self.lambd, self.two_sides)
 
@@ -430,7 +430,7 @@ class adaptiveImplicitMLE(optModule):
             n_iterations: Sum-of-Gamma summation length
             two_sides: use central differencing instead of backward
             seed: random seed for the perturbation generator
-            processes: number of solver processes (1 = single-core)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
             solve_ratio: fraction of instances solved exactly each step
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
@@ -457,7 +457,7 @@ class adaptiveImplicitMLE(optModule):
             self.n_iterations,
             (pred_cost.shape[0], self.n_samples, pred_cost.shape[1]),
         )
-        # keep known fixed costs unperturbed under partial prediction
+        # keep fixed costs unperturbed
         noises = _mask_pred(noises, self.optmodel)
         return _adaptive_implicit_mle(pred_cost, noises, self)
 

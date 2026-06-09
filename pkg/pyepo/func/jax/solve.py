@@ -14,14 +14,14 @@ from pyepo.func.utils import _solve_batch
 from pyepo.model.mpax import optMpaxModel
 
 
-def batch_solve(cost, optmodel):
+def batch_solve(cost, optmodel, processes=1, pool=None):
     """
     A function to solve a batch of costs for the JAX frontend
     """
     # MPAX solves natively; any other backend via pure_callback
     if isinstance(optmodel, optMpaxModel):
         return _batch_solve_mpax(cost, optmodel)
-    return _batch_solve_callback(cost, optmodel)
+    return _batch_solve_callback(cost, optmodel, processes, pool)
 
 
 def _batch_solve_mpax(cost, optmodel):
@@ -38,7 +38,7 @@ def _batch_solve_mpax(cost, optmodel):
     return sol, obj
 
 
-def _batch_solve_callback(cost, optmodel):
+def _batch_solve_callback(cost, optmodel, processes=1, pool=None):
     """
     A function to solve via jax.pure_callback over _solve_batch
     """
@@ -46,7 +46,7 @@ def _batch_solve_callback(cost, optmodel):
 
     def _np_solve(c_np):
         # solve on host
-        sol, obj = _solve_batch(np.asarray(c_np, dtype=np.float32), optmodel, 1, None)
+        sol, obj = _solve_batch(np.asarray(c_np, dtype=np.float32), optmodel, processes, pool)
         # to numpy
         return (
             np.asarray(sol.detach().cpu(), dtype=np.float32),
@@ -63,18 +63,14 @@ def _batch_solve_callback(cost, optmodel):
 def solve_or_cache(cost, module):
     """
     A function to solve a batch or reuse the solution pool
-
-    The branch RNG draws solve-vs-cache each pass; the solve branch grows the
-    pool. Eager (mutates module.solpool); caching at solve_ratio < 1 is not
-    jittable because the pool shape is data-dependent.
     """
     if module._branch_rng.uniform() <= module.solve_ratio:
-        sol, obj = batch_solve(cost, module.optmodel)
-        # grow the pool with newly solved solutions
+        sol, obj = batch_solve(cost, module.optmodel, module.processes, module.pool)
+        # grow the pool
         if module.solpool is not None:
             module.solpool = _update_solution_pool(sol, module.solpool)
         return sol, obj
-    # cache branch (solve_ratio < 1 guarantees the pool was seeded)
+    # reuse the pool
     return _cache_in_pass(cost, module.optmodel, module.solpool)
 
 
@@ -104,3 +100,29 @@ def _cache_in_pass(cost, optmodel, solpool):
         ind = jnp.argmax(solpool_obj, axis=1)
     obj = jnp.take_along_axis(solpool_obj, ind[:, None], axis=1).squeeze(1)
     return solpool[ind], obj
+
+
+def _full_cost(pred_cost, optmodel):
+    """
+    A function to lift a predicted cost to the full objective space
+    """
+    idx = optmodel.c_pred_index
+    if idx is None:
+        return pred_cost
+    prob = optmodel.problem
+    full = jnp.broadcast_to(
+        jnp.asarray(prob.fixed_cost, dtype=pred_cost.dtype),
+        (*pred_cost.shape[:-1], prob.num_vars),
+    )
+    return full.at[..., jnp.asarray(idx)].add(pred_cost)
+
+
+def grow_solpool(module, pred_cost):
+    """
+    A function to re-solve the predicted cost and grow the module's solution pool
+    """
+    if module._branch_rng.uniform() <= module.solve_ratio:
+        sol, _ = batch_solve(
+            jax.lax.stop_gradient(pred_cost), module.optmodel, module.processes, module.pool
+        )
+        module.solpool = _update_solution_pool(sol, module.solpool)
