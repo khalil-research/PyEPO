@@ -11,6 +11,7 @@ optimization problem per sample at construction, so they are built once and
 shared across a whole test module.
 """
 
+import numpy as np
 import pytest
 import torch
 from torch import nn
@@ -243,6 +244,35 @@ def call_op(fn, sig, cp, c, w, z):
     for the c/w/z naming; cp is the predicted cost)."""
     args = {"cp": cp, "c": c, "w": w, "z": z}
     return fn(*(args[a] for a in sig.split(",")))
+
+
+def jx(*arrays):
+    """torch tensors -> jax arrays."""
+    import jax.numpy as jnp
+
+    return tuple(jnp.asarray(a.numpy()) for a in arrays)
+
+
+def sp_jax_pred(backend="mpax", n=16):
+    """Shortest-path (model, dataset, pred, true_cost, true_sol, true_obj) for a JAX backend.
+
+    pred is 1.3 x the true cost; the cost/sol/obj triple is returned as float32 numpy.
+    """
+    import pyepo
+    from pyepo.data.dataset import optDataset
+
+    if backend == "mpax":
+        from pyepo.model.mpax.shortestpath import shortestPathModel
+    elif backend == "grb":
+        from pyepo.model.grb.shortestpath import shortestPathModel
+    else:
+        raise ValueError(backend)
+    x, c = pyepo.data.shortestpath.genData(n, NUM_FEAT, GRID, seed=42)
+    model = shortestPathModel(grid=GRID)
+    ds = optDataset(model, x, c)
+    pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
+    tc, ts, to = (np.asarray(a, np.float32) for a in (ds.costs, ds.sols, ds.objs))
+    return model, ds, pred, tc, ts, to
 
 
 def finite_diff_grad(loss_fn, x, eps=1e-3):

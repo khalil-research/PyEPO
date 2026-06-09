@@ -18,9 +18,11 @@ from .conftest import (
     NUM_FEAT,
     call_op,
     finite_diff_grad,
+    jx,
     requires_clarabel,
     requires_gurobi,
     requires_mpax,
+    sp_jax_pred,
     take_batch,
 )
 
@@ -51,17 +53,6 @@ def _sp_mpax(n):
     return shortestPathModel(grid=GRID), np.asarray(c, np.float32)
 
 
-def _sp_mpax_ds(n):
-    """mpax shortest-path model + optDataset."""
-    import pyepo
-    from pyepo.data.dataset import optDataset
-    from pyepo.model.mpax.shortestpath import shortestPathModel
-
-    x, c = pyepo.data.shortestpath.genData(n, NUM_FEAT, GRID, seed=SEED)
-    model = shortestPathModel(grid=GRID)
-    return model, optDataset(model, x, c)
-
-
 @requires_mpax
 class TestBatchSolve:
     def test_callback_matches_native(self):
@@ -87,43 +78,44 @@ def _spo_closed_form(model, pred, true_cost, true_sol):
     return 2.0 * (true_sol - np.array(w_spo))
 
 
-@requires_mpax
-class TestSPOPlusJaxMpax:
-    def _setup(self):
-        model, ds = _sp_mpax_ds(16)
-        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
-        return (
-            model,
-            pred,
-            np.asarray(ds.costs, np.float32),
-            np.asarray(ds.sols, np.float32),
-            np.asarray(ds.objs, np.float32),
-        )
+# SPO+ closed form on each backend: native MPAX and the Gurobi pure_callback path
+SPO_CLOSED_FORM = [
+    pytest.param("mpax", 16, 1e-3, marks=requires_mpax),
+    pytest.param("grb", 8, 1e-4, marks=requires_gurobi),
+]
 
-    def test_grad_matches_closed_form(self):
+
+class TestSPOPlusClosedFormJax:
+    """SPO+ subgradient vs the independent 2*(w_true - w_spo) ground truth, per backend."""
+
+    @pytest.mark.parametrize("backend,n,atol", SPO_CLOSED_FORM)
+    def test_grad_matches_closed_form(self, backend, n, atol):
         import jax
         import jax.numpy as jnp
 
         from pyepo.func.jax import SPOPlus
 
-        model, pred, tc, ts, to = self._setup()
+        model, _ds, pred, tc, ts, to = sp_jax_pred(backend, n)
         B = pred.shape[0]
         spo = SPOPlus(model, reduction="mean")
-
-        def f(p):
-            return spo(p, jnp.asarray(tc), jnp.asarray(ts), jnp.asarray(to))
-
-        grad = np.array(jax.grad(f)(jnp.asarray(pred)))
+        grad = np.array(
+            jax.grad(lambda p: spo(p, jnp.asarray(tc), jnp.asarray(ts), jnp.asarray(to)))(
+                jnp.asarray(pred)
+            )
+        )
         expected = _spo_closed_form(model, pred, tc, ts) / B
-        np.testing.assert_allclose(grad, expected, atol=1e-3)
+        np.testing.assert_allclose(grad, expected, atol=atol)
 
+
+@requires_mpax
+class TestSPOPlusTrainingJax:
     def test_training_step_decreases_loss(self):
         import jax
         import jax.numpy as jnp
 
         from pyepo.func.jax import SPOPlus
 
-        model, _pred, tc, ts, to = self._setup()
+        model, _ds, _pred, tc, ts, to = sp_jax_pred("mpax", 16)
         x = np.random.RandomState(1).randn(tc.shape[0], NUM_FEAT).astype(np.float32)
         rng = np.random.RandomState(2)
         params = {
@@ -142,35 +134,6 @@ class TestSPOPlusJaxMpax:
             g = jax.grad(loss_fn)(params)
             params = jax.tree_util.tree_map(lambda a, d: a - 0.1 * d, params, g)
         assert float(loss_fn(params)) < l0
-
-
-@requires_gurobi
-class TestSPOPlusJaxCallback:
-    """Non-MPAX backend: SPO+ over Gurobi via the pure_callback path."""
-
-    def test_grad_matches_closed_form(self):
-        import jax
-        import jax.numpy as jnp
-
-        import pyepo
-        from pyepo.data.dataset import optDataset
-        from pyepo.func.jax import SPOPlus
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        x, c = pyepo.data.shortestpath.genData(8, NUM_FEAT, GRID, seed=SEED)
-        model = shortestPathModel(grid=GRID)
-        ds = optDataset(model, x, c)
-        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
-        tc, ts, to = (np.asarray(a, np.float32) for a in (ds.costs, ds.sols, ds.objs))
-        B = pred.shape[0]
-        spo = SPOPlus(model, reduction="mean")
-
-        def f(p):
-            return spo(p, jnp.asarray(tc), jnp.asarray(ts), jnp.asarray(to))
-
-        grad = np.array(jax.grad(f)(jnp.asarray(pred)))
-        expected = _spo_closed_form(model, pred, tc, ts) / B
-        np.testing.assert_allclose(grad, expected, atol=1e-4)
 
 
 @requires_mpax
@@ -210,9 +173,8 @@ class TestSolveCacheHelpers:
 
         from pyepo.func.jax import SPOPlus
 
-        model, ds = _sp_mpax_ds(16)
-        pred = (np.random.RandomState(0).rand(*np.asarray(ds.costs).shape) + 0.1).astype(np.float32)
-        tc, ts, to = (np.asarray(a, np.float32) for a in (ds.costs, ds.sols, ds.objs))
+        model, ds, _pred, tc, ts, to = sp_jax_pred("mpax", 16)
+        pred = (np.random.RandomState(0).rand(*tc.shape) + 0.1).astype(np.float32)
         spo = SPOPlus(model, solve_ratio=0.5, dataset=ds)
         # force the solve-and-grow branch deterministically
         spo.solve_ratio = 1.0
@@ -630,9 +592,8 @@ class TestRankContrastiveJax:
     """Pool/contrastive losses gated by finite difference (reused from conftest)."""
 
     def _data(self):
-        model, ds = _sp_mpax_ds(12)
-        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
-        return model, ds, pred, np.asarray(ds.costs, np.float32), np.asarray(ds.sols, np.float32)
+        model, ds, pred, tc, ts, _to = sp_jax_pred("mpax", 12)
+        return model, ds, pred, tc, ts
 
     @pytest.mark.parametrize(
         "name,arg",
@@ -756,11 +717,8 @@ class TestJitJax:
 
         from pyepo.func.jax import SPOPlus
 
-        model, ds = _sp_mpax_ds(16)
-        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
-        tcj, tsj, toj = (
-            jnp.asarray(np.asarray(a, np.float32)) for a in (ds.costs, ds.sols, ds.objs)
-        )
+        model, _ds, pred, tc, ts, to = sp_jax_pred("mpax", 16)
+        tcj, tsj, toj = (jnp.asarray(a) for a in (tc, ts, to))
         spo = SPOPlus(model, reduction="mean")
 
         def loss(p):
@@ -778,9 +736,9 @@ class TestJitJax:
 
         from pyepo.func.jax import noiseContrastiveEstimation
 
-        model, ds = _sp_mpax_ds(12)
-        ts = jnp.asarray(np.asarray(ds.sols, np.float32))
-        pred = jnp.asarray((np.asarray(ds.costs) * 1.2).astype(np.float32))
+        model, ds, _pred, tc, ts_np, _to = sp_jax_pred("mpax", 12)
+        ts = jnp.asarray(ts_np)
+        pred = jnp.asarray((tc * 1.2).astype(np.float32))
         nce = noiseContrastiveEstimation(model, dataset=ds, solve_ratio=0.0)
         # eager is fine
         assert np.isfinite(np.array(jax.grad(lambda p: nce(p, ts))(pred))).all()
@@ -832,13 +790,6 @@ class TestPGTwoSidesJax:
 # ============================================================
 
 
-def _jx(*arrays):
-    """torch tensors -> jax arrays."""
-    import jax.numpy as jnp
-
-    return tuple(jnp.asarray(a.numpy()) for a in arrays)
-
-
 @requires_gurobi
 class TestJaxContract:
     """Forward/backward contract over JAX_LOSS_REGISTRY, on the Gurobi callback path."""
@@ -851,7 +802,7 @@ class TestJaxContract:
         optmodel, dataset, loader = sp_data
         _kind, build, sig = JAX_LOSS_REGISTRY[name]
         _x, c, w, z = take_batch(loader)
-        cp, cj, wj, zj = _jx(c * 1.2, c, w, z)
+        cp, cj, wj, zj = jx(c * 1.2, c, w, z)
         op = build(optmodel, dataset, "mean")
         out = call_op(op, sig, cp, cj, wj, zj)
         assert out.shape == cp.shape
@@ -866,7 +817,7 @@ class TestJaxContract:
         optmodel, dataset, loader = sp_data
         _kind, build, sig = JAX_LOSS_REGISTRY[name]
         _x, c, w, z = take_batch(loader)
-        cp, cj, wj, zj = _jx(c * 1.2, c, w, z)
+        cp, cj, wj, zj = jx(c * 1.2, c, w, z)
         loss = call_op(build(optmodel, dataset, "mean"), sig, cp, cj, wj, zj)
         assert loss.ndim == 0
         g = jax.grad(lambda p: call_op(build(optmodel, dataset, "mean"), sig, p, cj, wj, zj))(cp)
@@ -903,7 +854,7 @@ class TestTorchJaxParity:
         g_t = cpt.grad.numpy()
         # jax grad (Gurobi via callback)
         jop = jbuild(optmodel, dataset, "mean")
-        cj, cc, ww, zz = _jx(torch.as_tensor(cp_np), c, w, z)
+        cj, cc, ww, zz = jx(torch.as_tensor(cp_np), c, w, z)
         g_j = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, sig, p, cc, ww, zz)))(cj))
         np.testing.assert_allclose(g_j, g_t, atol=1e-3)
 
@@ -990,3 +941,28 @@ class TestPartialPredictionJax:
         g = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, sig, p, cc, ww, zz)))(jnp.asarray(cn)))
         assert g.shape == cn.shape
         assert np.isfinite(g).all()
+
+
+@requires_gurobi
+def test_full_prediction_lift_includes_offset():
+    """`_full_cost` must add the objective offset even when every var is predicted.
+
+    For ``Minimize((c + d) @ x)`` num_cost == num_vars, so the `c_pred_index`
+    property is None, but `fixed_cost == d` is nonzero. The JAX lift must still
+    add d, matching the torch `_fullCost`.
+    """
+    import jax.numpy as jnp
+    import torch
+
+    from pyepo import EPO, dsl
+    from pyepo.func.jax.utils import _full_cost
+
+    x = dsl.Variable(4, vtype=EPO.BINARY)
+    c = dsl.Parameter(4)
+    d = np.array([1.0, 2.0, 3.0, 4.0])
+    model = dsl.Problem(dsl.Minimize((c + d) @ x), [x.sum() >= 1]).compile(backend="gurobi")
+    pred = np.array([10.0, 20.0, 30.0, 40.0], dtype=np.float32)
+    jax_full = np.asarray(_full_cost(jnp.asarray(pred), model))
+    torch_full = model._fullCost(torch.as_tensor(pred)).numpy()
+    np.testing.assert_allclose(jax_full, torch_full)
+    np.testing.assert_allclose(jax_full, pred + d)

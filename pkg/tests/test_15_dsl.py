@@ -449,7 +449,7 @@ def test_addconstr_cost_space(backend):
     assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
 
 
-@pytest.mark.parametrize("backend", _ALL)
+@pytest.mark.parametrize("backend", [*_ALL, pytest.param("mpax", marks=requires_mpax)])
 def test_partial_prediction_solves(backend):
     # predicted cost on x, known cost on y; y is expensive so x is used
     x = dsl.Variable(2, lb=0, ub=1)
@@ -458,10 +458,11 @@ def test_partial_prediction_solves(backend):
     d = np.array([5.0, 5.0])
     comp = dsl.Problem(dsl.Minimize(c @ x + d @ y),
                        [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend=backend, **_kw(backend))
-    comp.setObj([1.0, 1.0])                                 # short predicted cost; setObj scatters it
+    comp.setObj(np.array([1.0, 1.0]))                      # short predicted cost; setObj scatters it
     sol, obj = comp.solve()                                 # full: [x0, x1, y0, y1]
-    assert len(sol) == 4 and np.allclose(np.asarray(sol), [1, 1, 0, 0])
-    assert obj == pytest.approx(2.0)                        # full objective c @ x + d @ y
+    atol = 1e-2 if backend == "mpax" else 1e-6             # MPAX is first-order PDHG
+    assert len(sol) == 4 and np.allclose(np.asarray(sol), [1, 1, 0, 0], atol=atol)
+    assert obj == pytest.approx(2.0, abs=atol)             # full objective c @ x + d @ y
 
 
 @pytest.mark.parametrize("backend", _ALL)
@@ -581,20 +582,6 @@ def test_mpax_torch_cost_returns_tensor():
     mpx.setObj(torch.ones(3))
     w, _ = mpx.solve()
     assert isinstance(w, torch.Tensor) and len(w) == 3
-
-
-@requires_mpax
-def test_mpax_partial_prediction_solves():
-    x = dsl.Variable(2, lb=0, ub=1)
-    y = dsl.Variable(2, lb=0, ub=1)
-    c = dsl.Parameter(2)
-    d = np.array([5.0, 5.0])
-    mpx = dsl.Problem(dsl.Minimize(c @ x + d @ y),
-                      [x[0] + y[0] >= 1, x[1] + y[1] >= 1]).compile(backend="mpax")
-    mpx.setObj(np.array([1.0, 1.0], np.float32))            # short predicted cost; setObj scatters it
-    sol, obj = mpx.solve()                                  # full: [x0, x1, y0, y1]
-    assert np.allclose(np.asarray(sol), [1, 1, 0, 0], atol=1e-2)
-    assert obj == pytest.approx(2.0, abs=1e-2)              # full objective c @ x + d @ y
 
 
 @requires_mpax

@@ -574,6 +574,28 @@ def _solve_3d_batch(optmodel, ptb_c):
     return sols.reshape(b, n, d)
 
 
+def _perturb_torch(cp, noises, sigma, mul):
+    """Additive or multiplicative log-normal perturbation of clean cost (b, d)."""
+    if mul:
+        return cp.unsqueeze(1) * torch.exp(sigma * noises - 0.5 * sigma**2)
+    return cp.unsqueeze(1) + sigma * noises
+
+
+def _grad_scale_torch(cp, n, sigma, mul):
+    """Divisor of the perturbed reward estimator: n*sigma (additive) or n*denom_safe (multiplicative)."""
+    from pyepo.utils import _EPS
+
+    if not mul:
+        return n * sigma + _EPS
+    denom = sigma * cp
+    denom_safe = torch.where(
+        denom.abs() < _EPS,
+        torch.where(denom >= 0, torch.full_like(denom, _EPS), torch.full_like(denom, -_EPS)),
+        denom,
+    )
+    return n * denom_safe
+
+
 class TestSolutionGradientTruth:
     """Estimator solution-ops: autograd gradient == an independent re-solve of the estimator."""
 
@@ -606,41 +628,18 @@ class TestSolutionGradientTruth:
         expected = (sol_q - sol_p) / mod.lambd
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
-    def test_perturbed_opt(self, sp_truth):
-        from pyepo.utils import _EPS
-
-        optmodel, mod, cp, target = self._setup(sp_truth, "DPO")
+    @pytest.mark.parametrize("mul", [False, True])
+    def test_perturbed_opt(self, sp_truth, mul):
+        optmodel, mod, cp, target = self._setup(sp_truth, "DPOMul" if mul else "DPO")
         n, sigma = mod.n_samples, mod.sigma
         cpg = cp.clone().requires_grad_(True)
         (mod(cpg) * target).sum().backward()
         noises = _gaussian_noise(mod, cp)
-        ptb_sols = _solve_3d_batch(optmodel, cp.unsqueeze(1) + sigma * noises)
+        ptb_sols = _solve_3d_batch(optmodel, _perturb_torch(cp, noises, sigma, mul))
         reward = torch.einsum("bnd,bd->bn", ptb_sols, target)
         if mod.variance_reduction and n > 1:  # leave-one-out baseline
             reward = (reward - reward.mean(dim=1, keepdim=True)) * (n / (n - 1))
-        expected = torch.einsum("bnd,bn->bd", noises, reward) / (n * sigma + _EPS)
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
-
-    def test_perturbed_opt_mul(self, sp_truth):
-        from pyepo.utils import _EPS
-
-        optmodel, mod, cp, target = self._setup(sp_truth, "DPOMul")
-        n, sigma = mod.n_samples, mod.sigma
-        cpg = cp.clone().requires_grad_(True)
-        (mod(cpg) * target).sum().backward()
-        noises = _gaussian_noise(mod, cp)
-        factor = torch.exp(sigma * noises - 0.5 * sigma**2)
-        ptb_sols = _solve_3d_batch(optmodel, cp.unsqueeze(1) * factor)
-        reward = torch.einsum("bnd,bd->bn", ptb_sols, target)
-        if mod.variance_reduction and n > 1:  # leave-one-out baseline
-            reward = (reward - reward.mean(dim=1, keepdim=True)) * (n / (n - 1))
-        denom = sigma * cp
-        denom_safe = torch.where(
-            denom.abs() < _EPS,
-            torch.where(denom >= 0, torch.full_like(denom, _EPS), torch.full_like(denom, -_EPS)),
-            denom,
-        )
-        expected = torch.einsum("bnd,bn->bd", noises, reward) / (n * denom_safe)
+        expected = torch.einsum("bnd,bn->bd", noises, reward) / _grad_scale_torch(cp, n, sigma, mul)
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
     def test_implicit_mle(self, sp_truth):
@@ -706,25 +705,20 @@ class TestLossGradientTruth:
         expected = (w_sol - wm_sol) / (mod.sigma + _EPS) / b  # sign = +1 (MINIMIZE)
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
-    def test_perturbed_fenchel_young(self, sp_truth):
-        optmodel, mod, cp, _c, w = self._setup(sp_truth, "PFY")
+    @pytest.mark.parametrize("mul", [False, True])
+    def test_perturbed_fenchel_young(self, sp_truth, mul):
+        optmodel, mod, cp, _c, w = self._setup(sp_truth, "PFYMul" if mul else "PFY")
         b = cp.shape[0]
         cpg = cp.clone().requires_grad_(True)
         mod(cpg, w).backward()
         noises = _gaussian_noise(mod, cp)
-        e_sol = _solve_3d_batch(optmodel, cp.unsqueeze(1) + mod.sigma * noises).mean(dim=1)
+        ptb_sols = _solve_3d_batch(optmodel, _perturb_torch(cp, noises, mod.sigma, mul))
+        if mul:
+            factor = torch.exp(mod.sigma * noises - 0.5 * mod.sigma**2)
+            e_sol = (ptb_sols * factor).mean(dim=1)
+        else:
+            e_sol = ptb_sols.mean(dim=1)
         expected = (w - e_sol) / b  # MINIMIZE residual w - E[sol]
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
-
-    def test_perturbed_fenchel_young_mul(self, sp_truth):
-        optmodel, mod, cp, _c, w = self._setup(sp_truth, "PFYMul")
-        b = cp.shape[0]
-        cpg = cp.clone().requires_grad_(True)
-        mod(cpg, w).backward()
-        noises = _gaussian_noise(mod, cp)
-        factor = torch.exp(mod.sigma * noises - 0.5 * mod.sigma**2)
-        e_sol = (_solve_3d_batch(optmodel, cp.unsqueeze(1) * factor) * factor).mean(dim=1)
-        expected = (w - e_sol) / b
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
 

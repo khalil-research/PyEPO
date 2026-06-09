@@ -588,56 +588,43 @@ def test_vrp_rci_lazy_constrs_tracked():
 # Cross-backend objective parity (vs Gurobi reference)
 # ============================================================
 
-@requires_gurobi
-@pytest.mark.parametrize("backend", [
-    pytest.param("copt", marks=requires_copt),
-    pytest.param("omo", marks=requires_omo),
-    pytest.param("ort", marks=requires_ortools),
-])
-def test_knapsack_parity_vs_gurobi(backend):
-    ref, _ = _make_knapsack("grb")
-    ref.setObj(_KNAP_COST)
-    _, ref_obj = ref.solve()
-    m, _ = _make_knapsack(backend)
-    m.setObj(_KNAP_COST)
-    _, obj = m.solve()
-    np.testing.assert_allclose(obj, ref_obj, atol=1e-4)
+# (problem, backend): each non-Gurobi backend's objective must match the Gurobi reference.
+# shortestpath also covers MPAX (its LP relaxation equals the IP on a TU matrix).
+_PARITY_CASES = [
+    pytest.param("knapsack", "copt", marks=requires_copt),
+    pytest.param("knapsack", "omo", marks=requires_omo),
+    pytest.param("knapsack", "ort", marks=requires_ortools),
+    pytest.param("shortestpath", "copt", marks=requires_copt),
+    pytest.param("shortestpath", "omo", marks=requires_omo),
+    pytest.param("shortestpath", "ort", marks=requires_ortools),
+    pytest.param("shortestpath", "mpax", marks=requires_mpax),
+    pytest.param("portfolio", "copt", marks=requires_copt),
+    pytest.param("portfolio", "omo", marks=requires_omo),
+]
+
+
+def _parity_case(problem, backend):
+    """(reference model, backend model, cost, atol) for a parity-vs-Gurobi problem."""
+    if problem == "knapsack":
+        return _make_knapsack("grb")[0], _make_knapsack(backend)[0], _KNAP_COST, 1e-4
+    if problem == "shortestpath":
+        # exact LP solvers match Gurobi tightly; MPAX is first-order PDHG (~1e-3)
+        cost = np.random.RandomState(42).rand(12)
+        atol = 1e-2 if backend == "mpax" else 1e-4
+        return _make_shortestpath("grb")[0], _make_shortestpath(backend)[0], cost, atol
+    cov, revenue = _portfolio_data()
+    return _make_portfolio("grb", cov), _make_portfolio(backend, cov), revenue[0], 1e-4
 
 
 @requires_gurobi
-@pytest.mark.parametrize("backend", [
-    pytest.param("copt", marks=requires_copt),
-    pytest.param("omo", marks=requires_omo),
-    pytest.param("ort", marks=requires_ortools),
-    pytest.param("mpax", marks=requires_mpax),  # SP LP relax == IP (TU matrix)
-])
-def test_shortestpath_parity_vs_gurobi(backend):
-    cost = np.random.RandomState(42).rand(12)
-    ref, _ = _make_shortestpath("grb")
+@pytest.mark.parametrize("problem,backend", _PARITY_CASES)
+def test_parity_vs_gurobi(problem, backend):
+    ref, m, cost, atol = _parity_case(problem, backend)
     ref.setObj(cost)
     _, ref_obj = ref.solve()
-    m, _meta = _make_shortestpath(backend)
     m.setObj(cost)
     _, obj = m.solve()
-    # exact LP solvers match Gurobi tightly; MPAX is first-order PDHG (~1e-3)
-    atol = 1e-2 if backend == "mpax" else 1e-4
     np.testing.assert_allclose(obj, ref_obj, atol=atol)
-
-
-@requires_gurobi
-@pytest.mark.parametrize("backend", [
-    pytest.param("copt", marks=requires_copt),
-    pytest.param("omo", marks=requires_omo),
-])
-def test_portfolio_parity_vs_gurobi(backend):
-    cov, revenue = _portfolio_data()
-    ref = _make_portfolio("grb", cov)
-    ref.setObj(revenue[0])
-    _, ref_obj = ref.solve()
-    m = _make_portfolio(backend, cov)
-    m.setObj(revenue[0])
-    _, obj = m.solve()
-    np.testing.assert_allclose(obj, ref_obj, atol=1e-4)
 
 
 # ============================================================
@@ -755,6 +742,34 @@ class TestMpaxQP:
         sol, obj = sp.solve()
         assert isinstance(obj, float)
         assert len(sol) == sp.num_cost
+
+
+@requires_mpax
+class TestMpaxStatusCheck:
+    """`solve()` surfaces a non-OPTIMAL PDHG termination instead of silently
+    returning a possibly inaccurate / infeasible solution."""
+
+    def test_converged_solve_is_silent(self):
+        import warnings
+
+        m = _MpaxBoxQP(Q_diag=[2.0, 4.0, 6.0, 8.0])
+        m.setObj(np.array([-2.0, -4.0, -6.0, -8.0]))
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")  # any warning becomes an error
+            m.solve()
+
+    def test_non_optimal_status_warns(self):
+        import warnings
+
+        from mpax.utils import TerminationStatus
+
+        from pyepo.model.mpax.mpaxmodel import _warn_if_not_optimal
+
+        with pytest.warns(UserWarning, match="ITERATION_LIMIT"):
+            _warn_if_not_optimal(int(TerminationStatus.ITERATION_LIMIT))
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            _warn_if_not_optimal(int(TerminationStatus.OPTIMAL))
 
 
 # backend-dispatching factories: pyepo.model.<problem>(..., backend=)
