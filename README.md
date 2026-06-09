@@ -79,6 +79,7 @@ Our recent tutorial was at the ACC 2024 conference. You can view the talk slides
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20Real-World%20Energy%20Scheduling.ipynb)**07 Real-World Energy Scheduling:** Apply PyEPO to real energy data
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb)**08 kNN Robust Losses:** Use optDatasetKNN for robust losses
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb)**09 Solving on MPAX with PDHG:** Use MPAX for GPU-accelerated batch solving
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb)**10 JAX Frontend:** Train any loss in JAX/Flax with `jax.grad` (MPAX or any solver)
 
 
 ## Experiments
@@ -113,7 +114,45 @@ spo = SPOPlus(optmodel, reduction="mean")             # same constructor kwargs
 loss = spo(pred_cost, true_cost, true_sol, true_obj)  # same call signature, use with jax.grad
 ```
 
-All `pyepo.func` losses are ported (SPO+, PG, DBB/NID, DPO/DPOMul, PFY/PFYMul, I-MLE/AI-MLE, RFWO/RFY, listwise/pairwise/pointwise LTR, NCE/CMAP, CaVE). Install the loss frontend and the MPAX fast path with `pip install pyepo[mpax]`; the any-solver callback path needs only a JAX install.
+End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ loss (Flax + optax):
+
+```python
+import jax
+import jax.numpy as jnp
+import optax
+from flax import linen as nn
+
+import pyepo
+from pyepo.data.dataset import optDataset
+from pyepo.func.jax import SPOPlus
+
+# optimization model: 5x5 grid shortest path (any PyEPO solver works)
+grid = (5, 5)
+optmodel = pyepo.model.shortestPathModel(grid)
+
+# synthetic data
+x, c = pyepo.data.shortestpath.genData(
+    num_data=1000, num_features=5, grid=grid, deg=4, noise_width=0.5, seed=135,
+)
+ds = optDataset(optmodel, x, c)
+xj = jnp.asarray(x, jnp.float32)
+cj, wj, zj = (jnp.asarray(a, jnp.float32) for a in (ds.costs, ds.sols, ds.objs))
+
+# linear predictor and SPO+ loss
+predmodel = nn.Dense(optmodel.num_cost)
+params = predmodel.init(jax.random.PRNGKey(0), xj[:1])
+spo = SPOPlus(optmodel, reduction="mean")
+optimizer = optax.adam(1e-2)
+opt_state = optimizer.init(params)
+
+# end-to-end training
+for epoch in range(10):
+    grads = jax.grad(lambda p: spo(predmodel.apply(p, xj), cj, wj, zj))(params)
+    updates, opt_state = optimizer.update(grads, opt_state)
+    params = optax.apply_updates(params, updates)
+```
+
+Install with `pip install pyepo[mpax]` (loss frontend + MPAX) and `pip install pyepo[jaxdev]` (Flax + optax for the example above). See the [JAX frontend docs](https://khalil-research.github.io/PyEPO) for the MPAX fast path, `jax.jit`, and caching.
 
 ## Installation
 
