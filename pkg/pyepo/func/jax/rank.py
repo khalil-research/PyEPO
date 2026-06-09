@@ -52,12 +52,12 @@ class listwiseLearningToRank(optModule):
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = -(
                 jax.nn.log_softmax(objpool_cp, axis=1)
-                * jnp.clip(jax.nn.softmax(objpool_c, axis=1), min=1e-8)
+                * jnp.clip(jax.nn.softmax(objpool_c, axis=1), 1e-8, None)
             )
         else:
             loss = -(
                 jax.nn.log_softmax(-objpool_cp, axis=1)
-                * jnp.clip(jax.nn.softmax(-objpool_c, axis=1), min=1e-8)
+                * jnp.clip(jax.nn.softmax(-objpool_c, axis=1), 1e-8, None)
             )
         return self._reduce(loss)
 
