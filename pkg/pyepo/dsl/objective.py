@@ -25,14 +25,19 @@ class Objective:
 
     def __init__(self, expr):
         from pyepo.dsl.expression import ParametricObjective, ParametricVector
+
         # an elementwise c * x is a vector, not a scalar objective
         if isinstance(expr, ParametricVector):
-            raise TypeError("c * x is an elementwise vector, not a scalar objective; "
-                            "write (c * x).sum() or c @ x.")
+            raise TypeError(
+                "c * x is an elementwise vector, not a scalar objective; "
+                "write (c * x).sum() or c @ x."
+            )
         # the objective must carry the predicted cost (a ParametricObjective)
         if not isinstance(expr, ParametricObjective):
-            raise TypeError("The objective must be a predicted cost term like c @ x, "
-                            "optionally plus a known quadratic term.")
+            raise TypeError(
+                "The objective must be a predicted cost term like c @ x, "
+                "optionally plus a known quadratic term."
+            )
         self.expr = expr
 
     @property
@@ -46,9 +51,11 @@ class Objective:
 
 class Minimize(Objective):
     """Minimization objective."""
+
     modelSense = EPO.MINIMIZE
 
 
 class Maximize(Objective):
     """Maximization objective."""
+
     modelSense = EPO.MAXIMIZE

@@ -74,7 +74,11 @@ class compiledGrbProblem(compiledBase, optGrbModel):
         lb = np.where(np.isneginf(prob.var_lb), -GRB.INFINITY, prob.var_lb)
         ub = np.where(np.isposinf(prob.var_ub), GRB.INFINITY, prob.var_ub)
         # EPO type -> Gurobi vtype
-        grb_vtype = {EPO.BINARY: GRB.BINARY, EPO.INTEGER: GRB.INTEGER, EPO.CONTINUOUS: GRB.CONTINUOUS}
+        grb_vtype = {
+            EPO.BINARY: GRB.BINARY,
+            EPO.INTEGER: GRB.INTEGER,
+            EPO.CONTINUOUS: GRB.CONTINUOUS,
+        }
         vtype = [grb_vtype[t] for t in prob.var_type]
         return m.addMVar(prob.num_vars, lb=lb, ub=ub, vtype=vtype, name=prob.cost_var.name or "x")
 

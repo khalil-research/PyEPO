@@ -74,9 +74,15 @@ class compiledCoptProblem(compiledBase, optCoptModel):
         lb = np.where(np.isneginf(prob.var_lb), -COPT.INFINITY, prob.var_lb)
         ub = np.where(np.isposinf(prob.var_ub), COPT.INFINITY, prob.var_ub)
         # EPO type -> COPT vtype
-        copt_vtype = {EPO.BINARY: COPT.BINARY, EPO.INTEGER: COPT.INTEGER, EPO.CONTINUOUS: COPT.CONTINUOUS}
+        copt_vtype = {
+            EPO.BINARY: COPT.BINARY,
+            EPO.INTEGER: COPT.INTEGER,
+            EPO.CONTINUOUS: COPT.CONTINUOUS,
+        }
         vtype = [copt_vtype[t] for t in prob.var_type]
-        return m.addMVar(prob.num_vars, lb=lb, ub=ub, vtype=vtype, nameprefix=prob.cost_var.name or "x")
+        return m.addMVar(
+            prob.num_vars, lb=lb, ub=ub, vtype=vtype, nameprefix=prob.cost_var.name or "x"
+        )
 
     def _emit_constraints(self, m, x):
         # linear (Q is None) via addConstr, quadratic via addQConstr

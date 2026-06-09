@@ -149,7 +149,12 @@ class optMpaxModel(optModel):
             qp_template = create_qp(
                 self.Q,
                 jnp.zeros(n, dtype=jnp.float32),
-                self.A, self.b, self.G, self.h, self.l, self.u,
+                self.A,
+                self.b,
+                self.G,
+                self.h,
+                self.l,
+                self.u,
                 use_sparse_matrix=self.use_sparse_matrix,
             )
             # Python bool keeps is_lp static under jit/vmap
@@ -236,7 +241,10 @@ class optMpaxModel(optModel):
         """JIT-compiled LP solve (cᵀx)."""
         lp = create_lp(c, A, b, G, h, l, u, use_sparse_matrix=use_sparse_matrix)
         solver = raPDHG(
-            eps_abs=1e-4, eps_rel=1e-4, verbose=False, iteration_limit=50_000,
+            eps_abs=1e-4,
+            eps_rel=1e-4,
+            verbose=False,
+            iteration_limit=50_000,
         )
         result = solver.optimize(lp)
         obj = jnp.dot(c, result.primal_solution)
@@ -256,7 +264,10 @@ class optMpaxModel(optModel):
         """
         qp = dataclasses.replace(qp_template, objective_vector=c)
         solver = raPDHG(
-            eps_abs=1e-4, eps_rel=1e-4, verbose=False, iteration_limit=50_000,
+            eps_abs=1e-4,
+            eps_rel=1e-4,
+            verbose=False,
+            iteration_limit=50_000,
         )
         result = solver.optimize(qp)
         x = result.primal_solution

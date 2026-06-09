@@ -150,7 +150,9 @@ class Affine:
                 self._add_block(blocks, v, b)
             return Affine(blocks, self.const + o.const, self.shape)
         if _is_num(o):
-            return Affine(self.blocks, self.const + np.asarray(o, dtype=float).reshape(-1), self.shape)
+            return Affine(
+                self.blocks, self.const + np.asarray(o, dtype=float).reshape(-1), self.shape
+            )
         return NotImplemented
 
     def __radd__(self, o):
@@ -231,7 +233,9 @@ class Affine:
         sel = np.arange(self.size).reshape(self.shape)[idx]
         out_shape = sel.shape if hasattr(sel, "shape") else ()
         sel = np.atleast_1d(sel).reshape(-1)
-        S = sp.csr_matrix((np.ones(sel.size), (np.arange(sel.size), sel)), shape=(sel.size, self.size))
+        S = sp.csr_matrix(
+            (np.ones(sel.size), (np.arange(sel.size), sel)), shape=(sel.size, self.size)
+        )
         return self._row_op(S, out_shape)
 
     # ---- constraints ----
@@ -339,9 +343,12 @@ class Quadratic:
 
 def _is_row_selection(S, rows):
     # one entry of value 1 per row, distinct columns (a plain index / slice pick)
-    return (S.nnz == rows and (S.data == 1).all()
-            and np.array_equal(S.indptr, np.arange(rows + 1))
-            and len(set(S.indices)) == S.nnz)
+    return (
+        S.nnz == rows
+        and (S.data == 1).all()
+        and np.array_equal(S.indptr, np.arange(rows + 1))
+        and len(set(S.indices)) == S.nnz
+    )
 
 
 def _as_selection(operand):
@@ -349,12 +356,14 @@ def _as_selection(operand):
     if isinstance(operand, Variable):
         return operand, None
     if isinstance(operand, Affine) and len(operand.blocks) == 1 and not operand.const.any():
-        (var, S), = operand.blocks.items()
+        ((var, S),) = operand.blocks.items()
         S = S.tocsr()
         if _is_row_selection(S, operand.size):
-            return var, S.indices.copy()                # selected columns of var
-    raise TypeError("A Parameter may only multiply a Variable or a plain slice / index "
-                    "of one (e.g. x, x[:k], x[idx]).")
+            return var, S.indices.copy()  # selected columns of var
+    raise TypeError(
+        "A Parameter may only multiply a Variable or a plain slice / index "
+        "of one (e.g. x, x[:k], x[idx])."
+    )
 
 
 def _make_objective(param, base, sel, inner=False):
@@ -362,10 +371,14 @@ def _make_objective(param, base, sel, inner=False):
     var, local_idx = _as_selection(sel)
     # `@` is a 1-D inner product; a multi-dimensional cost must go through (c * x).sum()
     if inner and len(getattr(sel, "shape", ())) > 1:
-        raise TypeError("c @ x is a 1-D inner product; for a multi-dimensional cost write (c * x).sum().")
+        raise TypeError(
+            "c @ x is a 1-D inner product; for a multi-dimensional cost write (c * x).sum()."
+        )
     n = var.size if local_idx is None else len(local_idx)
     if param.size != n:
-        raise TypeError(f"Parameter size {param.size} does not match the selected variable size {n}.")
+        raise TypeError(
+            f"Parameter size {param.size} does not match the selected variable size {n}."
+        )
     return ParametricObjective(param, var, local_idx, base=base)
 
 
@@ -418,8 +431,10 @@ class Parameter:
         return self._forbid()
 
     def _forbid(self, *a, **k):
-        raise TypeError("Unsupported operation on Parameter (only c @ var / c * var, "
-                        "optionally with a known base: (d + c) @ var).")
+        raise TypeError(
+            "Unsupported operation on Parameter (only c @ var / c * var, "
+            "optionally with a known base: (d + c) @ var)."
+        )
 
     __rsub__ = __neg__ = __getitem__ = __le__ = __ge__ = __eq__ = _forbid
 
@@ -470,7 +485,9 @@ class ParametricVector:
         var, local_idx = _as_selection(sel)
         n = var.size if local_idx is None else len(local_idx)
         if param.size != n:
-            raise TypeError(f"Parameter size {param.size} does not match the selected variable size {n}.")
+            raise TypeError(
+                f"Parameter size {param.size} does not match the selected variable size {n}."
+            )
         self.param = param
         self.base = base
         self.sel = sel
@@ -481,12 +498,16 @@ class ParametricVector:
     def sum(self, axis=None):
         # reduce to the scalar predicted objective term
         if axis is not None:
-            raise TypeError("A predicted objective must reduce to a scalar; use .sum() with no axis.")
+            raise TypeError(
+                "A predicted objective must reduce to a scalar; use .sum() with no axis."
+            )
         return _make_objective(self.param, self.base, self.sel)
 
     def __add__(self, o):
-        raise TypeError("c * x is an elementwise vector; reduce it with .sum() before adding "
-                        "other terms, e.g. (c * x).sum() + d @ y.")
+        raise TypeError(
+            "c * x is an elementwise vector; reduce it with .sum() before adding "
+            "other terms, e.g. (c * x).sum() + d @ y."
+        )
 
     __radd__ = __add__
 
@@ -519,9 +540,14 @@ class ParametricObjective:
 
     def _with(self, fixed=None, quad=None):
         # copy with a replaced fixed / quad term
-        return ParametricObjective(self.cost_param, self.cost_var, self.local_idx, self.base,
-                                  self.fixed if fixed is None else fixed,
-                                  self.quad if quad is None else quad)
+        return ParametricObjective(
+            self.cost_param,
+            self.cost_var,
+            self.local_idx,
+            self.base,
+            self.fixed if fixed is None else fixed,
+            self.quad if quad is None else quad,
+        )
 
     def sum(self, axis=None):
         # already a scalar; sum is the identity here
@@ -530,7 +556,9 @@ class ParametricObjective:
     def __add__(self, o):
         # attach a known linear (Affine / Variable) or quadratic (Quadratic) term
         if isinstance(o, ParametricObjective):
-            raise TypeError("Cannot add two predicted cost terms; a problem has exactly one predicted cost.")
+            raise TypeError(
+                "Cannot add two predicted cost terms; a problem has exactly one predicted cost."
+            )
         if isinstance(o, Quadratic):
             return self._with(quad=o if self.quad is None else self.quad + o)
         if isinstance(o, Variable):

@@ -44,6 +44,7 @@ class Problem:
 
     def __init__(self, objective, constraints=None):
         from pyepo.dsl.expression import Constraint
+
         # a single bare constraint would hit Constraint.__bool__ via `if constraints`
         if isinstance(constraints, Constraint):
             raise TypeError("`constraints` must be a list; wrap it: [your_constraint].")
@@ -65,8 +66,10 @@ class Problem:
         n_quad = sum(1 for Q, *_ in self.constrs if Q is not None)
         quad = f" [{n_quad} quad]" if n_quad else ""
         obj_q = " +quad obj" if self.obj_Q is not None else ""
-        return (f"Problem({sense}, {self.num_vars} vars, {len(self.constrs)} constrs"
-                f"{quad}, cost dim={self.num_cost}{obj_q})")
+        return (
+            f"Problem({sense}, {self.num_vars} vars, {len(self.constrs)} constrs"
+            f"{quad}, cost dim={self.num_cost}{obj_q})"
+        )
 
     @property
     def num_cost(self) -> int:
@@ -97,6 +100,7 @@ class Problem:
         # objective is a Minimize / Maximize carrying a predicted cost term
         from pyepo.dsl.expression import ParametricObjective
         from pyepo.dsl.objective import Objective
+
         if not isinstance(self.objective, Objective):
             raise TypeError("Problem objective must be wrapped in Minimize(...) or Maximize(...).")
         if not isinstance(self.objective.expr, ParametricObjective):
@@ -104,6 +108,7 @@ class Problem:
 
     def _finalize(self):
         from pyepo.dsl.expression import Quadratic
+
         expr = self.objective.expr
         # predicted positions: the global flat indices the cost lands on
         sl = self.flat_slice[expr.cost_var]
@@ -151,18 +156,23 @@ class Problem:
         # route to the backend compiler
         if backend == "gurobi":
             from pyepo.model.grb.compile import compileProblem
+
             return compileProblem(self, **kwargs)
         if backend == "copt":
             from pyepo.model.copt.compile import compileProblem
+
             return compileProblem(self, **kwargs)
         if backend == "pyomo":
             from pyepo.model.omo.compile import compileProblem
+
             return compileProblem(self, **kwargs)
         if backend == "ortools":
             from pyepo.model.ort.compile import compileProblem
+
             return compileProblem(self, **kwargs)
         if backend == "mpax":
             from pyepo.model.mpax.compile import compileProblem
+
             return compileProblem(self, **kwargs)
         raise NotImplementedError(
             f"DSL backend {backend!r} is not supported "

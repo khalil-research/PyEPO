@@ -40,7 +40,9 @@ def _formulation(table, name, kind):
     try:
         return table[name]
     except KeyError:
-        raise ValueError(f"unknown {kind} formulation {name!r}; choose from {list(table)}") from None
+        raise ValueError(
+            f"unknown {kind} formulation {name!r}; choose from {list(table)}"
+        ) from None
 
 
 def shortestPathModel(grid, *, backend="gurobi", **kwargs):
@@ -90,7 +92,9 @@ def tspModel(num_nodes, *, backend="gurobi", formulation="DFJ", **kwargs):
     return _classFor(backend, _formulation(_TSP, formulation, "TSP"))(num_nodes, **kwargs)
 
 
-def vrpModel(num_nodes, demands, capacity, num_vehicle, *, backend="gurobi", formulation="RCI", **kwargs):
+def vrpModel(
+    num_nodes, demands, capacity, num_vehicle, *, backend="gurobi", formulation="RCI", **kwargs
+):
     """
     Capacitated vehicle routing.
 

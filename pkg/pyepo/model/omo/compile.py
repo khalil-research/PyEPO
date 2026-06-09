@@ -54,9 +54,14 @@ class compiledOmoProblem(compiledBase, optOmoModel):
 
     # canonical `timelimit` (seconds) -> each solver's own option name
     _TIMELIMIT_OPT = {
-        "glpk": "tmlim", "cbc": "seconds", "scip": "limits/time",
-        "highs": "time_limit", "appsi_highs": "time_limit",
-        "ipopt": "max_cpu_time", "gurobi": "TimeLimit", "cplex": "timelimit",
+        "glpk": "tmlim",
+        "cbc": "seconds",
+        "scip": "limits/time",
+        "highs": "time_limit",
+        "appsi_highs": "time_limit",
+        "ipopt": "max_cpu_time",
+        "gurobi": "TimeLimit",
+        "cplex": "timelimit",
     }
 
     def __init__(self, problem, params=None, solver="glpk"):
@@ -64,7 +69,7 @@ class compiledOmoProblem(compiledBase, optOmoModel):
         self.problem = problem
         self.params = dict(params) if params else {}
         self.solver = solver
-        optModel.__init__(self)            # builds the model via _getModel
+        optModel.__init__(self)  # builds the model via _getModel
         self._solverfac = po.SolverFactory(solver)
         self._apply_params()
 
@@ -90,8 +95,10 @@ class compiledOmoProblem(compiledBase, optOmoModel):
             if key == "timelimit":
                 name = self._TIMELIMIT_OPT.get(self.solver)
                 if name is None:
-                    raise ValueError(f"Pyomo solver {self.solver!r} has no known 'timelimit' option "
-                                     "name; pass the solver's native option instead.")
+                    raise ValueError(
+                        f"Pyomo solver {self.solver!r} has no known 'timelimit' option "
+                        "name; pass the solver's native option instead."
+                    )
                 self._solverfac.options[name] = value
             else:
                 self._solverfac.options[key] = value
@@ -110,7 +117,9 @@ class compiledOmoProblem(compiledBase, optOmoModel):
     def _add_cut(self, coef, rhs):
         # add coef @ x <= rhs to a fresh copy
         new_model = self.copy()
-        expr = sum(float(coef[j]) * new_model.x[j] for j in range(self.problem.num_vars)) <= float(rhs)
+        expr = sum(float(coef[j]) * new_model.x[j] for j in range(self.problem.num_vars)) <= float(
+            rhs
+        )
         new_model._model.cons.add(expr)
         return new_model
 

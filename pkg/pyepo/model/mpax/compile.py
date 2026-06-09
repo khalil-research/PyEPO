@@ -45,10 +45,18 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
         prob = self.problem
         self.modelSense = prob.objective.modelSense
         self._emit_constraints()
-        self.l = jnp.asarray(np.where(np.isneginf(prob.var_lb), -np.inf, prob.var_lb).astype(np.float32))
-        self.u = jnp.asarray(np.where(np.isposinf(prob.var_ub), np.inf, prob.var_ub).astype(np.float32))
+        self.l = jnp.asarray(
+            np.where(np.isneginf(prob.var_lb), -np.inf, prob.var_lb).astype(np.float32)
+        )
+        self.u = jnp.asarray(
+            np.where(np.isposinf(prob.var_ub), np.inf, prob.var_ub).astype(np.float32)
+        )
         # quadratic objective (None ⇒ LP); Q = 2·obj_Q for MPAX's ½xᵀQx convention
-        self.Q = jnp.asarray(2.0 * np.asarray(prob.obj_Q.todense(), np.float32)) if prob.obj_Q is not None else None
+        self.Q = (
+            jnp.asarray(2.0 * np.asarray(prob.obj_Q.todense(), np.float32))
+            if prob.obj_Q is not None
+            else None
+        )
         return None, []
 
     def _emit_constraints(self):
@@ -57,17 +65,19 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
         A_eq, b_eq, G, h = [], [], [], []
         for Q, A, sense, b in self.problem.constrs:
             if Q is not None:
-                raise NotImplementedError("MPAX supports a quadratic objective only, not quadratic constraints.")
+                raise NotImplementedError(
+                    "MPAX supports a quadratic objective only, not quadratic constraints."
+                )
             A = np.asarray(A.todense(), dtype=np.float32)
             b = np.asarray(b, dtype=np.float32).reshape(-1)
             if sense == "==":
                 A_eq.append(A)
                 b_eq.append(b)
             elif sense == "<=":
-                G.append(-A)                                # A x <= b  ->  -A x >= -b
+                G.append(-A)  # A x <= b  ->  -A x >= -b
                 h.append(-b)
             else:
-                G.append(A)                                 # A x >= b
+                G.append(A)  # A x >= b
                 h.append(b)
         self.A = jnp.asarray(np.vstack(A_eq) if A_eq else np.zeros((0, n), np.float32))
         self.b = jnp.asarray(np.concatenate(b_eq) if b_eq else np.zeros(0, np.float32))
@@ -89,8 +99,12 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
             if is_full:
                 coef = c.contiguous()
             else:
-                coef = torch.as_tensor(prob.fixed_cost, dtype=torch.float32, device=c.device).clone()
-                coef.index_add_(0, torch.as_tensor(prob.c_pred_index, dtype=torch.long, device=c.device), c)
+                coef = torch.as_tensor(
+                    prob.fixed_cost, dtype=torch.float32, device=c.device
+                ).clone()
+                coef.index_add_(
+                    0, torch.as_tensor(prob.c_pred_index, dtype=torch.long, device=c.device), c
+                )
             self.c = jnp.from_dlpack(coef)
             if self._gpu_device is not None:
                 self.c = jax.device_put(self.c, self._gpu_device)

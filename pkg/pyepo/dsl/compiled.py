@@ -57,8 +57,12 @@ class compiledBase(optModel):
         idx = prob.c_pred_index
         if isinstance(pred_cost, torch.Tensor):
             index = torch.as_tensor(idx, dtype=torch.long, device=pred_cost.device)
-            scattered = pred_cost.new_zeros((*pred_cost.shape[:-1], prob.num_vars)).index_add(-1, index, pred_cost)
-            return scattered + torch.as_tensor(prob.fixed_cost, dtype=pred_cost.dtype, device=pred_cost.device)
+            scattered = pred_cost.new_zeros((*pred_cost.shape[:-1], prob.num_vars)).index_add(
+                -1, index, pred_cost
+            )
+            return scattered + torch.as_tensor(
+                prob.fixed_cost, dtype=pred_cost.dtype, device=pred_cost.device
+            )
         arr = np.asarray(pred_cost, dtype=float)
         full = np.broadcast_to(prob.fixed_cost, (*arr.shape[:-1], prob.num_vars)).copy()
         full[..., idx] += arr

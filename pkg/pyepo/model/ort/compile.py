@@ -39,8 +39,8 @@ class compiledOrtProblem(compiledBase, optOrtModel):
         self.problem = problem
         self.params = dict(params) if params else {}
         self.solver = solver
-        self._extra_constrs = []           # (coef, rhs) cuts replayed on copy
-        optModel.__init__(self)            # builds the model via _getModel
+        self._extra_constrs = []  # (coef, rhs) cuts replayed on copy
+        optModel.__init__(self)  # builds the model via _getModel
         self._model.SuppressOutput()
         self._set_obj_sense()
         self._vars_list = list(self.x.values())
@@ -65,7 +65,9 @@ class compiledOrtProblem(compiledBase, optOrtModel):
             if key.lower() == "timelimit":
                 self._model.SetTimeLimit(int(value * 1000))
             else:
-                raise ValueError(f"OR-Tools backend supports only the 'timelimit' param, got {key!r}.")
+                raise ValueError(
+                    f"OR-Tools backend supports only the 'timelimit' param, got {key!r}."
+                )
 
     def _write_obj(self, coef):
         # set the full-length objective coefficient
@@ -78,7 +80,9 @@ class compiledOrtProblem(compiledBase, optOrtModel):
         status = self._model.Solve()
         if status != pywraplp.Solver.OPTIMAL:
             raise RuntimeError(f"OR-Tools did not find an optimal solution (status {status}).")
-        sol = np.fromiter((self.x[j].solution_value() for j in range(self.problem.num_vars)), dtype=float)
+        sol = np.fromiter(
+            (self.x[j].solution_value() for j in range(self.problem.num_vars)), dtype=float
+        )
         return sol, self._model.Objective().Value()
 
     def _add_cut(self, coef, rhs):
@@ -109,7 +113,9 @@ class compiledOrtProblem(compiledBase, optOrtModel):
         # linear constraints from the finalized IR (one relation per row)
         for Q, A, sense, b in self.problem.constrs:
             if Q is not None:
-                raise NotImplementedError("OR-Tools (pywraplp) does not support quadratic constraints.")
+                raise NotImplementedError(
+                    "OR-Tools (pywraplp) does not support quadratic constraints."
+                )
             A = A.tocsr()
             b = np.asarray(b, dtype=float).reshape(-1)
             for r in range(A.shape[0]):

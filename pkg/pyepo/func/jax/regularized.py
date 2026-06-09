@@ -308,9 +308,7 @@ def _regularized_frank_wolfe_fy_bwd(module, use_cache, res, g):
     return (g[:, None] * diff, jnp.zeros_like(true_sol))
 
 
-_regularized_frank_wolfe_fy.defvjp(
-    _regularized_frank_wolfe_fy_fwd, _regularized_frank_wolfe_fy_bwd
-)
+_regularized_frank_wolfe_fy.defvjp(_regularized_frank_wolfe_fy_fwd, _regularized_frank_wolfe_fy_bwd)
 
 
 # acronym aliases
