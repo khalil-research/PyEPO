@@ -20,12 +20,12 @@ from pyepo.func.perturbed import (
     perturbedOptMul,
 )
 from pyepo.func.rank import (
-    lsLTR,
-    prLTR,
-    ptLTR,
     listwiseLearningToRank,
+    lsLTR,
     pairwiseLearningToRank,
+    prLTR,
     pointwiseLearningToRank,
+    ptLTR,
 )
 from pyepo.func.regularized import (
     RFWO,

@@ -181,6 +181,8 @@ ignore = [
 "pyepo/__init__.py" = ["E402"]
 # optional backends imported via try/except; `__all__ +=` not seen as use
 "pyepo/model/__init__.py" = ["F401"]
+# __all__ is ordered as full-name, acronym pairs, not alphabetically
+"pyepo/func/__init__.py" = ["RUF022"]
 # tests intentionally use broad pytest.raises(Exception) for cross-solver
 # infeasibility assertions (Gurobi/COPT/Pyomo each raise distinct types)
 "tests/test_30_model.py" = ["B017"]
