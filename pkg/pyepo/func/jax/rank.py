@@ -48,17 +48,17 @@ class listwiseLearningToRank(optModule):
         # obj for solpool
         objpool_c = true_cost @ self.solpool.T
         objpool_cp = pred_cost @ self.solpool.T
-        # cross entropy loss
+        # cross entropy loss, summed over the pool per instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = -(
                 jax.nn.log_softmax(objpool_cp, axis=1)
                 * jnp.clip(jax.nn.softmax(objpool_c, axis=1), 1e-8, None)
-            )
+            ).sum(axis=1)
         else:
             loss = -(
                 jax.nn.log_softmax(-objpool_cp, axis=1)
                 * jnp.clip(jax.nn.softmax(-objpool_c, axis=1), 1e-8, None)
-            )
+            ).sum(axis=1)
         return self._reduce(loss)
 
 
