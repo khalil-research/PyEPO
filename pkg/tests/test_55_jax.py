@@ -263,110 +263,109 @@ class TestBlackboxJax:
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
 
-@requires_mpax
+def _perturbed_setup(sense):
+    """(model, base cost c) for a MINIMIZE (MPAX shortest path) or MAXIMIZE (Gurobi knapsack) test."""
+    import pyepo
+
+    if sense == "min":
+        from pyepo.model.mpax.shortestpath import shortestPathModel
+
+        _x, c = pyepo.data.shortestpath.genData(8, NUM_FEAT, GRID, seed=SEED)
+        return shortestPathModel(grid=GRID), np.asarray(c, np.float32)
+    from pyepo.model.grb.knapsack import knapsackModel
+
+    model = knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
+    c = (np.random.RandomState(0).rand(8, model.num_cost) + 0.5).astype(np.float32)
+    return model, c
+
+
+# sense -> backend: MINIMIZE on MPAX (native), MAXIMIZE on Gurobi (callback)
+PERTURBED_SENSE = [
+    pytest.param("min", marks=requires_mpax),
+    pytest.param("max", marks=requires_gurobi),
+]
+
+
 class TestPerturbedJax:
-    """Gate = formula re-derivation from the same seed-derived noise (not torch-vs-jax)."""
+    """DPO/PFY (additive + multiplicative) closed-form parity from seed-derived noise.
 
-    def _model_pred(self):
-        return _sp_mpax(8)
+    Gate is an independent re-solve of the same perturbed costs, not torch-vs-jax.
+    Covers both senses (MINIMIZE via MPAX, MAXIMIZE via the Gurobi callback path).
+    """
 
-    def _gauss(self, seed, shape):
+    @staticmethod
+    def _gauss(shape):
         import jax
         import jax.numpy as jnp
 
-        _key, sub = jax.random.split(jax.random.PRNGKey(seed))
+        _key, sub = jax.random.split(jax.random.PRNGKey(0))
         return jax.random.normal(sub, shape, dtype=jnp.float32)
 
-    def test_perturbed_fenchel_young_grad_matches_reference(self):
+    @staticmethod
+    def _perturb(pred, noises, sigma, mul):
+        # jnp throughout so ptb_c matches the impl bit-for-bit (multiplicative vertex-flip gotcha)
+        import jax.numpy as jnp
+
+        p = jnp.asarray(pred)[:, None, :]
+        if mul:
+            return p * jnp.exp(sigma * noises - 0.5 * sigma**2)
+        return p + sigma * noises
+
+    @pytest.mark.parametrize("sense", PERTURBED_SENSE)
+    @pytest.mark.parametrize("mul", [False, True])
+    def test_perturbed_opt_grad_matches_reference(self, sense, mul):
         import jax
         import jax.numpy as jnp
 
-        from pyepo.func.jax import perturbedFenchelYoung
+        from pyepo.func.jax import perturbedOpt, perturbedOptMul
         from pyepo.func.jax.utils import batch_solve
 
-        model, c = self._model_pred()
-        n_samples, sigma, seed = 5, 1.0, 0
-        w_true, _ = batch_solve(jnp.asarray(c), model)
-        w_true = np.array(w_true)
-        pred = (c * 1.3).astype(np.float32)
-        B, d = pred.shape
-        noises = self._gauss(seed, (B, n_samples, d))
-        ptb_c = pred[:, None, :] + sigma * noises
-        sols, _ = batch_solve(jnp.asarray(ptb_c.reshape(-1, d)), model)
-        e_sol = np.array(sols).reshape(B, n_samples, d).mean(1)
-        expected = (w_true - e_sol) / B
-        pfy = perturbedFenchelYoung(model, n_samples=n_samples, sigma=sigma, seed=seed)
-        g = np.array(jax.grad(lambda p: pfy(p, jnp.asarray(w_true)))(jnp.asarray(pred)))
-        np.testing.assert_allclose(g, expected, atol=1e-3)
-
-    def test_perturbed_opt_grad_matches_reference(self):
-        import jax
-        import jax.numpy as jnp
-
-        from pyepo.func.jax import perturbedOpt
-        from pyepo.func.jax.utils import batch_solve
-
-        model, c = self._model_pred()
-        n_samples, sigma, seed = 5, 1.0, 0
+        model, c = _perturbed_setup(sense)
+        sigma = 0.5 if mul else 1.0
         pred = (c * 1.3).astype(np.float32)
         B, d = pred.shape
         target = np.random.RandomState(3).randn(B, d).astype(np.float32)
-        noises = self._gauss(seed, (B, n_samples, d))
-        ptb_c = pred[:, None, :] + sigma * noises
+        noises = self._gauss((B, 5, d))
+        ptb_c = self._perturb(pred, noises, sigma, mul)
         sols, _ = batch_solve(jnp.asarray(ptb_c.reshape(-1, d)), model)
-        ptb_sols = np.array(sols).reshape(B, n_samples, d)
+        ptb_sols = np.array(sols).reshape(B, 5, d)
         reward = np.einsum("bnd,bd->bn", ptb_sols, target)
-        reward = (reward - reward.mean(1, keepdims=True)) * (n_samples / (n_samples - 1))
-        expected = np.einsum("bnd,bn->bd", np.array(noises), reward) / (n_samples * sigma)
-        po = perturbedOpt(model, n_samples=n_samples, sigma=sigma, seed=seed)
-        g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * po(p)))(jnp.asarray(pred)))
-        np.testing.assert_allclose(g, expected, atol=1e-3)
-
-    def test_perturbed_opt_mul_grad_matches_reference(self):
-        import jax
-        import jax.numpy as jnp
-
-        from pyepo.func.jax import perturbedOptMul
-        from pyepo.func.jax.utils import batch_solve
-
-        model, c = self._model_pred()
-        n_samples, sigma, seed = 5, 0.5, 0
-        pred = (c * 1.3).astype(np.float32)
-        B, d = pred.shape
-        target = np.random.RandomState(3).randn(B, d).astype(np.float32)
-        noises = self._gauss(seed, (B, n_samples, d))
-        # build ptb_c with jnp.exp to match the impl exactly (vertex-flip gotcha)
-        ptb_c = jnp.asarray(pred)[:, None, :] * jnp.exp(sigma * noises - 0.5 * sigma**2)
-        sols, _ = batch_solve(ptb_c.reshape(-1, d), model)
-        ptb_sols = np.array(sols).reshape(B, n_samples, d)
-        reward = np.einsum("bnd,bd->bn", ptb_sols, target)
-        reward = (reward - reward.mean(1, keepdims=True)) * (n_samples / (n_samples - 1))
-        denom = n_samples * sigma * pred
+        reward = (reward - reward.mean(1, keepdims=True)) * (5 / 4)
+        denom = 5 * sigma * pred if mul else 5 * sigma
         expected = np.einsum("bnd,bn->bd", np.array(noises), reward) / denom
-        po = perturbedOptMul(model, n_samples=n_samples, sigma=sigma, seed=seed)
+        cls = perturbedOptMul if mul else perturbedOpt
+        po = cls(model, n_samples=5, sigma=sigma, seed=0)
         g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * po(p)))(jnp.asarray(pred)))
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
-    def test_perturbed_fenchel_young_mul_grad_matches_reference(self):
+    @pytest.mark.parametrize("sense", PERTURBED_SENSE)
+    @pytest.mark.parametrize("mul", [False, True])
+    def test_perturbed_fenchel_young_grad_matches_reference(self, sense, mul):
         import jax
         import jax.numpy as jnp
 
-        from pyepo.func.jax import perturbedFenchelYoungMul
+        from pyepo.func.jax import perturbedFenchelYoung, perturbedFenchelYoungMul
         from pyepo.func.jax.utils import batch_solve
 
-        model, c = self._model_pred()
-        n_samples, sigma, seed = 5, 0.5, 0
+        model, c = _perturbed_setup(sense)
+        sigma = 0.5 if mul else 1.0
         w_true = np.array(batch_solve(jnp.asarray(c), model)[0])
         pred = (c * 1.3).astype(np.float32)
         B, d = pred.shape
-        noises = self._gauss(seed, (B, n_samples, d))
-        factor = jnp.exp(sigma * noises - 0.5 * sigma**2)
-        ptb_c = jnp.asarray(pred)[:, None, :] * factor
-        sols, _ = batch_solve(ptb_c.reshape(-1, d), model)
-        ptb_sols = jnp.asarray(np.array(sols).reshape(B, n_samples, d))
-        e_sol = np.array((ptb_sols * factor).mean(axis=1))
-        expected = (w_true - e_sol) / B
-        pfy = perturbedFenchelYoungMul(model, n_samples=n_samples, sigma=sigma, seed=seed)
+        noises = self._gauss((B, 5, d))
+        ptb_c = self._perturb(pred, noises, sigma, mul)
+        sols, _ = batch_solve(jnp.asarray(ptb_c.reshape(-1, d)), model)
+        ptb_sols = np.array(sols).reshape(B, 5, d)
+        if mul:
+            factor = np.array(jnp.exp(sigma * noises - 0.5 * sigma**2))
+            e_sol = (ptb_sols * factor).mean(1)
+        else:
+            e_sol = ptb_sols.mean(1)
+        # Fenchel-Young residual: w - e_sol (MIN), e_sol - w (MAX)
+        diff = (e_sol - w_true) if sense == "max" else (w_true - e_sol)
+        expected = diff / B
+        cls = perturbedFenchelYoungMul if mul else perturbedFenchelYoung
+        pfy = cls(model, n_samples=5, sigma=sigma, seed=0)
         g = np.array(jax.grad(lambda p: pfy(p, jnp.asarray(w_true)))(jnp.asarray(pred)))
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
@@ -460,6 +459,45 @@ class TestImplicitMLEJax:
         g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * aimle(p)))(jnp.asarray(pred)))
         np.testing.assert_allclose(g, expected, atol=1e-3)
         assert aimle.alpha != a0
+
+    @staticmethod
+    def _resolve_grad_two_sides(module, target, ptb_c, lambd):
+        import jax.numpy as jnp
+
+        from pyepo.func.jax.perturbed import solve_or_cache_3d
+
+        delta = lambd * jnp.asarray(target)[:, None, :]
+        pos = np.array(solve_or_cache_3d(ptb_c + delta, module))
+        neg = np.array(solve_or_cache_3d(ptb_c - delta, module))
+        return (pos - neg).mean(axis=1) / (2 * lambd)
+
+    def test_implicit_mle_two_sides_grad_matches_reference(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import implicitMLE
+
+        model, pred, target, ptb_c = self._setup()
+        lambd = 10.0
+        imle = implicitMLE(
+            model, n_samples=5, sigma=1.0, lambd=lambd, kappa=5.0, two_sides=True, seed=0
+        )
+        expected = self._resolve_grad_two_sides(imle, target, ptb_c, lambd)
+        g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * imle(p)))(jnp.asarray(pred)))
+        np.testing.assert_allclose(g, expected, atol=1e-3)
+
+    def test_adaptive_two_sides_grad_matches_reference(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import adaptiveImplicitMLE
+
+        model, pred, target, ptb_c = self._setup()
+        aimle = adaptiveImplicitMLE(model, n_samples=5, sigma=1.0, kappa=5.0, two_sides=True, seed=0)
+        lambd = aimle.alpha * float(np.linalg.norm(pred)) / float(np.linalg.norm(target))
+        expected = self._resolve_grad_two_sides(aimle, target, ptb_c, lambd)
+        g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * aimle(p)))(jnp.asarray(pred)))
+        np.testing.assert_allclose(g, expected, atol=1e-3)
 
 
 @requires_gurobi
@@ -749,6 +787,44 @@ class TestJitJax:
         # jit raises a clear, actionable error
         with pytest.raises(RuntimeError, match="jax.jit"):
             jax.jit(jax.grad(lambda p: nce(p, ts)))(pred)
+
+
+@requires_gurobi
+class TestPGTwoSidesJax:
+    """PG central differencing (two_sides=True), torch parity on MINIMIZE and MAXIMIZE."""
+
+    def _model(self, sense):
+        if sense == "min":
+            from pyepo.model.grb.shortestpath import shortestPathModel
+
+            return shortestPathModel(grid=GRID)
+        from pyepo.model.grb.knapsack import knapsackModel
+
+        return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
+
+    @pytest.mark.parametrize("sense", ["min", "max"])
+    def test_two_sides_grad_matches_torch(self, sense):
+        import jax
+        import jax.numpy as jnp
+        import torch
+
+        from pyepo.func import PG as TPG
+        from pyepo.func.jax import PG as JPG
+
+        model = self._model(sense)
+        d = model.num_cost
+        rng = np.random.RandomState(0)
+        c = (rng.rand(4, d) + 0.5).astype(np.float32)
+        cp = (c * 1.2).astype(np.float32)
+        # torch reference (deterministic: no internal noise)
+        tpg = TPG(model, sigma=0.5, two_sides=True, processes=1, reduction="mean")
+        cpt = torch.tensor(cp, requires_grad=True)
+        tpg(cpt, torch.as_tensor(c)).backward()
+        g_t = cpt.grad.numpy()
+        # jax
+        jpg = JPG(model, sigma=0.5, two_sides=True, reduction="mean")
+        g_j = np.array(jax.grad(lambda p: jpg(p, jnp.asarray(c)))(jnp.asarray(cp)))
+        np.testing.assert_allclose(g_j, g_t, atol=1e-3)
 
 
 # ============================================================
