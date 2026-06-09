@@ -465,6 +465,21 @@ def test_partial_prediction_solves(backend):
 
 
 @pytest.mark.parametrize("backend", _ALL)
+def test_full_prediction_fixed_cost_dataset_includes_offset(backend):
+    # fixed-cost offset shifts the optimum
+    from pyepo.data.dataset import optDataset
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    d = np.array([5.0, 0.0, 0.0])
+    comp = dsl.Problem(dsl.Minimize((c + d) @ x), [x.sum() >= 1]).compile(backend=backend, **_kw(backend))
+    feats = np.random.RandomState(0).rand(4, 3).astype(np.float32)
+    costs = np.tile([1.0, 2.0, 3.0], (4, 1)).astype(np.float32)   # raw favors x0; (c+d) favors x1
+    ds = optDataset(comp, feats, costs)
+    assert np.allclose(np.asarray(ds.sols[0]), [0, 1, 0])
+    assert float(ds.objs[0]) == pytest.approx(2.0)
+
+
+@pytest.mark.parametrize("backend", _ALL)
 def test_aux_variable_solves(backend):
     # y appears only in a constraint (no objective cost)
     x = dsl.Variable(2, lb=0, ub=1)

@@ -105,7 +105,7 @@ class optDataset(Dataset):
         """
         logger.info("Optimizing for optDataset (MPAX batched)...")
         model = cast("_optMpaxModelT", self.model)
-        model.setObj(self.costs)
+        model.setObj(model._fullCost(self.costs))
         sols, objs = model.batch_optimize(model.c)
         # writable copy; torch.as_tensor warns on JAX read-only buffers
         sols_np = np.array(sols, dtype=np.float32)
@@ -128,7 +128,7 @@ class optDataset(Dataset):
         Returns:
             tuple: optimal solution (np.ndarray) and objective value (float)
         """
-        self.model.setObj(cost)
+        self.model.setObj(self.model._fullCost(cost))
         sol, obj = self.model.solve()
         return sol, obj
 

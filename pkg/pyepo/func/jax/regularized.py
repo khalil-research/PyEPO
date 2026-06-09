@@ -14,7 +14,13 @@ from jax import lax
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.utils import _cache_in_pass, _full_cost, _update_solution_pool, batch_solve
+from pyepo.func.jax.utils import (
+    _cache_in_pass,
+    _check_jit_caching,
+    _full_cost,
+    _update_solution_pool,
+    batch_solve,
+)
 
 
 def _sense_sign(optmodel):
@@ -170,6 +176,7 @@ class regularizedFrankWolfeOpt(optModule):
         """
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
+        _check_jit_caching(pred_cost, self)
         return _regularized_frank_wolfe_opt(pred_cost, self, _draw_use_cache(self))
 
 
@@ -258,6 +265,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         """
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
+        _check_jit_caching(pred_cost, self)
         loss = _regularized_frank_wolfe_fy(pred_cost, true_sol, self, _draw_use_cache(self))
         return self._reduce(loss)
 

@@ -102,7 +102,7 @@ def calRegret(
         float: true regret loss
     """
     # opt sol for pred cost
-    optmodel.setObj(pred_cost)
+    optmodel.setObj(optmodel._fullCost(pred_cost))
     sol, _ = optmodel.solve()
     # MPAX backend returns a torch tensor; convert without coercing dtype
     if isinstance(sol, torch.Tensor):
