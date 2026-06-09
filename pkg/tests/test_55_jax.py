@@ -25,6 +25,7 @@ from .conftest import (
     finite_diff_grad,
     requires_clarabel,
     requires_gurobi,
+    requires_jax,
     requires_mpax,
     sp_jax_pred,
 )
@@ -145,6 +146,7 @@ class TestMaskPred:
         np.testing.assert_array_equal(out[..., [1, 3]], 0.0)  # fixed positions zeroed
 
 
+@requires_jax
 @requires_gurobi
 class TestOptModuleInit:
     def _model(self):
@@ -178,6 +180,7 @@ class TestOptModuleInit:
             SPOPlus(self._model(), solve_ratio=0.5, dataset=None)
 
 
+@requires_jax
 @requires_gurobi
 class TestConstructorGuards:
     """Constructor validation shared across losses: lambda must be positive."""
@@ -216,6 +219,7 @@ class TestBatchSolve:
         np.testing.assert_allclose(np.array(obj_c), np.array(obj_n), atol=1e-3)
 
 
+@requires_jax
 @requires_gurobi
 class TestMultiprocessing:
     """processes > 1 parallelizes the callback-path solves (results identical to single-core)."""
@@ -313,6 +317,7 @@ SPO_CLOSED_FORM = [
 ]
 
 
+@requires_jax
 class TestSPOPlusClosedForm:
     """SPO+ subgradient vs the independent 2*(w_true - w_spo) ground truth, per backend."""
 
@@ -395,6 +400,7 @@ PERTURBED_SENSE = [
 ]
 
 
+@requires_jax
 class TestPerturbed:
     """DPO/PFY (additive + multiplicative) closed-form parity from seed-derived noise.
 
@@ -602,6 +608,7 @@ class TestPG:
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
 
+@requires_jax
 @requires_gurobi
 class TestRegularized:
     """Regularized FW over an exact Gurobi LMO, gated against a finite difference / Danskin residual."""
@@ -741,6 +748,7 @@ class TestRankContrastive:
 # ============================================================
 
 
+@requires_jax
 @requires_gurobi
 class TestPGTwoSidesParity:
     """PG central differencing (two_sides=True), torch parity on MINIMIZE and MAXIMIZE."""
@@ -779,6 +787,7 @@ class TestPGTwoSidesParity:
         np.testing.assert_allclose(g_j, g_t, atol=1e-3)
 
 
+@requires_jax
 @requires_gurobi
 @requires_clarabel
 class TestCaVEParity:
@@ -852,6 +861,7 @@ def _partial_data(n=4):
     return model, optDataset(model, x, c), c
 
 
+@requires_jax
 @requires_gurobi
 class TestPartialPredictionParity:
     """`_full_cost` lift parity for partial prediction (num_cost < num_vars).
@@ -907,6 +917,7 @@ class TestPartialPredictionParity:
         assert np.isfinite(g).all()
 
 
+@requires_jax
 @requires_gurobi
 def test_full_prediction_lift_includes_offset():
     """`_full_cost` adds the fixed-cost offset when every variable is predicted (c_pred_index is None)."""

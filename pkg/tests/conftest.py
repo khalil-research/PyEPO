@@ -53,6 +53,13 @@ except Exception:
 
 try:
     import jax  # noqa: F401
+
+    _HAS_JAX = True
+except Exception:
+    _HAS_JAX = False
+
+try:
+    import jax  # noqa: F401
     import mpax  # noqa: F401
 
     _HAS_MPAX = True
@@ -90,6 +97,7 @@ requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not install
 requires_pyomo = pytest.mark.skipif(not _HAS_PYOMO, reason="Pyomo not installed")
 requires_copt = pytest.mark.skipif(not _HAS_COPT, reason="COPT not installed")
 requires_ortools = pytest.mark.skipif(not _HAS_ORTOOLS, reason="OR-Tools not installed")
+requires_jax = pytest.mark.skipif(not _HAS_JAX, reason="JAX not installed")
 requires_mpax = pytest.mark.skipif(not _HAS_MPAX, reason="MPAX (jax + mpax) not installed")
 requires_clarabel = pytest.mark.skipif(not _HAS_CLARABEL, reason="Clarabel not installed")
 requires_cuda = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA not available")
