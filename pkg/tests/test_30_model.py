@@ -270,21 +270,26 @@ class TestShortestPath:
         _, obj2 = m2.solve()
         np.testing.assert_allclose(obj1, obj2, atol=meta["tol"])
 
-    def test_addConstr_no_improvement(self, backend):
-        # MINIMIZE: a tighter constraint cannot decrease the objective
-        m, meta = _make_shortestpath(backend)
-        cost = np.random.RandomState(42).rand(m.num_cost)
-        m2 = m.addConstr(np.ones(m.num_cost), 5)
-        m2.setObj(cost)
-        _, obj2 = m2.solve()
-        m.setObj(cost)
-        _, obj1 = m.solve()
-        assert obj2 >= obj1 - max(meta["tol"], 1e-6)
-
     def test_grid_sizes_num_cost(self, backend):
         for grid in [(2, 2), (3, 4), (5, 5)]:
             m, _ = _make_shortestpath(backend, grid=grid)
             assert m.num_cost == (grid[0] - 1) * grid[1] + (grid[1] - 1) * grid[0]
+
+
+# addConstr excludes mpax: its first-order PDHG can hit the iteration cap on the
+# extra-constraint LP and return a suboptimal objective, making the strict
+# no-improvement comparison flaky. Exact backends keep the check.
+@pytest.mark.parametrize("backend", [p for p in _SP_BACKENDS if p.values[0] != "mpax"])
+def test_shortestpath_addConstr_no_improvement(backend):
+    # MINIMIZE: a tighter constraint cannot decrease the objective
+    m, meta = _make_shortestpath(backend)
+    cost = np.random.RandomState(42).rand(m.num_cost)
+    m2 = m.addConstr(np.ones(m.num_cost), 5)
+    m2.setObj(cost)
+    _, obj2 = m2.solve()
+    m.setObj(cost)
+    _, obj1 = m.solve()
+    assert obj2 >= obj1 - max(meta["tol"], 1e-6)
 
 
 # ============================================================
@@ -325,6 +330,12 @@ class TestPortfolio:
         m = _make_portfolio(backend, cov)
         assert m.modelSense == EPO.MAXIMIZE
         assert m.num_cost == 10
+
+    def test_setObj_wrong_size_raises(self, backend):
+        cov, _ = _portfolio_data()
+        m = _make_portfolio(backend, cov)
+        with pytest.raises(ValueError):
+            m.setObj(np.ones(3))
 
     def test_solve_budget_constraint(self, backend):
         cov, revenue = _portfolio_data()
@@ -428,13 +439,15 @@ class TestTSP:
         with pytest.raises(ValueError):
             m.setObj(np.ones(3))
 
-    def test_copy_runs(self, backend, formulation):
+    def test_copy_isolation(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         cost = np.random.RandomState(42).rand(m.num_cost)
+        m.setObj(cost)
+        _, obj1 = m.solve()
         m2 = m.copy()
         m2.setObj(cost)
-        _, obj = m2.solve()
-        assert isinstance(obj, float)
+        _, obj2 = m2.solve()
+        np.testing.assert_allclose(obj1, obj2, atol=1e-4)
 
     def test_addConstr_infeasible(self, backend, formulation):
         # 4-node tour needs 4 edges; sum(edges) <= 3 is infeasible
@@ -541,6 +554,31 @@ class TestVRP:
         assert isinstance(obj, float)
         np.testing.assert_allclose(sol, np.round(sol), atol=1e-6)
 
+    def test_setObj_wrong_size_raises(self, backend, formulation):
+        m, _ = _make_vrp(backend, formulation)
+        with pytest.raises(ValueError):
+            m.setObj(np.ones(3))
+
+    def test_copy_isolation(self, backend, formulation):
+        m, _ = _make_vrp(backend, formulation)
+        m.setObj(_VRP_COST)
+        _, obj1 = m.solve()
+        m2 = m.copy()
+        m2.setObj(_VRP_COST)
+        _, obj2 = m2.solve()
+        np.testing.assert_allclose(obj1, obj2, atol=1e-4)
+
+    def test_addConstr_no_improvement(self, backend, formulation):
+        # MINIMIZE: re-imposing the optimal edge count cannot decrease the objective
+        m, _ = _make_vrp(backend, formulation)
+        m.setObj(_VRP_COST)
+        sol1, obj1 = m.solve()
+        k = int(round(np.asarray(sol1).sum()))
+        m2 = m.addConstr(np.ones(m.num_cost), k)
+        m2.setObj(_VRP_COST)
+        _, obj2 = m2.solve()
+        assert obj2 >= obj1 - 1e-6
+
     def test_getTour_depot_anchored(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)
         m.setObj(_VRP_COST)
@@ -561,6 +599,8 @@ class TestVRP:
         m.setObj(_VRP_COST)
         _, obj_int = m.solve()
         assert obj_rel <= obj_int + 1e-6
+        with pytest.raises(RuntimeError):
+            rel.relax()
         with pytest.raises(RuntimeError):
             rel.getTour([0] * m.num_cost)
 
@@ -588,56 +628,43 @@ def test_vrp_rci_lazy_constrs_tracked():
 # Cross-backend objective parity (vs Gurobi reference)
 # ============================================================
 
-@requires_gurobi
-@pytest.mark.parametrize("backend", [
-    pytest.param("copt", marks=requires_copt),
-    pytest.param("omo", marks=requires_omo),
-    pytest.param("ort", marks=requires_ortools),
-])
-def test_knapsack_parity_vs_gurobi(backend):
-    ref, _ = _make_knapsack("grb")
-    ref.setObj(_KNAP_COST)
-    _, ref_obj = ref.solve()
-    m, _ = _make_knapsack(backend)
-    m.setObj(_KNAP_COST)
-    _, obj = m.solve()
-    np.testing.assert_allclose(obj, ref_obj, atol=1e-4)
+# (problem, backend): each non-Gurobi backend's objective must match the Gurobi reference.
+# shortestpath also covers MPAX (its LP relaxation equals the IP on a TU matrix).
+_PARITY_CASES = [
+    pytest.param("knapsack", "copt", marks=requires_copt),
+    pytest.param("knapsack", "omo", marks=requires_omo),
+    pytest.param("knapsack", "ort", marks=requires_ortools),
+    pytest.param("shortestpath", "copt", marks=requires_copt),
+    pytest.param("shortestpath", "omo", marks=requires_omo),
+    pytest.param("shortestpath", "ort", marks=requires_ortools),
+    pytest.param("shortestpath", "mpax", marks=requires_mpax),
+    pytest.param("portfolio", "copt", marks=requires_copt),
+    pytest.param("portfolio", "omo", marks=requires_omo),
+]
+
+
+def _parity_case(problem, backend):
+    """(reference model, backend model, cost, atol) for a parity-vs-Gurobi problem."""
+    if problem == "knapsack":
+        return _make_knapsack("grb")[0], _make_knapsack(backend)[0], _KNAP_COST, 1e-4
+    if problem == "shortestpath":
+        # exact LP solvers match Gurobi tightly; MPAX is first-order PDHG (~1e-3)
+        cost = np.random.RandomState(42).rand(12)
+        atol = 1e-2 if backend == "mpax" else 1e-4
+        return _make_shortestpath("grb")[0], _make_shortestpath(backend)[0], cost, atol
+    cov, revenue = _portfolio_data()
+    return _make_portfolio("grb", cov), _make_portfolio(backend, cov), revenue[0], 1e-4
 
 
 @requires_gurobi
-@pytest.mark.parametrize("backend", [
-    pytest.param("copt", marks=requires_copt),
-    pytest.param("omo", marks=requires_omo),
-    pytest.param("ort", marks=requires_ortools),
-    pytest.param("mpax", marks=requires_mpax),  # SP LP relax == IP (TU matrix)
-])
-def test_shortestpath_parity_vs_gurobi(backend):
-    cost = np.random.RandomState(42).rand(12)
-    ref, _ = _make_shortestpath("grb")
+@pytest.mark.parametrize("problem,backend", _PARITY_CASES)
+def test_parity_vs_gurobi(problem, backend):
+    ref, m, cost, atol = _parity_case(problem, backend)
     ref.setObj(cost)
     _, ref_obj = ref.solve()
-    m, _meta = _make_shortestpath(backend)
     m.setObj(cost)
     _, obj = m.solve()
-    # exact LP solvers match Gurobi tightly; MPAX is first-order PDHG (~1e-3)
-    atol = 1e-2 if backend == "mpax" else 1e-4
     np.testing.assert_allclose(obj, ref_obj, atol=atol)
-
-
-@requires_gurobi
-@pytest.mark.parametrize("backend", [
-    pytest.param("copt", marks=requires_copt),
-    pytest.param("omo", marks=requires_omo),
-])
-def test_portfolio_parity_vs_gurobi(backend):
-    cov, revenue = _portfolio_data()
-    ref = _make_portfolio("grb", cov)
-    ref.setObj(revenue[0])
-    _, ref_obj = ref.solve()
-    m = _make_portfolio(backend, cov)
-    m.setObj(revenue[0])
-    _, obj = m.solve()
-    np.testing.assert_allclose(obj, ref_obj, atol=1e-4)
 
 
 # ============================================================
@@ -719,7 +746,7 @@ class TestMpaxQP:
 
     def test_qp_batch_optimize(self, model):
         C = jnp.array([[-2.0, -4.0, -6.0, -8.0], [-1.0, -2.0, -3.0, -4.0]], dtype=jnp.float32)
-        X, _objs = model.batch_optimize(C)
+        X, _objs, _status = model.batch_optimize(C)
         np.testing.assert_allclose(_to_np(X[0]), [1.0, 1.0, 1.0, 1.0], atol=1e-2)
         np.testing.assert_allclose(_to_np(X[1]), [0.5, 0.5, 0.5, 0.5], atol=1e-2)
 

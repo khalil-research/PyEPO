@@ -92,7 +92,7 @@ def _solve_batch(
         optmodel.setObj(cp)
         cp = optmodel.c  # pyright: ignore[reportAssignmentType]  # jax Array
         # batch solving
-        sol, obj = optmodel.batch_optimize(cp)
+        sol, obj, _ = optmodel.batch_optimize(cp)
         # convert to torch
         sol = torch.from_dlpack(sol)
         obj = torch.from_dlpack(obj)

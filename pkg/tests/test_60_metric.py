@@ -138,6 +138,15 @@ class TestSPOError:
         pred_c = rng.rand(10, m.num_cost) + 0.1
         assert SPOError(pred_c, true_c, type(m), {"grid": (3, 3)}) >= -1e-6
 
+    def test_non_negative_maximize(self):
+        from pyepo.model.grb.knapsack import knapsackModel
+        weights, cap = np.array([[3.0, 4.0, 5.0]]), np.array([8.0])
+        m = knapsackModel(weights=weights, capacity=cap)
+        rng = np.random.RandomState(42)
+        true_c = rng.rand(10, m.num_cost) + 1.0
+        pred_c = rng.rand(10, m.num_cost) + 1.0
+        assert SPOError(pred_c, true_c, type(m), {"weights": weights, "capacity": cap}) >= -1e-6
+
     def test_shape_mismatch(self):
         m = self._sp()
         with pytest.raises(AssertionError):
@@ -166,6 +175,15 @@ class TestCalUnambRegret:
         _, true_obj = m.solve()
         assert calUnambRegret(m, cp, ct, true_obj) >= -1e-3
 
+    def test_non_negative_maximize(self):
+        from pyepo.model.grb.knapsack import knapsackModel
+        m = knapsackModel(weights=np.array([[3.0, 4.0, 5.0]]), capacity=np.array([8.0]))
+        rng = np.random.RandomState(42)
+        ct, cp = rng.rand(m.num_cost) + 1.0, rng.rand(m.num_cost) + 1.0
+        m.setObj(ct)
+        _, true_obj = m.solve()
+        assert calUnambRegret(m, cp, ct, true_obj) >= -1e-3
+
     def test_at_least_standard_regret(self):
         m = self._sp()
         rng = np.random.RandomState(7)
@@ -183,6 +201,19 @@ class TestCalUnambRegret:
         _, true_obj = m.solve()
         with pytest.raises(RuntimeError):
             calUnambRegret(m, cost, cost, true_obj, max_iter=0)
+
+    def test_worst_case_includes_offset(self):
+        # tie {[1,0],[0,1]} from full pred [cp+d]=[0,0]; true full [10,5], z*=5, worst=10 -> regret 5
+        from pyepo import EPO, dsl
+
+        x = dsl.Variable(2, vtype=EPO.BINARY)
+        c = dsl.Parameter(2)
+        d = np.array([10.0, 0.0])
+        m = dsl.Problem(dsl.Minimize((c + d) @ x), [x.sum() == 1]).compile(backend="gurobi")
+        loss = calUnambRegret(
+            m, np.array([-10.0, 0.0]), np.array([0.0, 5.0]), true_obj=5.0, tolerance=1.0
+        )
+        assert loss == pytest.approx(5.0)
 
 
 # ============================================================

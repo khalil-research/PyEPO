@@ -14,6 +14,7 @@ problem base listed first so its ``__init__`` runs before the backend's::
 
 from __future__ import annotations
 
+from collections import defaultdict
 from itertools import combinations
 from typing import TYPE_CHECKING
 
@@ -21,7 +22,7 @@ import numpy as np
 
 from pyepo import EPO
 from pyepo.model.opt import optModel
-from pyepo.model.utils import _get_grid_arcs, getTspTour
+from pyepo.model.utils import _EDGE_ACTIVE_TOL, _get_grid_arcs, getTspTour
 
 if TYPE_CHECKING:
     import torch
@@ -242,4 +243,148 @@ class tspABBase(optModel):
         rhs: float,
     ) -> None:
         """Backend-specific: add a single linear constraint to ``self._model``."""
+        raise NotImplementedError
+
+
+class vrpABBase(optModel):
+    """
+    Problem-level base for the capacitated vehicle routing problem.
+
+    Routes a fleet of ``num_vehicle`` vehicles of capacity ``capacity`` from
+    a depot (node 0) to serve every customer's ``demands`` exactly once at
+    minimum total edge cost. Concrete formulations (RCI with lazy cuts, MTZ
+    with load potentials) are supplied per backend.
+
+    The base manages formulation-independent state (nodes, edges, demands,
+    extra-constraint replay) and the ``getTour`` helper. Concrete
+    formulations implement ``_getModel`` (build the solver model) and
+    ``_addExtraConstr`` (add a single linear extra constraint over the
+    cost-aligned edge variables).
+
+    Attributes:
+        num_nodes (int): number of nodes (depot at index 0)
+        nodes (list): node indices ``0 .. num_nodes - 1``
+        edges (list): undirected edges as ``(i, j)`` with ``i < j``
+        demands (list | np.ndarray): per-customer demands, length ``num_nodes - 1``
+        capacity (float): per-vehicle capacity
+        num_vehicle (int): number of vehicles
+    """
+
+    def __init__(
+        self,
+        num_nodes: int,
+        demands: list[float] | np.ndarray,
+        capacity: float,
+        num_vehicle: int,
+        *args,
+        **kwargs,
+    ) -> None:
+        """
+        Args:
+            num_nodes: number of nodes (depot is node 0)
+            demands: per-customer demands, length ``num_nodes - 1``
+            capacity: vehicle capacity
+            num_vehicle: number of vehicles
+        """
+        # problem parameters
+        self.num_nodes = num_nodes
+        self.nodes = list(range(num_nodes))
+        self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
+        self.demands = demands
+        self.capacity = capacity
+        self.num_vehicle = num_vehicle
+        self._extra_constrs: list = []
+        super().__init__(*args, **kwargs)
+
+    @property
+    def num_cost(self) -> int:
+        # one predicted cost per undirected edge
+        return len(self.edges)
+
+    def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[list[int]]:
+        """
+        Reconstruct vehicle tours from an undirected edge-selection vector.
+
+        Args:
+            sol: per-edge selection values aligned with ``self.edges``
+
+        Returns:
+            list of tours; each tour is a node sequence starting and ending at the depot
+        """
+        # active-edge adjacency
+        adj: dict[int, list[int]] = defaultdict(list)
+        for i, (u, v) in enumerate(self.edges):
+            if sol[i] > _EDGE_ACTIVE_TOL:
+                adj[u].append(v)
+                adj[v].append(u)
+        # peel one depot-anchored route at a time
+        routes = []
+        while adj[0]:
+            v_curr = 0
+            tour = [0]
+            v_next = adj[v_curr][0]
+            adj[v_curr].remove(v_next)
+            adj[v_next].remove(v_curr)
+            while v_next != 0:
+                tour.append(v_next)
+                # single-customer dead-end falls back to depot
+                if not adj[v_next]:
+                    v_curr, v_next = v_next, 0
+                else:
+                    v_curr, v_next = v_next, adj[v_next][0]
+                    adj[v_curr].remove(v_next)
+                    adj[v_next].remove(v_curr)
+            tour.append(0)
+            routes.append(tour)
+        return routes
+
+    def copy(self) -> Self:
+        """
+        Return a fresh model with all extra constraints replayed onto it.
+        """
+        new_model = self._new_instance()
+        self._replay_extras(new_model)
+        return new_model
+
+    def _new_instance(self) -> Self:
+        """Construct a fresh instance with the same problem args. Override for backends with extra ctor args."""
+        return type(self)(self.num_nodes, self.demands, self.capacity, self.num_vehicle)
+
+    def _replay_extras(self, other: vrpABBase) -> None:
+        # re-add tracked extra constraints to a fresh copy
+        for coefs, rhs in self._extra_constrs:
+            other._extra_constrs.append((coefs, rhs))
+            other._addExtraConstr(coefs, rhs)
+
+    def addConstr(
+        self,
+        coefs: np.ndarray | torch.Tensor | list,
+        rhs: float,
+    ) -> Self:
+        """
+        Return a new model with one extra linear constraint added.
+
+        Args:
+            coefs: per-edge coefficients aligned with ``self.edges``
+            rhs: right-hand side
+        """
+        if len(coefs) != self.num_cost:
+            raise ValueError("Size of coef vector does not match number of cost variables.")
+        # normalize to numpy so replay on copy avoids per-element solver-var sync
+        coefs = np.asarray(coefs)
+        new_model = self.copy()
+        new_model._extra_constrs.append((coefs, rhs))
+        new_model._addExtraConstr(coefs, rhs)
+        return new_model
+
+    def _expand_coefs(self, coefs: np.ndarray) -> np.ndarray:
+        # per-cost-var coefficients; override for paired (directed-edge) formulations
+        return coefs
+
+    def _addExtraConstr(
+        self,
+        coefs: np.ndarray | torch.Tensor | list,
+        rhs: float,
+    ) -> None:
+        """Backend-specific: add a single linear constraint over the cost-aligned edge variables."""
         raise NotImplementedError

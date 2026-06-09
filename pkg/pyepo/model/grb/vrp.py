@@ -5,111 +5,33 @@ Capacitated vehicle routing problem with binding-constraint tracking for CaVE
 
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import TYPE_CHECKING, NoReturn
 
 import gurobipy as gp
 import numpy as np
 from gurobipy import GRB
 
+from pyepo.model.bases import vrpABBase
 from pyepo.model.grb.grbmodel import optGrbModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, _uf_components, unionFind
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
-    from typing_extensions import Self
 
 
-class vrpABModel(optGrbModel):
+class vrpABModel(vrpABBase, optGrbModel):
     """
     Abstract Gurobi-backed model for the capacitated vehicle routing problem.
 
     A single-customer route is excluded so all edge variables stay strictly
     binary; if a single-stop route is actually needed, duplicate the depot.
-
-    Attributes:
-        num_nodes: number of nodes (including depot at index 0)
-        nodes: list of node indices
-        edges: undirected edges as (i, j) with i < j
-        demands: customer demands (excluding depot)
-        capacity: per-vehicle capacity
-        num_vehicle: number of vehicles
     """
 
-    def __init__(
-        self,
-        num_nodes: int,
-        demands: list[float] | np.ndarray,
-        capacity: float,
-        num_vehicle: int,
-    ) -> None:
-        """
-        Args:
-            num_nodes: number of nodes (depot is node 0)
-            demands: per-customer demands, length ``num_nodes - 1``
-            capacity: vehicle capacity
-            num_vehicle: number of vehicles
-        """
-        # problem parameters
-        self.num_nodes = num_nodes
-        self.nodes = list(range(num_nodes))
-        self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
-        self.demands = demands
-        self.capacity = capacity
-        self.num_vehicle = num_vehicle
-        super().__init__()
-
-    @property
-    def num_cost(self) -> int:
-        """
-        number of costs to be predicted
-        """
-        return len(self.edges)
-
-    def getTour(self, sol: np.ndarray | torch.Tensor | list) -> list[list[int]]:
-        """
-        Reconstruct vehicle tours from an undirected edge-selection vector.
-
-        Args:
-            sol: per-edge selection values aligned with ``self.edges``
-
-        Returns:
-            list of tours; each tour is a node sequence starting and ending at the depot
-        """
-        # active-edge adjacency
-        adj: dict[int, list[int]] = defaultdict(list)
-        for i, (u, v) in enumerate(self.edges):
-            if sol[i] > _EDGE_ACTIVE_TOL:
-                adj[u].append(v)
-                adj[v].append(u)
-        # peel one depot-anchored route at a time
-        routes = []
-        while adj[0]:
-            v_curr = 0
-            tour = [0]
-            v_next = adj[v_curr][0]
-            adj[v_curr].remove(v_next)
-            adj[v_next].remove(v_curr)
-            while v_next != 0:
-                tour.append(v_next)
-                # single-customer dead-end falls back to depot
-                if not adj[v_next]:
-                    v_curr, v_next = v_next, 0
-                else:
-                    v_curr, v_next = v_next, adj[v_next][0]
-                    adj[v_curr].remove(v_next)
-                    adj[v_next].remove(v_curr)
-            tour.append(0)
-            routes.append(tour)
-        return routes
-
-    def copy(self) -> Self:
-        """
-        A method to copy the model
-        """
-        # fresh build to re-populate callback state on the new Gurobi model
-        return type(self)(self.num_nodes, self.demands, self.capacity, self.num_vehicle)
+    def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
+        # coefs @ edge-selection <= rhs over the cost-aligned vars
+        expr = gp.LinExpr(self._expand_coefs(np.asarray(coefs)).tolist(), self._cost_vars)
+        self._model.addConstr(expr <= rhs)
 
 
 class vrpRCIModel(vrpABModel):
@@ -218,6 +140,10 @@ class vrpMTZModel(vrpABModel):
     (no lazy cuts). Cost vector is per undirected edge: cost ``c[k]`` is
     assigned to both ``x[i,j]`` and ``x[j,i]``.
     """
+
+    def _expand_coefs(self, coefs: np.ndarray) -> np.ndarray:
+        # each undirected edge maps to 2 directed cost vars
+        return np.repeat(coefs, 2)
 
     def _getModel(self) -> tuple:
         """

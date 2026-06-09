@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
 
 import numpy as np
+import torch
 
 from pyepo import EPO
 from pyepo.utils import _EPS, getArgs
@@ -44,12 +45,15 @@ def SPOError(
     optobj_sum = 0
     for c, cp in zip(true_cost, pred_cost):
         # opt sol for pred cost
-        optmodel.setObj(cp)
+        optmodel.setObj(optmodel._fullCost(cp))
         sol, _ = optmodel.solve()
+        # MPAX backend returns a torch tensor
+        if isinstance(sol, torch.Tensor):
+            sol = sol.detach().cpu().numpy()
         # full objective of the predicted decision at the true cost
         obj = np.dot(sol, optmodel._fullCost(np.asarray(c, dtype=float)))
         # opt obj for true cost
-        optmodel.setObj(c)
+        optmodel.setObj(optmodel._fullCost(c))
         _, optobj = optmodel.solve()
         # calculate regret
         if optmodel.modelSense == EPO.MINIMIZE:

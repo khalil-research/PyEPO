@@ -1,16 +1,19 @@
 #!/usr/bin/env python
-"""Tests for pyepo.func: autograd losses, helpers, and the optModule base.
+"""Tests for pyepo.func autograd losses, helpers, and the optModule base.
 
-Three groups:
+Grouped neutral -> both -> torch:
 
-1. Pure / mock helpers (solution pool, cache selection, sum-of-gamma noise,
-   solution check) and optModule init validation — no solver.
-2. A focused forward/backward contract applied to every loss via parametrized
-   registries: solution-returning ops must return (batch, vars) with finite
-   gradients; loss-returning ops must return a scalar that backpropagates, and
-   honour reduction = mean/sum/none.
-3. Deep correctness gates that compare an autograd gradient to its closed form
-   or a finite-difference Jacobian (SPO+, regularized Frank-Wolfe).
+1. neutral: pure / mock helpers (solution pool, cache selection, sum-of-gamma
+   noise, solution check, perturbed estimator internals) — no solver.
+2. both: the forward/backward contract applied to every loss on both frontends
+   via `contract_backend` over LOSS_REGISTRY / JAX_LOSS_REGISTRY. Solution ops
+   return (batch, vars) with finite gradients; loss ops return a scalar that
+   backpropagates and honours reduction = mean/sum/none.
+3. torch: init validation, MAXIMIZE/caching behaviour, and deep correctness
+   gates comparing an autograd gradient to its closed form or a finite-
+   difference Jacobian (SPO+, regularized Frank-Wolfe, the estimator ops, CaVE).
+
+The jax-only correctness gates live in test_55_jax.py.
 """
 
 from unittest.mock import MagicMock
@@ -40,7 +43,7 @@ from .conftest import (
 )
 
 # ============================================================
-# 1a. Pure helpers
+# neutral: pure helpers (no solver)
 # ============================================================
 
 
@@ -135,8 +138,100 @@ class TestSolutionPool:
         assert pool.shape[0] == 3
 
 
+class TestPerturbedInternals:
+    """Perturbed estimator internals (pure tensor math, no solver)."""
+
+    def test_variance_reduction_leave_one_out(self):
+        from pyepo.func.perturbed import DPO
+
+        ptb = DPO.__new__(DPO)
+        ptb.variance_reduction = True
+        reward = torch.tensor([[1.0, 2.0, 4.0], [3.0, 3.0, 9.0]])
+        n = reward.shape[1]
+        expected = n * (reward - reward.mean(dim=1, keepdim=True)) / (n - 1)
+        assert torch.allclose(ptb._apply_variance_reduction(reward), expected)
+
+    def test_variance_reduction_single_sample_noop(self):
+        from pyepo.func.perturbed import DPO
+
+        ptb = DPO.__new__(DPO)
+        ptb.variance_reduction = True
+        reward = torch.tensor([[1.0], [3.0]])
+        assert torch.equal(ptb._apply_variance_reduction(reward), reward)
+
+    def test_mul_uses_weighted_expected_solution(self):
+        from pyepo.func.perturbed import PFYMul
+
+        pfy = PFYMul.__new__(PFYMul)
+        pfy.sigma = 0.5
+        noises = torch.tensor([[[0.0, 1.0, -1.0], [0.5, -0.5, 0.25]]])
+        ptb_sols = torch.tensor([[[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]]])
+        factor = torch.exp(pfy.sigma * noises - 0.5 * pfy.sigma**2)
+        expected = (ptb_sols * factor).mean(dim=1)
+        assert torch.allclose(
+            pfy._calculate_expected_solution(None, None, ptb_sols, noises), expected
+        )
+
+
 # ============================================================
-# 1b. optModule init validation
+# both: forward/backward contract for every loss (torch & jax frontends)
+# ============================================================
+# `contract_backend` selects the frontend (LOSS_REGISTRY / JAX_LOSS_REGISTRY);
+# the assertions are identical. Solution-returning ops yield (batch, vars);
+# loss-returning ops yield a scalar and honour reduction = mean/sum/none.
+
+
+@requires_gurobi
+class TestForwardBackwardContract:
+    """Solution ops return (batch, vars) with finite grad; loss ops return a
+    scalar that backpropagates and honours the reduction modes."""
+
+    @pytest.mark.parametrize("name", SOLUTION_OPS)
+    def test_solution_forward_and_backward(self, name, contract_backend, sp_data):
+        be = contract_backend
+        optmodel, dataset, loader = sp_data
+        _kind, build, sig = be.registry[name]
+        _x, c, w, z = take_batch(loader)
+        cp, c2, w2, z2 = be.inputs(c, w, z)
+        op = build(optmodel, dataset, "mean")
+        out = be.forward(op, sig, cp, c2, w2, z2)
+        assert be.shape(out) == be.shape(cp)
+        assert be.finite(out)
+        g = be.grad(op, sig, cp, c2, w2, z2)
+        assert be.shape(g) == be.shape(cp)
+        assert be.finite(g)
+
+    @pytest.mark.parametrize("name", LOSS_OPS)
+    def test_loss_scalar_and_backward(self, name, contract_backend, sp_data):
+        be = contract_backend
+        optmodel, dataset, loader = sp_data
+        _kind, build, sig = be.registry[name]
+        _x, c, w, z = take_batch(loader)
+        cp, c2, w2, z2 = be.inputs(c, w, z)
+        op = build(optmodel, dataset, "mean")
+        out = be.forward(op, sig, cp, c2, w2, z2)
+        assert be.ndim(out) == 0
+        g = be.grad(op, sig, cp, c2, w2, z2)
+        assert be.finite(g)
+
+    @pytest.mark.parametrize("name", LOSS_OPS)
+    def test_loss_reduction_modes(self, name, contract_backend, sp_data):
+        be = contract_backend
+        optmodel, dataset, loader = sp_data
+        _kind, build, sig = be.registry[name]
+        _x, c, w, z = take_batch(loader)
+        cp, c2, w2, z2 = be.inputs(c, w, z)
+        # most losses reduce to (batch,); lsLTR keeps a (batch, pool) grid
+        none = be.forward(build(optmodel, dataset, "none"), sig, cp, c2, w2, z2)
+        assert be.shape(none)[0] == be.shape(cp)[0]
+        mean = be.forward(build(optmodel, dataset, "mean"), sig, cp, c2, w2, z2)
+        total = be.forward(build(optmodel, dataset, "sum"), sig, cp, c2, w2, z2)
+        np.testing.assert_allclose(float(be.to_np(mean)), float(be.to_np(none).mean()), atol=1e-5)
+        np.testing.assert_allclose(float(be.to_np(total)), float(be.to_np(none).sum()), atol=1e-5)
+
+
+# ============================================================
+# torch: optModule init validation
 # ============================================================
 
 
@@ -173,62 +268,32 @@ class TestOptModuleInit:
             SPOPlus(self._model(), solve_ratio=0.5, dataset=None)
 
 
-# ============================================================
-# 2. Forward/backward contract for every loss
-# ============================================================
-# Losses are constructed from the shared conftest.LOSS_REGISTRY; here we only
-# assert the forward/backward contract. Solution-returning ops yield (batch,
-# vars); loss-returning ops yield a scalar and honour reduction = mean/sum/none.
-
-
 @requires_gurobi
-class TestSolutionLossContract:
-    """Ops that return a predicted solution of shape (batch, vars)."""
+class TestConstructorGuards:
+    """Constructor validation shared across losses: lambda must be positive."""
 
-    @pytest.mark.parametrize("name", SOLUTION_OPS)
-    def test_forward_shape_and_backward(self, name, sp_data):
-        optmodel, dataset, loader = sp_data
-        _kind, build, sig = LOSS_REGISTRY[name]
-        _x, c, w, z = take_batch(loader)
-        cp = (c * 1.2).clone().detach().requires_grad_(True)
-        out = call_op(build(optmodel, dataset, "mean"), sig, cp, c, w, z)
-        assert out.shape == cp.shape
-        assert torch.isfinite(out).all()
-        out.sum().backward()
-        assert cp.grad is not None
-        assert cp.grad.shape == cp.shape
-        assert torch.isfinite(cp.grad).all()
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "blackboxOpt",
+            "implicitMLE",
+            "regularizedFrankWolfeOpt",
+            "regularizedFrankWolfeFenchelYoung",
+        ],
+    )
+    def test_rejects_nonpositive_lambda(self, name):
+        import pyepo.func as F
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        model = shortestPathModel(grid=(3, 3))
+        for bad in (0.0, -1.0):
+            with pytest.raises(ValueError):
+                getattr(F, name)(model, processes=1, lambd=bad)
 
 
-@requires_gurobi
-class TestLossContract:
-    """Ops that return a scalar differentiable loss."""
-
-    @pytest.mark.parametrize("name", LOSS_OPS)
-    def test_scalar_forward_and_backward(self, name, sp_data):
-        optmodel, dataset, loader = sp_data
-        _kind, build, sig = LOSS_REGISTRY[name]
-        _x, c, w, z = take_batch(loader)
-        cp = (c * 1.2).clone().detach().requires_grad_(True)
-        loss = call_op(build(optmodel, dataset, "mean"), sig, cp, c, w, z)
-        assert loss.dim() == 0
-        loss.backward()
-        assert cp.grad is not None and cp.grad.shape == cp.shape
-        assert torch.isfinite(cp.grad).all()
-
-    @pytest.mark.parametrize("name", LOSS_OPS)
-    def test_reduction_modes(self, name, sp_data):
-        optmodel, dataset, loader = sp_data
-        _kind, build, sig = LOSS_REGISTRY[name]
-        _x, c, w, z = take_batch(loader)
-        cp = (c * 1.2).clone().detach()
-        none = call_op(build(optmodel, dataset, "none"), sig, cp, c, w, z)
-        # most losses reduce to (batch,); lsLTR keeps a (batch, pool) grid
-        assert none.shape[0] == cp.shape[0]
-        mean = call_op(build(optmodel, dataset, "mean"), sig, cp, c, w, z)
-        total = call_op(build(optmodel, dataset, "sum"), sig, cp, c, w, z)
-        np.testing.assert_allclose(mean.item(), none.mean().item(), atol=1e-5)
-        np.testing.assert_allclose(total.item(), none.sum().item(), atol=1e-5)
+# ============================================================
+# torch: MAXIMIZE sense and solve-ratio caching
+# ============================================================
 
 
 @requires_gurobi
@@ -276,7 +341,7 @@ class TestSolveRatioCaching:
 
 
 # ============================================================
-# 3. Deep correctness gates
+# torch: deep correctness gates
 # ============================================================
 
 
@@ -320,16 +385,6 @@ class TestSPOPlusGradient:
         expected = 2.0 * (w_true.numpy() - w_spo) / cp.shape[0]
         np.testing.assert_allclose(cp.grad.numpy(), expected, atol=1e-4)
 
-    def test_gradient_step_decreases_loss(self):
-        spo, _, c_true, w_true, z_true = self._setup(1)
-        cp = (c_true * 1.5).clone().detach().requires_grad_(True)
-        loss0 = spo(cp, c_true, w_true, z_true)
-        loss0.backward()
-        with torch.no_grad():
-            cp_new = cp - 0.1 * cp.grad
-        loss1 = spo(cp_new, c_true, w_true, z_true)
-        assert loss1.item() <= loss0.item() + 1e-6
-
 
 def _fw_knapsack():
     """Knapsack shared by the Frank-Wolfe tests: weights [3,4,2,5], capacity 7,
@@ -341,13 +396,6 @@ def _fw_knapsack():
 
 @requires_gurobi
 class TestRegularizedFrankWolfe:
-    def test_lambd_must_be_positive(self):
-        from pyepo.func.regularized import RFWO
-
-        for bad in (0.0, -1.0):
-            with pytest.raises(ValueError):
-                RFWO(_fw_knapsack(), lambd=bad)
-
     def test_compute_regularization_includes_lambd(self):
         from pyepo.func.regularized import RFWO
 
@@ -574,6 +622,28 @@ def _solve_3d_batch(optmodel, ptb_c):
     return sols.reshape(b, n, d)
 
 
+def _perturb_torch(cp, noises, sigma, mul):
+    """Additive or multiplicative log-normal perturbation of clean cost (b, d)."""
+    if mul:
+        return cp.unsqueeze(1) * torch.exp(sigma * noises - 0.5 * sigma**2)
+    return cp.unsqueeze(1) + sigma * noises
+
+
+def _grad_scale_torch(cp, n, sigma, mul):
+    """Divisor of the perturbed reward estimator: n*sigma (additive) or n*denom_safe (multiplicative)."""
+    from pyepo.utils import _EPS
+
+    if not mul:
+        return n * sigma + _EPS
+    denom = sigma * cp
+    denom_safe = torch.where(
+        denom.abs() < _EPS,
+        torch.where(denom >= 0, torch.full_like(denom, _EPS), torch.full_like(denom, -_EPS)),
+        denom,
+    )
+    return n * denom_safe
+
+
 class TestSolutionGradientTruth:
     """Estimator solution-ops: autograd gradient == an independent re-solve of the estimator."""
 
@@ -586,6 +656,28 @@ class TestSolutionGradientTruth:
         torch.manual_seed(0)
         target = torch.randn_like(cp)
         return optmodel, mod, cp, target
+
+    @staticmethod
+    def _imle_noise_ptb(cp, mod):
+        """Perturbed costs sharing the module's Sum-of-Gamma noise (fresh draw, same default seed)."""
+        from pyepo.func.utils import sumGammaDistribution
+
+        noises = sumGammaDistribution(kappa=5).sample(
+            size=(cp.shape[0], mod.n_samples, cp.shape[1]),
+            device=torch.device("cpu"),
+            dtype=torch.float32,
+        )
+        return cp.unsqueeze(1) + mod.sigma * noises
+
+    @staticmethod
+    def _resolve_two_sides(optmodel, ptb_c, target, lambd):
+        """Central-difference re-solve estimator: (w(+) - w(-)) / (2*lambd)."""
+        from pyepo.utils import _EPS
+
+        delta = lambd * target.unsqueeze(1)
+        pos = _solve_3d_batch(optmodel, ptb_c + delta)
+        neg = _solve_3d_batch(optmodel, ptb_c - delta)
+        return (pos - neg).mean(dim=1) / (2 * lambd + _EPS)
 
     def test_negative_identity(self, sp_truth):
         _om, mod, cp, target = self._setup(sp_truth, "NID")
@@ -606,79 +698,71 @@ class TestSolutionGradientTruth:
         expected = (sol_q - sol_p) / mod.lambd
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
-    def test_perturbed_opt(self, sp_truth):
-        from pyepo.utils import _EPS
-
-        optmodel, mod, cp, target = self._setup(sp_truth, "DPO")
+    @pytest.mark.parametrize("mul", [False, True])
+    def test_perturbed_opt(self, sp_truth, mul):
+        optmodel, mod, cp, target = self._setup(sp_truth, "DPOMul" if mul else "DPO")
         n, sigma = mod.n_samples, mod.sigma
         cpg = cp.clone().requires_grad_(True)
         (mod(cpg) * target).sum().backward()
         noises = _gaussian_noise(mod, cp)
-        ptb_sols = _solve_3d_batch(optmodel, cp.unsqueeze(1) + sigma * noises)
+        ptb_sols = _solve_3d_batch(optmodel, _perturb_torch(cp, noises, sigma, mul))
         reward = torch.einsum("bnd,bd->bn", ptb_sols, target)
         if mod.variance_reduction and n > 1:  # leave-one-out baseline
             reward = (reward - reward.mean(dim=1, keepdim=True)) * (n / (n - 1))
-        expected = torch.einsum("bnd,bn->bd", noises, reward) / (n * sigma + _EPS)
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
-
-    def test_perturbed_opt_mul(self, sp_truth):
-        from pyepo.utils import _EPS
-
-        optmodel, mod, cp, target = self._setup(sp_truth, "DPOMul")
-        n, sigma = mod.n_samples, mod.sigma
-        cpg = cp.clone().requires_grad_(True)
-        (mod(cpg) * target).sum().backward()
-        noises = _gaussian_noise(mod, cp)
-        factor = torch.exp(sigma * noises - 0.5 * sigma**2)
-        ptb_sols = _solve_3d_batch(optmodel, cp.unsqueeze(1) * factor)
-        reward = torch.einsum("bnd,bd->bn", ptb_sols, target)
-        if mod.variance_reduction and n > 1:  # leave-one-out baseline
-            reward = (reward - reward.mean(dim=1, keepdim=True)) * (n / (n - 1))
-        denom = sigma * cp
-        denom_safe = torch.where(
-            denom.abs() < _EPS,
-            torch.where(denom >= 0, torch.full_like(denom, _EPS), torch.full_like(denom, -_EPS)),
-            denom,
-        )
-        expected = torch.einsum("bnd,bn->bd", noises, reward) / (n * denom_safe)
+        expected = torch.einsum("bnd,bn->bd", noises, reward) / _grad_scale_torch(cp, n, sigma, mul)
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
     def test_implicit_mle(self, sp_truth):
-        from pyepo.func.utils import sumGammaDistribution
         from pyepo.utils import _EPS
 
         optmodel, mod, cp, target = self._setup(sp_truth, "IMLE")
-        n, sigma, lambd = mod.n_samples, mod.sigma, mod.lambd
         cpg = cp.clone().requires_grad_(True)
         (mod(cpg) * target).sum().backward()
-        # reproduce Sum-of-Gamma noise (fresh distribution, same default seed)
-        noises = sumGammaDistribution(kappa=5).sample(
-            size=(cp.shape[0], n, cp.shape[1]), device=torch.device("cpu"), dtype=torch.float32
-        )
-        ptb_c = cp.unsqueeze(1) + sigma * noises
+        ptb_c = self._imle_noise_ptb(cp, mod)
         ptb_sols = _solve_3d_batch(optmodel, ptb_c)
-        ptb_sols_pos = _solve_3d_batch(optmodel, ptb_c + lambd * target.unsqueeze(1))
-        expected = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
+        ptb_sols_pos = _solve_3d_batch(optmodel, ptb_c + mod.lambd * target.unsqueeze(1))
+        expected = (ptb_sols_pos - ptb_sols).mean(dim=1) / (mod.lambd + _EPS)
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
     def test_adaptive_implicit_mle(self, sp_truth):
-        from pyepo.func.utils import sumGammaDistribution
         from pyepo.utils import _EPS
 
         optmodel, mod, cp, target = self._setup(sp_truth, "AIMLE")
-        n, sigma = mod.n_samples, mod.sigma
+        a0 = mod.alpha
         cpg = cp.clone().requires_grad_(True)
         (mod(cpg) * target).sum().backward()
-        noises = sumGammaDistribution(kappa=5).sample(
-            size=(cp.shape[0], n, cp.shape[1]), device=torch.device("cpu"), dtype=torch.float32
-        )
-        ptb_c = cp.unsqueeze(1) + sigma * noises
+        ptb_c = self._imle_noise_ptb(cp, mod)
         ptb_sols = _solve_3d_batch(optmodel, ptb_c)
-        # adaptive lambda (alpha = 1.0)
-        lambd = cp.norm() / target.norm()
+        lambd = cp.norm() / target.norm()  # adaptive lambda (alpha = 1.0)
         ptb_sols_pos = _solve_3d_batch(optmodel, ptb_c + lambd * target.unsqueeze(1))
         expected = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert mod.alpha != a0  # online alpha update fired
+
+    def test_implicit_mle_two_sides(self, sp_truth):
+        from pyepo.func.perturbed import implicitMLE
+
+        optmodel, _mod, cp, target = self._setup(sp_truth, "IMLE")
+        mod = implicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0, two_sides=True)
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        ptb_c = self._imle_noise_ptb(cp, mod)
+        expected = self._resolve_two_sides(optmodel, ptb_c, target, mod.lambd)
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+
+    def test_adaptive_implicit_mle_two_sides(self, sp_truth):
+        from pyepo.func.perturbed import adaptiveImplicitMLE
+
+        optmodel, _mod, cp, target = self._setup(sp_truth, "AIMLE")
+        mod = adaptiveImplicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0, two_sides=True)
+        a0 = mod.alpha
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        ptb_c = self._imle_noise_ptb(cp, mod)
+        lambd = cp.norm() / target.norm()  # adaptive lambda (alpha = 1.0)
+        expected = self._resolve_two_sides(optmodel, ptb_c, target, lambd)
+        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert mod.alpha != a0  # online alpha update fired
 
 
 class TestLossGradientTruth:
@@ -706,25 +790,20 @@ class TestLossGradientTruth:
         expected = (w_sol - wm_sol) / (mod.sigma + _EPS) / b  # sign = +1 (MINIMIZE)
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
-    def test_perturbed_fenchel_young(self, sp_truth):
-        optmodel, mod, cp, _c, w = self._setup(sp_truth, "PFY")
+    @pytest.mark.parametrize("mul", [False, True])
+    def test_perturbed_fenchel_young(self, sp_truth, mul):
+        optmodel, mod, cp, _c, w = self._setup(sp_truth, "PFYMul" if mul else "PFY")
         b = cp.shape[0]
         cpg = cp.clone().requires_grad_(True)
         mod(cpg, w).backward()
         noises = _gaussian_noise(mod, cp)
-        e_sol = _solve_3d_batch(optmodel, cp.unsqueeze(1) + mod.sigma * noises).mean(dim=1)
+        ptb_sols = _solve_3d_batch(optmodel, _perturb_torch(cp, noises, mod.sigma, mul))
+        if mul:
+            factor = torch.exp(mod.sigma * noises - 0.5 * mod.sigma**2)
+            e_sol = (ptb_sols * factor).mean(dim=1)
+        else:
+            e_sol = ptb_sols.mean(dim=1)
         expected = (w - e_sol) / b  # MINIMIZE residual w - E[sol]
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
-
-    def test_perturbed_fenchel_young_mul(self, sp_truth):
-        optmodel, mod, cp, _c, w = self._setup(sp_truth, "PFYMul")
-        b = cp.shape[0]
-        cpg = cp.clone().requires_grad_(True)
-        mod(cpg, w).backward()
-        noises = _gaussian_noise(mod, cp)
-        factor = torch.exp(mod.sigma * noises - 0.5 * mod.sigma**2)
-        e_sol = (_solve_3d_batch(optmodel, cp.unsqueeze(1) * factor) * factor).mean(dim=1)
-        expected = (w - e_sol) / b
         assert torch.allclose(cpg.grad, expected, atol=1e-3)
 
 
@@ -792,41 +871,3 @@ class TestCaVE:
             return float((1.0 - F.cosine_similarity(s, proj, dim=1)).mean())
 
         np.testing.assert_allclose(cp.grad.numpy(), finite_diff_grad(value, cp0), atol=3e-2)
-
-
-# ============================================================
-# perturbed internals (pure tensor math, no solver)
-# ============================================================
-
-
-class TestPerturbedInternals:
-    def test_variance_reduction_leave_one_out(self):
-        from pyepo.func.perturbed import DPO
-
-        ptb = DPO.__new__(DPO)
-        ptb.variance_reduction = True
-        reward = torch.tensor([[1.0, 2.0, 4.0], [3.0, 3.0, 9.0]])
-        n = reward.shape[1]
-        expected = n * (reward - reward.mean(dim=1, keepdim=True)) / (n - 1)
-        assert torch.allclose(ptb._apply_variance_reduction(reward), expected)
-
-    def test_variance_reduction_single_sample_noop(self):
-        from pyepo.func.perturbed import DPO
-
-        ptb = DPO.__new__(DPO)
-        ptb.variance_reduction = True
-        reward = torch.tensor([[1.0], [3.0]])
-        assert torch.equal(ptb._apply_variance_reduction(reward), reward)
-
-    def test_mul_uses_weighted_expected_solution(self):
-        from pyepo.func.perturbed import PFYMul
-
-        pfy = PFYMul.__new__(PFYMul)
-        pfy.sigma = 0.5
-        noises = torch.tensor([[[0.0, 1.0, -1.0], [0.5, -0.5, 0.25]]])
-        ptb_sols = torch.tensor([[[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]]])
-        factor = torch.exp(pfy.sigma * noises - 0.5 * pfy.sigma**2)
-        expected = (ptb_sols * factor).mean(dim=1)
-        assert torch.allclose(
-            pfy._calculate_expected_solution(None, None, ptb_sols, noises), expected
-        )

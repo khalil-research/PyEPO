@@ -37,13 +37,12 @@ class compiledBase(optModel):
 
     @property
     def c_pred_index(self):
-        # predicted positions, or None when every variable carries a predicted cost
-        prob = self.problem
-        return prob.c_pred_index if prob.num_cost != prob.num_vars else None
+        # predicted positions
+        return self.problem.c_pred_index
 
     def setObj(self, c):
         """Set the objective from a predicted cost of length ``num_cost``, scattered onto the known fixed costs."""
-        # a full coefficient (length num_vars) is written as-is
+        # scatter onto fixed costs
         prob = self.problem
         coef = costToNumpy(c)
         if coef.shape[-1] != prob.num_vars:
