@@ -209,6 +209,8 @@ class optDatasetKNN(optDataset):
         num_data = len(feats)
         if not 1 <= k < num_data:
             raise ValueError(f"Invalid k={k}; must satisfy 1 <= k < num_data ({num_data}).")
+        if not 0.0 <= weight <= 1.0:
+            raise ValueError(f"Invalid weight={weight}; must satisfy 0 <= weight <= 1.")
         # kNN loss parameters
         self.k = k
         self.weight = weight
