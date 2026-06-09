@@ -9,7 +9,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.solve import _full_cost, grow_solpool
+from pyepo.func.jax.utils import _full_cost, grow_solpool
 
 
 class noiseContrastiveEstimation(optModule):

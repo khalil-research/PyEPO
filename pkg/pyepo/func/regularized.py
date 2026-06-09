@@ -153,8 +153,8 @@ class regularizedFrankWolfeOpt(optModule):
             max_iter: Frank-Wolfe iteration cap
             tol: per-instance Frank-Wolfe gap convergence tolerance
             processes: number of solver processes (1 = single-core, 0 = all cores)
-            solve_ratio: fraction of LMO calls solved exactly each step (1.0 = no caching)
-            dataset: training dataset used to seed the LMO pool when ``solve_ratio < 1``
+            solve_ratio: fraction of linear minimization oracle calls solved exactly each step (1.0 = no caching)
+            dataset: training dataset used to seed the linear minimization oracle pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # regularization strength
@@ -294,9 +294,9 @@ class regularizedFrankWolfeFenchelYoung(optModule):
             max_iter: Frank-Wolfe iteration cap
             tol: per-instance Frank-Wolfe gap convergence tolerance
             processes: number of solver processes (1 = single-core, 0 = all cores)
-            solve_ratio: fraction of LMO calls solved exactly each step (1.0 = no caching)
+            solve_ratio: fraction of linear minimization oracle calls solved exactly each step (1.0 = no caching)
             reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
-            dataset: training dataset used to seed the LMO pool when ``solve_ratio < 1``
+            dataset: training dataset used to seed the linear minimization oracle pool when ``solve_ratio < 1``
         """
         super().__init__(optmodel, processes, solve_ratio, reduction=reduction, dataset=dataset)
         # regularization strength

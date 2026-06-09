@@ -67,7 +67,7 @@ class TestBatchSolve:
     def test_callback_matches_native(self):
         import jax.numpy as jnp
 
-        from pyepo.func.jax.solve import _batch_solve_callback, _batch_solve_mpax
+        from pyepo.func.jax.utils import _batch_solve_callback, _batch_solve_mpax
 
         model, c = _sp_mpax(8)
         c_jax = jnp.asarray(c)
@@ -81,7 +81,7 @@ def _spo_closed_form(model, pred, true_cost, true_sol):
     """Independent ground truth: 2*(w_true - w_spo) for MINIMIZE."""
     import jax.numpy as jnp
 
-    from pyepo.func.jax.solve import batch_solve
+    from pyepo.func.jax.utils import batch_solve
 
     w_spo, _ = batch_solve(jnp.asarray(2.0 * pred - true_cost), model)
     return 2.0 * (true_sol - np.array(w_spo))
@@ -180,7 +180,7 @@ class TestSolveCacheHelpers:
     def test_update_pool_dedups_and_appends(self):
         import jax.numpy as jnp
 
-        from pyepo.func.jax.solve import _update_solution_pool
+        from pyepo.func.jax.utils import _update_solution_pool
 
         pool = jnp.array([[1.0, 0.0], [0.0, 1.0]])
         # one duplicate row, one new row
@@ -193,7 +193,7 @@ class TestSolveCacheHelpers:
         import jax.numpy as jnp
 
         from pyepo import EPO
-        from pyepo.func.jax.solve import _cache_in_pass
+        from pyepo.func.jax.utils import _cache_in_pass
 
         m = MagicMock()
         m.modelSense = EPO.MINIMIZE
@@ -250,7 +250,7 @@ class TestBlackboxJax:
         import jax.numpy as jnp
 
         from pyepo.func.jax import blackboxOpt
-        from pyepo.func.jax.solve import batch_solve
+        from pyepo.func.jax.utils import batch_solve
 
         model, pred, target = self._setup()
         lambd = 10.0
@@ -282,7 +282,7 @@ class TestPerturbedJax:
         import jax.numpy as jnp
 
         from pyepo.func.jax import perturbedFenchelYoung
-        from pyepo.func.jax.solve import batch_solve
+        from pyepo.func.jax.utils import batch_solve
 
         model, c = self._model_pred()
         n_samples, sigma, seed = 5, 1.0, 0
@@ -304,7 +304,7 @@ class TestPerturbedJax:
         import jax.numpy as jnp
 
         from pyepo.func.jax import perturbedOpt
-        from pyepo.func.jax.solve import batch_solve
+        from pyepo.func.jax.utils import batch_solve
 
         model, c = self._model_pred()
         n_samples, sigma, seed = 5, 1.0, 0
@@ -327,7 +327,7 @@ class TestPerturbedJax:
         import jax.numpy as jnp
 
         from pyepo.func.jax import perturbedOptMul
-        from pyepo.func.jax.solve import batch_solve
+        from pyepo.func.jax.utils import batch_solve
 
         model, c = self._model_pred()
         n_samples, sigma, seed = 5, 0.5, 0
@@ -352,7 +352,7 @@ class TestPerturbedJax:
         import jax.numpy as jnp
 
         from pyepo.func.jax import perturbedFenchelYoungMul
-        from pyepo.func.jax.solve import batch_solve
+        from pyepo.func.jax.utils import batch_solve
 
         model, c = self._model_pred()
         n_samples, sigma, seed = 5, 0.5, 0
@@ -476,7 +476,7 @@ class TestRegularizedJax:
         import jax.numpy as jnp
 
         from pyepo.func.jax import regularizedFrankWolfeFenchelYoung
-        from pyepo.func.jax.regularized import _frank_wolfe
+        from pyepo.func.jax.regularized import _frank_wolfe_active
 
         model = self._knapsack()
         lambd = 1.0
@@ -486,9 +486,59 @@ class TestRegularizedJax:
         fy = regularizedFrankWolfeFenchelYoung(model, lambd=lambd, max_iter=100, tol=1e-8)
         g = np.array(jax.grad(lambda p: fy(p, jnp.asarray(w)))(jnp.asarray(cp)))
         # MAXIMIZE: theta = pred/lambd, Danskin residual diff = r_sol - w
-        r_sol = np.array(_frank_wolfe(jnp.asarray(cp) / lambd, model, 100, 1e-8))
+        r_sol = np.array(_frank_wolfe_active(jnp.asarray(cp) / lambd, fy)[0])
         expected = (r_sol - w) / B
         np.testing.assert_allclose(g, expected, atol=1e-3)
+
+    def test_caching_reads_pool_and_grows(self):
+        # solve_ratio<1 seeds a vertex pool: cached passes read it, exact passes grow it
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.data.dataset import optDataset
+        from pyepo.func.jax import regularizedFrankWolfeOpt as JOpt
+
+        model = self._knapsack()
+        rng = np.random.RandomState(0)
+        c = (rng.rand(6, model.num_cost) + 0.5).astype(np.float32)
+        x = rng.rand(6, 3).astype(np.float32)
+        ds = optDataset(model, x, c)
+        target = rng.randn(6, model.num_cost).astype(np.float32)
+        opt = JOpt(model, lambd=1.0, max_iter=50, tol=1e-8, solve_ratio=0.5, dataset=ds)
+        n0 = int(opt.solpool.shape[0])
+
+        def grad(cp):
+            return np.array(
+                jax.grad(lambda p: jnp.sum(jnp.asarray(target) * opt(p)))(jnp.asarray(cp))
+            )
+
+        # force a cached forward: runs on the frozen pool, no growth
+        opt.solve_ratio = 0.0
+        g_cache = grad(c * 1.2)
+        assert np.isfinite(g_cache).all()
+        assert int(opt.solpool.shape[0]) == n0
+        # force an exact forward: solves the LMO and may grow the pool
+        opt.solve_ratio = 1.0
+        g_exact = grad(c * 1.2)
+        assert np.isfinite(g_exact).all()
+        assert int(opt.solpool.shape[0]) >= n0
+
+    def test_multiprocessing_lmo_matches_single_core(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import regularizedFrankWolfeOpt as JOpt
+
+        cp = np.array([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]], np.float32)
+        target = np.random.RandomState(0).randn(*cp.shape).astype(np.float32)
+
+        def grad_with(n_proc):
+            opt = JOpt(self._knapsack(), lambd=1.0, max_iter=50, tol=1e-8, processes=n_proc)
+            return np.array(
+                jax.grad(lambda p: jnp.sum(jnp.asarray(target) * opt(p)))(jnp.asarray(cp))
+            )
+
+        np.testing.assert_allclose(grad_with(2), grad_with(1), atol=1e-4)
 
     def test_opt_forward_and_backward_match_torch(self):
         import jax

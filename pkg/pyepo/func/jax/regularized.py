@@ -9,24 +9,42 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
+import numpy as np
 from jax import lax
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.solve import _full_cost, batch_solve
+from pyepo.func.jax.utils import _cache_in_pass, _full_cost, _update_solution_pool, batch_solve
 
 
 def _sense_sign(optmodel):
     return -1.0 if optmodel.modelSense == EPO.MINIMIZE else 1.0
 
 
-def _frank_wolfe(theta, optmodel, max_iter, tol):
-    """Away-step Frank-Wolfe for argmin_mu 1/2||mu - theta||^2 over conv(S); returns mu."""
-    mu, _, _ = _frank_wolfe_active(theta, optmodel, max_iter, tol)
-    return mu
+def _draw_use_cache(module):
+    # per-forward coin: reuse the cached vertex pool as the linear minimization oracle when the draw misses solve_ratio
+    return module.solpool is not None and module._branch_rng.uniform() > module.solve_ratio
 
 
-def _frank_wolfe_active(theta, optmodel, max_iter, tol):
+def _linear_minimization_oracle(cost, module, use_cache):
+    # one Frank-Wolfe linear-minimization-oracle call: cached pool lookup or exact solve
+    if use_cache:
+        sol, _ = _cache_in_pass(cost, module.optmodel, module.solpool)
+    else:
+        sol, _ = batch_solve(cost, module.optmodel, module.processes, module.pool)
+    return sol
+
+
+def _grow_pool_from_active(module, vertices, weights):
+    # append the FW support vertices to the pool (eager, like grow_solpool)
+    if module.solpool is None:
+        return
+    rows = np.asarray(vertices)[np.asarray(weights) > 0]
+    if rows.shape[0]:
+        module.solpool = _update_solution_pool(jnp.asarray(rows), module.solpool)
+
+
+def _frank_wolfe_active(theta, module, use_cache=False):
     """
     Batched away-step Frank-Wolfe with active-set tracking (lax.while_loop);
     returns (mu, vertices, weights).
@@ -36,12 +54,19 @@ def _frank_wolfe_active(theta, optmodel, max_iter, tol):
     support. The buffer width is bounded by the Caratheodory support, independent
     of max_iter. Every instance is solved each step: the away-step gap is not
     monotone, so a per-instance freeze stops short.
+
+    The linear minimization oracle reads everything off `module` (solver backend, process pool, sense,
+    cached vertex pool), so it inherits the module's configuration. Under
+    ``use_cache`` the linear minimization oracle is a pool lookup instead of an exact solve.
     """
+    optmodel = module.optmodel
+    max_iter = module.max_iter
+    tol = module.tol
     ss = _sense_sign(optmodel)
     b, d = theta.shape
     width = 2 * d + 2
     bidx = jnp.arange(b)
-    v0, _ = batch_solve(ss * theta, optmodel)
+    v0 = _linear_minimization_oracle(ss * theta, module, use_cache)
     vertices = jnp.zeros((b, width, d)).at[:, 0].set(v0)
     weights = jnp.zeros((b, width)).at[:, 0].set(1.0)
     vnorms = jnp.zeros((b, width)).at[:, 0].set(jnp.sum(v0 * v0, axis=-1))
@@ -54,7 +79,7 @@ def _frank_wolfe_active(theta, optmodel, max_iter, tol):
         k, mu, vt, w, vn, _ = state
         grad = mu - theta
         # Frank-Wolfe vertex and gap, solved for every instance each step
-        v, _ = batch_solve(ss * (theta - mu), optmodel)
+        v = _linear_minimization_oracle(ss * (theta - mu), module, use_cache)
         gap_fw = jnp.sum(grad * (mu - v), axis=-1)
         # away vertex: active atom maximizing <grad, .>
         scores = jnp.where(w > 0, jnp.einsum("bwv,bv->bw", vt, grad), -jnp.inf)
@@ -106,7 +131,7 @@ class regularizedFrankWolfeOpt(optModule):
     Returns the L2-regularized minimizer over conv(S), solved by batched
     Frank-Wolfe (the only oracle is the standard linear ``optModel`` solve).
     Returns a regularized solution, not a loss -- pair with a task loss, or use
-    ``regularizedFrankWolfeFenchelYoung``. The FW loop needs an accurate LMO;
+    ``regularizedFrankWolfeFenchelYoung``. The FW loop needs an accurate linear minimization oracle;
     prefer the callback path with an exact solver (MPAX is approximate here).
 
     Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
@@ -129,8 +154,8 @@ class regularizedFrankWolfeOpt(optModule):
             max_iter: Frank-Wolfe iteration cap
             tol: per-instance Frank-Wolfe gap tolerance
             processes: number of solver processes (1 = single-core, 0 = all cores)
-            solve_ratio: fraction of LMO calls solved exactly each step
-            dataset: training dataset used to seed the LMO pool when solve_ratio < 1
+            solve_ratio: per-forward probability of an exact FW solve; < 1 reuses the cached vertex pool as the linear minimization oracle
+            dataset: training dataset used to seed the linear minimization oracle pool when solve_ratio < 1
         """
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         if lambd <= 0:
@@ -145,28 +170,27 @@ class regularizedFrankWolfeOpt(optModule):
         """
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
-        return _regularized_frank_wolfe_opt(
-            pred_cost,
-            self.optmodel,
-            _sense_sign(self.optmodel) / self.lambd,
-            self.max_iter,
-            self.tol,
-        )
+        return _regularized_frank_wolfe_opt(pred_cost, self, _draw_use_cache(self))
 
 
-@partial(jax.custom_vjp, nondiff_argnums=(1, 2, 3, 4))
-def _regularized_frank_wolfe_opt(pred_cost, optmodel, scale, max_iter, tol):
-    mu, _, _ = _frank_wolfe_active(scale * pred_cost, optmodel, max_iter, tol)
+@partial(jax.custom_vjp, nondiff_argnums=(1, 2))
+def _regularized_frank_wolfe_opt(pred_cost, module, use_cache):
+    scale = _sense_sign(module.optmodel) / module.lambd
+    mu, _, _ = _frank_wolfe_active(scale * pred_cost, module, use_cache)
     return mu
 
 
-def _regularized_frank_wolfe_opt_fwd(pred_cost, optmodel, scale, max_iter, tol):
-    mu, vertices, weights = _frank_wolfe_active(scale * pred_cost, optmodel, max_iter, tol)
-    return mu, (vertices, weights)
+def _regularized_frank_wolfe_opt_fwd(pred_cost, module, use_cache):
+    scale = _sense_sign(module.optmodel) / module.lambd
+    mu, vertices, weights = _frank_wolfe_active(scale * pred_cost, module, use_cache)
+    # exact pass refreshes the pool; cached pass leaves it untouched
+    if not use_cache:
+        _grow_pool_from_active(module, vertices, weights)
+    return mu, (vertices, weights, scale)
 
 
-def _regularized_frank_wolfe_opt_bwd(optmodel, scale, max_iter, tol, res, g):
-    vertices, weights = res
+def _regularized_frank_wolfe_opt_bwd(module, use_cache, res, g):
+    vertices, weights, scale = res
     # project g onto the affine hull of the active vertices (Gram solve)
     s = (weights > 0).astype(jnp.float32)
     n_active = jnp.clip(s.sum(-1, keepdims=True), 1.0, None)
@@ -217,9 +241,9 @@ class regularizedFrankWolfeFenchelYoung(optModule):
             max_iter: Frank-Wolfe iteration cap
             tol: per-instance Frank-Wolfe gap tolerance
             processes: number of solver processes (1 = single-core, 0 = all cores)
-            solve_ratio: fraction of LMO calls solved exactly each step
+            solve_ratio: per-forward probability of an exact FW solve; < 1 reuses the cached vertex pool as the linear minimization oracle
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
-            dataset: training dataset used to seed the LMO pool when solve_ratio < 1
+            dataset: training dataset used to seed the linear minimization oracle pool when solve_ratio < 1
         """
         super().__init__(optmodel, processes, solve_ratio, reduction=reduction, dataset=dataset)
         if lambd <= 0:
@@ -234,19 +258,49 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         """
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
-        # stop the gradient into the solver
-        if self.optmodel.modelSense == EPO.MINIMIZE:
-            theta = jax.lax.stop_gradient(-pred_cost / self.lambd)
-            r_sol = _frank_wolfe(theta, self.optmodel, self.max_iter, self.tol)
-            diff = true_sol - r_sol
-        else:
-            theta = jax.lax.stop_gradient(pred_cost / self.lambd)
-            r_sol = _frank_wolfe(theta, self.optmodel, self.max_iter, self.tol)
-            diff = r_sol - true_sol
-        omega_w = 0.5 * self.lambd * jnp.sum(true_sol**2, axis=-1)
-        omega_r = 0.5 * self.lambd * jnp.sum(r_sol**2, axis=-1)
-        loss = (omega_w - omega_r) + jnp.einsum("bi,bi->b", pred_cost, diff)
+        loss = _regularized_frank_wolfe_fy(pred_cost, true_sol, self, _draw_use_cache(self))
         return self._reduce(loss)
+
+
+@partial(jax.custom_vjp, nondiff_argnums=(2, 3))
+def _regularized_frank_wolfe_fy(pred_cost, true_sol, module, use_cache):
+    loss, _ = _regularized_frank_wolfe_fy_value_and_grad(pred_cost, true_sol, module, use_cache)
+    return loss
+
+
+def _regularized_frank_wolfe_fy_value_and_grad(pred_cost, true_sol, module, use_cache):
+    # stop the gradient into the solver; the loss gradient is the Danskin residual
+    if module.optmodel.modelSense == EPO.MINIMIZE:
+        theta = jax.lax.stop_gradient(-pred_cost / module.lambd)
+        r_sol, vertices, weights = _frank_wolfe_active(theta, module, use_cache)
+        diff = true_sol - r_sol
+    else:
+        theta = jax.lax.stop_gradient(pred_cost / module.lambd)
+        r_sol, vertices, weights = _frank_wolfe_active(theta, module, use_cache)
+        diff = r_sol - true_sol
+    omega_w = 0.5 * module.lambd * jnp.sum(true_sol**2, axis=-1)
+    omega_r = 0.5 * module.lambd * jnp.sum(r_sol**2, axis=-1)
+    loss = (omega_w - omega_r) + jnp.einsum("bi,bi->b", pred_cost, diff)
+    return loss, (diff, vertices, weights)
+
+
+def _regularized_frank_wolfe_fy_fwd(pred_cost, true_sol, module, use_cache):
+    loss, (diff, vertices, weights) = _regularized_frank_wolfe_fy_value_and_grad(
+        pred_cost, true_sol, module, use_cache
+    )
+    # exact pass refreshes the pool; cached pass leaves it untouched
+    if not use_cache:
+        _grow_pool_from_active(module, vertices, weights)
+    return loss, diff
+
+
+def _regularized_frank_wolfe_fy_bwd(module, use_cache, diff, g):
+    return (g[:, None] * diff, jnp.zeros_like(diff))
+
+
+_regularized_frank_wolfe_fy.defvjp(
+    _regularized_frank_wolfe_fy_fwd, _regularized_frank_wolfe_fy_bwd
+)
 
 
 # acronym aliases

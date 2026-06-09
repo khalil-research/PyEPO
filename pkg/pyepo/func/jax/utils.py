@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Batched optimization solve for the JAX frontend
+Utility functions for the JAX frontend
 """
 
 from __future__ import annotations

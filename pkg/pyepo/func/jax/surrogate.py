@@ -12,7 +12,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.solve import _full_cost, solve_or_cache
+from pyepo.func.jax.utils import _full_cost, solve_or_cache
 from pyepo.utils import _EPS
 
 
