@@ -296,6 +296,94 @@ def finite_diff_grad(loss_fn, x, eps=1e-3):
     return grad
 
 
+# ============================================================
+# Backend adapters for the shared forward/backward contract (both frontends)
+# ============================================================
+# The contract assertions are identical on torch and jax; only the autodiff
+# harness differs (torch .backward()/.grad vs jax.grad). The op build signature
+# and call_op are shared, so the contract body is backend-agnostic.
+class _ContractTorch:
+    name = "torch"
+    registry = LOSS_REGISTRY
+
+    def inputs(self, c, w, z):
+        cp = (c * 1.2).clone().detach().requires_grad_(True)
+        return cp, c, w, z
+
+    def forward(self, op, sig, cp, c, w, z):
+        return call_op(op, sig, cp, c, w, z)
+
+    def grad(self, op, sig, cp, c, w, z):
+        out = call_op(op, sig, cp, c, w, z)
+        (out if out.dim() == 0 else out.sum()).backward()
+        return cp.grad
+
+    @staticmethod
+    def shape(x):
+        return tuple(x.shape)
+
+    @staticmethod
+    def ndim(x):
+        return x.dim()
+
+    @staticmethod
+    def to_np(x):
+        return x.detach().numpy()
+
+    @staticmethod
+    def finite(x):
+        import torch
+
+        return bool(torch.isfinite(x).all())
+
+
+class _ContractJax:
+    name = "jax"
+
+    @property
+    def registry(self):
+        return JAX_LOSS_REGISTRY
+
+    def inputs(self, c, w, z):
+        return jx(c * 1.2, c, w, z)
+
+    def forward(self, op, sig, cp, c, w, z):
+        return call_op(op, sig, cp, c, w, z)
+
+    def grad(self, op, sig, cp, c, w, z):
+        import jax
+        import jax.numpy as jnp
+
+        return jax.grad(lambda p: jnp.sum(call_op(op, sig, p, c, w, z)))(cp)
+
+    @staticmethod
+    def shape(x):
+        return tuple(x.shape)
+
+    @staticmethod
+    def ndim(x):
+        return x.ndim
+
+    @staticmethod
+    def to_np(x):
+        return np.asarray(x)
+
+    @staticmethod
+    def finite(x):
+        return bool(np.isfinite(np.asarray(x)).all())
+
+
+@pytest.fixture(
+    params=[
+        pytest.param("torch"),
+        pytest.param("jax", marks=requires_mpax),
+    ]
+)
+def contract_backend(request):
+    """Adapter exposing one frontend's autodiff harness to the shared contract."""
+    return _ContractTorch() if request.param == "torch" else _ContractJax()
+
+
 # losses gated by a finite difference of the loss value; the flag sets how to
 # keep that value deterministic across the FD evaluations:
 #   freeze_pool : set solve_ratio = 0 (freezes the cached pool)

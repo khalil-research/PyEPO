@@ -6,6 +6,7 @@ Abstract optimization model based on MPAX
 from __future__ import annotations
 
 import dataclasses
+import logging
 from copy import deepcopy
 from functools import partial
 from typing import TYPE_CHECKING
@@ -16,6 +17,7 @@ try:
     import jax
     from jax import numpy as jnp
     from mpax import create_lp, create_qp, raPDHG
+    from mpax.termination import TerminationStatus
 
     _HAS_MPAX = True
 except ImportError:
@@ -27,6 +29,28 @@ from pyepo.model.opt import optModel
 if TYPE_CHECKING:
     import numpy as np
     from typing_extensions import Self
+
+logger = logging.getLogger(__name__)
+
+# warn once across all solves if PDHG stops short of OPTIMAL
+_warned_not_optimal = False
+
+
+def _warn_if_not_optimal(status) -> None:
+    """Warn once if any MPAX solve did not reach OPTIMAL termination."""
+    global _warned_not_optimal
+    if _warned_not_optimal:
+        return
+    flat = jnp.asarray(status).reshape(-1)
+    if not bool(jnp.any(flat != int(TerminationStatus.OPTIMAL))):
+        return
+    _warned_not_optimal = True
+    example = int(flat[jnp.argmax(flat != int(TerminationStatus.OPTIMAL))])
+    logger.warning(
+        "MPAX did not reach OPTIMAL termination for some instances (e.g. status=%s); "
+        "the returned solution may be suboptimal or infeasible. Consider raising iteration_limit.",
+        TerminationStatus(example).name,
+    )
 
 
 class optMpaxModel(optModel):
@@ -195,7 +219,8 @@ class optMpaxModel(optModel):
             tuple: optimal solution (torch.Tensor) and objective value (float)
         """
         # create lp model
-        sol, obj = self.jitted_solve(self.c)
+        sol, obj, status = self.jitted_solve(self.c)
+        _warn_if_not_optimal(status)
         # convert to torch
         sol = torch.from_dlpack(sol)
         if self.modelSense == EPO.MINIMIZE:
@@ -215,7 +240,7 @@ class optMpaxModel(optModel):
         )
         result = solver.optimize(lp)
         obj = jnp.dot(c, result.primal_solution)
-        return result.primal_solution, obj
+        return result.primal_solution, obj, result.termination_status
 
     @staticmethod
     def _jitted_solve_qp(c, qp_template, Q):
@@ -236,7 +261,7 @@ class optMpaxModel(optModel):
         result = solver.optimize(qp)
         x = result.primal_solution
         obj = 0.5 * jnp.dot(x, Q @ x) + jnp.dot(c, x)
-        return x, obj
+        return x, obj, result.termination_status
 
     def copy(self) -> Self:
         """

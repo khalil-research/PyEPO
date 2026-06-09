@@ -138,6 +138,15 @@ class TestSPOError:
         pred_c = rng.rand(10, m.num_cost) + 0.1
         assert SPOError(pred_c, true_c, type(m), {"grid": (3, 3)}) >= -1e-6
 
+    def test_non_negative_maximize(self):
+        from pyepo.model.grb.knapsack import knapsackModel
+        weights, cap = np.array([[3.0, 4.0, 5.0]]), np.array([8.0])
+        m = knapsackModel(weights=weights, capacity=cap)
+        rng = np.random.RandomState(42)
+        true_c = rng.rand(10, m.num_cost) + 1.0
+        pred_c = rng.rand(10, m.num_cost) + 1.0
+        assert SPOError(pred_c, true_c, type(m), {"weights": weights, "capacity": cap}) >= -1e-6
+
     def test_shape_mismatch(self):
         m = self._sp()
         with pytest.raises(AssertionError):
@@ -162,6 +171,15 @@ class TestCalUnambRegret:
         m = self._sp()
         rng = np.random.RandomState(42)
         ct, cp = rng.rand(m.num_cost) + 0.1, rng.rand(m.num_cost) + 0.1
+        m.setObj(ct)
+        _, true_obj = m.solve()
+        assert calUnambRegret(m, cp, ct, true_obj) >= -1e-3
+
+    def test_non_negative_maximize(self):
+        from pyepo.model.grb.knapsack import knapsackModel
+        m = knapsackModel(weights=np.array([[3.0, 4.0, 5.0]]), capacity=np.array([8.0]))
+        rng = np.random.RandomState(42)
+        ct, cp = rng.rand(m.num_cost) + 1.0, rng.rand(m.num_cost) + 1.0
         m.setObj(ct)
         _, true_obj = m.solve()
         assert calUnambRegret(m, cp, ct, true_obj) >= -1e-3

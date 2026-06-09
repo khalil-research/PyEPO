@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 """Tests for the JAX training frontend (pyepo.func.jax).
 
-Correctness gate is the closed form (independent re-solve), not torch-vs-jax.
-Covers both backends of batch_solve: the universal pure_callback path and the
-native MPAX path. A jax-only training step confirms end-to-end gradient flow.
+Grouped jax -> both:
+
+- jax: helpers / infrastructure / validation, then independent correctness
+  gates. The gate is the closed form (an independent re-solve) or a finite
+  difference, never torch-vs-jax, so a bug shared by both frontends is still
+  caught. Covers both batch_solve backends: the universal pure_callback path
+  and the native MPAX path.
+- both: torch-vs-jax parity for the few features (CaVE, PG central differencing,
+  the partial-prediction lift) where an independent reference is impractical and
+  the torch implementation is the reference.
 """
 
 import numpy as np
@@ -11,35 +18,16 @@ import pytest
 
 from .conftest import (
     GRID,
-    JAX_LOSS_OPS,
     JAX_LOSS_REGISTRY,
-    JAX_SOLUTION_OPS,
     LOSS_REGISTRY,
     NUM_FEAT,
     call_op,
     finite_diff_grad,
-    jx,
     requires_clarabel,
     requires_gurobi,
     requires_mpax,
     sp_jax_pred,
-    take_batch,
 )
-
-# losses with a deterministic forward (no internal noise) -> torch-vs-jax grad parity
-DETERMINISTIC_PARITY = [
-    "SPOPlus",
-    "PG",
-    "DBB",
-    "NID",
-    "RFWO",
-    "RFY",
-    "lsLTR",
-    "prLTR",
-    "ptLTR",
-    "NCE",
-    "CMAP",
-]
 
 SEED = 42
 
@@ -53,87 +41,9 @@ def _sp_mpax(n):
     return shortestPathModel(grid=GRID), np.asarray(c, np.float32)
 
 
-@requires_mpax
-class TestBatchSolve:
-    def test_callback_matches_native(self):
-        import jax.numpy as jnp
-
-        from pyepo.func.jax.utils import _batch_solve_callback, _batch_solve_mpax
-
-        model, c = _sp_mpax(8)
-        c_jax = jnp.asarray(c)
-        sol_n, obj_n = _batch_solve_mpax(c_jax, model)
-        sol_c, obj_c = _batch_solve_callback(c_jax, model)
-        np.testing.assert_allclose(np.array(sol_c), np.array(sol_n), atol=1e-3)
-        np.testing.assert_allclose(np.array(obj_c), np.array(obj_n), atol=1e-3)
-
-
-def _spo_closed_form(model, pred, true_cost, true_sol):
-    """Independent ground truth: 2*(w_true - w_spo) for MINIMIZE."""
-    import jax.numpy as jnp
-
-    from pyepo.func.jax.utils import batch_solve
-
-    w_spo, _ = batch_solve(jnp.asarray(2.0 * pred - true_cost), model)
-    return 2.0 * (true_sol - np.array(w_spo))
-
-
-# SPO+ closed form on each backend: native MPAX and the Gurobi pure_callback path
-SPO_CLOSED_FORM = [
-    pytest.param("mpax", 16, 1e-3, marks=requires_mpax),
-    pytest.param("grb", 8, 1e-4, marks=requires_gurobi),
-]
-
-
-class TestSPOPlusClosedFormJax:
-    """SPO+ subgradient vs the independent 2*(w_true - w_spo) ground truth, per backend."""
-
-    @pytest.mark.parametrize("backend,n,atol", SPO_CLOSED_FORM)
-    def test_grad_matches_closed_form(self, backend, n, atol):
-        import jax
-        import jax.numpy as jnp
-
-        from pyepo.func.jax import SPOPlus
-
-        model, _ds, pred, tc, ts, to = sp_jax_pred(backend, n)
-        B = pred.shape[0]
-        spo = SPOPlus(model, reduction="mean")
-        grad = np.array(
-            jax.grad(lambda p: spo(p, jnp.asarray(tc), jnp.asarray(ts), jnp.asarray(to)))(
-                jnp.asarray(pred)
-            )
-        )
-        expected = _spo_closed_form(model, pred, tc, ts) / B
-        np.testing.assert_allclose(grad, expected, atol=atol)
-
-
-@requires_mpax
-class TestSPOPlusTrainingJax:
-    def test_training_step_decreases_loss(self):
-        import jax
-        import jax.numpy as jnp
-
-        from pyepo.func.jax import SPOPlus
-
-        model, _ds, _pred, tc, ts, to = sp_jax_pred("mpax", 16)
-        x = np.random.RandomState(1).randn(tc.shape[0], NUM_FEAT).astype(np.float32)
-        rng = np.random.RandomState(2)
-        params = {
-            "W": jnp.asarray(0.01 * rng.randn(NUM_FEAT, tc.shape[1]).astype(np.float32)),
-            "b": jnp.zeros((tc.shape[1],), jnp.float32),
-        }
-        xj, tcj, tsj, toj = (jnp.asarray(a) for a in (x, tc, ts, to))
-        spo = SPOPlus(model, reduction="mean")
-
-        def loss_fn(p):
-            pred_cost = xj @ p["W"] + p["b"]
-            return spo(pred_cost, tcj, tsj, toj)
-
-        l0 = float(loss_fn(params))
-        for _ in range(20):
-            g = jax.grad(loss_fn)(params)
-            params = jax.tree_util.tree_map(lambda a, d: a - 0.1 * d, params, g)
-        assert float(loss_fn(params)) < l0
+# ============================================================
+# jax: helpers, infrastructure, validation
+# ============================================================
 
 
 @requires_mpax
@@ -167,6 +77,23 @@ class TestSolveCacheHelpers:
         np.testing.assert_allclose(np.array(sol[1]), [0.0, 0.0, 1.0])
         np.testing.assert_allclose(np.array(obj), [1.0, 1.0])
 
+    def test_cache_in_pass_maximize_picks_max_obj(self):
+        from unittest.mock import MagicMock
+
+        import jax.numpy as jnp
+
+        from pyepo import EPO
+        from pyepo.func.jax.utils import _cache_in_pass
+
+        m = MagicMock()
+        m.modelSense = EPO.MAXIMIZE
+        cost = jnp.array([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]])
+        pool = jnp.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+        sol, obj = _cache_in_pass(cost, m, pool)
+        np.testing.assert_allclose(np.array(sol[0]), [0.0, 0.0, 1.0])
+        np.testing.assert_allclose(np.array(sol[1]), [1.0, 0.0, 0.0])
+        np.testing.assert_allclose(np.array(obj), [3.0, 3.0])
+
     def test_spoplus_caching_runs_eager(self):
         import jax
         import jax.numpy as jnp
@@ -189,7 +116,227 @@ class TestSolveCacheHelpers:
 
 
 @requires_mpax
-class TestBlackboxJax:
+class TestMaskPred:
+    """Partial-prediction masking: zero perturbation on non-predicted cost positions."""
+
+    def test_none_is_noop(self):
+        from unittest.mock import MagicMock
+
+        import jax.numpy as jnp
+
+        from pyepo.func.jax.perturbed import _mask_pred
+
+        m = MagicMock()
+        m.c_pred_index = None
+        noises = jnp.ones((1, 2, 4))
+        np.testing.assert_array_equal(np.array(_mask_pred(noises, m)), np.ones((1, 2, 4)))
+
+    def test_masks_non_predicted_positions(self):
+        from unittest.mock import MagicMock
+
+        import jax.numpy as jnp
+
+        from pyepo.func.jax.perturbed import _mask_pred
+
+        m = MagicMock()
+        m.c_pred_index = np.array([0, 2])
+        out = np.array(_mask_pred(jnp.ones((1, 2, 4)), m))
+        np.testing.assert_array_equal(out[..., [0, 2]], 1.0)  # predicted positions kept
+        np.testing.assert_array_equal(out[..., [1, 3]], 0.0)  # fixed positions zeroed
+
+
+@requires_gurobi
+class TestOptModuleInit:
+    def _model(self):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        return shortestPathModel(grid=GRID)
+
+    def test_invalid_model_type_raises(self):
+        from pyepo.func.jax import SPOPlus
+
+        with pytest.raises(TypeError):
+            SPOPlus("not_a_model")
+
+    def test_invalid_processes_raises(self):
+        from pyepo.func.jax import SPOPlus
+
+        with pytest.raises(ValueError):
+            SPOPlus(self._model(), processes=-1)
+
+    @pytest.mark.parametrize("ratio", [1.5, -0.1])
+    def test_invalid_solve_ratio_raises(self, ratio):
+        from pyepo.func.jax import SPOPlus
+
+        with pytest.raises(ValueError):
+            SPOPlus(self._model(), solve_ratio=ratio)
+
+    def test_solve_ratio_lt1_requires_dataset(self):
+        from pyepo.func.jax import SPOPlus
+
+        with pytest.raises(TypeError):
+            SPOPlus(self._model(), solve_ratio=0.5, dataset=None)
+
+
+@requires_gurobi
+class TestConstructorGuards:
+    """Constructor validation shared across losses: lambda must be positive."""
+
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "blackboxOpt",
+            "implicitMLE",
+            "regularizedFrankWolfeOpt",
+            "regularizedFrankWolfeFenchelYoung",
+        ],
+    )
+    def test_rejects_nonpositive_lambda(self, name):
+        import pyepo.func.jax as J
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        model = shortestPathModel(grid=GRID)
+        for bad in (0.0, -1.0):
+            with pytest.raises(ValueError):
+                getattr(J, name)(model, lambd=bad)
+
+
+@requires_mpax
+class TestBatchSolve:
+    def test_callback_matches_native(self):
+        import jax.numpy as jnp
+
+        from pyepo.func.jax.utils import _batch_solve_callback, _batch_solve_mpax
+
+        model, c = _sp_mpax(8)
+        c_jax = jnp.asarray(c)
+        sol_n, obj_n = _batch_solve_mpax(c_jax, model)
+        sol_c, obj_c = _batch_solve_callback(c_jax, model)
+        np.testing.assert_allclose(np.array(sol_c), np.array(sol_n), atol=1e-3)
+        np.testing.assert_allclose(np.array(obj_c), np.array(obj_n), atol=1e-3)
+
+
+@requires_gurobi
+class TestMultiprocessing:
+    """processes > 1 parallelizes the callback-path solves (results identical to single-core)."""
+
+    def _model(self):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        return shortestPathModel(grid=GRID)
+
+    def test_builds_worker_pool(self):
+        from pyepo.func.jax import SPOPlus
+
+        assert SPOPlus(self._model(), processes=1).pool is None
+        spo = SPOPlus(self._model(), processes=2)
+        assert spo.pool is not None
+
+    def test_grad_matches_single_core(self):
+        import jax
+        import jax.numpy as jnp
+
+        import pyepo
+        from pyepo.data.dataset import optDataset
+        from pyepo.func.jax import SPOPlus
+
+        x, c = pyepo.data.shortestpath.genData(8, NUM_FEAT, GRID, seed=SEED)
+        ds = optDataset(self._model(), x, c)
+        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
+        tc, ts, to = (jnp.asarray(np.asarray(a, np.float32)) for a in (ds.costs, ds.sols, ds.objs))
+
+        def grad_with(n_proc):
+            spo = SPOPlus(self._model(), processes=n_proc)
+            return np.array(jax.grad(lambda p: spo(p, tc, ts, to))(jnp.asarray(pred)))
+
+        np.testing.assert_allclose(grad_with(2), grad_with(1), atol=1e-5)
+
+
+@requires_mpax
+class TestJit:
+    def test_spoplus_jit_matches_eager(self):
+        """jax.jit of the loss gradient (model closed over) equals the eager gradient."""
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import SPOPlus
+
+        model, _ds, pred, tc, ts, to = sp_jax_pred("mpax", 16)
+        tcj, tsj, toj = (jnp.asarray(a) for a in (tc, ts, to))
+        spo = SPOPlus(model, reduction="mean")
+
+        def loss(p):
+            return spo(p, tcj, tsj, toj)
+
+        cj = jnp.asarray(pred)
+        g_eager = np.array(jax.grad(loss)(cj))
+        g_jit = np.array(jax.jit(jax.grad(loss))(cj))
+        np.testing.assert_allclose(g_jit, g_eager, atol=1e-4)
+
+    def test_jit_caching_raises_clear_error(self):
+        """A caching loss under jax.jit raises a clear error, not a cryptic tracer crash."""
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import noiseContrastiveEstimation
+
+        model, ds, _pred, tc, ts_np, _to = sp_jax_pred("mpax", 12)
+        ts = jnp.asarray(ts_np)
+        pred = jnp.asarray((tc * 1.2).astype(np.float32))
+        nce = noiseContrastiveEstimation(model, dataset=ds, solve_ratio=0.0)
+        # eager is fine
+        assert np.isfinite(np.array(jax.grad(lambda p: nce(p, ts))(pred))).all()
+        # jit raises a clear, actionable error
+        with pytest.raises(RuntimeError, match="jax.jit"):
+            jax.jit(jax.grad(lambda p: nce(p, ts)))(pred)
+
+
+# ============================================================
+# jax: independent correctness gates (closed-form re-solve or finite difference)
+# ============================================================
+
+
+def _spo_closed_form(model, pred, true_cost, true_sol):
+    """Independent ground truth: 2*(w_true - w_spo) for MINIMIZE."""
+    import jax.numpy as jnp
+
+    from pyepo.func.jax.utils import batch_solve
+
+    w_spo, _ = batch_solve(jnp.asarray(2.0 * pred - true_cost), model)
+    return 2.0 * (true_sol - np.array(w_spo))
+
+
+# SPO+ closed form on each backend: native MPAX and the Gurobi pure_callback path
+SPO_CLOSED_FORM = [
+    pytest.param("mpax", 16, 1e-3, marks=requires_mpax),
+    pytest.param("grb", 8, 1e-4, marks=requires_gurobi),
+]
+
+
+class TestSPOPlusClosedForm:
+    """SPO+ subgradient vs the independent 2*(w_true - w_spo) ground truth, per backend."""
+
+    @pytest.mark.parametrize("backend,n,atol", SPO_CLOSED_FORM)
+    def test_grad_matches_closed_form(self, backend, n, atol):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import SPOPlus
+
+        model, _ds, pred, tc, ts, to = sp_jax_pred(backend, n)
+        B = pred.shape[0]
+        spo = SPOPlus(model, reduction="mean")
+        grad = np.array(
+            jax.grad(lambda p: spo(p, jnp.asarray(tc), jnp.asarray(ts), jnp.asarray(to)))(
+                jnp.asarray(pred)
+            )
+        )
+        expected = _spo_closed_form(model, pred, tc, ts) / B
+        np.testing.assert_allclose(grad, expected, atol=atol)
+
+
+@requires_mpax
+class TestBlackbox:
     def _setup(self):
         model, c = _sp_mpax(8)
         pred = (c * 1.3).astype(np.float32)
@@ -248,7 +395,7 @@ PERTURBED_SENSE = [
 ]
 
 
-class TestPerturbedJax:
+class TestPerturbed:
     """DPO/PFY (additive + multiplicative) closed-form parity from seed-derived noise.
 
     Gate is an independent re-solve of the same perturbed costs, not torch-vs-jax.
@@ -333,37 +480,7 @@ class TestPerturbedJax:
 
 
 @requires_mpax
-class TestMaskPred:
-    """Partial-prediction masking: zero perturbation on non-predicted cost positions."""
-
-    def test_none_is_noop(self):
-        from unittest.mock import MagicMock
-
-        import jax.numpy as jnp
-
-        from pyepo.func.jax.perturbed import _mask_pred
-
-        m = MagicMock()
-        m.c_pred_index = None
-        noises = jnp.ones((1, 2, 4))
-        np.testing.assert_array_equal(np.array(_mask_pred(noises, m)), np.ones((1, 2, 4)))
-
-    def test_masks_non_predicted_positions(self):
-        from unittest.mock import MagicMock
-
-        import jax.numpy as jnp
-
-        from pyepo.func.jax.perturbed import _mask_pred
-
-        m = MagicMock()
-        m.c_pred_index = np.array([0, 2])
-        out = np.array(_mask_pred(jnp.ones((1, 2, 4)), m))
-        np.testing.assert_array_equal(out[..., [0, 2]], 1.0)  # predicted positions kept
-        np.testing.assert_array_equal(out[..., [1, 3]], 0.0)  # fixed positions zeroed
-
-
-@requires_mpax
-class TestImplicitMLEJax:
+class TestImplicitMLE:
     """I-MLE / AI-MLE: gradient == an independent re-solve along the seed-derived noise."""
 
     def _setup(self):
@@ -462,14 +579,56 @@ class TestImplicitMLEJax:
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
 
+@requires_mpax
+class TestPG:
+    """PG one-sided backward differencing: grad == (w(pred) - w(pred - sigma*c)) / sigma / B."""
+
+    def test_grad_matches_backward_difference(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import PG
+        from pyepo.func.jax.utils import batch_solve
+        from pyepo.utils import _EPS
+
+        model, _ds, pred, tc, _ts, _to = sp_jax_pred("mpax", 8)
+        sigma = 1.0
+        B = pred.shape[0]
+        pg = PG(model, sigma=sigma, reduction="mean")
+        g = np.array(jax.grad(lambda p: pg(p, jnp.asarray(tc)))(jnp.asarray(pred)))
+        w_sol, _ = batch_solve(jnp.asarray(pred), model)
+        wm_sol, _ = batch_solve(jnp.asarray(pred - sigma * tc), model)
+        expected = (np.array(w_sol) - np.array(wm_sol)) / (sigma + _EPS) / B  # sign +1 (MINIMIZE)
+        np.testing.assert_allclose(g, expected, atol=1e-3)
+
+
 @requires_gurobi
-class TestRegularizedJax:
-    """Regularized FW over an exact Gurobi LMO; AFW cross-checked against torch."""
+class TestRegularized:
+    """Regularized FW over an exact Gurobi LMO, gated against a finite difference / Danskin residual."""
 
     def _knapsack(self):
         from pyepo.model.grb.knapsack import knapsackModel
 
         return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
+
+    def test_opt_grad_matches_finite_difference(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import regularizedFrankWolfeOpt as JOpt
+
+        lambd = 1.0
+        rng = np.random.RandomState(0)
+        cp = (rng.rand(1, 4) * 2 + 1.0).astype(np.float32)
+        target = rng.randn(1, 4).astype(np.float32)
+        opt = JOpt(self._knapsack(), lambd=lambd, max_iter=30, tol=1e-8)
+        g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * opt(p)))(jnp.asarray(cp)))
+
+        def value(c):
+            return float(jnp.sum(jnp.asarray(target) * opt(jnp.asarray(c))))
+
+        fd = finite_diff_grad(value, cp, eps=5e-3)
+        np.testing.assert_allclose(g, fd, atol=5e-2)
 
     def test_fy_grad_matches_danskin_residual(self):
         import jax
@@ -540,55 +699,9 @@ class TestRegularizedJax:
 
         np.testing.assert_allclose(grad_with(2), grad_with(1), atol=1e-4)
 
-    def test_opt_forward_and_backward_match_torch(self):
-        import jax
-        import jax.numpy as jnp
-        import torch
-
-        from pyepo.func.jax import regularizedFrankWolfeOpt as JOpt
-        from pyepo.func.regularized import regularizedFrankWolfeOpt as TOpt
-
-        lambd = 1.0
-        cp = np.array([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]], np.float32)
-        target = np.random.RandomState(0).randn(*cp.shape).astype(np.float32)
-        # jax (exact Gurobi LMO via callback)
-        jopt = JOpt(self._knapsack(), lambd=lambd, max_iter=200, tol=1e-8)
-        mu_j = np.array(jopt(jnp.asarray(cp)))
-        g_j = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * jopt(p)))(jnp.asarray(cp)))
-        # torch reference (same exact LMO)
-        topt = TOpt(self._knapsack(), lambd=lambd, max_iter=200, tol=1e-8)
-        cpt = torch.tensor(cp, requires_grad=True)
-        mu_t = topt(cpt)
-        (torch.as_tensor(target) * mu_t).sum().backward()
-        np.testing.assert_allclose(mu_j, mu_t.detach().numpy(), atol=1e-3)
-        np.testing.assert_allclose(g_j, cpt.grad.numpy(), atol=1e-3)
-
-
-@requires_gurobi
-class TestConstructorGuards:
-    """Constructor validation shared across losses."""
-
-    @pytest.mark.parametrize(
-        "name",
-        [
-            "blackboxOpt",
-            "implicitMLE",
-            "regularizedFrankWolfeOpt",
-            "regularizedFrankWolfeFenchelYoung",
-        ],
-    )
-    def test_rejects_nonpositive_lambda(self, name):
-        import pyepo.func.jax as J
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        model = shortestPathModel(grid=GRID)
-        for bad in (0.0, -1.0):
-            with pytest.raises(ValueError):
-                getattr(J, name)(model, lambd=bad)
-
 
 @requires_mpax
-class TestRankContrastiveJax:
+class TestRankContrastive:
     """Pool/contrastive losses gated by finite difference (reused from conftest)."""
 
     def _data(self):
@@ -623,9 +736,52 @@ class TestRankContrastiveJax:
         np.testing.assert_allclose(g_auto, finite_diff_grad(f, pred), atol=3e-2)
 
 
+# ============================================================
+# both: torch-vs-jax parity (no practical independent reference; torch is the reference)
+# ============================================================
+
+
+@requires_gurobi
+class TestPGTwoSidesParity:
+    """PG central differencing (two_sides=True), torch parity on MINIMIZE and MAXIMIZE."""
+
+    def _model(self, sense):
+        if sense == "min":
+            from pyepo.model.grb.shortestpath import shortestPathModel
+
+            return shortestPathModel(grid=GRID)
+        from pyepo.model.grb.knapsack import knapsackModel
+
+        return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
+
+    @pytest.mark.parametrize("sense", ["min", "max"])
+    def test_two_sides_grad_matches_torch(self, sense):
+        import jax
+        import jax.numpy as jnp
+        import torch
+
+        from pyepo.func import PG as TPG
+        from pyepo.func.jax import PG as JPG
+
+        model = self._model(sense)
+        d = model.num_cost
+        rng = np.random.RandomState(0)
+        c = (rng.rand(4, d) + 0.5).astype(np.float32)
+        cp = (c * 1.2).astype(np.float32)
+        # torch reference (deterministic: no internal noise)
+        tpg = TPG(model, sigma=0.5, two_sides=True, processes=1, reduction="mean")
+        cpt = torch.tensor(cp, requires_grad=True)
+        tpg(cpt, torch.as_tensor(c)).backward()
+        g_t = cpt.grad.numpy()
+        # jax
+        jpg = JPG(model, sigma=0.5, two_sides=True, reduction="mean")
+        g_j = np.array(jax.grad(lambda p: jpg(p, jnp.asarray(c)))(jnp.asarray(cp)))
+        np.testing.assert_allclose(g_j, g_t, atol=1e-3)
+
+
 @requires_gurobi
 @requires_clarabel
-class TestCaVEJax:
+class TestCaVEParity:
     """CaVE cosine-distance gradient cross-checked against torch (projection detached)."""
 
     def _setup(self):
@@ -672,198 +828,6 @@ class TestCaVEJax:
         np.testing.assert_allclose(g_j, pt.grad.numpy(), atol=1e-3)
 
 
-@requires_gurobi
-class TestMultiprocessing:
-    """processes > 1 parallelizes the callback-path solves (results identical to single-core)."""
-
-    def _model(self):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        return shortestPathModel(grid=GRID)
-
-    def test_builds_worker_pool(self):
-        from pyepo.func.jax import SPOPlus
-
-        assert SPOPlus(self._model(), processes=1).pool is None
-        spo = SPOPlus(self._model(), processes=2)
-        assert spo.pool is not None
-
-    def test_grad_matches_single_core(self):
-        import jax
-        import jax.numpy as jnp
-
-        import pyepo
-        from pyepo.data.dataset import optDataset
-        from pyepo.func.jax import SPOPlus
-
-        x, c = pyepo.data.shortestpath.genData(8, NUM_FEAT, GRID, seed=SEED)
-        ds = optDataset(self._model(), x, c)
-        pred = (np.asarray(ds.costs) * 1.3).astype(np.float32)
-        tc, ts, to = (jnp.asarray(np.asarray(a, np.float32)) for a in (ds.costs, ds.sols, ds.objs))
-
-        def grad_with(n_proc):
-            spo = SPOPlus(self._model(), processes=n_proc)
-            return np.array(jax.grad(lambda p: spo(p, tc, ts, to))(jnp.asarray(pred)))
-
-        np.testing.assert_allclose(grad_with(2), grad_with(1), atol=1e-5)
-
-
-@requires_mpax
-class TestJitJax:
-    def test_spoplus_jit_matches_eager(self):
-        """jax.jit of the loss gradient (model closed over) equals the eager gradient."""
-        import jax
-        import jax.numpy as jnp
-
-        from pyepo.func.jax import SPOPlus
-
-        model, _ds, pred, tc, ts, to = sp_jax_pred("mpax", 16)
-        tcj, tsj, toj = (jnp.asarray(a) for a in (tc, ts, to))
-        spo = SPOPlus(model, reduction="mean")
-
-        def loss(p):
-            return spo(p, tcj, tsj, toj)
-
-        cj = jnp.asarray(pred)
-        g_eager = np.array(jax.grad(loss)(cj))
-        g_jit = np.array(jax.jit(jax.grad(loss))(cj))
-        np.testing.assert_allclose(g_jit, g_eager, atol=1e-4)
-
-    def test_jit_caching_raises_clear_error(self):
-        """A caching loss under jax.jit raises a clear error, not a cryptic tracer crash."""
-        import jax
-        import jax.numpy as jnp
-
-        from pyepo.func.jax import noiseContrastiveEstimation
-
-        model, ds, _pred, tc, ts_np, _to = sp_jax_pred("mpax", 12)
-        ts = jnp.asarray(ts_np)
-        pred = jnp.asarray((tc * 1.2).astype(np.float32))
-        nce = noiseContrastiveEstimation(model, dataset=ds, solve_ratio=0.0)
-        # eager is fine
-        assert np.isfinite(np.array(jax.grad(lambda p: nce(p, ts))(pred))).all()
-        # jit raises a clear, actionable error
-        with pytest.raises(RuntimeError, match="jax.jit"):
-            jax.jit(jax.grad(lambda p: nce(p, ts)))(pred)
-
-
-@requires_gurobi
-class TestPGTwoSidesJax:
-    """PG central differencing (two_sides=True), torch parity on MINIMIZE and MAXIMIZE."""
-
-    def _model(self, sense):
-        if sense == "min":
-            from pyepo.model.grb.shortestpath import shortestPathModel
-
-            return shortestPathModel(grid=GRID)
-        from pyepo.model.grb.knapsack import knapsackModel
-
-        return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
-
-    @pytest.mark.parametrize("sense", ["min", "max"])
-    def test_two_sides_grad_matches_torch(self, sense):
-        import jax
-        import jax.numpy as jnp
-        import torch
-
-        from pyepo.func import PG as TPG
-        from pyepo.func.jax import PG as JPG
-
-        model = self._model(sense)
-        d = model.num_cost
-        rng = np.random.RandomState(0)
-        c = (rng.rand(4, d) + 0.5).astype(np.float32)
-        cp = (c * 1.2).astype(np.float32)
-        # torch reference (deterministic: no internal noise)
-        tpg = TPG(model, sigma=0.5, two_sides=True, processes=1, reduction="mean")
-        cpt = torch.tensor(cp, requires_grad=True)
-        tpg(cpt, torch.as_tensor(c)).backward()
-        g_t = cpt.grad.numpy()
-        # jax
-        jpg = JPG(model, sigma=0.5, two_sides=True, reduction="mean")
-        g_j = np.array(jax.grad(lambda p: jpg(p, jnp.asarray(c)))(jnp.asarray(cp)))
-        np.testing.assert_allclose(g_j, g_t, atol=1e-3)
-
-
-# ============================================================
-# A1 hybrid infra: registry-driven contract tests + torch parity
-# ============================================================
-
-
-@requires_gurobi
-class TestJaxContract:
-    """Forward/backward contract over JAX_LOSS_REGISTRY, on the Gurobi callback path."""
-
-    @pytest.mark.parametrize("name", JAX_SOLUTION_OPS)
-    def test_solution_forward_and_backward(self, name, sp_data):
-        import jax
-        import jax.numpy as jnp
-
-        optmodel, dataset, loader = sp_data
-        _kind, build, sig = JAX_LOSS_REGISTRY[name]
-        _x, c, w, z = take_batch(loader)
-        cp, cj, wj, zj = jx(c * 1.2, c, w, z)
-        op = build(optmodel, dataset, "mean")
-        out = call_op(op, sig, cp, cj, wj, zj)
-        assert out.shape == cp.shape
-        assert np.isfinite(np.array(out)).all()
-        g = jax.grad(lambda p: jnp.sum(call_op(op, sig, p, cj, wj, zj)))(cp)
-        assert np.isfinite(np.array(g)).all()
-
-    @pytest.mark.parametrize("name", JAX_LOSS_OPS)
-    def test_loss_scalar_and_reduction(self, name, sp_data):
-        import jax
-
-        optmodel, dataset, loader = sp_data
-        _kind, build, sig = JAX_LOSS_REGISTRY[name]
-        _x, c, w, z = take_batch(loader)
-        cp, cj, wj, zj = jx(c * 1.2, c, w, z)
-        loss = call_op(build(optmodel, dataset, "mean"), sig, cp, cj, wj, zj)
-        assert loss.ndim == 0
-        g = jax.grad(lambda p: call_op(build(optmodel, dataset, "mean"), sig, p, cj, wj, zj))(cp)
-        assert np.isfinite(np.array(g)).all()
-        # reduction modes (fresh seed each build -> deterministic across the three)
-        none = call_op(build(optmodel, dataset, "none"), sig, cp, cj, wj, zj)
-        assert none.shape[0] == cp.shape[0]
-        mean = call_op(build(optmodel, dataset, "mean"), sig, cp, cj, wj, zj)
-        total = call_op(build(optmodel, dataset, "sum"), sig, cp, cj, wj, zj)
-        np.testing.assert_allclose(float(mean), float(np.array(none).mean()), atol=1e-5)
-        np.testing.assert_allclose(float(total), float(np.array(none).sum()), atol=1e-5)
-
-
-@requires_gurobi
-class TestTorchJaxParity:
-    """Secondary regression net: jax.grad == torch grad for deterministic losses."""
-
-    @pytest.mark.parametrize("name", DETERMINISTIC_PARITY)
-    def test_grad_matches_torch(self, name, sp_data):
-        import jax
-        import jax.numpy as jnp
-        import torch
-
-        optmodel, dataset, loader = sp_data
-        _x, c, w, z = take_batch(loader)
-        cp_np = (c * 1.2).numpy().astype(np.float32)
-        _kind, jbuild, sig = JAX_LOSS_REGISTRY[name]
-        _tk, tbuild, _ts = LOSS_REGISTRY[name]
-        # torch grad on the same Gurobi model
-        top = tbuild(optmodel, dataset, "mean")
-        cpt = torch.tensor(cp_np, requires_grad=True)
-        out_t = call_op(top, sig, cpt, c, w, z)
-        (out_t if out_t.dim() == 0 else out_t.sum()).backward()
-        g_t = cpt.grad.numpy()
-        # jax grad (Gurobi via callback)
-        jop = jbuild(optmodel, dataset, "mean")
-        cj, cc, ww, zz = jx(torch.as_tensor(cp_np), c, w, z)
-        g_j = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, sig, p, cc, ww, zz)))(cj))
-        np.testing.assert_allclose(g_j, g_t, atol=1e-3)
-
-
-# ============================================================
-# Partial prediction: short predicted cost, full-dimension solution
-# ============================================================
-
-
 def _partial_model():
     """DSL model with 3 predicted-cost vars and 2 fixed-cost vars (num_cost < num_vars)."""
     from pyepo import EPO, dsl
@@ -889,7 +853,7 @@ def _partial_data(n=4):
 
 
 @requires_gurobi
-class TestPartialPredictionJax:
+class TestPartialPredictionParity:
     """`_full_cost` lift parity for partial prediction (num_cost < num_vars).
 
     Every other test uses full prediction, where the lift is a no-op, so a
@@ -945,12 +909,7 @@ class TestPartialPredictionJax:
 
 @requires_gurobi
 def test_full_prediction_lift_includes_offset():
-    """`_full_cost` must add the objective offset even when every var is predicted.
-
-    For ``Minimize((c + d) @ x)`` num_cost == num_vars, so the `c_pred_index`
-    property is None, but `fixed_cost == d` is nonzero. The JAX lift must still
-    add d, matching the torch `_fullCost`.
-    """
+    """`_full_cost` adds the fixed-cost offset when every variable is predicted (c_pred_index is None)."""
     import jax.numpy as jnp
     import torch
 

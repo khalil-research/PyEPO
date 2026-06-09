@@ -25,7 +25,7 @@ except ImportError:
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase
-from pyepo.model.mpax.mpaxmodel import optMpaxModel
+from pyepo.model.mpax.mpaxmodel import _warn_if_not_optimal, optMpaxModel
 
 
 def compileProblem(problem, **params) -> compiledMpaxProblem:
@@ -109,7 +109,8 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
 
     def solve(self):
         # the full (relaxed) decision-variable solution and true objective value
-        sol, obj = self.jitted_solve(self.c)
+        sol, obj, status = self.jitted_solve(self.c)
+        _warn_if_not_optimal(status)
         full_obj = float(obj) if self.modelSense == EPO.MINIMIZE else -float(obj)
         return torch.from_dlpack(sol), full_obj
 

@@ -89,6 +89,10 @@ class TestShortestPathData:
         _, c1 = shortestpath.genData(20, 5, (3, 3), noise_width=0.5, seed=42)
         assert not np.array_equal(c0, c1)
 
+    def test_higher_degree_finite(self):
+        _, c = shortestpath.genData(10, 3, (3, 3), deg=3, seed=42)
+        assert np.all(np.isfinite(c))
+
     @pytest.mark.parametrize("deg", [0, -1, 1.5])
     def test_deg_invalid_raises(self, deg):
         with pytest.raises(ValueError):
@@ -128,6 +132,10 @@ class TestTSPData:
         _, c1 = tsp.genData(20, 3, 5, noise_width=0.5, seed=42)
         assert not np.array_equal(c0, c1)
 
+    def test_higher_degree_finite(self):
+        _, c = tsp.genData(10, 3, 5, deg=3, seed=42)
+        assert np.all(np.isfinite(c))
+
     @pytest.mark.parametrize("deg", [0, -1, 1.5])
     def test_deg_invalid_raises(self, deg):
         with pytest.raises(ValueError):
@@ -157,6 +165,25 @@ class TestPortfolioData:
         np.testing.assert_array_equal(x1, x2)
         np.testing.assert_array_equal(r1, r2)
 
-    def test_deg_invalid_raises(self):
+    def test_different_seeds(self):
+        _, _, r1 = portfolio.genData(10, 3, 4, seed=0)
+        _, _, r2 = portfolio.genData(10, 3, 4, seed=1)
+        assert not np.array_equal(r1, r2)
+
+    def test_revenue_dtype_float32(self):
+        _, _, r = portfolio.genData(10, 3, 4)
+        assert r.dtype == np.float32
+
+    def test_noise_changes_revenue(self):
+        _, _, r0 = portfolio.genData(20, 3, 4, noise_level=0, seed=42)
+        _, _, r1 = portfolio.genData(20, 3, 4, noise_level=2, seed=42)
+        assert not np.array_equal(r0, r1)
+
+    def test_higher_degree_finite(self):
+        _, _, r = portfolio.genData(10, 3, 4, deg=3, seed=42)
+        assert np.all(np.isfinite(r))
+
+    @pytest.mark.parametrize("deg", [0, -1, 1.5])
+    def test_deg_invalid_raises(self, deg):
         with pytest.raises(ValueError):
-            portfolio.genData(10, 3, 4, deg=0)
+            portfolio.genData(10, 3, 4, deg=deg)

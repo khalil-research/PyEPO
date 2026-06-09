@@ -54,8 +54,16 @@ def _scalar_loss_call(name):
     return lambda fn, cp, c, w, z: (call_op(fn, sig, cp, c, w, z) * c).sum(1).mean()
 
 
+# Per-loss forward/backward is gated exhaustively in test_50; the e2e loop only
+# adds the optimizer.step + multi-batch path, which is identical across losses.
+# Sample one loss per mechanism: the three scalar-loss sigs (cp,c,w,z / cp,c /
+# cp,w), the blackbox / perturbed / Frank-Wolfe solution-ops, and one pool loss
+# (NCE) whose cached solution pool grows across batches.
+_E2E_LOSSES = ["SPOPlus", "PG", "PFY", "DBB", "DPO", "RFWO", "NCE"]
+
+
 @requires_gurobi
-@pytest.mark.parametrize("name", list(LOSS_REGISTRY))
+@pytest.mark.parametrize("name", _E2E_LOSSES)
 def test_train_minimize(name, sp_data):
     optmodel, dataset, loader = sp_data
     build = LOSS_REGISTRY[name][1]
