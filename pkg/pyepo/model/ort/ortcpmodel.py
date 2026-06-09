@@ -70,8 +70,8 @@ class optOrtCpModel(optModel):
         if len(c) != self.num_cost:
             raise ValueError("Size of cost vector does not match number of cost variables.")
         c = costToNumpy(c, dtype=np.float64)
-        # scale float to int
-        scaled = (c * self._OBJ_SCALE).astype(np.int64).tolist()
+        # scale float to int (round to match addConstr; truncation biases the objective)
+        scaled = np.round(c * self._OBJ_SCALE).astype(np.int64).tolist()
         # C-level weighted sum avoids Python expression building per var
         obj_expr = cp_model.LinearExpr.weighted_sum(self._vars_list, scaled)
         if self.modelSense == EPO.MAXIMIZE:
