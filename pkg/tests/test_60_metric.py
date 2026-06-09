@@ -184,6 +184,19 @@ class TestCalUnambRegret:
         with pytest.raises(RuntimeError):
             calUnambRegret(m, cost, cost, true_obj, max_iter=0)
 
+    def test_worst_case_includes_offset(self):
+        # tie {[1,0],[0,1]} from full pred [cp+d]=[0,0]; true full [10,5], z*=5, worst=10 -> regret 5
+        from pyepo import EPO, dsl
+
+        x = dsl.Variable(2, vtype=EPO.BINARY)
+        c = dsl.Parameter(2)
+        d = np.array([10.0, 0.0])
+        m = dsl.Problem(dsl.Minimize((c + d) @ x), [x.sum() == 1]).compile(backend="gurobi")
+        loss = calUnambRegret(
+            m, np.array([-10.0, 0.0]), np.array([0.0, 5.0]), true_obj=5.0, tolerance=1.0
+        )
+        assert loss == pytest.approx(5.0)
+
 
 # ============================================================
 # Dataloader-level metrics (untrained predictor -> sane floats)

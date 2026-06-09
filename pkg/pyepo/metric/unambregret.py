@@ -121,7 +121,7 @@ def calUnambRegret(
         raise ValueError("Invalid modelSense.")
     # opt model to find worst case
     try:
-        wst_optmodel.setObj(optmodel._fullCost(-np.asarray(true_cost, dtype=float)))
+        wst_optmodel.setObj(-optmodel._fullCost(np.asarray(true_cost, dtype=float)))
         _, obj = wst_optmodel.solve()
     except Exception as e:  # noqa: BLE001  any solver failure triggers retry
         new_tolerance = tolerance * 10
