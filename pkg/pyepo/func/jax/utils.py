@@ -10,7 +10,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from pyepo import EPO
-from pyepo.func.utils import _solve_batch
+from pyepo.func.utils import _solve_batch_np
 from pyepo.model.mpax import optMpaxModel
 
 try:
@@ -32,17 +32,32 @@ def _check_jit_caching(cost, module):
         ) from None
 
 
-def batch_solve(cost, optmodel, processes=1, pool=None):
+def _solve_or_cache(cost, module):
+    """
+    A function to solve a batch or reuse the solution pool
+    """
+    _check_jit_caching(cost, module)
+    if module._branch_rng.uniform() <= module.solve_ratio:
+        sol, obj = _solve_batch(cost, module.optmodel, module.processes, module.pool)
+        # grow the pool
+        if module.solpool is not None:
+            module.solpool = _update_solution_pool(sol, module.solpool)
+        return sol, obj
+    # reuse the pool
+    return _cache_in_pass(cost, module.optmodel, module.solpool)
+
+
+def _solve_batch(cost, optmodel, processes=1, pool=None):
     """
     A function to solve a batch of costs for the JAX frontend
     """
     # MPAX solves natively; any other backend via pure_callback
     if isinstance(optmodel, optMpaxModel):
-        return _batch_solve_mpax(cost, optmodel)
-    return _batch_solve_callback(cost, optmodel, processes, pool)
+        return _solve_batch_mpax(cost, optmodel)
+    return _solve_batch_callback(cost, optmodel, processes, pool)
 
 
-def _batch_solve_mpax(cost, optmodel):
+def _solve_batch_mpax(cost, optmodel):
     """
     A function to solve natively with MPAX
     """
@@ -56,41 +71,21 @@ def _batch_solve_mpax(cost, optmodel):
     return sol, obj
 
 
-def _batch_solve_callback(cost, optmodel, processes=1, pool=None):
+def _solve_batch_callback(cost, optmodel, processes=1, pool=None):
     """
-    A function to solve via jax.pure_callback over _solve_batch
+    A function to solve via jax.pure_callback over the shared numpy solver
     """
     b, n = cost.shape
 
     def _np_solve(c_np):
         # solve on host
-        sol, obj = _solve_batch(np.asarray(c_np, dtype=np.float32), optmodel, processes, pool)
-        # to numpy
-        return (
-            np.asarray(sol.detach().cpu(), dtype=np.float32),
-            np.asarray(obj.detach().cpu(), dtype=np.float32),
-        )
+        return _solve_batch_np(np.asarray(c_np, dtype=np.float32), optmodel, processes, pool)
 
     out = (
         jax.ShapeDtypeStruct((b, n), jnp.float32),
         jax.ShapeDtypeStruct((b,), jnp.float32),
     )
     return jax.pure_callback(_np_solve, out, cost)
-
-
-def solve_or_cache(cost, module):
-    """
-    A function to solve a batch or reuse the solution pool
-    """
-    _check_jit_caching(cost, module)
-    if module._branch_rng.uniform() <= module.solve_ratio:
-        sol, obj = batch_solve(cost, module.optmodel, module.processes, module.pool)
-        # grow the pool
-        if module.solpool is not None:
-            module.solpool = _update_solution_pool(sol, module.solpool)
-        return sol, obj
-    # reuse the pool
-    return _cache_in_pass(cost, module.optmodel, module.solpool)
 
 
 def _update_solution_pool(sol, solpool):
@@ -121,6 +116,18 @@ def _cache_in_pass(cost, optmodel, solpool):
     return solpool[ind], obj
 
 
+def _grow_solpool(module, pred_cost):
+    """
+    A function to re-solve the predicted cost and grow the module's solution pool
+    """
+    _check_jit_caching(pred_cost, module)
+    if module._branch_rng.uniform() <= module.solve_ratio:
+        sol, _ = _solve_batch(
+            jax.lax.stop_gradient(pred_cost), module.optmodel, module.processes, module.pool
+        )
+        module.solpool = _update_solution_pool(sol, module.solpool)
+
+
 def _full_cost(pred_cost, optmodel):
     """
     A function to lift a predicted cost to the full objective space
@@ -135,13 +142,26 @@ def _full_cost(pred_cost, optmodel):
     return full.at[..., jnp.asarray(prob.c_pred_index)].add(pred_cost)
 
 
-def grow_solpool(module, pred_cost):
+def _mask_pred(noises, optmodel):
     """
-    A function to re-solve the predicted cost and grow the module's solution pool
+    A function to zero the perturbation outside the predicted cost positions
+
+    No-op when every variable is predicted (c_pred_index is None); under partial
+    prediction the known fixed costs are left unperturbed.
     """
-    _check_jit_caching(pred_cost, module)
-    if module._branch_rng.uniform() <= module.solve_ratio:
-        sol, _ = batch_solve(
-            jax.lax.stop_gradient(pred_cost), module.optmodel, module.processes, module.pool
-        )
-        module.solpool = _update_solution_pool(sol, module.solpool)
+    idx = optmodel.c_pred_index
+    if idx is None:
+        return noises
+    mask = jnp.zeros(noises.shape[-1], dtype=noises.dtype).at[jnp.asarray(idx)].set(1.0)
+    return noises * mask
+
+
+def _sum_gamma_sample(key, kappa, n_iterations, shape):
+    """
+    A function to sample Sum-of-Gamma perturbation noise
+    """
+    keys = jax.random.split(key, n_iterations)
+    s = jnp.zeros(shape, dtype=jnp.float32)
+    for i in range(1, n_iterations + 1):
+        s = s + (kappa / i) * jax.random.gamma(keys[i - 1], 1.0 / kappa, shape=shape)
+    return (s - jnp.log(n_iterations)) / kappa

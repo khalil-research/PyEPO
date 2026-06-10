@@ -56,36 +56,42 @@ class optModule(ABC):
         if optmodel.modelSense not in (EPO.MINIMIZE, EPO.MAXIMIZE):
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
         self.optmodel = optmodel
-        # MPAX is GPU-batched; force single-core
+        # force processes to 1 for MPAX
         if isinstance(optmodel, optMpaxModel) and processes > 1:
             logger.warning("MPAX does not support multiprocessing. Setting `processes = 1`.")
             processes = 1
+        # number of processes
         if processes < 0 or processes > mp.cpu_count():
             raise ValueError(f"Invalid processors number {processes}, only {mp.cpu_count()} cores.")
         self.processes = mp.cpu_count() if processes == 0 else processes
-        # worker pool for parallel solves (each worker builds its own optmodel once)
+        # single-core
         if self.processes == 1:
             self.pool = None
+        # multi-core: each worker builds its own optmodel once via the initializer
         else:
             self.pool = ProcessingPool(
                 self.processes,
                 initializer=_init_worker_model,
                 initargs=(type(optmodel), getArgs(optmodel)),
             )
+            # release worker processes when this module is garbage-collected
             weakref.finalize(self, _close_pool, self.pool)
-        # solution-pool caching: the branch RNG decides solve-vs-cache each pass
-        if not (0 <= solve_ratio <= 1):
-            raise ValueError(f"Invalid solving ratio {solve_ratio}. It should be between 0 and 1.")
+        logger.info("Num of cores: %d", self.processes)
+        # solution pool
         self.solve_ratio = solve_ratio
-        self._branch_rng = np.random.RandomState(seed)
-        # solution pool: seeded when caching or a pool loss needs it; grows in solve_or_cache
+        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
+            raise ValueError(
+                f"Invalid solving ratio {self.solve_ratio}. It should be between 0 and 1."
+            )
         self.solpool = None
-        if self.solve_ratio < 1 or require_solpool:
+        if self.solve_ratio < 1 or require_solpool:  # init solution pool
             from pyepo.data.dataset import optDataset
 
-            if not isinstance(dataset, optDataset):
+            if not isinstance(dataset, optDataset):  # type checking
                 raise TypeError("dataset is not an optDataset")
             self.solpool = jnp.unique(jnp.asarray(dataset.sols), axis=0)
+        # per-instance RNG for the solve-vs-cache branch
+        self._branch_rng = np.random.RandomState(seed)
         # reduction
         if reduction not in ("mean", "sum", "none"):
             raise ValueError(f"No reduction '{reduction}'.")

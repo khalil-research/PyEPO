@@ -18,8 +18,8 @@ from pyepo.func.jax.utils import (
     _cache_in_pass,
     _check_jit_caching,
     _full_cost,
+    _solve_batch,
     _update_solution_pool,
-    batch_solve,
 )
 
 
@@ -37,12 +37,12 @@ def _linear_minimization_oracle(cost, module, use_cache):
     if use_cache:
         sol, _ = _cache_in_pass(cost, module.optmodel, module.solpool)
     else:
-        sol, _ = batch_solve(cost, module.optmodel, module.processes, module.pool)
+        sol, _ = _solve_batch(cost, module.optmodel, module.processes, module.pool)
     return sol
 
 
 def _grow_pool_from_active(module, vertices, weights):
-    # append the FW support vertices to the pool (eager, like grow_solpool)
+    # append the FW support vertices to the pool (host-side side effect, eager only)
     if module.solpool is None:
         return
     rows = np.asarray(vertices)[np.asarray(weights) > 0]
@@ -50,7 +50,7 @@ def _grow_pool_from_active(module, vertices, weights):
         module.solpool = _update_solution_pool(jnp.asarray(rows), module.solpool)
 
 
-def _frank_wolfe_active(theta, module, use_cache=False):
+def _away_step_frank_wolfe(theta, module, use_cache=False):
     """
     Batched away-step Frank-Wolfe with active-set tracking (lax.while_loop);
     returns (mu, vertices, weights).
@@ -183,13 +183,13 @@ class regularizedFrankWolfeOpt(optModule):
 @partial(jax.custom_vjp, nondiff_argnums=(1, 2))
 def _regularized_frank_wolfe_opt(pred_cost, module, use_cache):
     scale = _sense_sign(module.optmodel) / module.lambd
-    mu, _, _ = _frank_wolfe_active(scale * pred_cost, module, use_cache)
+    mu, _, _ = _away_step_frank_wolfe(scale * pred_cost, module, use_cache)
     return mu
 
 
 def _regularized_frank_wolfe_opt_fwd(pred_cost, module, use_cache):
     scale = _sense_sign(module.optmodel) / module.lambd
-    mu, vertices, weights = _frank_wolfe_active(scale * pred_cost, module, use_cache)
+    mu, vertices, weights = _away_step_frank_wolfe(scale * pred_cost, module, use_cache)
     # exact pass refreshes the pool; cached pass leaves it untouched
     if not use_cache:
         _grow_pool_from_active(module, vertices, weights)
@@ -281,11 +281,11 @@ def _regularized_frank_wolfe_fy_value_and_grad(pred_cost, true_sol, module, use_
     # stop the gradient into the solver; the loss gradient is the Danskin residual
     if module.optmodel.modelSense == EPO.MINIMIZE:
         theta = jax.lax.stop_gradient(-pred_cost / module.lambd)
-        r_sol, vertices, weights = _frank_wolfe_active(theta, module, use_cache)
+        r_sol, vertices, weights = _away_step_frank_wolfe(theta, module, use_cache)
         diff = true_sol - r_sol
     else:
         theta = jax.lax.stop_gradient(pred_cost / module.lambd)
-        r_sol, vertices, weights = _frank_wolfe_active(theta, module, use_cache)
+        r_sol, vertices, weights = _away_step_frank_wolfe(theta, module, use_cache)
         diff = r_sol - true_sol
     omega_w = 0.5 * module.lambd * jnp.sum(true_sol**2, axis=-1)
     omega_r = 0.5 * module.lambd * jnp.sum(r_sol**2, axis=-1)

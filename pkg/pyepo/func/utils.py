@@ -84,8 +84,6 @@ def _solve_batch(
     """
     # get device
     device = cp.device if isinstance(cp, torch.Tensor) else torch.device("cpu")
-    # number of instance
-    ins_num = len(cp)
     # MPAX batch solving
     if isinstance(optmodel, optMpaxModel):
         # get params
@@ -114,26 +112,40 @@ def _solve_batch(
             obj = -obj
         else:
             raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+    # host solving on numpy costs
+    else:
+        sol_np, obj_np = _solve_batch_np(costToNumpy(cp), optmodel, processes, pool)
+        sol = torch.as_tensor(sol_np).to(device)
+        obj = torch.as_tensor(obj_np).to(device)
+    return sol, obj
+
+
+def _solve_batch_np(
+    cp: np.ndarray,
+    optmodel: optModel,
+    processes: int,
+    pool,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    A function to solve a batch of numpy costs on the host, shared by both frontends
+    """
     # single-core
-    elif processes == 1:
-        cp = costToNumpy(cp)
+    if processes == 1:
         sol_list: list = []
         obj_list: list = []
-        for i in range(ins_num):
+        for i in range(len(cp)):
             optmodel.setObj(cp[i])
             solp, objp = optmodel.solve()
             sol_list.append(solp)
             obj_list.append(objp)
         # stack + dtype convert in a single call
-        sol = torch.as_tensor(np.asarray(sol_list, dtype=np.float32)).to(device)
-        obj = torch.tensor(obj_list, dtype=torch.float32, device=device)
+        sol = np.asarray(sol_list, dtype=np.float32)
+        obj = np.asarray(obj_list, dtype=np.float32)
     # multi-core (workers pre-loaded with optmodel via pool initializer)
     else:
-        cp = costToNumpy(cp)
         res = pool.amap(_solveWithObj4Par, cp).get()
-        # get res
-        sol = torch.as_tensor(np.stack([r[0] for r in res]), dtype=torch.float32).to(device)
-        obj = torch.tensor([r[1] for r in res], dtype=torch.float32, device=device)
+        sol = np.stack([r[0] for r in res]).astype(np.float32)
+        obj = np.asarray([r[1] for r in res], dtype=np.float32)
     return sol, obj
 
 

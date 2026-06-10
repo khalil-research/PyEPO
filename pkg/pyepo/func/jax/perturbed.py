@@ -12,40 +12,120 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.utils import _full_cost, solve_or_cache
+from pyepo.func.jax.utils import _full_cost, _mask_pred, _solve_or_cache, _sum_gamma_sample
 from pyepo.utils import _EPS
 
 
-def solve_or_cache_3d(ptb_c, module):
+class perturbedOpt(optModule):
     """
-    A function to solve perturbed 3D costs (batch, n_samples, vars) with caching
+    Differentiable Perturbed Optimizer (DPO) -- additive-Gaussian variant.
+
+    Estimates the expected solution
+    :math:`\\mathbb{E}_{\\boldsymbol{\\xi}}[\\mathbf{w}^*(\\hat{\\mathbf{c}} +
+    \\sigma\\boldsymbol{\\xi})]` by Monte Carlo averaging, giving an
+    informative gradient where the bare solver gives zero. Returns a solution;
+    pair with a task loss.
+
+    Reference: Berthet et al. (2020)
+    `<https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>`_
     """
-    b, n, d = ptb_c.shape
-    sol, _ = solve_or_cache(ptb_c.reshape(-1, d), module)
-    return sol.reshape(b, n, d)
+
+    _multiplicative = False
+
+    def __init__(
+        self,
+        optmodel,
+        n_samples=10,
+        sigma=1.0,
+        processes=1,
+        seed=135,
+        variance_reduction=True,
+        solve_ratio=1.0,
+        dataset=None,
+    ):
+        """
+        Args:
+            optmodel: a PyEPO optimization model
+            n_samples: number of Monte Carlo perturbation samples per instance
+            sigma: perturbation amplitude (Gaussian standard deviation)
+            processes: number of solver processes (1 = single-core, 0 = all cores)
+            seed: random seed for the perturbation generator
+            variance_reduction: apply a leave-one-out baseline in the backward estimator
+            solve_ratio: fraction of instances solved exactly each step
+            dataset: training dataset used to seed the solution pool when solve_ratio < 1
+        """
+        super().__init__(optmodel, processes, solve_ratio, dataset=dataset, seed=seed)
+        self.n_samples = n_samples
+        self.sigma = float(sigma)
+        self.variance_reduction = variance_reduction
+        self._key = jax.random.PRNGKey(seed)
+
+    def forward(self, pred_cost, key=None):
+        """
+        Forward pass
+        """
+        # lift to the full objective space
+        pred_cost = _full_cost(pred_cost, self.optmodel)
+        # explicit key -> jittable; None -> eager, advance the instance key
+        if key is None:
+            self._key, key = jax.random.split(self._key)
+        noises = jax.random.normal(
+            key, (pred_cost.shape[0], self.n_samples, pred_cost.shape[1]), dtype=pred_cost.dtype
+        )
+        # keep fixed costs unperturbed
+        noises = _mask_pred(noises, self.optmodel)
+        return _perturbed_opt(
+            pred_cost, noises, self, self.sigma, self.variance_reduction, self._multiplicative
+        )
 
 
-def _perturb(pred_cost, noises, sigma, multiplicative):
-    """
-    A function to perturb the cost additively or multiplicatively
-    """
+@partial(jax.custom_vjp, nondiff_argnums=(2, 3, 4, 5))
+def _perturbed_opt(pred_cost, noises, module, sigma, variance_reduction, multiplicative):
+    e_sol, _ = _perturbed_opt_core(pred_cost, noises, module, sigma, multiplicative)
+    return e_sol
+
+
+def _perturbed_opt_core(pred_cost, noises, module, sigma, multiplicative):
+    ptb_c = _perturb(pred_cost, noises, sigma, multiplicative)
+    ptb_sols = _solve_or_cache_3d(ptb_c, module)
+    return ptb_sols.mean(axis=1), ptb_sols
+
+
+def _perturbed_opt_fwd(pred_cost, noises, module, sigma, variance_reduction, multiplicative):
+    e_sol, ptb_sols = _perturbed_opt_core(pred_cost, noises, module, sigma, multiplicative)
+    return e_sol, (pred_cost, ptb_sols, noises)
+
+
+def _perturbed_opt_bwd(module, sigma, variance_reduction, multiplicative, res, g):
+    pred_cost, ptb_sols, noises = res
+    n = noises.shape[1]
+    # reward-weighted estimator
+    reward = jnp.einsum("bnd,bd->bn", ptb_sols, g)
+    if variance_reduction and n > 1:
+        reward = (reward - reward.mean(axis=1, keepdims=True)) * (n / (n - 1))
     if multiplicative:
-        return pred_cost[:, None, :] * jnp.exp(sigma * noises - 0.5 * sigma**2)
-    return pred_cost[:, None, :] + sigma * noises
+        denom = sigma * pred_cost
+        denom_safe = jnp.where(jnp.abs(denom) < _EPS, jnp.where(denom >= 0, _EPS, -_EPS), denom)
+        grad = jnp.einsum("bnd,bn->bd", noises, reward) / (n * denom_safe)
+    else:
+        grad = jnp.einsum("bnd,bn->bd", noises, reward) / (n * sigma + _EPS)
+    return (grad, jnp.zeros_like(noises))
 
 
-def _mask_pred(noises, optmodel):
+_perturbed_opt.defvjp(_perturbed_opt_fwd, _perturbed_opt_bwd)
+
+
+class perturbedOptMul(perturbedOpt):
     """
-    A function to zero the perturbation outside the predicted cost positions
+    Differentiable Perturbed Optimizer (DPO) -- multiplicative log-normal variant.
 
-    No-op when every variable is predicted (c_pred_index is None); under partial
-    prediction the known fixed costs are left unperturbed.
+    As :class:`perturbedOpt`, but perturbs the cost multiplicatively with
+    log-normal noise :math:`\\exp(\\sigma\\boldsymbol{\\xi} - \\sigma^2/2)`.
+
+    Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
     """
-    idx = optmodel.c_pred_index
-    if idx is None:
-        return noises
-    mask = jnp.zeros(noises.shape[-1], dtype=noises.dtype).at[jnp.asarray(idx)].set(1.0)
-    return noises * mask
+
+    _multiplicative = True
 
 
 class perturbedFenchelYoung(optModule):
@@ -124,7 +204,7 @@ def _perturbed_fenchel_young_value_and_grad(
 ):
     # perturb and solve
     ptb_c = _perturb(pred_cost, noises, sigma, multiplicative)
-    ptb_sols = solve_or_cache_3d(ptb_c, module)
+    ptb_sols = _solve_or_cache_3d(ptb_c, module)
     # expected solution
     if multiplicative:
         factor = jnp.exp(sigma * noises - 0.5 * sigma**2)
@@ -169,129 +249,6 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
     """
 
     _multiplicative = True
-
-
-class perturbedOpt(optModule):
-    """
-    Differentiable Perturbed Optimizer (DPO) -- additive-Gaussian variant.
-
-    Estimates the expected solution
-    :math:`\\mathbb{E}_{\\boldsymbol{\\xi}}[\\mathbf{w}^*(\\hat{\\mathbf{c}} +
-    \\sigma\\boldsymbol{\\xi})]` by Monte Carlo averaging, giving an
-    informative gradient where the bare solver gives zero. Returns a solution;
-    pair with a task loss.
-
-    Reference: Berthet et al. (2020)
-    `<https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>`_
-    """
-
-    _multiplicative = False
-
-    def __init__(
-        self,
-        optmodel,
-        n_samples=10,
-        sigma=1.0,
-        processes=1,
-        seed=135,
-        variance_reduction=True,
-        solve_ratio=1.0,
-        dataset=None,
-    ):
-        """
-        Args:
-            optmodel: a PyEPO optimization model
-            n_samples: number of Monte Carlo perturbation samples per instance
-            sigma: perturbation amplitude (Gaussian standard deviation)
-            processes: number of solver processes (1 = single-core, 0 = all cores)
-            seed: random seed for the perturbation generator
-            variance_reduction: apply a leave-one-out baseline in the backward estimator
-            solve_ratio: fraction of instances solved exactly each step
-            dataset: training dataset used to seed the solution pool when solve_ratio < 1
-        """
-        super().__init__(optmodel, processes, solve_ratio, dataset=dataset, seed=seed)
-        self.n_samples = n_samples
-        self.sigma = float(sigma)
-        self.variance_reduction = variance_reduction
-        self._key = jax.random.PRNGKey(seed)
-
-    def forward(self, pred_cost, key=None):
-        """
-        Forward pass
-        """
-        # lift to the full objective space
-        pred_cost = _full_cost(pred_cost, self.optmodel)
-        # explicit key -> jittable; None -> eager, advance the instance key
-        if key is None:
-            self._key, key = jax.random.split(self._key)
-        noises = jax.random.normal(
-            key, (pred_cost.shape[0], self.n_samples, pred_cost.shape[1]), dtype=pred_cost.dtype
-        )
-        # keep fixed costs unperturbed
-        noises = _mask_pred(noises, self.optmodel)
-        return _perturbed_opt(
-            pred_cost, noises, self, self.sigma, self.variance_reduction, self._multiplicative
-        )
-
-
-@partial(jax.custom_vjp, nondiff_argnums=(2, 3, 4, 5))
-def _perturbed_opt(pred_cost, noises, module, sigma, variance_reduction, multiplicative):
-    e_sol, _ = _perturbed_opt_core(pred_cost, noises, module, sigma, multiplicative)
-    return e_sol
-
-
-def _perturbed_opt_core(pred_cost, noises, module, sigma, multiplicative):
-    ptb_c = _perturb(pred_cost, noises, sigma, multiplicative)
-    ptb_sols = solve_or_cache_3d(ptb_c, module)
-    return ptb_sols.mean(axis=1), ptb_sols
-
-
-def _perturbed_opt_fwd(pred_cost, noises, module, sigma, variance_reduction, multiplicative):
-    e_sol, ptb_sols = _perturbed_opt_core(pred_cost, noises, module, sigma, multiplicative)
-    return e_sol, (pred_cost, ptb_sols, noises)
-
-
-def _perturbed_opt_bwd(module, sigma, variance_reduction, multiplicative, res, g):
-    pred_cost, ptb_sols, noises = res
-    n = noises.shape[1]
-    # reward-weighted estimator
-    reward = jnp.einsum("bnd,bd->bn", ptb_sols, g)
-    if variance_reduction and n > 1:
-        reward = (reward - reward.mean(axis=1, keepdims=True)) * (n / (n - 1))
-    if multiplicative:
-        denom = sigma * pred_cost
-        denom_safe = jnp.where(jnp.abs(denom) < _EPS, jnp.where(denom >= 0, _EPS, -_EPS), denom)
-        grad = jnp.einsum("bnd,bn->bd", noises, reward) / (n * denom_safe)
-    else:
-        grad = jnp.einsum("bnd,bn->bd", noises, reward) / (n * sigma + _EPS)
-    return (grad, jnp.zeros_like(noises))
-
-
-_perturbed_opt.defvjp(_perturbed_opt_fwd, _perturbed_opt_bwd)
-
-
-class perturbedOptMul(perturbedOpt):
-    """
-    Differentiable Perturbed Optimizer (DPO) -- multiplicative log-normal variant.
-
-    As :class:`perturbedOpt`, but perturbs the cost multiplicatively with
-    log-normal noise :math:`\\exp(\\sigma\\boldsymbol{\\xi} - \\sigma^2/2)`.
-
-    Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
-    """
-
-    _multiplicative = True
-
-
-def _sum_gamma_sample(key, kappa, n_iterations, shape):
-    """
-    A function to sample Sum-of-Gamma perturbation noise
-    """
-    keys = jax.random.split(key, n_iterations)
-    s = jnp.zeros(shape, dtype=jnp.float32)
-    for i in range(1, n_iterations + 1):
-        s = s + (kappa / i) * jax.random.gamma(keys[i - 1], 1.0 / kappa, shape=shape)
-    return (s - jnp.log(n_iterations)) / kappa
 
 
 class implicitMLE(optModule):
@@ -375,7 +332,7 @@ def _implicit_mle(pred_cost, noises, module, sigma, lambd, two_sides):
 
 def _implicit_mle_core(pred_cost, noises, module, sigma):
     ptb_c = pred_cost[:, None, :] + sigma * noises
-    ptb_sols = solve_or_cache_3d(ptb_c, module)
+    ptb_sols = _solve_or_cache_3d(ptb_c, module)
     return ptb_sols.mean(axis=1), (ptb_c, ptb_sols)
 
 
@@ -391,10 +348,10 @@ def _implicit_mle_bwd(module, sigma, lambd, two_sides, res, g):
     if two_sides:
         # batch +delta and -delta into one solve
         n = noises.shape[1]
-        both = solve_or_cache_3d(jnp.concatenate([ptb_c + delta, ptb_c - delta], axis=1), module)
+        both = _solve_or_cache_3d(jnp.concatenate([ptb_c + delta, ptb_c - delta], axis=1), module)
         grad = (both[:, :n] - both[:, n:]).mean(axis=1) / (2 * lambd + _EPS)
     else:
-        grad = (solve_or_cache_3d(ptb_c + delta, module) - ptb_sols).mean(axis=1) / (lambd + _EPS)
+        grad = (_solve_or_cache_3d(ptb_c + delta, module) - ptb_sols).mean(axis=1) / (lambd + _EPS)
     return (grad, jnp.zeros_like(noises))
 
 
@@ -493,10 +450,10 @@ def _adaptive_implicit_mle_bwd(module, res, g):
     if module.two_sides:
         # batch +delta and -delta into one solve
         n = noises.shape[1]
-        both = solve_or_cache_3d(jnp.concatenate([ptb_c + delta, ptb_c - delta], axis=1), module)
+        both = _solve_or_cache_3d(jnp.concatenate([ptb_c + delta, ptb_c - delta], axis=1), module)
         grad = (both[:, :n] - both[:, n:]).mean(axis=1) / (2 * lambd + _EPS)
     else:
-        grad = (solve_or_cache_3d(ptb_c + delta, module) - ptb_sols).mean(axis=1) / (lambd + _EPS)
+        grad = (_solve_or_cache_3d(ptb_c + delta, module) - ptb_sols).mean(axis=1) / (lambd + _EPS)
     # online alpha update
     grad_norm = float((jnp.abs(grad) > _EPS).mean())
     module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm
@@ -509,6 +466,24 @@ def _adaptive_implicit_mle_bwd(module, res, g):
 
 
 _adaptive_implicit_mle.defvjp(_adaptive_implicit_mle_fwd, _adaptive_implicit_mle_bwd)
+
+
+def _solve_or_cache_3d(ptb_c, module):
+    """
+    A function to solve perturbed 3D costs (batch, n_samples, vars) with caching
+    """
+    b, n, d = ptb_c.shape
+    sol, _ = _solve_or_cache(ptb_c.reshape(-1, d), module)
+    return sol.reshape(b, n, d)
+
+
+def _perturb(pred_cost, noises, sigma, multiplicative):
+    """
+    A function to perturb the cost additively or multiplicatively
+    """
+    if multiplicative:
+        return pred_cost[:, None, :] * jnp.exp(sigma * noises - 0.5 * sigma**2)
+    return pred_cost[:, None, :] + sigma * noises
 
 
 # acronym aliases

@@ -9,7 +9,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.utils import _full_cost, grow_solpool
+from pyepo.func.jax.utils import _full_cost, _grow_solpool
 
 
 class noiseContrastiveEstimation(optModule):
@@ -40,7 +40,7 @@ class noiseContrastiveEstimation(optModule):
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
         # solve and update pool
-        grow_solpool(self, pred_cost)
+        _grow_solpool(self, pred_cost)
         # current obj and pool obj
         obj_cp = jnp.einsum("bd,bd->b", pred_cost, true_sol)[:, None]
         objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, self.solpool)
@@ -80,7 +80,7 @@ class contrastiveMAP(optModule):
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
         # solve and update pool
-        grow_solpool(self, pred_cost)
+        _grow_solpool(self, pred_cost)
         # current obj and pool obj
         obj_cp = jnp.einsum("bd,bd->b", pred_cost, true_sol)[:, None]
         objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, self.solpool)

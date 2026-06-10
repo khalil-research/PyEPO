@@ -11,10 +11,10 @@ try:
 except ImportError:
     _HAS_JAX = False
 
-# public name -> submodule that defines it (full names and acronym aliases)
+# public name -> submodule that defines it (each pair is full name, acronym)
 _EXPORTS = {
-    "SPOPlus": "surrogate",
     "smartPredictThenOptimizePlus": "surrogate",
+    "SPOPlus": "surrogate",
     "perturbationGradient": "surrogate",
     "PG": "surrogate",
     "blackboxOpt": "blackbox",
@@ -37,18 +37,18 @@ _EXPORTS = {
     "RFWO": "regularized",
     "regularizedFrankWolfeFenchelYoung": "regularized",
     "RFY": "regularized",
-    "listwiseLearningToRank": "rank",
-    "lsLTR": "rank",
-    "pairwiseLearningToRank": "rank",
-    "prLTR": "rank",
-    "pointwiseLearningToRank": "rank",
-    "ptLTR": "rank",
     "noiseContrastiveEstimation": "contrastive",
     "NCE": "contrastive",
     "contrastiveMAP": "contrastive",
     "CMAP": "contrastive",
     "coneAlignedCosine": "cave",
     "CaVE": "cave",
+    "listwiseLearningToRank": "rank",
+    "lsLTR": "rank",
+    "pairwiseLearningToRank": "rank",
+    "prLTR": "rank",
+    "pointwiseLearningToRank": "rank",
+    "ptLTR": "rank",
 }
 
 __all__ = list(_EXPORTS)

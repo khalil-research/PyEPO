@@ -66,7 +66,7 @@ class coneAlignedCosine(optModule):
         sc = jax.lax.stop_gradient(signed_cost)
         # per-batch coin flip: QP projection or cheap heuristic
         if self._branch_rng.uniform() <= self.solve_ratio:
-            proj = _clarabel_project(sc, tight_ctrs, self.max_iter, self.pool)
+            proj = _clarabel_project_batch(sc, tight_ctrs, self.max_iter, self.pool)
         else:
             # blend normalized pred with the average binding-constraint normal
             pred_n = sc / jnp.maximum(jnp.linalg.norm(sc, axis=1, keepdims=True), 1e-8)
@@ -81,9 +81,7 @@ class coneAlignedCosine(optModule):
 
 
 def _average_ctrs(tight_ctrs):
-    """
-    A function to average the unit-normalized binding-constraint normals per instance
-    """
+    """Per-instance average of unit-normalized binding-constraint normals (zero-padded rows skipped)."""
     norms = jnp.linalg.norm(tight_ctrs, axis=2, keepdims=True)
     valid = (norms > 1e-7).astype(tight_ctrs.dtype)
     # unit-normalize valid rows, then average over them
@@ -92,8 +90,10 @@ def _average_ctrs(tight_ctrs):
     return unit.sum(axis=1) / n_valid
 
 
-def _clarabel_project(signed_cost, tight_ctrs, max_iter, pool=None):
-    """Project each instance's signed cost onto its tight-constraint cone via Clarabel."""
+def _clarabel_project_batch(signed_cost, tight_ctrs, max_iter, pool=None):
+    """
+    A function to project each instance's signed cost onto its tight-constraint cone via Clarabel
+    """
     b, n = signed_cost.shape
 
     def _np_proj(sc, ct):

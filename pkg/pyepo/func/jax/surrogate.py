@@ -12,7 +12,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.utils import _full_cost, solve_or_cache
+from pyepo.func.jax.utils import _full_cost, _solve_or_cache
 from pyepo.utils import _EPS
 
 
@@ -60,7 +60,7 @@ def _spoplus(pred_cost, true_cost, true_sol, true_obj, module):
 
 def _spoplus_value_and_grad(pred_cost, true_cost, true_sol, true_obj, module):
     # solve the perturbed problem
-    sol, obj = solve_or_cache(2.0 * pred_cost - true_cost, module)
+    sol, obj = _solve_or_cache(2.0 * pred_cost - true_cost, module)
     z = jnp.squeeze(true_obj, axis=-1) if true_obj.ndim > 1 else true_obj
     inner = 2.0 * jnp.einsum("bi,bi->b", pred_cost, true_sol)
     # loss and subgradient
@@ -142,7 +142,7 @@ class perturbationGradient(optModule):
         b = cp.shape[0]
         if self.two_sides:
             # batch +sigma and -sigma into one solve
-            combined, _ = solve_or_cache(
+            combined, _ = _solve_or_cache(
                 jnp.concatenate([cp + self.sigma * true_cost, cp - self.sigma * true_cost], axis=0),
                 self,
             )
@@ -152,7 +152,7 @@ class perturbationGradient(optModule):
             loss = sign * (obj_plus - obj_minus) / (2 * self.sigma + _EPS)
         else:
             # batch clean and -sigma into one solve
-            combined, _ = solve_or_cache(
+            combined, _ = _solve_or_cache(
                 jnp.concatenate([cp, cp - self.sigma * true_cost], axis=0), self
             )
             w, wm = jax.lax.stop_gradient(combined[:b]), jax.lax.stop_gradient(combined[b:])

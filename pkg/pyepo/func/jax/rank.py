@@ -10,7 +10,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.utils import _full_cost, grow_solpool
+from pyepo.func.jax.utils import _full_cost, _grow_solpool
 
 
 class listwiseLearningToRank(optModule):
@@ -44,7 +44,7 @@ class listwiseLearningToRank(optModule):
         pred_cost = _full_cost(pred_cost, self.optmodel)
         true_cost = _full_cost(true_cost, self.optmodel)
         # solve and update pool
-        grow_solpool(self, pred_cost)
+        _grow_solpool(self, pred_cost)
         # obj for solpool
         objpool_c = true_cost @ self.solpool.T
         objpool_cp = pred_cost @ self.solpool.T
@@ -92,7 +92,7 @@ class pairwiseLearningToRank(optModule):
         pred_cost = _full_cost(pred_cost, self.optmodel)
         true_cost = _full_cost(true_cost, self.optmodel)
         # solve and update pool
-        grow_solpool(self, pred_cost)
+        _grow_solpool(self, pred_cost)
         # obj for solpool
         objpool_c = true_cost @ self.solpool.T
         objpool_cp = pred_cost @ self.solpool.T
@@ -142,7 +142,7 @@ class pointwiseLearningToRank(optModule):
         pred_cost = _full_cost(pred_cost, self.optmodel)
         true_cost = _full_cost(true_cost, self.optmodel)
         # solve and update pool
-        grow_solpool(self, pred_cost)
+        _grow_solpool(self, pred_cost)
         # squared loss over the pool
         loss = (((true_cost - pred_cost) @ self.solpool.T) ** 2).mean(axis=1)
         return self._reduce(loss)
