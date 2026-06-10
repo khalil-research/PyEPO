@@ -26,18 +26,12 @@ from .conftest import (
     requires_gurobi,
     requires_mpax,
     requires_ortools,
+    to_np,
 )
 
 # omo models here always use solver="gurobi", so they need both backends
 requires_omo = pytest.mark.skipif(
     not (_HAS_PYOMO and _HAS_GUROBI), reason="Pyomo or Gurobi not installed")
-
-
-def _to_np(sol):
-    """MPAX returns a torch.Tensor (possibly CUDA); normalize to CPU numpy."""
-    if hasattr(sol, "cpu"):
-        return sol.cpu().numpy()
-    return np.asarray(sol)
 
 
 # ============================================================
@@ -111,7 +105,7 @@ class TestKnapsack:
         m, meta = _make_knapsack(backend)
         m.setObj(_KNAP_COST)
         sol, obj = m.solve()
-        sol = _to_np(sol)
+        sol = to_np(sol)
         assert len(sol) == m.num_cost
         assert isinstance(obj, float)
         # feasible: weights @ sol <= capacity
@@ -192,7 +186,7 @@ def test_knapsack_multidimensional(backend):
     assert m.num_cost == 3
     m.setObj(np.array([5.0, 4.0, 3.0]))
     sol, _ = m.solve()
-    sol = _to_np(sol)
+    sol = to_np(sol)
     # feasible against both dimensions
     assert np.all(w @ sol <= cap + 1e-6)
 
@@ -247,7 +241,7 @@ class TestShortestPath:
         cost = np.random.RandomState(42).rand(m.num_cost)
         m.setObj(cost)
         sol, obj = m.solve()
-        sol = _to_np(sol)
+        sol = to_np(sol)
         assert len(sol) == m.num_cost
         assert isinstance(obj, float)
         assert obj > 0
@@ -342,7 +336,7 @@ class TestPortfolio:
         m = _make_portfolio(backend, cov)
         m.setObj(revenue[0])
         sol, obj = m.solve()
-        sol = _to_np(sol)
+        sol = to_np(sol)
         assert len(sol) == m.num_cost
         assert isinstance(obj, float)
         # budget: weights sum to 1
@@ -741,14 +735,14 @@ class TestMpaxQP:
         # c = -Q_diag => x* = [1,1,1,1], obj* = 0.5·sum(Q) - sum(Q) = -10
         model.setObj(np.array([-2.0, -4.0, -6.0, -8.0]))
         sol, obj = model.solve()
-        np.testing.assert_allclose(_to_np(sol), [1.0, 1.0, 1.0, 1.0], atol=1e-2)
+        np.testing.assert_allclose(to_np(sol), [1.0, 1.0, 1.0, 1.0], atol=1e-2)
         np.testing.assert_allclose(obj, -10.0, atol=1e-2)
 
     def test_qp_batch_optimize(self, model):
         C = jnp.array([[-2.0, -4.0, -6.0, -8.0], [-1.0, -2.0, -3.0, -4.0]], dtype=jnp.float32)
         X, _objs, _status = model.batch_optimize(C)
-        np.testing.assert_allclose(_to_np(X[0]), [1.0, 1.0, 1.0, 1.0], atol=1e-2)
-        np.testing.assert_allclose(_to_np(X[1]), [0.5, 0.5, 0.5, 0.5], atol=1e-2)
+        np.testing.assert_allclose(to_np(X[0]), [1.0, 1.0, 1.0, 1.0], atol=1e-2)
+        np.testing.assert_allclose(to_np(X[1]), [0.5, 0.5, 0.5, 0.5], atol=1e-2)
 
     def test_qp_addConstr_preserves_Q(self, model):
         model.setObj(np.array([-2.0, -4.0, -6.0, -8.0]))
@@ -760,7 +754,7 @@ class TestMpaxQP:
         # PyEPO convention is coefs·x <= rhs: the solution must respect it.
         # (Replaces the old flaky exact-match-vs-Gurobi assertion; checking the
         # constraint directly is robust to PDHG's first-order tolerance.)
-        assert np.sum(_to_np(sol)) <= 2.0 + 1e-2
+        assert np.sum(to_np(sol)) <= 2.0 + 1e-2
         assert obj1 > obj0 - 1e-3  # MINIMIZE: binding constraint worsens objective
 
     def test_qp_rejects_maximize(self):

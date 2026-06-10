@@ -31,7 +31,7 @@ from pyepo.func.utils import (
 )
 
 from .conftest import (
-    FD_TRUTH,
+    FD_LOSSES,
     LOSS_OPS,
     LOSS_REGISTRY,
     SOLUTION_OPS,
@@ -39,6 +39,8 @@ from .conftest import (
     finite_diff_grad,
     requires_clarabel,
     requires_gurobi,
+    requires_jax,
+    solver_atol,
     take_batch,
 )
 
@@ -231,8 +233,18 @@ class TestForwardBackwardContract:
 
 
 # ============================================================
-# torch: optModule init validation
+# both: optModule init validation (torch & jax frontends)
 # ============================================================
+
+
+@pytest.fixture(params=[pytest.param("torch"), pytest.param("jax", marks=requires_jax)])
+def func_frontend(request):
+    """The pyepo.func / pyepo.func.jax module; init validation is identical."""
+    if request.param == "torch":
+        import pyepo.func as mod
+    else:
+        import pyepo.func.jax as mod
+    return mod
 
 
 @requires_gurobi
@@ -242,30 +254,22 @@ class TestOptModuleInit:
 
         return shortestPathModel(grid=(3, 3))
 
-    def test_invalid_model_type_raises(self):
-        from pyepo.func.surrogate import SPOPlus
-
+    def test_invalid_model_type_raises(self, func_frontend):
         with pytest.raises(TypeError):
-            SPOPlus("not_a_model")
+            func_frontend.SPOPlus("not_a_model")
 
-    def test_invalid_processes_raises(self):
-        from pyepo.func.surrogate import SPOPlus
-
+    def test_invalid_processes_raises(self, func_frontend):
         with pytest.raises(ValueError):
-            SPOPlus(self._model(), processes=-1)
+            func_frontend.SPOPlus(self._model(), processes=-1)
 
     @pytest.mark.parametrize("ratio", [1.5, -0.1])
-    def test_invalid_solve_ratio_raises(self, ratio):
-        from pyepo.func.surrogate import SPOPlus
-
+    def test_invalid_solve_ratio_raises(self, func_frontend, ratio):
         with pytest.raises(ValueError):
-            SPOPlus(self._model(), solve_ratio=ratio)
+            func_frontend.SPOPlus(self._model(), solve_ratio=ratio)
 
-    def test_solve_ratio_lt1_requires_dataset(self):
-        from pyepo.func.surrogate import SPOPlus
-
+    def test_solve_ratio_lt1_requires_dataset(self, func_frontend):
         with pytest.raises(TypeError):
-            SPOPlus(self._model(), solve_ratio=0.5, dataset=None)
+            func_frontend.SPOPlus(self._model(), solve_ratio=0.5, dataset=None)
 
 
 @requires_gurobi
@@ -281,14 +285,13 @@ class TestConstructorGuards:
             "regularizedFrankWolfeFenchelYoung",
         ],
     )
-    def test_rejects_nonpositive_lambda(self, name):
-        import pyepo.func as F
+    def test_rejects_nonpositive_lambda(self, func_frontend, name):
         from pyepo.model.grb.shortestpath import shortestPathModel
 
         model = shortestPathModel(grid=(3, 3))
         for bad in (0.0, -1.0):
             with pytest.raises(ValueError):
-                getattr(F, name)(model, processes=1, lambd=bad)
+                getattr(func_frontend, name)(model, processes=1, lambd=bad)
 
 
 # ============================================================
@@ -583,16 +586,13 @@ class TestRegularizedFrankWolfeFenchelYoung:
 class TestGradientTruthFD:
     """Autograd gradient == finite difference of the loss value."""
 
-    @pytest.mark.parametrize("name", list(FD_TRUTH))
+    @pytest.mark.parametrize("name", FD_LOSSES)
     def test_grad_matches_finite_difference(self, name, sp_truth):
         optmodel, dataset, loader = sp_truth
         _kind, build, sig = LOSS_REGISTRY[name]
-        flags = FD_TRUTH[name]
         _x, c, w, z = take_batch(loader)
         mod = build(optmodel, dataset, "mean")
-        # freeze the pool
-        if "freeze_pool" in flags:
-            mod.solve_ratio = 0.0
+        mod.solve_ratio = 0.0  # freeze the pool: keeps the FD value deterministic
 
         def value(cp_np):
             with torch.no_grad():
@@ -645,7 +645,9 @@ def _grad_scale_torch(cp, n, sigma, mul):
 
 
 class TestSolutionGradientTruth:
-    """Estimator solution-ops: autograd gradient == an independent re-solve of the estimator."""
+    """Estimator solution-ops: autograd gradient == the estimator's closed form,
+    reconstructed from an independent re-solve (or, for DPO, from the module's
+    recorded solutions, since a first-order GPU solve is not reproducible)."""
 
     def _setup(self, sp_truth, name):
         optmodel, dataset, loader = sp_truth
@@ -655,6 +657,7 @@ class TestSolutionGradientTruth:
         cp = (c * 1.2).clone().detach()
         torch.manual_seed(0)
         target = torch.randn_like(cp)
+        self.atol = solver_atol(optmodel)
         return optmodel, mod, cp, target
 
     @staticmethod
@@ -696,21 +699,39 @@ class TestSolutionGradientTruth:
         sol_p, _ = _solve_batch(cp, optmodel, 1, None)
         sol_q, _ = _solve_batch(cp + mod.lambd * target, optmodel, 1, None)
         expected = (sol_q - sol_p) / mod.lambd
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
 
     @pytest.mark.parametrize("mul", [False, True])
-    def test_perturbed_opt(self, sp_truth, mul):
-        optmodel, mod, cp, target = self._setup(sp_truth, "DPOMul" if mul else "DPO")
+    def test_perturbed_opt(self, sp_truth, mul, monkeypatch):
+        # this gate records the solutions the module actually used instead of
+        # re-solving: MPAX's GPU PDHG is not run-to-run reproducible on near-tie
+        # vertices (~3e-2 between two solves of identical costs), so the
+        # independently reconstructed perturbed costs are asserted against the
+        # recorded solver input, and the estimator math is then checked exactly
+        import pyepo.func.perturbed as perturbed
+
+        _optmodel, mod, cp, target = self._setup(sp_truth, "DPOMul" if mul else "DPO")
         n, sigma = mod.n_samples, mod.sigma
+        recorded = []
+        real_solve = perturbed._solve_or_cache_3d
+
+        def recording(ptb_c, module):
+            ptb_sols = real_solve(ptb_c, module)
+            recorded.append((ptb_c.detach().clone(), ptb_sols.detach().clone()))
+            return ptb_sols
+
+        monkeypatch.setattr(perturbed, "_solve_or_cache_3d", recording)
         cpg = cp.clone().requires_grad_(True)
         (mod(cpg) * target).sum().backward()
         noises = _gaussian_noise(mod, cp)
-        ptb_sols = _solve_3d_batch(optmodel, _perturb_torch(cp, noises, sigma, mul))
+        rec_c, ptb_sols = recorded[0]
+        # the module solved exactly the perturbed costs the formula prescribes
+        assert torch.allclose(rec_c, _perturb_torch(cp, noises, sigma, mul), atol=1e-6)
         reward = torch.einsum("bnd,bd->bn", ptb_sols, target)
         if mod.variance_reduction and n > 1:  # leave-one-out baseline
             reward = (reward - reward.mean(dim=1, keepdim=True)) * (n / (n - 1))
         expected = torch.einsum("bnd,bn->bd", noises, reward) / _grad_scale_torch(cp, n, sigma, mul)
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert torch.allclose(cpg.grad, expected, atol=1e-4)
 
     def test_implicit_mle(self, sp_truth):
         from pyepo.utils import _EPS
@@ -722,7 +743,7 @@ class TestSolutionGradientTruth:
         ptb_sols = _solve_3d_batch(optmodel, ptb_c)
         ptb_sols_pos = _solve_3d_batch(optmodel, ptb_c + mod.lambd * target.unsqueeze(1))
         expected = (ptb_sols_pos - ptb_sols).mean(dim=1) / (mod.lambd + _EPS)
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
 
     def test_adaptive_implicit_mle(self, sp_truth):
         from pyepo.utils import _EPS
@@ -736,7 +757,7 @@ class TestSolutionGradientTruth:
         lambd = cp.norm() / target.norm()  # adaptive lambda (alpha = 1.0)
         ptb_sols_pos = _solve_3d_batch(optmodel, ptb_c + lambd * target.unsqueeze(1))
         expected = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
         assert mod.alpha != a0  # online alpha update fired
 
     def test_implicit_mle_two_sides(self, sp_truth):
@@ -748,7 +769,7 @@ class TestSolutionGradientTruth:
         (mod(cpg) * target).sum().backward()
         ptb_c = self._imle_noise_ptb(cp, mod)
         expected = self._resolve_two_sides(optmodel, ptb_c, target, mod.lambd)
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
 
     def test_adaptive_implicit_mle_two_sides(self, sp_truth):
         from pyepo.func.perturbed import adaptiveImplicitMLE
@@ -761,7 +782,7 @@ class TestSolutionGradientTruth:
         ptb_c = self._imle_noise_ptb(cp, mod)
         lambd = cp.norm() / target.norm()  # adaptive lambda (alpha = 1.0)
         expected = self._resolve_two_sides(optmodel, ptb_c, target, lambd)
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
         assert mod.alpha != a0  # online alpha update fired
 
 
@@ -774,6 +795,7 @@ class TestLossGradientTruth:
         _x, c, w, _z = take_batch(loader)
         mod = build(optmodel, dataset, "mean")
         cp = (c * 1.2).clone().detach()
+        self.atol = solver_atol(optmodel)
         return optmodel, mod, cp, c, w
 
     def test_perturbation_gradient(self, sp_truth):
@@ -788,7 +810,7 @@ class TestLossGradientTruth:
         w_sol, _ = _solve_batch(cp, optmodel, 1, None)
         wm_sol, _ = _solve_batch(cp - mod.sigma * c, optmodel, 1, None)
         expected = (w_sol - wm_sol) / (mod.sigma + _EPS) / b  # sign = +1 (MINIMIZE)
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
 
     @pytest.mark.parametrize("mul", [False, True])
     def test_perturbed_fenchel_young(self, sp_truth, mul):
@@ -804,7 +826,7 @@ class TestLossGradientTruth:
         else:
             e_sol = ptb_sols.mean(dim=1)
         expected = (w - e_sol) / b  # MINIMIZE residual w - E[sol]
-        assert torch.allclose(cpg.grad, expected, atol=1e-3)
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
 
 
 # ============================================================

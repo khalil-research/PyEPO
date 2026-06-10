@@ -270,3 +270,16 @@ class TestSkScorer:
         # greater_is_better=False => scorer returns negated regret (<= 0)
         assert np.isfinite(score)
         assert score <= 1e-6
+
+
+class TestAutoSkScorer:
+
+    def test_raises_without_autosklearn(self):
+        from pyepo.metric.metrics import makeAutoSkScorer
+        from pyepo.twostage.autosklearnpred import _HAS_AUTO
+
+        if _HAS_AUTO:
+            pytest.skip("auto-sklearn is installed; skip negative test")
+        # the lazy autosklearn import fails before the model is touched
+        with pytest.raises(ImportError):
+            makeAutoSkScorer(None)

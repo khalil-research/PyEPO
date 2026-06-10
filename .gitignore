@@ -130,3 +130,4 @@ logs/*
 wandb/*
 archives/*
 data/*
+/docs/superpowers

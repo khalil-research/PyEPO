@@ -65,7 +65,6 @@ class compiledCoptProblem(compiledBase, optCoptModel):
         # add coef @ x <= rhs to a fresh copy
         new_model = self.copy()
         new_model._model.addConstr(coef @ new_model.x <= float(rhs))
-        new_model._model.update()
         return new_model
 
     def _build_flat_vars(self, m):

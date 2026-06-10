@@ -15,7 +15,7 @@ import pytest
 from pyepo import EPO, dsl
 from pyepo.model.opt import optModel
 
-from .conftest import requires_copt, requires_gurobi, requires_mpax, requires_ortools
+from .conftest import requires_copt, requires_gurobi, requires_mpax, requires_ortools, to_np
 
 # ============================================================
 # Variable / Parameter construction
@@ -461,7 +461,7 @@ def test_partial_prediction_solves(backend):
     comp.setObj(np.array([1.0, 1.0]))                      # short predicted cost; setObj scatters it
     sol, obj = comp.solve()                                 # full: [x0, x1, y0, y1]
     atol = 1e-2 if backend == "mpax" else 1e-6             # MPAX is first-order PDHG
-    assert len(sol) == 4 and np.allclose(np.asarray(sol), [1, 1, 0, 0], atol=atol)
+    assert len(sol) == 4 and np.allclose(to_np(sol), [1, 1, 0, 0], atol=atol)
     assert obj == pytest.approx(2.0, abs=atol)             # full objective c @ x + d @ y
 
 
@@ -513,7 +513,8 @@ def test_constraints_named(backend):
     x = dsl.Variable(2, vtype=EPO.BINARY)
     c = dsl.Parameter(2)
     comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 2)) @ x <= 1]).compile(backend=backend, **_kw(backend))
-    comp._model.update()
+    if backend == "gurobi":  # COPT needs no explicit model update
+        comp._model.update()
     names = [con.ConstrName if backend == "gurobi" else con.name
              for con in comp._model.getConstrs()]
     assert any(n.startswith("c0") for n in names)          # constraints named c{i}
@@ -606,7 +607,7 @@ def test_mpax_addconstr():
     cut = mpx.addConstr([1, 1, 1, 0, 0], 1.0)              # cost-space cut (copy + G/h row)
     cut.setObj(np.ones(5, np.float32))
     sol, _ = cut.solve()
-    assert np.asarray(sol)[:3].sum() <= 1 + 1e-2
+    assert to_np(sol)[:3].sum() <= 1 + 1e-2
 
 
 # ============================================================

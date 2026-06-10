@@ -59,10 +59,9 @@ except Exception:
     _HAS_JAX = False
 
 try:
-    import jax  # noqa: F401
     import mpax  # noqa: F401
 
-    _HAS_MPAX = True
+    _HAS_MPAX = _HAS_JAX
 except Exception:
     _HAS_MPAX = False
 
@@ -202,7 +201,7 @@ LOSS_OPS = [n for n, (kind, _, _) in LOSS_REGISTRY.items() if kind == "loss"]
 # Same acronym keys / sigs as LOSS_REGISTRY; build swaps to pyepo.func.jax. The
 # shared contract tests construct from this, so a drifted jax signature fails
 # to build. Guarded behind the jax import so torch-only collection is unaffected.
-if _HAS_MPAX:
+if _HAS_JAX:
     import pyepo.func.jax as JF
 
     JAX_LOSS_REGISTRY = {
@@ -236,6 +235,22 @@ else:
     JAX_LOSS_OPS = []
 
 
+def to_np(sol):
+    """Normalize a solver solution to CPU numpy (MPAX may return a CUDA torch.Tensor)."""
+    if hasattr(sol, "cpu"):
+        return sol.cpu().numpy()
+    return np.asarray(sol)
+
+
+def solver_atol(optmodel, exact=1e-3, first_order=5e-2):
+    """Gradient-gate tolerance for a backend: exact solvers reproduce to 1e-3;
+    MPAX is first-order PDHG, where GPU-nondeterministic reductions can flip a
+    near-tie vertex between two solves of the same costs (observed ~1.5e-2)."""
+    if optmodel.__class__.__module__.startswith("pyepo.model.mpax"):
+        return first_order
+    return exact
+
+
 def take_batch(loader, n=4):
     """First n rows of the loader's first batch.
 
@@ -254,7 +269,7 @@ def call_op(fn, sig, cp, c, w, z):
     return fn(*(args[a] for a in sig.split(",")))
 
 
-def jx(*arrays):
+def to_jax(*arrays):
     """torch tensors -> jax arrays."""
     import jax.numpy as jnp
 
@@ -353,7 +368,7 @@ class _ContractJax:
         return JAX_LOSS_REGISTRY
 
     def inputs(self, c, w, z):
-        return jx(c * 1.2, c, w, z)
+        return to_jax(c * 1.2, c, w, z)
 
     def forward(self, op, sig, cp, c, w, z):
         return call_op(op, sig, cp, c, w, z)
@@ -384,7 +399,7 @@ class _ContractJax:
 @pytest.fixture(
     params=[
         pytest.param("torch"),
-        pytest.param("jax", marks=requires_mpax),
+        pytest.param("jax", marks=requires_jax),
     ]
 )
 def contract_backend(request):
@@ -392,16 +407,10 @@ def contract_backend(request):
     return _ContractTorch() if request.param == "torch" else _ContractJax()
 
 
-# losses gated by a finite difference of the loss value; the flag sets how to
-# keep that value deterministic across the FD evaluations:
-#   freeze_pool : set solve_ratio = 0 (freezes the cached pool)
-FD_TRUTH = {
-    "lsLTR": ("freeze_pool",),
-    "prLTR": ("freeze_pool",),
-    "ptLTR": ("freeze_pool",),
-    "NCE": ("freeze_pool",),
-    "CMAP": ("freeze_pool",),
-}
+# losses gated by a finite difference of the loss value; all are pool-based, so
+# the gate sets solve_ratio = 0 (freezes the cached pool) to keep the value
+# deterministic across the FD evaluations
+FD_LOSSES = ["lsLTR", "prLTR", "ptLTR", "NCE", "CMAP"]
 
 
 # ============================================================
@@ -449,6 +458,8 @@ def ks_data():
 # (dataset -> loss -> metric -> train) once per non-Gurobi backend, covering the
 # predict->solve->loss path — including MPAX's batched dlpack bridge and the
 # MAXIMIZE sign flip — that a Gurobi-only suite never reaches.
+# Pyomo is deliberately absent: the legacy omo models wrap the Gurobi solver, so
+# the pipeline would re-drive the same solve path the Gurobi layers already cover.
 
 _PIPELINE_BACKENDS = [
     pytest.param("copt", marks=requires_copt),
