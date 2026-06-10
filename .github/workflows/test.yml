@@ -27,9 +27,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest gurobipy pyomo
         # open-source backends, best effort: tests skip cleanly where a wheel
-        # is unavailable for this Python version
-        pip install ortools highspy || true
-        pip install "jax[cpu]" mpax || true
+        # is unavailable for this Python version; one line per package so a
+        # missing wheel does not drop the others
+        pip install ortools || true
+        pip install highspy || true
+        pip install "jax[cpu]" || true
+        pip install mpax || true
         pip install -e .
 
     - name: Run tests
