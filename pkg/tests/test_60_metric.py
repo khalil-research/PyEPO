@@ -271,6 +271,29 @@ class TestSkScorer:
         assert np.isfinite(score)
         assert score <= 1e-6
 
+    def test_scorer_argument_orientation(self):
+        from sklearn.linear_model import LinearRegression
+
+        import pyepo
+        from pyepo.model.grb.shortestpath import shortestPathModel
+        from pyepo.twostage import sklearnPred
+        from pyepo.utils import getArgs
+
+        # nonlinear costs + noise keep the linear fit imperfect, so regret is asymmetric
+        x, c = pyepo.data.shortestpath.genData(20, NUM_FEAT, (3, 3), deg=4, noise_width=0.5, seed=42)
+        optmodel = shortestPathModel(grid=(3, 3))
+        est = sklearnPred(LinearRegression())
+        est.fit(x, c)
+        cp = est.predict(x)
+        scorer = makeSkScorer(optmodel)
+        # sklearn calls score_func(y_true, y_pred): the scorer must negate SPOError(pred, true)
+        expected = -SPOError(cp, c, type(optmodel), getArgs(optmodel))
+        swapped = -SPOError(c, cp, type(optmodel), getArgs(optmodel))
+        assert expected < -1e-3
+        assert np.isclose(scorer(est, x, c), expected)
+        # the orientation is observable: swapping the arguments changes the value
+        assert not np.isclose(expected, swapped)
+
 
 class TestAutoSkScorer:
 

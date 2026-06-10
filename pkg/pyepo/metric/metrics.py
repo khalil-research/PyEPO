@@ -69,6 +69,28 @@ def SPOError(
     return norm_regret
 
 
+def _SPOErrorScore(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    model_type: type,
+    args: dict,
+) -> float:
+    """
+    A function to calculate normalized true regret with the (y_true, y_pred)
+    argument order of sklearn / autosklearn scorers
+
+    Args:
+        y_true: true costs
+        y_pred: predicted costs
+        model_type: optModel class type
+        args: optModel args
+
+    Returns:
+        float: regret loss
+    """
+    return SPOError(y_pred, y_true, model_type, args)
+
+
 def makeSkScorer(optmodel: optModel) -> Callable:
     """
     A function to create sklearn scorer
@@ -86,7 +108,9 @@ def makeSkScorer(optmodel: optModel) -> Callable:
     # get args
     args = getArgs(optmodel)
     # build score
-    SPO_scorer = make_scorer(SPOError, greater_is_better=False, model_type=model_type, args=args)
+    SPO_scorer = make_scorer(
+        _SPOErrorScore, greater_is_better=False, model_type=model_type, args=args
+    )
     return SPO_scorer
 
 
@@ -109,7 +133,7 @@ def makeAutoSkScorer(optmodel: optModel) -> Callable:
     # build score
     SPO_scorer = make_scorer(
         name="SPO_error",
-        score_func=SPOError,
+        score_func=_SPOErrorScore,
         greater_is_better=False,
         needs_proba=False,
         needs_threshold=False,
