@@ -79,11 +79,11 @@ class listwiseLearningToRank(optModule):
         # cross entropy loss, summed over the pool per instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = -(
-                F.log_softmax(objpool_cp, dim=1) * F.softmax(objpool_c, dim=1).clamp(min=1e-8)
+                F.log_softmax(-objpool_cp, dim=1) * F.softmax(-objpool_c, dim=1).clamp(min=1e-8)
             ).sum(dim=1)
         else:
             loss = -(
-                F.log_softmax(-objpool_cp, dim=1) * F.softmax(-objpool_c, dim=1).clamp(min=1e-8)
+                F.log_softmax(objpool_cp, dim=1) * F.softmax(objpool_c, dim=1).clamp(min=1e-8)
             ).sum(dim=1)
         return self._reduce(loss)
 

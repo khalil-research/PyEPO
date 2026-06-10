@@ -369,6 +369,48 @@ class TestMaximizeSense:
 
 
 @requires_gurobi
+class TestListwiseLTRTarget:
+    """Listwise LTR cross-entropy: the target is the Boltzmann distribution over the pool."""
+
+    @staticmethod
+    def _expected(mod, cp, c, sign):
+        import torch.nn.functional as F
+
+        pool = mod.solpool
+        obj_c, obj_cp = c @ pool.T, cp @ pool.T
+        ce = -(F.log_softmax(sign * obj_cp, dim=1) * F.softmax(sign * obj_c, dim=1).clamp(min=1e-8))
+        return ce.sum(dim=1).mean()
+
+    def test_minimize_favors_low_objective(self, sp_data):
+        from pyepo.func.rank import listwiseLearningToRank
+
+        optmodel, dataset, loader = sp_data
+        _x, c, _w, _z = take_batch(loader)
+        mod = listwiseLearningToRank(optmodel, processes=1, dataset=dataset)
+        cp = (c * 1.2).clone().detach()
+        loss = mod(cp, c)
+        # MINIMIZE: target softmax(-obj) puts its mass on the cheapest pool members
+        assert torch.allclose(loss, self._expected(mod, cp, c, -1.0), atol=1e-6)
+
+    def test_maximize_favors_high_objective(self):
+        from pyepo.data.dataset import optDataset
+        from pyepo.func.rank import listwiseLearningToRank
+        from pyepo.model.grb.knapsack import knapsackModel
+
+        optmodel = knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
+        costs = (np.random.RandomState(0).rand(8, optmodel.num_cost) + 0.5).astype(np.float32)
+        dataset = optDataset(optmodel, np.zeros((8, 2), np.float32), costs)
+        mod = listwiseLearningToRank(optmodel, processes=1, dataset=dataset)
+        c = torch.as_tensor(costs[:4])
+        cp = (c * 1.2).clone().detach()
+        loss = mod(cp, c)
+        # >= 3 distinct pool members: with 2 the softmax reversal identity hides the sign
+        assert mod.solpool.shape[0] >= 3
+        # MAXIMIZE: target softmax(+obj) puts its mass on the most valuable pool members
+        assert torch.allclose(loss, self._expected(mod, cp, c, 1.0), atol=1e-6)
+
+
+@requires_gurobi
 class TestSolveRatioCaching:
     """solve_ratio < 1 routes some passes through the cached solution pool."""
 

@@ -754,6 +754,31 @@ class TestRankContrastive:
 
 
 @requires_jax
+class TestListwiseLTRParity:
+    """Listwise LTR loss on a frozen pool, torch parity on MINIMIZE and MAXIMIZE."""
+
+    @pytest.mark.parametrize("sense", PERTURBED_SENSE)
+    def test_loss_matches_torch(self, sense):
+        import jax.numpy as jnp
+        import torch
+
+        from pyepo.data.dataset import optDataset
+        from pyepo.func.jax import listwiseLearningToRank as JLTR
+        from pyepo.func.rank import listwiseLearningToRank as TLTR
+
+        model, c = _perturbed_setup(sense)
+        feats = np.random.RandomState(1).rand(len(c), NUM_FEAT).astype(np.float32)
+        ds = optDataset(model, feats, c)
+        pred = (c * 1.2).astype(np.float32)
+        # solve_ratio=0 freezes both pools at the identical dataset seed
+        t_loss = TLTR(model, solve_ratio=0, dataset=ds)(
+            torch.as_tensor(pred), torch.as_tensor(c, dtype=torch.float32)
+        )
+        j_loss = JLTR(model, solve_ratio=0, dataset=ds)(jnp.asarray(pred), jnp.asarray(c))
+        np.testing.assert_allclose(float(j_loss), t_loss.item(), atol=1e-5)
+
+
+@requires_jax
 @requires_gurobi
 class TestPGTwoSidesParity:
     """PG central differencing (two_sides=True), torch parity on MINIMIZE and MAXIMIZE."""
