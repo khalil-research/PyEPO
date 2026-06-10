@@ -194,6 +194,29 @@ class TestCalUnambRegret:
         unamb = calUnambRegret(m, cp, ct, true_obj)
         assert unamb >= std - 1e-3
 
+    def test_continuous_maximize_fractional_optimum(self):
+        from pyepo import dsl
+
+        x = dsl.Variable(2, lb=0, ub=1)
+        c = dsl.Parameter(2)
+        m = dsl.Problem(dsl.Maximize(c @ x), [np.array([1.0, 3.0]) @ x <= 1.0]).compile("gurobi")
+        # fractional predicted optimum (x2 = 1/3)
+        unamb = calUnambRegret(m, np.array([1.0, 4.0]), np.array([1.0, 1.0]), true_obj=1.0)
+        assert unamb == pytest.approx(2.0 / 3.0, abs=1e-3)
+
+    def test_partial_prediction_scales_fixed_cost(self):
+        from pyepo import dsl
+
+        x = dsl.Variable(1, lb=0, ub=1)
+        y = dsl.Variable(1, lb=0, ub=1)
+        c = dsl.Parameter(1)
+        m = dsl.Problem(
+            dsl.Minimize(c @ x + np.array([5.0]) @ y), [x.sum() + y.sum() >= 1]
+        ).compile("gurobi")
+        # cp = 2 < 5: the tie set is {x}, not the fixed-cost var y
+        unamb = calUnambRegret(m, np.array([2.0]), np.array([3.0]), true_obj=3.0)
+        assert unamb == pytest.approx(0.0, abs=1e-3)
+
     def test_max_iter_raises(self):
         m = self._sp()
         cost = np.random.RandomState(42).rand(m.num_cost) + 0.1

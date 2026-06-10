@@ -103,19 +103,20 @@ def calUnambRegret(
     """
     if max_iter <= 0:
         raise RuntimeError("Max iterations reached in calUnambRegret.")
-    # change precision; lift to the full objective space
-    cp = optmodel._fullCost(np.around(pred_cost / tolerance).astype(float))
+    # lift to the full objective space, then change precision
+    cp = np.around(optmodel._fullCost(np.asarray(pred_cost, dtype=float)) / tolerance)
     # opt sol for pred cost
     optmodel.setObj(cp)
-    sol, objp = optmodel.solve()
+    sol, _ = optmodel.solve()
     # MPAX backend may return a torch tensor; convert without dtype coercion
     if isinstance(sol, torch.Tensor):
         sol = sol.detach().cpu().numpy()
-    objp = np.ceil(np.dot(cp, np.asarray(sol).T))
-    # opt for pred cost
+    # loose-side rounding keeps the optimum in the tie set
     if optmodel.modelSense == EPO.MINIMIZE:
+        objp = np.ceil(np.dot(cp, np.asarray(sol).T))
         wst_optmodel = optmodel.addConstr(cp, objp + 1e-2)
     elif optmodel.modelSense == EPO.MAXIMIZE:
+        objp = np.floor(np.dot(cp, np.asarray(sol).T))
         wst_optmodel = optmodel.addConstr(-cp, -objp + 1e-2)
     else:
         raise ValueError("Invalid modelSense.")
