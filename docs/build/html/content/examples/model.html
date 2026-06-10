@@ -398,7 +398,51 @@
 </div>
 <p>The compiled model is a standard <code class="docutils literal notranslate"><span class="pre">optModel</span></code> that drops into <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> unchanged; <code class="docutils literal notranslate"><span class="pre">setObj</span></code> and <code class="docutils literal notranslate"><span class="pre">solve</span></code> are called for you during training.</p>
 <p>All backends share this interface, so you can switch with <code class="docutils literal notranslate"><span class="pre">backend=</span></code>. Gurobi and COPT are commercial solvers; Pyomo and OR-Tools let you use open solvers such as HiGHS, GLPK, CBC, and SCIP without a license; MPAX solves linear and quadratic programs on the GPU and can batch-solve an entire mini-batch. The generic backends take a <code class="docutils literal notranslate"><span class="pre">solver=</span></code> argument naming the solver to run.</p>
-<p><code class="docutils literal notranslate"><span class="pre">compile</span></code> forwards keyword arguments to the backend: <code class="docutils literal notranslate"><span class="pre">solver=</span></code> picks an open solver, <code class="docutils literal notranslate"><span class="pre">timelimit=</span></code> (seconds) sets a time limit on any backend, and native solver parameters pass through by name.</p>
+<p><code class="docutils literal notranslate"><span class="pre">compile</span></code> forwards keyword arguments to the backend. <code class="docutils literal notranslate"><span class="pre">solver=</span></code> applies only to the generic backends (<code class="docutils literal notranslate"><span class="pre">pyomo</span></code> / <code class="docutils literal notranslate"><span class="pre">ortools</span></code>) and names the solver they run; <code class="docutils literal notranslate"><span class="pre">timelimit=</span></code> (seconds) sets a time limit where the backend supports one; any other keyword is passed to the solver as a native parameter:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12.0%" />
+<col style="width: 26.0%" />
+<col style="width: 34.0%" />
+<col style="width: 28.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Backend</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">solver=</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">timelimit=</span></code> (seconds)</p></th>
+<th class="head"><p>Other keywords</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gurobi</span></code></p></td>
+<td><p>—</p></td>
+<td><p>maps to <code class="docutils literal notranslate"><span class="pre">TimeLimit</span></code></p></td>
+<td><p>any native Gurobi parameter, e.g. <code class="docutils literal notranslate"><span class="pre">MIPGap=0.01</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">copt</span></code></p></td>
+<td><p>—</p></td>
+<td><p>maps to <code class="docutils literal notranslate"><span class="pre">TimeLimit</span></code></p></td>
+<td><p>any native COPT parameter</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pyomo</span></code></p></td>
+<td><p>open solver name (default <code class="docutils literal notranslate"><span class="pre">&quot;glpk&quot;</span></code>)</p></td>
+<td><p>maps to the chosen solver’s own option (known for GLPK, CBC, SCIP, HiGHS, Ipopt, Gurobi, CPLEX; for other solvers pass the native option)</p></td>
+<td><p>passed through as solver options</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ortools</span></code></p></td>
+<td><p>pywraplp solver name (default <code class="docutils literal notranslate"><span class="pre">&quot;scip&quot;</span></code>)</p></td>
+<td><p>supported</p></td>
+<td><p>not accepted</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mpax</span></code></p></td>
+<td><p>—</p></td>
+<td><p>accepted and ignored (MPAX exposes no time-limit setting)</p></td>
+<td><p>not accepted</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prob</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;pyomo&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;appsi_highs&quot;</span><span class="p">)</span>    <span class="c1"># an open solver via Pyomo</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;gurobi&quot;</span><span class="p">,</span> <span class="n">timelimit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>           <span class="c1"># time limit (seconds)</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;gurobi&quot;</span><span class="p">,</span> <span class="n">MIPGap</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>            <span class="c1"># native solver parameters pass through</span>

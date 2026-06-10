@@ -378,7 +378,17 @@
 <section id="where-to-start">
 <h2>Where to Start<a class="headerlink" href="#where-to-start" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>New to PyEPO</strong>: read the pages below in order. <a class="reference internal" href="examples/model.html"><span class="doc">Model</span></a> and <a class="reference internal" href="examples/data.html"><span class="doc">Data</span></a> set up the modeling primitives; <a class="reference internal" href="examples/twostage.html"><span class="doc">Two-Stage Method</span></a> introduces the regression baseline; <a class="reference internal" href="examples/function.html"><span class="doc">Autograd Functions</span></a> and <a class="reference internal" href="examples/training.html"><span class="doc">Training</span></a> cover the end-to-end methods; <a class="reference internal" href="examples/pool.html"><span class="doc">Solution Pool</span></a> explains the cached solution pool shared by the contrastive and learning-to-rank methods; <a class="reference internal" href="examples/evaluation.html"><span class="doc">Evaluation</span></a> defines the metrics.</p></li>
+<li><p><strong>New to PyEPO</strong>: read the pages below in order.</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="examples/model.html"><span class="doc">Model</span></a> — define the optimization model</p></li>
+<li><p><a class="reference internal" href="examples/data.html"><span class="doc">Data</span></a> — generate data and build the dataset</p></li>
+<li><p><a class="reference internal" href="examples/twostage.html"><span class="doc">Two-Stage Method</span></a> — the two-stage regression baseline</p></li>
+<li><p><a class="reference internal" href="examples/function.html"><span class="doc">Autograd Functions</span></a> — the end-to-end training modules</p></li>
+<li><p><a class="reference internal" href="examples/training.html"><span class="doc">Training</span></a> — training loop templates</p></li>
+<li><p><a class="reference internal" href="examples/pool.html"><span class="doc">Solution Pool</span></a> — the cached solution pool shared by the contrastive and learning-to-rank methods</p></li>
+<li><p><a class="reference internal" href="examples/evaluation.html"><span class="doc">Evaluation</span></a> — decision-quality metrics</p></li>
+</ol>
+</li>
 <li><p><strong>Want to pick a method</strong>: jump to the <em>Choosing a Method</em> section of <a class="reference internal" href="examples/function.html"><span class="doc">Autograd Functions</span></a>. It poses three questions (what supervision you have, whether you want a loss or a solution, special constraints) and points you at the right module.</p></li>
 <li><p><strong>Training in JAX/Flax</strong>: <a class="reference internal" href="examples/jax.html"><span class="doc">JAX Frontend</span></a> mirrors every loss for <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code>-based end-to-end training, on MPAX (GPU-native) or any solver via <code class="docutils literal notranslate"><span class="pre">jax.pure_callback</span></code>.</p></li>
 <li><p><strong>Prefer hands-on</strong>: jump to the <em>Notebooks</em> section below for runnable Colab examples grouped by purpose.</p></li>
@@ -412,7 +422,7 @@
 <section id="applied-examples">
 <h3>Applied Examples<a class="headerlink" href="#applied-examples" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%202D%20knapsack%20Solution%20Visualization.ipynb">05 2D Knapsack Solution Visualization</a>: visualize selected items for a 2D knapsack instance to inspect what the trained predictor is doing.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%202D%20Knapsack%20Solution%20Visualization.ipynb">05 2D Knapsack Solution Visualization</a>: visualize selected items for a 2D knapsack instance to inspect what the trained predictor is doing.</p></li>
 <li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Warcraft%20Shortest%20Path.ipynb">06 Warcraft Shortest Path</a>: train an image-based shortest-path predictor on the Warcraft terrain dataset, using a CNN encoder feeding into PyEPO.</p></li>
 <li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20Real-World%20Energy%20Scheduling.ipynb">07 Real-World Energy Scheduling</a>: apply PyEPO to a real-world energy scheduling benchmark with measured demand data.</p></li>
 </ul>

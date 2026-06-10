@@ -415,7 +415,7 @@ automatically put into <code class="docutils literal notranslate"><span class="p
 </section>
 <section id="unambiguous-regret">
 <h2>Unambiguous Regret<a class="headerlink" href="#unambiguous-regret" title="Link to this heading">¶</a></h2>
-<p>When a predicted cost vector <span class="math notranslate nohighlight">\(\hat{c}\)</span> yields multiple optimal solutions for <span class="math notranslate nohighlight">\(\underset{\mathbf{w} \in S}{\min}\;\hat{\mathbf{c}}^T \mathbf{w}\)</span>, the unambiguous regret considers the worst case: <span class="math notranslate nohighlight">\(l_{URegret}(\hat{\mathbf{c}}, \mathbf{c}) = \underset{\mathbf{w} \in W^*(\hat{\mathbf{c}})}{\max} \mathbf{w}^T \mathbf{c} - z^*(\mathbf{c})\)</span>.</p>
+<p>When a predicted cost vector <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> yields multiple optimal solutions for <span class="math notranslate nohighlight">\(\underset{\mathbf{w} \in S}{\min}\;\hat{\mathbf{c}}^T \mathbf{w}\)</span>, the regret depends on which optimum the solver happens to return. The unambiguous regret removes this ambiguity by scoring the worst case: <span class="math notranslate nohighlight">\(l_{URegret}(\hat{\mathbf{c}}, \mathbf{c}) = \underset{\mathbf{w} \in W^*(\hat{\mathbf{c}})}{\max} \mathbf{w}^T \mathbf{c} - z^*(\mathbf{c})\)</span>.</p>
 <a class="light-bg reference internal image-reference" href="../../_images/regret.png"><img alt="learning curves" class="light-bg" src="../../_images/regret.png" width="650" />
 </a>
 <p>As the figure shows, regret and unambiguous regret are nearly identical across all training procedures. While the unambiguous regret is more theoretically rigorous, it is rarely necessary in practice.</p>
