@@ -33,6 +33,7 @@ jobs:
         pip install highspy || true
         pip install "jax[cpu]" || true
         pip install mpax || true
+        pip install clarabel || true
         pip install -e .
 
     - name: Run tests

@@ -41,7 +41,6 @@ dependencies = [
     "tqdm",
     "scikit_learn",
     "torch>=1.13.1",
-    "clarabel",
 ]
 
 [project.optional-dependencies]
@@ -49,10 +48,12 @@ pyomo = ["pyomo>=6.1.2"]
 gurobi = ["gurobipy>=9.1.2"]
 copt = ["coptpy"]
 ortools = ["ortools>=9.6"]
+cave = ["clarabel"]
 mpax = ["mpax", "jax>=0.4.1", "jaxlib>=0.4.1"]
 jaxdev = ["flax", "optax"]
 autosklearn = ["auto-sklearn", "configspace"]
 all = [
+    "clarabel",
     "pyomo>=6.1.2",
     "gurobipy>=9.1.2",
     "coptpy",
