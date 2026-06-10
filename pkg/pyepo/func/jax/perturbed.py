@@ -86,7 +86,7 @@ def _perturbed_opt(pred_cost, noises, module, sigma, variance_reduction, multipl
 
 
 def _perturbed_opt_core(pred_cost, noises, module, sigma, multiplicative):
-    ptb_c = _perturb(pred_cost, noises, sigma, multiplicative)
+    ptb_c = _perturb(pred_cost, noises, sigma, multiplicative, module.optmodel)
     ptb_sols = _solve_or_cache_3d(ptb_c, module)
     return ptb_sols.mean(axis=1), ptb_sols
 
@@ -203,11 +203,12 @@ def _perturbed_fenchel_young_value_and_grad(
     pred_cost, true_sol, noises, module, sigma, multiplicative
 ):
     # perturb and solve
-    ptb_c = _perturb(pred_cost, noises, sigma, multiplicative)
+    ptb_c = _perturb(pred_cost, noises, sigma, multiplicative, module.optmodel)
     ptb_sols = _solve_or_cache_3d(ptb_c, module)
     # expected solution
     if multiplicative:
-        factor = jnp.exp(sigma * noises - 0.5 * sigma**2)
+        # masked exponent keeps known fixed costs at factor exactly 1
+        factor = jnp.exp(_mask_pred(sigma * noises - 0.5 * sigma**2, module.optmodel))
         e_sol = (ptb_sols * factor).mean(axis=1)
     else:
         e_sol = ptb_sols.mean(axis=1)
@@ -489,12 +490,14 @@ def _solve_or_cache_3d(ptb_c, module):
     return sol.reshape(b, n, d)
 
 
-def _perturb(pred_cost, noises, sigma, multiplicative):
+def _perturb(pred_cost, noises, sigma, multiplicative, optmodel):
     """
     A function to perturb the cost additively or multiplicatively
     """
     if multiplicative:
-        return pred_cost[:, None, :] * jnp.exp(sigma * noises - 0.5 * sigma**2)
+        # masked exponent keeps known fixed costs at factor exactly 1
+        exponent = _mask_pred(sigma * noises - 0.5 * sigma**2, optmodel)
+        return pred_cost[:, None, :] * jnp.exp(exponent)
     return pred_cost[:, None, :] + sigma * noises
 
 

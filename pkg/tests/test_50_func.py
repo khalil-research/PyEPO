@@ -369,6 +369,59 @@ class TestMaximizeSense:
 
 
 @requires_gurobi
+class TestMultiplicativePerturbPartial:
+    """Multiplicative perturbation under partial prediction: fixed costs keep factor 1."""
+
+    @staticmethod
+    def _model():
+        from pyepo import dsl
+
+        items = dsl.Variable(3, vtype=EPO.BINARY)
+        extra = dsl.Variable(2, vtype=EPO.BINARY)
+        cost = dsl.Parameter(3)
+        prob = dsl.Problem(
+            dsl.Maximize(cost @ items + np.array([1.0, 2.0]) @ extra),
+            [items.sum() + extra.sum() <= 3],
+        )
+        return prob.compile(backend="gurobi")
+
+    @staticmethod
+    def _inputs(optmodel, n_samples=3):
+        from pyepo.func.utils import _mask_pred
+
+        full = optmodel._fullCost(torch.ones(2, optmodel.num_cost))
+        torch.manual_seed(0)
+        noises = _mask_pred(torch.randn(2, n_samples, full.shape[-1]), optmodel)
+        fixed = [i for i in range(full.shape[-1]) if i not in set(optmodel.c_pred_index.tolist())]
+        return full, noises, fixed
+
+    @pytest.mark.parametrize("name", ["DPOMul", "PFYLMul"])
+    def test_fixed_positions_unperturbed(self, name):
+        from pyepo.func.perturbed import perturbedFenchelYoungMul, perturbedOptMul
+
+        optmodel = self._model()
+        cls = perturbedOptMul if name == "DPOMul" else perturbedFenchelYoungMul
+        mod = cls(optmodel, n_samples=3, sigma=1.0, processes=1)
+        full, noises, fixed = self._inputs(optmodel)
+        ptb_c = mod._perturb(full, noises)
+        # non-predicted positions keep the known fixed cost exactly
+        assert torch.allclose(ptb_c[:, :, fixed], full[:, None, fixed].expand(-1, 3, -1))
+        # predicted positions are genuinely perturbed
+        pred_idx = list(optmodel.c_pred_index)
+        assert not torch.allclose(ptb_c[:, :, pred_idx], full[:, None, pred_idx].expand(-1, 3, -1))
+
+    def test_expected_solution_factor_is_one_at_fixed(self):
+        from pyepo.func.perturbed import perturbedFenchelYoungMul
+
+        optmodel = self._model()
+        mod = perturbedFenchelYoungMul(optmodel, n_samples=3, sigma=1.0, processes=1)
+        full, noises, fixed = self._inputs(optmodel)
+        # unit solutions expose the weighting factor directly
+        e_sol = mod._calculate_expected_solution(full, None, torch.ones_like(noises), noises)
+        assert torch.allclose(e_sol[:, fixed], torch.ones(2, len(fixed)))
+
+
+@requires_gurobi
 class TestListwiseLTRTarget:
     """Listwise LTR cross-entropy: the target is the Boltzmann distribution over the pool."""
 

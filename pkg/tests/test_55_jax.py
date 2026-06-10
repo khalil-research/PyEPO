@@ -905,6 +905,22 @@ class TestPartialPredictionParity:
     PARITY = ["SPOPlus", "PG", "DBB", "NID", "RFWO", "RFY"]
     SMOKE = ["DPO", "DPOMul", "IMLE", "AIMLE", "PFY", "PFYMul"]
 
+    def test_multiplicative_perturb_keeps_fixed_costs(self):
+        import jax.numpy as jnp
+
+        from pyepo.func.jax.perturbed import _perturb
+        from pyepo.func.jax.utils import _full_cost, _mask_pred
+
+        model = _partial_model()
+        full = _full_cost(jnp.ones((2, model.num_cost)), model)
+        raw = np.random.RandomState(0).randn(2, 3, full.shape[-1]).astype(np.float32)
+        noises = _mask_pred(jnp.asarray(raw), model)
+        ptb_c = np.array(_perturb(full, noises, 1.0, True, model))
+        # non-predicted positions keep the known fixed cost exactly
+        fixed = np.setdiff1d(np.arange(full.shape[-1]), np.asarray(model.c_pred_index))
+        expected = np.broadcast_to(np.array(full)[:, None, fixed], (2, 3, fixed.size))
+        np.testing.assert_allclose(ptb_c[:, :, fixed], expected, atol=1e-7)
+
     @pytest.mark.parametrize("name", PARITY)
     def test_deterministic_grad_matches_torch(self, name):
         import jax

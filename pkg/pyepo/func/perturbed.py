@@ -180,7 +180,9 @@ class perturbedOptMul(perturbedOpt):
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        return cp.unsqueeze(1) * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        # masked exponent keeps known fixed costs at factor exactly 1
+        exponent = _mask_pred(self.sigma * noises - 0.5 * self.sigma**2, self.optmodel)
+        return cp.unsqueeze(1) * torch.exp(exponent)
 
     def _grad_scale(self, cp: torch.Tensor) -> torch.Tensor:
         denom = self.sigma * cp
@@ -345,7 +347,9 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
     """
 
     def _perturb(self, cp: torch.Tensor, noises: torch.Tensor) -> torch.Tensor:
-        return cp.unsqueeze(1) * torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        # masked exponent keeps known fixed costs at factor exactly 1
+        exponent = _mask_pred(self.sigma * noises - 0.5 * self.sigma**2, self.optmodel)
+        return cp.unsqueeze(1) * torch.exp(exponent)
 
     def _calculate_expected_solution(
         self,
@@ -354,7 +358,8 @@ class perturbedFenchelYoungMul(perturbedFenchelYoung):
         ptb_sols: torch.Tensor,
         noises: torch.Tensor,
     ) -> torch.Tensor:
-        factor = torch.exp(self.sigma * noises - 0.5 * self.sigma**2)
+        # masked exponent keeps known fixed costs at factor exactly 1
+        factor = torch.exp(_mask_pred(self.sigma * noises - 0.5 * self.sigma**2, self.optmodel))
         return (ptb_sols * factor).mean(dim=1)
 
 
