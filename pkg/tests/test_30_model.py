@@ -582,6 +582,25 @@ class TestVRP:
         visited = sorted(v for t in tours for v in t[1:-1])
         assert visited == list(range(1, _VRP_NUM_NODES))
 
+    def test_rci_two_customer_capacity(self, backend, formulation):
+        if formulation != "RCI":
+            pytest.skip("rounded-capacity cuts are RCI-specific")
+        if backend == "grb":
+            from pyepo.model.grb import vrp as v
+        else:
+            from pyepo.model.copt import vrp as v
+        # cheap pairing {1,2}+{3,4} is capacity-infeasible ({3,4}: 12 > 10)
+        demands, capacity = [2.0, 2.0, 6.0, 6.0], 10.0
+        m = v.vrpRCIModel(num_nodes=5, demands=demands, capacity=capacity, num_vehicle=2)
+        # edge order (0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)
+        m.setObj(np.array([1.0, 1.0, 1.0, 1.0, 0.1, 5.0, 5.0, 5.0, 5.0, 0.1]))
+        sol, obj = m.solve()
+        # every reconstructed tour respects the vehicle capacity
+        for tour in m.getTour(sol):
+            assert sum(demands[i - 1] for i in tour[1:-1]) <= capacity + 1e-6
+        # optimum pairs each heavy customer with a light one
+        np.testing.assert_allclose(obj, 14.0, atol=1e-4)
+
     def test_relax(self, backend, formulation):
         m, rel_cls = _make_vrp(backend, formulation)
         if rel_cls is None:

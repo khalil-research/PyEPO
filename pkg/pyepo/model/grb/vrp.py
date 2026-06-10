@@ -121,7 +121,7 @@ class vrpRCIModel(vrpABModel):
                 uf.union(u, v)
         # rounded-capacity / subtour cut per non-trivial component
         for component in _uf_components(uf):
-            if len(component) < 3:
+            if len(component) < 2:
                 continue
             # rounded number of vehicles
             k = int(np.ceil(sum(model._q[v] for v in component) / model._Q))
