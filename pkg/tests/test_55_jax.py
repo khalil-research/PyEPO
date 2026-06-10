@@ -6,7 +6,7 @@ Grouped jax -> both:
 - jax: helpers / infrastructure / validation, then independent correctness
   gates. The gate is the closed form (an independent re-solve) or a finite
   difference, never torch-vs-jax, so a bug shared by both frontends is still
-  caught. Covers both batch_solve backends: the universal pure_callback path
+  caught. Covers both _solve_batch backends: the universal pure_callback path
   and the native MPAX path.
 - both: torch-vs-jax parity for the few features (CaVE, PG central differencing,
   the partial-prediction lift) where an independent reference is impractical and
@@ -126,7 +126,7 @@ class TestMaskPred:
 
         import jax.numpy as jnp
 
-        from pyepo.func.jax.perturbed import _mask_pred
+        from pyepo.func.jax.utils import _mask_pred
 
         m = MagicMock()
         m.c_pred_index = None
@@ -138,7 +138,7 @@ class TestMaskPred:
 
         import jax.numpy as jnp
 
-        from pyepo.func.jax.perturbed import _mask_pred
+        from pyepo.func.jax.utils import _mask_pred
 
         m = MagicMock()
         m.c_pred_index = np.array([0, 2])
@@ -157,12 +157,12 @@ class TestBatchSolve:
     def test_callback_matches_native(self):
         import jax.numpy as jnp
 
-        from pyepo.func.jax.utils import _batch_solve_callback, _batch_solve_mpax
+        from pyepo.func.jax.utils import _solve_batch_callback, _solve_batch_mpax
 
         model, c = _sp_mpax(8)
         c_jax = jnp.asarray(c)
-        sol_n, obj_n = _batch_solve_mpax(c_jax, model)
-        sol_c, obj_c = _batch_solve_callback(c_jax, model)
+        sol_n, obj_n = _solve_batch_mpax(c_jax, model)
+        sol_c, obj_c = _solve_batch_callback(c_jax, model)
         # 1e-2: two independent first-order PDHG solves of the same costs
         np.testing.assert_allclose(np.array(sol_c), np.array(sol_n), atol=1e-2)
         np.testing.assert_allclose(np.array(obj_c), np.array(obj_n), atol=1e-2)
@@ -253,9 +253,9 @@ def _spo_closed_form(model, pred, true_cost, true_sol):
     """Independent ground truth: 2*(w_true - w_spo) for MINIMIZE."""
     import jax.numpy as jnp
 
-    from pyepo.func.jax.utils import batch_solve
+    from pyepo.func.jax.utils import _solve_batch
 
-    w_spo, _ = batch_solve(jnp.asarray(2.0 * pred - true_cost), model)
+    w_spo, _ = _solve_batch(jnp.asarray(2.0 * pred - true_cost), model)
     return 2.0 * (true_sol - np.array(w_spo))
 
 
@@ -314,15 +314,15 @@ class TestBlackbox:
         import jax.numpy as jnp
 
         from pyepo.func.jax import blackboxOpt
-        from pyepo.func.jax.utils import batch_solve
+        from pyepo.func.jax.utils import _solve_batch
 
         model, pred, target = self._setup()
         lambd = 10.0
         dbb = blackboxOpt(model, lambd=lambd)
         g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * dbb(p)))(jnp.asarray(pred)))
         # closed form: (w*(pred + lambd*d) - w*(pred)) / lambd with d = target
-        wp, _ = batch_solve(jnp.asarray(pred), model)
-        wq, _ = batch_solve(jnp.asarray(pred + lambd * target), model)
+        wp, _ = _solve_batch(jnp.asarray(pred), model)
+        wq, _ = _solve_batch(jnp.asarray(pred + lambd * target), model)
         expected = (np.array(wq) - np.array(wp)) / lambd
         np.testing.assert_allclose(g, expected, atol=1e-2)  # mpax PDHG re-solve
 
@@ -383,7 +383,7 @@ class TestPerturbed:
         import jax.numpy as jnp
 
         from pyepo.func.jax import perturbedOpt, perturbedOptMul
-        from pyepo.func.jax.utils import batch_solve
+        from pyepo.func.jax.utils import _solve_batch
 
         model, c = _perturbed_setup(sense)
         sigma = 0.5 if mul else 1.0
@@ -392,7 +392,7 @@ class TestPerturbed:
         target = np.random.RandomState(3).randn(B, d).astype(np.float32)
         noises = self._gauss((B, 5, d))
         ptb_c = self._perturb(pred, noises, sigma, mul)
-        sols, _ = batch_solve(jnp.asarray(ptb_c.reshape(-1, d)), model)
+        sols, _ = _solve_batch(jnp.asarray(ptb_c.reshape(-1, d)), model)
         ptb_sols = np.array(sols).reshape(B, 5, d)
         reward = np.einsum("bnd,bd->bn", ptb_sols, target)
         reward = (reward - reward.mean(1, keepdims=True)) * (5 / 4)
@@ -411,16 +411,16 @@ class TestPerturbed:
         import jax.numpy as jnp
 
         from pyepo.func.jax import perturbedFenchelYoung, perturbedFenchelYoungMul
-        from pyepo.func.jax.utils import batch_solve
+        from pyepo.func.jax.utils import _solve_batch
 
         model, c = _perturbed_setup(sense)
         sigma = 0.5 if mul else 1.0
-        w_true = np.array(batch_solve(jnp.asarray(c), model)[0])
+        w_true = np.array(_solve_batch(jnp.asarray(c), model)[0])
         pred = (c * 1.3).astype(np.float32)
         B, d = pred.shape
         noises = self._gauss((B, 5, d))
         ptb_c = self._perturb(pred, noises, sigma, mul)
-        sols, _ = batch_solve(jnp.asarray(ptb_c.reshape(-1, d)), model)
+        sols, _ = _solve_batch(jnp.asarray(ptb_c.reshape(-1, d)), model)
         ptb_sols = np.array(sols).reshape(B, 5, d)
         if mul:
             factor = np.array(jnp.exp(sigma * noises - 0.5 * sigma**2))
@@ -446,7 +446,7 @@ class TestImplicitMLE:
         import jax
         import jax.numpy as jnp
 
-        from pyepo.func.jax.perturbed import _sum_gamma_sample
+        from pyepo.func.jax.utils import _sum_gamma_sample
 
         model, c = _sp_mpax(8)
         pred = (c * 1.3).astype(np.float32)
@@ -461,11 +461,11 @@ class TestImplicitMLE:
     def _resolve_grad(module, target, ptb_c, lambd):
         import jax.numpy as jnp
 
-        from pyepo.func.jax.perturbed import solve_or_cache_3d
+        from pyepo.func.jax.perturbed import _solve_or_cache_3d
 
-        ptb_sols = np.array(solve_or_cache_3d(ptb_c, module))
+        ptb_sols = np.array(_solve_or_cache_3d(ptb_c, module))
         sols_pos = np.array(
-            solve_or_cache_3d(ptb_c + lambd * jnp.asarray(target)[:, None, :], module)
+            _solve_or_cache_3d(ptb_c + lambd * jnp.asarray(target)[:, None, :], module)
         )
         return (sols_pos - ptb_sols).mean(axis=1) / lambd
 
@@ -501,11 +501,11 @@ class TestImplicitMLE:
     def _resolve_grad_two_sides(module, target, ptb_c, lambd):
         import jax.numpy as jnp
 
-        from pyepo.func.jax.perturbed import solve_or_cache_3d
+        from pyepo.func.jax.perturbed import _solve_or_cache_3d
 
         delta = lambd * jnp.asarray(target)[:, None, :]
-        pos = np.array(solve_or_cache_3d(ptb_c + delta, module))
-        neg = np.array(solve_or_cache_3d(ptb_c - delta, module))
+        pos = np.array(_solve_or_cache_3d(ptb_c + delta, module))
+        neg = np.array(_solve_or_cache_3d(ptb_c - delta, module))
         return (pos - neg).mean(axis=1) / (2 * lambd)
 
     def test_implicit_mle_two_sides_grad_matches_reference(self):
@@ -546,7 +546,7 @@ class TestPG:
         import jax.numpy as jnp
 
         from pyepo.func.jax import PG
-        from pyepo.func.jax.utils import batch_solve
+        from pyepo.func.jax.utils import _solve_batch
         from pyepo.utils import _EPS
 
         model, _ds, pred, tc, _ts, _to = sp_jax_pred("mpax", 8)
@@ -554,8 +554,8 @@ class TestPG:
         B = pred.shape[0]
         pg = PG(model, sigma=sigma, reduction="mean")
         g = np.array(jax.grad(lambda p: pg(p, jnp.asarray(tc)))(jnp.asarray(pred)))
-        w_sol, _ = batch_solve(jnp.asarray(pred), model)
-        wm_sol, _ = batch_solve(jnp.asarray(pred - sigma * tc), model)
+        w_sol, _ = _solve_batch(jnp.asarray(pred), model)
+        wm_sol, _ = _solve_batch(jnp.asarray(pred - sigma * tc), model)
         expected = (np.array(w_sol) - np.array(wm_sol)) / (sigma + _EPS) / B  # sign +1 (MINIMIZE)
         np.testing.assert_allclose(g, expected, atol=1e-2)  # mpax PDHG re-solve
 
@@ -594,7 +594,7 @@ class TestRegularized:
         import jax.numpy as jnp
 
         from pyepo.func.jax import regularizedFrankWolfeFenchelYoung
-        from pyepo.func.jax.regularized import _frank_wolfe_active
+        from pyepo.func.jax.regularized import _away_step_frank_wolfe
 
         model = self._knapsack()
         lambd = 1.0
@@ -604,7 +604,7 @@ class TestRegularized:
         fy = regularizedFrankWolfeFenchelYoung(model, lambd=lambd, max_iter=100, tol=1e-8)
         g = np.array(jax.grad(lambda p: fy(p, jnp.asarray(w)))(jnp.asarray(cp)))
         # MAXIMIZE: theta = pred/lambd, Danskin residual diff = r_sol - w
-        r_sol = np.array(_frank_wolfe_active(jnp.asarray(cp) / lambd, fy)[0])
+        r_sol = np.array(_away_step_frank_wolfe(jnp.asarray(cp) / lambd, fy)[0])
         expected = (r_sol - w) / B
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
