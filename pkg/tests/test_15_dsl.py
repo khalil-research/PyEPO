@@ -95,6 +95,41 @@ def test_scalar_scale_and_subtract():
     assert np.allclose(b, 5.0)             # rhs 4 - const(-1) = 5
 
 
+def test_const_add_broadcasts_to_shape():
+    x = dsl.Variable((2, 3))
+    a = x + np.ones(3)                                      # row-broadcast like numpy
+    assert np.allclose(a.const, np.ones(6))
+    with pytest.raises(ValueError):
+        _ = x + np.arange(6).reshape(3, 2)                  # numpy rejects (2,3)+(3,2)
+
+
+def test_sum_negative_axis():
+    x = dsl.Variable((2, 3))
+    _, A1, _, _ = (x.sum(axis=-1) <= 1).finalize({x: slice(0, 6)}, 6)
+    _, A2, _, _ = (x.sum(axis=1) <= 1).finalize({x: slice(0, 6)}, 6)
+    assert np.allclose(A1.toarray(), A2.toarray())
+    with pytest.raises(ValueError):
+        x.sum(axis=2)                                       # out of bounds
+
+
+def test_matrix_rhs_broadcasts_to_lhs_shape():
+    x = dsl.Variable((2, 3))
+    _, _, _, b1 = (x <= np.ones((2, 3))).finalize({x: slice(0, 6)}, 6)
+    _, _, _, b2 = (x <= np.array([1.0, 2.0, 3.0])).finalize({x: slice(0, 6)}, 6)
+    assert np.allclose(b1, np.ones(6))
+    assert np.allclose(b2, np.tile([1.0, 2.0, 3.0], 2))    # row-broadcast over 2 rows
+
+
+def test_divide_and_quadratic_subtract():
+    x = dsl.Variable(2)
+    _, A, _, _ = (x / 2.0 <= 1).finalize({x: slice(0, 2)}, 2)
+    assert np.allclose(A.toarray(), 0.5 * np.eye(2))
+    con = (x @ x - 1.0 <= 0.0)                              # Quadratic - const
+    Q, _, sense, b = con.finalize({x: slice(0, 2)}, 2)
+    assert np.allclose(Q.toarray(), np.eye(2))
+    assert sense == "<=" and np.allclose(b, 1.0)            # rhs 0 - const(-1) = 1
+
+
 # ============================================================
 # Full problems: finalized IR vs hand-derived
 # ============================================================
@@ -192,6 +227,22 @@ def test_qp_objective_offset():
     assert np.allclose(prob.obj_Q.toarray(), Sig)            # already symmetric
 
 
+def test_objective_only_variable_assigned():
+    x = dsl.Variable(3)
+    y = dsl.Variable(2, lb=0, ub=2)
+    c = dsl.Parameter(3)
+    prob = dsl.Problem(dsl.Minimize(c @ x + 2 * y.sum()), [x.sum() >= 1])
+    assert prob.num_vars == 5                               # y gets a flat slice
+    assert np.allclose(prob.fixed_cost, [0, 0, 0, 2, 2])
+
+
+def test_objective_constant_becomes_offset():
+    x = dsl.Variable(2, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    prob = dsl.Problem(dsl.Minimize(c @ x + (x - 1) @ (x - 1)), [x.sum() >= 0.0])
+    assert prob.obj_offset == pytest.approx(2.0)            # (x-1)@(x-1) carries +2
+
+
 # ============================================================
 # relax
 # ============================================================
@@ -260,6 +311,21 @@ def test_objective_rejects_constant():
     c = dsl.Parameter(3)
     with pytest.raises(TypeError):
         _ = c @ x + 5.0                                     # a constant term has no effect
+
+
+def test_objective_rejects_vector_term():
+    x = dsl.Variable(3)
+    y = dsl.Variable(2)
+    c = dsl.Parameter(3)
+    with pytest.raises(TypeError):
+        _ = c @ x + y                                       # un-reduced vector term
+
+
+def test_constraint_list_elements_validated():
+    x = dsl.Variable(3)
+    c = dsl.Parameter(3)
+    with pytest.raises(TypeError):
+        dsl.Problem(dsl.Minimize(c @ x), [x.sum()])         # Affine, not a Constraint
 
 
 # ============================================================
@@ -463,6 +529,33 @@ def test_partial_prediction_solves(backend):
     atol = 1e-2 if backend == "mpax" else 1e-6             # MPAX is first-order PDHG
     assert len(sol) == 4 and np.allclose(to_np(sol), [1, 1, 0, 0], atol=atol)
     assert obj == pytest.approx(2.0, abs=atol)             # full objective c @ x + d @ y
+
+
+@pytest.mark.parametrize("backend", [*_BACKENDS, pytest.param("mpax", marks=requires_mpax)])
+def test_objective_constant_in_solve(backend):
+    # min c @ x + (x - 1) @ (x - 1) over [0,1]^2: analytic optimum -0.25 at [0.5, 1]
+    x = dsl.Variable(2, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    prob = dsl.Problem(dsl.Minimize(c @ x + (x - 1) @ (x - 1)), [x.sum() >= 0.0])
+    comp = prob.compile(backend=backend, **_kw(backend))
+    comp.setObj(comp._fullCost(np.array([1.0, -1.0])))
+    sol, obj = comp.solve()
+    atol = 1e-2 if backend == "mpax" else 1e-3
+    assert np.allclose(to_np(sol), [0.5, 1.0], atol=atol)
+    assert obj == pytest.approx(-0.25, abs=atol)
+
+
+@requires_mpax
+def test_mpax_batch_dataset_includes_objective_constant():
+    # the vmap batch path must add obj_offset like the per-instance solve
+    from pyepo.data.dataset import optDataset
+    x = dsl.Variable(2, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    prob = dsl.Problem(dsl.Minimize(c @ x + (x - 1) @ (x - 1)), [x.sum() >= 0.0])
+    comp = prob.compile(backend="mpax")
+    costs = np.tile([1.0, -1.0], (3, 1)).astype(np.float32)
+    ds = optDataset(comp, np.zeros((3, 2), np.float32), costs)
+    assert np.allclose(ds.objs.numpy().ravel(), -0.25, atol=1e-2)
 
 
 @pytest.mark.parametrize("backend", _ALL)

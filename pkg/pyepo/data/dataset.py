@@ -116,6 +116,10 @@ class optDataset(Dataset):
         # jitted_solve returns c·sol where setObj already negated c for MAX
         if self.model.modelSense == EPO.MAXIMIZE:
             objs_np = -objs_np
+        # compiled DSL problems carry bare objective constants outside the solver model
+        problem = getattr(self.model, "problem", None)
+        if problem is not None:
+            objs_np += problem.obj_offset
         return sols_np, objs_np.reshape(-1, 1)
 
     def _solve(

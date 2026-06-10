@@ -126,7 +126,8 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
         sol, obj, status = self.jitted_solve(self.c)
         _warn_if_not_optimal(status)
         full_obj = float(obj) if self.modelSense == EPO.MINIMIZE else -float(obj)
-        return torch.from_dlpack(sol), full_obj
+        # bare objective constants live outside the solver model
+        return torch.from_dlpack(sol), full_obj + self.problem.obj_offset
 
     def _add_cut(self, coef, rhs):
         # add coef @ x <= rhs  ->  -coef @ x >= -rhs  to a fresh copy

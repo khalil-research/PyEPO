@@ -71,7 +71,8 @@ class compiledBase(optModel):
     def solve(self):
         """Solve and return the full decision-vector solution (length ``num_vars``) with its objective value."""
         sol, obj = self._read_sol()
-        return np.asarray(sol), obj
+        # bare objective constants live outside the solver model
+        return np.asarray(sol), obj + self.problem.obj_offset
 
     def addConstr(self, coefs, rhs):
         # add a cut coefs @ x <= rhs over the full variable vector

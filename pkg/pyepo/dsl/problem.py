@@ -50,6 +50,13 @@ class Problem:
             raise TypeError("`constraints` must be a list; wrap it: [your_constraint].")
         self.objective = objective
         self.constraints = list(constraints) if constraints else []
+        # every element must be a Constraint built with <= / >= / ==
+        for i, con in enumerate(self.constraints):
+            if not isinstance(con, Constraint):
+                raise TypeError(
+                    f"constraints[{i}] is {type(con).__name__}, not a Constraint; "
+                    "build one with <=, >= or ==."
+                )
         # PyEPO-scope checks
         self._validate()
         # objective cost layout
@@ -79,11 +86,26 @@ class Problem:
     def _assign_flat(self):
         # collect variables in encounter order; dedup by identity (Variable.__eq__ is overloaded)
         order, seen = [self.cost_var], {id(self.cost_var)}
+
+        def visit(v):
+            if id(v) not in seen:
+                seen.add(id(v))
+                order.append(v)
+
+        # objective-only variables: known fixed linear and quadratic terms
+        expr = self.objective.expr
+        if expr.fixed is not None:
+            for v in expr.fixed.blocks:
+                visit(v)
+        if expr.quad is not None:
+            for vi, vj in expr.quad.quad:
+                visit(vi)
+                visit(vj)
+            for v in expr.quad.affine.blocks:
+                visit(v)
         for con in self.constraints:
             for v in con.variables():
-                if id(v) not in seen:
-                    seen.add(id(v))
-                    order.append(v)
+                visit(v)
         self.variables = order
         self.flat_slice = {}
         n = 0
@@ -116,17 +138,20 @@ class Problem:
             self.c_pred_index = np.arange(sl.start, sl.stop)
         else:
             self.c_pred_index = sl.start + np.asarray(expr.local_idx, dtype=int)
-        # known fixed linear coefficients over all variables
+        # known fixed linear coefficients over all variables; bare constants shift the objective value
         self.fixed_cost = np.zeros(self.num_vars)
+        self.obj_offset = 0.0
         if expr.base is not None:
             self.fixed_cost[self.c_pred_index] += expr.base
         if expr.fixed is not None:
             self.fixed_cost += _dense_row(expr.fixed.finalize(self.flat_slice, self.num_vars))
+            self.obj_offset += float(expr.fixed.const.sum())
         # parameter-free quadratic term; its linear part folds into fixed_cost
         self.obj_Q = None
         if isinstance(expr.quad, Quadratic):
             self.obj_Q = expr.quad.finalize_Q(self.flat_slice, self.num_vars)
             self.fixed_cost += _dense_row(expr.quad.affine.finalize(self.flat_slice, self.num_vars))
+            self.obj_offset += float(expr.quad.affine.const.sum())
         # constraints -> global (Q, A, sense, b_eff)
         self.constrs = [con.finalize(self.flat_slice, self.num_vars) for con in self.constraints]
 

@@ -86,6 +86,9 @@ class Variable:
     def __rmul__(self, o):
         return self._to_affine() * o
 
+    def __truediv__(self, o):
+        return self._to_affine() / o
+
     def __matmul__(self, o):
         return self._to_affine() @ o
 
@@ -150,9 +153,11 @@ class Affine:
                 self._add_block(blocks, v, b)
             return Affine(blocks, self.const + o.const, self.shape)
         if _is_num(o):
-            return Affine(
-                self.blocks, self.const + np.asarray(o, dtype=float).reshape(-1), self.shape
-            )
+            # broadcast the constant over the logical shape; a flat full-length vector is kept as-is
+            a = np.asarray(o, dtype=float)
+            if not (a.ndim == 1 and a.size == self.size):
+                a = np.broadcast_to(a, self.shape or (self.size,))
+            return Affine(self.blocks, self.const + a.reshape(-1), self.shape)
         return NotImplemented
 
     def __radd__(self, o):
@@ -188,6 +193,12 @@ class Affine:
         # reflected scale
         return self * o
 
+    def __truediv__(self, o):
+        # elementwise divide by a scalar or shape-broadcast array
+        if _is_num(o):
+            return self * (1.0 / np.asarray(o, dtype=float))
+        return NotImplemented
+
     def __matmul__(self, o):
         # Affine @ (ndarray)  -> Affine ;  Affine @ (Variable | Affine) -> Quadratic
         if isinstance(o, Variable):
@@ -218,15 +229,20 @@ class Affine:
         # reduce along axis (or fully) via a 0/1 summation matrix
         if axis is None:
             return self._row_op(np.ones((1, self.size)), ())
+        # normalize a negative axis (numpy semantics)
+        if not -len(self.shape) <= axis < len(self.shape):
+            raise ValueError(f"axis {axis} is out of bounds for shape {self.shape}.")
+        axis %= len(self.shape)
         idx = np.arange(self.size).reshape(self.shape)
         kept = tuple(d for a, d in enumerate(self.shape) if a != axis)
         out_m = int(np.prod(kept)) if kept else 1
         # build summation matrix: out row r sums the flat cols collapsed into it
         keep_idx = np.moveaxis(idx, axis, -1).reshape(out_m, self.shape[axis])
-        S = sp.lil_matrix((out_m, self.size))
-        for r in range(out_m):
-            S[r, keep_idx[r]] = 1.0
-        return self._row_op(S.tocsr(), kept)
+        rows = np.repeat(np.arange(out_m), self.shape[axis])
+        S = sp.csr_matrix(
+            (np.ones(keep_idx.size), (rows, keep_idx.reshape(-1))), shape=(out_m, self.size)
+        )
+        return self._row_op(S, kept)
 
     def __getitem__(self, idx):
         # numpy-style indexing -> row selection
@@ -294,8 +310,10 @@ class Quadratic:
         # Quadratic + (Affine | Variable | Quadratic | const) -> Quadratic
         if isinstance(o, Variable):
             o = o._to_affine()
-        # affine / constant folds into the linear part
+        # affine / constant folds into the scalar linear part
         if isinstance(o, Affine):
+            if o.size != 1:
+                raise TypeError("A Quadratic is scalar; reduce the added term with .sum().")
             return Quadratic(self.quad, self.affine + o)
         # merge the two quadratic block dicts
         if isinstance(o, Quadratic):
@@ -311,6 +329,14 @@ class Quadratic:
         # reflected add
         return self + o
 
+    def __sub__(self, o):
+        # subtract via negated add
+        return self + (-o)
+
+    def __rsub__(self, o):
+        # reflected subtract
+        return (-self) + o
+
     def __mul__(self, o):
         # scale the quadratic and its affine part by a scalar
         if _is_num(o):
@@ -321,6 +347,12 @@ class Quadratic:
     def __rmul__(self, o):
         # reflected scale
         return self * o
+
+    def __truediv__(self, o):
+        # scale by the reciprocal scalar
+        if _is_num(o):
+            return self * (1.0 / float(o))
+        return NotImplemented
 
     def __neg__(self):
         # negate the quadratic and its affine part
@@ -456,7 +488,10 @@ class ParametricCoef:
 
     def __init__(self, param, base):
         self.param = param
-        self.base = np.broadcast_to(np.asarray(base, dtype=float), (param.size,)).copy()
+        base = np.asarray(base, dtype=float)
+        # multi-dim bases broadcast over the parameter's logical shape, flat ones over its size
+        shape = param.shape if base.ndim > 1 else (param.size,)
+        self.base = np.broadcast_to(base, shape).reshape(-1).astype(float)
 
     __array_ufunc__ = None
 
@@ -568,6 +603,9 @@ class ParametricObjective:
         if isinstance(o, Variable):
             o = o._to_affine()
         if isinstance(o, Affine):
+            # a vector objective term is meaningless; require a scalar
+            if o.size != 1:
+                raise TypeError("A known objective term must be scalar; reduce it with .sum().")
             return self._with(fixed=o if self.fixed is None else self.fixed + o)
         if _is_num(o):
             raise TypeError("A constant objective term has no effect; omit it.")
@@ -584,7 +622,7 @@ class Constraint:
     Attributes:
         lhs (Affine | Quadratic): left-hand side expression
         sense (str): one of ``"<="`` / ``">="`` / ``"=="``
-        rhs (np.ndarray): right-hand side, broadcast to the LHS length
+        rhs (np.ndarray): right-hand side, broadcast over the LHS shape
     """
 
     def __init__(self, lhs, sense, rhs):
@@ -631,5 +669,9 @@ class Constraint:
         return None, A, self.sense, self._rhs_vec(aff.size) - aff.const
 
     def _rhs_vec(self, m):
-        # broadcast the rhs to a flat (m,) vector
-        return np.broadcast_to(np.asarray(self.rhs, dtype=float), (m,)).astype(float)
+        # broadcast the rhs over the LHS logical shape; a flat full-length vector is kept as-is
+        rhs = np.asarray(self.rhs, dtype=float)
+        if rhs.ndim == 1 and rhs.size == m:
+            return rhs.astype(float)
+        shape = getattr(self.lhs, "shape", ()) or (m,)
+        return np.broadcast_to(rhs, shape).reshape(-1).astype(float)
