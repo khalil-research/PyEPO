@@ -407,17 +407,17 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung" title="pyepo.func.jax.perturbed.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p></td>
-<td><p>Perturbed Fenchel-Young loss (PFYL) -- additive-Gaussian variant.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoungMul" title="pyepo.func.jax.perturbed.perturbedFenchelYoungMul"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoungMul</span></code></a></p></td>
-<td><p>Perturbed Fenchel-Young loss (PFYL) -- multiplicative log-normal variant.</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedOpt" title="pyepo.func.jax.perturbed.perturbedOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a></p></td>
 <td><p>Differentiable Perturbed Optimizer (DPO) -- additive-Gaussian variant.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedOptMul" title="pyepo.func.jax.perturbed.perturbedOptMul"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedOptMul</span></code></a></p></td>
 <td><p>Differentiable Perturbed Optimizer (DPO) -- multiplicative log-normal variant.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung" title="pyepo.func.jax.perturbed.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p></td>
+<td><p>Perturbed Fenchel-Young loss (PFYL) -- additive-Gaussian variant.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoungMul" title="pyepo.func.jax.perturbed.perturbedFenchelYoungMul"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoungMul</span></code></a></p></td>
+<td><p>Perturbed Fenchel-Young loss (PFYL) -- multiplicative log-normal variant.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.perturbed.implicitMLE" title="pyepo.func.jax.perturbed.implicitMLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">implicitMLE</span></code></a></p></td>
 <td><p>Implicit Maximum Likelihood Estimator (I-MLE) via perturb-and-MAP.</p></td>
@@ -429,66 +429,8 @@
 </table>
 </div>
 </section>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.perturbed.solve_or_cache_3d" title="pyepo.func.jax.perturbed.solve_or_cache_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_or_cache_3d</span></code></a>(ptb_c, module)</p></td>
-<td><p>A function to solve perturbed 3D costs (batch, n_samples, vars) with caching</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.solve_or_cache_3d">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.perturbed.</span></span><span class="sig-name descname"><span class="pre">solve_or_cache_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ptb_c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.perturbed.solve_or_cache_3d" title="Link to this definition">¶</a></dt>
-<dd><p>A function to solve perturbed 3D costs (batch, n_samples, vars) with caching</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoung">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.jax.abcmodule.optModule" title="pyepo.func.jax.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.jax.abcmodule.optModule</span></code></a></p>
-<p>Perturbed Fenchel-Young loss (PFYL) – additive-Gaussian variant.</p>
-<p>Pairs a Monte-Carlo expected perturbed solution with the Fenchel-Young
-loss against the true optimum, returning a scalar loss whose gradient is
-the residual <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) -
-\mathbb{E}_{\boldsymbol{\xi}}[\mathbf{w}^*(\hat{\mathbf{c}} +
-\sigma\boldsymbol{\xi})]\)</span>.</p>
-<p>Reference: Berthet et al. (2020)
-<a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoung.n_samples">
-<span class="sig-name descname"><span class="pre">n_samples</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.n_samples" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoung.sigma">
-<span class="sig-name descname"><span class="pre">sigma</span></span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.sigma" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoung.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.forward" title="Link to this definition">¶</a></dt>
-<dd><p>Forward pass</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoungMul">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoungMul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoungMul" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung" title="pyepo.func.jax.perturbed.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p>
-<p>Perturbed Fenchel-Young loss (PFYL) – multiplicative log-normal variant.</p>
-<p>As <a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung" title="pyepo.func.jax.perturbed.perturbedFenchelYoung"><code class="xref py py-class docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a>, but perturbs the cost multiplicatively
-with log-normal noise <span class="math notranslate nohighlight">\(\exp(\sigma\boldsymbol{\xi} - \sigma^2/2)\)</span>.</p>
-<p>Reference: Dalle et al. (2022) <a class="reference external" href="https://arxiv.org/abs/2207.13513">https://arxiv.org/abs/2207.13513</a></p>
-</dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedOpt">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance_reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedOpt" title="Link to this definition">¶</a></dt>
@@ -531,6 +473,46 @@ pair with a task loss.</p>
 <p>Differentiable Perturbed Optimizer (DPO) – multiplicative log-normal variant.</p>
 <p>As <a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedOpt" title="pyepo.func.jax.perturbed.perturbedOpt"><code class="xref py py-class docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a>, but perturbs the cost multiplicatively with
 log-normal noise <span class="math notranslate nohighlight">\(\exp(\sigma\boldsymbol{\xi} - \sigma^2/2)\)</span>.</p>
+<p>Reference: Dalle et al. (2022) <a class="reference external" href="https://arxiv.org/abs/2207.13513">https://arxiv.org/abs/2207.13513</a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoung">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.jax.abcmodule.optModule" title="pyepo.func.jax.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.jax.abcmodule.optModule</span></code></a></p>
+<p>Perturbed Fenchel-Young loss (PFYL) – additive-Gaussian variant.</p>
+<p>Pairs a Monte-Carlo expected perturbed solution with the Fenchel-Young
+loss against the true optimum, returning a scalar loss whose gradient is
+the residual <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) -
+\mathbb{E}_{\boldsymbol{\xi}}[\mathbf{w}^*(\hat{\mathbf{c}} +
+\sigma\boldsymbol{\xi})]\)</span>.</p>
+<p>Reference: Berthet et al. (2020)
+<a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoung.n_samples">
+<span class="sig-name descname"><span class="pre">n_samples</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.n_samples" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoung.sigma">
+<span class="sig-name descname"><span class="pre">sigma</span></span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.sigma" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoung.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.jax.perturbed.perturbedFenchelYoungMul">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.perturbed.</span></span><span class="sig-name descname"><span class="pre">perturbedFenchelYoungMul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.perturbed.perturbedFenchelYoungMul" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung" title="pyepo.func.jax.perturbed.perturbedFenchelYoung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p>
+<p>Perturbed Fenchel-Young loss (PFYL) – multiplicative log-normal variant.</p>
+<p>As <a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung" title="pyepo.func.jax.perturbed.perturbedFenchelYoung"><code class="xref py py-class docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a>, but perturbs the cost multiplicatively
+with log-normal noise <span class="math notranslate nohighlight">\(\exp(\sigma\boldsymbol{\xi} - \sigma^2/2)\)</span>.</p>
 <p>Reference: Dalle et al. (2022) <a class="reference external" href="https://arxiv.org/abs/2207.13513">https://arxiv.org/abs/2207.13513</a></p>
 </dd></dl>
 
@@ -735,16 +717,7 @@ not <code class="docutils literal notranslate"><span class="pre">jax.jit</span><
 <li><a class="reference internal" href="#">pyepo.func.jax.perturbed</a><ul>
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#pyepo.func.jax.perturbed.solve_or_cache_3d"><code class="docutils literal notranslate"><span class="pre">solve_or_cache_3d()</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a><ul>
-<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.n_samples"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung.n_samples</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.sigma"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung.sigma</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.forward"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung.forward()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoungMul"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoungMul</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedOpt"><code class="docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedOpt.n_samples"><code class="docutils literal notranslate"><span class="pre">perturbedOpt.n_samples</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedOpt.sigma"><code class="docutils literal notranslate"><span class="pre">perturbedOpt.sigma</span></code></a></li>
@@ -753,6 +726,13 @@ not <code class="docutils literal notranslate"><span class="pre">jax.jit</span><
 </ul>
 </li>
 <li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedOptMul"><code class="docutils literal notranslate"><span class="pre">perturbedOptMul</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a><ul>
+<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.n_samples"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung.n_samples</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.sigma"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung.sigma</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoung.forward"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoung.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pyepo.func.jax.perturbed.perturbedFenchelYoungMul"><code class="docutils literal notranslate"><span class="pre">perturbedFenchelYoungMul</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.perturbed.implicitMLE"><code class="docutils literal notranslate"><span class="pre">implicitMLE</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.func.jax.perturbed.implicitMLE.n_samples"><code class="docutils literal notranslate"><span class="pre">implicitMLE.n_samples</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.perturbed.implicitMLE.sigma"><code class="docutils literal notranslate"><span class="pre">implicitMLE.sigma</span></code></a></li>

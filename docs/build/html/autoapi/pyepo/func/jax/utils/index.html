@@ -189,7 +189,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -367,7 +367,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
@@ -375,45 +375,6 @@
           <section id="module-pyepo.func.jax.utils">
 <span id="pyepo-func-jax-utils"></span><h1>pyepo.func.jax.utils<a class="headerlink" href="#module-pyepo.func.jax.utils" title="Link to this heading">¶</a></h1>
 <p>Utility functions for the JAX frontend</p>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.utils.batch_solve" title="pyepo.func.jax.utils.batch_solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_solve</span></code></a>(cost, optmodel[, processes, pool])</p></td>
-<td><p>A function to solve a batch of costs for the JAX frontend</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.jax.utils.solve_or_cache" title="pyepo.func.jax.utils.solve_or_cache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_or_cache</span></code></a>(cost, module)</p></td>
-<td><p>A function to solve a batch or reuse the solution pool</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.utils.grow_solpool" title="pyepo.func.jax.utils.grow_solpool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grow_solpool</span></code></a>(module, pred_cost)</p></td>
-<td><p>A function to re-solve the predicted cost and grow the module's solution pool</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyepo.func.jax.utils.batch_solve">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.utils.</span></span><span class="sig-name descname"><span class="pre">batch_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.utils.batch_solve" title="Link to this definition">¶</a></dt>
-<dd><p>A function to solve a batch of costs for the JAX frontend</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyepo.func.jax.utils.solve_or_cache">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.utils.</span></span><span class="sig-name descname"><span class="pre">solve_or_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.utils.solve_or_cache" title="Link to this definition">¶</a></dt>
-<dd><p>A function to solve a batch or reuse the solution pool</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyepo.func.jax.utils.grow_solpool">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.utils.</span></span><span class="sig-name descname"><span class="pre">grow_solpool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.utils.grow_solpool" title="Link to this definition">¶</a></dt>
-<dd><p>A function to re-solve the predicted cost and grow the module’s solution pool</p>
-</dd></dl>
-
-</section>
 </section>
 
         </article>
@@ -459,33 +420,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">pyepo.func.jax.utils</a><ul>
-<li><a class="reference internal" href="#functions">Functions</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#pyepo.func.jax.utils.batch_solve"><code class="docutils literal notranslate"><span class="pre">batch_solve()</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.func.jax.utils.solve_or_cache"><code class="docutils literal notranslate"><span class="pre">solve_or_cache()</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.func.jax.utils.grow_solpool"><code class="docutils literal notranslate"><span class="pre">grow_solpool()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

@@ -27,73 +27,16 @@ Classes
 
 .. autoapisummary::
 
-   pyepo.func.jax.perturbed.perturbedFenchelYoung
-   pyepo.func.jax.perturbed.perturbedFenchelYoungMul
    pyepo.func.jax.perturbed.perturbedOpt
    pyepo.func.jax.perturbed.perturbedOptMul
+   pyepo.func.jax.perturbed.perturbedFenchelYoung
+   pyepo.func.jax.perturbed.perturbedFenchelYoungMul
    pyepo.func.jax.perturbed.implicitMLE
    pyepo.func.jax.perturbed.adaptiveImplicitMLE
 
 
-Functions
----------
-
-.. autoapisummary::
-
-   pyepo.func.jax.perturbed.solve_or_cache_3d
-
-
 Module Contents
 ---------------
-
-.. py:function:: solve_or_cache_3d(ptb_c, module)
-
-   A function to solve perturbed 3D costs (batch, n_samples, vars) with caching
-
-
-.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1.0, reduction='mean', dataset=None)
-
-   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
-
-
-   Perturbed Fenchel-Young loss (PFYL) -- additive-Gaussian variant.
-
-   Pairs a Monte-Carlo expected perturbed solution with the Fenchel-Young
-   loss against the true optimum, returning a scalar loss whose gradient is
-   the residual :math:`\mathbf{w}^*(\mathbf{c}) -
-   \mathbb{E}_{\boldsymbol{\xi}}[\mathbf{w}^*(\hat{\mathbf{c}} +
-   \sigma\boldsymbol{\xi})]`.
-
-   Reference: Berthet et al. (2020)
-   `<https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>`_
-
-
-   .. py:attribute:: n_samples
-      :value: 10
-
-
-
-   .. py:attribute:: sigma
-
-
-   .. py:method:: forward(pred_cost, true_sol, key=None)
-
-      Forward pass
-
-
-
-.. py:class:: perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1.0, reduction='mean', dataset=None)
-
-   Bases: :py:obj:`perturbedFenchelYoung`
-
-
-   Perturbed Fenchel-Young loss (PFYL) -- multiplicative log-normal variant.
-
-   As :class:`perturbedFenchelYoung`, but perturbs the cost multiplicatively
-   with log-normal noise :math:`\exp(\sigma\boldsymbol{\xi} - \sigma^2/2)`.
-
-   Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
-
 
 .. py:class:: perturbedOpt(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, variance_reduction=True, solve_ratio=1.0, dataset=None)
 
@@ -140,6 +83,50 @@ Module Contents
 
    As :class:`perturbedOpt`, but perturbs the cost multiplicatively with
    log-normal noise :math:`\exp(\sigma\boldsymbol{\xi} - \sigma^2/2)`.
+
+   Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
+
+
+.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1.0, reduction='mean', dataset=None)
+
+   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
+
+
+   Perturbed Fenchel-Young loss (PFYL) -- additive-Gaussian variant.
+
+   Pairs a Monte-Carlo expected perturbed solution with the Fenchel-Young
+   loss against the true optimum, returning a scalar loss whose gradient is
+   the residual :math:`\mathbf{w}^*(\mathbf{c}) -
+   \mathbb{E}_{\boldsymbol{\xi}}[\mathbf{w}^*(\hat{\mathbf{c}} +
+   \sigma\boldsymbol{\xi})]`.
+
+   Reference: Berthet et al. (2020)
+   `<https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>`_
+
+
+   .. py:attribute:: n_samples
+      :value: 10
+
+
+
+   .. py:attribute:: sigma
+
+
+   .. py:method:: forward(pred_cost, true_sol, key=None)
+
+      Forward pass
+
+
+
+.. py:class:: perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1.0, reduction='mean', dataset=None)
+
+   Bases: :py:obj:`perturbedFenchelYoung`
+
+
+   Perturbed Fenchel-Young loss (PFYL) -- multiplicative log-normal variant.
+
+   As :class:`perturbedFenchelYoung`, but perturbs the cost multiplicatively
+   with log-normal noise :math:`\exp(\sigma\boldsymbol{\xi} - \sigma^2/2)`.
 
    Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
 

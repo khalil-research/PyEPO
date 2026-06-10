@@ -23,33 +23,12 @@ Classes
 
 .. autoapisummary::
 
-   pyepo.func.jax.blackbox.negativeIdentity
    pyepo.func.jax.blackbox.blackboxOpt
+   pyepo.func.jax.blackbox.negativeIdentity
 
 
 Module Contents
 ---------------
-
-.. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1.0, dataset=None)
-
-   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
-
-
-   Negative Identity Backpropagation (NID) -- hyperparameter-free DBB.
-
-   Treats the solver Jacobian as a signed identity:
-   :math:`\partial \mathbf{w}^* / \partial \hat{\mathbf{c}} \approx
-   -\mathbf{I}` for minimization (and :math:`+\mathbf{I}` for maximization),
-   a straight-through gradient estimator needing no extra solve.
-
-   Reference: Sahoo et al. (2022) `<https://arxiv.org/abs/2205.15213>`_
-
-
-   .. py:method:: forward(pred_cost)
-
-      Forward pass
-
-
 
 .. py:class:: blackboxOpt(optmodel, lambd=10, processes=1, solve_ratio=1.0, dataset=None)
 
@@ -68,6 +47,27 @@ Module Contents
 
 
    .. py:attribute:: lambd
+
+
+   .. py:method:: forward(pred_cost)
+
+      Forward pass
+
+
+
+.. py:class:: negativeIdentity(optmodel, processes=1, solve_ratio=1.0, dataset=None)
+
+   Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
+
+
+   Negative Identity Backpropagation (NID) -- hyperparameter-free DBB.
+
+   Treats the solver Jacobian as a signed identity:
+   :math:`\partial \mathbf{w}^* / \partial \hat{\mathbf{c}} \approx
+   -\mathbf{I}` for minimization (and :math:`+\mathbf{I}` for maximization),
+   a straight-through gradient estimator needing no extra solve.
+
+   Reference: Sahoo et al. (2022) `<https://arxiv.org/abs/2205.15213>`_
 
 
    .. py:method:: forward(pred_cost)

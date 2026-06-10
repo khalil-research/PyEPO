@@ -9,31 +9,3 @@ pyepo.func.jax.utils
 
 
 
-Functions
----------
-
-.. autoapisummary::
-
-   pyepo.func.jax.utils.batch_solve
-   pyepo.func.jax.utils.solve_or_cache
-   pyepo.func.jax.utils.grow_solpool
-
-
-Module Contents
----------------
-
-.. py:function:: batch_solve(cost, optmodel, processes=1, pool=None)
-
-   A function to solve a batch of costs for the JAX frontend
-
-
-.. py:function:: solve_or_cache(cost, module)
-
-   A function to solve a batch or reuse the solution pool
-
-
-.. py:function:: grow_solpool(module, pred_cost)
-
-   A function to re-solve the predicted cost and grow the module's solution pool
-
-

@@ -395,11 +395,11 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.blackbox.negativeIdentity" title="pyepo.func.jax.blackbox.negativeIdentity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a></p></td>
-<td><p>Negative Identity Backpropagation (NID) -- hyperparameter-free DBB.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.jax.blackbox.blackboxOpt" title="pyepo.func.jax.blackbox.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.jax.blackbox.blackboxOpt" title="pyepo.func.jax.blackbox.blackboxOpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p></td>
 <td><p>Differentiable Black-Box Optimizer (DBB) -- gradient via solution interpolation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.jax.blackbox.negativeIdentity" title="pyepo.func.jax.blackbox.negativeIdentity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a></p></td>
+<td><p>Negative Identity Backpropagation (NID) -- hyperparameter-free DBB.</p></td>
 </tr>
 </tbody>
 </table>
@@ -407,24 +407,6 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="pyepo.func.jax.blackbox.negativeIdentity">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.blackbox.</span></span><span class="sig-name descname"><span class="pre">negativeIdentity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.blackbox.negativeIdentity" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.jax.abcmodule.optModule" title="pyepo.func.jax.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.jax.abcmodule.optModule</span></code></a></p>
-<p>Negative Identity Backpropagation (NID) – hyperparameter-free DBB.</p>
-<p>Treats the solver Jacobian as a signed identity:
-<span class="math notranslate nohighlight">\(\partial \mathbf{w}^* / \partial \hat{\mathbf{c}} \approx
--\mathbf{I}\)</span> for minimization (and <span class="math notranslate nohighlight">\(+\mathbf{I}\)</span> for maximization),
-a straight-through gradient estimator needing no extra solve.</p>
-<p>Reference: Sahoo et al. (2022) <a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyepo.func.jax.blackbox.negativeIdentity.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.blackbox.negativeIdentity.forward" title="Link to this definition">¶</a></dt>
-<dd><p>Forward pass</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.func.jax.blackbox.blackboxOpt">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.blackbox.</span></span><span class="sig-name descname"><span class="pre">blackboxOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.blackbox.blackboxOpt" title="Link to this definition">¶</a></dt>
@@ -444,6 +426,24 @@ more (recommended 10-20).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.func.jax.blackbox.blackboxOpt.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.blackbox.blackboxOpt.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.func.jax.blackbox.negativeIdentity">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.jax.blackbox.</span></span><span class="sig-name descname"><span class="pre">negativeIdentity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.blackbox.negativeIdentity" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../abcmodule/index.html#pyepo.func.jax.abcmodule.optModule" title="pyepo.func.jax.abcmodule.optModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyepo.func.jax.abcmodule.optModule</span></code></a></p>
+<p>Negative Identity Backpropagation (NID) – hyperparameter-free DBB.</p>
+<p>Treats the solver Jacobian as a signed identity:
+<span class="math notranslate nohighlight">\(\partial \mathbf{w}^* / \partial \hat{\mathbf{c}} \approx
+-\mathbf{I}\)</span> for minimization (and <span class="math notranslate nohighlight">\(+\mathbf{I}\)</span> for maximization),
+a straight-through gradient estimator needing no extra solve.</p>
+<p>Reference: Sahoo et al. (2022) <a class="reference external" href="https://arxiv.org/abs/2205.15213">https://arxiv.org/abs/2205.15213</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.func.jax.blackbox.negativeIdentity.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.func.jax.blackbox.negativeIdentity.forward" title="Link to this definition">¶</a></dt>
 <dd><p>Forward pass</p>
 </dd></dl>
 
@@ -521,13 +521,13 @@ more (recommended 10-20).</p>
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#pyepo.func.jax.blackbox.negativeIdentity"><code class="docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a><ul>
-<li><a class="reference internal" href="#pyepo.func.jax.blackbox.negativeIdentity.forward"><code class="docutils literal notranslate"><span class="pre">negativeIdentity.forward()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#pyepo.func.jax.blackbox.blackboxOpt"><code class="docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.func.jax.blackbox.blackboxOpt.lambd"><code class="docutils literal notranslate"><span class="pre">blackboxOpt.lambd</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.blackbox.blackboxOpt.forward"><code class="docutils literal notranslate"><span class="pre">blackboxOpt.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pyepo.func.jax.blackbox.negativeIdentity"><code class="docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a><ul>
+<li><a class="reference internal" href="#pyepo.func.jax.blackbox.negativeIdentity.forward"><code class="docutils literal notranslate"><span class="pre">negativeIdentity.forward()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pyepo.func.jax.blackbox.DBB"><code class="docutils literal notranslate"><span class="pre">DBB</span></code></a></li>
