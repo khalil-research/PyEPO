@@ -36,7 +36,36 @@ The compiled model is a standard ``optModel`` that drops into ``pyepo.func`` unc
 
 All backends share this interface, so you can switch with ``backend=``. Gurobi and COPT are commercial solvers; Pyomo and OR-Tools let you use open solvers such as HiGHS, GLPK, CBC, and SCIP without a license; MPAX solves linear and quadratic programs on the GPU and can batch-solve an entire mini-batch. The generic backends take a ``solver=`` argument naming the solver to run.
 
-``compile`` forwards keyword arguments to the backend: ``solver=`` picks an open solver, ``timelimit=`` (seconds) sets a time limit on any backend, and native solver parameters pass through by name.
+``compile`` forwards keyword arguments to the backend. ``solver=`` applies only to the generic backends (``pyomo`` / ``ortools``) and names the solver they run; ``timelimit=`` (seconds) sets a time limit where the backend supports one; any other keyword is passed to the solver as a native parameter:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 12 26 34 28
+
+   * - Backend
+     - ``solver=``
+     - ``timelimit=`` (seconds)
+     - Other keywords
+   * - ``gurobi``
+     - —
+     - maps to ``TimeLimit``
+     - any native Gurobi parameter, e.g. ``MIPGap=0.01``
+   * - ``copt``
+     - —
+     - maps to ``TimeLimit``
+     - any native COPT parameter
+   * - ``pyomo``
+     - open solver name (default ``"glpk"``)
+     - maps to the chosen solver's own option (known for GLPK, CBC, SCIP, HiGHS, Ipopt, Gurobi, CPLEX; for other solvers pass the native option)
+     - passed through as solver options
+   * - ``ortools``
+     - pywraplp solver name (default ``"scip"``)
+     - supported
+     - not accepted
+   * - ``mpax``
+     - —
+     - accepted and ignored (MPAX exposes no time-limit setting)
+     - not accepted
 
 .. code-block:: python
 

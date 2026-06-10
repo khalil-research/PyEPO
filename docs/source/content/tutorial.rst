@@ -7,7 +7,16 @@ This guide walks through the main ``PyEPO`` workflow for predict-then-optimize p
 Where to Start
 ==============
 
-* **New to PyEPO**: read the pages below in order. :doc:`examples/model` and :doc:`examples/data` set up the modeling primitives; :doc:`examples/twostage` introduces the regression baseline; :doc:`examples/function` and :doc:`examples/training` cover the end-to-end methods; :doc:`examples/pool` explains the cached solution pool shared by the contrastive and learning-to-rank methods; :doc:`examples/evaluation` defines the metrics.
+* **New to PyEPO**: read the pages below in order.
+
+  #. :doc:`examples/model` — define the optimization model
+  #. :doc:`examples/data` — generate data and build the dataset
+  #. :doc:`examples/twostage` — the two-stage regression baseline
+  #. :doc:`examples/function` — the end-to-end training modules
+  #. :doc:`examples/training` — training loop templates
+  #. :doc:`examples/pool` — the cached solution pool shared by the contrastive and learning-to-rank methods
+  #. :doc:`examples/evaluation` — decision-quality metrics
+
 * **Want to pick a method**: jump to the *Choosing a Method* section of :doc:`examples/function`. It poses three questions (what supervision you have, whether you want a loss or a solution, special constraints) and points you at the right module.
 * **Training in JAX/Flax**: :doc:`examples/jax` mirrors every loss for ``jax.grad``-based end-to-end training, on MPAX (GPU-native) or any solver via ``jax.pure_callback``.
 * **Prefer hands-on**: jump to the *Notebooks* section below for runnable Colab examples grouped by purpose.
@@ -40,7 +49,7 @@ GPU Acceleration
 Applied Examples
 ----------------
 
-* `05 2D Knapsack Solution Visualization <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%202D%20knapsack%20Solution%20Visualization.ipynb>`_: visualize selected items for a 2D knapsack instance to inspect what the trained predictor is doing.
+* `05 2D Knapsack Solution Visualization <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%202D%20Knapsack%20Solution%20Visualization.ipynb>`_: visualize selected items for a 2D knapsack instance to inspect what the trained predictor is doing.
 * `06 Warcraft Shortest Path <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Warcraft%20Shortest%20Path.ipynb>`_: train an image-based shortest-path predictor on the Warcraft terrain dataset, using a CNN encoder feeding into PyEPO.
 * `07 Real-World Energy Scheduling <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20Real-World%20Energy%20Scheduling.ipynb>`_: apply PyEPO to a real-world energy scheduling benchmark with measured demand data.
 

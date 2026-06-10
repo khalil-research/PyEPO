@@ -20,7 +20,7 @@ Regret
 Unambiguous Regret
 ==================
 
-When a predicted cost vector :math:`\hat{c}` yields multiple optimal solutions for :math:`\underset{\mathbf{w} \in S}{\min}\;\hat{\mathbf{c}}^T \mathbf{w}`, the unambiguous regret considers the worst case: :math:`l_{URegret}(\hat{\mathbf{c}}, \mathbf{c}) = \underset{\mathbf{w} \in W^*(\hat{\mathbf{c}})}{\max} \mathbf{w}^T \mathbf{c} - z^*(\mathbf{c})`.
+When a predicted cost vector :math:`\hat{\mathbf{c}}` yields multiple optimal solutions for :math:`\underset{\mathbf{w} \in S}{\min}\;\hat{\mathbf{c}}^T \mathbf{w}`, the regret depends on which optimum the solver happens to return. The unambiguous regret removes this ambiguity by scoring the worst case: :math:`l_{URegret}(\hat{\mathbf{c}}, \mathbf{c}) = \underset{\mathbf{w} \in W^*(\hat{\mathbf{c}})}{\max} \mathbf{w}^T \mathbf{c} - z^*(\mathbf{c})`.
 
 .. image:: ../../images/regret.png
   :width: 650
