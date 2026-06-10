@@ -537,6 +537,59 @@ class TestImplicitMLE:
         np.testing.assert_allclose(g, expected, atol=5e-2)  # mpax PDHG re-solve
 
 
+@requires_jax
+@requires_gurobi
+class TestMaximizeSenseEstimators:
+    """DBB / one-sided I-MLE on a MAXIMIZE knapsack: the perturbation direction flips sign."""
+
+    def _setup(self):
+        model, c = _perturbed_setup("max")
+        pred = (c * 1.2).astype(np.float32)
+        target = np.random.RandomState(3).randn(*pred.shape).astype(np.float32)
+        return model, pred, target
+
+    def test_blackbox_opt_grad_matches_closed_form(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import blackboxOpt
+        from pyepo.func.jax.utils import _solve_batch
+
+        model, pred, target = self._setup()
+        lambd = 10.0
+        dbb = blackboxOpt(model, lambd=lambd)
+        g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * dbb(p)))(jnp.asarray(pred)))
+        # MAXIMIZE: perturb against the upstream gradient and flip the sign
+        wp, _ = _solve_batch(jnp.asarray(pred), model)
+        wq, _ = _solve_batch(jnp.asarray(pred - lambd * target), model)
+        expected = -(np.array(wq) - np.array(wp)) / lambd
+        np.testing.assert_allclose(g, expected, atol=1e-4)
+
+    def test_implicit_mle_grad_matches_reference(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import implicitMLE
+        from pyepo.func.jax.perturbed import _solve_or_cache_3d
+        from pyepo.func.jax.utils import _sum_gamma_sample
+
+        model, pred, target = self._setup()
+        lambd = 10.0
+        imle = implicitMLE(model, n_samples=5, sigma=1.0, lambd=lambd, kappa=5.0, seed=0)
+        # seed-derived noise reproduces the module's perturbed costs
+        b, d = pred.shape
+        _key, sub = jax.random.split(jax.random.PRNGKey(0))
+        noises = _sum_gamma_sample(sub, 5.0, 10, (b, 5, d))
+        ptb_c = jnp.asarray(pred)[:, None, :] + 1.0 * noises
+        g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * imle(p)))(jnp.asarray(pred)))
+        # MAXIMIZE: perturb against the upstream gradient and flip the sign
+        ptb_sols = np.array(_solve_or_cache_3d(ptb_c, imle))
+        delta = lambd * jnp.asarray(target)[:, None, :]
+        sols_neg = np.array(_solve_or_cache_3d(ptb_c - delta, imle))
+        expected = -(sols_neg - ptb_sols).mean(axis=1) / lambd
+        np.testing.assert_allclose(g, expected, atol=1e-4)
+
+
 @requires_mpax
 class TestPG:
     """PG one-sided backward differencing: grad == (w(pred) - w(pred - sigma*c)) / sigma / B."""

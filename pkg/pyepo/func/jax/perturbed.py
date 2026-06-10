@@ -351,7 +351,13 @@ def _implicit_mle_bwd(module, sigma, lambd, two_sides, res, g):
         both = _solve_or_cache_3d(jnp.concatenate([ptb_c + delta, ptb_c - delta], axis=1), module)
         grad = (both[:, :n] - both[:, n:]).mean(axis=1) / (2 * lambd + _EPS)
     else:
-        grad = (_solve_or_cache_3d(ptb_c + delta, module) - ptb_sols).mean(axis=1) / (lambd + _EPS)
+        # the informative perturbation direction flips for MAX
+        if module.optmodel.modelSense == EPO.MINIMIZE:
+            sign = 1.0
+        else:
+            sign = -1.0
+        ptb_sols_shift = _solve_or_cache_3d(ptb_c + sign * delta, module)
+        grad = sign * (ptb_sols_shift - ptb_sols).mean(axis=1) / (lambd + _EPS)
     return (grad, jnp.zeros_like(noises))
 
 
@@ -453,7 +459,13 @@ def _adaptive_implicit_mle_bwd(module, res, g):
         both = _solve_or_cache_3d(jnp.concatenate([ptb_c + delta, ptb_c - delta], axis=1), module)
         grad = (both[:, :n] - both[:, n:]).mean(axis=1) / (2 * lambd + _EPS)
     else:
-        grad = (_solve_or_cache_3d(ptb_c + delta, module) - ptb_sols).mean(axis=1) / (lambd + _EPS)
+        # the informative perturbation direction flips for MAX
+        if module.optmodel.modelSense == EPO.MINIMIZE:
+            sign = 1.0
+        else:
+            sign = -1.0
+        ptb_sols_shift = _solve_or_cache_3d(ptb_c + sign * delta, module)
+        grad = sign * (ptb_sols_shift - ptb_sols).mean(axis=1) / (lambd + _EPS)
     # online alpha update
     grad_norm = float((jnp.abs(grad) > _EPS).mean())
     module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm

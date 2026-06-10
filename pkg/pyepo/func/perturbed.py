@@ -492,8 +492,13 @@ class implicitMLEFunc(Function):
             ptb_sols_pos, ptb_sols_neg = combined_sols[:, :n], combined_sols[:, n:]
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + _EPS)
         else:
-            ptb_sols_pos = _solve_or_cache_3d(ptb_c + delta, module)
-            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (module.lambd + _EPS)
+            # the informative perturbation direction flips for MAX
+            if module.optmodel.modelSense == EPO.MINIMIZE:
+                sign = 1.0
+            else:
+                sign = -1.0
+            ptb_sols_shift = _solve_or_cache_3d(ptb_c + sign * delta, module)
+            grad = sign * (ptb_sols_shift - ptb_sols).mean(dim=1) / (module.lambd + _EPS)
         return grad, None
 
 
@@ -592,8 +597,13 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             ptb_sols_pos, ptb_sols_neg = combined_sols[:, :n], combined_sols[:, n:]
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + _EPS)
         else:
-            ptb_sols_pos = _solve_or_cache_3d(ptb_c + delta, module)
-            grad = (ptb_sols_pos - ptb_sols).mean(dim=1) / (lambd + _EPS)
+            # the informative perturbation direction flips for MAX
+            if module.optmodel.modelSense == EPO.MINIMIZE:
+                sign = 1.0
+            else:
+                sign = -1.0
+            ptb_sols_shift = _solve_or_cache_3d(ptb_c + sign * delta, module)
+            grad = sign * (ptb_sols_shift - ptb_sols).mean(dim=1) / (lambd + _EPS)
         # moving average of the gradient norm
         grad_norm = (grad.abs() > _EPS).float().mean().item()
         module.grad_norm_avg = 0.9 * module.grad_norm_avg + 0.1 * grad_norm

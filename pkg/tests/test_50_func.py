@@ -325,6 +325,48 @@ class TestMaximizeSense:
         out.sum().backward()
         assert torch.isfinite(cp.grad).all()
 
+    def test_blackbox_grad_matches_estimator(self, ks_data):
+        from pyepo.func.blackbox import blackboxOpt
+        from pyepo.func.utils import _solve_batch
+
+        optmodel, _dataset, loader = ks_data
+        _x, c, _w, _z = take_batch(loader)
+        mod = blackboxOpt(optmodel, lambd=10, processes=1)
+        cp = (c * 1.2).clone().detach().requires_grad_(True)
+        torch.manual_seed(0)
+        target = torch.randn_like(cp)
+        (mod(cp) * target).sum().backward()
+        # MAXIMIZE: perturb against the upstream gradient and flip the sign
+        sol_p, _ = _solve_batch(cp.detach(), optmodel, 1, None)
+        sol_q, _ = _solve_batch(cp.detach() - mod.lambd * target, optmodel, 1, None)
+        expected = -(sol_q - sol_p) / mod.lambd
+        assert torch.allclose(cp.grad, expected, atol=solver_atol(optmodel))
+
+    def test_implicit_mle_grad_matches_estimator(self, ks_data):
+        from pyepo.func.perturbed import implicitMLE
+        from pyepo.utils import _EPS
+
+        optmodel, _dataset, loader = ks_data
+        _x, c, _w, _z = take_batch(loader)
+        mod = implicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0)
+        cp = (c * 1.2).clone().detach()
+        torch.manual_seed(0)
+        target = torch.randn_like(cp)
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        # perturbed costs sharing the module's Sum-of-Gamma noise (fresh draw, same default seed)
+        noises = sumGammaDistribution(kappa=5).sample(
+            size=(cp.shape[0], mod.n_samples, cp.shape[1]),
+            device=torch.device("cpu"),
+            dtype=torch.float32,
+        )
+        ptb_c = cp.unsqueeze(1) + mod.sigma * noises
+        # MAXIMIZE: perturb against the upstream gradient and flip the sign
+        ptb_sols = _solve_3d_batch(optmodel, ptb_c)
+        ptb_sols_neg = _solve_3d_batch(optmodel, ptb_c - mod.lambd * target.unsqueeze(1))
+        expected = -(ptb_sols_neg - ptb_sols).mean(dim=1) / (mod.lambd + _EPS)
+        assert torch.allclose(cpg.grad, expected, atol=solver_atol(optmodel))
+
 
 @requires_gurobi
 class TestSolveRatioCaching:

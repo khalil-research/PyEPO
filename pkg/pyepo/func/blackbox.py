@@ -115,12 +115,17 @@ class blackboxOptFunc(Function):
         cp = pred_cost.detach()
         wp = pred_sol.detach()
         dl = grad_output.detach()
+        # the informative perturbation direction flips for MAX
+        if module.optmodel.modelSense == EPO.MINIMIZE:
+            sign = 1.0
+        else:
+            sign = -1.0
         # perturbed costs
-        cq = cp + lambd * dl
+        cq = cp + sign * lambd * dl
         # solve
         sol, _ = _solve_or_cache(cq, module)
         # get gradient
-        grad = (sol - wp) / (lambd + _EPS)
+        grad = sign * (sol - wp) / (lambd + _EPS)
         return grad, None
 
 

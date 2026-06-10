@@ -64,10 +64,15 @@ def _blackbox_opt_fwd(pred_cost, module, lambd):
 
 def _blackbox_opt_bwd(module, lambd, res, g):
     pred_cost, wp = res
+    # the informative perturbation direction flips for MAX
+    if module.optmodel.modelSense == EPO.MINIMIZE:
+        sign = 1.0
+    else:
+        sign = -1.0
     # perturbed solve in the backward pass
-    sol, _ = _solve_or_cache(pred_cost + lambd * g, module)
+    sol, _ = _solve_or_cache(pred_cost + sign * lambd * g, module)
     # interpolation gradient
-    grad = (sol - wp) / (lambd + _EPS)
+    grad = sign * (sol - wp) / (lambd + _EPS)
     return (grad,)
 
 
