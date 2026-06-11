@@ -504,13 +504,14 @@ class TestDataloaderMetricsJax:
     def test_callable_returns_non_negative_float(self, mpax_data):
         import pyepo
         optmodel, _ds, loader = mpax_data
-        reg = pyepo.metric.regret(lambda x: x, optmodel, loader)
+        fn = lambda x: np.ones((x.shape[0], optmodel.num_cost), dtype=np.float32)  # noqa: E731
+        reg = pyepo.metric.regret(fn, optmodel, loader)
         assert isinstance(reg, float) and reg >= 0
 
     def test_callable_reductions_consistent(self, mpax_data):
         import pyepo
         optmodel, ds, loader = mpax_data
-        fn = lambda x: x  # noqa: E731
+        fn = lambda x: np.ones((x.shape[0], optmodel.num_cost), dtype=np.float32)  # noqa: E731
         per = pyepo.metric.regret(fn, optmodel, loader, reduction="none")
         total = pyepo.metric.regret(fn, optmodel, loader, reduction="sum")
         assert isinstance(per, np.ndarray) and len(per) == len(ds)
