@@ -152,11 +152,11 @@ Multi-dimensional 0/1 knapsack: maximize value subject to per-dimension capaciti
 Traveling Salesperson Model
 ---------------------------
 
-Shortest tour visiting each city once. ``formulation`` is ``"DFJ"`` (lazy subtour elimination), ``"GG"``, or ``"MTZ"``. Backends: gurobi and copt (all three); pyomo (GG, MTZ).
+Shortest tour visiting each city once. ``formulation`` is ``"DFJ"`` (lazy subtour elimination), ``"GG"``, or ``"MTZ"``. Backends: gurobi and copt (all three); pyomo (GG, MTZ). On gurobi, ``recycle_cuts=True`` keeps the subtour cuts found in one solve for later solves — a worthwhile speedup when the same model is re-solved many times during training.
 
 .. code-block:: python
 
-   optmodel = model.tspModel(20, formulation="DFJ")
+   optmodel = model.tspModel(20, formulation="DFJ", recycle_cuts=True)
 
 .. autofunction:: pyepo.model.tspModel
 
@@ -164,7 +164,7 @@ Shortest tour visiting each city once. ``formulation`` is ``"DFJ"`` (lazy subtou
 Capacitated Vehicle Routing Model
 ---------------------------------
 
-Shortest vehicle routes from a depot that serve every customer within capacity. ``formulation`` is ``"RCI"`` (lazy rounded-capacity cuts) or ``"MTZ"``. Backends: gurobi and copt (both); pyomo (MTZ).
+Shortest vehicle routes from a depot that serve every customer within capacity. ``formulation`` is ``"RCI"`` (lazy rounded-capacity cuts) or ``"MTZ"``. Backends: gurobi and copt (both); pyomo (MTZ). On gurobi, ``"RCI"`` also accepts ``recycle_cuts=True`` to keep the cuts found in one solve for later solves.
 
 .. code-block:: python
 
