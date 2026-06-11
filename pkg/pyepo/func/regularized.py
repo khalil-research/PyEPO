@@ -20,6 +20,16 @@ if TYPE_CHECKING:
     from pyepo.model.opt import optModel
 
 
+def _fw_free_slot(weights: torch.Tensor) -> torch.Tensor:
+    """Slot index for a new active vertex: the first free slot, or the smallest-weight atom when the buffer is full."""
+    free_mask = weights <= 1e-12
+    return torch.where(
+        free_mask.any(dim=-1),
+        free_mask.to(weights.dtype).argmax(dim=-1),
+        weights.argmin(dim=-1),
+    )
+
+
 @torch.no_grad()
 def _away_step_frank_wolfe(
     module: optModule,
@@ -96,8 +106,9 @@ def _away_step_frank_wolfe(
         match = (dist_sq < 1e-6) & (weights > 0)
         has_match = match.any(dim=-1)
         match_idx = match.to(dtype).argmax(dim=-1)
-        free_idx = (weights <= 1e-12).to(dtype).argmax(dim=-1)
-        add_new = (~has_match) & use_fw
+        free_idx = _fw_free_slot(weights)
+        # zero-weight adds carry no mass and must not displace an atom
+        add_new = (~has_match) & use_fw & (gamma_fw > 0)
         weights[batch_idx, match_idx] = weights[batch_idx, match_idx] + gamma_fw * (
             has_match & use_fw
         ).to(dtype)
@@ -107,7 +118,9 @@ def _away_step_frank_wolfe(
         vertex_norms[batch_idx, free_idx] = torch.where(
             add_new, v_norm_sq, vertex_norms[batch_idx, free_idx]
         )
-        weights[batch_idx, free_idx] = torch.where(add_new, gamma_fw, weights[batch_idx, free_idx])
+        weights[batch_idx, free_idx] = torch.where(
+            add_new, gamma_fw + weights[batch_idx, free_idx], weights[batch_idx, free_idx]
+        )
         # away subtract, then clear FP residue so dropped atoms leave the active set
         weights[batch_idx, away_idx] = weights[batch_idx, away_idx] - gamma_away
         weights = weights.clamp(min=0.0)

@@ -27,6 +27,16 @@ def _sense_sign(optmodel):
     return -1.0 if optmodel.modelSense == EPO.MINIMIZE else 1.0
 
 
+def _fw_free_slot(w):
+    """Slot index for a new active vertex: the first free slot, or the smallest-weight atom when the buffer is full."""
+    free_mask = w <= 1e-12
+    return jnp.where(
+        jnp.any(free_mask, axis=-1),
+        jnp.argmax(free_mask.astype(w.dtype), axis=-1),
+        jnp.argmin(w, axis=-1),
+    )
+
+
 def _draw_use_cache(module):
     # per-forward coin: reuse the cached vertex pool as the linear minimization oracle when the draw misses solve_ratio
     return module.solpool is not None and module._branch_rng.uniform() > module.solve_ratio
@@ -114,12 +124,13 @@ def _away_step_frank_wolfe(theta, module, use_cache=False):
         match = (dist_sq < 1e-6) & (w > 0)
         has_match = jnp.any(match, axis=-1)
         match_idx = jnp.argmax(match.astype(theta.dtype), axis=-1)
-        free_idx = jnp.argmax((w <= 1e-12).astype(theta.dtype), axis=-1)
-        add_new = (~has_match) & use_fw
+        free_idx = _fw_free_slot(w)
+        # zero-weight adds carry no mass and must not displace an atom
+        add_new = (~has_match) & use_fw & (gamma_fw > 0)
         w = w.at[bidx, match_idx].add(gamma_fw * (has_match & use_fw).astype(theta.dtype))
         vt = vt.at[bidx, free_idx].set(jnp.where(add_new[:, None], v, vt[bidx, free_idx]))
         vn = vn.at[bidx, free_idx].set(jnp.where(add_new, vnv, vn[bidx, free_idx]))
-        w = w.at[bidx, free_idx].set(jnp.where(add_new, gamma_fw, w[bidx, free_idx]))
+        w = w.at[bidx, free_idx].set(jnp.where(add_new, gamma_fw + w[bidx, free_idx], w[bidx, free_idx]))
         # away subtract, then clear FP residue so dropped atoms leave the active set
         w = w.at[bidx, away_idx].add(-gamma_away)
         w = jnp.where(w < 1e-12, 0.0, jnp.maximum(w, 0.0))

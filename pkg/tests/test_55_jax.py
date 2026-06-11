@@ -118,6 +118,20 @@ class TestSolveCacheHelpers:
 
 
 @requires_jax
+class TestFrankWolfeFreeSlot:
+    """Active-set slot pick: the first free slot, else the smallest-weight atom."""
+
+    def test_matches_expected_slots(self):
+        import jax.numpy as jnp
+
+        from pyepo.func.jax.regularized import _fw_free_slot
+
+        # row 1 has a free slot; row 2 is full and merges into the smallest atom
+        w = jnp.asarray([[0.5, 0.0, 0.5, 0.0], [0.4, 0.3, 0.1, 0.2]])
+        np.testing.assert_array_equal(np.array(_fw_free_slot(w)), [1, 2])
+
+
+@requires_jax
 class TestMaskPred:
     """Partial-prediction masking: zero perturbation on non-predicted cost positions."""
 

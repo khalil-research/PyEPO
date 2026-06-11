@@ -140,6 +140,23 @@ class TestSolutionPool:
         assert pool.shape[0] == 3
 
 
+class TestFrankWolfeFreeSlot:
+    """Active-set slot pick: the first free slot, else the smallest-weight atom."""
+
+    def test_picks_first_free_slot(self):
+        from pyepo.func.regularized import _fw_free_slot
+
+        w = torch.tensor([[0.5, 0.0, 0.5, 0.0]])
+        assert _fw_free_slot(w).tolist() == [1]
+
+    def test_full_buffer_picks_smallest_atom(self):
+        from pyepo.func.regularized import _fw_free_slot
+
+        # a full buffer merges into the smallest atom instead of clobbering slot 0
+        w = torch.tensor([[0.4, 0.3, 0.1, 0.2]])
+        assert _fw_free_slot(w).tolist() == [2]
+
+
 class TestPerturbedInternals:
     """Perturbed estimator internals (pure tensor math, no solver)."""
 
