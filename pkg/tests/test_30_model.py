@@ -637,6 +637,21 @@ def test_vrp_rci_lazy_constrs_tracked():
     assert isinstance(m._model._lazy_constrs, list)
 
 
+@requires_gurobi
+@pytest.mark.parametrize("problem", ["tsp", "vrp"])
+def test_lazy_buffer_holds_current_solve_only(problem):
+    if problem == "tsp":
+        from pyepo.model.grb.tsp import tspDFJModel
+        m = tspDFJModel(num_nodes=5)
+    else:
+        m, _ = _make_vrp("grb", "RCI")
+    # a sentinel from a previous solve must not survive the next one
+    m._model._lazy_constrs.append("sentinel")
+    m.setObj(np.random.RandomState(0).rand(m.num_cost))
+    m.solve()
+    assert "sentinel" not in m._model._lazy_constrs
+
+
 # ============================================================
 # Cross-backend objective parity (vs Gurobi reference)
 # ============================================================

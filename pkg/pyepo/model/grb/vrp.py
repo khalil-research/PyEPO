@@ -98,6 +98,8 @@ class vrpRCIModel(vrpABModel):
         Returns:
             tuple: edge-selection vector (uint8) and objective value (float)
         """
+        # the cut buffer tracks the current solve only
+        self._model._lazy_constrs = []
         # optimize
         self._model.optimize(self._vrpCallback)
         # threshold to binary selection

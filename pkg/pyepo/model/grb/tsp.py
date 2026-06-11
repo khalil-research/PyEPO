@@ -234,6 +234,8 @@ class tspDFJModel(tspABModel):
         """
         A method to solve model
         """
+        # the cut buffer tracks the current solve only
+        self._model._lazy_constrs = []
         self._model.optimize(self._subtourelim)
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars))
         sol = (xvals > _EDGE_ACTIVE_TOL).astype(np.uint8)

@@ -224,15 +224,8 @@ class TestOptDatasetConstrs:
             def __setattr__(self, name, value):
                 setattr(self._real, name, value)
 
-        original_copy = model.copy
-
-        def patched_copy():
-            m = original_copy()
-            m.solve = fake_solve
-            m._model = _StatusProxy(m._model, 2)  # 2 == GRB.OPTIMAL
-            return m
-
-        model.copy = patched_copy
+        model.solve = fake_solve
+        model._model = _StatusProxy(model._model, 2)  # 2 == GRB.OPTIMAL
         rng = np.random.RandomState(0)
         x = rng.randn(2, NUM_FEAT).astype(np.float32)
         c = rng.randn(2, num_cost).astype(np.float32)

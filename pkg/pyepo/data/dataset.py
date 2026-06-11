@@ -285,9 +285,9 @@ class optDatasetConstrs(optDataset):
     """
     PyTorch ``Dataset`` for the CaVE cone-aligned loss.
 
-    Stores features and cost coefficients, solves each instance with a fresh
-    copy of the Gurobi model, and extracts the **normals of the binding
-    constraints at the optimal vertex** in canonical ``<=`` orientation.
+    Stores features and cost coefficients, solves each instance, and extracts
+    the **normals of the binding constraints at the optimal vertex** in
+    canonical ``<=`` orientation.
     These normals span the polyhedral cone onto which ``coneAlignedCosine``
     projects the predicted cost vector during training.
 
@@ -359,9 +359,8 @@ class optDatasetConstrs(optDataset):
         ctrs: list[np.ndarray] = []
         valid: list[int] = []
         logger.info("Optimizing for optDatasetConstrs...")
+        model = self.model
         for i, c in enumerate(tqdm(self.costs)):
-            # fresh per-instance copy keeps the lazy-constraint buffer clean
-            model = self.model.copy()
             model.setObj(model._fullCost(c))
             sol, obj = model.solve()
             # infeasibility check
@@ -459,11 +458,14 @@ def _extract_tight_normals(
         senses_arr = np.asarray(grb.getAttr("Sense", constrs))
         tight_mask = np.abs(slacks) < tol
         if tight_mask.any():
-            # project the constraint matrix onto cost-variable columns
-            cost_col_idx = np.asarray([v.index for v in cost_vars])
-            A = grb.getA().tocsr()
+            # cost-column slice cached across solves; the row count keys invalidation
+            cache = getattr(grb, "_cave_A_cost", None)
+            if cache is None or cache[0] != grb.NumConstrs:
+                cost_col_idx = np.asarray([v.index for v in cost_vars])
+                cache = (grb.NumConstrs, grb.getA().tocsr()[:, cost_col_idx])
+                grb._cave_A_cost = cache
             # extract all tight rows in a single sparse-to-dense conversion
-            A_tight = A[:, cost_col_idx][tight_mask].toarray()
+            A_tight = cache[1][tight_mask].toarray()
             tight_senses = senses_arr[tight_mask]
             is_le = tight_senses == GRB.LESS_EQUAL
             is_ge = tight_senses == GRB.GREATER_EQUAL
