@@ -107,9 +107,10 @@ def _update_solution_pool(sol, solpool):
     A function to append rows of sol not already in the pool
     """
     sol_uniq = jnp.unique(sol, axis=0)
-    # exact-equality via L1 distance (== 0 -> identical row)
+    # capped L1-tolerance dedup: first-order solvers re-emit near-identical vertices
+    tol = min(1e-4 * sol.shape[-1], 0.1)
     dists = jnp.sum(jnp.abs(sol_uniq[:, None, :] - solpool[None, :, :]), axis=-1)
-    is_new = jnp.all(dists != 0, axis=1)
+    is_new = jnp.all(dists > tol, axis=1)
     # host-side gather: the number of new rows is data-dependent
     new_rows = np.asarray(sol_uniq)[np.asarray(is_new)]
     if new_rows.shape[0]:

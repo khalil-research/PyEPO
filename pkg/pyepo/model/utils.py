@@ -8,13 +8,25 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
+import numpy as np
+from scipy import sparse
+
 if TYPE_CHECKING:
-    import numpy as np
     import torch
 
 
 # edge/arc treated as inactive when solver value falls below this (≈ MIP feasibility tol)
 _EDGE_ACTIVE_TOL: float = 1e-6
+
+
+def _incidence_matrix(arcs: list[tuple[int, int]], num_nodes: int) -> sparse.csr_matrix:
+    """Sparse node-arc incidence: column a holds -1 at row u and +1 at row v for arc a = (u, v)."""
+    arr = np.asarray(arcs, dtype=np.int64).reshape(-1, 2)
+    num_arcs = arr.shape[0]
+    rows = np.concatenate([arr[:, 0], arr[:, 1]])
+    cols = np.tile(np.arange(num_arcs), 2)
+    vals = np.concatenate([-np.ones(num_arcs), np.ones(num_arcs)])
+    return sparse.csr_matrix((vals, (rows, cols)), shape=(num_nodes, num_arcs))
 
 
 def _get_grid_arcs(grid: tuple[int, int]) -> list[tuple[int, int]]:

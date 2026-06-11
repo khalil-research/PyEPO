@@ -139,6 +139,12 @@ class TestSolutionPool:
         pool = _update_solution_pool(torch.tensor([[1.0, 0.0], [1.0, 1.0]]), pool)
         assert pool.shape[0] == 3
 
+    def test_near_duplicate_within_tolerance_deduped(self):
+        # first-order solver noise must not grow the pool
+        pool = _update_solution_pool(torch.tensor([[1.0, 0.0]]), None)
+        pool = _update_solution_pool(torch.tensor([[1.0 + 1e-6, 1e-6]]), pool)
+        assert pool.shape[0] == 1
+
 
 class TestFrankWolfeFreeSlot:
     """Active-set slot pick: the first free slot, else the smallest-weight atom."""

@@ -163,9 +163,10 @@ def _update_solution_pool(
     if sol.device != solpool.device:
         sol = sol.to(solpool.device)
     sol_uniq = torch.unique(sol, dim=0)
-    # exact-equality via L1 distance (== 0 ⇒ identical row)
+    # capped L1-tolerance dedup: first-order solvers re-emit near-identical vertices
+    tol = min(1e-4 * sol.shape[-1], 0.1)
     dists = torch.cdist(sol_uniq, solpool, p=1.0)
-    is_new = (dists != 0).all(dim=1)
+    is_new = (dists > tol).all(dim=1)
     if bool(is_new.any()):
         solpool = torch.cat((solpool, sol_uniq[is_new]), dim=0)
     return solpool

@@ -15,6 +15,7 @@ except ImportError:
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.grb.grbmodel import optGrbModel
+from pyepo.model.utils import _incidence_matrix
 
 
 class shortestPathModel(shortestPathBase, optGrbModel):
@@ -39,11 +40,8 @@ class shortestPathModel(shortestPathBase, optGrbModel):
         num_arcs = len(self.arcs)
         x = m.addMVar(num_arcs, ub=1.0, name="x")
         m.modelSense = GRB.MINIMIZE
-        # node-arc incidence: row v sums (in-flow) - (out-flow) at v
-        A = np.zeros((num_nodes, num_arcs), dtype=np.float64)
-        for a, (u, v) in enumerate(self.arcs):
-            A[u, a] = -1.0
-            A[v, a] = +1.0
+        # sparse node-arc incidence: row v sums (in-flow) - (out-flow) at v
+        A = _incidence_matrix(self.arcs, num_nodes)
         b = np.zeros(num_nodes, dtype=np.float64)
         b[0] = -1.0
         b[num_nodes - 1] = 1.0

@@ -61,6 +61,16 @@ class TestSolveCacheHelpers:
         out = _update_solution_pool(jnp.array([[1.0, 0.0], [1.0, 1.0]]), pool)
         assert int(out.shape[0]) == 3
 
+    def test_update_pool_dedups_near_duplicates(self):
+        import jax.numpy as jnp
+
+        from pyepo.func.jax.utils import _update_solution_pool
+
+        pool = jnp.array([[1.0, 0.0]])
+        # first-order solver noise must not grow the pool
+        out = _update_solution_pool(jnp.array([[1.0 + 1e-6, 1e-6]]), pool)
+        assert int(out.shape[0]) == 1
+
     def test_cache_in_pass_minimize_picks_min_obj(self):
         from unittest.mock import MagicMock
 
