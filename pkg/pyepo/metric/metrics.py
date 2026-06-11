@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
-from pyepo.metric.regret import calRegret
+from pyepo.metric.regret import _checkLinearObj, calRegret
 from pyepo.utils import _EPS, getArgs
 
 if TYPE_CHECKING:
@@ -47,6 +47,7 @@ def SPOError(
             stacklevel=2,
         )
         optmodel = optmodel(**(args or {}))
+    _checkLinearObj(optmodel)
     pred_cost = np.array(pred_cost)
     true_cost = np.array(true_cost)
     assert pred_cost.shape == true_cost.shape, "Shape of true and predicted value does not match."

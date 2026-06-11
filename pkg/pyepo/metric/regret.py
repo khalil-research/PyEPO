@@ -62,6 +62,18 @@ def _objOffset(optmodel) -> float:
     return float(problem.obj_offset) if problem is not None else 0.0
 
 
+def _checkLinearObj(optmodel) -> None:
+    """
+    Raise if the model carries a quadratic objective term.
+
+    Args:
+        optmodel: optimization model
+    """
+    problem = getattr(optmodel, "problem", None)
+    if problem is not None and getattr(problem, "obj_Q", None) is not None:
+        raise ValueError("Regret metrics require a linear objective.")
+
+
 def regret(
     predmodel: nn.Module,
     optmodel: optModel,
@@ -99,6 +111,7 @@ def regret(
     """
     if reduction not in ("normalized", "sum", "mean", "none"):
         raise ValueError(f"Invalid reduction '{reduction}'.")
+    _checkLinearObj(optmodel)
     # force processes to 1 for MPAX
     if isinstance(optmodel, optMpaxModel) and processes != 1:
         logger.warning("MPAX does not support multiprocessing. Setting `processes = 1`.")
@@ -175,6 +188,7 @@ def calRegret(
     Returns:
         float: true regret
     """
+    _checkLinearObj(optmodel)
     # opt sol for pred cost
     optmodel.setObj(optmodel._fullCost(pred_cost))
     sol, _ = optmodel.solve()

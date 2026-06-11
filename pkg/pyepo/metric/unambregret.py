@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.metric.regret import _objOffset, _regretFromObj
+from pyepo.metric.regret import _checkLinearObj, _objOffset, _regretFromObj
 from pyepo.utils import _EPS, costToNumpy
 
 if TYPE_CHECKING:
@@ -54,6 +54,7 @@ def unambRegret(
     Returns:
         float: normalized unambiguous regret
     """
+    _checkLinearObj(optmodel)
     # evaluate under eval(); the original mode is restored afterwards
     was_training = predmodel.training
     predmodel.eval()
@@ -109,6 +110,7 @@ def calUnambRegret(
     """
     if max_iter <= 0:
         raise RuntimeError("Max iterations reached in calUnambRegret.")
+    _checkLinearObj(optmodel)
     # lift to the full objective space, then change precision
     cp = np.around(optmodel._fullCost(np.asarray(pred_cost, dtype=float)) / tolerance)
     # opt sol for pred cost

@@ -167,6 +167,26 @@ class TestCalRegret:
         _, true_obj = m.solve()
         assert abs(calRegret(m, cost, cost, true_obj)) < 1e-6
 
+    def test_rejects_quadratic_objective(self):
+        from pyepo import dsl
+        x = dsl.Variable(2, lb=0, ub=1)
+        c = dsl.Parameter(2)
+        m = dsl.Problem(
+            dsl.Minimize(c @ x + (x - 1) @ (x - 1)), [x.sum() >= 0.0]
+        ).compile(backend="gurobi")
+        cost = np.array([1.0, -1.0])
+        with pytest.raises(ValueError):
+            calRegret(m, cost, cost, 0.0)
+        with pytest.raises(ValueError):
+            calUnambRegret(m, cost, cost, 0.0)
+        with pytest.raises(ValueError):
+            SPOError(cost.reshape(1, -1), cost.reshape(1, -1), m)
+        import pyepo
+        with pytest.raises(ValueError):
+            pyepo.metric.regret(_IdentityModel(), m, _loader())
+        with pytest.raises(ValueError):
+            pyepo.metric.unambRegret(_IdentityModel(), m, _loader())
+
 
 @requires_gurobi
 class TestSPOError:
