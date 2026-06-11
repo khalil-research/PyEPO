@@ -440,7 +440,8 @@
 <span class="math notranslate nohighlight">\(\mathbb{E}_{\boldsymbol{\xi}}[\mathbf{w}^*(\hat{\mathbf{c}} +
 \sigma\boldsymbol{\xi})]\)</span> by Monte Carlo averaging, giving an
 informative gradient where the bare solver gives zero. Returns a solution;
-pair with a task loss.</p>
+pair with a task loss. The forward accepts <code class="docutils literal notranslate"><span class="pre">key=</span></code> for explicit RNG
+control, required under <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>.</p>
 <p>Reference: Berthet et al. (2020)
 <a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a></p>
 <dl class="py attribute">
@@ -485,7 +486,8 @@ log-normal noise <span class="math notranslate nohighlight">\(\exp(\sigma\boldsy
 loss against the true optimum, returning a scalar loss whose gradient is
 the residual <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) -
 \mathbb{E}_{\boldsymbol{\xi}}[\mathbf{w}^*(\hat{\mathbf{c}} +
-\sigma\boldsymbol{\xi})]\)</span>.</p>
+\sigma\boldsymbol{\xi})]\)</span>. The forward accepts <code class="docutils literal notranslate"><span class="pre">key=</span></code> for explicit
+RNG control, required under <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>.</p>
 <p>Reference: Berthet et al. (2020)
 <a class="reference external" href="https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html">https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html</a></p>
 <dl class="py attribute">
@@ -525,7 +527,8 @@ with log-normal noise <span class="math notranslate nohighlight">\(\exp(\sigma\b
 induces a virtual update <span class="math notranslate nohighlight">\(\hat{\mathbf{c}} + \lambda \mathbf{d}\)</span>,
 and the gradient is a directional finite difference between smoothed
 solutions at the updated and original costs, sharing one Sum-of-Gamma noise
-realization across both.</p>
+realization across both. The forward accepts <code class="docutils literal notranslate"><span class="pre">key=</span></code> for explicit RNG
+control, required under <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>.</p>
 <p>Reference: Niepert, Minervini &amp; Franceschi (2021)
 <a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html</a></p>
 <dl class="py attribute">
