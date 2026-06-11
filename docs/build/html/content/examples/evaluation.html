@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Reference" href="../ref.html"><link rel="prev" title="Solution Pool" href="pool.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Evaluation - PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.1 documentation</title>
+        <title>Evaluation - PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.1 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.1 documentation</span>
+  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -379,7 +379,7 @@
 <p><code class="docutils literal notranslate"><span class="pre">pyepo.metric.regret</span></code> evaluates the decision quality of a prediction model. Regret is defined as <span class="math notranslate nohighlight">\(l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^T \mathbf{w}^*(\hat{\mathbf{c}}) - z^*(\mathbf{c})\)</span>, which measures the excess cost of the predicted solution over the true optimum.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.metric.</span></span><span class="sig-name descname"><span class="pre">regret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normalized'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span></span></span></dt>
+<span class="sig-prename descclassname"><span class="pre">pyepo.metric.</span></span><span class="sig-name descname"><span class="pre">regret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">nn.Module</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normalized'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span></span></span></dt>
 <dd><p>True regret (SPO loss) of a trained predictor.</p>
 <p>Solves the optimization problem on the predicted cost vector
 <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>, then measures the excess true objective
@@ -388,12 +388,17 @@ incurred by that decision:
 z^*(\mathbf{c}_i)\)</span>. With the default <code class="docutils literal notranslate"><span class="pre">reduction=&quot;normalized&quot;</span></code> the
 result is <span class="math notranslate nohighlight">\(\sum_i l_i / \sum_i |z^*(\mathbf{c}_i)|\)</span>,
 dimensionless and comparable across problem scales; instances with
-near-zero true optima inflate the ratio. The predictor is evaluated
-under <code class="docutils literal notranslate"><span class="pre">eval()</span></code>; its original mode is restored afterwards.</p>
+near-zero true optima inflate the ratio. PyTorch predictors are
+evaluated under <code class="docutils literal notranslate"><span class="pre">eval()</span></code>; the original mode is restored afterwards.</p>
+<p><code class="docutils literal notranslate"><span class="pre">predmodel</span></code> may also be a plain callable <code class="docutils literal notranslate"><span class="pre">f(x:</span> <span class="pre">np.ndarray)</span> <span class="pre">-&gt;</span>
+<span class="pre">array-like</span></code> for JAX/Flax models; pass a <code class="docutils literal notranslate"><span class="pre">functools.partial</span></code> that
+closes over the current parameter pytree, e.g.
+<code class="docutils literal notranslate"><span class="pre">functools.partial(model.apply,</span> <span class="pre">params)</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>predmodel</strong> – a regression neural network for cost prediction</p></li>
+<li><p><strong>predmodel</strong> – a PyTorch <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> for cost prediction, or a
+JAX callable <code class="docutils literal notranslate"><span class="pre">f(x_numpy)</span> <span class="pre">-&gt;</span> <span class="pre">cost_array</span></code></p></li>
 <li><p><strong>optmodel</strong> – a PyEPO optimization model</p></li>
 <li><p><strong>dataloader</strong> – PyTorch DataLoader over an <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> (yielding
 <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code> tuples)</p></li>
@@ -535,7 +540,7 @@ The result is normalized by <span class="math notranslate nohighlight">\(\sum_i 
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=192a11e6"></script>
+</div><script src="../../_static/documentation_options.js?v=399b8b0d"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

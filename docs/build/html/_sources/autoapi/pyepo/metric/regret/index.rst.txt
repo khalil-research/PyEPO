@@ -31,7 +31,7 @@ Module Contents
 
 .. py:data:: logger
 
-.. py:function:: regret(predmodel: torch.nn.Module, optmodel: pyepo.model.opt.optModel, dataloader: torch.utils.data.DataLoader, processes: int = 1, reduction: str = 'normalized') -> float | numpy.ndarray
+.. py:function:: regret(predmodel: torch.nn.Module | collections.abc.Callable, optmodel: pyepo.model.opt.optModel, dataloader: torch.utils.data.DataLoader, processes: int = 1, reduction: str = 'normalized') -> float | numpy.ndarray
 
    True regret (SPO loss) of a trained predictor.
 
@@ -42,10 +42,16 @@ Module Contents
    z^*(\mathbf{c}_i)`. With the default ``reduction="normalized"`` the
    result is :math:`\sum_i l_i / \sum_i |z^*(\mathbf{c}_i)|`,
    dimensionless and comparable across problem scales; instances with
-   near-zero true optima inflate the ratio. The predictor is evaluated
-   under ``eval()``; its original mode is restored afterwards.
+   near-zero true optima inflate the ratio. PyTorch predictors are
+   evaluated under ``eval()``; the original mode is restored afterwards.
 
-   :param predmodel: a regression neural network for cost prediction
+   ``predmodel`` may also be a plain callable ``f(x: np.ndarray) ->
+   array-like`` for JAX/Flax models; pass a ``functools.partial`` that
+   closes over the current parameter pytree, e.g.
+   ``functools.partial(model.apply, params)``.
+
+   :param predmodel: a PyTorch ``nn.Module`` for cost prediction, or a
+                     JAX callable ``f(x_numpy) -> cost_array``
    :param optmodel: a PyEPO optimization model
    :param dataloader: PyTorch DataLoader over an ``optDataset`` (yielding
                       ``(x, c, w, z)`` tuples)
