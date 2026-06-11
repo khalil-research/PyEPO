@@ -12,6 +12,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
+from pyepo.metric.regret import _objOffset, _regretFromObj
 from pyepo.utils import _EPS, costToNumpy
 
 if TYPE_CHECKING:
@@ -28,6 +29,7 @@ def unambRegret(
     optmodel: optModel,
     dataloader: DataLoader,
     tolerance: float = 1e-5,
+    max_iter: int = 10,
 ) -> float:
     """
     Normalized unambiguous regret (worst-case-tie SPO loss).
@@ -40,22 +42,26 @@ def unambRegret(
     \\mathbf{w} - z^*(\\mathbf{c})`. More theoretically rigorous than
     ``regret``, but in practice the two are nearly identical and
     ``unambRegret`` is rarely required.
+    The result is normalized by :math:`\\sum_i |z^*(\\mathbf{c}_i)|`; instances with near-zero true optima inflate the ratio.
 
     Args:
         predmodel: a regression neural network for cost prediction
         optmodel: a PyEPO optimization model
         dataloader: PyTorch DataLoader over an ``optDataset``
         tolerance: precision used when rounding predicted costs to find ties
+        max_iter: maximum number of solve retries with relaxed tolerance
 
     Returns:
         float: normalized unambiguous regret
     """
-    # evaluate
+    # evaluate under eval(); the original mode is restored afterwards
+    was_training = predmodel.training
     predmodel.eval()
     loss = 0
     optsum = 0
-    # get device
-    device = next(predmodel.parameters()).device
+    # get device (cpu fallback for parameterless predictors)
+    param = next(predmodel.parameters(), None)
+    device = param.device if param is not None else torch.device("cpu")
     try:
         # load data
         for data in dataloader:
@@ -69,12 +75,12 @@ def unambRegret(
             for j in range(cp.shape[0]):
                 # accumulate loss
                 loss += calUnambRegret(
-                    optmodel, cp[j], c_np[j], z[j].item(), tolerance, max_iter=10
+                    optmodel, cp[j], c_np[j], z[j].item(), tolerance, max_iter=max_iter
                 )
             optsum += abs(z).sum().item()
     finally:
-        # restore training mode even if evaluation raises
-        predmodel.train()
+        # restore the original mode even if evaluation raises
+        predmodel.train(was_training)
     # normalized
     return loss / (optsum + _EPS)
 
@@ -88,7 +94,7 @@ def calUnambRegret(
     max_iter: int = 10,
 ) -> float:
     """
-    A function to calculate normalized unambiguous regret for a batch
+    Unambiguous (worst-case-tie) regret of a single instance.
 
     Args:
         optmodel: optimization model
@@ -121,9 +127,10 @@ def calUnambRegret(
     else:
         raise ValueError("Invalid modelSense.")
     # opt model to find worst case
+    c_full = optmodel._fullCost(np.asarray(true_cost, dtype=float))
     try:
-        wst_optmodel.setObj(-optmodel._fullCost(np.asarray(true_cost, dtype=float)))
-        _, obj = wst_optmodel.solve()
+        wst_optmodel.setObj(-c_full)
+        wst_sol, _ = wst_optmodel.solve()
     except Exception as e:  # noqa: BLE001  any solver failure triggers retry
         new_tolerance = tolerance * 10
         logger.warning(
@@ -136,12 +143,9 @@ def calUnambRegret(
         return calUnambRegret(
             optmodel, pred_cost, true_cost, true_obj, tolerance=new_tolerance, max_iter=max_iter - 1
         )
-    obj = -obj
-    # loss
-    if optmodel.modelSense == EPO.MINIMIZE:
-        loss = obj - true_obj
-    elif optmodel.modelSense == EPO.MAXIMIZE:
-        loss = true_obj - obj
-    else:
-        raise ValueError("Invalid modelSense.")
-    return loss
+    # MPAX backend may return a torch tensor; convert without dtype coercion
+    if isinstance(wst_sol, torch.Tensor):
+        wst_sol = wst_sol.detach().cpu().numpy()
+    # worst-case full objective of the tied decisions at the true cost
+    obj = np.dot(np.asarray(wst_sol), c_full) + _objOffset(optmodel)
+    return float(_regretFromObj(obj, true_obj, optmodel.modelSense))

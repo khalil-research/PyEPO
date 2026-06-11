@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from pyepo.metric.metrics import SPOError, makeSkScorer
 from pyepo.metric.metrics import testMSE as _testMSE
 from pyepo.metric.mse import MSE
-from pyepo.metric.regret import calRegret
+from pyepo.metric.regret import _regretFromObj, calRegret
 from pyepo.metric.unambregret import calUnambRegret
 
 from .conftest import NUM_FEAT, LinearPred, requires_gurobi
@@ -28,6 +28,13 @@ class _IdentityModel(nn.Module):
     def __init__(self):
         super().__init__()
         self.dummy = nn.Parameter(torch.tensor(0.0))
+
+    def forward(self, x):
+        return x
+
+
+class _NoParamModel(nn.Module):
+    """Parameterless predictor that returns its input unchanged."""
 
     def forward(self, x):
         return x
@@ -65,6 +72,15 @@ class TestMSE:
         MSE(m, _loader())
         assert m.training
 
+    def test_preserves_eval_mode(self):
+        m = _IdentityModel()
+        m.eval()
+        MSE(m, _loader())
+        assert not m.training
+
+    def test_parameterless_model(self):
+        assert MSE(_NoParamModel(), _loader()) >= 0
+
 
 class TestTestMSE:
 
@@ -78,6 +94,26 @@ class TestTestMSE:
     def test_shape_mismatch(self):
         with pytest.raises(AssertionError):
             _testMSE(np.ones((5, 3)), np.ones((5, 4)), None, None)
+
+
+class TestRegretFromObj:
+
+    def test_minimize(self):
+        from pyepo import EPO
+        assert _regretFromObj(3.0, 1.0, EPO.MINIMIZE) == 2.0
+
+    def test_maximize(self):
+        from pyepo import EPO
+        assert _regretFromObj(3.0, 5.0, EPO.MAXIMIZE) == 2.0
+
+    def test_vectorized(self):
+        from pyepo import EPO
+        out = _regretFromObj(np.array([3.0, 4.0]), np.array([1.0, 1.0]), EPO.MINIMIZE)
+        np.testing.assert_allclose(out, [2.0, 3.0])
+
+    def test_invalid_sense(self):
+        with pytest.raises(ValueError):
+            _regretFromObj(1.0, 1.0, "bad")
 
 
 # ============================================================
@@ -118,6 +154,19 @@ class TestCalRegret:
         _, true_obj = m.solve()
         assert calRegret(m, cp, ct, true_obj) >= -1e-6
 
+    def test_zero_with_objective_constant(self):
+        from pyepo import EPO, dsl
+        x = dsl.Variable(2, vtype=EPO.BINARY)
+        c = dsl.Parameter(2)
+        # (x - 1).sum() adds +1 per var to fixed_cost and obj_offset -2
+        m = dsl.Problem(
+            dsl.Minimize(c @ x + (x - 1).sum()), [x.sum() >= 1]
+        ).compile(backend="gurobi")
+        cost = np.array([1.0, 2.0])
+        m.setObj(m._fullCost(cost))
+        _, true_obj = m.solve()
+        assert abs(calRegret(m, cost, cost, true_obj)) < 1e-6
+
 
 @requires_gurobi
 class TestSPOError:
@@ -129,14 +178,14 @@ class TestSPOError:
     def test_perfect_prediction_zero(self):
         m = self._sp()
         costs = np.random.RandomState(42).rand(10, m.num_cost) + 0.1
-        assert abs(SPOError(costs, costs, type(m), {"grid": (3, 3)})) < 1e-6
+        assert abs(SPOError(costs, costs, m)) < 1e-6
 
     def test_non_negative(self):
         m = self._sp()
         rng = np.random.RandomState(42)
         true_c = rng.rand(10, m.num_cost) + 0.1
         pred_c = rng.rand(10, m.num_cost) + 0.1
-        assert SPOError(pred_c, true_c, type(m), {"grid": (3, 3)}) >= -1e-6
+        assert SPOError(pred_c, true_c, m) >= -1e-6
 
     def test_non_negative_maximize(self):
         from pyepo.model.grb.knapsack import knapsackModel
@@ -145,12 +194,19 @@ class TestSPOError:
         rng = np.random.RandomState(42)
         true_c = rng.rand(10, m.num_cost) + 1.0
         pred_c = rng.rand(10, m.num_cost) + 1.0
-        assert SPOError(pred_c, true_c, type(m), {"weights": weights, "capacity": cap}) >= -1e-6
+        assert SPOError(pred_c, true_c, m) >= -1e-6
 
     def test_shape_mismatch(self):
         m = self._sp()
         with pytest.raises(AssertionError):
-            SPOError(np.ones((5, 12)), np.ones((5, 10)), type(m), {"grid": (3, 3)})
+            SPOError(np.ones((5, 12)), np.ones((5, 10)), m)
+
+    def test_deprecated_type_args_signature(self):
+        m = self._sp()
+        costs = np.random.RandomState(42).rand(4, m.num_cost) + 0.1
+        with pytest.warns(DeprecationWarning):
+            old = SPOError(costs, costs, type(m), {"grid": (3, 3)})
+        assert abs(old) < 1e-6
 
 
 @requires_gurobi
@@ -238,6 +294,18 @@ class TestCalUnambRegret:
         )
         assert loss == pytest.approx(5.0)
 
+    def test_zero_with_objective_constant(self):
+        from pyepo import EPO, dsl
+        x = dsl.Variable(2, vtype=EPO.BINARY)
+        c = dsl.Parameter(2)
+        m = dsl.Problem(
+            dsl.Minimize(c @ x + (x - 1).sum()), [x.sum() >= 1]
+        ).compile(backend="gurobi")
+        cost = np.array([1.0, 2.0])
+        m.setObj(m._fullCost(cost))
+        _, true_obj = m.solve()
+        assert abs(calUnambRegret(m, cost, cost, true_obj, tolerance=1.0)) < 1e-3
+
 
 # ============================================================
 # Dataloader-level metrics (untrained predictor -> sane floats)
@@ -267,8 +335,74 @@ class TestDataloaderMetrics:
     def test_unamb_regret(self, sp_data):
         import pyepo
         optmodel, _ds, loader = sp_data
-        unamb = pyepo.metric.unambRegret(LinearPred(NUM_FEAT, optmodel.num_cost), optmodel, loader)
+        pred = LinearPred(NUM_FEAT, optmodel.num_cost)
+        pred.eval()
+        unamb = pyepo.metric.unambRegret(pred, optmodel, loader)
         assert isinstance(unamb, float) and unamb >= -1e-6
+        assert not pred.training
+
+    def test_regret_preserves_eval_mode(self, sp_data):
+        import pyepo
+        optmodel, _ds, loader = sp_data
+        pred = LinearPred(NUM_FEAT, optmodel.num_cost)
+        pred.eval()
+        pyepo.metric.regret(pred, optmodel, loader)
+        assert not pred.training
+
+    def test_regret_reductions_consistent(self, sp_data):
+        import pyepo
+        optmodel, ds, loader = sp_data
+        torch.manual_seed(42)
+        pred = LinearPred(NUM_FEAT, optmodel.num_cost)
+        per = pyepo.metric.regret(pred, optmodel, loader, reduction="none")
+        total = pyepo.metric.regret(pred, optmodel, loader, reduction="sum")
+        mean = pyepo.metric.regret(pred, optmodel, loader, reduction="mean")
+        norm = pyepo.metric.regret(pred, optmodel, loader)
+        assert isinstance(per, np.ndarray) and len(per) == len(ds)
+        assert total == pytest.approx(per.sum(), rel=1e-5)
+        assert mean == pytest.approx(per.mean(), rel=1e-5)
+        zsum = sum(abs(z).sum().item() for _, _, _, z in loader)
+        assert norm == pytest.approx(total / zsum, rel=1e-4)
+
+    def test_regret_invalid_reduction(self, sp_data):
+        import pyepo
+        optmodel, _ds, loader = sp_data
+        with pytest.raises(ValueError):
+            pyepo.metric.regret(
+                LinearPred(NUM_FEAT, optmodel.num_cost), optmodel, loader, reduction="bad"
+            )
+
+    def test_regret_multiprocess_matches_single(self, sp_data):
+        import pyepo
+        optmodel, _ds, loader = sp_data
+        torch.manual_seed(0)
+        pred = LinearPred(NUM_FEAT, optmodel.num_cost)
+        single = pyepo.metric.regret(pred, optmodel, loader)
+        multi = pyepo.metric.regret(pred, optmodel, loader, processes=2)
+        assert multi == pytest.approx(single, rel=1e-5)
+
+    def test_unamb_regret_max_iter_passthrough(self, sp_data):
+        import pyepo
+        optmodel, _ds, loader = sp_data
+        with pytest.raises(RuntimeError):
+            pyepo.metric.unambRegret(
+                LinearPred(NUM_FEAT, optmodel.num_cost), optmodel, loader, max_iter=0
+            )
+
+    def test_regret_offset_dataloader(self):
+        import pyepo
+        from pyepo import EPO, dsl
+        from pyepo.data.dataset import optDataset
+        x = dsl.Variable(2, vtype=EPO.BINARY)
+        c = dsl.Parameter(2)
+        m = dsl.Problem(
+            dsl.Minimize(c @ x + (x - 1).sum()), [x.sum() >= 1]
+        ).compile(backend="gurobi")
+        costs = (np.random.RandomState(42).rand(6, 2) + 0.1).astype(np.float32)
+        ds = optDataset(m, costs, costs)
+        loader = DataLoader(ds, batch_size=3)
+        # identity predictor makes predictions perfect, so regret must vanish
+        assert abs(pyepo.metric.regret(_IdentityModel(), m, loader)) < 1e-5
 
 
 # ============================================================
@@ -300,7 +434,6 @@ class TestSkScorer:
         import pyepo
         from pyepo.model.grb.shortestpath import shortestPathModel
         from pyepo.twostage import sklearnPred
-        from pyepo.utils import getArgs
 
         # nonlinear costs + noise keep the linear fit imperfect, so regret is asymmetric
         x, c = pyepo.data.shortestpath.genData(20, NUM_FEAT, (3, 3), deg=4, noise_width=0.5, seed=42)
@@ -310,8 +443,8 @@ class TestSkScorer:
         cp = est.predict(x)
         scorer = makeSkScorer(optmodel)
         # sklearn calls score_func(y_true, y_pred): the scorer must negate SPOError(pred, true)
-        expected = -SPOError(cp, c, type(optmodel), getArgs(optmodel))
-        swapped = -SPOError(c, cp, type(optmodel), getArgs(optmodel))
+        expected = -SPOError(cp, c, optmodel)
+        swapped = -SPOError(c, cp, optmodel)
         assert expected < -1e-3
         assert np.isclose(scorer(est, x, c), expected)
         # the orientation is observable: swapping the arguments changes the value

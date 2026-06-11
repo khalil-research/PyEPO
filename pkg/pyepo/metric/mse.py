@@ -27,11 +27,13 @@ def MSE(predmodel: nn.Module, dataloader: DataLoader) -> float:
     Returns:
         float: MSE loss
     """
-    # evaluate
+    # evaluate under eval(); the original mode is restored afterwards
+    was_training = predmodel.training
     predmodel.eval()
     loss = 0
-    # get device
-    device = next(predmodel.parameters()).device
+    # get device (cpu fallback for parameterless predictors)
+    param = next(predmodel.parameters(), None)
+    device = param.device if param is not None else torch.device("cpu")
     try:
         # load data
         with torch.no_grad():
@@ -42,6 +44,6 @@ def MSE(predmodel: nn.Module, dataloader: DataLoader) -> float:
                 cp = predmodel(x)
                 loss += ((cp - c) ** 2).mean(dim=1).sum().item()
     finally:
-        # restore training mode even if evaluation raises
-        predmodel.train()
+        # restore the original mode even if evaluation raises
+        predmodel.train(was_training)
     return loss / len(cast("Sized", dataloader.dataset))

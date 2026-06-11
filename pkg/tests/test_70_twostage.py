@@ -52,7 +52,7 @@ class TestSklearnPredPipeline:
         est.fit(x, c)
         c_pred = est.predict(x)
         assert c_pred.shape == c.shape
-        err = SPOError(c_pred, c, shortestPathModel, {"grid": (3, 3)})
+        err = SPOError(c_pred, c, shortestPathModel(grid=(3, 3)))
         assert err >= -1e-6
 
 

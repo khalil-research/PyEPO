@@ -5,12 +5,12 @@ Metrics for SKlearn model
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Callable
 
 import numpy as np
-import torch
 
-from pyepo import EPO
+from pyepo.metric.regret import calRegret
 from pyepo.utils import _EPS, getArgs
 
 if TYPE_CHECKING:
@@ -20,53 +20,48 @@ if TYPE_CHECKING:
 def SPOError(
     pred_cost: np.ndarray,
     true_cost: np.ndarray,
-    model_type: type,
-    args: dict,
+    optmodel: optModel | type,
+    args: dict | None = None,
 ) -> float:
     """
-    A function to calculate normalized true regret
+    Normalized true regret of predicted costs over a dataset.
+
+    Solves each instance at the predicted and the true cost and returns
+    :math:`\\sum_i l_i / \\sum_i |z^*(\\mathbf{c}_i)|`; instances with
+    near-zero true optima inflate the ratio.
 
     Args:
-        pred_cost: predicted costs
-        true_cost: true costs
-        model_type: optModel class type
-        args: optModel args
+        pred_cost: predicted costs of shape (num_data, num_cost)
+        true_cost: true costs of shape (num_data, num_cost)
+        optmodel: a PyEPO optimization model
+        args: optModel args for the deprecated ``(model_type, args)`` form
 
     Returns:
-        float: regret loss
+        float: normalized regret
     """
+    # deprecated form: rebuild the model from its class and args
+    if isinstance(optmodel, type):
+        warnings.warn(
+            "Passing (model_type, args) to SPOError is deprecated; pass an optModel instance.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        optmodel = optmodel(**(args or {}))
     pred_cost = np.array(pred_cost)
     true_cost = np.array(true_cost)
     assert pred_cost.shape == true_cost.shape, "Shape of true and predicted value does not match."
-    # rebuild model
-    optmodel = model_type(**args)
     # init sum
-    regret_sum = 0
-    optobj_sum = 0
+    regret_sum = 0.0
+    optobj_sum = 0.0
     for c, cp in zip(true_cost, pred_cost):
-        # opt sol for pred cost
-        optmodel.setObj(optmodel._fullCost(cp))
-        sol, _ = optmodel.solve()
-        # MPAX backend returns a torch tensor
-        if isinstance(sol, torch.Tensor):
-            sol = sol.detach().cpu().numpy()
-        # full objective of the predicted decision at the true cost
-        obj = np.dot(sol, optmodel._fullCost(np.asarray(c, dtype=float)))
         # opt obj for true cost
         optmodel.setObj(optmodel._fullCost(c))
         _, optobj = optmodel.solve()
-        # calculate regret
-        if optmodel.modelSense == EPO.MINIMIZE:
-            regret = obj - optobj
-        elif optmodel.modelSense == EPO.MAXIMIZE:
-            regret = optobj - obj
-        else:
-            raise ValueError("Invalid modelSense.")
-        regret_sum += regret
+        # per-instance regret
+        regret_sum += calRegret(optmodel, cp, c, optobj)
         optobj_sum += np.abs(optobj)
     # normalized regret
-    norm_regret = regret_sum / (optobj_sum + _EPS)
-    return norm_regret
+    return regret_sum / (optobj_sum + _EPS)
 
 
 def _SPOErrorScore(
@@ -88,7 +83,8 @@ def _SPOErrorScore(
     Returns:
         float: regret loss
     """
-    return SPOError(y_pred, y_true, model_type, args)
+    # rebuild per call; class + args stay picklable for scorer kwargs
+    return SPOError(y_pred, y_true, model_type(**args))
 
 
 def makeSkScorer(optmodel: optModel) -> Callable:
