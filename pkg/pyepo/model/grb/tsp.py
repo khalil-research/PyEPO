@@ -17,12 +17,13 @@ except ImportError:
     pass
 
 from pyepo.model.bases import tspABBase
-from pyepo.model.grb.grbmodel import optGrbModel
+from pyepo.model.grb.grbmodel import _promote_lazy_cuts, optGrbModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 
 class tspABModel(tspABBase, optGrbModel):
@@ -162,8 +163,23 @@ class tspDFJModel(tspABModel):
 
     Uses one undirected Var per edge (``x[j,i]`` aliases ``x[i,j]``), so the
     paired-vars ``setObj`` / ``solve`` / ``_addExtraConstr`` inherited from
-    ``tspABModel`` are overridden here.
+    ``tspABModel`` are overridden here. With ``recycle_cuts`` the subtour cuts
+    found in one solve join the model's lazy pool, so later solves on new cost
+    vectors skip rediscovering them.
     """
+
+    def __init__(self, num_nodes: int, recycle_cuts: bool = False, *args, **kwargs) -> None:
+        """
+        Args:
+            num_nodes: number of nodes (cities)
+            recycle_cuts: keep generated subtour cuts in the lazy pool across solves
+        """
+        self.recycle_cuts = recycle_cuts
+        self._recycled_keys: set = set()
+        super().__init__(num_nodes, *args, **kwargs)
+
+    def _new_instance(self) -> Self:
+        return type(self)(self.num_nodes, recycle_cuts=self.recycle_cuts)
 
     def _getModel(self) -> tuple:
         """
@@ -234,6 +250,9 @@ class tspDFJModel(tspABModel):
         """
         A method to solve model
         """
+        # promote the previous solve's cuts into the lazy pool
+        if self.recycle_cuts:
+            _promote_lazy_cuts(self._model, self._recycled_keys)
         # the cut buffer tracks the current solve only
         self._model._lazy_constrs = []
         self._model.optimize(self._subtourelim)

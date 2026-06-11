@@ -689,6 +689,59 @@ def test_lazy_buffer_holds_current_solve_only(problem):
     assert "sentinel" not in m._model._lazy_constrs
 
 
+@requires_gurobi
+class TestCutRecycling:
+    """DFJ/RCI cut recycling: prior cuts join the lazy pool exactly once."""
+
+    @staticmethod
+    def _subtour_cut(m):
+        import gurobipy as gp
+
+        x = m.x
+        return gp.quicksum([x[0, 1], x[0, 2], x[1, 2]]) <= 2
+
+    def test_promoted_cuts_join_the_lazy_pool(self):
+        from pyepo.model.grb.tsp import tspDFJModel
+
+        m = tspDFJModel(num_nodes=5, recycle_cuts=True)
+        cost = np.random.RandomState(0).rand(m.num_cost)
+        m.setObj(cost)
+        m.solve()
+        # plant a valid subtour cut as the previous solve's buffer
+        m._model._lazy_constrs = [self._subtour_cut(m)]
+        n0 = m._model.NumConstrs
+        m.solve()
+        assert m._model.NumConstrs == n0 + 1
+        # an identical cut is not promoted twice
+        m._model._lazy_constrs = [self._subtour_cut(m)]
+        m.solve()
+        assert m._model.NumConstrs == n0 + 1
+
+    def test_disabled_keeps_model_rows_constant(self):
+        from pyepo.model.grb.tsp import tspDFJModel
+
+        m = tspDFJModel(num_nodes=5, recycle_cuts=False)
+        m.setObj(np.random.RandomState(0).rand(m.num_cost))
+        m.solve()
+        m._model._lazy_constrs = [self._subtour_cut(m)]
+        n0 = m._model.NumConstrs
+        m.solve()
+        assert m._model.NumConstrs == n0
+
+    def test_objectives_match_fresh_solves(self):
+        from pyepo.model.grb.tsp import tspDFJModel
+
+        rng = np.random.RandomState(3)
+        m = tspDFJModel(num_nodes=7, recycle_cuts=True)
+        for c in rng.rand(4, m.num_cost):
+            m.setObj(c)
+            _, obj = m.solve()
+            fresh = tspDFJModel(num_nodes=7)
+            fresh.setObj(c)
+            _, obj_fresh = fresh.solve()
+            assert obj == pytest.approx(obj_fresh, abs=1e-6)
+
+
 # ============================================================
 # Cross-backend objective parity (vs Gurobi reference)
 # ============================================================

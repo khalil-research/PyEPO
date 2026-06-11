@@ -16,12 +16,13 @@ except ImportError:
     pass
 
 from pyepo.model.bases import vrpABBase
-from pyepo.model.grb.grbmodel import optGrbModel
+from pyepo.model.grb.grbmodel import _promote_lazy_cuts, optGrbModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, _uf_components, unionFind
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
+    from typing_extensions import Self
 
 
 class vrpABModel(vrpABBase, optGrbModel):
@@ -45,8 +46,39 @@ class vrpRCIModel(vrpABModel):
     Uses one undirected Var per edge (``x[j,i]`` aliases ``x[i,j]``). Subtour
     elimination and rounded capacity inequalities are added lazily during
     branch-and-cut; the cuts added at the optimum are tracked on
-    ``model._lazy_constrs`` for downstream CaVE cone extraction.
+    ``model._lazy_constrs`` for downstream CaVE cone extraction. With
+    ``recycle_cuts`` the cuts found in one solve join the model's lazy pool,
+    so later solves on new cost vectors skip rediscovering them.
     """
+
+    def __init__(
+        self,
+        num_nodes: int,
+        demands: list[float] | np.ndarray,
+        capacity: float,
+        num_vehicle: int,
+        recycle_cuts: bool = False,
+    ) -> None:
+        """
+        Args:
+            num_nodes: number of nodes (depot is node 0)
+            demands: per-customer demands, length ``num_nodes - 1``
+            capacity: vehicle capacity
+            num_vehicle: number of vehicles
+            recycle_cuts: keep generated cuts in the lazy pool across solves
+        """
+        self.recycle_cuts = recycle_cuts
+        self._recycled_keys: set = set()
+        super().__init__(num_nodes, demands, capacity, num_vehicle)
+
+    def _new_instance(self) -> Self:
+        return type(self)(
+            self.num_nodes,
+            self.demands,
+            self.capacity,
+            self.num_vehicle,
+            recycle_cuts=self.recycle_cuts,
+        )
 
     def _getModel(self) -> tuple:
         """
@@ -102,6 +134,9 @@ class vrpRCIModel(vrpABModel):
         Returns:
             tuple: edge-selection vector (uint8) and objective value (float)
         """
+        # promote the previous solve's cuts into the lazy pool
+        if self.recycle_cuts:
+            _promote_lazy_cuts(self._model, self._recycled_keys)
         # the cut buffer tracks the current solve only
         self._model._lazy_constrs = []
         # optimize

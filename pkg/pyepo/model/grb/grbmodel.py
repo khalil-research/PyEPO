@@ -157,3 +157,31 @@ class optGrbModel(optModel):
         # track for replay on relax
         new_model._extra_constrs = [*self._extra_constrs, (coefs, float(rhs))]
         return new_model
+
+
+def _lazy_cut_key(tc) -> tuple | None:
+    """Structural identity of a TempConstr: sorted (var, coef) terms with sense and rhs."""
+    lhs = getattr(tc, "_lhs", None)
+    rhs = getattr(tc, "_rhs", None)
+    sense = getattr(tc, "_sense", None)
+    if lhs is None or rhs is None or sense is None:
+        return None
+    terms = tuple(
+        sorted((lhs.getVar(i).VarName, round(lhs.getCoeff(i), 9)) for i in range(lhs.size()))
+    )
+    return (terms, sense, round(float(rhs), 9))
+
+
+def _promote_lazy_cuts(grb_model, recycled_keys: set) -> None:
+    """Move the previous solve's tracked lazy cuts into the model's lazy pool (``Constr.Lazy = 1``)."""
+    new_constrs = []
+    for tc in getattr(grb_model, "_lazy_constrs", []):
+        key = _lazy_cut_key(tc)
+        if key is None or key in recycled_keys:
+            continue
+        recycled_keys.add(key)
+        new_constrs.append(grb_model.addConstr(tc))
+    if new_constrs:
+        grb_model.update()
+        for constr in new_constrs:
+            constr.Lazy = 1
