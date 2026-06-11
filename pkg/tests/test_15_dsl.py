@@ -374,7 +374,7 @@ try:
 
     # appsi raises ApplicationError (not False) when HiGHS is absent
     _HAS_HIGHS = bool(_SolverFactory(_PYOMO_SOLVER).available())
-except Exception:
+except Exception:  # noqa: BLE001
     _HAS_HIGHS = False
 
 requires_pyomo_highs = pytest.mark.skipif(not _HAS_HIGHS, reason="Pyomo + HiGHS not available")

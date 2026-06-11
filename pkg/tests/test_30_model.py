@@ -587,7 +587,7 @@ class TestVRP:
         m, _ = _make_vrp(backend, formulation)
         m.setObj(_VRP_COST)
         sol1, obj1 = m.solve()
-        k = int(round(np.asarray(sol1).sum()))
+        k = round(np.asarray(sol1).sum())
         m2 = m.addConstr(np.ones(m.num_cost), k)
         m2.setObj(_VRP_COST)
         _, obj2 = m2.solve()

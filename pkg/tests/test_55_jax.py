@@ -264,7 +264,7 @@ class TestJit:
         # eager is fine
         assert np.isfinite(np.array(jax.grad(lambda p: nce(p, ts))(pred))).all()
         # jit raises a clear, actionable error
-        with pytest.raises(RuntimeError, match="jax.jit"):
+        with pytest.raises(RuntimeError, match=r"jax\.jit"):
             jax.jit(jax.grad(lambda p: nce(p, ts)))(pred)
 
 

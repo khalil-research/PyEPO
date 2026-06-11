@@ -66,6 +66,13 @@ except Exception:
     _HAS_MPAX = False
 
 try:
+    import flax  # noqa: F401
+
+    _HAS_FLAX = _HAS_JAX
+except Exception:
+    _HAS_FLAX = False
+
+try:
     from pyepo.twostage.autosklearnpred import _HAS_AUTO
 except Exception:
     _HAS_AUTO = False
@@ -98,6 +105,7 @@ requires_copt = pytest.mark.skipif(not _HAS_COPT, reason="COPT not installed")
 requires_ortools = pytest.mark.skipif(not _HAS_ORTOOLS, reason="OR-Tools not installed")
 requires_jax = pytest.mark.skipif(not _HAS_JAX, reason="JAX not installed")
 requires_mpax = pytest.mark.skipif(not _HAS_MPAX, reason="MPAX (jax + mpax) not installed")
+requires_flax = pytest.mark.skipif(not _HAS_FLAX, reason="Flax (jax + flax) not installed")
 requires_clarabel = pytest.mark.skipif(not _HAS_CLARABEL, reason="Clarabel not installed")
 requires_cuda = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA not available")
 requires_jax_gpu = pytest.mark.skipif(

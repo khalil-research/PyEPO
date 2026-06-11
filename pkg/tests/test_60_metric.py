@@ -21,10 +21,15 @@ from pyepo.metric.regret import _regretFromObj, calRegret
 from pyepo.metric.unambregret import calUnambRegret
 
 from .conftest import (
-    NUM_FEAT, GRID, NUM_DATA, BATCH,
+    _HAS_FLAX,
+    _HAS_GUROBI,
+    BATCH,
+    GRID,
+    NUM_DATA,
+    NUM_FEAT,
     LinearPred,
-    requires_gurobi, requires_jax, requires_mpax,
-    _HAS_GUROBI, _HAS_JAX,
+    requires_gurobi,
+    requires_mpax,
 )
 
 
@@ -513,8 +518,8 @@ class TestDataloaderMetricsJax:
 
 
 @pytest.mark.skipif(
-    not (_HAS_GUROBI and _HAS_JAX),
-    reason="Parity: Gurobi (exact solve) + JAX both required",
+    not (_HAS_GUROBI and _HAS_FLAX),
+    reason="Parity: Gurobi (exact solve) + Flax both required",
 )
 class TestDataloaderMetricsJaxParity:
     """JAX callable and torch nn.Module with identical weights give the same regret."""
@@ -523,8 +528,9 @@ class TestDataloaderMetricsJaxParity:
         import functools
 
         import jax.numpy as jnp
-        import pyepo
         from flax import linen as nn
+
+        import pyepo
 
         optmodel, _ds, loader = sp_data
 
