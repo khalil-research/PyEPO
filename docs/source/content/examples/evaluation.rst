@@ -5,7 +5,7 @@ Evaluation
 Regret
 ======
 
-``pyepo.metric.regret`` evaluates the decision quality of a prediction model. Regret is defined as :math:`l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^T \mathbf{w}^*(\hat{\mathbf{c}}) - z^*(\mathbf{c})`, which measures the excess cost of the predicted solution over the true optimum.
+``pyepo.metric.regret`` evaluates the decision quality of a prediction model. Regret is defined as :math:`l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^T \mathbf{w}^*(\hat{\mathbf{c}}) - z^*(\mathbf{c})`, which measures the excess cost of the predicted solution over the true optimum. By default the instances are aggregated as the normalized regret :math:`\sum_i l_i \, / \, \sum_i |z^*(\mathbf{c}_i)|`, dimensionless and comparable across problem scales; ``reduction`` switches to ``"sum"``, ``"mean"``, or ``"none"`` (per-instance array).
 
 .. autofunction:: pyepo.metric.regret
     :noindex:
