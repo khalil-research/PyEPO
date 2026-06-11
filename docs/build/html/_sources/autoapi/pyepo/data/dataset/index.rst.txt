@@ -152,9 +152,9 @@ Module Contents
 
    PyTorch ``Dataset`` for the CaVE cone-aligned loss.
 
-   Stores features and cost coefficients, solves each instance with a fresh
-   copy of the Gurobi model, and extracts the **normals of the binding
-   constraints at the optimal vertex** in canonical ``<=`` orientation.
+   Stores features and cost coefficients, solves each instance, and extracts
+   the **normals of the binding constraints at the optimal vertex** in
+   canonical ``<=`` orientation.
    These normals span the polyhedral cone onto which ``coneAlignedCosine``
    projects the predicted cost vector during training.
 

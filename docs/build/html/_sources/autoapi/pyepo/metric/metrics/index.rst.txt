@@ -24,16 +24,20 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: SPOError(pred_cost: numpy.ndarray, true_cost: numpy.ndarray, model_type: type, args: dict) -> float
+.. py:function:: SPOError(pred_cost: numpy.ndarray, true_cost: numpy.ndarray, optmodel: pyepo.model.opt.optModel | type, args: dict | None = None) -> float
 
-   A function to calculate normalized true regret
+   Normalized true regret of predicted costs over a dataset.
 
-   :param pred_cost: predicted costs
-   :param true_cost: true costs
-   :param model_type: optModel class type
-   :param args: optModel args
+   Solves each instance at the predicted and the true cost and returns
+   :math:`\sum_i l_i / \sum_i |z^*(\mathbf{c}_i)|`; instances with
+   near-zero true optima inflate the ratio.
 
-   :returns: regret loss
+   :param pred_cost: predicted costs of shape (num_data, num_cost)
+   :param true_cost: true costs of shape (num_data, num_cost)
+   :param optmodel: a PyEPO optimization model
+   :param args: optModel args for the deprecated ``(model_type, args)`` form
+
+   :returns: normalized regret
    :rtype: float
 
 

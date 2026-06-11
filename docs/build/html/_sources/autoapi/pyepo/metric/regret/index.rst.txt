@@ -9,6 +9,14 @@ pyepo.metric.regret
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.metric.regret.logger
+
+
 Functions
 ---------
 
@@ -21,38 +29,47 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: regret(predmodel: torch.nn.Module, optmodel: pyepo.model.opt.optModel, dataloader: torch.utils.data.DataLoader) -> float
+.. py:data:: logger
 
-   Normalized true regret (SPO loss) of a trained predictor.
+.. py:function:: regret(predmodel: torch.nn.Module, optmodel: pyepo.model.opt.optModel, dataloader: torch.utils.data.DataLoader, processes: int = 1, reduction: str = 'normalized') -> float | numpy.ndarray
+
+   True regret (SPO loss) of a trained predictor.
 
    Solves the optimization problem on the predicted cost vector
    :math:`\hat{\mathbf{c}}`, then measures the excess true objective
    incurred by that decision:
-   :math:`\sum_i (\mathbf{c}_i^\top \mathbf{w}^*(\hat{\mathbf{c}}_i) -
-   z^*(\mathbf{c}_i)) / \sum_i |z^*(\mathbf{c}_i)|`. The result is
-   dimensionless and comparable across problem scales. The predictor is
-   automatically put into ``eval()`` for the call and restored to
-   ``train()`` afterwards.
+   :math:`l_i = \mathbf{c}_i^\top \mathbf{w}^*(\hat{\mathbf{c}}_i) -
+   z^*(\mathbf{c}_i)`. With the default ``reduction="normalized"`` the
+   result is :math:`\sum_i l_i / \sum_i |z^*(\mathbf{c}_i)|`,
+   dimensionless and comparable across problem scales; instances with
+   near-zero true optima inflate the ratio. The predictor is evaluated
+   under ``eval()``; its original mode is restored afterwards.
 
    :param predmodel: a regression neural network for cost prediction
    :param optmodel: a PyEPO optimization model
    :param dataloader: PyTorch DataLoader over an ``optDataset`` (yielding
                       ``(x, c, w, z)`` tuples)
+   :param processes: number of processors, 1 for single-core, 0 for all of
+                     cores; a fresh worker pool is spawned per call, each worker
+                     rebuilding the model from its constructor args
+   :param reduction: "normalized" (sum of regrets over sum of absolute true
+                     optima), "sum", "mean", or "none" (per-instance array)
 
-   :returns: normalized true regret
-   :rtype: float
+   :returns: aggregated regret, or per-instance regrets
+             when ``reduction="none"``
+   :rtype: float or np.ndarray
 
 
 .. py:function:: calRegret(optmodel: pyepo.model.opt.optModel, pred_cost: numpy.ndarray, true_cost: numpy.ndarray, true_obj: float) -> float
 
-   A function to calculate normalized true regret for a batch
+   True regret of a single instance.
 
    :param optmodel: optimization model
-   :param pred_cost: predicted costs
-   :param true_cost: true costs
+   :param pred_cost: predicted cost vector
+   :param true_cost: true cost vector
    :param true_obj: true optimal objective value
 
-   :returns: true regret loss
+   :returns: true regret
    :rtype: float
 
 

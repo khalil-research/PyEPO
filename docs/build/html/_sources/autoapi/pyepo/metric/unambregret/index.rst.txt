@@ -31,7 +31,7 @@ Module Contents
 
 .. py:data:: logger
 
-.. py:function:: unambRegret(predmodel: torch.nn.Module, optmodel: pyepo.model.opt.optModel, dataloader: torch.utils.data.DataLoader, tolerance: float = 1e-05) -> float
+.. py:function:: unambRegret(predmodel: torch.nn.Module, optmodel: pyepo.model.opt.optModel, dataloader: torch.utils.data.DataLoader, tolerance: float = 1e-05, max_iter: int = 10) -> float
 
    Normalized unambiguous regret (worst-case-tie SPO loss).
 
@@ -43,11 +43,13 @@ Module Contents
    \mathbf{w} - z^*(\mathbf{c})`. More theoretically rigorous than
    ``regret``, but in practice the two are nearly identical and
    ``unambRegret`` is rarely required.
+   The result is normalized by :math:`\sum_i |z^*(\mathbf{c}_i)|`; instances with near-zero true optima inflate the ratio.
 
    :param predmodel: a regression neural network for cost prediction
    :param optmodel: a PyEPO optimization model
    :param dataloader: PyTorch DataLoader over an ``optDataset``
    :param tolerance: precision used when rounding predicted costs to find ties
+   :param max_iter: maximum number of solve retries with relaxed tolerance
 
    :returns: normalized unambiguous regret
    :rtype: float
@@ -55,7 +57,7 @@ Module Contents
 
 .. py:function:: calUnambRegret(optmodel: pyepo.model.opt.optModel, pred_cost: numpy.ndarray, true_cost: numpy.ndarray, true_obj: float, tolerance: float = 1e-05, max_iter: int = 10) -> float
 
-   A function to calculate normalized unambiguous regret for a batch
+   Unambiguous (worst-case-tie) regret of a single instance.
 
    :param optmodel: optimization model
    :param pred_cost: predicted costs

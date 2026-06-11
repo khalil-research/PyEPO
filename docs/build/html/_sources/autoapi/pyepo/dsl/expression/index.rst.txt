@@ -254,7 +254,7 @@ Module Contents
    :vartype lhs: Affine | Quadratic
    :ivar sense: one of ``"<="`` / ``">="`` / ``"=="``
    :vartype sense: str
-   :ivar rhs: right-hand side, broadcast to the LHS length
+   :ivar rhs: right-hand side, broadcast over the LHS shape
 
    :vartype rhs: np.ndarray
 

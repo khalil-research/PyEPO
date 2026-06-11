@@ -375,16 +375,28 @@
           <section id="module-pyepo.metric.regret">
 <span id="pyepo-metric-regret"></span><h1>pyepo.metric.regret<a class="headerlink" href="#module-pyepo.metric.regret" title="Link to this heading">¶</a></h1>
 <p>True regret loss</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.metric.regret.logger" title="pyepo.metric.regret.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.metric.regret.regret" title="pyepo.metric.regret.regret"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regret</span></code></a>(→ float)</p></td>
-<td><p>Normalized true regret (SPO loss) of a trained predictor.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.metric.regret.regret" title="pyepo.metric.regret.regret"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regret</span></code></a>(→ float | numpy.ndarray)</p></td>
+<td><p>True regret (SPO loss) of a trained predictor.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyepo.metric.regret.calRegret" title="pyepo.metric.regret.calRegret"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calRegret</span></code></a>(→ float)</p></td>
-<td><p>A function to calculate normalized true regret for a batch</p></td>
+<td><p>True regret of a single instance.</p></td>
 </tr>
 </tbody>
 </table>
@@ -392,18 +404,24 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.metric.regret.logger">
+<span class="sig-prename descclassname"><span class="pre">pyepo.metric.regret.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#pyepo.metric.regret.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.metric.regret.regret">
-<span class="sig-prename descclassname"><span class="pre">pyepo.metric.regret.</span></span><span class="sig-name descname"><span class="pre">regret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.12)"><span class="pre">torch.nn.Module</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(in PyTorch v2.12)"><span class="pre">torch.utils.data.DataLoader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pyepo.metric.regret.regret" title="Link to this definition">¶</a></dt>
-<dd><p>Normalized true regret (SPO loss) of a trained predictor.</p>
+<span class="sig-prename descclassname"><span class="pre">pyepo.metric.regret.</span></span><span class="sig-name descname"><span class="pre">regret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.12)"><span class="pre">torch.nn.Module</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(in PyTorch v2.12)"><span class="pre">torch.utils.data.DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normalized'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></span><a class="headerlink" href="#pyepo.metric.regret.regret" title="Link to this definition">¶</a></dt>
+<dd><p>True regret (SPO loss) of a trained predictor.</p>
 <p>Solves the optimization problem on the predicted cost vector
 <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>, then measures the excess true objective
 incurred by that decision:
-<span class="math notranslate nohighlight">\(\sum_i (\mathbf{c}_i^\top \mathbf{w}^*(\hat{\mathbf{c}}_i) -
-z^*(\mathbf{c}_i)) / \sum_i |z^*(\mathbf{c}_i)|\)</span>. The result is
-dimensionless and comparable across problem scales. The predictor is
-automatically put into <code class="docutils literal notranslate"><span class="pre">eval()</span></code> for the call and restored to
-<code class="docutils literal notranslate"><span class="pre">train()</span></code> afterwards.</p>
+<span class="math notranslate nohighlight">\(l_i = \mathbf{c}_i^\top \mathbf{w}^*(\hat{\mathbf{c}}_i) -
+z^*(\mathbf{c}_i)\)</span>. With the default <code class="docutils literal notranslate"><span class="pre">reduction=&quot;normalized&quot;</span></code> the
+result is <span class="math notranslate nohighlight">\(\sum_i l_i / \sum_i |z^*(\mathbf{c}_i)|\)</span>,
+dimensionless and comparable across problem scales; instances with
+near-zero true optima inflate the ratio. The predictor is evaluated
+under <code class="docutils literal notranslate"><span class="pre">eval()</span></code>; its original mode is restored afterwards.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -411,13 +429,19 @@ automatically put into <code class="docutils literal notranslate"><span class="p
 <li><p><strong>optmodel</strong> – a PyEPO optimization model</p></li>
 <li><p><strong>dataloader</strong> – PyTorch DataLoader over an <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> (yielding
 <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code> tuples)</p></li>
+<li><p><strong>processes</strong> – number of processors, 1 for single-core, 0 for all of
+cores; a fresh worker pool is spawned per call, each worker
+rebuilding the model from its constructor args</p></li>
+<li><p><strong>reduction</strong> – “normalized” (sum of regrets over sum of absolute true
+optima), “sum”, “mean”, or “none” (per-instance array)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>normalized true regret</p>
+<dd class="field-even"><p>aggregated regret, or per-instance regrets
+when <code class="docutils literal notranslate"><span class="pre">reduction=&quot;none&quot;</span></code></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -425,18 +449,18 @@ automatically put into <code class="docutils literal notranslate"><span class="p
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.metric.regret.calRegret">
 <span class="sig-prename descclassname"><span class="pre">pyepo.metric.regret.</span></span><span class="sig-name descname"><span class="pre">calRegret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pyepo.metric.regret.calRegret" title="Link to this definition">¶</a></dt>
-<dd><p>A function to calculate normalized true regret for a batch</p>
+<dd><p>True regret of a single instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>optmodel</strong> – optimization model</p></li>
-<li><p><strong>pred_cost</strong> – predicted costs</p></li>
-<li><p><strong>true_cost</strong> – true costs</p></li>
+<li><p><strong>pred_cost</strong> – predicted cost vector</p></li>
+<li><p><strong>true_cost</strong> – true cost vector</p></li>
 <li><p><strong>true_obj</strong> – true optimal objective value</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>true regret loss</p>
+<dd class="field-even"><p>true regret</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
@@ -503,8 +527,10 @@ automatically put into <code class="docutils literal notranslate"><span class="p
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">pyepo.metric.regret</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#pyepo.metric.regret.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.metric.regret.regret"><code class="docutils literal notranslate"><span class="pre">regret()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.metric.regret.calRegret"><code class="docutils literal notranslate"><span class="pre">calRegret()</span></code></a></li>
 </ul>
