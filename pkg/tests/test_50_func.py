@@ -166,6 +166,8 @@ class TestPerturbedInternals:
 
         pfy = PFYMul.__new__(PFYMul)
         pfy.sigma = 0.5
+        # full prediction: c_pred_index is None so the mask is a no-op
+        pfy.optmodel = MagicMock(c_pred_index=None)
         noises = torch.tensor([[[0.0, 1.0, -1.0], [0.5, -0.5, 0.25]]])
         ptb_sols = torch.tensor([[[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]]])
         factor = torch.exp(pfy.sigma * noises - 0.5 * pfy.sigma**2)
