@@ -12,7 +12,14 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.utils import _full_cost, _mask_pred, _solve_or_cache, _sum_gamma_sample
+from pyepo.func.jax.utils import (
+    _check_jit_key,
+    _concretizable,
+    _full_cost,
+    _mask_pred,
+    _solve_or_cache,
+    _sum_gamma_sample,
+)
 from pyepo.utils import _EPS
 
 
@@ -24,7 +31,8 @@ class perturbedOpt(optModule):
     :math:`\\mathbb{E}_{\\boldsymbol{\\xi}}[\\mathbf{w}^*(\\hat{\\mathbf{c}} +
     \\sigma\\boldsymbol{\\xi})]` by Monte Carlo averaging, giving an
     informative gradient where the bare solver gives zero. Returns a solution;
-    pair with a task loss.
+    pair with a task loss. The forward accepts ``key=`` for explicit RNG
+    control, required under ``jax.jit``.
 
     Reference: Berthet et al. (2020)
     `<https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>`_
@@ -67,6 +75,7 @@ class perturbedOpt(optModule):
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
         # explicit key -> jittable; None -> eager, advance the instance key
+        _check_jit_key(pred_cost, key)
         if key is None:
             self._key, key = jax.random.split(self._key)
         noises = jax.random.normal(
@@ -136,7 +145,8 @@ class perturbedFenchelYoung(optModule):
     loss against the true optimum, returning a scalar loss whose gradient is
     the residual :math:`\\mathbf{w}^*(\\mathbf{c}) -
     \\mathbb{E}_{\\boldsymbol{\\xi}}[\\mathbf{w}^*(\\hat{\\mathbf{c}} +
-    \\sigma\\boldsymbol{\\xi})]`.
+    \\sigma\\boldsymbol{\\xi})]`. The forward accepts ``key=`` for explicit
+    RNG control, required under ``jax.jit``.
 
     Reference: Berthet et al. (2020)
     `<https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html>`_
@@ -178,6 +188,7 @@ class perturbedFenchelYoung(optModule):
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
         # explicit key -> jittable; None -> eager, advance the instance key
+        _check_jit_key(pred_cost, key)
         if key is None:
             self._key, key = jax.random.split(self._key)
         noises = jax.random.normal(
@@ -260,7 +271,8 @@ class implicitMLE(optModule):
     induces a virtual update :math:`\\hat{\\mathbf{c}} + \\lambda \\mathbf{d}`,
     and the gradient is a directional finite difference between smoothed
     solutions at the updated and original costs, sharing one Sum-of-Gamma noise
-    realization across both.
+    realization across both. The forward accepts ``key=`` for explicit RNG
+    control, required under ``jax.jit``.
 
     Reference: Niepert, Minervini & Franceschi (2021)
     `<https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html>`_
@@ -312,6 +324,7 @@ class implicitMLE(optModule):
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
         # explicit key -> jittable; None -> eager, advance the instance key
+        _check_jit_key(pred_cost, key)
         if key is None:
             self._key, key = jax.random.split(self._key)
         noises = _sum_gamma_sample(
@@ -423,6 +436,9 @@ class adaptiveImplicitMLE(optModule):
         """
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
+        # eager-only: the adaptive state and key advance host-side
+        if not _concretizable(pred_cost):
+            raise RuntimeError("adaptiveImplicitMLE is eager-only; do not wrap it in jax.jit.")
         self._key, sub = jax.random.split(self._key)
         noises = _sum_gamma_sample(
             sub,

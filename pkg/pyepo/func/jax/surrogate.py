@@ -135,7 +135,8 @@ class perturbationGradient(optModule):
         """
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
-        true_cost = _full_cost(true_cost, self.optmodel)
+        # the label direction carries no gradient
+        true_cost = jax.lax.stop_gradient(_full_cost(true_cost, self.optmodel))
         sign = 1.0 if self.optmodel.modelSense == EPO.MINIMIZE else -1.0
         # stop the gradient into the solver
         cp = jax.lax.stop_gradient(pred_cost)

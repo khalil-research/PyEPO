@@ -97,8 +97,8 @@ class optModule(ABC):
             raise ValueError(f"No reduction '{reduction}'.")
         self.reduction = reduction
 
-    def __call__(self, *args):
-        return self.forward(*args)
+    def __call__(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)
 
     @abstractmethod
     def forward(self, *args):

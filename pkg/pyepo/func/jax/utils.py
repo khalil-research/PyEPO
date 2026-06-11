@@ -19,17 +19,31 @@ except ImportError:  # older jax
     from jax.core import concrete_or_error as _concrete_or_error
 
 
+def _concretizable(x):
+    """Whether x is concrete (eager / eager grad) rather than a jit-traced abstract value."""
+    try:
+        _concrete_or_error(None, x)
+    except jax.errors.ConcretizationTypeError:
+        return False
+    return True
+
+
 def _check_jit_caching(cost, module):
     """Raise a clear error if a pool-caching side effect is traced under jax.jit."""
-    if module.solpool is None:
-        return
-    try:
-        _concrete_or_error(None, cost)
-    except jax.errors.ConcretizationTypeError:
+    if module.solpool is not None and not _concretizable(cost):
         raise RuntimeError(
             "JAX pool caching is not supported under jax.jit; run the loss eagerly "
             "(call jax.grad without wrapping it in jax.jit)."
-        ) from None
+        )
+
+
+def _check_jit_key(cost, key):
+    """Raise a clear error if the implicit RNG (key=None) is traced under jax.jit."""
+    if key is None and not _concretizable(cost):
+        raise RuntimeError(
+            "Implicit RNG (key=None) is constant-folded under jax.jit (or other abstract "
+            "tracing); pass a fresh key per step, e.g. loss(..., key=jax.random.fold_in(key, step))."
+        )
 
 
 def _solve_or_cache(cost, module):

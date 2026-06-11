@@ -14,6 +14,7 @@ import numpy as np
 from pyepo import EPO
 from pyepo.func.cave import _HAS_CLARABEL, _project_one
 from pyepo.func.jax.abcmodule import optModule
+from pyepo.func.jax.utils import _concretizable
 
 
 class coneAlignedCosine(optModule):
@@ -62,8 +63,16 @@ class coneAlignedCosine(optModule):
         """
         Forward pass
         """
+        # labels carry no gradient (torch parity: detached projection target)
+        tight_ctrs = jax.lax.stop_gradient(tight_ctrs)
         signed_cost = self._sign * pred_cost
         sc = jax.lax.stop_gradient(signed_cost)
+        # the per-batch coin is host randomness; jit would freeze one branch
+        if 0.0 < self.solve_ratio < 1.0 and not _concretizable(pred_cost):
+            raise RuntimeError(
+                "The CaVE Hybrid solve-vs-heuristic coin is not supported under jax.jit "
+                "(or other abstract tracing); run eagerly or use solve_ratio 0 or 1."
+            )
         # per-batch coin flip: QP projection or cheap heuristic
         if self._branch_rng.uniform() <= self.solve_ratio:
             proj = _clarabel_project_batch(sc, tight_ctrs, self.max_iter, self.pool)

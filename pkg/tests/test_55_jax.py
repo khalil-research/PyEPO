@@ -244,9 +244,49 @@ class TestJit:
             jax.jit(jax.grad(lambda p: nce(p, ts)))(pred)
 
 
+@requires_jax
+@requires_gurobi
+class TestJitKeyGuard:
+    """Implicit RNG (key=None) is rejected under jit; explicit keys match eager."""
+
+    def test_perturbed_jit_requires_explicit_key(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import perturbedOpt
+
+        model, c = _perturbed_setup("max")
+        dpo = perturbedOpt(model, n_samples=3, sigma=1.0, seed=0)
+        pred = jnp.asarray((c * 1.2).astype(np.float32))
+        with pytest.raises(RuntimeError, match="key"):
+            jax.jit(lambda p: dpo(p).sum())(pred)
+        # an explicit key is a traced argument: jit matches eager
+        key = jax.random.PRNGKey(7)
+        out_jit = jax.jit(lambda p, k: dpo(p, key=k))(pred, key)
+        np.testing.assert_allclose(np.array(out_jit), np.array(dpo(pred, key=key)), atol=1e-6)
+
+
 # ============================================================
 # jax: independent correctness gates (closed-form re-solve or finite difference)
 # ============================================================
+
+
+@requires_jax
+@requires_gurobi
+class TestPGLabelGradient:
+    """PG: the true-cost label carries no gradient."""
+
+    def test_true_cost_grad_is_zero(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import PG
+
+        model, c = _perturbed_setup("max")
+        pg = PG(model, sigma=0.1)
+        pred = jnp.asarray((c * 1.2).astype(np.float32))
+        g = jax.grad(lambda p, t: pg(p, t), argnums=1)(pred, jnp.asarray(c))
+        np.testing.assert_allclose(np.array(g), 0.0, atol=1e-7)
 
 
 def _spo_closed_form(model, pred, true_cost, true_sol):
@@ -865,6 +905,45 @@ class TestCaVEParity:
         pt = torch.tensor(pred, requires_grad=True)
         tcave(pt, torch.as_tensor(tight)).backward()
         np.testing.assert_allclose(g_j, pt.grad.numpy(), atol=1e-3)
+
+
+@requires_jax
+@requires_gurobi
+@requires_clarabel
+class TestCaVEGuards:
+    """CaVE: detached labels and the jit guard on the hybrid coin."""
+
+    def _setup(self):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        model = shortestPathModel(grid=(2, 3))  # 7 edges
+        rng = np.random.RandomState(0)
+        pred = rng.randn(2, model.num_cost).astype(np.float32)
+        tight = rng.randn(2, 3, model.num_cost).astype(np.float32)
+        return model, pred, tight
+
+    def test_tight_ctrs_grad_is_zero(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import coneAlignedCosine as JCaVE
+
+        model, pred, tight = self._setup()
+        jcave = JCaVE(model, reduction="mean")
+        # labels carry no gradient
+        g = jax.grad(lambda t: jcave(jnp.asarray(pred), t), argnums=0)(jnp.asarray(tight))
+        np.testing.assert_allclose(np.array(g), 0.0, atol=1e-7)
+
+    def test_hybrid_coin_rejected_under_jit(self):
+        import jax
+        import jax.numpy as jnp
+
+        from pyepo.func.jax import coneAlignedCosine as JCaVE
+
+        model, pred, tight = self._setup()
+        jcave = JCaVE(model, solve_ratio=0.5, reduction="mean")
+        with pytest.raises(RuntimeError, match="jit"):
+            jax.jit(lambda p: jcave(p, jnp.asarray(tight)))(jnp.asarray(pred))
 
 
 def _partial_model():

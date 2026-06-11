@@ -369,6 +369,24 @@ class TestMaximizeSense:
 
 
 @requires_gurobi
+class TestPGLabelGradient:
+    """PG: the true-cost label carries no gradient."""
+
+    def test_true_cost_grad_is_none(self, sp_data):
+        from pyepo.func.surrogate import PG
+
+        optmodel, _dataset, loader = sp_data
+        _x, c, _w, _z = take_batch(loader)
+        pg = PG(optmodel, processes=1, sigma=0.1)
+        ct = c.clone().requires_grad_(True)
+        cp = (c * 1.2).clone().detach().requires_grad_(True)
+        pg(cp, ct).backward()
+        # the label never enters the graph
+        assert ct.grad is None
+        assert torch.isfinite(cp.grad).all()
+
+
+@requires_gurobi
 class TestMultiplicativePerturbPartial:
     """Multiplicative perturbation under partial prediction: fixed costs keep factor 1."""
 

@@ -214,9 +214,9 @@ class perturbationGradient(optModule):
                 self,
             )
             wp, wm = combined_sol[:b], combined_sol[b:]
-            # differentiable objective value
-            obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * true_cost, wp)
-            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
+            # differentiable objective value; the label direction carries no gradient
+            obj_plus = torch.einsum("bi,bi->b", pred_cost + self.sigma * c, wp)
+            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * c, wm)
             # loss
             loss = sign * (obj_plus - obj_minus) / (2 * self.sigma + _EPS)
         # back differencing
@@ -227,9 +227,9 @@ class perturbationGradient(optModule):
                 self,
             )
             w, wm = combined_sol[:b], combined_sol[b:]
-            # differentiable objective value
+            # differentiable objective value; the label direction carries no gradient
             obj = torch.einsum("bi,bi->b", pred_cost, w)
-            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * true_cost, wm)
+            obj_minus = torch.einsum("bi,bi->b", pred_cost - self.sigma * c, wm)
             # loss
             loss = sign * (obj - obj_minus) / (self.sigma + _EPS)
         return loss
