@@ -88,7 +88,7 @@ Module Contents
 
 
 
-.. py:class:: tspDFJModel(num_nodes: int, *args, **kwargs)
+.. py:class:: tspDFJModel(num_nodes: int, recycle_cuts: bool = False, *args, **kwargs)
 
    Bases: :py:obj:`tspABModel`
 
@@ -97,7 +97,14 @@ Module Contents
 
    Uses one undirected Var per edge (``x[j,i]`` aliases ``x[i,j]``), so the
    paired-vars ``setObj`` / ``solve`` / ``_addExtraConstr`` inherited from
-   ``tspABModel`` are overridden here.
+   ``tspABModel`` are overridden here. With ``recycle_cuts`` the subtour cuts
+   found in one solve join the model's lazy pool, so later solves on new cost
+   vectors skip rediscovering them.
+
+
+   .. py:attribute:: recycle_cuts
+      :value: False
+
 
 
    .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None

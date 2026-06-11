@@ -34,7 +34,7 @@ Module Contents
    binary; if a single-stop route is actually needed, duplicate the depot.
 
 
-.. py:class:: vrpRCIModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int, *args, **kwargs)
+.. py:class:: vrpRCIModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int, recycle_cuts: bool = False)
 
    Bases: :py:obj:`vrpABModel`
 
@@ -44,7 +44,14 @@ Module Contents
    Uses one undirected Var per edge (``x[j,i]`` aliases ``x[i,j]``). Subtour
    elimination and rounded capacity inequalities are added lazily during
    branch-and-cut; the cuts added at the optimum are tracked on
-   ``model._lazy_constrs`` for downstream CaVE cone extraction.
+   ``model._lazy_constrs`` for downstream CaVE cone extraction. With
+   ``recycle_cuts`` the cuts found in one solve join the model's lazy pool,
+   so later solves on new cost vectors skip rediscovering them.
+
+
+   .. py:attribute:: recycle_cuts
+      :value: False
+
 
 
    .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
