@@ -28,7 +28,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: portfolioModel(num_assets: int, covariance: numpy.ndarray, gamma: float = 2.25, solver: str = 'glpk')
+.. py:class:: portfolioModel(num_assets: int, covariance: numpy.ndarray, gamma: float = 2.25, solver: str = 'ipopt')
 
    Bases: :py:obj:`pyepo.model.bases.portfolioBase`, :py:obj:`pyepo.model.omo.omomodel.optOmoModel`
 

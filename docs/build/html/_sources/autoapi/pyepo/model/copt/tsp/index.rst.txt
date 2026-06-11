@@ -14,6 +14,7 @@ Attributes
 
 .. autoapisummary::
 
+   pyepo.model.copt.tsp.CallbackBase
    pyepo.model.copt.tsp.num_nodes
 
 
@@ -32,6 +33,8 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: CallbackBase
 
 .. py:class:: tspABModel(num_nodes: int, *args, **kwargs)
 
