@@ -9,36 +9,39 @@ For a runnable walkthrough, see the `03 Training and Testing <https://colab.rese
 Common Setup
 ============
 
-All examples below share the same setup: a linear prediction model trained on shortest-path data.
+All examples below share the same setup: a linear prediction model trained on knapsack data defined with the DSL.
 
 .. code-block:: python
 
+   import numpy as np
    import pyepo
+   from pyepo import EPO, dsl
    import torch
    from torch import nn
    from torch.utils.data import DataLoader
 
-   # model for shortest path
-   grid = (5, 5)
-   optmodel = pyepo.model.shortestPathModel(grid)
-
    # generate data
-   num_data = 1000
-   num_feat = 5
-   deg = 4
-   noise_width = 0.5
-   x, c = pyepo.data.shortestpath.genData(num_data, num_feat, grid, deg, noise_width, seed=135)
+   num_data, num_feat, num_item, num_dim = 1000, 5, 10, 3
+   weights, feat, costs = pyepo.data.knapsack.genData(
+       num_data, num_feat, num_item, num_dim, deg=4, noise_width=0.5, seed=135
+   )
+   capacity = (weights.sum(axis=1) * 0.5).astype(int)
+
+   # define the knapsack problem with the DSL
+   x = dsl.Variable(num_item, vtype=EPO.BINARY)
+   c = dsl.Parameter(num_item)
+   optmodel = dsl.Problem(dsl.Maximize(c @ x), [weights @ x <= capacity]).compile(backend="gurobi")
 
    # dataset and data loader
-   dataset = pyepo.data.dataset.optDataset(optmodel, x, c)
+   dataset = pyepo.data.dataset.optDataset(optmodel, feat, costs)
    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 
    # build linear prediction model
-   predmodel = nn.Linear(5, 40)
+   predmodel = nn.Linear(num_feat, num_item)
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
    # a positive-output predictor, for the multiplicative perturbed variants below
-   positive_predmodel = nn.Sequential(nn.Linear(5, 40), nn.Softplus())
+   positive_predmodel = nn.Sequential(nn.Linear(num_feat, num_item), nn.Softplus())
 
 Each recipe below is a self-contained training loop: pick the method you want and copy its block as-is.
 
@@ -218,7 +221,7 @@ L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)
 Black-Box Methods
 =================
 
-Black-box methods return a predicted solution. An objective-value loss :math:`|\langle \mathbf{c}, \hat{\mathbf{w}} \rangle - z^*|` is the standard pairing.
+Black-box methods return a predicted solution. An objective-value loss :math:`|\langle \mathbf{c}, \hat{\mathbf{w}} \rangle - \mathbf{c}^\top \mathbf{w}^*(\mathbf{c})|` is the standard pairing.
 
 
 Differentiable Black-Box Optimizer (DBB)

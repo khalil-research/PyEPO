@@ -14,28 +14,35 @@ This is the documentation of ``PyEPO`` (PyTorch-based End-to-End Predict-then-Op
 Quick Example
 +++++++++++++
 
-End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+ loss:
+End-to-end training of a knapsack predictor defined with the DSL, using the SPO+ loss:
 
 .. code-block:: python
 
+   import numpy as np
    import pyepo
+   from pyepo import EPO, dsl
    import torch
    from torch import nn
    from torch.utils.data import DataLoader
 
-   # optimization model: 5x5 grid shortest path
-   grid = (5, 5)
-   optmodel = pyepo.model.shortestPathModel(grid)
-
-   # synthetic data and dataset
-   x, c = pyepo.data.shortestpath.genData(
-       num_data=1000, num_features=5, grid=grid, deg=4, noise_width=0.5, seed=135,
+   # generate knapsack data
+   num_item = 10
+   weights, feat, costs = pyepo.data.knapsack.genData(
+       1000, 5, num_item, 3, deg=4, noise_width=0.5, seed=135,
    )
-   dataset = pyepo.data.dataset.optDataset(optmodel, x, c)
+   capacity = (weights.sum(axis=1) * 0.5).astype(int)
+
+   # define the problem with the DSL
+   x = dsl.Variable(num_item, vtype=EPO.BINARY)
+   c = dsl.Parameter(num_item)
+   optmodel = dsl.Problem(dsl.Maximize(c @ x), [weights @ x <= capacity]).compile(backend="gurobi")
+
+   # dataset
+   dataset = pyepo.data.dataset.optDataset(optmodel, feat, costs)
    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 
    # linear predictor and SPO+ loss
-   predmodel = nn.Linear(5, 40)
+   predmodel = nn.Linear(5, num_item)
    spo = pyepo.func.SPOPlus(optmodel, processes=1)
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
