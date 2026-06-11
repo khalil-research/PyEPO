@@ -515,6 +515,20 @@ def test_addconstr_cost_space(backend):
     assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
 
 
+@pytest.mark.parametrize("backend", _ALL)
+def test_relax_keeps_added_constraints(backend):
+    W = np.array([[3.0, 4, 3, 6, 4]])
+    cap = np.array([9.0])
+    x = dsl.Variable(5, vtype=EPO.BINARY)
+    c = dsl.Parameter(5)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [W @ x <= cap]).compile(backend=backend, **_kw(backend))
+    # a binding cut must survive the relaxation
+    rel = comp.addConstr(np.ones(5), 1.0).relax()
+    rel.setObj(np.ones(5))
+    sol, _ = rel.solve()
+    assert to_np(sol).sum() <= 1.0 + 1e-4
+
+
 @pytest.mark.parametrize("backend", [*_ALL, pytest.param("mpax", marks=requires_mpax)])
 def test_partial_prediction_solves(backend):
     # predicted cost on x, known cost on y; y is expensive so x is used

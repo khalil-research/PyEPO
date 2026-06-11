@@ -137,4 +137,6 @@ class optOmoModel(optModel):
         # add constraint
         expr = sum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
         new_model._model.cons.add(expr)
+        # track for replay on relax
+        new_model._extra_constrs = [*self._extra_constrs, (costToNumpy(coefs), float(rhs))]
         return new_model

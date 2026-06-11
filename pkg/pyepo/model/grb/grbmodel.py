@@ -151,4 +151,6 @@ class optGrbModel(optModel):
             # LinExpr(coeffs, vars) builds the affine expression in one C call
             expr = gp.LinExpr(coefs.tolist(), new_model._vars_list) <= rhs
             new_model._model.addConstr(expr)
+        # track for replay on relax
+        new_model._extra_constrs = [*self._extra_constrs, (coefs, float(rhs))]
         return new_model

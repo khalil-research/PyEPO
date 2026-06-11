@@ -155,6 +155,16 @@ class TestKnapsack:
         with pytest.raises(RuntimeError):
             rel.relax()
 
+    def test_relax_keeps_added_constraints(self, backend):
+        m, meta = _make_knapsack(backend)
+        if meta["relax"] is None:
+            pytest.skip("backend has no LP relaxation")
+        # a binding cut must survive the relaxation
+        rel = m.addConstr(np.ones(m.num_cost), 1.0).relax()
+        rel.setObj(_KNAP_COST)
+        sol, _ = rel.solve()
+        assert to_np(sol).sum() <= 1.0 + 1e-4
+
 
 def _make_knapsack_multidim(backend):
     """A 2-dimensional knapsack on the given backend (distinct code path)."""
@@ -600,6 +610,23 @@ class TestVRP:
             assert sum(demands[i - 1] for i in tour[1:-1]) <= capacity + 1e-6
         # optimum pairs each heavy customer with a light one
         np.testing.assert_allclose(obj, 14.0, atol=1e-4)
+
+    def test_relax_keeps_added_constraints(self, backend, formulation):
+        m, rel_cls = _make_vrp(backend, formulation)
+        if rel_cls is None:
+            pytest.skip("RCI has no relaxation (lazy cuts)")
+        rel0 = m.relax()
+        rel0.setObj(_VRP_COST)
+        sol0, _ = rel0.solve()
+        # cap the heaviest relaxed edge; the cut must survive the relaxation
+        e = int(np.argmax(np.asarray(sol0)))
+        assert np.asarray(sol0)[e] > 0.1  # the cut is binding, not vacuous
+        coefs = np.zeros(m.num_cost)
+        coefs[e] = 1.0
+        rel = m.addConstr(coefs, 0.1).relax()
+        rel.setObj(_VRP_COST)
+        sol, _ = rel.solve()
+        assert np.asarray(sol)[e] <= 0.1 + 1e-4
 
     def test_relax(self, backend, formulation):
         m, rel_cls = _make_vrp(backend, formulation)

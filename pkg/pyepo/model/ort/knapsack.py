@@ -54,7 +54,11 @@ class knapsackModel(knapsackBase, optOrtModel):
         """
         A method to get linear relaxation model
         """
-        return knapsackModelRel(self.weights, self.capacity, self.solver)
+        model_rel = knapsackModelRel(self.weights, self.capacity, self.solver)
+        # replay user cuts on the relaxation
+        for coefs, rhs in self._extra_constrs:
+            model_rel = model_rel.addConstr(coefs, rhs)
+        return model_rel
 
 
 class knapsackModelRel(knapsackModel):

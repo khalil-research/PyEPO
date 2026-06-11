@@ -47,6 +47,8 @@ class optModel(ABC):
     _cost_vars: list = []
 
     def __init__(self) -> None:
+        # user cuts tracked for replay on relax
+        self._extra_constrs: list = []
         self._model, self.x = self._getModel()
 
     def __repr__(self) -> str:

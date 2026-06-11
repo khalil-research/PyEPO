@@ -76,13 +76,21 @@ class compiledBase(optModel):
 
     def addConstr(self, coefs, rhs):
         # add a cut coefs @ x <= rhs over the full variable vector
-        return self._add_cut(np.asarray(coefs, dtype=float).reshape(-1), rhs)
+        coefs = np.asarray(coefs, dtype=float).reshape(-1)
+        new_model = self._add_cut(coefs, rhs)
+        # track for replay on relax
+        new_model._extra_constrs = [*self._extra_constrs, (coefs, float(rhs))]
+        return new_model
 
     def relax(self):
         # recompile the relaxed problem, preserving backend kwargs
         kwargs = getArgs(self)
         kwargs["problem"] = self.problem.relax()
-        return type(self)(**kwargs)
+        model_rel = type(self)(**kwargs)
+        # replay user cuts on the relaxation
+        for coefs, rhs in self._extra_constrs:
+            model_rel = model_rel.addConstr(coefs, rhs)
+        return model_rel
 
     def _apply_params(self):
         # push self.params to the solver

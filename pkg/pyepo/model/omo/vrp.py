@@ -141,13 +141,16 @@ class vrpMTZModel(vrpABModel):
 
     def relax(self) -> vrpMTZModelRel:
         """A method to get linear relaxation model"""
-        return vrpMTZModelRel(
+        model_rel = vrpMTZModelRel(
             self.num_nodes,
             self.demands,
             self.capacity,
             self.num_vehicle,
             self.solver,
         )
+        # replay user cuts on the relaxation
+        self._replay_extras(model_rel)
+        return model_rel
 
 
 class vrpMTZModelRel(vrpMTZModel):

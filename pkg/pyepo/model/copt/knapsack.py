@@ -40,6 +40,9 @@ class knapsackModel(knapsackBase, optCoptModel):
         """
         # copy
         model_rel = knapsackModelRel(self.weights, self.capacity)
+        # replay user cuts on the relaxation
+        for coefs, rhs in self._extra_constrs:
+            model_rel = model_rel.addConstr(coefs, rhs)
         return model_rel
 
 
