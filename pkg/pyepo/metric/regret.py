@@ -158,7 +158,7 @@ def regret(
                     cp = predmodel(x)
             else:
                 # JAX callable: f(x_numpy) -> array-like
-                cp = torch.as_tensor(np.asarray(predmodel(x.numpy())), dtype=torch.float32)
+                cp = torch.as_tensor(np.array(predmodel(x.numpy()), dtype=np.float32))
             # full cost so the MPAX backend can batch-set the objective in one call
             sols, _ = _solve_batch(optmodel._fullCost(cp), optmodel, processes=processes, pool=pool)
             # vectorized regret accumulation (one host sync per batch)
