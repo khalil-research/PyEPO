@@ -36,7 +36,7 @@ class portfolioModel(portfolioBase, optOmoModel):
         num_assets: int,
         covariance: np.ndarray,
         gamma: float = 2.25,
-        solver: str = "glpk",
+        solver: str = "ipopt",
     ) -> None:
         """
         Args:

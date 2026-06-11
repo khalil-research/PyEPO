@@ -6,7 +6,11 @@ Shortest path problem
 from __future__ import annotations
 
 import numpy as np
-from coptpy import COPT
+
+try:
+    from coptpy import COPT
+except ImportError:
+    pass
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.copt.coptmodel import _get_envr, optCoptModel

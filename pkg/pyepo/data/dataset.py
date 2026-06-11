@@ -64,6 +64,11 @@ class optDataset(Dataset):
         """
         if not isinstance(model, optModel):
             raise TypeError("arg model is not an optModel")
+        if len(feats) != len(costs):
+            raise ValueError(
+                f"feats and costs must have the same number of instances: "
+                f"{len(feats)} vs {len(costs)}."
+            )
         self.model = model
         # data
         self.feats = feats
@@ -86,15 +91,10 @@ class optDataset(Dataset):
         objs = []
         logger.info("Optimizing for optDataset...")
         for c in tqdm(self.costs):
-            try:
-                sol, obj = self._solve(c)
-                # to numpy
-                if isinstance(sol, torch.Tensor):
-                    sol = sol.detach().cpu().numpy()
-            except Exception as e:
-                raise ValueError(
-                    "For optModel, the method 'solve' should return solution vector and objective value."
-                ) from e
+            sol, obj = self._solve(c)
+            # to numpy
+            if isinstance(sol, torch.Tensor):
+                sol = sol.detach().cpu().numpy()
             sols.append(np.asarray(sol))
             objs.append(obj)
         return np.stack(sols), np.asarray(objs).reshape(-1, 1)
@@ -211,6 +211,11 @@ class optDatasetKNN(optDataset):
         """
         if not isinstance(model, optModel):
             raise TypeError("arg model is not an optModel")
+        if len(feats) != len(costs):
+            raise ValueError(
+                f"feats and costs must have the same number of instances: "
+                f"{len(feats)} vs {len(costs)}."
+            )
         self.model = model
         # at most num_data-1 neighbours exist (self excluded), so k must stay below it
         num_data = len(feats)
@@ -245,14 +250,9 @@ class optDatasetKNN(optDataset):
             sol_knn = np.zeros((self.costs.shape[1], self.k))
             obj_knn = np.zeros(self.k)
             for i, c in enumerate(c_knn.T):
-                try:
-                    sol_i, obj_i = self._solve(c)
-                    if isinstance(sol_i, torch.Tensor):
-                        sol_i = sol_i.detach().cpu().numpy()
-                except Exception as e:
-                    raise ValueError(
-                        "For optModel, the method 'solve' should return solution vector and objective value."
-                    ) from e
+                sol_i, obj_i = self._solve(c)
+                if isinstance(sol_i, torch.Tensor):
+                    sol_i = sol_i.detach().cpu().numpy()
                 sol_knn[:, i] = sol_i
                 obj_knn[i] = obj_i
             # get average
@@ -268,6 +268,11 @@ class optDatasetKNN(optDataset):
         """
         A method to get kNN costs
         """
+        # scipy needs host numpy arrays
+        if isinstance(self.feats, torch.Tensor):
+            self.feats = self.feats.detach().cpu().numpy()
+        if isinstance(self.costs, torch.Tensor):
+            self.costs = self.costs.detach().cpu().numpy()
         # calculate distances between features
         distances = distance.cdist(self.feats, self.feats, "euclidean")
         # exclude self (diagonal) to get true nearest neighbours
@@ -331,6 +336,11 @@ class optDatasetConstrs(optDataset):
         """
         if not isinstance(model, optModel):
             raise TypeError("arg model is not an optModel")
+        if len(feats) != len(costs):
+            raise ValueError(
+                f"feats and costs must have the same number of instances: "
+                f"{len(feats)} vs {len(costs)}."
+            )
         self.model = model
         self.skip_infeas = skip_infeas
         # data
@@ -362,7 +372,13 @@ class optDatasetConstrs(optDataset):
         model = self.model
         for i, c in enumerate(tqdm(self.costs)):
             model._setFullObj(model._fullCost(c))
-            sol, obj = model.solve()
+            try:
+                sol, obj = model.solve()
+            except RuntimeError as e:
+                if self.skip_infeas:
+                    logger.warning("Instance %d had no solution, skipping: %s", i, e)
+                    continue
+                raise
             # infeasibility check
             if model._model.Status != GRB.OPTIMAL:
                 if self.skip_infeas:
@@ -378,7 +394,13 @@ class optDatasetConstrs(optDataset):
                 )
             # binary-vertex check: CaVE is defined for binary linear programs
             sol_arr = np.asarray(sol, dtype=np.float64)
-            if not np.all((sol_arr < 1e-5) | (sol_arr > 1 - 1e-5)):
+            is_binary = np.all(
+                np.isclose(sol_arr, 0.0, atol=1e-5) | np.isclose(sol_arr, 1.0, atol=1e-5)
+            )
+            if not is_binary:
+                if self.skip_infeas:
+                    logger.warning("Instance %d optimal vertex is not binary, skipping.", i)
+                    continue
                 raise ValueError(
                     f"Instance {i} optimal vertex is not binary; "
                     "CaVE requires binary linear programs."
@@ -387,6 +409,8 @@ class optDatasetConstrs(optDataset):
             objs.append([float(obj)])
             ctrs.append(_extract_tight_normals(model, sol_arr))
             valid.append(i)
+        if not valid:
+            raise ValueError("No valid instances (all skipped or empty input).")
         return np.stack(sols), np.asarray(objs), ctrs, valid
 
     def __len__(self) -> int:

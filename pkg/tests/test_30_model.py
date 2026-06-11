@@ -155,6 +155,16 @@ class TestKnapsack:
         with pytest.raises(RuntimeError):
             rel.relax()
 
+    def test_infeasible_solve_raises_clearly(self, backend):
+        if backend in ("mpax", "ortcp"):
+            pytest.skip("PDHG warns on infeasibility; CP-SAT has its own integer guard")
+        m, _meta = _make_knapsack(backend)
+        # sum(x) <= -1 over x >= 0 is infeasible
+        m2 = m.addConstr(np.ones(m.num_cost), -1.0)
+        m2.setObj(_KNAP_COST)
+        with pytest.raises(RuntimeError):
+            m2.solve()
+
     def test_relax_keeps_added_constraints(self, backend):
         m, meta = _make_knapsack(backend)
         if meta["relax"] is None:

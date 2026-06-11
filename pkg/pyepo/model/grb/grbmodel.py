@@ -97,6 +97,9 @@ class optGrbModel(optModel):
         """
         # optimize() flushes pending changes
         self._model.optimize()
+        # surface failed solves clearly instead of a raw attribute error
+        if self._model.SolCount == 0:
+            raise RuntimeError(f"Gurobi found no solution (status {self._model.Status}).")
         if isinstance(self.x, gp.MVar):
             sol = self.x.x
         else:

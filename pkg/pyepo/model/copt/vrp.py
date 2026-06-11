@@ -8,7 +8,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
-from coptpy import COPT, CallbackBase
+
+try:
+    from coptpy import COPT, CallbackBase
+except ImportError:
+    CallbackBase = object  # placeholder so class bodies evaluate without coptpy
 
 from pyepo.model.bases import vrpABBase
 from pyepo.model.copt.coptmodel import _get_envr, optCoptModel

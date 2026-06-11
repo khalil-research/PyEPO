@@ -98,7 +98,16 @@ class optOmoModel(optModel):
         Returns:
             tuple: optimal solution (np.ndarray) and objective value (float)
         """
-        self._solverfac.solve(self._model)
+        res = self._solverfac.solve(self._model)
+        # surface failed solves clearly instead of an uninitialized-value error
+        cond = res.solver.termination_condition
+        if cond in (
+            po.TerminationCondition.infeasible,
+            po.TerminationCondition.unbounded,
+            po.TerminationCondition.infeasibleOrUnbounded,
+            po.TerminationCondition.error,
+        ):
+            raise RuntimeError(f"Pyomo found no solution (termination {cond}).")
         sol = np.fromiter(
             (pe.value(self.x[k]) for k in self.x),
             dtype=np.float32,

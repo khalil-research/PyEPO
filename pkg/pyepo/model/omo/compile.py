@@ -110,7 +110,16 @@ class compiledOmoProblem(compiledBase, optOmoModel):
 
     def _read_sol(self):
         # solve and read the full solution + objective value
-        self._solverfac.solve(self._model)
+        res = self._solverfac.solve(self._model)
+        # surface failed solves clearly instead of an uninitialized-value error
+        cond = res.solver.termination_condition
+        if cond in (
+            po.TerminationCondition.infeasible,
+            po.TerminationCondition.unbounded,
+            po.TerminationCondition.infeasibleOrUnbounded,
+            po.TerminationCondition.error,
+        ):
+            raise RuntimeError(f"Pyomo found no solution (termination {cond}).")
         sol = np.fromiter((pe.value(self.x[j]) for j in range(self.problem.num_vars)), dtype=float)
         return sol, float(pe.value(self._model.obj))
 

@@ -104,12 +104,17 @@ class optCoptModel(optModel):
             tuple: optimal solution and objective value
         """
         self._model.solve()
-        if _is_mvar(self.x):
-            # MVar.x is a coptpy NdArray; tolist() flattens it to plain floats
-            sol = np.asarray(self.x.x.tolist())
-        else:
-            sol = np.asarray(self._model.getInfo("Value", self._vars_list))
-        return sol, self._model.objVal
+        # surface failed solves clearly instead of a raw attribute error
+        try:
+            if _is_mvar(self.x):
+                # MVar.x is a coptpy NdArray; tolist() flattens it to plain floats
+                sol = np.asarray(self.x.x.tolist())
+            else:
+                sol = np.asarray(self._model.getInfo("Value", self._vars_list))
+            obj = self._model.objVal
+        except Exception as e:  # noqa: BLE001  coptpy raises generic errors on no-solution
+            raise RuntimeError(f"COPT found no solution (status {self._model.status}).") from e
+        return sol, obj
 
     def copy(self) -> Self:
         """

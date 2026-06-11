@@ -7,9 +7,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, NoReturn
 
-import gurobipy as gp
 import numpy as np
-from gurobipy import GRB
+
+try:
+    import gurobipy as gp
+    from gurobipy import GRB
+except ImportError:
+    pass
 
 from pyepo.model.bases import vrpABBase
 from pyepo.model.grb.grbmodel import optGrbModel

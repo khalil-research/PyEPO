@@ -5,7 +5,10 @@ Portfolio problem
 
 from __future__ import annotations
 
-from coptpy import COPT
+try:
+    from coptpy import COPT
+except ImportError:
+    pass
 
 from pyepo.model.bases import portfolioBase
 from pyepo.model.copt.coptmodel import _get_envr, optCoptModel

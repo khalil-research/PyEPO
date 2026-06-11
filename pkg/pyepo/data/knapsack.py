@@ -44,6 +44,8 @@ def genData(
         raise ValueError(f"deg = {deg} should be int.")
     if deg <= 0:
         raise ValueError(f"deg = {deg} should be positive.")
+    if noise_width < 0:
+        raise ValueError(f"noise_width = {noise_width} should be non-negative.")
     # set seed
     rnd = np.random.RandomState(seed)
     # number of data points

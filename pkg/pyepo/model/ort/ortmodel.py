@@ -94,8 +94,15 @@ class optOrtModel(optModel):
             tuple: optimal solution (list) and objective value (float)
         """
         status = self._model.Solve()
-        if status != pywraplp.Solver.OPTIMAL:
-            raise RuntimeError(f"Solver did not find an optimal solution. Status: {status}")
+        # FEASIBLE keeps the time-limited incumbent usable
+        if status not in (pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE):
+            names = {
+                pywraplp.Solver.INFEASIBLE: "INFEASIBLE",
+                pywraplp.Solver.UNBOUNDED: "UNBOUNDED",
+                pywraplp.Solver.ABNORMAL: "ABNORMAL",
+                pywraplp.Solver.NOT_SOLVED: "NOT_SOLVED",
+            }
+            raise RuntimeError(f"OR-Tools found no solution (status {names.get(status, status)}).")
         sol = np.fromiter(
             (v.solution_value() for v in self._vars_list),
             dtype=np.float32,

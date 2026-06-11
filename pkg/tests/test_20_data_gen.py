@@ -20,6 +20,10 @@ class TestKnapsackData:
         assert x.shape == (50, 5)
         assert c.shape == (50, 8)
 
+    def test_negative_noise_width_rejected(self):
+        with pytest.raises(ValueError):
+            knapsack.genData(4, 3, 4, noise_width=-0.1)
+
     def test_deterministic(self):
         w1, x1, c1 = knapsack.genData(20, 3, 4, seed=0)
         w2, x2, c2 = knapsack.genData(20, 3, 4, seed=0)
@@ -84,6 +88,10 @@ class TestShortestPathData:
         _, c = shortestpath.genData(20, 5, (3, 3), seed=42)
         assert np.all(c > 0)
 
+    def test_negative_noise_width_rejected(self):
+        with pytest.raises(ValueError):
+            shortestpath.genData(4, 3, (3, 3), noise_width=-0.1)
+
     def test_noise_changes_costs(self):
         _, c0 = shortestpath.genData(20, 5, (3, 3), noise_width=0, seed=42)
         _, c1 = shortestpath.genData(20, 5, (3, 3), noise_width=0.5, seed=42)
@@ -106,6 +114,10 @@ class TestTSPData:
         # edges = 6*5/2 = 15
         assert x.shape == (20, 5)
         assert c.shape == (20, 15)
+
+    def test_negative_noise_width_rejected(self):
+        with pytest.raises(ValueError):
+            tsp.genData(4, 3, 5, noise_width=-0.1)
 
     def test_edge_count_formula(self):
         n = 8

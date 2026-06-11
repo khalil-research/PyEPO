@@ -73,7 +73,15 @@ class TestOptDatasetErrors:
         rng = np.random.RandomState(0)
         x = rng.randn(_N, NUM_FEAT).astype(np.float32)
         c = rng.randn(_N, 4).astype(np.float32)
-        with pytest.raises(ValueError):
+        # a malformed solve() return surfaces as the raw unpacking error
+        with pytest.raises((TypeError, ValueError)):
+            optDataset(_BadReturnModel(4), x, c)
+
+    def test_rejects_length_mismatch(self):
+        rng = np.random.RandomState(0)
+        x = rng.randn(3, NUM_FEAT).astype(np.float32)
+        c = rng.randn(4, 4).astype(np.float32)
+        with pytest.raises(ValueError, match="same number of instances"):
             optDataset(_BadReturnModel(4), x, c)
 
 

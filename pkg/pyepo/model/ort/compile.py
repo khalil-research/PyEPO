@@ -78,8 +78,9 @@ class compiledOrtProblem(compiledBase, optOrtModel):
     def _read_sol(self):
         # solve and read the full solution + objective value
         status = self._model.Solve()
-        if status != pywraplp.Solver.OPTIMAL:
-            raise RuntimeError(f"OR-Tools did not find an optimal solution (status {status}).")
+        # FEASIBLE keeps the time-limited incumbent usable
+        if status not in (pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE):
+            raise RuntimeError(f"OR-Tools found no solution (status {status}).")
         sol = np.fromiter(
             (self.x[j].solution_value() for j in range(self.problem.num_vars)), dtype=float
         )

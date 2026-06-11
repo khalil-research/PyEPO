@@ -9,7 +9,11 @@ from itertools import combinations
 from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
-from coptpy import COPT, CallbackBase, LinExpr
+
+try:
+    from coptpy import COPT, CallbackBase, LinExpr
+except ImportError:
+    CallbackBase = object  # placeholder so class bodies evaluate without coptpy
 
 from pyepo.model.bases import tspABBase
 from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
