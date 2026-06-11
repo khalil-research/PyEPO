@@ -100,6 +100,10 @@ class optModel(ABC):
         """The full objective coefficient for a predicted cost; identity by default, overridden under partial prediction."""
         return pred_cost
 
+    def _setFullObj(self, c: np.ndarray | torch.Tensor | list) -> None:
+        """Set the objective from full-space coefficients; alias of ``setObj`` unless overridden under partial prediction."""
+        self.setObj(c)
+
     def copy(self) -> Self:
         """
         A method to copy the model

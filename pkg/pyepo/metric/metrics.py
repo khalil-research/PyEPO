@@ -56,7 +56,7 @@ def SPOError(
     optobj_sum = 0.0
     for c, cp in zip(true_cost, pred_cost):
         # opt obj for true cost
-        optmodel.setObj(optmodel._fullCost(c))
+        optmodel._setFullObj(optmodel._fullCost(c))
         _, optobj = optmodel.solve()
         # per-instance regret
         regret_sum += calRegret(optmodel, cp, c, optobj)

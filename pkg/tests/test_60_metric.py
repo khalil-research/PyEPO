@@ -163,7 +163,7 @@ class TestCalRegret:
             dsl.Minimize(c @ x + (x - 1).sum()), [x.sum() >= 1]
         ).compile(backend="gurobi")
         cost = np.array([1.0, 2.0])
-        m.setObj(m._fullCost(cost))
+        m.setObj(cost)
         _, true_obj = m.solve()
         assert abs(calRegret(m, cost, cost, true_obj)) < 1e-6
 
@@ -322,7 +322,7 @@ class TestCalUnambRegret:
             dsl.Minimize(c @ x + (x - 1).sum()), [x.sum() >= 1]
         ).compile(backend="gurobi")
         cost = np.array([1.0, 2.0])
-        m.setObj(m._fullCost(cost))
+        m.setObj(cost)
         _, true_obj = m.solve()
         assert abs(calUnambRegret(m, cost, cost, true_obj, tolerance=1.0)) < 1e-3
 

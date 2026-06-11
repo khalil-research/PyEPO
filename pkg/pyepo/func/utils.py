@@ -87,7 +87,7 @@ def _solve_batch(
     # MPAX batch solving
     if isinstance(optmodel, optMpaxModel):
         # get params
-        optmodel.setObj(cp)
+        optmodel._setFullObj(cp)
         cp = optmodel.c  # pyright: ignore[reportAssignmentType]  # jax Array
         # batch solving
         sol, obj, _ = optmodel.batch_optimize(cp)
@@ -134,7 +134,7 @@ def _solve_batch_np(
         sol_list: list = []
         obj_list: list = []
         for i in range(len(cp)):
-            optmodel.setObj(cp[i])
+            optmodel._setFullObj(cp[i])
             solp, objp = optmodel.solve()
             sol_list.append(solp)
             obj_list.append(objp)
@@ -208,7 +208,7 @@ def _init_worker_model(model_type: type, args: dict) -> None:
 def _solveWithObj4Par(cost: np.ndarray) -> tuple[np.ndarray, float]:
     """Solve a single instance in a pool worker using the pre-built optmodel."""
     assert _worker_model is not None, "_init_worker_model must run before this"
-    _worker_model.setObj(cost)
+    _worker_model._setFullObj(cost)
     sol, obj = _worker_model.solve()
     return np.asarray(sol, dtype=np.float32), obj
 

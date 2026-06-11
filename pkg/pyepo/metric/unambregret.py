@@ -114,7 +114,7 @@ def calUnambRegret(
     # lift to the full objective space, then change precision
     cp = np.around(optmodel._fullCost(np.asarray(pred_cost, dtype=float)) / tolerance)
     # opt sol for pred cost
-    optmodel.setObj(cp)
+    optmodel._setFullObj(cp)
     sol, _ = optmodel.solve()
     # MPAX backend may return a torch tensor; convert without dtype coercion
     if isinstance(sol, torch.Tensor):
@@ -131,7 +131,7 @@ def calUnambRegret(
     # opt model to find worst case
     c_full = optmodel._fullCost(np.asarray(true_cost, dtype=float))
     try:
-        wst_optmodel.setObj(-c_full)
+        wst_optmodel._setFullObj(-c_full)
         wst_sol, _ = wst_optmodel.solve()
     except Exception as e:  # noqa: BLE001  any solver failure triggers retry
         new_tolerance = tolerance * 10

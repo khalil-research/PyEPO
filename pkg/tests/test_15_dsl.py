@@ -515,6 +515,62 @@ def test_addconstr_cost_space(backend):
     assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
 
 
+@pytest.mark.parametrize("backend", [*_BACKENDS, pytest.param("mpax", marks=requires_mpax)])
+def test_setobj_scatters_when_dims_coincide(backend):
+    # full coverage with a known base: setObj input is the predicted cost, not the full one
+    x = dsl.Variable(2, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    comp = dsl.Problem(dsl.Minimize((c + 1.0) @ x), [x.sum() >= 0.0]).compile(
+        backend=backend, **_kw(backend))
+    comp.setObj(np.array([1.0, -3.0]))                      # full coefficients [2, -2]
+    sol, obj = comp.solve()
+    atol = 1e-2 if backend == "mpax" else 1e-6
+    assert np.allclose(to_np(sol), [0.0, 1.0], atol=atol)
+    assert obj == pytest.approx(-2.0, abs=atol)
+
+
+def test_setobj_applies_permutation():
+    # a permuted full-coverage prediction lands on the permuted positions
+    x = dsl.Variable(3, lb=0, ub=1)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Minimize(c @ x[[2, 1, 0]]), [x.sum() >= 0.0]).compile("gurobi")
+    comp.setObj(np.array([1.0, 2.0, -1.0]))                 # lands as [-1, 2, 1]
+    sol, obj = comp.solve()
+    assert np.allclose(to_np(sol), [1.0, 0.0, 0.0], atol=1e-6)
+    assert obj == pytest.approx(-1.0, abs=1e-6)
+
+
+def test_setobj_rejects_wrong_length():
+    x = dsl.Variable(3, lb=0, ub=1)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Minimize(c @ x), [x.sum() >= 1]).compile("gurobi")
+    with pytest.raises(ValueError):
+        comp.setObj(np.array([5.0]))                        # no silent broadcast
+
+
+def test_setfullobj_matches_scatter():
+    # the internal full-space protocol agrees with the user-facing scatter
+    x = dsl.Variable(2, lb=0, ub=1)
+    y = dsl.Variable(1, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    comp = dsl.Problem(
+        dsl.Minimize(c @ x + np.array([5.0]) @ y), [x.sum() + y.sum() >= 1]
+    ).compile("gurobi")
+    pred = np.array([2.0, 3.0])
+    comp.setObj(pred)
+    _, obj1 = comp.solve()
+    comp._setFullObj(comp._fullCost(pred))
+    _, obj2 = comp.solve()
+    assert obj1 == pytest.approx(obj2, abs=1e-6)
+    # an unambiguous full-length vector passes through the user-facing setObj
+    comp.setObj(comp._fullCost(pred))
+    _, obj3 = comp.solve()
+    assert obj3 == pytest.approx(obj1, abs=1e-6)
+    # the full-space protocol rejects predicted-length input
+    with pytest.raises(ValueError):
+        comp._setFullObj(pred)
+
+
 @pytest.mark.parametrize("backend", _ALL)
 def test_relax_keeps_added_constraints(backend):
     W = np.array([[3.0, 4, 3, 6, 4]])
@@ -552,7 +608,7 @@ def test_objective_constant_in_solve(backend):
     c = dsl.Parameter(2)
     prob = dsl.Problem(dsl.Minimize(c @ x + (x - 1) @ (x - 1)), [x.sum() >= 0.0])
     comp = prob.compile(backend=backend, **_kw(backend))
-    comp.setObj(comp._fullCost(np.array([1.0, -1.0])))
+    comp.setObj(np.array([1.0, -1.0]))
     sol, obj = comp.solve()
     atol = 1e-2 if backend == "mpax" else 1e-3
     assert np.allclose(to_np(sol), [0.5, 1.0], atol=atol)

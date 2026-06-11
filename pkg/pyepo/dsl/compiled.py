@@ -42,13 +42,22 @@ class compiledBase(optModel):
 
     def setObj(self, c):
         """Set the objective from a predicted cost of length ``num_cost``, scattered onto the known fixed costs."""
-        # scatter onto fixed costs
         prob = self.problem
         coef = costToNumpy(c)
-        if coef.shape[-1] != prob.num_vars:
+        # scatter onto fixed costs; an unambiguous full-length vector passes through
+        if coef.shape[-1] == prob.num_cost:
             full = prob.fixed_cost.copy()
             full[prob.c_pred_index] += coef
             coef = full
+        elif coef.shape[-1] != prob.num_vars:
+            raise ValueError("Size of cost vector does not match number of cost variables.")
+        self._write_obj(coef)
+
+    def _setFullObj(self, c):
+        """Set the objective from full-space coefficients (length ``num_vars``), bypassing the predicted-cost scatter."""
+        coef = costToNumpy(c)
+        if coef.shape[-1] != self.problem.num_vars:
+            raise ValueError("Size of cost vector does not match number of variables.")
         self._write_obj(coef)
 
     def _fullCost(self, pred_cost):

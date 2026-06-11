@@ -91,9 +91,27 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
             raise ValueError("MPAX backend does not accept solver params.")
 
     def setObj(self, c):
-        # short cost scatters onto fixed_cost; full cost kept as-is
+        """Set the objective from a predicted cost of length ``num_cost``, scattered onto the known fixed costs."""
         prob = self.problem
-        is_full = c.shape[-1] == prob.num_vars
+        n = c.shape[-1] if hasattr(c, "shape") else len(c)
+        # scatter onto fixed costs; an unambiguous full-length vector passes through
+        if n == prob.num_cost:
+            self._write_cost(c, is_full=False)
+        elif n == prob.num_vars:
+            self._write_cost(c, is_full=True)
+        else:
+            raise ValueError("Size of cost vector does not match number of cost variables.")
+
+    def _setFullObj(self, c):
+        """Set the objective from full-space coefficients (length ``num_vars``), bypassing the predicted-cost scatter."""
+        n = c.shape[-1] if hasattr(c, "shape") else len(c)
+        if n != self.problem.num_vars:
+            raise ValueError("Size of cost vector does not match number of variables.")
+        self._write_cost(c, is_full=True)
+
+    def _write_cost(self, c, is_full):
+        # convert, scatter if needed, negate for MAX, and place on the device
+        prob = self.problem
         if isinstance(c, torch.Tensor):
             c = (c.detach() if self._has_jax_gpu else c.detach().cpu()).to(torch.float32)
             if is_full:

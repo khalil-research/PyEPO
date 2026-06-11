@@ -107,13 +107,13 @@ class optDataset(Dataset):
         from pyepo.model.mpax.mpaxmodel import _warn_if_not_optimal
 
         model = cast("_optMpaxModelT", self.model)
-        model.setObj(model._fullCost(self.costs))
+        model._setFullObj(model._fullCost(self.costs))
         sols, objs, status = model.batch_optimize(model.c)
         _warn_if_not_optimal(status)
         # writable copy; torch.as_tensor warns on JAX read-only buffers
         sols_np = np.array(sols, dtype=np.float32)
         objs_np = np.array(objs, dtype=np.float32)
-        # jitted_solve returns c·sol where setObj already negated c for MAX
+        # jitted_solve returns c·sol where the objective write already negated c for MAX
         if self.model.modelSense == EPO.MAXIMIZE:
             objs_np = -objs_np
         # compiled DSL problems carry bare objective constants outside the solver model
@@ -135,7 +135,7 @@ class optDataset(Dataset):
         Returns:
             tuple: optimal solution (np.ndarray) and objective value (float)
         """
-        self.model.setObj(self.model._fullCost(cost))
+        self.model._setFullObj(self.model._fullCost(cost))
         sol, obj = self.model.solve()
         return sol, obj
 
@@ -361,7 +361,7 @@ class optDatasetConstrs(optDataset):
         logger.info("Optimizing for optDatasetConstrs...")
         model = self.model
         for i, c in enumerate(tqdm(self.costs)):
-            model.setObj(model._fullCost(c))
+            model._setFullObj(model._fullCost(c))
             sol, obj = model.solve()
             # infeasibility check
             if model._model.Status != GRB.OPTIMAL:
