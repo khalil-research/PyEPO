@@ -47,7 +47,7 @@ class vrpRCIModel(vrpABModel):
     branch-and-cut via a COPT callback.
     """
 
-    class _RCICallback(CallbackBase):
+    class _RCICallback(CallbackBase):  # type: ignore[misc]
         """A callback for rounded-capacity / subtour elimination cuts."""
 
         def __init__(self, x, n, edges, demands, capacity):

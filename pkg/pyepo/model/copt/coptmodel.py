@@ -112,7 +112,7 @@ class optCoptModel(optModel):
             else:
                 sol = np.asarray(self._model.getInfo("Value", self._vars_list))
             obj = self._model.objVal
-        except Exception as e:  # noqa: BLE001  coptpy raises generic errors on no-solution
+        except Exception as e:  # coptpy raises generic errors on no-solution
             raise RuntimeError(f"COPT found no solution (status {self._model.status}).") from e
         return sol, obj
 
@@ -127,7 +127,7 @@ class optCoptModel(optModel):
         new_model._model = self._model.clone()
         new_vars = new_model._model.getVars()
         if _is_mvar(self.x):
-            new_model.x = _CoptMVar.fromlist(new_vars)
+            new_model.x = _CoptMVar.fromlist(new_vars)  # type: ignore[union-attr]
             new_model._vars_list = None
         else:
             new_model.x = {key: new_vars[i] for i, key in enumerate(self.x)}

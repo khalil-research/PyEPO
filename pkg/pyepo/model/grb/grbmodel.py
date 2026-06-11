@@ -83,7 +83,7 @@ class optGrbModel(optModel):
         c = costToNumpy(c)
         if isinstance(self.x, gp.MVar):
             # direct Obj attr write skips MLinExpr allocation
-            self.x.Obj = c
+            self.x.Obj = c  # type: ignore[attr-defined]
         else:
             # batch C-level coefficient update
             self._model.setAttr("Obj", self._vars_list, c.tolist())
@@ -101,7 +101,7 @@ class optGrbModel(optModel):
         if self._model.SolCount == 0:
             raise RuntimeError(f"Gurobi found no solution (status {self._model.Status}).")
         if isinstance(self.x, gp.MVar):
-            sol = self.x.x
+            sol = self.x.x  # type: ignore[attr-defined]
         else:
             sol = np.asarray(self._model.getAttr("X", self._vars_list))
         obj = self._model.objVal

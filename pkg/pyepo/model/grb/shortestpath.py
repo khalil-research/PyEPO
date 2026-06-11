@@ -45,7 +45,7 @@ class shortestPathModel(shortestPathBase, optGrbModel):
         b = np.zeros(num_nodes, dtype=np.float64)
         b[0] = -1.0
         b[num_nodes - 1] = 1.0
-        m.addConstr(A @ x == b)
+        m.addConstr(A @ x == b)  # type: ignore[call-overload, arg-type]
         return m, x
 
 

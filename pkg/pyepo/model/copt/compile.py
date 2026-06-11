@@ -62,7 +62,7 @@ class compiledCoptProblem(compiledBase, optCoptModel):
         try:
             # MVar.x is a coptpy NdArray; tolist() flattens it to plain floats
             return np.asarray(self.x.x.tolist(), dtype=float), self._model.objVal
-        except Exception as e:  # noqa: BLE001  coptpy raises generic errors on no-solution
+        except Exception as e:  # coptpy raises generic errors on no-solution
             raise RuntimeError(f"COPT found no solution (status {self._model.status}).") from e
 
     def _add_cut(self, coef, rhs):

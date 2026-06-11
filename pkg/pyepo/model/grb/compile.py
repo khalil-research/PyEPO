@@ -37,7 +37,7 @@ class compiledGrbProblem(compiledBase, optGrbModel):
         # build the gurobi model from the finalized IR
         prob = self.problem
         m = gp.Model()
-        m.Params.outputFlag = 0
+        m.Params.outputFlag = 0  # type: ignore[attr-defined]
         # objective sense (EPO -> Gurobi)
         m.modelSense = GRB.MAXIMIZE if prob.objective.modelSense == EPO.MAXIMIZE else GRB.MINIMIZE
         x = self._build_flat_vars(m)

@@ -180,7 +180,7 @@ class tspDFJModel(tspABModel):
     overridden here.
     """
 
-    class _SubtourCallback(CallbackBase):
+    class _SubtourCallback(CallbackBase):  # type: ignore[misc]
         """
         A callback class for subtour elimination
         """
@@ -255,7 +255,7 @@ class tspDFJModel(tspABModel):
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to ``self._model`` using the DFJ variable scheme."""
         expr = LinExpr()
-        expr.addTerms(self._cost_vars, coefs.tolist())
+        expr.addTerms(self._cost_vars, coefs.tolist())  # type: ignore[attr-defined]
         self._model.addConstr(expr <= rhs)
 
 

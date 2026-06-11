@@ -59,7 +59,7 @@ def SPOError(
         optmodel._setFullObj(optmodel._fullCost(c))
         _, optobj = optmodel.solve()
         # per-instance regret
-        regret_sum += calRegret(optmodel, cp, c, optobj)
+        regret_sum += calRegret(optmodel, cp, c, optobj)  # type: ignore[arg-type]
         optobj_sum += np.abs(optobj)
     # normalized regret
     return regret_sum / (optobj_sum + _EPS)
