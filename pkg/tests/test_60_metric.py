@@ -20,7 +20,12 @@ from pyepo.metric.mse import MSE
 from pyepo.metric.regret import _regretFromObj, calRegret
 from pyepo.metric.unambregret import calUnambRegret
 
-from .conftest import NUM_FEAT, LinearPred, requires_gurobi
+from .conftest import (
+    NUM_FEAT, GRID, NUM_DATA, BATCH,
+    LinearPred,
+    requires_gurobi, requires_jax, requires_mpax,
+    _HAS_GUROBI, _HAS_JAX,
+)
 
 
 class _IdentityModel(nn.Module):
@@ -469,6 +474,75 @@ class TestSkScorer:
         assert np.isclose(scorer(est, x, c), expected)
         # the orientation is observable: swapping the arguments changes the value
         assert not np.isclose(expected, swapped)
+
+
+# ============================================================
+# JAX callable path for pyepo.metric.regret
+# ============================================================
+
+@requires_mpax
+class TestDataloaderMetricsJax:
+    """pyepo.metric.regret accepts a plain callable f(x_numpy) -> array."""
+
+    @pytest.fixture(scope="class")
+    def mpax_data(self):
+        import pyepo
+        from pyepo.data.dataset import optDataset
+        from pyepo.model.mpax.shortestpath import shortestPathModel
+
+        x, c = pyepo.data.shortestpath.genData(NUM_DATA, NUM_FEAT, GRID, seed=42)
+        optmodel = shortestPathModel(grid=GRID)
+        dataset = optDataset(optmodel, x, c)
+        loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
+        return optmodel, dataset, loader
+
+    def test_callable_returns_non_negative_float(self, mpax_data):
+        import pyepo
+        optmodel, _ds, loader = mpax_data
+        reg = pyepo.metric.regret(lambda x: x, optmodel, loader)
+        assert isinstance(reg, float) and reg >= 0
+
+    def test_callable_reductions_consistent(self, mpax_data):
+        import pyepo
+        optmodel, ds, loader = mpax_data
+        fn = lambda x: x  # noqa: E731
+        per = pyepo.metric.regret(fn, optmodel, loader, reduction="none")
+        total = pyepo.metric.regret(fn, optmodel, loader, reduction="sum")
+        assert isinstance(per, np.ndarray) and len(per) == len(ds)
+        assert total == pytest.approx(per.sum(), rel=1e-5)
+
+
+@pytest.mark.skipif(
+    not (_HAS_GUROBI and _HAS_JAX),
+    reason="Parity: Gurobi (exact solve) + JAX both required",
+)
+class TestDataloaderMetricsJaxParity:
+    """JAX callable and torch nn.Module with identical weights give the same regret."""
+
+    def test_same_weights_same_regret(self, sp_data):
+        import functools
+
+        import jax.numpy as jnp
+        import pyepo
+        from flax import linen as nn
+
+        optmodel, _ds, loader = sp_data
+
+        # random torch predictor; capture weights as numpy
+        torch_pred = LinearPred(NUM_FEAT, optmodel.num_cost)
+        torch_pred.eval()
+        w = torch_pred.linear.weight.detach().numpy()   # (num_cost, num_feat)
+        b = torch_pred.linear.bias.detach().numpy()     # (num_cost,)
+
+        # Flax Dense: kernel shape is (num_feat, num_cost) = w.T
+        flax_pred = nn.Dense(optmodel.num_cost)
+        params = {"params": {"kernel": jnp.asarray(w.T), "bias": jnp.asarray(b)}}
+
+        torch_reg = pyepo.metric.regret(torch_pred, optmodel, loader)
+        jax_reg = pyepo.metric.regret(
+            functools.partial(flax_pred.apply, params), optmodel, loader
+        )
+        assert jax_reg == pytest.approx(torch_reg, abs=1e-4)
 
 
 class TestAutoSkScorer:

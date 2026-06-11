@@ -19,6 +19,8 @@ from pyepo.model.mpax import optMpaxModel
 from pyepo.utils import _EPS, costToNumpy, getArgs
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from torch import nn
     from torch.utils.data import DataLoader
 
@@ -75,7 +77,7 @@ def _checkLinearObj(optmodel) -> None:
 
 
 def regret(
-    predmodel: nn.Module,
+    predmodel: nn.Module | Callable,
     optmodel: optModel,
     dataloader: DataLoader,
     processes: int = 1,
@@ -91,11 +93,17 @@ def regret(
     z^*(\\mathbf{c}_i)`. With the default ``reduction="normalized"`` the
     result is :math:`\\sum_i l_i / \\sum_i |z^*(\\mathbf{c}_i)|`,
     dimensionless and comparable across problem scales; instances with
-    near-zero true optima inflate the ratio. The predictor is evaluated
-    under ``eval()``; its original mode is restored afterwards.
+    near-zero true optima inflate the ratio. PyTorch predictors are
+    evaluated under ``eval()``; the original mode is restored afterwards.
+
+    ``predmodel`` may also be a plain callable ``f(x: np.ndarray) ->
+    array-like`` for JAX/Flax models; pass a ``functools.partial`` that
+    closes over the current parameter pytree, e.g.
+    ``functools.partial(model.apply, params)``.
 
     Args:
-        predmodel: a regression neural network for cost prediction
+        predmodel: a PyTorch ``nn.Module`` for cost prediction, or a
+            JAX callable ``f(x_numpy) -> cost_array``
         optmodel: a PyEPO optimization model
         dataloader: PyTorch DataLoader over an ``optDataset`` (yielding
             ``(x, c, w, z)`` tuples)
@@ -122,9 +130,12 @@ def regret(
     processes = mp.cpu_count() if processes == 0 else processes
     losses = []
     optsum = 0.0
-    # get device (cpu fallback for parameterless predictors)
-    param = next(predmodel.parameters(), None)
-    device = param.device if param is not None else torch.device("cpu")
+    _is_torch = isinstance(predmodel, torch.nn.Module)
+    # get device (cpu fallback for parameterless predictors; JAX callables always use cpu)
+    device = torch.device("cpu")
+    if _is_torch:
+        param = next(predmodel.parameters(), None)
+        device = param.device if param is not None else torch.device("cpu")
     # multi-core: each worker builds its own optmodel once via the initializer
     pool = None
     if processes > 1:
@@ -134,16 +145,20 @@ def regret(
             initargs=(type(optmodel), getArgs(optmodel)),
         )
     # evaluate under eval(); the original mode is restored afterwards
-    was_training = predmodel.training
-    predmodel.eval()
+    was_training = predmodel.training if _is_torch else False
+    if _is_torch:
+        predmodel.eval()
     try:
         # load data
         for data in dataloader:
             x, c, _, z = data
-            x, c, z = x.to(device), c.to(device), z.to(device)
-            # predict and batch-solve all instances in one call
-            with torch.no_grad():
-                cp = predmodel(x)
+            if _is_torch:
+                x, c, z = x.to(device), c.to(device), z.to(device)
+                with torch.no_grad():
+                    cp = predmodel(x)
+            else:
+                # JAX callable: f(x_numpy) -> array-like
+                cp = torch.as_tensor(np.asarray(predmodel(x.numpy())), dtype=torch.float32)
             # full cost so the MPAX backend can batch-set the objective in one call
             sols, _ = _solve_batch(optmodel._fullCost(cp), optmodel, processes=processes, pool=pool)
             # vectorized regret accumulation (one host sync per batch)
@@ -158,7 +173,8 @@ def regret(
         if pool is not None:
             _close_pool(pool)
         # restore the original mode even if evaluation raises
-        predmodel.train(was_training)
+        if _is_torch:
+            predmodel.train(was_training)
     loss = np.concatenate(losses) if losses else np.empty(0)
     # reduce
     if reduction == "normalized":
