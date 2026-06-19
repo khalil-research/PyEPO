@@ -259,6 +259,7 @@
 <li class="toctree-l4"><a class="reference internal" href="autoapi/pyepo/func/perturbed/index.html">pyepo.func.perturbed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="autoapi/pyepo/func/rank/index.html">pyepo.func.rank</a></li>
 <li class="toctree-l4"><a class="reference internal" href="autoapi/pyepo/func/regularized/index.html">pyepo.func.regularized</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/pyepo/func/runtime/index.html">pyepo.func.runtime</a></li>
 <li class="toctree-l4"><a class="reference internal" href="autoapi/pyepo/func/surrogate/index.html">pyepo.func.surrogate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="autoapi/pyepo/func/utils/index.html">pyepo.func.utils</a></li>
 </ul>
@@ -457,8 +458,6 @@
           <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.SPOPlusFunc.backward">(pyepo.func.surrogate.SPOPlusFunc static method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/pyepo/dsl/expression/index.html#pyepo.dsl.expression.ParametricCoef.base">base (pyepo.dsl.expression.ParametricCoef attribute)</a>
 
         <ul>
@@ -467,6 +466,8 @@
           <li><a href="autoapi/pyepo/dsl/expression/index.html#pyepo.dsl.expression.ParametricVector.base">(pyepo.dsl.expression.ParametricVector attribute)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/pyepo/EPO/index.html#pyepo.EPO.BINARY">BINARY (in module pyepo.EPO)</a>
 
         <ul>
@@ -482,6 +483,8 @@
         <li><a href="autoapi/pyepo/func/blackbox/index.html#pyepo.func.blackbox.blackboxOptFunc">blackboxOptFunc (class in pyepo.func.blackbox)</a>
 </li>
         <li><a href="autoapi/pyepo/dsl/expression/index.html#pyepo.dsl.expression.Affine.blocks">blocks (pyepo.dsl.expression.Affine attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.RuntimeState.branch_rng">branch_rng (pyepo.func.runtime.RuntimeState attribute)</a>
 </li>
         <li><a href="autoapi/pyepo/model/opt/index.html#pyepo.model.opt.ModelSpec.build">build() (pyepo.model.opt.ModelSpec method)</a>
 </li>
@@ -654,6 +657,8 @@
         <li><a href="autoapi/pyepo/utils/index.html#pyepo.utils.costToNumpy">costToNumpy() (in module pyepo.utils)</a>
 </li>
         <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.portfolioBase.covariance">covariance (pyepo.model.bases.portfolioBase attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.create_solver_pool">create_solver_pool() (in module pyepo.func.runtime)</a>
 </li>
         <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDatasetConstrs.ctrs">ctrs (pyepo.data.dataset.optDatasetConstrs attribute)</a>
 </li>
@@ -943,6 +948,8 @@
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.init_runtime">init_runtime() (in module pyepo.func.runtime)</a>
+</li>
         <li><a href="autoapi/pyepo/func/cave/index.html#pyepo.func.cave.coneAlignedCosine.inner_ratio">inner_ratio (pyepo.func.cave.coneAlignedCosine attribute)</a>
 
         <ul>
@@ -1207,6 +1214,8 @@
 </li>
           <li><a href="autoapi/pyepo/func/regularized/index.html#module-pyepo.func.regularized">pyepo.func.regularized</a>
 </li>
+          <li><a href="autoapi/pyepo/func/runtime/index.html#module-pyepo.func.runtime">pyepo.func.runtime</a>
+</li>
           <li><a href="autoapi/pyepo/func/surrogate/index.html#module-pyepo.func.surrogate">pyepo.func.surrogate</a>
 </li>
           <li><a href="autoapi/pyepo/func/utils/index.html#module-pyepo.func.utils">pyepo.func.utils</a>
@@ -1390,6 +1399,8 @@
         </ul></li>
         <li><a href="autoapi/pyepo/twostage/autosklearnpred/index.html#pyepo.twostage.autosklearnpred.NoPreprocessing">NoPreprocessing (class in pyepo.twostage.autosklearnpred)</a>
 </li>
+        <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.normalize_processes">normalize_processes() (in module pyepo.func.runtime)</a>
+</li>
         <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.portfolioBase.num_assets">num_assets (pyepo.model.bases.portfolioBase attribute)</a>
 </li>
         <li><a href="autoapi/pyepo/dsl/compiled/index.html#pyepo.dsl.compiled.compiledBase.num_cost">num_cost (pyepo.dsl.compiled.compiledBase property)</a>
@@ -1460,8 +1471,6 @@
 </li>
         <li><a href="autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel">optModel (class in pyepo.model.opt)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/pyepo/model/copt/portfolio/index.html#pyepo.model.copt.portfolio.optmodel">optmodel (in module pyepo.model.copt.portfolio)</a>
 
         <ul>
@@ -1473,7 +1482,11 @@
 </li>
           <li><a href="autoapi/pyepo/func/jax/abcmodule/index.html#pyepo.func.jax.abcmodule.optModule.optmodel">(pyepo.func.jax.abcmodule.optModule attribute)</a>
 </li>
+          <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.RuntimeState.optmodel">(pyepo.func.runtime.RuntimeState attribute)</a>
+</li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.optModule">optModule (class in pyepo.func.abcmodule)</a>
 
         <ul>
@@ -1588,6 +1601,14 @@
           <li><a href="autoapi/pyepo/func/rank/index.html#pyepo.func.rank.pointwiseLearningToRank">(class in pyepo.func.rank)</a>
 </li>
         </ul></li>
+        <li><a href="autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.optModule.pool">pool (pyepo.func.abcmodule.optModule attribute)</a>
+
+        <ul>
+          <li><a href="autoapi/pyepo/func/jax/abcmodule/index.html#pyepo.func.jax.abcmodule.optModule.pool">(pyepo.func.jax.abcmodule.optModule attribute)</a>
+</li>
+          <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.RuntimeState.pool">(pyepo.func.runtime.RuntimeState attribute)</a>
+</li>
+        </ul></li>
         <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.portfolioBase">portfolioBase (class in pyepo.model.bases)</a>
 </li>
         <li><a href="autoapi/pyepo/model/copt/portfolio/index.html#pyepo.model.copt.portfolio.portfolioModel">portfolioModel (class in pyepo.model.copt.portfolio)</a>
@@ -1624,6 +1645,8 @@
 
         <ul>
           <li><a href="autoapi/pyepo/func/jax/abcmodule/index.html#pyepo.func.jax.abcmodule.optModule.processes">(pyepo.func.jax.abcmodule.optModule attribute)</a>
+</li>
+          <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.RuntimeState.processes">(pyepo.func.runtime.RuntimeState attribute)</a>
 </li>
         </ul></li>
         <li><a href="autoapi/pyepo/func/jax/rank/index.html#pyepo.func.jax.rank.ptLTR">ptLTR (in module pyepo.func.jax.rank)</a>
@@ -1849,6 +1872,13 @@
 
         <ul>
           <li><a href="autoapi/pyepo/func/regularized/index.html#module-pyepo.func.regularized">module</a>
+</li>
+        </ul></li>
+        <li>
+    pyepo.func.runtime
+
+        <ul>
+          <li><a href="autoapi/pyepo/func/runtime/index.html#module-pyepo.func.runtime">module</a>
 </li>
         </ul></li>
         <li>
@@ -2244,12 +2274,14 @@
           <li><a href="autoapi/pyepo/model/grb/vrp/index.html#pyepo.model.grb.vrp.vrpRCIModel.recycle_cuts">(pyepo.model.grb.vrp.vrpRCIModel attribute)</a>
 </li>
         </ul></li>
-        <li><a href="autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.Reduction">Reduction (in module pyepo.func.abcmodule)</a>
+        <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.Reduction">Reduction (in module pyepo.func.runtime)</a>
 </li>
         <li><a href="autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.optModule.reduction">reduction (pyepo.func.abcmodule.optModule attribute)</a>
 
         <ul>
           <li><a href="autoapi/pyepo/func/jax/abcmodule/index.html#pyepo.func.jax.abcmodule.optModule.reduction">(pyepo.func.jax.abcmodule.optModule attribute)</a>
+</li>
+          <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.RuntimeState.reduction">(pyepo.func.runtime.RuntimeState attribute)</a>
 </li>
         </ul></li>
         <li><a href="autoapi/pyepo/metric/regret/index.html#pyepo.metric.regret.regret">regret() (in module pyepo.metric.regret)</a>
@@ -2353,6 +2385,8 @@
         <li><a href="autoapi/pyepo/model/bases/index.html#pyepo.model.bases.portfolioBase.risk_level">risk_level (pyepo.model.bases.portfolioBase property)</a>
 </li>
         <li><a href="autoapi/pyepo/func/utils/index.html#pyepo.func.utils.sumGammaDistribution.rnd">rnd (pyepo.func.utils.sumGammaDistribution attribute)</a>
+</li>
+        <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.RuntimeState">RuntimeState (class in pyepo.func.runtime)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -2482,14 +2516,14 @@
           <li><a href="autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.smartPredictThenOptimizePlus">(in module pyepo.func.surrogate)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/pyepo/func/abcmodule/index.html#pyepo.func.abcmodule.optModule.solpool">solpool (pyepo.func.abcmodule.optModule attribute)</a>
 
         <ul>
           <li><a href="autoapi/pyepo/func/jax/abcmodule/index.html#pyepo.func.jax.abcmodule.optModule.solpool">(pyepo.func.jax.abcmodule.optModule attribute)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDataset.sols">sols (pyepo.data.dataset.optDataset attribute)</a>
 
         <ul>
@@ -2564,6 +2598,8 @@
           <li><a href="autoapi/pyepo/func/jax/abcmodule/index.html#pyepo.func.jax.abcmodule.optModule.solve_ratio">(pyepo.func.jax.abcmodule.optModule attribute)</a>
 </li>
           <li><a href="autoapi/pyepo/func/jax/cave/index.html#pyepo.func.jax.cave.coneAlignedCosine.solve_ratio">(pyepo.func.jax.cave.coneAlignedCosine attribute)</a>
+</li>
+          <li><a href="autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.RuntimeState.solve_ratio">(pyepo.func.runtime.RuntimeState attribute)</a>
 </li>
         </ul></li>
         <li><a href="autoapi/pyepo/model/omo/compile/index.html#pyepo.model.omo.compile.compiledOmoProblem.solver">solver (pyepo.model.omo.compile.compiledOmoProblem attribute)</a>

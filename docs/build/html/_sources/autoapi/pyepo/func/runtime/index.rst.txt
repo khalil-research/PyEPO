@@ -1,0 +1,86 @@
+pyepo.func.runtime
+==================
+
+.. py:module:: pyepo.func.runtime
+
+.. autoapi-nested-parse::
+
+   Framework-neutral runtime setup for differentiable optimization modules.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.func.runtime.Reduction
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pyepo.func.runtime.RuntimeState
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pyepo.func.runtime.normalize_processes
+   pyepo.func.runtime.create_solver_pool
+   pyepo.func.runtime.init_runtime
+
+
+Module Contents
+---------------
+
+.. py:data:: Reduction
+
+.. py:class:: RuntimeState
+
+   Validated state shared by the Torch and JAX frontends.
+
+
+   .. py:attribute:: optmodel
+      :type:  pyepo.model.opt.optModel
+
+
+   .. py:attribute:: processes
+      :type:  int
+
+
+   .. py:attribute:: pool
+      :type:  pathos.multiprocessing.ProcessingPool | None
+
+
+   .. py:attribute:: solve_ratio
+      :type:  float
+
+
+   .. py:attribute:: reduction
+      :type:  Reduction
+
+
+   .. py:attribute:: branch_rng
+      :type:  numpy.random.RandomState
+
+
+.. py:function:: normalize_processes(optmodel: pyepo.model.opt.optModel, processes: int, logger: logging.Logger) -> int
+
+   Validate and normalize a requested solver-process count.
+
+
+.. py:function:: create_solver_pool(optmodel: pyepo.model.opt.optModel, processes: int, *, owner=None) -> pathos.multiprocessing.ProcessingPool | None
+
+   Create a worker pool, optionally tied to an owner's lifetime.
+
+
+.. py:function:: init_runtime(owner, optmodel: pyepo.model.opt.optModel, processes: int, solve_ratio: float, reduction: str, seed: int | None, logger: logging.Logger) -> RuntimeState
+
+   Validate common module arguments and initialize solver runtime state.
+
+

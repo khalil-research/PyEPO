@@ -46,18 +46,17 @@ Module Contents
    .. py:attribute:: processes
 
 
-   .. py:attribute:: solve_ratio
-      :value: 1.0
+   .. py:attribute:: pool
 
+
+   .. py:attribute:: solve_ratio
+
+
+   .. py:attribute:: reduction
 
 
    .. py:attribute:: solpool
       :value: None
-
-
-
-   .. py:attribute:: reduction
-      :value: 'mean'
 
 
 

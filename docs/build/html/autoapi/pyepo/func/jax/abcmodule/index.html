@@ -261,6 +261,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../perturbed/index.html">pyepo.func.perturbed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rank/index.html">pyepo.func.rank</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../regularized/index.html">pyepo.func.regularized</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../runtime/index.html">pyepo.func.runtime</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../surrogate/index.html">pyepo.func.surrogate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../utils/index.html">pyepo.func.utils</a></li>
 </ul>
@@ -424,18 +425,23 @@ and the solution pool for all loss modules.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.jax.abcmodule.optModule.pool">
+<span class="sig-name descname"><span class="pre">pool</span></span><a class="headerlink" href="#pyepo.func.jax.abcmodule.optModule.pool" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.jax.abcmodule.optModule.solve_ratio">
-<span class="sig-name descname"><span class="pre">solve_ratio</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#pyepo.func.jax.abcmodule.optModule.solve_ratio" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve_ratio</span></span><a class="headerlink" href="#pyepo.func.jax.abcmodule.optModule.solve_ratio" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.func.jax.abcmodule.optModule.reduction">
+<span class="sig-name descname"><span class="pre">reduction</span></span><a class="headerlink" href="#pyepo.func.jax.abcmodule.optModule.reduction" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.func.jax.abcmodule.optModule.solpool">
 <span class="sig-name descname"><span class="pre">solpool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pyepo.func.jax.abcmodule.optModule.solpool" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyepo.func.jax.abcmodule.optModule.reduction">
-<span class="sig-name descname"><span class="pre">reduction</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mean'</span></span><a class="headerlink" href="#pyepo.func.jax.abcmodule.optModule.reduction" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -512,9 +518,10 @@ and the solution pool for all loss modules.</p>
 <li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule"><code class="docutils literal notranslate"><span class="pre">optModule</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule.optmodel"><code class="docutils literal notranslate"><span class="pre">optModule.optmodel</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule.processes"><code class="docutils literal notranslate"><span class="pre">optModule.processes</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule.pool"><code class="docutils literal notranslate"><span class="pre">optModule.pool</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule.solve_ratio"><code class="docutils literal notranslate"><span class="pre">optModule.solve_ratio</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule.solpool"><code class="docutils literal notranslate"><span class="pre">optModule.solpool</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule.reduction"><code class="docutils literal notranslate"><span class="pre">optModule.reduction</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule.solpool"><code class="docutils literal notranslate"><span class="pre">optModule.solpool</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.jax.abcmodule.optModule.forward"><code class="docutils literal notranslate"><span class="pre">optModule.forward()</span></code></a></li>
 </ul>
 </li>
