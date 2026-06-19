@@ -37,10 +37,6 @@ class tspABModel(tspABBase, optOmoModel):
         """
         super().__init__(num_nodes, solver)
 
-    def _new_instance(self) -> tspABModel:
-        """Override: omo carries a ``solver`` ctor arg."""
-        return type(self)(self.num_nodes, self.solver)
-
     def _obj_expr(self):
         """Paired: each undirected edge cost weights x[i,j] + x[j,i]."""
         return sum(

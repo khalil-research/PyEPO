@@ -21,7 +21,6 @@ from pyepo.data.dataset import optDataset
 from pyepo.func.utils import _close_pool, _init_worker_model
 from pyepo.model.mpax import optMpaxModel
 from pyepo.model.opt import optModel
-from pyepo.utils import getArgs
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +78,7 @@ class optModule(nn.Module):
             self.pool = ProcessingPool(
                 self.processes,
                 initializer=_init_worker_model,
-                initargs=(type(optmodel), getArgs(optmodel)),
+                initargs=(optmodel.to_spec(),),
             )
             # release worker processes when this module is garbage-collected
             weakref.finalize(self, _close_pool, self.pool)

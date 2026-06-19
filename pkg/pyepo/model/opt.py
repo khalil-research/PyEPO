@@ -7,7 +7,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import TYPE_CHECKING
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, cast
 
 from pyepo import EPO
 
@@ -17,6 +18,18 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from pyepo.EPO import ModelSense
+
+
+@dataclass(frozen=True)
+class ModelSpec:
+    """Serializable recipe for building a fresh optimization model."""
+
+    model_type: type[optModel]
+    config: dict
+
+    def build(self) -> optModel:
+        """Build a fresh model without sharing mutable configuration values."""
+        return self.model_type.from_config(self.config)
 
 
 class optModel(ABC):
@@ -31,6 +44,11 @@ class optModel(ABC):
     and MPAX (``optMpaxModel``); subclass ``optModel`` directly to integrate
     any other solver or algorithm.
 
+    Models that take constructor arguments should override ``get_config`` and
+    cooperatively merge ``super().get_config()``. The resulting configuration
+    powers ``rebuild()``, multiprocessing workers, and sklearn scorers without
+    inspecting constructor signatures or runtime solver state.
+
     The default objective sense is minimization; set
     ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for
     maximization problems (some backends, e.g. Gurobi and COPT, detect this
@@ -44,15 +62,36 @@ class optModel(ABC):
     modelSense: ModelSense = EPO.MINIMIZE
     # populated by problem-level bases (shortestPathBase / tspABBase) or _getModel
     arcs: list = []
-    _cost_vars: list = []
+    _cost_vars: list
 
     def __init__(self) -> None:
+        # Cache for models whose solver variables do not map one-to-one to
+        # predicted costs (for example directed TSP/VRP formulations).
+        # It must be instance-local because concrete builders mutate it.
+        self._cost_vars: list = []
         # user cuts tracked for replay on relax
         self._extra_constrs: list = []
         self._model, self.x = self._getModel()
 
     def __repr__(self) -> str:
         return "optModel " + self.__class__.__name__
+
+    def get_config(self) -> dict:
+        """Return the explicit constructor configuration for this model."""
+        return {}
+
+    @classmethod
+    def from_config(cls, config: dict) -> Self:
+        """Build a model from a configuration produced by ``get_config``."""
+        return cls(**deepcopy(config))
+
+    def to_spec(self) -> ModelSpec:
+        """Return a serializable, immutable-snapshot rebuild recipe."""
+        return ModelSpec(type(self), deepcopy(self.get_config()))
+
+    def rebuild(self) -> Self:
+        """Build a structurally equivalent model with clean runtime state."""
+        return cast("Self", self.to_spec().build())
 
     @property
     def num_cost(self) -> int:

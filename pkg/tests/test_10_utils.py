@@ -5,14 +5,42 @@ Pure-logic layer: unionFind, getTspTour, costToNumpy need no solver and run
 fast. getArgs needs a real optModel (Gurobi) and is gated accordingly.
 """
 
+import pickle
+
 import numpy as np
 import pytest
 import torch
 
+from pyepo.model.opt import ModelSpec, optModel
 from pyepo.model.utils import getTspTour, unionFind
 from pyepo.utils import costToNumpy, getArgs
 
 from .conftest import requires_gurobi
+
+
+class ConfigModel(optModel):
+    """Solver-free model for the explicit reconstruction protocol."""
+
+    def __init__(self, values, label="default"):
+        self.values = np.asarray(values)
+        self.label = label
+        super().__init__()
+
+    def get_config(self):
+        return {
+            **super().get_config(),
+            "values": self.values,
+            "label": self.label,
+        }
+
+    def _getModel(self):
+        return None, list(range(len(self.values)))
+
+    def setObj(self, c):
+        self.cost = np.asarray(c)
+
+    def solve(self):
+        return np.zeros(len(self.values)), 0.0
 
 # ============================================================
 # unionFind (pure)
@@ -132,6 +160,58 @@ class TestCostToNumpy:
 
 
 # ============================================================
+# explicit model reconstruction protocol (pure)
+# ============================================================
+
+class TestModelSpec:
+
+    def test_get_config_and_compatibility_wrapper(self):
+        model = ConfigModel([1, 2, 3], label="x")
+        config = model.get_config()
+        assert getArgs(model) == config
+        assert config["label"] == "x"
+        np.testing.assert_array_equal(config["values"], [1, 2, 3])
+
+    def test_rebuild_has_clean_independent_config(self):
+        model = ConfigModel([1, 2, 3], label="x")
+        rebuilt = model.rebuild()
+
+        assert type(rebuilt) is type(model)
+        assert rebuilt is not model
+        assert rebuilt.values is not model.values
+        np.testing.assert_array_equal(rebuilt.values, model.values)
+        assert rebuilt.label == model.label
+        assert not hasattr(rebuilt, "cost")
+
+    def test_spec_snapshots_mutable_config(self):
+        model = ConfigModel([1, 2, 3])
+        spec = model.to_spec()
+        model.values[0] = 99
+
+        rebuilt = spec.build()
+        np.testing.assert_array_equal(rebuilt.values, [1, 2, 3])
+
+    def test_spec_is_pickleable(self):
+        model = ConfigModel([1, 2, 3], label="pickled")
+        spec = pickle.loads(pickle.dumps(model.to_spec()))
+
+        assert isinstance(spec, ModelSpec)
+        rebuilt = spec.build()
+        assert rebuilt.label == "pickled"
+        np.testing.assert_array_equal(rebuilt.values, model.values)
+
+    def test_worker_initializer_builds_from_spec(self):
+        from pyepo.func.utils import _init_worker_model, _solveWithObj4Par
+
+        model = ConfigModel([1, 2, 3])
+        _init_worker_model(model.to_spec())
+        sol, obj = _solveWithObj4Par(np.array([3.0, 2.0, 1.0]))
+
+        np.testing.assert_array_equal(sol, [0.0, 0.0, 0.0])
+        assert obj == 0.0
+
+
+# ============================================================
 # getArgs (needs a real optModel)
 # ============================================================
 
@@ -167,7 +247,7 @@ class TestGetArgs:
     def test_rebuild_solves_same(self):
         _, shortestPathModel = self._models()
         model = shortestPathModel(grid=(3, 3))
-        model2 = shortestPathModel(**getArgs(model))
+        model2 = model.rebuild()
         cost = np.random.RandomState(42).rand(model.num_cost)
         model.setObj(cost)
         sol1, obj1 = model.solve()

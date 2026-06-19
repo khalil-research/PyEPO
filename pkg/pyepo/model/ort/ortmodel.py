@@ -64,6 +64,9 @@ class optOrtModel(optModel):
     def __repr__(self) -> str:
         return "optOrtModel " + self.__class__.__name__
 
+    def get_config(self) -> dict:
+        return {**super().get_config(), "solver": self.solver}
+
     def _set_obj_sense(self) -> None:
         """Set objective sense on ``self._model.Objective()`` based on ``self.modelSense``."""
         obj = self._model.Objective()

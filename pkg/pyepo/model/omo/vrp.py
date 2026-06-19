@@ -15,7 +15,6 @@ from pyepo.model.utils import _EDGE_ACTIVE_TOL
 
 if TYPE_CHECKING:
     import torch
-    from typing_extensions import Self
 
 try:
     from pyomo import environ as pe
@@ -59,12 +58,6 @@ class vrpABModel(vrpABBase, optOmoModel):
         return sum(
             self._model.cost[k] * (self.x[i, j] + self.x[j, i])
             for k, (i, j) in enumerate(self.edges)
-        )
-
-    def _new_instance(self) -> Self:
-        # thread the solver through the fresh build
-        return type(self)(
-            self.num_nodes, self.demands, self.capacity, self.num_vehicle, self.solver
         )
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:

@@ -15,7 +15,7 @@ import numpy as np
 import torch
 
 from pyepo.model.opt import optModel
-from pyepo.utils import costToNumpy, getArgs
+from pyepo.utils import costToNumpy
 
 
 class compiledBase(optModel):
@@ -29,6 +29,13 @@ class compiledBase(optModel):
         self.params = dict(params) if params else {}
         super().__init__()
         self._apply_params()
+
+    def get_config(self) -> dict:
+        return {
+            **super().get_config(),
+            "problem": self.problem,
+            "params": self.params,
+        }
 
     @property
     def num_cost(self) -> int:
@@ -93,7 +100,7 @@ class compiledBase(optModel):
 
     def relax(self):
         # recompile the relaxed problem, preserving backend kwargs
-        kwargs = getArgs(self)
+        kwargs = self.get_config()
         kwargs["problem"] = self.problem.relax()
         model_rel = type(self)(**kwargs)
         # replay user cuts on the relaxation

@@ -11,10 +11,10 @@ from typing import TYPE_CHECKING, Callable
 import numpy as np
 
 from pyepo.metric.regret import _checkLinearObj, calRegret
-from pyepo.utils import _EPS, getArgs
+from pyepo.utils import _EPS
 
 if TYPE_CHECKING:
-    from pyepo.model.opt import optModel
+    from pyepo.model.opt import ModelSpec, optModel
 
 
 def SPOError(
@@ -68,8 +68,7 @@ def SPOError(
 def _SPOErrorScore(
     y_true: np.ndarray,
     y_pred: np.ndarray,
-    model_type: type,
-    args: dict,
+    model_spec: ModelSpec,
 ) -> float:
     """
     A function to calculate normalized true regret with the (y_true, y_pred)
@@ -78,14 +77,13 @@ def _SPOErrorScore(
     Args:
         y_true: true costs
         y_pred: predicted costs
-        model_type: optModel class type
-        args: optModel args
+        model_spec: serializable optimization-model rebuild recipe
 
     Returns:
         float: regret loss
     """
-    # rebuild per call; class + args stay picklable for scorer kwargs
-    return SPOError(y_pred, y_true, model_type(**args))
+    # rebuild per call; the spec stays picklable for scorer kwargs
+    return SPOError(y_pred, y_true, model_spec.build())
 
 
 def makeSkScorer(optmodel: optModel) -> Callable:
@@ -100,14 +98,8 @@ def makeSkScorer(optmodel: optModel) -> Callable:
     """
     from sklearn.metrics import make_scorer
 
-    # get class
-    model_type = type(optmodel)
-    # get args
-    args = getArgs(optmodel)
     # build score
-    SPO_scorer = make_scorer(
-        _SPOErrorScore, greater_is_better=False, model_type=model_type, args=args
-    )
+    SPO_scorer = make_scorer(_SPOErrorScore, greater_is_better=False, model_spec=optmodel.to_spec())
     return SPO_scorer
 
 
@@ -123,10 +115,6 @@ def makeAutoSkScorer(optmodel: optModel) -> Callable:
     """
     from autosklearn.metrics import make_scorer  # pyright: ignore[reportMissingImports]
 
-    # get class
-    model_type = type(optmodel)
-    # get args
-    args = getArgs(optmodel)
     # build score
     SPO_scorer = make_scorer(
         name="SPO_error",
@@ -134,8 +122,7 @@ def makeAutoSkScorer(optmodel: optModel) -> Callable:
         greater_is_better=False,
         needs_proba=False,
         needs_threshold=False,
-        model_type=model_type,
-        args=args,
+        model_spec=optmodel.to_spec(),
     )
     return SPO_scorer
 
@@ -176,16 +163,12 @@ def makeTestMSEScorer(optmodel: optModel) -> Callable:
     """
     from autosklearn.metrics import make_scorer  # pyright: ignore[reportMissingImports]
 
-    # get class
-    model_type = type(optmodel)
-    # get args
-    args = getArgs(optmodel)
     # build score
     mse_scorer = make_scorer(
         name="test_error",
         score_func=testMSE,
         greater_is_better=False,
-        model_type=model_type,
-        args=args,
+        model_type=type(optmodel),
+        args=optmodel.get_config(),
     )
     return mse_scorer

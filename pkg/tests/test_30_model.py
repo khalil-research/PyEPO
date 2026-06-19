@@ -44,6 +44,25 @@ class TestOptModelBase:
         with pytest.raises(TypeError):
             optModel()
 
+    def test_cost_var_cache_is_instance_local(self):
+        class CacheModel(optModel):
+            def _getModel(self):
+                self._cost_vars.append(object())
+                return None, [0]
+
+            def setObj(self, c):
+                pass
+
+            def solve(self):
+                return [0], 0.0
+
+        first = CacheModel()
+        second = CacheModel()
+
+        assert len(first._cost_vars) == 1
+        assert len(second._cost_vars) == 1
+        assert first._cost_vars is not second._cost_vars
+
 
 # ============================================================
 # Knapsack (MAXIMIZE, binary) — parametrized over backends
@@ -100,6 +119,18 @@ class TestKnapsack:
         m, _ = _make_knapsack(backend)
         assert m.modelSense == EPO.MAXIMIZE
         assert m.num_cost == 4
+
+    def test_rebuild_preserves_constructor_config(self, backend):
+        m, _ = _make_knapsack(backend)
+        rebuilt = m.rebuild()
+
+        assert type(rebuilt) is type(m)
+        assert rebuilt.weights is not m.weights
+        assert rebuilt.capacity is not m.capacity
+        np.testing.assert_array_equal(rebuilt.weights, m.weights)
+        np.testing.assert_array_equal(rebuilt.capacity, m.capacity)
+        if hasattr(m, "solver"):
+            assert rebuilt.solver == m.solver
 
     def test_setObj_and_solve(self, backend):
         m, meta = _make_knapsack(backend)
@@ -255,6 +286,16 @@ class TestShortestPath:
         assert m.modelSense == EPO.MINIMIZE
         # 3x3 grid: 6 horizontal + 6 vertical edges
         assert m.num_cost == 12
+
+    def test_rebuild_preserves_constructor_config(self, backend):
+        m, _ = _make_shortestpath(backend)
+        rebuilt = m.rebuild()
+
+        assert type(rebuilt) is type(m)
+        assert rebuilt.grid == m.grid
+        assert rebuilt.arcs == m.arcs
+        if hasattr(m, "solver"):
+            assert rebuilt.solver == m.solver
 
     def test_setObj_and_solve(self, backend):
         m, meta = _make_shortestpath(backend)
@@ -433,6 +474,16 @@ class TestTSP:
         assert m.num_cost == 6  # C(4, 2)
         assert len(m.edges) == 6
 
+    def test_rebuild_preserves_constructor_config(self, backend, formulation):
+        m, _ = _make_tsp(backend, formulation)
+        rebuilt = m.rebuild()
+
+        assert type(rebuilt) is type(m)
+        assert rebuilt.num_nodes == m.num_nodes
+        assert rebuilt.edges == m.edges
+        if hasattr(m, "solver"):
+            assert rebuilt.solver == m.solver
+
     def test_setObj_solve_is_tour(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         cost = np.random.RandomState(42).rand(m.num_cost)
@@ -558,6 +609,18 @@ class TestVRP:
         assert m.num_nodes == _VRP_NUM_NODES
         assert m.modelSense == EPO.MINIMIZE
         assert m.num_cost == _VRP_NUM_EDGES
+
+    def test_rebuild_preserves_constructor_config(self, backend, formulation):
+        m, _ = _make_vrp(backend, formulation)
+        rebuilt = m.rebuild()
+
+        assert type(rebuilt) is type(m)
+        assert rebuilt.num_nodes == m.num_nodes
+        assert rebuilt.capacity == m.capacity
+        assert rebuilt.num_vehicle == m.num_vehicle
+        np.testing.assert_array_equal(rebuilt.demands, m.demands)
+        if hasattr(m, "solver"):
+            assert rebuilt.solver == m.solver
 
     def test_setObj_solve_binary(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)
@@ -716,6 +779,15 @@ class TestCutRecycling:
         m._model._lazy_constrs = [self._subtour_cut(m)]
         m.solve()
         assert m._model.NumConstrs == n0 + 1
+
+    def test_rebuild_preserves_recycle_cuts(self):
+        from pyepo.model.grb.tsp import tspDFJModel
+
+        m = tspDFJModel(num_nodes=5, recycle_cuts=True)
+        rebuilt = m.rebuild()
+
+        assert rebuilt.recycle_cuts is True
+        assert rebuilt._recycled_keys == set()
 
     def test_disabled_keeps_model_rows_constant(self):
         from pyepo.model.grb.tsp import tspDFJModel

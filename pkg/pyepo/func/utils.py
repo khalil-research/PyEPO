@@ -18,7 +18,7 @@ from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     from pyepo.func.abcmodule import optModule
-    from pyepo.model.opt import optModel
+    from pyepo.model.opt import ModelSpec, optModel
 
 logger = logging.getLogger(__name__)
 
@@ -200,10 +200,10 @@ def _cache_in_pass(
 _worker_model = None
 
 
-def _init_worker_model(model_type: type, args: dict) -> None:
+def _init_worker_model(spec: ModelSpec) -> None:
     """Pool-initializer hook: build the optmodel once per worker process."""
     global _worker_model
-    _worker_model = model_type(**args)
+    _worker_model = spec.build()
 
 
 def _solveWithObj4Par(cost: np.ndarray) -> tuple[np.ndarray, float]:

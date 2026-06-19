@@ -404,6 +404,23 @@ def _kw(backend):
     return {"pyomo": {"solver": _PYOMO_SOLVER}, "ortools": {"solver": _ORTOOLS_SOLVER}}.get(backend, {})
 
 
+@pytest.mark.parametrize("backend", _ALL)
+def test_compiled_model_rebuild_preserves_problem_and_backend_config(backend):
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 2]).compile(
+        backend=backend, **_kw(backend)
+    )
+    rebuilt = comp.rebuild()
+
+    assert type(rebuilt) is type(comp)
+    assert rebuilt.problem is not comp.problem
+    assert rebuilt.problem.num_vars == comp.problem.num_vars
+    assert rebuilt.params == comp.params
+    if hasattr(comp, "solver"):
+        assert rebuilt.solver == comp.solver
+
+
 @pytest.mark.parametrize("backend", _BACKENDS)
 def test_knapsack_matches_legacy(backend):
     W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])

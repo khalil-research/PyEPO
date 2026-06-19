@@ -6,7 +6,6 @@ Package-wide utility functions
 
 from __future__ import annotations
 
-import inspect
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -22,7 +21,7 @@ _EPS: float = 1e-8
 
 def getArgs(model: optModel) -> dict:
     """
-    A global function to get args of model
+    Compatibility wrapper for the explicit model configuration protocol.
 
     Args:
         model: optimization model
@@ -30,8 +29,7 @@ def getArgs(model: optModel) -> dict:
     Returns:
         dict: model args
     """
-    params = inspect.signature(model.__init__).parameters
-    return {name: getattr(model, name) for name in params if hasattr(model, name)}
+    return model.get_config()
 
 
 def costToNumpy(

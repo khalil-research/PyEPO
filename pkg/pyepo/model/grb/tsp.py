@@ -23,7 +23,6 @@ from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
-    from typing_extensions import Self
 
 
 class tspABModel(tspABBase, optGrbModel):
@@ -178,8 +177,8 @@ class tspDFJModel(tspABModel):
         self._recycled_keys: set = set()
         super().__init__(num_nodes, *args, **kwargs)
 
-    def _new_instance(self) -> Self:
-        return type(self)(self.num_nodes, recycle_cuts=self.recycle_cuts)
+    def get_config(self) -> dict:
+        return {**super().get_config(), "recycle_cuts": self.recycle_cuts}
 
     def _getModel(self) -> tuple:
         """

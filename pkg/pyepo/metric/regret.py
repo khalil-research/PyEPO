@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import multiprocessing as mp
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import torch
@@ -16,7 +16,7 @@ from pathos.multiprocessing import ProcessingPool
 from pyepo import EPO
 from pyepo.func.utils import _close_pool, _init_worker_model, _solve_batch
 from pyepo.model.mpax import optMpaxModel
-from pyepo.utils import _EPS, costToNumpy, getArgs
+from pyepo.utils import _EPS, costToNumpy
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -130,11 +130,11 @@ def regret(
     processes = mp.cpu_count() if processes == 0 else processes
     losses = []
     optsum = 0.0
-    _is_torch = isinstance(predmodel, torch.nn.Module)
+    torch_model = cast("nn.Module", predmodel) if isinstance(predmodel, torch.nn.Module) else None
     # get device (cpu fallback for parameterless predictors; JAX callables always use cpu)
     device = torch.device("cpu")
-    if _is_torch:
-        param = next(predmodel.parameters(), None)
+    if torch_model is not None:
+        param = next(torch_model.parameters(), None)
         device = param.device if param is not None else torch.device("cpu")
     # multi-core: each worker builds its own optmodel once via the initializer
     pool = None
@@ -142,20 +142,20 @@ def regret(
         pool = ProcessingPool(
             processes,
             initializer=_init_worker_model,
-            initargs=(type(optmodel), getArgs(optmodel)),
+            initargs=(optmodel.to_spec(),),
         )
     # evaluate under eval(); the original mode is restored afterwards
-    was_training = predmodel.training if _is_torch else False
-    if _is_torch:
-        predmodel.eval()
+    was_training = torch_model.training if torch_model is not None else False
+    if torch_model is not None:
+        torch_model.eval()
     try:
         # load data
         for data in dataloader:
             x, c, _, z = data
-            if _is_torch:
+            if torch_model is not None:
                 x, c, z = x.to(device), c.to(device), z.to(device)
                 with torch.no_grad():
-                    cp = predmodel(x)
+                    cp = torch_model(x)
             else:
                 # JAX callable: f(x_numpy) -> array-like
                 cp = torch.as_tensor(np.array(predmodel(x.numpy()), dtype=np.float32))
@@ -173,8 +173,8 @@ def regret(
         if pool is not None:
             _close_pool(pool)
         # restore the original mode even if evaluation raises
-        if _is_torch:
-            predmodel.train(was_training)
+        if torch_model is not None:
+            torch_model.train(was_training)
     loss = np.concatenate(losses) if losses else np.empty(0)
     # reduce
     if reduction == "normalized":

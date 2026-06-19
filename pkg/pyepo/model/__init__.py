@@ -3,6 +3,7 @@ Optimization Model based on solvers
 """
 
 from pyepo.model import opt
+from pyepo.model.opt import ModelSpec
 from pyepo.model.predefined import (
     knapsackModel,
     portfolioModel,
@@ -12,6 +13,7 @@ from pyepo.model.predefined import (
 )
 
 __all__ = [
+    "ModelSpec",
     "knapsackModel",
     "opt",
     "portfolioModel",

@@ -74,6 +74,9 @@ class optOmoModel(optModel):
     def __repr__(self) -> str:
         return "optOmoModel " + self.__class__.__name__
 
+    def get_config(self) -> dict:
+        return {**super().get_config(), "solver": self.solver}
+
     def _obj_expr(self):
         """Parameterized objective expression. Override for non-trivial variable groupings (e.g., TSP paired edges)."""
         return sum(self._model.cost[i] * self.x[k] for i, k in enumerate(self.x))

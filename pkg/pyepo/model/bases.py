@@ -53,6 +53,9 @@ class shortestPathBase(optModel):
         self.arcs = _get_grid_arcs(grid)
         super().__init__(*args, **kwargs)
 
+    def get_config(self) -> dict:
+        return {**super().get_config(), "grid": self.grid}
+
     @property
     def num_cost(self) -> int:
         return len(self.arcs)
@@ -92,6 +95,13 @@ class knapsackBase(optModel):
         self.capacity = np.asarray(capacity)
         self.items = list(range(self.weights.shape[1]))
         super().__init__(*args, **kwargs)
+
+    def get_config(self) -> dict:
+        return {
+            **super().get_config(),
+            "weights": self.weights,
+            "capacity": self.capacity,
+        }
 
     @property
     def num_cost(self) -> int:
@@ -137,6 +147,14 @@ class portfolioBase(optModel):
         self.covariance = np.asarray(covariance)
         self.gamma = gamma
         super().__init__(*args, **kwargs)
+
+    def get_config(self) -> dict:
+        return {
+            **super().get_config(),
+            "num_assets": self.num_assets,
+            "covariance": self.covariance,
+            "gamma": self.gamma,
+        }
 
     @property
     def num_cost(self) -> int:
@@ -185,6 +203,9 @@ class tspABBase(optModel):
         self._extra_constrs: list = []
         super().__init__(*args, **kwargs)
 
+    def get_config(self) -> dict:
+        return {**super().get_config(), "num_nodes": self.num_nodes}
+
     @property
     def num_cost(self) -> int:
         # use edges; backend's self.x has 2*num_edges directed Vars
@@ -203,13 +224,9 @@ class tspABBase(optModel):
         """
         Return a fresh model with all extra constraints replayed onto it.
         """
-        new_model = self._new_instance()
+        new_model = self.rebuild()
         self._replay_extras(new_model)
         return new_model
-
-    def _new_instance(self) -> Self:
-        """Construct a fresh instance with the same problem args. Override for backends with extra ctor args."""
-        return type(self)(self.num_nodes)
 
     def _replay_extras(self, other: tspABBase) -> None:
         for coefs, rhs in self._extra_constrs:
@@ -296,6 +313,15 @@ class vrpABBase(optModel):
         self._extra_constrs: list = []
         super().__init__(*args, **kwargs)
 
+    def get_config(self) -> dict:
+        return {
+            **super().get_config(),
+            "num_nodes": self.num_nodes,
+            "demands": self.demands,
+            "capacity": self.capacity,
+            "num_vehicle": self.num_vehicle,
+        }
+
     @property
     def num_cost(self) -> int:
         # one predicted cost per undirected edge
@@ -342,13 +368,9 @@ class vrpABBase(optModel):
         """
         Return a fresh model with all extra constraints replayed onto it.
         """
-        new_model = self._new_instance()
+        new_model = self.rebuild()
         self._replay_extras(new_model)
         return new_model
-
-    def _new_instance(self) -> Self:
-        """Construct a fresh instance with the same problem args. Override for backends with extra ctor args."""
-        return type(self)(self.num_nodes, self.demands, self.capacity, self.num_vehicle)
 
     def _replay_extras(self, other: vrpABBase) -> None:
         # re-add tracked extra constraints to a fresh copy
