@@ -40,6 +40,12 @@ Module Contents
    .. py:attribute:: params
 
 
+   .. py:method:: get_config() -> dict
+
+      Return the explicit constructor configuration for this model.
+
+
+
    .. py:property:: num_cost
       :type: int
 

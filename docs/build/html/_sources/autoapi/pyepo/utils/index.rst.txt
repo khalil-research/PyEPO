@@ -23,7 +23,7 @@ Module Contents
 
 .. py:function:: getArgs(model: pyepo.model.opt.optModel) -> dict
 
-   A global function to get args of model
+   Compatibility wrapper for the explicit model configuration protocol.
 
    :param model: optimization model
 

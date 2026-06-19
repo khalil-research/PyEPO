@@ -380,7 +380,10 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optModel</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.opt.ModelSpec" title="pyepo.model.opt.ModelSpec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></p></td>
+<td><p>Serializable recipe for building a fresh optimization model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optModel</span></code></a></p></td>
 <td><p>Abstract base class for predict-then-optimize models.</p></td>
 </tr>
 </tbody>
@@ -389,6 +392,28 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyepo.model.opt.ModelSpec">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">ModelSpec</span></span><a class="headerlink" href="#pyepo.model.opt.ModelSpec" title="Link to this definition">¶</a></dt>
+<dd><p>Serializable recipe for building a fresh optimization model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.opt.ModelSpec.model_type">
+<span class="sig-name descname"><span class="pre">model_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pyepo.model.opt.ModelSpec.model_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyepo.model.opt.ModelSpec.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span><a class="headerlink" href="#pyepo.model.opt.ModelSpec.config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.opt.ModelSpec.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></span><a class="headerlink" href="#pyepo.model.opt.ModelSpec.build" title="Link to this definition">¶</a></dt>
+<dd><p>Build a fresh model without sharing mutable configuration values.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.opt.optModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">optModel</span></span><a class="headerlink" href="#pyepo.model.opt.optModel" title="Link to this definition">¶</a></dt>
@@ -401,6 +426,10 @@ provided for GurobiPy (<code class="docutils literal notranslate"><span class="p
 COPT (<code class="docutils literal notranslate"><span class="pre">optCoptModel</span></code>), OR-Tools (<code class="docutils literal notranslate"><span class="pre">optOrtModel</span></code> / <code class="docutils literal notranslate"><span class="pre">optOrtCpModel</span></code>),
 and MPAX (<code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code>); subclass <code class="docutils literal notranslate"><span class="pre">optModel</span></code> directly to integrate
 any other solver or algorithm.</p>
+<p>Models that take constructor arguments should override <code class="docutils literal notranslate"><span class="pre">get_config</span></code> and
+cooperatively merge <code class="docutils literal notranslate"><span class="pre">super().get_config()</span></code>. The resulting configuration
+powers <code class="docutils literal notranslate"><span class="pre">rebuild()</span></code>, multiprocessing workers, and sklearn scorers without
+inspecting constructor signatures or runtime solver state.</p>
 <p>The default objective sense is minimization; set
 <code class="docutils literal notranslate"><span class="pre">self.modelSense</span> <span class="pre">=</span> <span class="pre">EPO.MAXIMIZE</span></code> in <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> or <code class="docutils literal notranslate"><span class="pre">__init__</span></code> for
 maximization problems (some backends, e.g. Gurobi and COPT, detect this
@@ -422,6 +451,30 @@ automatically from the underlying solver model).</p>
 <dt class="sig sig-object py" id="pyepo.model.opt.optModel.arcs">
 <span class="sig-name descname"><span class="pre">arcs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></span><a class="headerlink" href="#pyepo.model.opt.optModel.arcs" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.opt.optModel.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#pyepo.model.opt.optModel.get_config" title="Link to this definition">¶</a></dt>
+<dd><p>Return the explicit constructor configuration for this model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.opt.optModel.from_config">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pyepo.model.opt.optModel.from_config" title="Link to this definition">¶</a></dt>
+<dd><p>Build a model from a configuration produced by <code class="docutils literal notranslate"><span class="pre">get_config</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.opt.optModel.to_spec">
+<span class="sig-name descname"><span class="pre">to_spec</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.opt.ModelSpec" title="pyepo.model.opt.ModelSpec"><span class="pre">ModelSpec</span></a></span></span><a class="headerlink" href="#pyepo.model.opt.optModel.to_spec" title="Link to this definition">¶</a></dt>
+<dd><p>Return a serializable, immutable-snapshot rebuild recipe.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyepo.model.opt.optModel.rebuild">
+<span class="sig-name descname"><span class="pre">rebuild</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pyepo.model.opt.optModel.rebuild" title="Link to this definition">¶</a></dt>
+<dd><p>Build a structurally equivalent model with clean runtime state.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyepo.model.opt.optModel.num_cost">
@@ -563,9 +616,19 @@ automatically from the underlying solver model).</p>
 <li><a class="reference internal" href="#">pyepo.model.opt</a><ul>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#pyepo.model.opt.ModelSpec"><code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul>
+<li><a class="reference internal" href="#pyepo.model.opt.ModelSpec.model_type"><code class="docutils literal notranslate"><span class="pre">ModelSpec.model_type</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.opt.ModelSpec.config"><code class="docutils literal notranslate"><span class="pre">ModelSpec.config</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.opt.ModelSpec.build"><code class="docutils literal notranslate"><span class="pre">ModelSpec.build()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#pyepo.model.opt.optModel"><code class="docutils literal notranslate"><span class="pre">optModel</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.model.opt.optModel.modelSense"><code class="docutils literal notranslate"><span class="pre">optModel.modelSense</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.opt.optModel.arcs"><code class="docutils literal notranslate"><span class="pre">optModel.arcs</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.opt.optModel.get_config"><code class="docutils literal notranslate"><span class="pre">optModel.get_config()</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.opt.optModel.from_config"><code class="docutils literal notranslate"><span class="pre">optModel.from_config()</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.opt.optModel.to_spec"><code class="docutils literal notranslate"><span class="pre">optModel.to_spec()</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.opt.optModel.rebuild"><code class="docutils literal notranslate"><span class="pre">optModel.rebuild()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.opt.optModel.num_cost"><code class="docutils literal notranslate"><span class="pre">optModel.num_cost</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.opt.optModel.setObj"><code class="docutils literal notranslate"><span class="pre">optModel.setObj()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.opt.optModel.solve"><code class="docutils literal notranslate"><span class="pre">optModel.solve()</span></code></a></li>

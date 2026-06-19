@@ -14,11 +14,31 @@ Classes
 
 .. autoapisummary::
 
+   pyepo.model.opt.ModelSpec
    pyepo.model.opt.optModel
 
 
 Module Contents
 ---------------
+
+.. py:class:: ModelSpec
+
+   Serializable recipe for building a fresh optimization model.
+
+
+   .. py:attribute:: model_type
+      :type:  type[optModel]
+
+
+   .. py:attribute:: config
+      :type:  dict
+
+
+   .. py:method:: build() -> optModel
+
+      Build a fresh model without sharing mutable configuration values.
+
+
 
 .. py:class:: optModel
 
@@ -34,6 +54,11 @@ Module Contents
    COPT (``optCoptModel``), OR-Tools (``optOrtModel`` / ``optOrtCpModel``),
    and MPAX (``optMpaxModel``); subclass ``optModel`` directly to integrate
    any other solver or algorithm.
+
+   Models that take constructor arguments should override ``get_config`` and
+   cooperatively merge ``super().get_config()``. The resulting configuration
+   powers ``rebuild()``, multiprocessing workers, and sklearn scorers without
+   inspecting constructor signatures or runtime solver state.
 
    The default objective sense is minimization; set
    ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for
@@ -54,6 +79,32 @@ Module Contents
    .. py:attribute:: arcs
       :type:  list
       :value: []
+
+
+
+   .. py:method:: get_config() -> dict
+
+      Return the explicit constructor configuration for this model.
+
+
+
+   .. py:method:: from_config(config: dict) -> Self
+      :classmethod:
+
+
+      Build a model from a configuration produced by ``get_config``.
+
+
+
+   .. py:method:: to_spec() -> ModelSpec
+
+      Return a serializable, immutable-snapshot rebuild recipe.
+
+
+
+   .. py:method:: rebuild() -> Self
+
+      Build a structurally equivalent model with clean runtime state.
 
 
 
