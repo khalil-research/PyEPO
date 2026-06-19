@@ -90,26 +90,20 @@ def autoSklearnPred(
         raise ImportError(
             "Autosklearn is not installed. Please install autosklearn to use this feature."
         )
-    # get metrics
-    pyepo_scorer = makeAutoSkScorer(optmodel)
-    # scorer = makeTestMSEScorer(optmodel)
     # build regressor
     if metric == "regret":
+        pyepo_scorer = makeAutoSkScorer(optmodel)
         regressor = AutoSklearnRegressor(
             time_left_for_this_task=timelimit,
             per_run_time_limit=1200,
             memory_limit=None,
             seed=seed,
             metric=pyepo_scorer,
-            # scoring_functions=[pyepo_scorer, mean_squared_error],
             include={
                 "data_preprocessor": ["NoPreprocessing"],
                 "feature_preprocessor": ["no_preprocessing"],
             },
         )
-        # "regressor": ["adaboost", "ard_regression", "extra_trees",
-        #            "gaussian_process", "k_nearest_neighbors",
-        #            "mlp", "random_forest"]})
     elif metric == "mse":
         regressor = AutoSklearnRegressor(
             time_left_for_this_task=timelimit,
