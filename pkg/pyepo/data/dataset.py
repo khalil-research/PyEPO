@@ -28,6 +28,25 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
+def _validate_inputs(
+    model: optModel,
+    feats: np.ndarray | torch.Tensor,
+    costs: np.ndarray | torch.Tensor,
+) -> None:
+    """Validate the common constructor contract for optimization datasets."""
+    if not isinstance(model, optModel):
+        raise TypeError("arg model is not an optModel")
+    if len(feats) != len(costs):
+        raise ValueError(
+            f"feats and costs must have the same number of instances: {len(feats)} vs {len(costs)}."
+        )
+
+
+def _as_float_tensor(data) -> torch.Tensor:
+    """Convert dataset arrays to the common float32 tensor representation."""
+    return torch.as_tensor(data, dtype=torch.float32)
+
+
 class optDataset(Dataset):
     """
     PyTorch ``Dataset`` for predict-then-optimize problems.
@@ -62,23 +81,17 @@ class optDataset(Dataset):
             feats: data features
             costs: costs of objective function
         """
-        if not isinstance(model, optModel):
-            raise TypeError("arg model is not an optModel")
-        if len(feats) != len(costs):
-            raise ValueError(
-                f"feats and costs must have the same number of instances: "
-                f"{len(feats)} vs {len(costs)}."
-            )
+        _validate_inputs(model, feats, costs)
         self.model = model
         # data
         self.feats = feats
         self.costs = costs
         # find optimal solutions
         sols, objs = self._getSols()
-        self.feats = torch.as_tensor(feats, dtype=torch.float32)
-        self.costs = torch.as_tensor(costs, dtype=torch.float32)
-        self.sols = torch.as_tensor(sols, dtype=torch.float32)
-        self.objs = torch.as_tensor(objs, dtype=torch.float32)
+        self.feats = _as_float_tensor(feats)
+        self.costs = _as_float_tensor(costs)
+        self.sols = _as_float_tensor(sols)
+        self.objs = _as_float_tensor(objs)
 
     def _getSols(self) -> tuple[np.ndarray, np.ndarray]:
         """
@@ -209,13 +222,7 @@ class optDatasetKNN(optDataset):
             k: number of nearest neighbours selected
             weight: self-weight in the kNN convex combination (1.0 = no smoothing)
         """
-        if not isinstance(model, optModel):
-            raise TypeError("arg model is not an optModel")
-        if len(feats) != len(costs):
-            raise ValueError(
-                f"feats and costs must have the same number of instances: "
-                f"{len(feats)} vs {len(costs)}."
-            )
+        _validate_inputs(model, feats, costs)
         self.model = model
         # at most num_data-1 neighbours exist (self excluded), so k must stay below it
         num_data = len(feats)
@@ -231,10 +238,10 @@ class optDatasetKNN(optDataset):
         self.costs = costs
         # find optimal solutions
         sols, objs = self._getSols()
-        self.feats = torch.as_tensor(self.feats, dtype=torch.float32)
-        self.costs = torch.as_tensor(self.costs, dtype=torch.float32)
-        self.sols = torch.as_tensor(sols, dtype=torch.float32)
-        self.objs = torch.as_tensor(objs, dtype=torch.float32)
+        self.feats = _as_float_tensor(self.feats)
+        self.costs = _as_float_tensor(self.costs)
+        self.sols = _as_float_tensor(sols)
+        self.objs = _as_float_tensor(objs)
 
     def _getSols(self) -> tuple[np.ndarray, np.ndarray]:
         """
@@ -334,13 +341,7 @@ class optDatasetConstrs(optDataset):
             costs: costs of objective function
             skip_infeas: if True, drop infeasible instances instead of raising
         """
-        if not isinstance(model, optModel):
-            raise TypeError("arg model is not an optModel")
-        if len(feats) != len(costs):
-            raise ValueError(
-                f"feats and costs must have the same number of instances: "
-                f"{len(feats)} vs {len(costs)}."
-            )
+        _validate_inputs(model, feats, costs)
         self.model = model
         self.skip_infeas = skip_infeas
         # data
@@ -349,11 +350,11 @@ class optDatasetConstrs(optDataset):
         # find optimal solutions and binding constraints
         sols, objs, ctrs, valid = self._getSols()
         # pre-convert to tensors (on CPU) to avoid repeated numpy→tensor copies
-        self.feats = torch.as_tensor(self.feats[valid], dtype=torch.float32)
-        self.costs = torch.as_tensor(self.costs[valid], dtype=torch.float32)
-        self.sols = torch.as_tensor(sols, dtype=torch.float32)
-        self.objs = torch.as_tensor(objs, dtype=torch.float32)
-        self.ctrs = [torch.as_tensor(c, dtype=torch.float32) for c in ctrs]
+        self.feats = _as_float_tensor(self.feats[valid])
+        self.costs = _as_float_tensor(self.costs[valid])
+        self.sols = _as_float_tensor(sols)
+        self.objs = _as_float_tensor(objs)
+        self.ctrs = [_as_float_tensor(c) for c in ctrs]
 
     def _getSols(  # type: ignore[override]
         self,
@@ -371,9 +372,8 @@ class optDatasetConstrs(optDataset):
         logger.info("Optimizing for optDatasetConstrs...")
         model = self.model
         for i, c in enumerate(tqdm(self.costs)):
-            model._setFullObj(model._fullCost(c))
             try:
-                sol, obj = model.solve()
+                sol, obj = self._solve(c)
             except RuntimeError as e:
                 if self.skip_infeas:
                     logger.warning("Instance %d had no solution, skipping: %s", i, e)
@@ -412,12 +412,6 @@ class optDatasetConstrs(optDataset):
         if not valid:
             raise ValueError("No valid instances (all skipped or empty input).")
         return np.stack(sols), np.asarray(objs), ctrs, valid
-
-    def __len__(self) -> int:
-        """
-        A method to get data size
-        """
-        return len(self.feats)
 
     def __getitem__(  # type: ignore[override]
         self,

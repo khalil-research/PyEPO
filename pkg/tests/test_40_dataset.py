@@ -24,13 +24,21 @@ from .conftest import GRID, NUM_FEAT, requires_gurobi
 
 _N = 6  # tiny: each sample triggers a solve at construction
 
+_DATASET_BUILDERS = [
+    pytest.param(optDataset, {}, id="standard"),
+    pytest.param(optDatasetKNN, {"k": 1}, id="knn"),
+    pytest.param(optDatasetConstrs, {}, id="constraints"),
+]
+
 
 # ============================================================
 # A minimal concrete optModel for testing error paths without a solver
 # ============================================================
 
+
 class _GoodModel(optModel):
     """Returns a fixed feasible (sol, obj) pair."""
+
     def __init__(self, num_cost=4):
         self._num_cost = num_cost
         super().__init__()
@@ -52,6 +60,7 @@ class _GoodModel(optModel):
 
 class _BadReturnModel(_GoodModel):
     """solve() returns a single value instead of (sol, obj)."""
+
     def solve(self):
         return np.ones(self._num_cost, dtype=np.float32)
 
@@ -60,28 +69,32 @@ class _BadReturnModel(_GoodModel):
 # optDataset
 # ============================================================
 
-class TestOptDatasetErrors:
 
-    def test_rejects_non_optmodel(self):
+class TestDatasetInputContract:
+    @pytest.mark.parametrize(("dataset_cls", "kwargs"), _DATASET_BUILDERS)
+    def test_rejects_non_optmodel(self, dataset_cls, kwargs):
         rng = np.random.RandomState(0)
         x = rng.randn(_N, NUM_FEAT).astype(np.float32)
         c = rng.randn(_N, 4).astype(np.float32)
         with pytest.raises(TypeError):
-            optDataset("not_a_model", x, c)
+            dataset_cls("not_a_model", x, c, **kwargs)
 
+    @pytest.mark.parametrize(("dataset_cls", "kwargs"), _DATASET_BUILDERS)
+    def test_rejects_length_mismatch(self, dataset_cls, kwargs):
+        rng = np.random.RandomState(0)
+        x = rng.randn(3, NUM_FEAT).astype(np.float32)
+        c = rng.randn(4, 4).astype(np.float32)
+        with pytest.raises(ValueError, match="same number of instances"):
+            dataset_cls(_GoodModel(4), x, c, **kwargs)
+
+
+class TestOptDatasetErrors:
     def test_bad_solve_return_raises(self):
         rng = np.random.RandomState(0)
         x = rng.randn(_N, NUM_FEAT).astype(np.float32)
         c = rng.randn(_N, 4).astype(np.float32)
         # a malformed solve() return surfaces as the raw unpacking error
         with pytest.raises((TypeError, ValueError)):
-            optDataset(_BadReturnModel(4), x, c)
-
-    def test_rejects_length_mismatch(self):
-        rng = np.random.RandomState(0)
-        x = rng.randn(3, NUM_FEAT).astype(np.float32)
-        c = rng.randn(4, 4).astype(np.float32)
-        with pytest.raises(ValueError, match="same number of instances"):
             optDataset(_BadReturnModel(4), x, c)
 
 
@@ -126,6 +139,7 @@ class TestOptDatasetGurobi:
 
     def test_solution_optimal(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         x, c = shortestpath.genData(_N, NUM_FEAT, GRID, seed=42)
         model = shortestPathModel(grid=GRID)
         ds = optDataset(model, x, c)
@@ -138,11 +152,12 @@ class TestOptDatasetGurobi:
 # optDatasetKNN
 # ============================================================
 
+
 @requires_gurobi
 class TestOptDatasetKNN:
-
     def _model_data(self, n=12):
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         x, c = shortestpath.genData(n, NUM_FEAT, GRID, seed=42)
         return shortestPathModel(grid=GRID), x, c
 
@@ -185,18 +200,12 @@ class TestOptDatasetKNN:
 # optDatasetConstrs (CaVE binding-constraint dataset)
 # ============================================================
 
+
 @requires_gurobi
 class TestOptDatasetConstrs:
-
-    def test_rejects_non_optmodel(self):
-        rng = np.random.RandomState(0)
-        x = rng.randn(2, NUM_FEAT).astype(np.float32)
-        c = rng.randn(2, 12).astype(np.float32)
-        with pytest.raises(TypeError):
-            optDatasetConstrs("not_a_model", x, c)
-
     def test_construct_shortestpath(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         model = shortestPathModel(grid=GRID)
         x, c = shortestpath.genData(4, NUM_FEAT, GRID, seed=42)
         ds = optDatasetConstrs(model, x, c)
@@ -207,6 +216,7 @@ class TestOptDatasetConstrs:
 
     def test_rejects_non_binary_vertex(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         model = shortestPathModel(grid=GRID)
         num_cost = model.num_cost
 
