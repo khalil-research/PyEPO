@@ -390,12 +390,6 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.metric.metrics.makeAutoSkScorer" title="pyepo.metric.metrics.makeAutoSkScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">makeAutoSkScorer</span></code></a>(→ Callable)</p></td>
 <td><p>A function to create Auto-SKlearn scorer</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.metric.metrics.testMSE" title="pyepo.metric.metrics.testMSE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testMSE</span></code></a>(→ float)</p></td>
-<td><p>A function to calculate MSE for testing</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.metric.metrics.makeTestMSEScorer" title="pyepo.metric.metrics.makeTestMSEScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">makeTestMSEScorer</span></code></a>(→ Callable)</p></td>
-<td><p>A function to create MSE scorer for testing</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -404,7 +398,7 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.metric.metrics.SPOError">
-<span class="sig-prename descclassname"><span class="pre">pyepo.metric.metrics.</span></span><span class="sig-name descname"><span class="pre">SPOError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><span class="pre">type</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pyepo.metric.metrics.SPOError" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyepo.metric.metrics.</span></span><span class="sig-name descname"><span class="pre">SPOError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pyepo.metric.metrics.SPOError" title="Link to this definition">¶</a></dt>
 <dd><p>Normalized true regret of predicted costs over a dataset.</p>
 <p>Solves each instance at the predicted and the true cost and returns
 <span class="math notranslate nohighlight">\(\sum_i l_i / \sum_i |z^*(\mathbf{c}_i)|\)</span>; instances with
@@ -415,7 +409,6 @@ near-zero true optima inflate the ratio.</p>
 <li><p><strong>pred_cost</strong> – predicted costs of shape (num_data, num_cost)</p></li>
 <li><p><strong>true_cost</strong> – true costs of shape (num_data, num_cost)</p></li>
 <li><p><strong>optmodel</strong> – a PyEPO optimization model</p></li>
-<li><p><strong>args</strong> – optModel args for the deprecated <code class="docutils literal notranslate"><span class="pre">(model_type,</span> <span class="pre">args)</span></code> form</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -448,45 +441,6 @@ near-zero true optima inflate the ratio.</p>
 <dt class="sig sig-object py" id="pyepo.metric.metrics.makeAutoSkScorer">
 <span class="sig-prename descclassname"><span class="pre">pyepo.metric.metrics.</span></span><span class="sig-name descname"><span class="pre">makeAutoSkScorer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="headerlink" href="#pyepo.metric.metrics.makeAutoSkScorer" title="Link to this definition">¶</a></dt>
 <dd><p>A function to create Auto-SKlearn scorer</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>optmodel</strong> – optimization model</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>callable object that returns a scalar score; less is better.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>scorer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyepo.metric.metrics.testMSE">
-<span class="sig-prename descclassname"><span class="pre">pyepo.metric.metrics.</span></span><span class="sig-name descname"><span class="pre">testMSE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><span class="pre">type</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#pyepo.metric.metrics.testMSE" title="Link to this definition">¶</a></dt>
-<dd><p>A function to calculate MSE for testing</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pred_cost</strong> – predicted costs</p></li>
-<li><p><strong>true_cost</strong> – true costs</p></li>
-<li><p><strong>model_type</strong> – optModel class type</p></li>
-<li><p><strong>args</strong> – optModel args</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>mse</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyepo.metric.metrics.makeTestMSEScorer">
-<span class="sig-prename descclassname"><span class="pre">pyepo.metric.metrics.</span></span><span class="sig-name descname"><span class="pre">makeTestMSEScorer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">pyepo.model.opt.optModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="headerlink" href="#pyepo.metric.metrics.makeTestMSEScorer" title="Link to this definition">¶</a></dt>
-<dd><p>A function to create MSE scorer for testing</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>optmodel</strong> – optimization model</p>
@@ -564,8 +518,6 @@ near-zero true optima inflate the ratio.</p>
 <li><a class="reference internal" href="#pyepo.metric.metrics.SPOError"><code class="docutils literal notranslate"><span class="pre">SPOError()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.metric.metrics.makeSkScorer"><code class="docutils literal notranslate"><span class="pre">makeSkScorer()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.metric.metrics.makeAutoSkScorer"><code class="docutils literal notranslate"><span class="pre">makeAutoSkScorer()</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.metric.metrics.testMSE"><code class="docutils literal notranslate"><span class="pre">testMSE()</span></code></a></li>
-<li><a class="reference internal" href="#pyepo.metric.metrics.makeTestMSEScorer"><code class="docutils literal notranslate"><span class="pre">makeTestMSEScorer()</span></code></a></li>
 </ul>
 </li>
 </ul>
