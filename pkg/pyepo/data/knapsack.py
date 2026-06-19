@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import numpy as np
 
+from pyepo.data._validation import validate_degree, validate_nonnegative
+
 
 def genData(
     num_data: int,
@@ -39,13 +41,8 @@ def genData(
     Returns:
        tuple: weights of items (np.ndarray), data features (np.ndarray), costs (np.ndarray)
     """
-    # positive integer parameter
-    if not isinstance(deg, int):
-        raise ValueError(f"deg = {deg} should be int.")
-    if deg <= 0:
-        raise ValueError(f"deg = {deg} should be positive.")
-    if noise_width < 0:
-        raise ValueError(f"noise_width = {noise_width} should be non-negative.")
+    validate_degree(deg)
+    validate_nonnegative(noise_width, "noise_width")
     # set seed
     rnd = np.random.RandomState(seed)
     # number of data points

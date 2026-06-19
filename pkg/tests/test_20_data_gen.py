@@ -11,18 +11,35 @@ import pytest
 
 from pyepo.data import knapsack, portfolio, shortestpath, tsp
 
+_GENERATORS = [
+    pytest.param(knapsack.genData, (10, 3, 4), id="knapsack"),
+    pytest.param(shortestpath.genData, (10, 3, (3, 3)), id="shortestpath"),
+    pytest.param(tsp.genData, (10, 3, 5), id="tsp"),
+    pytest.param(portfolio.genData, (10, 3, 4), id="portfolio"),
+]
+
+_NOISE_WIDTH_GENERATORS = _GENERATORS[:3]
+
+
+@pytest.mark.parametrize(("generator", "args"), _GENERATORS)
+@pytest.mark.parametrize("deg", [0, -1, 1.5])
+def test_invalid_degree_rejected(generator, args, deg):
+    with pytest.raises(ValueError):
+        generator(*args, deg=deg)
+
+
+@pytest.mark.parametrize(("generator", "args"), _NOISE_WIDTH_GENERATORS)
+def test_negative_noise_width_rejected(generator, args):
+    with pytest.raises(ValueError):
+        generator(*args, noise_width=-0.1)
+
 
 class TestKnapsackData:
-
     def test_output_shapes(self):
         weights, x, c = knapsack.genData(50, 5, 8, dim=2, deg=1, seed=42)
         assert weights.shape == (2, 8)
         assert x.shape == (50, 5)
         assert c.shape == (50, 8)
-
-    def test_negative_noise_width_rejected(self):
-        with pytest.raises(ValueError):
-            knapsack.genData(4, 3, 4, noise_width=-0.1)
 
     def test_deterministic(self):
         w1, x1, c1 = knapsack.genData(20, 3, 4, seed=0)
@@ -40,11 +57,6 @@ class TestKnapsackData:
         _, _, c = knapsack.genData(10, 3, 4)
         assert c.dtype == np.float32
 
-    @pytest.mark.parametrize("deg", [0, -1, 1.5])
-    def test_deg_invalid_raises(self, deg):
-        with pytest.raises(ValueError):
-            knapsack.genData(10, 3, 4, deg=deg)
-
     def test_higher_degree_finite(self):
         _, _, c = knapsack.genData(10, 3, 4, deg=3, seed=42)
         assert c.shape == (10, 4)
@@ -57,7 +69,6 @@ class TestKnapsackData:
 
 
 class TestShortestPathData:
-
     def test_output_shapes(self):
         x, c = shortestpath.genData(50, 5, (4, 4), deg=1, seed=42)
         # edges = (4-1)*4 + (4-1)*4 = 24
@@ -88,10 +99,6 @@ class TestShortestPathData:
         _, c = shortestpath.genData(20, 5, (3, 3), seed=42)
         assert np.all(c > 0)
 
-    def test_negative_noise_width_rejected(self):
-        with pytest.raises(ValueError):
-            shortestpath.genData(4, 3, (3, 3), noise_width=-0.1)
-
     def test_noise_changes_costs(self):
         _, c0 = shortestpath.genData(20, 5, (3, 3), noise_width=0, seed=42)
         _, c1 = shortestpath.genData(20, 5, (3, 3), noise_width=0.5, seed=42)
@@ -101,23 +108,13 @@ class TestShortestPathData:
         _, c = shortestpath.genData(10, 3, (3, 3), deg=3, seed=42)
         assert np.all(np.isfinite(c))
 
-    @pytest.mark.parametrize("deg", [0, -1, 1.5])
-    def test_deg_invalid_raises(self, deg):
-        with pytest.raises(ValueError):
-            shortestpath.genData(10, 3, (3, 3), deg=deg)
-
 
 class TestTSPData:
-
     def test_output_shapes(self):
         x, c = tsp.genData(20, 5, 6, seed=42)
         # edges = 6*5/2 = 15
         assert x.shape == (20, 5)
         assert c.shape == (20, 15)
-
-    def test_negative_noise_width_rejected(self):
-        with pytest.raises(ValueError):
-            tsp.genData(4, 3, 5, noise_width=-0.1)
 
     def test_edge_count_formula(self):
         n = 8
@@ -148,14 +145,8 @@ class TestTSPData:
         _, c = tsp.genData(10, 3, 5, deg=3, seed=42)
         assert np.all(np.isfinite(c))
 
-    @pytest.mark.parametrize("deg", [0, -1, 1.5])
-    def test_deg_invalid_raises(self, deg):
-        with pytest.raises(ValueError):
-            tsp.genData(10, 3, 5, deg=deg)
-
 
 class TestPortfolioData:
-
     def test_output_shapes(self):
         cov, x, r = portfolio.genData(30, 5, 8, seed=42)
         assert cov.shape == (8, 8)
@@ -194,8 +185,3 @@ class TestPortfolioData:
     def test_higher_degree_finite(self):
         _, _, r = portfolio.genData(10, 3, 4, deg=3, seed=42)
         assert np.all(np.isfinite(r))
-
-    @pytest.mark.parametrize("deg", [0, -1, 1.5])
-    def test_deg_invalid_raises(self, deg):
-        with pytest.raises(ValueError):
-            portfolio.genData(10, 3, 4, deg=deg)

@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import numpy as np
 
+from pyepo.data._validation import validate_degree
+
 
 def genData(
     num_data: int,
@@ -40,11 +42,7 @@ def genData(
     Returns:
         tuple: covariance matrix (np.ndarray), data features (np.ndarray), mean returns (np.ndarray)
     """
-    # positive integer parameter
-    if not isinstance(deg, int):
-        raise ValueError(f"deg = {deg} should be int.")
-    if deg <= 0:
-        raise ValueError(f"deg = {deg} should be positive.")
+    validate_degree(deg)
     # set seed
     rnd = np.random.RandomState(seed)
     # number of data points
