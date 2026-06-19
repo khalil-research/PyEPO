@@ -12,7 +12,7 @@ import torch
 from torch.autograd import Function
 
 from pyepo import EPO
-from pyepo.func._common import is_minimize
+from pyepo.func._common import is_minimize, validate_positive, validate_positive_int
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import (
     _mask_pred,
@@ -73,6 +73,8 @@ class perturbedOpt(optModule):
             solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
             dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
+        validate_positive_int(n_samples, "n_samples")
+        validate_positive(sigma, "sigma")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset, seed=seed)
         # number of samples
         self.n_samples = n_samples
@@ -235,6 +237,8 @@ class perturbedFenchelYoung(optModule):
             reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
             dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
+        validate_positive_int(n_samples, "n_samples")
+        validate_positive(sigma, "sigma")
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, seed=seed)
         # number of samples
         self.n_samples = n_samples
@@ -407,14 +411,15 @@ class implicitMLE(optModule):
             solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
             dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
+        validate_positive_int(n_samples, "n_samples")
+        validate_positive(sigma, "sigma")
+        validate_positive(lambd, "lambda")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
         self.n_samples = n_samples
         # noise temperature
         self.sigma = sigma
         # smoothing parameter
-        if lambd <= 0:
-            raise ValueError("lambda is not positive.")
         self.lambd = lambd
         # noise distribution
         if distribution is None:
@@ -546,6 +551,8 @@ class adaptiveImplicitMLE(optModule):
             solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
             dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
+        validate_positive_int(n_samples, "n_samples")
+        validate_positive(sigma, "sigma")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # number of samples
         self.n_samples = n_samples

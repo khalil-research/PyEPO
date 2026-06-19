@@ -101,6 +101,16 @@ class TestCheckSol:
 
 
 class TestSumGammaDistribution:
+    @pytest.mark.parametrize("kappa", [0.0, -1.0])
+    def test_rejects_nonpositive_kappa(self, kappa):
+        with pytest.raises(ValueError, match="kappa"):
+            sumGammaDistribution(kappa=kappa)
+
+    @pytest.mark.parametrize("n_iterations", [0, -1, 1.5, True])
+    def test_rejects_invalid_iteration_count(self, n_iterations):
+        with pytest.raises(ValueError, match="n_iterations"):
+            sumGammaDistribution(kappa=1.0, n_iterations=n_iterations)
+
     def test_sample_shape(self):
         dist = sumGammaDistribution(kappa=1.0, n_iterations=10, seed=42)
         assert dist.sample((5, 3)).shape == (5, 3)
@@ -389,7 +399,7 @@ class TestOptModuleInit:
 
 @requires_gurobi
 class TestConstructorGuards:
-    """Constructor validation shared across losses: lambda must be positive."""
+    """Constructor validation shared across the Torch and JAX frontends."""
 
     @pytest.mark.parametrize(
         "name",
@@ -407,6 +417,59 @@ class TestConstructorGuards:
         for bad in (0.0, -1.0):
             with pytest.raises(ValueError):
                 getattr(func_frontend, name)(model, processes=1, lambd=bad)
+
+    @pytest.mark.parametrize("name", ["perturbedOpt", "perturbedFenchelYoung", "implicitMLE"])
+    @pytest.mark.parametrize("n_samples", [0, -1, 1.5, True])
+    def test_rejects_invalid_sample_count(self, func_frontend, name, n_samples):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        with pytest.raises(ValueError, match="n_samples"):
+            getattr(func_frontend, name)(
+                shortestPathModel(grid=(3, 3)),
+                processes=1,
+                n_samples=n_samples,
+            )
+
+    @pytest.mark.parametrize("name", ["perturbedOpt", "perturbedFenchelYoung", "implicitMLE"])
+    @pytest.mark.parametrize("sigma", [0.0, -1.0])
+    def test_rejects_nonpositive_sigma(self, func_frontend, name, sigma):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        with pytest.raises(ValueError, match="sigma"):
+            getattr(func_frontend, name)(
+                shortestPathModel(grid=(3, 3)),
+                processes=1,
+                sigma=sigma,
+            )
+
+    @pytest.mark.parametrize(
+        "name",
+        ["regularizedFrankWolfeOpt", "regularizedFrankWolfeFenchelYoung"],
+    )
+    @pytest.mark.parametrize("max_iter", [0, -1, 1.5, True])
+    def test_rejects_invalid_iteration_cap(self, func_frontend, name, max_iter):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        with pytest.raises(ValueError, match="max_iter"):
+            getattr(func_frontend, name)(
+                shortestPathModel(grid=(3, 3)),
+                processes=1,
+                max_iter=max_iter,
+            )
+
+    @pytest.mark.parametrize(
+        "name",
+        ["regularizedFrankWolfeOpt", "regularizedFrankWolfeFenchelYoung"],
+    )
+    def test_rejects_negative_tolerance(self, func_frontend, name):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        with pytest.raises(ValueError, match="tol"):
+            getattr(func_frontend, name)(
+                shortestPathModel(grid=(3, 3)),
+                processes=1,
+                tol=-1e-6,
+            )
 
 
 # ============================================================
@@ -751,9 +814,7 @@ class TestAwayStepFrankWolfe:
         from pyepo.func.regularized import RFWO
         from pyepo.model.grb.shortestpath import shortestPathModel
 
-        return RFWO(
-            shortestPathModel(grid=(5, 5)), lambd=lambd, max_iter=max_iter, tol=tol
-        )
+        return RFWO(shortestPathModel(grid=(5, 5)), lambd=lambd, max_iter=max_iter, tol=tol)
 
     def test_converges_and_active_set_exact(self):
         import pyepo
@@ -818,9 +879,7 @@ class TestRegularizedFrankWolfeFenchelYoung:
         from pyepo.func.regularized import RFY
 
         lambd = 1.7
-        fy = RFY(
-            _fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="none"
-        )
+        fy = RFY(_fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="none")
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]])
         w = torch.tensor([[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]])
         loss = fy(cp, w)
@@ -834,9 +893,7 @@ class TestRegularizedFrankWolfeFenchelYoung:
         from pyepo.func.regularized import RFY
 
         lambd = 1.0
-        fy = RFY(
-            _fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="mean"
-        )
+        fy = RFY(_fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="mean")
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]], requires_grad=True)
         w = torch.tensor([[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]])
         fy(cp, w).backward()

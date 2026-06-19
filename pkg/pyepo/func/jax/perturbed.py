@@ -11,6 +11,7 @@ import jax
 import jax.numpy as jnp
 
 from pyepo import EPO
+from pyepo.func._common import validate_positive, validate_positive_int
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import (
     _check_jit_key,
@@ -62,6 +63,8 @@ class perturbedOpt(optModule):
             solve_ratio: fraction of instances solved exactly each step
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
+        validate_positive_int(n_samples, "n_samples")
+        validate_positive(sigma, "sigma")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset, seed=seed)
         self.n_samples = n_samples
         self.sigma = float(sigma)
@@ -176,6 +179,8 @@ class perturbedFenchelYoung(optModule):
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
+        validate_positive_int(n_samples, "n_samples")
+        validate_positive(sigma, "sigma")
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset, seed=seed)
         self.n_samples = n_samples
         self.sigma = float(sigma)
@@ -306,9 +311,12 @@ class implicitMLE(optModule):
             solve_ratio: fraction of instances solved exactly each step
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
+        validate_positive_int(n_samples, "n_samples")
+        validate_positive_int(n_iterations, "n_iterations")
+        validate_positive(sigma, "sigma")
+        validate_positive(lambd, "lambda")
+        validate_positive(kappa, "kappa")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset, seed=seed)
-        if lambd <= 0:
-            raise ValueError("lambda is not positive.")
         self.n_samples = n_samples
         self.sigma = float(sigma)
         self.lambd = float(lambd)
@@ -418,6 +426,10 @@ class adaptiveImplicitMLE(optModule):
             solve_ratio: fraction of instances solved exactly each step
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
+        validate_positive_int(n_samples, "n_samples")
+        validate_positive_int(n_iterations, "n_iterations")
+        validate_positive(sigma, "sigma")
+        validate_positive(kappa, "kappa")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset, seed=seed)
         self.n_samples = n_samples
         self.sigma = float(sigma)

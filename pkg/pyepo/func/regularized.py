@@ -11,6 +11,7 @@ import torch
 from torch.autograd import Function
 
 from pyepo import EPO
+from pyepo.func._common import validate_nonnegative, validate_positive, validate_positive_int
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
 
@@ -170,10 +171,11 @@ class regularizedFrankWolfeOpt(optModule):
             solve_ratio: fraction of linear minimization oracle calls solved exactly each step (1.0 = no caching)
             dataset: training dataset used to seed the linear minimization oracle pool when ``solve_ratio < 1``
         """
+        validate_positive(lambd, "lambda")
+        validate_positive_int(max_iter, "max_iter")
+        validate_nonnegative(tol, "tol")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # regularization strength
-        if lambd <= 0:
-            raise ValueError("lambda is not positive.")
         self.lambd = float(lambd)
         # Frank-Wolfe iteration budget
         self.max_iter = max_iter
@@ -312,10 +314,11 @@ class regularizedFrankWolfeFenchelYoung(optModule):
             reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
             dataset: training dataset used to seed the linear minimization oracle pool when ``solve_ratio < 1``
         """
+        validate_positive(lambd, "lambda")
+        validate_positive_int(max_iter, "max_iter")
+        validate_nonnegative(tol, "tol")
         super().__init__(optmodel, processes, solve_ratio, reduction=reduction, dataset=dataset)
         # regularization strength
-        if lambd <= 0:
-            raise ValueError("lambda is not positive.")
         self.lambd = float(lambd)
         # Frank-Wolfe iteration budget
         self.max_iter = max_iter

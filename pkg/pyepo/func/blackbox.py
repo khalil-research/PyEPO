@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, cast
 from torch.autograd import Function
 
 from pyepo import EPO
+from pyepo.func._common import validate_positive
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
 from pyepo.utils import _EPS
@@ -56,10 +57,9 @@ class blackboxOpt(optModule):
             solve_ratio: fraction of instances solved exactly each step (1.0 = no caching)
             dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
+        validate_positive(lambd, "lambda")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
         # smoothing parameter
-        if lambd <= 0:
-            raise ValueError("lambda is not positive.")
         self.lambd = lambd
 
     def forward(self, pred_cost: torch.Tensor) -> torch.Tensor:

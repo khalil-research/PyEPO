@@ -12,7 +12,12 @@ from typing import TYPE_CHECKING
 import numpy as np
 import torch
 
-from pyepo.func._common import is_minimize, solution_pool_tolerance
+from pyepo.func._common import (
+    is_minimize,
+    solution_pool_tolerance,
+    validate_positive,
+    validate_positive_int,
+)
 from pyepo.model.mpax import optMpaxModel
 from pyepo.utils import costToNumpy
 
@@ -254,6 +259,8 @@ class sumGammaDistribution:
     """
 
     def __init__(self, kappa: float, n_iterations: int = 10, seed: int = 135) -> None:
+        validate_positive(kappa, "kappa")
+        validate_positive_int(n_iterations, "n_iterations")
         self.κ = kappa
         self.n_iterations = n_iterations
         self.seed = seed

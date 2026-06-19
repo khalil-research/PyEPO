@@ -10,6 +10,7 @@ from functools import partial
 import jax
 
 from pyepo import EPO
+from pyepo.func._common import validate_positive
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost, _solve_or_cache
 from pyepo.utils import _EPS
@@ -37,9 +38,8 @@ class blackboxOpt(optModule):
             solve_ratio: fraction of instances solved exactly each step
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
+        validate_positive(lambd, "lambda")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
-        if lambd <= 0:
-            raise ValueError("lambda is not positive.")
         self.lambd = float(lambd)
 
     def forward(self, pred_cost):

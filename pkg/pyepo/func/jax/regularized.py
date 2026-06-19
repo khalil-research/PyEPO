@@ -13,6 +13,7 @@ import numpy as np
 from jax import lax
 
 from pyepo import EPO
+from pyepo.func._common import validate_nonnegative, validate_positive, validate_positive_int
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import (
     _cache_in_pass,
@@ -176,9 +177,10 @@ class regularizedFrankWolfeOpt(optModule):
             solve_ratio: per-forward probability of an exact FW solve; < 1 reuses the cached vertex pool as the linear minimization oracle
             dataset: training dataset used to seed the linear minimization oracle pool when solve_ratio < 1
         """
+        validate_positive(lambd, "lambda")
+        validate_positive_int(max_iter, "max_iter")
+        validate_nonnegative(tol, "tol")
         super().__init__(optmodel, processes, solve_ratio, dataset=dataset)
-        if lambd <= 0:
-            raise ValueError("lambda is not positive.")
         self.lambd = float(lambd)
         self.max_iter = max_iter
         self.tol = tol
@@ -266,9 +268,10 @@ class regularizedFrankWolfeFenchelYoung(optModule):
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the linear minimization oracle pool when solve_ratio < 1
         """
+        validate_positive(lambd, "lambda")
+        validate_positive_int(max_iter, "max_iter")
+        validate_nonnegative(tol, "tol")
         super().__init__(optmodel, processes, solve_ratio, reduction=reduction, dataset=dataset)
-        if lambd <= 0:
-            raise ValueError("lambda is not positive.")
         self.lambd = float(lambd)
         self.max_iter = max_iter
         self.tol = tol
