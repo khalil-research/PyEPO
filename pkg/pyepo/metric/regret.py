@@ -6,16 +6,14 @@ True regret loss
 from __future__ import annotations
 
 import logging
-import multiprocessing as mp
 from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import torch
-from pathos.multiprocessing import ProcessingPool
 
 from pyepo import EPO
-from pyepo.func.utils import _close_pool, _init_worker_model, _solve_batch
-from pyepo.model.mpax import optMpaxModel
+from pyepo.func.runtime import create_solver_pool, normalize_processes
+from pyepo.func.utils import _close_pool, _solve_batch
 from pyepo.utils import _EPS, costToNumpy
 
 if TYPE_CHECKING:
@@ -120,14 +118,7 @@ def regret(
     if reduction not in ("normalized", "sum", "mean", "none"):
         raise ValueError(f"Invalid reduction '{reduction}'.")
     _checkLinearObj(optmodel)
-    # force processes to 1 for MPAX
-    if isinstance(optmodel, optMpaxModel) and processes != 1:
-        logger.warning("MPAX does not support multiprocessing. Setting `processes = 1`.")
-        processes = 1
-    # number of processes
-    if processes < 0 or processes > mp.cpu_count():
-        raise ValueError(f"Invalid processors number {processes}, only {mp.cpu_count()} cores.")
-    processes = mp.cpu_count() if processes == 0 else processes
+    processes = normalize_processes(optmodel, processes, logger)
     losses = []
     optsum = 0.0
     torch_model = cast("nn.Module", predmodel) if isinstance(predmodel, torch.nn.Module) else None
@@ -137,13 +128,7 @@ def regret(
         param = next(torch_model.parameters(), None)
         device = param.device if param is not None else torch.device("cpu")
     # multi-core: each worker builds its own optmodel once via the initializer
-    pool = None
-    if processes > 1:
-        pool = ProcessingPool(
-            processes,
-            initializer=_init_worker_model,
-            initargs=(optmodel.to_spec(),),
-        )
+    pool = create_solver_pool(optmodel, processes)
     # evaluate under eval(); the original mode is restored afterwards
     was_training = torch_model.training if torch_model is not None else False
     if torch_model is not None:

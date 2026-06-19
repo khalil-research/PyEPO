@@ -6,18 +6,11 @@ Abstract optimization module
 from __future__ import annotations
 
 import logging
-import multiprocessing as mp
-import weakref
 from abc import ABC, abstractmethod
 
 import jax.numpy as jnp
-import numpy as np
-from pathos.multiprocessing import ProcessingPool
 
-from pyepo import EPO
-from pyepo.func.utils import _close_pool, _init_worker_model
-from pyepo.model.mpax import optMpaxModel
-from pyepo.model.opt import optModel
+from pyepo.func.runtime import init_runtime
 
 logger = logging.getLogger(__name__)
 
@@ -49,39 +42,14 @@ class optModule(ABC):
             require_solpool: always seed the solution pool from dataset
             seed: seed for the per-pass solve-vs-cache branch RNG
         """
-        # optimization model
-        if not isinstance(optmodel, optModel):
-            raise TypeError("arg model is not an optModel")
-        if optmodel.modelSense not in (EPO.MINIMIZE, EPO.MAXIMIZE):
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
-        self.optmodel = optmodel
-        # force processes to 1 for MPAX
-        if isinstance(optmodel, optMpaxModel) and processes > 1:
-            logger.warning("MPAX does not support multiprocessing. Setting `processes = 1`.")
-            processes = 1
-        # number of processes
-        if processes < 0 or processes > mp.cpu_count():
-            raise ValueError(f"Invalid processors number {processes}, only {mp.cpu_count()} cores.")
-        self.processes = mp.cpu_count() if processes == 0 else processes
-        # single-core
-        if self.processes == 1:
-            self.pool = None
-        # multi-core: each worker builds its own optmodel once via the initializer
-        else:
-            self.pool = ProcessingPool(
-                self.processes,
-                initializer=_init_worker_model,
-                initargs=(optmodel.to_spec(),),
-            )
-            # release worker processes when this module is garbage-collected
-            weakref.finalize(self, _close_pool, self.pool)
-        logger.info("Num of cores: %d", self.processes)
-        # solution pool
-        self.solve_ratio = solve_ratio
-        if (self.solve_ratio < 0) or (self.solve_ratio > 1):
-            raise ValueError(
-                f"Invalid solving ratio {self.solve_ratio}. It should be between 0 and 1."
-            )
+        runtime = init_runtime(self, optmodel, processes, solve_ratio, reduction, seed, logger)
+        self.optmodel = runtime.optmodel
+        self.processes = runtime.processes
+        self.pool = runtime.pool
+        self.solve_ratio = runtime.solve_ratio
+        self.reduction = runtime.reduction
+        self._branch_rng = runtime.branch_rng
+        # framework-specific solution pool
         self.solpool = None
         if self.solve_ratio < 1 or require_solpool:  # init solution pool
             from pyepo.data.dataset import optDataset
@@ -89,12 +57,6 @@ class optModule(ABC):
             if not isinstance(dataset, optDataset):  # type checking
                 raise TypeError("dataset is not an optDataset")
             self.solpool = jnp.unique(jnp.asarray(dataset.sols), axis=0)
-        # per-instance RNG for the solve-vs-cache branch
-        self._branch_rng = np.random.RandomState(seed)
-        # reduction
-        if reduction not in ("mean", "sum", "none"):
-            raise ValueError(f"No reduction '{reduction}'.")
-        self.reduction = reduction
 
     def __call__(self, *args, **kwargs):
         return self.forward(*args, **kwargs)

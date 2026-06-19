@@ -23,12 +23,14 @@ import pytest
 import torch
 
 from pyepo import EPO
+from pyepo.func.runtime import create_solver_pool, init_runtime, normalize_processes
 from pyepo.func.utils import (
     _cache_in_pass,
     _check_sol,
     _update_solution_pool,
     sumGammaDistribution,
 )
+from pyepo.model.opt import optModel
 
 from .conftest import (
     FD_LOSSES,
@@ -255,6 +257,94 @@ class TestForwardBackwardContract:
         total = be.forward(build(optmodel, dataset, "sum"), sig, cp, c2, w2, z2)
         np.testing.assert_allclose(float(be.to_np(mean)), float(be.to_np(none).mean()), atol=1e-5)
         np.testing.assert_allclose(float(be.to_np(total)), float(be.to_np(none).sum()), atol=1e-5)
+
+
+# ============================================================
+# neutral: shared frontend runtime
+# ============================================================
+
+
+class _RuntimeModel(optModel):
+    def _getModel(self):
+        return None, [0]
+
+    def setObj(self, c):
+        self.cost = c
+
+    def solve(self):
+        return [0], 0.0
+
+
+class TestSharedRuntime:
+    def test_single_process_needs_no_pool(self):
+        assert create_solver_pool(_RuntimeModel(), 1) is None
+
+    def test_multi_process_pool_uses_model_spec_and_owner_finalizer(self, monkeypatch):
+        pool = object()
+        pool_factory = MagicMock(return_value=pool)
+        finalize = MagicMock()
+        monkeypatch.setattr("pyepo.func.runtime.ProcessingPool", pool_factory)
+        monkeypatch.setattr("pyepo.func.runtime.weakref.finalize", finalize)
+        model = _RuntimeModel()
+        owner = object()
+
+        assert create_solver_pool(model, 2, owner=owner) is pool
+        kwargs = pool_factory.call_args.kwargs
+        assert kwargs["initargs"][0].model_type is type(model)
+        finalize.assert_called_once()
+        assert finalize.call_args.args[0] is owner
+        assert finalize.call_args.args[2] is pool
+
+    def test_process_zero_expands_to_cpu_count(self, monkeypatch):
+        monkeypatch.setattr("pyepo.func.runtime.mp.cpu_count", lambda: 7)
+        assert normalize_processes(_RuntimeModel(), 0, MagicMock()) == 7
+
+    def test_invalid_process_count_raises(self, monkeypatch):
+        monkeypatch.setattr("pyepo.func.runtime.mp.cpu_count", lambda: 4)
+        with pytest.raises(ValueError):
+            normalize_processes(_RuntimeModel(), -1, MagicMock())
+        with pytest.raises(ValueError):
+            normalize_processes(_RuntimeModel(), 5, MagicMock())
+
+    def test_mpax_all_cores_request_is_forced_to_one(self, monkeypatch):
+        logger = MagicMock()
+        monkeypatch.setattr("pyepo.func.runtime.optMpaxModel", _RuntimeModel)
+
+        assert normalize_processes(_RuntimeModel(), 0, logger) == 1
+        logger.warning.assert_called_once()
+
+    def test_runtime_state_is_seeded_and_validated(self):
+        owner = _RuntimeModel()
+        runtime = init_runtime(
+            owner,
+            owner,
+            processes=1,
+            solve_ratio=0.5,
+            reduction="sum",
+            seed=17,
+            logger=MagicMock(),
+        )
+
+        assert runtime.optmodel is owner
+        assert runtime.processes == 1
+        assert runtime.pool is None
+        assert runtime.solve_ratio == 0.5
+        assert runtime.reduction == "sum"
+        expected = np.random.RandomState(17).uniform()
+        assert runtime.branch_rng.uniform() == expected
+
+    @pytest.mark.parametrize("reduction", ["bad", "", None])
+    def test_invalid_reduction_raises(self, reduction):
+        with pytest.raises(ValueError):
+            init_runtime(
+                _RuntimeModel(),
+                _RuntimeModel(),
+                processes=1,
+                solve_ratio=1,
+                reduction=reduction,
+                seed=None,
+                logger=MagicMock(),
+            )
 
 
 # ============================================================
