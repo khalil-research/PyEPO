@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import torch
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize, solution_pool_tolerance
 from pyepo.model.mpax import optMpaxModel
 from pyepo.utils import costToNumpy
 
@@ -106,12 +106,8 @@ def _solve_batch(
                 _warned_mpax_device_mismatch = True
             sol, obj = sol.to(device), obj.to(device)
         # obj sense
-        if optmodel.modelSense == EPO.MINIMIZE:
-            pass
-        elif optmodel.modelSense == EPO.MAXIMIZE:
+        if not is_minimize(optmodel.modelSense):
             obj = -obj
-        else:
-            raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
     # host solving on numpy costs
     else:
         sol_np, obj_np = _solve_batch_np(costToNumpy(cp), optmodel, processes, pool)
@@ -164,7 +160,7 @@ def _update_solution_pool(
         sol = sol.to(solpool.device)
     sol_uniq = torch.unique(sol, dim=0)
     # capped L1-tolerance dedup: first-order solvers re-emit near-identical vertices
-    tol = min(1e-4 * sol.shape[-1], 0.1)
+    tol = solution_pool_tolerance(sol.shape[-1])
     dists = torch.cdist(sol_uniq, solpool, p=1.0)
     is_new = (dists > tol).all(dim=1)
     if bool(is_new.any()):
@@ -185,12 +181,8 @@ def _cache_in_pass(
         solpool = solpool.to(cp.device)
     # best solution in pool
     solpool_obj = torch.matmul(cp, solpool.T)
-    if optmodel.modelSense == EPO.MINIMIZE:
-        ind = torch.argmin(solpool_obj, dim=1)
-    elif optmodel.modelSense == EPO.MAXIMIZE:
-        ind = torch.argmax(solpool_obj, dim=1)
-    else:
-        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+    select = torch.argmin if is_minimize(optmodel.modelSense) else torch.argmax
+    ind = select(solpool_obj, dim=1)
     obj = solpool_obj.gather(1, ind.view(-1, 1)).squeeze(1)
     sol = solpool[ind]
     return sol, obj, solpool

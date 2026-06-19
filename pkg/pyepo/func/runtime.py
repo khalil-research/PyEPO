@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Literal, cast
 import numpy as np
 from pathos.multiprocessing import ProcessingPool
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize
 from pyepo.func.utils import _close_pool, _init_worker_model
 from pyepo.model.mpax import optMpaxModel
 from pyepo.model.opt import optModel
@@ -81,8 +81,7 @@ def init_runtime(
     """Validate common module arguments and initialize solver runtime state."""
     if not isinstance(optmodel, optModel):
         raise TypeError("arg model is not an optModel")
-    if optmodel.modelSense not in (EPO.MINIMIZE, EPO.MAXIMIZE):
-        raise ValueError("Invalid modelSense. Must be EPO.MINIMIZE or EPO.MAXIMIZE.")
+    is_minimize(optmodel.modelSense)
     if not 0 <= solve_ratio <= 1:
         raise ValueError(f"Invalid solving ratio {solve_ratio}. It should be between 0 and 1.")
     if reduction not in ("mean", "sum", "none"):

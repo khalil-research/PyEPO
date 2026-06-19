@@ -9,7 +9,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize, solution_pool_tolerance
 from pyepo.func.utils import _solve_batch_np
 from pyepo.model.mpax import optMpaxModel
 
@@ -76,11 +76,12 @@ def _solve_batch_mpax(cost, optmodel):
     A function to solve natively with MPAX
     """
     # change sign for maximization
-    cc = -cost if optmodel.modelSense == EPO.MAXIMIZE else cost
+    minimize = is_minimize(optmodel.modelSense)
+    cc = cost if minimize else -cost
     # batch solving; status dropped (this path may run under jax.jit)
     sol, obj, _ = optmodel.batch_optimize(cc)
     # obj in true sense
-    if optmodel.modelSense == EPO.MAXIMIZE:
+    if not minimize:
         obj = -obj
     return sol, obj
 
@@ -108,7 +109,7 @@ def _update_solution_pool(sol, solpool):
     """
     sol_uniq = jnp.unique(sol, axis=0)
     # capped L1-tolerance dedup: first-order solvers re-emit near-identical vertices
-    tol = min(1e-4 * sol.shape[-1], 0.1)
+    tol = solution_pool_tolerance(sol.shape[-1])
     dists = jnp.sum(jnp.abs(sol_uniq[:, None, :] - solpool[None, :, :]), axis=-1)
     is_new = jnp.all(dists > tol, axis=1)
     # host-side gather: the number of new rows is data-dependent
@@ -123,10 +124,8 @@ def _cache_in_pass(cost, optmodel, solpool):
     A function to pick the best pool member per instance for cost
     """
     solpool_obj = cost @ solpool.T
-    if optmodel.modelSense == EPO.MINIMIZE:
-        ind = jnp.argmin(solpool_obj, axis=1)
-    else:
-        ind = jnp.argmax(solpool_obj, axis=1)
+    select = jnp.argmin if is_minimize(optmodel.modelSense) else jnp.argmax
+    ind = select(solpool_obj, axis=1)
     obj = jnp.take_along_axis(solpool_obj, ind[:, None], axis=1).squeeze(1)
     return solpool[ind], obj
 

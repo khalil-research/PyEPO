@@ -12,6 +12,7 @@ import torch
 from torch.autograd import Function
 
 from pyepo import EPO
+from pyepo.func._common import is_minimize
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import (
     _mask_pred,
@@ -689,10 +690,8 @@ def _cache_in_pass_3d(
     # compute objective values: (batch, n_samples, pool_size)
     solpool_obj = torch.einsum("bnd,sd->bns", ptb_c, solpool)
     # best solution in pool
-    if optmodel.modelSense == EPO.MINIMIZE:
-        best_inds = torch.argmin(solpool_obj, dim=2)
-    else:
-        best_inds = torch.argmax(solpool_obj, dim=2)
+    select = torch.argmin if is_minimize(optmodel.modelSense) else torch.argmax
+    best_inds = select(solpool_obj, dim=2)
     ptb_sols = solpool[best_inds]
     return ptb_sols, solpool
 

@@ -105,6 +105,18 @@ class TestSolveCacheHelpers:
         np.testing.assert_allclose(np.array(sol[1]), [1.0, 0.0, 0.0])
         np.testing.assert_allclose(np.array(obj), [3.0, 3.0])
 
+    def test_cache_in_pass_rejects_invalid_sense(self):
+        from unittest.mock import MagicMock
+
+        import jax.numpy as jnp
+
+        from pyepo.func.jax.utils import _cache_in_pass
+
+        model = MagicMock()
+        model.modelSense = "invalid"
+        with pytest.raises(ValueError, match="Invalid modelSense"):
+            _cache_in_pass(jnp.ones((1, 2)), model, jnp.eye(2))
+
     @requires_mpax  # the eager caching pass solves through the native MPAX path
     def test_spoplus_caching_runs_eager(self):
         import jax
