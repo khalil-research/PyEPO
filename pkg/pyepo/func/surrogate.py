@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, cast
 import torch
 from torch.autograd import Function
 
-from pyepo.func._common import is_minimize
+from pyepo.func._common import is_minimize, validate_positive
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
 from pyepo.utils import _EPS
@@ -177,6 +177,7 @@ class perturbationGradient(optModule):
             reduction: reduction applied to the batch loss (``"mean"``, ``"sum"``, ``"none"``)
             dataset: training dataset used to seed the solution pool when ``solve_ratio < 1``
         """
+        validate_positive(sigma, "sigma")
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         # finite difference width
         self.sigma = sigma

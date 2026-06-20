@@ -393,9 +393,9 @@ class TestOptModuleInit:
         with pytest.raises(ValueError):
             func_frontend.SPOPlus(self._model(), processes=-1)
 
-    @pytest.mark.parametrize("ratio", [1.5, -0.1])
+    @pytest.mark.parametrize("ratio", [1.5, -0.1, np.nan, np.inf, True])
     def test_invalid_solve_ratio_raises(self, func_frontend, ratio):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="solve_ratio"):
             func_frontend.SPOPlus(self._model(), solve_ratio=ratio)
 
     def test_solve_ratio_lt1_requires_dataset(self, func_frontend):
@@ -420,7 +420,7 @@ class TestConstructorGuards:
         from pyepo.model.grb.shortestpath import shortestPathModel
 
         model = shortestPathModel(grid=(3, 3))
-        for bad in (0.0, -1.0):
+        for bad in (0.0, -1.0, np.nan, np.inf, True):
             with pytest.raises(ValueError):
                 getattr(func_frontend, name)(model, processes=1, lambd=bad)
 
@@ -437,12 +437,23 @@ class TestConstructorGuards:
             )
 
     @pytest.mark.parametrize("name", ["perturbedOpt", "perturbedFenchelYoung", "implicitMLE"])
-    @pytest.mark.parametrize("sigma", [0.0, -1.0])
+    @pytest.mark.parametrize("sigma", [0.0, -1.0, np.nan, np.inf, True])
     def test_rejects_nonpositive_sigma(self, func_frontend, name, sigma):
         from pyepo.model.grb.shortestpath import shortestPathModel
 
         with pytest.raises(ValueError, match="sigma"):
             getattr(func_frontend, name)(
+                shortestPathModel(grid=(3, 3)),
+                processes=1,
+                sigma=sigma,
+            )
+
+    @pytest.mark.parametrize("sigma", [0.0, -1.0, np.nan, np.inf, True])
+    def test_pg_rejects_invalid_sigma(self, func_frontend, sigma):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        with pytest.raises(ValueError, match="sigma"):
+            func_frontend.PG(
                 shortestPathModel(grid=(3, 3)),
                 processes=1,
                 sigma=sigma,
@@ -467,14 +478,15 @@ class TestConstructorGuards:
         "name",
         ["regularizedFrankWolfeOpt", "regularizedFrankWolfeFenchelYoung"],
     )
-    def test_rejects_negative_tolerance(self, func_frontend, name):
+    @pytest.mark.parametrize("tol", [-1e-6, np.nan, np.inf, True])
+    def test_rejects_invalid_tolerance(self, func_frontend, name, tol):
         from pyepo.model.grb.shortestpath import shortestPathModel
 
         with pytest.raises(ValueError, match="tol"):
             getattr(func_frontend, name)(
                 shortestPathModel(grid=(3, 3)),
                 processes=1,
-                tol=-1e-6,
+                tol=tol,
             )
 
     @pytest.mark.parametrize("max_iter", [0, -1, 1.5, True])
@@ -489,7 +501,7 @@ class TestConstructorGuards:
             )
 
     @pytest.mark.parametrize("name", ["solve_ratio", "inner_ratio"])
-    @pytest.mark.parametrize("value", [-0.1, 1.1])
+    @pytest.mark.parametrize("value", [-0.1, 1.1, np.nan, np.inf, True])
     def test_cave_rejects_invalid_ratio(self, func_frontend, name, value):
         from pyepo.model.grb.shortestpath import shortestPathModel
 

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Literal, cast
 import numpy as np
 from pathos.multiprocessing import ProcessingPool
 
-from pyepo.func._common import is_minimize
+from pyepo.func._common import is_minimize, validate_probability
 from pyepo.func.utils import _close_pool, _init_worker_model
 from pyepo.model.mpax import optMpaxModel
 from pyepo.model.opt import optModel
@@ -82,8 +82,7 @@ def init_runtime(
     if not isinstance(optmodel, optModel):
         raise TypeError("arg model is not an optModel")
     is_minimize(optmodel.modelSense)
-    if not 0 <= solve_ratio <= 1:
-        raise ValueError(f"Invalid solving ratio {solve_ratio}. It should be between 0 and 1.")
+    validate_probability(solve_ratio, "solve_ratio")
     if reduction not in ("mean", "sum", "none"):
         raise ValueError(f"No reduction '{reduction}'.")
 

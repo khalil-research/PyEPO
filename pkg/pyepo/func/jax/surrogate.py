@@ -10,7 +10,7 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
-from pyepo.func._common import is_minimize
+from pyepo.func._common import is_minimize, validate_positive
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost, _solve_or_cache
 from pyepo.utils import _EPS
@@ -125,6 +125,7 @@ class perturbationGradient(optModule):
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
             dataset: training dataset used to seed the solution pool when solve_ratio < 1
         """
+        validate_positive(sigma, "sigma")
         super().__init__(optmodel, processes, solve_ratio, reduction, dataset)
         self.sigma = float(sigma)
         self.two_sides = two_sides

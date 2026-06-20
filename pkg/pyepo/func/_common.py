@@ -1,5 +1,7 @@
 """Backend-independent policies shared by the Torch and JAX frontends."""
 
+import math
+from numbers import Real
 from typing import Optional, TypeVar
 
 from pyepo import EPO
@@ -22,9 +24,12 @@ def solution_pool_tolerance(num_cost: int) -> float:
 
 
 def validate_positive(value, name: str) -> None:
-    """Validate a strictly positive numeric parameter."""
-    if value <= 0:
-        raise ValueError(f"{name} must be positive.")
+    """Validate a finite, strictly positive real parameter."""
+    if not isinstance(value, Real) or isinstance(value, bool):
+        raise ValueError(f"{name} must be a finite positive number.")
+    number = float(value)
+    if not math.isfinite(number) or number <= 0:
+        raise ValueError(f"{name} must be a finite positive number.")
 
 
 def validate_positive_int(value, name: str) -> None:
@@ -34,15 +39,21 @@ def validate_positive_int(value, name: str) -> None:
 
 
 def validate_nonnegative(value, name: str) -> None:
-    """Validate a non-negative numeric parameter."""
-    if value < 0:
-        raise ValueError(f"{name} must be non-negative.")
+    """Validate a finite, non-negative real parameter."""
+    if not isinstance(value, Real) or isinstance(value, bool):
+        raise ValueError(f"{name} must be a finite non-negative number.")
+    number = float(value)
+    if not math.isfinite(number) or number < 0:
+        raise ValueError(f"{name} must be a finite non-negative number.")
 
 
 def validate_probability(value, name: str) -> None:
-    """Validate a probability in the closed interval [0, 1]."""
-    if not 0.0 <= value <= 1.0:
-        raise ValueError(f"{name} must be in [0, 1].")
+    """Validate a finite real probability in the closed interval [0, 1]."""
+    if not isinstance(value, Real) or isinstance(value, bool):
+        raise ValueError(f"{name} must be a finite number in [0, 1].")
+    number = float(value)
+    if not math.isfinite(number) or not 0.0 <= number <= 1.0:
+        raise ValueError(f"{name} must be a finite number in [0, 1].")
 
 
 def require_solution_pool(solpool: Optional[T]) -> T:
