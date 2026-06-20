@@ -8,13 +8,15 @@ regret() / unambRegret() / MSE() are run on a tiny untrained predictor to verify
 they return sane floats. MSE needs no solver.
 """
 
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from pyepo.metric.metrics import SPOError, makeSkScorer
+from pyepo.metric.metrics import SPOError, _validate_cost_batches, makeSkScorer
 from pyepo.metric.mse import MSE
 from pyepo.metric.regret import _regretFromObj, calRegret
 from pyepo.metric.unambregret import calUnambRegret, unambRegret
@@ -129,6 +131,54 @@ class TestRegretFromObj:
     def test_invalid_sense(self):
         with pytest.raises(ValueError):
             _regretFromObj(1.0, 1.0, "bad")
+
+
+class TestSPOErrorValidation:
+    model = SimpleNamespace(num_cost=4)
+
+    def test_validation_preserves_cost_dtype(self):
+        pred = np.ones((2, 4), dtype=np.float32)
+        true = np.ones((2, 4), dtype=np.float32)
+        validated_pred, validated_true = _validate_cost_batches(pred, true, self.model.num_cost)
+        assert validated_pred.dtype == np.float32
+        assert validated_true.dtype == np.float32
+
+    def test_rejects_shape_mismatch_before_solver_access(self):
+        with pytest.raises(ValueError, match="does not match"):
+            SPOError(np.ones((2, 4)), np.ones((3, 4)), self.model)
+
+    @pytest.mark.parametrize(
+        ("pred_cost", "true_cost"),
+        [
+            (np.ones(4), np.ones(4)),
+            (np.ones((1, 2, 4)), np.ones((1, 2, 4))),
+        ],
+    )
+    def test_rejects_non_batch_inputs_before_solver_access(self, pred_cost, true_cost):
+        with pytest.raises(ValueError, match="two-dimensional"):
+            SPOError(pred_cost, true_cost, self.model)
+
+    def test_rejects_empty_batch_before_solver_access(self):
+        with pytest.raises(ValueError, match="must not be empty"):
+            SPOError(np.empty((0, 4)), np.empty((0, 4)), self.model)
+
+    def test_rejects_wrong_cost_width_before_solver_access(self):
+        with pytest.raises(ValueError, match="num_cost"):
+            SPOError(np.ones((2, 3)), np.ones((2, 3)), self.model)
+
+    @pytest.mark.parametrize("cost_kind", ["predicted", "true"])
+    @pytest.mark.parametrize("invalid", [np.nan, np.inf, -np.inf])
+    def test_rejects_nonfinite_cost_before_solver_access(self, cost_kind, invalid):
+        pred = np.ones((2, 4))
+        true = np.ones((2, 4))
+        target = pred if cost_kind == "predicted" else true
+        target[0, 0] = invalid
+        with pytest.raises(ValueError, match="finite"):
+            SPOError(pred, true, self.model)
+
+    def test_rejects_nonnumeric_cost_before_solver_access(self):
+        with pytest.raises(ValueError, match="numerical"):
+            SPOError([["bad"] * 4], [["bad"] * 4], self.model)
 
 
 class TestUnambRegretValidation:
@@ -261,11 +311,6 @@ class TestSPOError:
         true_c = rng.rand(10, m.num_cost) + 1.0
         pred_c = rng.rand(10, m.num_cost) + 1.0
         assert SPOError(pred_c, true_c, m) >= -1e-6
-
-    def test_shape_mismatch(self):
-        m = self._sp()
-        with pytest.raises(ValueError):
-            SPOError(np.ones((5, 12)), np.ones((5, 10)), m)
 
 
 @requires_gurobi
