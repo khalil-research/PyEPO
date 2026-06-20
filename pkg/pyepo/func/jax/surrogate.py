@@ -10,7 +10,7 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost, _solve_or_cache
 from pyepo.utils import _EPS
@@ -64,7 +64,7 @@ def _spoplus_value_and_grad(pred_cost, true_cost, true_sol, true_obj, module):
     z = jnp.squeeze(true_obj, axis=-1) if true_obj.ndim > 1 else true_obj
     inner = 2.0 * jnp.einsum("bi,bi->b", pred_cost, true_sol)
     # loss and subgradient
-    if module.optmodel.modelSense == EPO.MINIMIZE:
+    if is_minimize(module.optmodel.modelSense):
         loss = -obj + inner - z
         grad = 2.0 * (true_sol - sol)
     else:
@@ -137,7 +137,7 @@ class perturbationGradient(optModule):
         pred_cost = _full_cost(pred_cost, self.optmodel)
         # the label direction carries no gradient
         true_cost = jax.lax.stop_gradient(_full_cost(true_cost, self.optmodel))
-        sign = 1.0 if self.optmodel.modelSense == EPO.MINIMIZE else -1.0
+        sign = 1.0 if is_minimize(self.optmodel.modelSense) else -1.0
         # stop the gradient into the solver
         cp = jax.lax.stop_gradient(pred_cost)
         b = cp.shape[0]

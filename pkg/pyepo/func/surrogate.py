@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, cast
 import torch
 from torch.autograd import Function
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
 from pyepo.utils import _EPS
@@ -116,7 +116,7 @@ class SPOPlusFunc(Function):
         # solve
         sol, obj = _solve_or_cache(2 * cp - c, module)
         # calculate loss
-        if module.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(module.optmodel.modelSense):
             loss = -obj + 2 * torch.einsum("bi,bi->b", cp, w) - z.squeeze(dim=-1)
         else:
             loss = obj - 2 * torch.einsum("bi,bi->b", cp, w) + z.squeeze(dim=-1)
@@ -133,7 +133,7 @@ class SPOPlusFunc(Function):
         """
         w, wq = ctx.saved_tensors
         optmodel = ctx.optmodel
-        if optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(optmodel.modelSense):
             grad = 2 * (w - wq)
         else:
             grad = 2 * (wq - w)
@@ -201,10 +201,7 @@ class perturbationGradient(optModule):
         cp = pred_cost.detach()
         c = true_cost.detach()
         # sense-flipped loss sign: MAX problems become minimization
-        if self.optmodel.modelSense == EPO.MINIMIZE:
-            sign = 1.0
-        else:
-            sign = -1.0
+        sign = 1.0 if is_minimize(self.optmodel.modelSense) else -1.0
         b = cp.shape[0]
         # central differencing
         if self.two_sides:

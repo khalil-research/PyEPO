@@ -11,7 +11,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize
 from pyepo.func.abcmodule import optModule
 
 if TYPE_CHECKING:
@@ -67,7 +67,7 @@ class listwiseLearningToRank(optModule):
         objpool_c = true_cost @ solpool.T  # true cost
         objpool_cp = pred_cost @ solpool.T  # pred cost
         # cross entropy loss, summed over the pool per instance
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             loss = -(
                 F.log_softmax(-objpool_cp, dim=1) * F.softmax(-objpool_c, dim=1).clamp(min=1e-8)
             ).sum(dim=1)
@@ -127,14 +127,14 @@ class pairwiseLearningToRank(optModule):
         objpool_c = true_cost @ solpool.T  # true cost
         objpool_cp = pred_cost @ solpool.T  # pred cost
         # best solutions for each instance
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             best_inds = torch.argmin(objpool_c, dim=1)
         else:
             best_inds = torch.argmax(objpool_c, dim=1)
         objpool_cp_best = objpool_cp.gather(1, best_inds.unsqueeze(1))
         # best-vs-rest diff
         solpool_size = objpool_cp.shape[1]
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             diff = objpool_cp_best - objpool_cp
         else:
             diff = objpool_cp - objpool_cp_best

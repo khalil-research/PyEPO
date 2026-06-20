@@ -12,8 +12,12 @@ import jax.numpy as jnp
 import numpy as np
 from jax import lax
 
-from pyepo import EPO
-from pyepo.func._common import validate_nonnegative, validate_positive, validate_positive_int
+from pyepo.func._common import (
+    is_minimize,
+    validate_nonnegative,
+    validate_positive,
+    validate_positive_int,
+)
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import (
     _cache_in_pass,
@@ -25,7 +29,7 @@ from pyepo.func.jax.utils import (
 
 
 def _sense_sign(optmodel):
-    return -1.0 if optmodel.modelSense == EPO.MINIMIZE else 1.0
+    return -1.0 if is_minimize(optmodel.modelSense) else 1.0
 
 
 def _fw_free_slot(w):
@@ -295,7 +299,7 @@ def _regularized_frank_wolfe_fy(pred_cost, true_sol, module, use_cache):
 
 def _regularized_frank_wolfe_fy_value_and_grad(pred_cost, true_sol, module, use_cache):
     # stop the gradient into the solver; the loss gradient is the Danskin residual
-    if module.optmodel.modelSense == EPO.MINIMIZE:
+    if is_minimize(module.optmodel.modelSense):
         theta = jax.lax.stop_gradient(-pred_cost / module.lambd)
         r_sol, vertices, weights = _away_step_frank_wolfe(theta, module, use_cache)
         diff = true_sol - r_sol

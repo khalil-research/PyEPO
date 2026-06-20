@@ -10,8 +10,12 @@ from typing import TYPE_CHECKING, cast
 import torch
 from torch.autograd import Function
 
-from pyepo import EPO
-from pyepo.func._common import validate_nonnegative, validate_positive, validate_positive_int
+from pyepo.func._common import (
+    is_minimize,
+    validate_nonnegative,
+    validate_positive,
+    validate_positive_int,
+)
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
 
@@ -50,10 +54,7 @@ def _away_step_frank_wolfe(
     batch, num_vars = theta.shape
     device, dtype = theta.device, theta.dtype
     # sense sign: flip so optmodel.solve runs as argmax
-    if module.optmodel.modelSense == EPO.MINIMIZE:
-        sense_sign = -1.0
-    else:
-        sense_sign = 1.0
+    sense_sign = -1.0 if is_minimize(module.optmodel.modelSense) else 1.0
     # bounded active-set buffer (support <= num_vars + 1 by Caratheodory)
     width = 2 * num_vars + 2
     vertices = torch.zeros((batch, width, num_vars), device=device, dtype=dtype)
@@ -231,10 +232,7 @@ class regularizedFrankWolfeOptFunc(Function):
         # convert tensor
         cp = pred_cost.detach()
         # rescale by sense and lambd
-        if module.optmodel.modelSense == EPO.MINIMIZE:
-            sign = -1.0
-        else:
-            sign = 1.0
+        sign = -1.0 if is_minimize(module.optmodel.modelSense) else 1.0
         scale = sign / module.lambd
         theta = scale * cp
         # batched Frank-Wolfe
@@ -376,7 +374,7 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
         cp = pred_cost.detach()
         w = true_sol.detach()
         # batched Frank-Wolfe
-        if module.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(module.optmodel.modelSense):
             r_sol = module._frankWolfe(-cp / module.lambd)
             diff = w - r_sol
         else:

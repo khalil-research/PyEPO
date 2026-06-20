@@ -10,8 +10,7 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
-from pyepo import EPO
-from pyepo.func._common import validate_positive, validate_positive_int
+from pyepo.func._common import is_minimize, validate_positive, validate_positive_int
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import (
     _check_jit_key,
@@ -231,7 +230,7 @@ def _perturbed_fenchel_young_value_and_grad(
     # fenchel-young value and residual gradient
     f_theta = jnp.einsum("bnd,bnd->bn", ptb_c, ptb_sols).mean(axis=1)
     target_obj = jnp.einsum("bd,bd->b", pred_cost, true_sol)
-    if module.optmodel.modelSense == EPO.MINIMIZE:
+    if is_minimize(module.optmodel.modelSense):
         loss = -(f_theta - target_obj)
         diff = true_sol - e_sol
     else:
@@ -374,10 +373,7 @@ def _implicit_mle_bwd(module, sigma, lambd, two_sides, res, g):
         grad = (both[:, :n] - both[:, n:]).mean(axis=1) / (2 * lambd + _EPS)
     else:
         # the informative perturbation direction flips for MAX
-        if module.optmodel.modelSense == EPO.MINIMIZE:
-            sign = 1.0
-        else:
-            sign = -1.0
+        sign = 1.0 if is_minimize(module.optmodel.modelSense) else -1.0
         ptb_sols_shift = _solve_or_cache_3d(ptb_c + sign * delta, module)
         grad = sign * (ptb_sols_shift - ptb_sols).mean(axis=1) / (lambd + _EPS)
     return (grad, jnp.zeros_like(noises))
@@ -489,10 +485,7 @@ def _adaptive_implicit_mle_bwd(module, res, g):
         grad = (both[:, :n] - both[:, n:]).mean(axis=1) / (2 * lambd + _EPS)
     else:
         # the informative perturbation direction flips for MAX
-        if module.optmodel.modelSense == EPO.MINIMIZE:
-            sign = 1.0
-        else:
-            sign = -1.0
+        sign = 1.0 if is_minimize(module.optmodel.modelSense) else -1.0
         ptb_sols_shift = _solve_or_cache_3d(ptb_c + sign * delta, module)
         grad = sign * (ptb_sols_shift - ptb_sols).mean(axis=1) / (lambd + _EPS)
     # online alpha update

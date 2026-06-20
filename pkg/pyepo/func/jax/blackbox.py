@@ -9,8 +9,7 @@ from functools import partial
 
 import jax
 
-from pyepo import EPO
-from pyepo.func._common import validate_positive
+from pyepo.func._common import is_minimize, validate_positive
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost, _solve_or_cache
 from pyepo.utils import _EPS
@@ -65,10 +64,7 @@ def _blackbox_opt_fwd(pred_cost, module, lambd):
 def _blackbox_opt_bwd(module, lambd, res, g):
     pred_cost, wp = res
     # the informative perturbation direction flips for MAX
-    if module.optmodel.modelSense == EPO.MINIMIZE:
-        sign = 1.0
-    else:
-        sign = -1.0
+    sign = 1.0 if is_minimize(module.optmodel.modelSense) else -1.0
     # perturbed solve in the backward pass
     sol, _ = _solve_or_cache(pred_cost + sign * lambd * g, module)
     # interpolation gradient
@@ -123,7 +119,7 @@ def _negative_identity_fwd(pred_cost, module):
 
 def _negative_identity_bwd(module, _res, g):
     # negative identity gradient
-    if module.optmodel.modelSense == EPO.MINIMIZE:
+    if is_minimize(module.optmodel.modelSense):
         return (-g,)
     return (g,)
 

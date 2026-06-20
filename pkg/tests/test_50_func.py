@@ -500,6 +500,23 @@ class TestConstructorGuards:
                 **{name: value},
             )
 
+    def test_rejects_model_sense_mutated_after_construction(self, func_frontend):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        model = shortestPathModel(grid=(3, 3))
+        module = func_frontend.NID(model, processes=1)
+        model.modelSense = "invalid"
+
+        with pytest.raises(ValueError, match="Invalid modelSense"):
+            if func_frontend.__name__ == "pyepo.func":
+                pred = torch.ones(1, model.num_cost, requires_grad=True)
+                module(pred).sum().backward()
+            else:
+                import jax
+                import jax.numpy as jnp
+
+                jax.grad(lambda pred: jnp.sum(module(pred)))(jnp.ones((1, model.num_cost)))
+
 
 # ============================================================
 # torch: MAXIMIZE sense and solve-ratio caching

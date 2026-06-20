@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import jax.numpy as jnp
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost
 
@@ -45,7 +45,7 @@ class noiseContrastiveEstimation(optModule):
         obj_cp = jnp.einsum("bd,bd->b", pred_cost, true_sol)[:, None]
         objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, solpool)
         # margin loss
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             loss = (obj_cp - objpool_cp).mean(axis=1)
         else:
             loss = (objpool_cp - obj_cp).mean(axis=1)
@@ -85,7 +85,7 @@ class contrastiveMAP(optModule):
         obj_cp = jnp.einsum("bd,bd->b", pred_cost, true_sol)[:, None]
         objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, solpool)
         # max-margin loss
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             loss = (obj_cp - objpool_cp).max(axis=1)
         else:
             loss = (objpool_cp - obj_cp).max(axis=1)

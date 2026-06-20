@@ -8,7 +8,7 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost
 
@@ -49,7 +49,7 @@ class listwiseLearningToRank(optModule):
         objpool_c = true_cost @ solpool.T
         objpool_cp = pred_cost @ solpool.T
         # cross entropy loss, summed over the pool per instance
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             loss = -(
                 jax.nn.log_softmax(-objpool_cp, axis=1)
                 * jnp.clip(jax.nn.softmax(-objpool_c, axis=1), 1e-8, None)
@@ -97,13 +97,13 @@ class pairwiseLearningToRank(optModule):
         objpool_c = true_cost @ solpool.T
         objpool_cp = pred_cost @ solpool.T
         # best solution per instance
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             best_inds = jnp.argmin(objpool_c, axis=1)
         else:
             best_inds = jnp.argmax(objpool_c, axis=1)
         objpool_cp_best = jnp.take_along_axis(objpool_cp, best_inds[:, None], axis=1)
         # best-vs-rest diff
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             diff = objpool_cp_best - objpool_cp
         else:
             diff = objpool_cp - objpool_cp_best

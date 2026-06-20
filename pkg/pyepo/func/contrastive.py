@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 import torch
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize
 from pyepo.func.abcmodule import optModule
 
 if TYPE_CHECKING:
@@ -68,7 +68,7 @@ class noiseContrastiveEstimation(optModule):
         # get obj for solpool
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
         # get loss
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             loss = (obj_cp - objpool_cp).mean(dim=1)
         else:
             loss = (objpool_cp - obj_cp).mean(dim=1)
@@ -122,7 +122,7 @@ class contrastiveMAP(optModule):
         # get obj for solpool
         objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
         # get loss
-        if self.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(self.optmodel.modelSense):
             loss, _ = (obj_cp - objpool_cp).max(dim=1)
         else:
             loss, _ = (objpool_cp - obj_cp).max(dim=1)

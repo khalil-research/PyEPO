@@ -9,8 +9,7 @@ from typing import TYPE_CHECKING, cast
 
 from torch.autograd import Function
 
-from pyepo import EPO
-from pyepo.func._common import validate_positive
+from pyepo.func._common import is_minimize, validate_positive
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
 from pyepo.utils import _EPS
@@ -116,10 +115,7 @@ class blackboxOptFunc(Function):
         wp = pred_sol.detach()
         dl = grad_output.detach()
         # the informative perturbation direction flips for MAX
-        if module.optmodel.modelSense == EPO.MINIMIZE:
-            sign = 1.0
-        else:
-            sign = -1.0
+        sign = 1.0 if is_minimize(module.optmodel.modelSense) else -1.0
         # perturbed costs
         cq = cp + sign * lambd * dl
         # solve
@@ -209,7 +205,7 @@ class negativeIdentityFunc(Function):
         """
         optmodel = ctx.optmodel
         # negative identity gradient
-        if optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(optmodel.modelSense):
             return -grad_output, None
         return grad_output, None
 

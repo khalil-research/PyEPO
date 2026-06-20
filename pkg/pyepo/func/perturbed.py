@@ -11,7 +11,6 @@ import numpy as np
 import torch
 from torch.autograd import Function
 
-from pyepo import EPO
 from pyepo.func._common import (
     is_minimize,
     require_solution_pool,
@@ -320,7 +319,7 @@ class perturbedFenchelYoungFunc(Function):
         ptb_sols = _solve_or_cache_3d(ptb_c, module)
         # solution expectation term in the Fenchel-Young gradient
         e_sol = module._calculate_expected_solution(cp, ptb_c, ptb_sols, noises)
-        if module.optmodel.modelSense == EPO.MINIMIZE:
+        if is_minimize(module.optmodel.modelSense):
             sign, diff = -1.0, w - e_sol
         else:
             sign, diff = 1.0, e_sol - w
@@ -509,10 +508,7 @@ class implicitMLEFunc(Function):
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * module.lambd + _EPS)
         else:
             # the informative perturbation direction flips for MAX
-            if module.optmodel.modelSense == EPO.MINIMIZE:
-                sign = 1.0
-            else:
-                sign = -1.0
+            sign = 1.0 if is_minimize(module.optmodel.modelSense) else -1.0
             ptb_sols_shift = _solve_or_cache_3d(ptb_c + sign * delta, module)
             grad = sign * (ptb_sols_shift - ptb_sols).mean(dim=1) / (module.lambd + _EPS)
         return grad, None
@@ -616,10 +612,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
             grad = (ptb_sols_pos - ptb_sols_neg).mean(dim=1) / (2 * lambd + _EPS)
         else:
             # the informative perturbation direction flips for MAX
-            if module.optmodel.modelSense == EPO.MINIMIZE:
-                sign = 1.0
-            else:
-                sign = -1.0
+            sign = 1.0 if is_minimize(module.optmodel.modelSense) else -1.0
             ptb_sols_shift = _solve_or_cache_3d(ptb_c + sign * delta, module)
             grad = sign * (ptb_sols_shift - ptb_sols).mean(dim=1) / (lambd + _EPS)
         # moving average of the gradient norm
