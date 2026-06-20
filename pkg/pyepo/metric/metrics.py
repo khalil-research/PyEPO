@@ -9,38 +9,11 @@ from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
-from pyepo.metric._common import is_real_numeric_array, normalize_regret
+from pyepo.metric._common import normalize_regret, validate_numpy_cost_batches
 from pyepo.metric.regret import _checkLinearObj, calRegret
 
 if TYPE_CHECKING:
     from pyepo.model.opt import ModelSpec, optModel
-
-
-def _validate_cost_batches(
-    pred_cost: np.ndarray,
-    true_cost: np.ndarray,
-    num_cost: int,
-) -> tuple[np.ndarray, np.ndarray]:
-    """Return finite, matching two-dimensional cost batches."""
-    try:
-        pred = np.asarray(pred_cost)
-        true = np.asarray(true_cost)
-    except (TypeError, ValueError) as exc:
-        raise ValueError("Predicted and true costs must be numerical arrays.") from exc
-
-    if pred.shape != true.shape:
-        raise ValueError("Shape of true and predicted value does not match.")
-    if pred.ndim != 2:
-        raise ValueError("Predicted and true costs must be two-dimensional batches.")
-    if pred.shape[0] == 0:
-        raise ValueError("Predicted and true cost batches must not be empty.")
-    if pred.shape[1] != num_cost:
-        raise ValueError(f"Cost batch width must match optmodel.num_cost ({num_cost}).")
-    if not is_real_numeric_array(pred) or not is_real_numeric_array(true):
-        raise ValueError("Predicted and true costs must be numerical arrays.")
-    if not np.isfinite(pred).all() or not np.isfinite(true).all():
-        raise ValueError("Predicted and true costs must contain only finite values.")
-    return pred, true
 
 
 def SPOError(
@@ -63,7 +36,7 @@ def SPOError(
     Returns:
         float: normalized regret
     """
-    pred_cost, true_cost = _validate_cost_batches(pred_cost, true_cost, optmodel.num_cost)
+    pred_cost, true_cost = validate_numpy_cost_batches(pred_cost, true_cost, optmodel.num_cost)
     _checkLinearObj(optmodel)
     # init sum
     regret_sum = 0.0
@@ -73,7 +46,7 @@ def SPOError(
         optmodel._setFullObj(optmodel._fullCost(c))
         _, optobj = optmodel.solve()
         # per-instance regret
-        regret_sum += calRegret(optmodel, cp, c, optobj)  # type: ignore[arg-type]
+        regret_sum += calRegret(optmodel, cp, c, float(optobj))
         optobj_sum += np.abs(optobj)
     # normalized regret
     return normalize_regret(regret_sum, optobj_sum)

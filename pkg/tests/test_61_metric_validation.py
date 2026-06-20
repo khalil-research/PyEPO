@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 
 from pyepo import EPO
-from pyepo.metric._common import normalize_regret
-from pyepo.metric.metrics import SPOError, _validate_cost_batches
+from pyepo.metric._common import normalize_regret, validate_numpy_cost_batches
+from pyepo.metric.metrics import SPOError
 from pyepo.metric.regret import _regretFromObj, calRegret
 from pyepo.metric.unambregret import calUnambRegret, unambRegret
 
@@ -45,7 +45,9 @@ class TestSPOErrorValidation:
     def test_validation_preserves_cost_dtype(self):
         pred = np.ones((2, 4), dtype=np.float32)
         true = np.ones((2, 4), dtype=np.float32)
-        validated_pred, validated_true = _validate_cost_batches(pred, true, self.model.num_cost)
+        validated_pred, validated_true = validate_numpy_cost_batches(
+            pred, true, self.model.num_cost
+        )
         assert validated_pred.dtype == np.float32
         assert validated_true.dtype == np.float32
 

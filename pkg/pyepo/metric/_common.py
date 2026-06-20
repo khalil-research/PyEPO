@@ -64,12 +64,20 @@ def normalize_regret(regret_sum: float, absolute_optimum_sum: float) -> float:
     return float(regret_sum) / (float(absolute_optimum_sum) + _EPS)
 
 
-def validate_prediction_batch(pred_cost, true_cost, num_cost: int | None = None) -> None:
+def validate_prediction_batch(
+    pred_cost,
+    true_cost,
+    num_cost: int | None = None,
+    *,
+    require_nonempty: bool = False,
+) -> None:
     """Validate matching, finite two-dimensional prediction and target batches."""
     if pred_cost.ndim != 2 or true_cost.ndim != 2:
         raise ValueError("Predicted and true costs must be two-dimensional batches.")
     if pred_cost.shape != true_cost.shape:
         raise ValueError("Shape of true and predicted cost batches does not match.")
+    if require_nonempty and pred_cost.shape[0] == 0:
+        raise ValueError("Predicted and true cost batches must not be empty.")
     if num_cost is not None and pred_cost.shape[1] != num_cost:
         raise ValueError(f"Cost batch width must match optmodel.num_cost ({num_cost}).")
 
@@ -90,6 +98,21 @@ def validate_prediction_batch(pred_cost, true_cost, num_cost: int | None = None)
         finite = np.isfinite(pred).all() and np.isfinite(true).all()
     if not finite:
         raise ValueError("Predicted and true costs must contain only finite values.")
+
+
+def validate_numpy_cost_batches(
+    pred_cost,
+    true_cost,
+    num_cost: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Convert and validate NumPy-compatible cost batches."""
+    try:
+        pred = np.asarray(pred_cost)
+        true = np.asarray(true_cost)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Predicted and true costs must be numerical batches.") from exc
+    validate_prediction_batch(pred, true, num_cost, require_nonempty=True)
+    return pred, true
 
 
 def validate_cost_vectors(
