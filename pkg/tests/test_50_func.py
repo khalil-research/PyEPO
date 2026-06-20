@@ -477,6 +477,29 @@ class TestConstructorGuards:
                 tol=-1e-6,
             )
 
+    @pytest.mark.parametrize("max_iter", [0, -1, 1.5, True])
+    def test_cave_rejects_invalid_iteration_cap(self, func_frontend, max_iter):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        with pytest.raises(ValueError, match="max_iter"):
+            func_frontend.CaVE(
+                shortestPathModel(grid=(3, 3)),
+                processes=1,
+                max_iter=max_iter,
+            )
+
+    @pytest.mark.parametrize("name", ["solve_ratio", "inner_ratio"])
+    @pytest.mark.parametrize("value", [-0.1, 1.1])
+    def test_cave_rejects_invalid_ratio(self, func_frontend, name, value):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        with pytest.raises(ValueError, match=name):
+            func_frontend.CaVE(
+                shortestPathModel(grid=(3, 3)),
+                processes=1,
+                **{name: value},
+            )
+
 
 # ============================================================
 # torch: MAXIMIZE sense and solve-ratio caching

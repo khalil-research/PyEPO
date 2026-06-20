@@ -11,7 +11,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from pyepo import EPO
+from pyepo.func._common import is_minimize, validate_positive_int, validate_probability
 from pyepo.func.cave import _HAS_CLARABEL, _project_one
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _concretizable
@@ -42,22 +42,22 @@ class coneAlignedCosine(optModule):
             processes: number of solver processes (1 = single-core, 0 = all cores)
             reduction: reduction applied to the batch loss ("mean", "sum", "none")
         """
-        super().__init__(optmodel, processes, solve_ratio=1.0, reduction=reduction)
+        validate_positive_int(max_iter, "max_iter")
+        validate_probability(solve_ratio, "solve_ratio")
+        validate_probability(inner_ratio, "inner_ratio")
         if not _HAS_CLARABEL:
             raise ImportError(
                 "clarabel is required for the CaVE cone projection. "
                 "Install with `pip install clarabel`."
             )
-        if not 0.0 <= solve_ratio <= 1.0:
-            raise ValueError(f"Invalid solve_ratio {solve_ratio}; must be in [0, 1].")
-        if not 0.0 <= inner_ratio <= 1.0:
-            raise ValueError(f"Invalid inner_ratio {inner_ratio}; must be in [0, 1].")
-        self.max_iter = int(max_iter)
+        # CaVE's ratio gates QP-vs-heuristic, not solution-pool caching.
+        super().__init__(optmodel, processes, solve_ratio=1.0, reduction=reduction)
+        self.max_iter = max_iter
         # ours gates the QP-vs-heuristic branch
         self.solve_ratio = float(solve_ratio)
         self.inner_ratio = float(inner_ratio)
         # sense-aware sign (constant once optmodel is fixed)
-        self._sign = -1.0 if optmodel.modelSense == EPO.MINIMIZE else 1.0
+        self._sign = -1.0 if is_minimize(optmodel.modelSense) else 1.0
 
     def forward(self, pred_cost, tight_ctrs):
         """

@@ -39,6 +39,12 @@ def validate_nonnegative(value, name: str) -> None:
         raise ValueError(f"{name} must be non-negative.")
 
 
+def validate_probability(value, name: str) -> None:
+    """Validate a probability in the closed interval [0, 1]."""
+    if not 0.0 <= value <= 1.0:
+        raise ValueError(f"{name} must be in [0, 1].")
+
+
 def require_solution_pool(solpool: Optional[T]) -> T:
     """Return an initialized solution pool or raise a stable runtime error."""
     if solpool is None:
