@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from pyepo.metric.metrics import SPOError, makeSkScorer
 from pyepo.metric.mse import MSE
 from pyepo.metric.regret import _regretFromObj, calRegret
-from pyepo.metric.unambregret import calUnambRegret
+from pyepo.metric.unambregret import calUnambRegret, unambRegret
 
 from .conftest import (
     _HAS_FLAX,
@@ -114,6 +114,31 @@ class TestRegretFromObj:
     def test_invalid_sense(self):
         with pytest.raises(ValueError):
             _regretFromObj(1.0, 1.0, "bad")
+
+
+class TestUnambRegretValidation:
+    def test_public_metric_rejects_invalid_tolerance_before_model_access(self):
+        with pytest.raises(ValueError, match="tolerance"):
+            unambRegret(None, None, None, tolerance=0.0)
+
+    def test_public_metric_rejects_invalid_retry_count_before_model_access(self):
+        with pytest.raises(ValueError, match="max_iter"):
+            unambRegret(None, None, None, max_iter=True)
+
+    @pytest.mark.parametrize("tolerance", [0.0, -1.0, np.nan, np.inf, True])
+    def test_rejects_invalid_tolerance_before_model_access(self, tolerance):
+        with pytest.raises(ValueError, match="tolerance"):
+            calUnambRegret(None, np.ones(2), np.ones(2), 0.0, tolerance=tolerance)
+
+    @pytest.mark.parametrize("max_iter", [1.5, True])
+    def test_rejects_noninteger_retry_count_before_model_access(self, max_iter):
+        with pytest.raises(ValueError, match="max_iter"):
+            calUnambRegret(None, np.ones(2), np.ones(2), 0.0, max_iter=max_iter)
+
+    @pytest.mark.parametrize("max_iter", [0, -1])
+    def test_exhausted_retry_budget_preserves_runtime_error(self, max_iter):
+        with pytest.raises(RuntimeError, match="Max iterations"):
+            calUnambRegret(None, np.ones(2), np.ones(2), 0.0, max_iter=max_iter)
 
 
 # ============================================================
