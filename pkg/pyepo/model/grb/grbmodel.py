@@ -19,7 +19,7 @@ except ImportError:
     _HAS_GUROBI = False
 
 from pyepo import EPO
-from pyepo.model._common import validate_objective_shape
+from pyepo.model._common import validate_constraint, validate_objective_shape
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
@@ -142,8 +142,7 @@ class optGrbModel(optModel):
         Returns:
             optModel: new model with the added constraint
         """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
+        rhs = validate_constraint(coefs, rhs, self.num_cost)
         coefs = costToNumpy(coefs)
         # copy
         new_model = self.copy()
@@ -155,7 +154,7 @@ class optGrbModel(optModel):
             expr = gp.LinExpr(coefs.tolist(), new_model._vars_list) <= rhs
             new_model._model.addConstr(expr)
         # track for replay on relax
-        new_model._extra_constrs = [*self._extra_constrs, (coefs, float(rhs))]
+        new_model._extra_constrs = [*self._extra_constrs, (coefs, rhs)]
         return new_model
 
 

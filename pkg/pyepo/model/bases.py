@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pyepo import EPO
+from pyepo.model._common import validate_constraint
 from pyepo.model.opt import optModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, _get_grid_arcs, getTspTour
 
@@ -245,8 +246,7 @@ class tspABBase(optModel):
             coefs: per-edge coefficients aligned with ``self.edges``
             rhs: right-hand side
         """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
+        rhs = validate_constraint(coefs, rhs, self.num_cost)
         # normalize to numpy so replay on copy/relax avoids per-element GPU sync
         coefs = np.asarray(coefs)
         new_model = self.copy()
@@ -390,8 +390,7 @@ class vrpABBase(optModel):
             coefs: per-edge coefficients aligned with ``self.edges``
             rhs: right-hand side
         """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
+        rhs = validate_constraint(coefs, rhs, self.num_cost)
         # normalize to numpy so replay on copy avoids per-element solver-var sync
         coefs = np.asarray(coefs)
         new_model = self.copy()

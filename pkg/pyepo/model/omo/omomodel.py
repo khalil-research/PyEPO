@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pyepo import EPO
-from pyepo.model._common import validate_objective_shape
+from pyepo.model._common import validate_constraint, validate_objective_shape
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
@@ -142,13 +142,12 @@ class optOmoModel(optModel):
         Returns:
             optModel: new model with the added constraint
         """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
+        rhs = validate_constraint(coefs, rhs, self.num_cost)
         # copy
         new_model = self.copy()
         # add constraint
         expr = sum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
         new_model._model.cons.add(expr)
         # track for replay on relax
-        new_model._extra_constrs = [*self._extra_constrs, (costToNumpy(coefs), float(rhs))]
+        new_model._extra_constrs = [*self._extra_constrs, (costToNumpy(coefs), rhs)]
         return new_model

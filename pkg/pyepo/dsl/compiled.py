@@ -14,7 +14,7 @@ from __future__ import annotations
 import numpy as np
 import torch
 
-from pyepo.model._common import validate_objective_shape
+from pyepo.model._common import validate_constraint, validate_objective_shape
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
@@ -91,10 +91,11 @@ class compiledBase(optModel):
 
     def addConstr(self, coefs, rhs):
         # add a cut coefs @ x <= rhs over the full variable vector
+        rhs = validate_constraint(coefs, rhs, self.problem.num_vars, full=True)
         coefs = np.asarray(coefs, dtype=float).reshape(-1)
         new_model = self._add_cut(coefs, rhs)
         # track for replay on relax
-        new_model._extra_constrs = [*self._extra_constrs, (coefs, float(rhs))]
+        new_model._extra_constrs = [*self._extra_constrs, (coefs, rhs)]
         return new_model
 
     def relax(self):

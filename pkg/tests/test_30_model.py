@@ -16,7 +16,7 @@ import pytest
 
 from pyepo import EPO
 from pyepo.model import predefined
-from pyepo.model._common import validate_objective_shape
+from pyepo.model._common import validate_constraint, validate_objective_shape
 from pyepo.model.opt import optModel
 
 from .conftest import (
@@ -83,6 +83,29 @@ class TestOptModelBase:
     def test_objective_shape_rejects_wrong_batch_width(self):
         with pytest.raises(ValueError, match="cost variables"):
             validate_objective_shape(np.ones((3, 5)), 4, allow_batch=True)
+
+    @pytest.mark.parametrize(
+        ("coefs", "match"),
+        [
+            (np.ones((4, 1)), "one-dimensional"),
+            (np.ones(3), "cost variables"),
+            ([1.0, 2.0, np.nan, 4.0], "finite"),
+            ([1.0, 2.0, np.inf, 4.0], "finite"),
+            ([1.0, 2.0, 3.0, 4.0j], "real"),
+            ([True, False, True, False], "real"),
+        ],
+    )
+    def test_constraint_validation_rejects_invalid_coefficients(self, coefs, match):
+        with pytest.raises(ValueError, match=match):
+            validate_constraint(coefs, 1.0, 4)
+
+    @pytest.mark.parametrize("rhs", [np.nan, np.inf, -np.inf, True, "bad", [1.0]])
+    def test_constraint_validation_rejects_invalid_rhs(self, rhs):
+        with pytest.raises(ValueError, match="rhs"):
+            validate_constraint(np.ones(4), rhs, 4)
+
+    def test_constraint_validation_returns_float_rhs(self):
+        assert validate_constraint(np.ones(4), np.float32(2.0), 4) == 2.0
 
 
 # ============================================================
@@ -201,6 +224,19 @@ class TestKnapsack:
         m2.setObj(_KNAP_COST)
         _, obj2 = m2.solve()
         assert obj2 <= obj1 + max(meta["tol"], 1e-6)
+
+    @pytest.mark.parametrize(
+        ("coefs", "rhs", "match"),
+        [
+            (np.ones((4, 1)), 1.0, "one-dimensional"),
+            (np.ones(4), np.nan, "rhs"),
+            (np.array([1.0, 1.0, np.inf, 1.0]), 1.0, "finite"),
+        ],
+    )
+    def test_addConstr_rejects_invalid_input(self, backend, coefs, rhs, match):
+        m, _ = _make_knapsack(backend)
+        with pytest.raises(ValueError, match=match):
+            m.addConstr(coefs, rhs)
 
     def test_relax(self, backend):
         m, meta = _make_knapsack(backend)

@@ -18,7 +18,7 @@ except ImportError:
     _HAS_ORTOOLS = False
 
 from pyepo import EPO
-from pyepo.model._common import validate_objective_shape
+from pyepo.model._common import validate_constraint, validate_objective_shape
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
@@ -130,8 +130,7 @@ class optOrtCpModel(optModel):
         Returns:
             optModel: new model with the added constraint
         """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
+        rhs = validate_constraint(coefs, rhs, self.num_cost)
         # scale to int
         scale = self._OBJ_SCALE
         scaled_coefs = [round(float(c) * scale) for c in coefs]

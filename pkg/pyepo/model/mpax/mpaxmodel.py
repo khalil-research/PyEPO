@@ -24,7 +24,7 @@ except ImportError:
     _HAS_MPAX = False
 
 from pyepo import EPO
-from pyepo.model._common import validate_objective_shape
+from pyepo.model._common import validate_constraint, validate_objective_shape
 from pyepo.model.opt import optModel
 
 if TYPE_CHECKING:
@@ -301,11 +301,10 @@ class optMpaxModel(optModel):
         Returns:
             optModel: new model with the added constraint
         """
-        if len(coefs) != self.num_cost:
-            raise ValueError("Size of coef vector does not match number of cost variables.")
+        rhs = validate_constraint(coefs, rhs, self.num_cost)
         # flip sign: PyEPO convention is `coefs · x <= rhs`, MPAX stores `G x >= h`
         coefs = -jnp.array(coefs, dtype=jnp.float32).reshape(1, -1)
-        rhs = -float(rhs)
+        rhs = -rhs
         # copy
         new_model = self.copy()
         # add constraint
