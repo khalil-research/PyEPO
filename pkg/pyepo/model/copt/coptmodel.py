@@ -28,12 +28,25 @@ from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+    from typing import TypeVar
+
     import torch
     from typing_extensions import Self
+
+    _T = TypeVar("_T")
 
 
 def _is_mvar(x) -> bool:
     return _CoptMVar is not None and isinstance(x, _CoptMVar)
+
+
+def _read_solution(model, reader: Callable[[], _T]) -> tuple[_T, float]:
+    """Read a COPT solution through one stable no-solution error boundary."""
+    try:
+        return reader(), model.objVal
+    except Exception as e:  # coptpy raises generic errors on no-solution
+        raise RuntimeError(f"COPT found no solution (status {model.status}).") from e
 
 
 _envr = None
@@ -104,17 +117,14 @@ class optCoptModel(optModel):
             tuple: optimal solution and objective value
         """
         self._model.solve()
-        # surface failed solves clearly instead of a raw attribute error
-        try:
+
+        def read():
             if _is_mvar(self.x):
                 # MVar.x is a coptpy NdArray; tolist() flattens it to plain floats
-                sol = np.asarray(self.x.x.tolist())
-            else:
-                sol = np.asarray(self._model.getInfo("Value", self._vars_list))
-            obj = self._model.objVal
-        except Exception as e:  # coptpy raises generic errors on no-solution
-            raise RuntimeError(f"COPT found no solution (status {self._model.status}).") from e
-        return sol, obj
+                return np.asarray(self.x.x.tolist())
+            return np.asarray(self._model.getInfo("Value", self._vars_list))
+
+        return _read_solution(self._model, read)
 
     def copy(self) -> Self:
         """

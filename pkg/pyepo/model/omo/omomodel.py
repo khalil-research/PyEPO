@@ -28,6 +28,18 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
+def _require_solution(result) -> None:
+    """Raise a stable error when Pyomo reports no usable solution."""
+    cond = result.solver.termination_condition
+    if cond in (
+        po.TerminationCondition.infeasible,
+        po.TerminationCondition.unbounded,
+        po.TerminationCondition.infeasibleOrUnbounded,
+        po.TerminationCondition.error,
+    ):
+        raise RuntimeError(f"Pyomo found no solution (termination {cond}).")
+
+
 class optOmoModel(optModel):
     """
     Abstract base class for Pyomo-backed optimization models.
@@ -102,15 +114,7 @@ class optOmoModel(optModel):
             tuple: optimal solution (np.ndarray) and objective value (float)
         """
         res = self._solverfac.solve(self._model)
-        # surface failed solves clearly instead of an uninitialized-value error
-        cond = res.solver.termination_condition
-        if cond in (
-            po.TerminationCondition.infeasible,
-            po.TerminationCondition.unbounded,
-            po.TerminationCondition.infeasibleOrUnbounded,
-            po.TerminationCondition.error,
-        ):
-            raise RuntimeError(f"Pyomo found no solution (termination {cond}).")
+        _require_solution(res)
         sol = np.fromiter(
             (pe.value(self.x[k]) for k in self.x),
             dtype=np.float32,

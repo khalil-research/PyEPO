@@ -591,7 +591,7 @@ class TestTSP:
         m, _ = _make_tsp(backend, formulation)
         m2 = m.addConstr(np.ones(m.num_cost), 3)
         m2.setObj(np.random.RandomState(42).rand(m.num_cost))
-        with pytest.raises(Exception):
+        with pytest.raises(RuntimeError, match="found no solution"):
             m2.solve()
 
     def test_relax(self, backend, formulation):
@@ -732,6 +732,13 @@ class TestVRP:
         m2.setObj(_VRP_COST)
         _, obj2 = m2.solve()
         assert obj2 >= obj1 - 1e-6
+
+    def test_addConstr_infeasible(self, backend, formulation):
+        m, _ = _make_vrp(backend, formulation)
+        m2 = m.addConstr(np.ones(m.num_cost), 0)
+        m2.setObj(_VRP_COST)
+        with pytest.raises(RuntimeError, match="found no solution"):
+            m2.solve()
 
     def test_getTour_depot_anchored(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)

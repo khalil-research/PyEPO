@@ -17,7 +17,7 @@ except ImportError:
 
 from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import tspABBase
-from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
+from pyepo.model.copt.coptmodel import _get_envr, _read_solution, optCoptModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
 from pyepo.utils import costToNumpy
 
@@ -48,9 +48,12 @@ class tspABModel(tspABBase, optCoptModel):
         A method to solve model
         """
         self._model.solve()
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
+        xvals, obj = _read_solution(
+            self._model,
+            lambda: np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2),
+        )
         sol = np.asarray((xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8))
-        return sol, self._model.objVal
+        return sol, obj
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to ``self._model`` using paired (x[i,j] + x[j,i])."""
@@ -154,9 +157,12 @@ class tspGGModelRel(tspGGModel):
         A method to solve model — returns fractional solution.
         """
         self._model.solve()
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
+        xvals, obj = _read_solution(
+            self._model,
+            lambda: np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2),
+        )
         sol = xvals.sum(axis=1)
-        return sol, self._model.objVal
+        return sol, obj
 
     def relax(self) -> NoReturn:
         """
@@ -247,9 +253,12 @@ class tspDFJModel(tspABModel):
         cb = self._SubtourCallback(self.x, len(self.nodes), self.edges)
         self._model.setCallback(cb, COPT.CBCONTEXT_MIPSOL)
         self._model.solve()
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars))
+        xvals, obj = _read_solution(
+            self._model,
+            lambda: np.asarray(self._model.getInfo("Value", self._cost_vars)),
+        )
         sol = (xvals > _EDGE_ACTIVE_TOL).astype(np.uint8)
-        return sol, self._model.objVal
+        return sol, obj
 
     def _addExtraConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> None:
         """Add a single linear constraint to ``self._model`` using the DFJ variable scheme."""
@@ -340,9 +349,12 @@ class tspMTZModelRel(tspMTZModel):
         A method to solve model — returns fractional solution.
         """
         self._model.solve()
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
+        xvals, obj = _read_solution(
+            self._model,
+            lambda: np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2),
+        )
         sol = xvals.sum(axis=1)
-        return sol, self._model.objVal
+        return sol, obj
 
     def relax(self) -> NoReturn:
         """

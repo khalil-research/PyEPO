@@ -18,7 +18,7 @@ except ImportError:
 
 from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import tspABBase
-from pyepo.model.grb.grbmodel import _promote_lazy_cuts, optGrbModel
+from pyepo.model.grb.grbmodel import _promote_lazy_cuts, _require_solution, optGrbModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
 from pyepo.utils import costToNumpy
 
@@ -49,6 +49,7 @@ class tspABModel(tspABBase, optGrbModel):
         A method to solve model
         """
         self._model.optimize()
+        _require_solution(self._model)
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
         sol = np.asarray((xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8))
         return sol, self._model.objVal
@@ -139,6 +140,7 @@ class tspGGModelRel(tspGGModel):
         A method to solve model — returns fractional solution.
         """
         self._model.optimize()
+        _require_solution(self._model)
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
         sol = xvals.sum(axis=1)
         return sol, self._model.objVal
@@ -254,6 +256,7 @@ class tspDFJModel(tspABModel):
         # the cut buffer tracks the current solve only
         self._model._lazy_constrs = []
         self._model.optimize(self._subtourelim)
+        _require_solution(self._model)
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars))
         sol = (xvals > _EDGE_ACTIVE_TOL).astype(np.uint8)
         return sol, self._model.objVal
@@ -346,6 +349,7 @@ class tspMTZModelRel(tspMTZModel):
         A method to solve model — returns fractional solution.
         """
         self._model.optimize()
+        _require_solution(self._model)
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
         sol = xvals.sum(axis=1)
         return sol, self._model.objVal

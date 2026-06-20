@@ -28,6 +28,12 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
+def _require_solution(model) -> None:
+    """Raise a stable error when Gurobi did not produce a usable solution."""
+    if model.SolCount == 0:
+        raise RuntimeError(f"Gurobi found no solution (status {model.Status}).")
+
+
 class optGrbModel(optModel):
     """
     Abstract base class for GurobiPy-backed optimization models.
@@ -97,9 +103,7 @@ class optGrbModel(optModel):
         """
         # optimize() flushes pending changes
         self._model.optimize()
-        # surface failed solves clearly instead of a raw attribute error
-        if self._model.SolCount == 0:
-            raise RuntimeError(f"Gurobi found no solution (status {self._model.Status}).")
+        _require_solution(self._model)
         if isinstance(self.x, gp.MVar):
             sol = self.x.x  # type: ignore[attr-defined]
         else:

@@ -17,7 +17,7 @@ except ImportError:
 
 from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import vrpABBase
-from pyepo.model.grb.grbmodel import _promote_lazy_cuts, optGrbModel
+from pyepo.model.grb.grbmodel import _promote_lazy_cuts, _require_solution, optGrbModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, _uf_components, unionFind
 from pyepo.utils import costToNumpy
 
@@ -134,6 +134,7 @@ class vrpRCIModel(vrpABModel):
         self._model._lazy_constrs = []
         # optimize
         self._model.optimize(self._vrpCallback)
+        _require_solution(self._model)
         # threshold to binary selection
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars))
         sol = (xvals > _EDGE_ACTIVE_TOL).astype(np.uint8)
@@ -243,6 +244,7 @@ class vrpMTZModel(vrpABModel):
         """
         # optimize
         self._model.optimize()
+        _require_solution(self._model)
         # collapse directed pair to undirected selection per edge
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
         sol = np.asarray((xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8))
@@ -307,6 +309,7 @@ class vrpMTZModelRel(vrpMTZModel):
         A method to solve the model — returns fractional edge selections
         """
         self._model.optimize()
+        _require_solution(self._model)
         # sum directed pair to per-edge fractional value
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars)).reshape(-1, 2)
         return xvals.sum(axis=1), self._model.objVal

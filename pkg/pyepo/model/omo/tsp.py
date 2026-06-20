@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, NoReturn
 import numpy as np
 
 from pyepo.model.bases import tspABBase
-from pyepo.model.omo.omomodel import optOmoModel
+from pyepo.model.omo.omomodel import _require_solution, optOmoModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL
 
 if TYPE_CHECKING:
@@ -48,7 +48,8 @@ class tspABModel(tspABBase, optOmoModel):
         """
         A method to solve model
         """
-        self._solverfac.solve(self._model)
+        res = self._solverfac.solve(self._model)
+        _require_solution(res)
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):
             if (
@@ -157,7 +158,8 @@ class tspGGModelRel(tspGGModel):
         """
         A method to solve model — returns fractional solution.
         """
-        self._solverfac.solve(self._model)
+        res = self._solverfac.solve(self._model)
+        _require_solution(res)
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):
             sol[k] = float(pe.value(self.x[i, j])) + float(pe.value(self.x[j, i]))
@@ -257,7 +259,8 @@ class tspMTZModelRel(tspMTZModel):
         """
         A method to solve model — returns fractional solution.
         """
-        self._solverfac.solve(self._model)
+        res = self._solverfac.solve(self._model)
+        _require_solution(res)
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):
             sol[k] = float(pe.value(self.x[i, j])) + float(pe.value(self.x[j, i]))

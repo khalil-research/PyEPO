@@ -16,7 +16,7 @@ except ImportError:
 
 from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import vrpABBase
-from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
+from pyepo.model.copt.coptmodel import _get_envr, _read_solution, optCoptModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, _uf_components, unionFind
 from pyepo.utils import costToNumpy
 
@@ -136,9 +136,12 @@ class vrpRCIModel(vrpABModel):
         # optimize
         self._model.solve()
         # threshold to binary selection
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars))
+        xvals, obj = _read_solution(
+            self._model,
+            lambda: np.asarray(self._model.getInfo("Value", self._cost_vars)),
+        )
         sol = (xvals > _EDGE_ACTIVE_TOL).astype(np.uint8)
-        return sol, self._model.objVal
+        return sol, obj
 
 
 class vrpMTZModel(vrpABModel):
@@ -213,9 +216,12 @@ class vrpMTZModel(vrpABModel):
         # optimize
         self._model.solve()
         # collapse directed pair to undirected selection per edge
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
+        xvals, obj = _read_solution(
+            self._model,
+            lambda: np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2),
+        )
         sol = np.asarray((xvals > _EDGE_ACTIVE_TOL).any(axis=1).astype(np.uint8))
-        return sol, self._model.objVal
+        return sol, obj
 
     def relax(self) -> vrpMTZModelRel:
         """A method to get linear relaxation model"""
@@ -273,8 +279,11 @@ class vrpMTZModelRel(vrpMTZModel):
         """
         self._model.solve()
         # sum directed pair to per-edge fractional value
-        xvals = np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2)
-        return xvals.sum(axis=1), self._model.objVal
+        xvals, obj = _read_solution(
+            self._model,
+            lambda: np.asarray(self._model.getInfo("Value", self._cost_vars)).reshape(-1, 2),
+        )
+        return xvals.sum(axis=1), obj
 
     def relax(self) -> NoReturn:
         """A forbidden method to relax MIP model"""
