@@ -206,14 +206,17 @@ class TestKnapsack:
             with pytest.raises(ValueError, match="one-dimensional"):
                 m.setObj(batch)
 
-    def test_copy_isolation(self, backend):
+    def test_copy_preserves_objective_and_is_independent(self, backend):
         m, meta = _make_knapsack(backend)
         m.setObj(_KNAP_COST)
         _, obj1 = m.solve()
         m2 = m.copy()
-        m2.setObj(_KNAP_COST)
         _, obj2 = m2.solve()
         np.testing.assert_allclose(obj1, obj2, atol=meta["tol"])
+
+        m2.setObj(-_KNAP_COST)
+        _, obj1_after = m.solve()
+        np.testing.assert_allclose(obj1_after, obj1, atol=meta["tol"])
 
     def test_addConstr_no_improvement(self, backend):
         # MAXIMIZE: a tighter constraint cannot increase the objective
@@ -221,7 +224,6 @@ class TestKnapsack:
         m.setObj(_KNAP_COST)
         _, obj1 = m.solve()
         m2 = m.addConstr(np.ones(m.num_cost), 1)
-        m2.setObj(_KNAP_COST)
         _, obj2 = m2.solve()
         assert obj2 <= obj1 + max(meta["tol"], 1e-6)
 

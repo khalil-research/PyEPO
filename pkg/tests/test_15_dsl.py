@@ -422,6 +422,24 @@ def test_compiled_model_rebuild_preserves_problem_and_backend_config(backend):
 
 
 @pytest.mark.parametrize("backend", _ALL)
+def test_compiled_copy_preserves_objective(backend):
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 1]).compile(
+        backend=backend, **_kw(backend)
+    )
+    comp.setObj([1.0, 2.0, 3.0])
+
+    _, obj = comp.solve()
+    copied = comp.copy()
+    _, copied_obj = copied.solve()
+
+    assert copied_obj == pytest.approx(obj)
+    copied.setObj([-3.0, -2.0, -1.0])
+    assert comp.solve()[1] == pytest.approx(obj)
+
+
+@pytest.mark.parametrize("backend", _ALL)
 def test_compiled_infeasible_solve_raises_clearly(backend):
     x = dsl.Variable(1, vtype=EPO.BINARY)
     c = dsl.Parameter(1)

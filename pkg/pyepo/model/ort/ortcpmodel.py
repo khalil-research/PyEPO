@@ -54,6 +54,7 @@ class optOrtCpModel(optModel):
                 "OR-Tools is not installed. Please install ortools to use this feature."
             )
         self._extra_constrs = []
+        self._objective_coefs: list[int] | None = None
         super().__init__()
         # cache ordered Var list for batched weighted_sum / per-Var Value() loop
         self._vars_list = list(self.x.values())
@@ -73,8 +74,13 @@ class optOrtCpModel(optModel):
         c = np.asarray(costToNumpy(c), dtype=np.float64)
         # scale float to int (round to match addConstr; truncation biases the objective)
         scaled = np.round(c * self._OBJ_SCALE).astype(np.int64).tolist()
+        self._objective_coefs = scaled
+        self._set_scaled_objective(scaled)
+
+    def _set_scaled_objective(self, coefs: list[int]) -> None:
+        """Set an already-scaled integer objective on the current CP-SAT model."""
         # C-level weighted sum avoids Python expression building per var
-        obj_expr = cp_model.LinearExpr.weighted_sum(self._vars_list, scaled)
+        obj_expr = cp_model.LinearExpr.weighted_sum(self._vars_list, coefs)
         if self.modelSense == EPO.MAXIMIZE:
             self._model.Maximize(obj_expr)
         else:
@@ -110,9 +116,14 @@ class optOrtCpModel(optModel):
         """
         new_model = copy(self)
         new_model._extra_constrs = list(self._extra_constrs)
+        new_model._objective_coefs = (
+            None if self._objective_coefs is None else list(self._objective_coefs)
+        )
         # rebuild model from scratch
         new_model._model, new_model.x = new_model._getModel()
         new_model._vars_list = list(new_model.x.values())
+        if new_model._objective_coefs is not None:
+            new_model._set_scaled_objective(new_model._objective_coefs)
         # replay extra constraints
         for coefs, rhs in new_model._extra_constrs:
             lhs = cp_model.LinearExpr.weighted_sum(new_model._vars_list, [int(c) for c in coefs])

@@ -121,6 +121,8 @@ class optOrtModel(optModel):
         Returns:
             optModel: new copied model
         """
+        obj = self._model.Objective()
+        objective_coefs = [obj.GetCoefficient(v) for v in self._vars_list]
         new_model = copy(self)
         new_model._extra_constrs = list(self._extra_constrs)
         # rebuild model from scratch
@@ -128,6 +130,9 @@ class optOrtModel(optModel):
         new_model._model.SuppressOutput()
         new_model._set_obj_sense()
         new_model._vars_list = list(new_model.x.values())
+        new_obj = new_model._model.Objective()
+        for v, coef in zip(new_model._vars_list, objective_coefs):
+            new_obj.SetCoefficient(v, coef)
         # replay extra constraints
         for coefs, rhs in new_model._extra_constrs:
             ct = new_model._model.Constraint(-new_model._model.infinity(), float(rhs))
