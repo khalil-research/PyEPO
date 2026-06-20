@@ -1,5 +1,7 @@
 """Shared helpers for optimization model backends."""
 
+from __future__ import annotations
+
 import math
 from numbers import Real
 

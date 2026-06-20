@@ -51,7 +51,7 @@ _EXPORTS = {
     "ptLTR": "rank",
 }
 
-__all__ = list(_EXPORTS)
+__all__ = list(_EXPORTS)  # pyright: ignore[reportUnsupportedDunderAll]
 
 
 def __getattr__(name):
