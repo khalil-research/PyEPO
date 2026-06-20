@@ -13,13 +13,14 @@ import torch
 
 from pyepo import EPO
 from pyepo.metric._common import (
+    normalize_regret,
     torch_evaluation,
     validate_cost_vectors,
     validate_retry_count,
     validate_tolerance,
 )
 from pyepo.metric.regret import _checkLinearObj, _objOffset, _regretFromObj
-from pyepo.utils import _EPS, costToNumpy
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     from torch import nn
@@ -82,7 +83,7 @@ def unambRegret(
                 )
             optsum += abs(z).sum().item()
     # normalized
-    return loss / (optsum + _EPS)
+    return normalize_regret(loss, optsum)
 
 
 def calUnambRegret(

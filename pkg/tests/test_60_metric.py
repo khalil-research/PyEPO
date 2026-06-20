@@ -16,6 +16,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
+from pyepo.metric._common import normalize_regret
 from pyepo.metric.metrics import SPOError, _validate_cost_batches, makeSkScorer
 from pyepo.metric.mse import MSE
 from pyepo.metric.regret import _regretFromObj, calRegret
@@ -131,6 +132,17 @@ class TestRegretFromObj:
     def test_invalid_sense(self):
         with pytest.raises(ValueError):
             _regretFromObj(1.0, 1.0, "bad")
+
+
+class TestNormalizeRegret:
+    def test_normalizes_by_absolute_optimum_sum(self):
+        assert normalize_regret(6.0, 3.0) == pytest.approx(2.0)
+
+    def test_zero_regret_remains_zero_with_zero_optimum_sum(self):
+        assert normalize_regret(0.0, 0.0) == 0.0
+
+    def test_zero_optimum_sum_uses_defensive_epsilon(self):
+        assert normalize_regret(1.0, 0.0) == pytest.approx(1e8)
 
 
 class TestSPOErrorValidation:

@@ -9,9 +9,8 @@ from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
-from pyepo.metric._common import is_real_numeric_array
+from pyepo.metric._common import is_real_numeric_array, normalize_regret
 from pyepo.metric.regret import _checkLinearObj, calRegret
-from pyepo.utils import _EPS
 
 if TYPE_CHECKING:
     from pyepo.model.opt import ModelSpec, optModel
@@ -77,7 +76,7 @@ def SPOError(
         regret_sum += calRegret(optmodel, cp, c, optobj)  # type: ignore[arg-type]
         optobj_sum += np.abs(optobj)
     # normalized regret
-    return regret_sum / (optobj_sum + _EPS)
+    return normalize_regret(regret_sum, optobj_sum)
 
 
 def _SPOErrorScore(

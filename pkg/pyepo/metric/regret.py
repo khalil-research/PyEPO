@@ -14,8 +14,8 @@ import torch
 from pyepo import EPO
 from pyepo.func.runtime import create_solver_pool, normalize_processes
 from pyepo.func.utils import _close_pool, _solve_batch
-from pyepo.metric._common import torch_evaluation, validate_cost_vectors
-from pyepo.utils import _EPS, costToNumpy
+from pyepo.metric._common import normalize_regret, torch_evaluation, validate_cost_vectors
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -155,7 +155,7 @@ def regret(
     loss = np.concatenate(losses) if losses else np.empty(0)
     # reduce
     if reduction == "normalized":
-        return float(loss.sum()) / (optsum + _EPS)
+        return normalize_regret(loss.sum(), optsum)
     if reduction == "sum":
         return float(loss.sum())
     if reduction == "mean":

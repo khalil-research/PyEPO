@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 import torch
 
+from pyepo.utils import _EPS
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
@@ -55,6 +57,11 @@ def is_real_numeric_array(value: np.ndarray) -> bool:
     return np.issubdtype(value.dtype, np.number) and not np.issubdtype(
         value.dtype, np.complexfloating
     )
+
+
+def normalize_regret(regret_sum: float, absolute_optimum_sum: float) -> float:
+    """Normalize aggregate regret by absolute true optimum magnitude."""
+    return float(regret_sum) / (float(absolute_optimum_sum) + _EPS)
 
 
 def validate_cost_vectors(
