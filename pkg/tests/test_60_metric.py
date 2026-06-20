@@ -181,6 +181,56 @@ class TestSPOErrorValidation:
             SPOError([["bad"] * 4], [["bad"] * 4], self.model)
 
 
+class TestSingleRegretValidation:
+    @staticmethod
+    def _call(metric, pred_cost, true_cost, true_obj=0.0):
+        metric(SimpleNamespace(num_cost=4), pred_cost, true_cost, true_obj)
+
+    @pytest.mark.parametrize("metric", [calRegret, calUnambRegret])
+    @pytest.mark.parametrize(
+        ("pred_cost", "true_cost"),
+        [
+            (np.ones((1, 4)), np.ones((1, 4))),
+            (np.ones(4), np.ones((1, 4))),
+        ],
+    )
+    def test_rejects_nonvector_cost_before_solver_access(self, metric, pred_cost, true_cost):
+        with pytest.raises(ValueError, match="one-dimensional"):
+            self._call(metric, pred_cost, true_cost)
+
+    @pytest.mark.parametrize("metric", [calRegret, calUnambRegret])
+    def test_rejects_mismatched_cost_shapes_before_solver_access(self, metric):
+        with pytest.raises(ValueError, match="does not match"):
+            self._call(metric, np.ones(4), np.ones(3))
+
+    @pytest.mark.parametrize("metric", [calRegret, calUnambRegret])
+    def test_rejects_wrong_cost_length_before_solver_access(self, metric):
+        with pytest.raises(ValueError, match="num_cost"):
+            self._call(metric, np.ones(3), np.ones(3))
+
+    @pytest.mark.parametrize("metric", [calRegret, calUnambRegret])
+    @pytest.mark.parametrize("cost_kind", ["predicted", "true"])
+    @pytest.mark.parametrize("invalid", [np.nan, np.inf, -np.inf])
+    def test_rejects_nonfinite_cost_before_solver_access(self, metric, cost_kind, invalid):
+        pred = np.ones(4)
+        true = np.ones(4)
+        target = pred if cost_kind == "predicted" else true
+        target[0] = invalid
+        with pytest.raises(ValueError, match="finite"):
+            self._call(metric, pred, true)
+
+    @pytest.mark.parametrize("metric", [calRegret, calUnambRegret])
+    def test_rejects_nonnumeric_cost_before_solver_access(self, metric):
+        with pytest.raises(ValueError, match="numerical"):
+            self._call(metric, ["bad"] * 4, ["bad"] * 4)
+
+    @pytest.mark.parametrize("metric", [calRegret, calUnambRegret])
+    @pytest.mark.parametrize("true_obj", [np.nan, np.inf, -np.inf, True, "bad"])
+    def test_rejects_invalid_true_objective_before_solver_access(self, metric, true_obj):
+        with pytest.raises(ValueError, match="true_obj"):
+            self._call(metric, np.ones(4), np.ones(4), true_obj)
+
+
 class TestUnambRegretValidation:
     def test_public_metric_rejects_invalid_tolerance_before_model_access(self):
         with pytest.raises(ValueError, match="tolerance"):

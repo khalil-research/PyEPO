@@ -12,7 +12,12 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.metric._common import torch_evaluation, validate_retry_count, validate_tolerance
+from pyepo.metric._common import (
+    torch_evaluation,
+    validate_cost_vectors,
+    validate_retry_count,
+    validate_tolerance,
+)
 from pyepo.metric.regret import _checkLinearObj, _objOffset, _regretFromObj
 from pyepo.utils import _EPS, costToNumpy
 
@@ -104,6 +109,9 @@ def calUnambRegret(
     """
     validate_tolerance(tolerance)
     validate_retry_count(max_iter)
+    pred_cost, true_cost, true_obj = validate_cost_vectors(
+        pred_cost, true_cost, true_obj, optmodel.num_cost
+    )
     _checkLinearObj(optmodel)
     # lift to the full objective space, then change precision
     cp = np.around(optmodel._fullCost(np.asarray(pred_cost, dtype=float)) / tolerance)

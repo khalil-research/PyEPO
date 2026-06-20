@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from numbers import Real
 from typing import TYPE_CHECKING
 
+import numpy as np
 import torch
 
 if TYPE_CHECKING:
@@ -47,3 +48,37 @@ def validate_retry_count(max_iter: int) -> None:
         raise ValueError("max_iter must be a positive integer.")
     if max_iter <= 0:
         raise RuntimeError("Max iterations reached in calUnambRegret.")
+
+
+def is_real_numeric_array(value: np.ndarray) -> bool:
+    """Return whether an array has a non-complex numerical dtype."""
+    return np.issubdtype(value.dtype, np.number) and not np.issubdtype(
+        value.dtype, np.complexfloating
+    )
+
+
+def validate_cost_vectors(
+    pred_cost,
+    true_cost,
+    true_obj,
+    num_cost: int,
+) -> tuple[np.ndarray, np.ndarray, float]:
+    """Return valid single-instance costs and objective value."""
+    pred = np.asarray(pred_cost)
+    true = np.asarray(true_cost)
+    if pred.ndim != 1 or true.ndim != 1:
+        raise ValueError("Predicted and true costs must be one-dimensional vectors.")
+    if pred.shape != true.shape:
+        raise ValueError("Shape of true and predicted cost does not match.")
+    if pred.shape[0] != num_cost:
+        raise ValueError(f"Cost vector length must match optmodel.num_cost ({num_cost}).")
+    if not is_real_numeric_array(pred) or not is_real_numeric_array(true):
+        raise ValueError("Predicted and true costs must be numerical vectors.")
+    if not np.isfinite(pred).all() or not np.isfinite(true).all():
+        raise ValueError("Predicted and true costs must contain only finite values.")
+    if not isinstance(true_obj, Real) or isinstance(true_obj, bool):
+        raise ValueError("true_obj must be a finite number.")
+    objective = float(true_obj)
+    if not math.isfinite(objective):
+        raise ValueError("true_obj must be a finite number.")
+    return pred, true, objective

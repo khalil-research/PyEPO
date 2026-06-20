@@ -14,7 +14,7 @@ import torch
 from pyepo import EPO
 from pyepo.func.runtime import create_solver_pool, normalize_processes
 from pyepo.func.utils import _close_pool, _solve_batch
-from pyepo.metric._common import torch_evaluation
+from pyepo.metric._common import torch_evaluation, validate_cost_vectors
 from pyepo.utils import _EPS, costToNumpy
 
 if TYPE_CHECKING:
@@ -181,6 +181,9 @@ def calRegret(
     Returns:
         float: true regret
     """
+    pred_cost, true_cost, true_obj = validate_cost_vectors(
+        pred_cost, true_cost, true_obj, optmodel.num_cost
+    )
     _checkLinearObj(optmodel)
     # opt sol for pred cost
     optmodel._setFullObj(optmodel._fullCost(pred_cost))

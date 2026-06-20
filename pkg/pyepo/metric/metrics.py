@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
+from pyepo.metric._common import is_real_numeric_array
 from pyepo.metric.regret import _checkLinearObj, calRegret
 from pyepo.utils import _EPS
 
@@ -36,12 +37,7 @@ def _validate_cost_batches(
         raise ValueError("Predicted and true cost batches must not be empty.")
     if pred.shape[1] != num_cost:
         raise ValueError(f"Cost batch width must match optmodel.num_cost ({num_cost}).")
-    if not (
-        np.issubdtype(pred.dtype, np.number)
-        and np.issubdtype(true.dtype, np.number)
-        and not np.issubdtype(pred.dtype, np.complexfloating)
-        and not np.issubdtype(true.dtype, np.complexfloating)
-    ):
+    if not is_real_numeric_array(pred) or not is_real_numeric_array(true):
         raise ValueError("Predicted and true costs must be numerical arrays.")
     if not np.isfinite(pred).all() or not np.isfinite(true).all():
         raise ValueError("Predicted and true costs must contain only finite values.")
