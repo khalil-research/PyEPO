@@ -146,6 +146,15 @@ class optOmoModel(optModel):
         new_model.x = new_model._model.x
         return new_model
 
+    def _copy_objective_to(self, other: optOmoModel) -> None:
+        """Copy the mutable Pyomo objective coefficients."""
+        coefs = np.fromiter(
+            (pe.value(self._model.cost[i]) for i in range(self.num_cost)),
+            dtype=float,
+            count=self.num_cost,
+        )
+        other.setObj(coefs)
+
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
         A method to add a new constraint

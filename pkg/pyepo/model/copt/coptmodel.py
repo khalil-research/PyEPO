@@ -144,6 +144,18 @@ class optCoptModel(optModel):
             new_model._vars_list = list(new_model.x.values())
         return new_model
 
+    def _copy_objective_to(self, other: optCoptModel) -> None:
+        """Copy COPT objective coefficients aligned with predicted costs."""
+        if self._cost_vars:
+            coefs = np.asarray(self._model.getInfo("Obj", self._cost_vars))
+            if coefs.size != self.num_cost:
+                coefs = coefs.reshape(self.num_cost, -1)[:, 0]
+        elif _is_mvar(self.x):
+            coefs = np.asarray(self.x.Obj.tolist())
+        else:
+            coefs = np.asarray(self._model.getInfo("Obj", self._vars_list))
+        other.setObj(coefs)
+
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
         A method to add a new constraint

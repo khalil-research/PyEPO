@@ -227,6 +227,9 @@ class tspABBase(optModel):
         """
         new_model = self.rebuild()
         self._replay_extras(new_model)
+        copy_objective = getattr(self, "_copy_objective_to", None)
+        if copy_objective is not None:
+            copy_objective(new_model)
         return new_model
 
     def _replay_extras(self, other: tspABBase) -> None:
@@ -370,6 +373,9 @@ class vrpABBase(optModel):
         """
         new_model = self.rebuild()
         self._replay_extras(new_model)
+        copy_objective = getattr(self, "_copy_objective_to", None)
+        if copy_objective is not None:
+            copy_objective(new_model)
         return new_model
 
     def _replay_extras(self, other: vrpABBase) -> None:

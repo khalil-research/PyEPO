@@ -578,15 +578,25 @@ class TestTSP:
         with pytest.raises(ValueError, match="one-dimensional"):
             m.setObj(np.ones((2, m.num_cost)))
 
-    def test_copy_isolation(self, backend, formulation):
+    def test_copy_preserves_objective_and_is_independent(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         cost = np.random.RandomState(42).rand(m.num_cost)
         m.setObj(cost)
         _, obj1 = m.solve()
         m2 = m.copy()
-        m2.setObj(cost)
         _, obj2 = m2.solve()
         np.testing.assert_allclose(obj1, obj2, atol=1e-4)
+
+        m2.setObj(-cost)
+        np.testing.assert_allclose(m.solve()[1], obj1, atol=1e-4)
+
+    def test_addConstr_preserves_objective(self, backend, formulation):
+        m, _ = _make_tsp(backend, formulation)
+        cost = np.random.RandomState(42).rand(m.num_cost)
+        m.setObj(cost)
+        _, obj = m.solve()
+        m2 = m.addConstr(np.zeros(m.num_cost), 0)
+        np.testing.assert_allclose(m2.solve()[1], obj, atol=1e-4)
 
     def test_addConstr_infeasible(self, backend, formulation):
         # 4-node tour needs 4 edges; sum(edges) <= 3 is infeasible
@@ -715,14 +725,16 @@ class TestVRP:
         with pytest.raises(ValueError, match="one-dimensional"):
             m.setObj(np.ones((2, m.num_cost)))
 
-    def test_copy_isolation(self, backend, formulation):
+    def test_copy_preserves_objective_and_is_independent(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)
         m.setObj(_VRP_COST)
         _, obj1 = m.solve()
         m2 = m.copy()
-        m2.setObj(_VRP_COST)
         _, obj2 = m2.solve()
         np.testing.assert_allclose(obj1, obj2, atol=1e-4)
+
+        m2.setObj(-_VRP_COST)
+        np.testing.assert_allclose(m.solve()[1], obj1, atol=1e-4)
 
     def test_addConstr_no_improvement(self, backend, formulation):
         # MINIMIZE: re-imposing the optimal edge count cannot decrease the objective
@@ -731,7 +743,6 @@ class TestVRP:
         sol1, obj1 = m.solve()
         k = round(np.asarray(sol1).sum())
         m2 = m.addConstr(np.ones(m.num_cost), k)
-        m2.setObj(_VRP_COST)
         _, obj2 = m2.solve()
         assert obj2 >= obj1 - 1e-6
 
