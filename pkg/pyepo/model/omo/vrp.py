@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, NoReturn
 import numpy as np
 
 from pyepo.model.bases import vrpABBase
-from pyepo.model.omo.omomodel import _require_solution, optOmoModel
+from pyepo.model.omo.omomodel import _solve_model, optOmoModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL
 
 if TYPE_CHECKING:
@@ -121,8 +121,7 @@ class vrpMTZModel(vrpABModel):
         Returns:
             tuple: edge-selection vector (uint8) and objective value (float)
         """
-        res = self._solverfac.solve(self._model)
-        _require_solution(res)
+        _solve_model(self._solverfac, self._model)
         # collapse directed pair to undirected selection per edge
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):
@@ -192,8 +191,7 @@ class vrpMTZModelRel(vrpMTZModel):
         """
         A method to solve the model — returns fractional edge selections
         """
-        res = self._solverfac.solve(self._model)
-        _require_solution(res)
+        _solve_model(self._solverfac, self._model)
         # sum directed pair to per-edge fractional value
         sol = np.zeros(self.num_cost, dtype=np.float32)
         for k, (i, j) in enumerate(self.edges):

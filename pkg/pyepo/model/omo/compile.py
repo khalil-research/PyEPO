@@ -22,7 +22,7 @@ except ImportError:
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase
-from pyepo.model.omo.omomodel import optOmoModel
+from pyepo.model.omo.omomodel import _solve_model, optOmoModel
 from pyepo.model.opt import optModel
 
 
@@ -110,16 +110,7 @@ class compiledOmoProblem(compiledBase, optOmoModel):
 
     def _read_sol(self):
         # solve and read the full solution + objective value
-        res = self._solverfac.solve(self._model)
-        # surface failed solves clearly instead of an uninitialized-value error
-        cond = res.solver.termination_condition
-        if cond in (
-            po.TerminationCondition.infeasible,
-            po.TerminationCondition.unbounded,
-            po.TerminationCondition.infeasibleOrUnbounded,
-            po.TerminationCondition.error,
-        ):
-            raise RuntimeError(f"Pyomo found no solution (termination {cond}).")
+        _solve_model(self._solverfac, self._model)
         sol = np.fromiter((pe.value(self.x[j]) for j in range(self.problem.num_vars)), dtype=float)
         return sol, float(pe.value(self._model.obj))
 

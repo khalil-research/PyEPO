@@ -19,7 +19,7 @@ except ImportError:
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase
-from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
+from pyepo.model.copt.coptmodel import _get_envr, _read_solution, optCoptModel
 
 
 def compileProblem(problem, **params) -> compiledCoptProblem:
@@ -58,12 +58,10 @@ class compiledCoptProblem(compiledBase, optCoptModel):
     def _read_sol(self):
         # optimize and read the full solution + objective value
         self._model.solve()
-        # surface failed solves clearly instead of a raw attribute error
-        try:
-            # MVar.x is a coptpy NdArray; tolist() flattens it to plain floats
-            return np.asarray(self.x.x.tolist(), dtype=float), self._model.objVal
-        except Exception as e:  # coptpy raises generic errors on no-solution
-            raise RuntimeError(f"COPT found no solution (status {self._model.status}).") from e
+        return _read_solution(
+            self._model,
+            lambda: np.asarray(self.x.x.tolist(), dtype=float),
+        )
 
     def _add_cut(self, coef, rhs):
         # add coef @ x <= rhs to a fresh copy

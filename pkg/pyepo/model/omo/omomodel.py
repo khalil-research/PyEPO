@@ -40,6 +40,18 @@ def _require_solution(result) -> None:
         raise RuntimeError(f"Pyomo found no solution (termination {cond}).")
 
 
+def _solve_model(solver, model):
+    """Solve without auto-loading, validate termination, then load a usable solution."""
+    result = solver.solve(model, load_solutions=False)
+    _require_solution(result)
+    try:
+        model.solutions.load_from(result)
+    except Exception as e:
+        cond = result.solver.termination_condition
+        raise RuntimeError(f"Pyomo found no solution (termination {cond}).") from e
+    return result
+
+
 class optOmoModel(optModel):
     """
     Abstract base class for Pyomo-backed optimization models.
@@ -113,8 +125,7 @@ class optOmoModel(optModel):
         Returns:
             tuple: optimal solution (np.ndarray) and objective value (float)
         """
-        res = self._solverfac.solve(self._model)
-        _require_solution(res)
+        _solve_model(self._solverfac, self._model)
         sol = np.fromiter(
             (pe.value(self.x[k]) for k in self.x),
             dtype=np.float32,

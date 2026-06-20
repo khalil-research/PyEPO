@@ -421,6 +421,19 @@ def test_compiled_model_rebuild_preserves_problem_and_backend_config(backend):
         assert rebuilt.solver == comp.solver
 
 
+@pytest.mark.parametrize("backend", _ALL)
+def test_compiled_infeasible_solve_raises_clearly(backend):
+    x = dsl.Variable(1, vtype=EPO.BINARY)
+    c = dsl.Parameter(1)
+    comp = dsl.Problem(dsl.Minimize(c @ x), [x >= 1, x <= 0]).compile(
+        backend=backend, **_kw(backend)
+    )
+    comp.setObj([1.0])
+
+    with pytest.raises(RuntimeError, match="found no solution"):
+        comp.solve()
+
+
 @pytest.mark.parametrize("backend", _BACKENDS)
 def test_knapsack_matches_legacy(backend):
     W = np.array([[3.0, 4, 3, 6, 4], [4, 5, 2, 3, 5], [5, 4, 6, 2, 3]])

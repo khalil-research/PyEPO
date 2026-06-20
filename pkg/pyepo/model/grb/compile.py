@@ -20,7 +20,7 @@ except ImportError:
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase
-from pyepo.model.grb.grbmodel import optGrbModel
+from pyepo.model.grb.grbmodel import _require_solution, optGrbModel
 
 
 def compileProblem(problem, **params) -> compiledGrbProblem:
@@ -59,9 +59,7 @@ class compiledGrbProblem(compiledBase, optGrbModel):
     def _read_sol(self):
         # optimize and read the full solution + objective value
         self._model.optimize()
-        # surface failed solves clearly instead of a raw attribute error
-        if self._model.SolCount == 0:
-            raise RuntimeError(f"Gurobi found no solution (status {self._model.Status}).")
+        _require_solution(self._model)
         return np.asarray(self.x.x), self._model.objVal
 
     def _add_cut(self, coef, rhs):
