@@ -9,7 +9,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.utils import _full_cost, _grow_solpool
+from pyepo.func.jax.utils import _full_cost
 
 
 class noiseContrastiveEstimation(optModule):
@@ -40,10 +40,10 @@ class noiseContrastiveEstimation(optModule):
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
         # solve and update pool
-        _grow_solpool(self, pred_cost)
+        solpool = self._refresh_solution_pool(pred_cost)
         # current obj and pool obj
         obj_cp = jnp.einsum("bd,bd->b", pred_cost, true_sol)[:, None]
-        objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, self.solpool)
+        objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, solpool)
         # margin loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = (obj_cp - objpool_cp).mean(axis=1)
@@ -80,10 +80,10 @@ class contrastiveMAP(optModule):
         # lift to the full objective space
         pred_cost = _full_cost(pred_cost, self.optmodel)
         # solve and update pool
-        _grow_solpool(self, pred_cost)
+        solpool = self._refresh_solution_pool(pred_cost)
         # current obj and pool obj
         obj_cp = jnp.einsum("bd,bd->b", pred_cost, true_sol)[:, None]
-        objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, self.solpool)
+        objpool_cp = jnp.einsum("bd,nd->bn", pred_cost, solpool)
         # max-margin loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = (obj_cp - objpool_cp).max(axis=1)

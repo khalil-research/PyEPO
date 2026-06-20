@@ -12,7 +12,12 @@ import torch
 from torch.autograd import Function
 
 from pyepo import EPO
-from pyepo.func._common import is_minimize, validate_positive, validate_positive_int
+from pyepo.func._common import (
+    is_minimize,
+    require_solution_pool,
+    validate_positive,
+    validate_positive_int,
+)
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import (
     _mask_pred,
@@ -640,8 +645,7 @@ def _solve_or_cache_3d(ptb_c: torch.Tensor, module: optModule) -> torch.Tensor:
     if module._branch_rng.uniform() <= module.solve_ratio:
         ptb_sols, solpool = _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool)
     else:
-        # cache branch implies solve_ratio < 1, so __init__ has populated solpool
-        assert solpool is not None
+        solpool = require_solution_pool(solpool)
         ptb_sols, solpool = _cache_in_pass_3d(ptb_c, optmodel, solpool)
     module.solpool = solpool
     return ptb_sols

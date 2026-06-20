@@ -39,7 +39,8 @@ def SPOError(
     _checkLinearObj(optmodel)
     pred_cost = np.array(pred_cost)
     true_cost = np.array(true_cost)
-    assert pred_cost.shape == true_cost.shape, "Shape of true and predicted value does not match."
+    if pred_cost.shape != true_cost.shape:
+        raise ValueError("Shape of true and predicted value does not match.")
     # init sum
     regret_sum = 0.0
     optobj_sum = 0.0

@@ -1,6 +1,10 @@
 """Backend-independent policies shared by the Torch and JAX frontends."""
 
+from typing import Optional, TypeVar
+
 from pyepo import EPO
+
+T = TypeVar("T")
 
 
 def is_minimize(model_sense) -> bool:
@@ -33,3 +37,12 @@ def validate_nonnegative(value, name: str) -> None:
     """Validate a non-negative numeric parameter."""
     if value < 0:
         raise ValueError(f"{name} must be non-negative.")
+
+
+def require_solution_pool(solpool: Optional[T]) -> T:
+    """Return an initialized solution pool or raise a stable runtime error."""
+    if solpool is None:
+        raise RuntimeError(
+            "Solution pool is unavailable; provide an optDataset when pool-based solving is enabled."
+        )
+    return solpool

@@ -224,7 +224,7 @@ class TestSPOError:
 
     def test_shape_mismatch(self):
         m = self._sp()
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             SPOError(np.ones((5, 12)), np.ones((5, 10)), m)
 
 

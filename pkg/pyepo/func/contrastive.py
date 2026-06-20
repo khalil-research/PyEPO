@@ -11,7 +11,6 @@ import torch
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
-from pyepo.func.utils import _solve_in_pass
 
 if TYPE_CHECKING:
     from pyepo.data.dataset import optDataset
@@ -63,20 +62,11 @@ class noiseContrastiveEstimation(optModule):
         pred_cost = self.optmodel._fullCost(pred_cost)
         # convert tensor
         cp = pred_cost.detach()
-        # solve and update pool
-        if self._branch_rng.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool
-            )
-        # require_solpool=True ensures the pool was populated in __init__
-        assert self.solpool is not None
-        # to device
-        if self.solpool.device != cp.device:
-            self.solpool = self.solpool.to(cp.device)
+        solpool = self._refresh_solution_pool(cp)
         # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
         # get obj for solpool
-        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool)
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = (obj_cp - objpool_cp).mean(dim=1)
@@ -126,20 +116,11 @@ class contrastiveMAP(optModule):
         pred_cost = self.optmodel._fullCost(pred_cost)
         # convert tensor
         cp = pred_cost.detach()
-        # solve and update pool
-        if self._branch_rng.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool
-            )
-        # require_solpool=True ensures the pool was populated in __init__
-        assert self.solpool is not None
-        # to device
-        if self.solpool.device != cp.device:
-            self.solpool = self.solpool.to(cp.device)
+        solpool = self._refresh_solution_pool(cp)
         # get current obj
         obj_cp = torch.einsum("bd,bd->b", pred_cost, true_sol).unsqueeze(1)
         # get obj for solpool
-        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, self.solpool)
+        objpool_cp = torch.einsum("bd,nd->bn", pred_cost, solpool)
         # get loss
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss, _ = (obj_cp - objpool_cp).max(dim=1)

@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 
 import jax.numpy as jnp
 
+from pyepo.func._common import require_solution_pool
 from pyepo.func.runtime import init_runtime
 
 logger = logging.getLogger(__name__)
@@ -77,3 +78,10 @@ class optModule(ABC):
             return jnp.sum(loss)
         # "none" — guaranteed valid by __init__
         return loss
+
+    def _refresh_solution_pool(self, cost):
+        """Optionally solve, then return the initialized JAX solution pool."""
+        from pyepo.func.jax.utils import _grow_solpool
+
+        _grow_solpool(self, cost)
+        return require_solution_pool(self.solpool)

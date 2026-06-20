@@ -14,6 +14,7 @@ import torch
 
 from pyepo.func._common import (
     is_minimize,
+    require_solution_pool,
     solution_pool_tolerance,
     validate_positive,
     validate_positive_int,
@@ -52,8 +53,7 @@ def _solve_or_cache(cp: torch.Tensor, module: optModule) -> tuple[torch.Tensor, 
     if module._branch_rng.uniform() <= module.solve_ratio:
         sol, obj, solpool = _solve_in_pass(cp, optmodel, processes, pool, solpool)
     else:
-        # cache branch implies solve_ratio < 1, so __init__ has populated solpool
-        assert solpool is not None
+        solpool = require_solution_pool(solpool)
         sol, obj, solpool = _cache_in_pass(cp, optmodel, solpool)
     module.solpool = solpool
     return sol, obj
@@ -205,7 +205,8 @@ def _init_worker_model(spec: ModelSpec) -> None:
 
 def _solveWithObj4Par(cost: np.ndarray) -> tuple[np.ndarray, float]:
     """Solve a single instance in a pool worker using the pre-built optmodel."""
-    assert _worker_model is not None, "_init_worker_model must run before this"
+    if _worker_model is None:
+        raise RuntimeError("_init_worker_model must run before solving in a worker")
     _worker_model._setFullObj(cost)
     sol, obj = _worker_model.solve()
     return np.asarray(sol, dtype=np.float32), obj

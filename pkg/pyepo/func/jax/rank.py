@@ -10,7 +10,7 @@ import jax.numpy as jnp
 
 from pyepo import EPO
 from pyepo.func.jax.abcmodule import optModule
-from pyepo.func.jax.utils import _full_cost, _grow_solpool
+from pyepo.func.jax.utils import _full_cost
 
 
 class listwiseLearningToRank(optModule):
@@ -44,10 +44,10 @@ class listwiseLearningToRank(optModule):
         pred_cost = _full_cost(pred_cost, self.optmodel)
         true_cost = _full_cost(true_cost, self.optmodel)
         # solve and update pool
-        _grow_solpool(self, pred_cost)
+        solpool = self._refresh_solution_pool(pred_cost)
         # obj for solpool
-        objpool_c = true_cost @ self.solpool.T
-        objpool_cp = pred_cost @ self.solpool.T
+        objpool_c = true_cost @ solpool.T
+        objpool_cp = pred_cost @ solpool.T
         # cross entropy loss, summed over the pool per instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = -(
@@ -92,10 +92,10 @@ class pairwiseLearningToRank(optModule):
         pred_cost = _full_cost(pred_cost, self.optmodel)
         true_cost = _full_cost(true_cost, self.optmodel)
         # solve and update pool
-        _grow_solpool(self, pred_cost)
+        solpool = self._refresh_solution_pool(pred_cost)
         # obj for solpool
-        objpool_c = true_cost @ self.solpool.T
-        objpool_cp = pred_cost @ self.solpool.T
+        objpool_c = true_cost @ solpool.T
+        objpool_cp = pred_cost @ solpool.T
         # best solution per instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
             best_inds = jnp.argmin(objpool_c, axis=1)
@@ -108,7 +108,7 @@ class pairwiseLearningToRank(optModule):
         else:
             diff = objpool_cp - objpool_cp_best
         # ranking loss; best-vs-best slot contributes 0
-        loss = jax.nn.relu(diff).sum(axis=1) / max(self.solpool.shape[0] - 1, 1)
+        loss = jax.nn.relu(diff).sum(axis=1) / max(solpool.shape[0] - 1, 1)
         return self._reduce(loss)
 
 
@@ -142,9 +142,9 @@ class pointwiseLearningToRank(optModule):
         pred_cost = _full_cost(pred_cost, self.optmodel)
         true_cost = _full_cost(true_cost, self.optmodel)
         # solve and update pool
-        _grow_solpool(self, pred_cost)
+        solpool = self._refresh_solution_pool(pred_cost)
         # squared loss over the pool
-        loss = (((true_cost - pred_cost) @ self.solpool.T) ** 2).mean(axis=1)
+        loss = (((true_cost - pred_cost) @ solpool.T) ** 2).mean(axis=1)
         return self._reduce(loss)
 
 

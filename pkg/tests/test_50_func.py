@@ -131,6 +131,12 @@ class TestSumGammaDistribution:
 
 
 class TestSolutionPool:
+    def test_missing_pool_raises_stable_error(self):
+        from pyepo.func._common import require_solution_pool
+
+        with pytest.raises(RuntimeError, match="Solution pool is unavailable"):
+            require_solution_pool(None)
+
     def test_init_pool(self):
         pool = _update_solution_pool(torch.tensor([[1.0, 0.0], [0.0, 1.0]]), None)
         assert pool.shape == (2, 2)

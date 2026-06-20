@@ -13,7 +13,9 @@ import torch
 from torch import nn
 
 from pyepo.data.dataset import optDataset
+from pyepo.func._common import require_solution_pool
 from pyepo.func.runtime import Reduction, init_runtime
+from pyepo.func.utils import _solve_in_pass
 
 if TYPE_CHECKING:
     from pyepo.model.opt import optModel
@@ -79,3 +81,15 @@ class optModule(nn.Module):
         if self.reduction == "sum":
             return torch.sum(loss)
         return loss
+
+    def _refresh_solution_pool(self, cost: torch.Tensor) -> torch.Tensor:
+        """Optionally solve, then return the initialized pool on ``cost``'s device."""
+        if self._branch_rng.uniform() <= self.solve_ratio:
+            _, _, self.solpool = _solve_in_pass(
+                cost, self.optmodel, self.processes, self.pool, self.solpool
+            )
+        solpool = require_solution_pool(self.solpool)
+        if solpool.device != cost.device:
+            solpool = solpool.to(cost.device)
+            self.solpool = solpool
+        return solpool

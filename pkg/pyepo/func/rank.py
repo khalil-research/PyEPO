@@ -13,7 +13,6 @@ from torch import nn
 
 from pyepo import EPO
 from pyepo.func.abcmodule import optModule
-from pyepo.func.utils import _solve_in_pass
 
 if TYPE_CHECKING:
     from pyepo.data.dataset import optDataset
@@ -63,19 +62,10 @@ class listwiseLearningToRank(optModule):
         true_cost = self.optmodel._fullCost(true_cost)
         # convert tensor
         cp = pred_cost.detach()
-        # solve and update pool
-        if self._branch_rng.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool
-            )
-        # require_solpool=True ensures the pool was populated in __init__
-        assert self.solpool is not None
-        # to device
-        if self.solpool.device != cp.device:
-            self.solpool = self.solpool.to(cp.device)
+        solpool = self._refresh_solution_pool(cp)
         # obj for solpool
-        objpool_c = true_cost @ self.solpool.T  # true cost
-        objpool_cp = pred_cost @ self.solpool.T  # pred cost
+        objpool_c = true_cost @ solpool.T  # true cost
+        objpool_cp = pred_cost @ solpool.T  # pred cost
         # cross entropy loss, summed over the pool per instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
             loss = -(
@@ -132,19 +122,10 @@ class pairwiseLearningToRank(optModule):
         true_cost = self.optmodel._fullCost(true_cost)
         # convert tensor
         cp = pred_cost.detach()
-        # solve and update pool
-        if self._branch_rng.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool
-            )
-        # require_solpool=True ensures the pool was populated in __init__
-        assert self.solpool is not None
-        # to device
-        if self.solpool.device != cp.device:
-            self.solpool = self.solpool.to(cp.device)
+        solpool = self._refresh_solution_pool(cp)
         # obj for solpool
-        objpool_c = true_cost @ self.solpool.T  # true cost
-        objpool_cp = pred_cost @ self.solpool.T  # pred cost
+        objpool_c = true_cost @ solpool.T  # true cost
+        objpool_cp = pred_cost @ solpool.T  # pred cost
         # best solutions for each instance
         if self.optmodel.modelSense == EPO.MINIMIZE:
             best_inds = torch.argmin(objpool_c, dim=1)
@@ -205,18 +186,9 @@ class pointwiseLearningToRank(optModule):
         true_cost = self.optmodel._fullCost(true_cost)
         # convert tensor
         cp = pred_cost.detach()
-        # solve and update pool
-        if self._branch_rng.uniform() <= self.solve_ratio:
-            _, _, self.solpool = _solve_in_pass(
-                cp, self.optmodel, self.processes, self.pool, self.solpool
-            )
-        # require_solpool=True ensures the pool was populated in __init__
-        assert self.solpool is not None
-        # to device
-        if self.solpool.device != cp.device:
-            self.solpool = self.solpool.to(cp.device)
+        solpool = self._refresh_solution_pool(cp)
         # squared loss
-        loss = ((true_cost - pred_cost) @ self.solpool.T).square().mean(dim=1)
+        loss = ((true_cost - pred_cost) @ solpool.T).square().mean(dim=1)
         return self._reduce(loss)
 
 
