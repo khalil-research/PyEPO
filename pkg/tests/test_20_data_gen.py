@@ -22,16 +22,17 @@ _NOISE_WIDTH_GENERATORS = _GENERATORS[:3]
 
 
 @pytest.mark.parametrize(("generator", "args"), _GENERATORS)
-@pytest.mark.parametrize("deg", [0, -1, 1.5])
+@pytest.mark.parametrize("deg", [0, -1, 1.5, True])
 def test_invalid_degree_rejected(generator, args, deg):
     with pytest.raises(ValueError):
         generator(*args, deg=deg)
 
 
 @pytest.mark.parametrize(("generator", "args"), _NOISE_WIDTH_GENERATORS)
-def test_negative_noise_width_rejected(generator, args):
+@pytest.mark.parametrize("noise_width", [-0.1, np.nan, np.inf, True])
+def test_invalid_noise_width_rejected(generator, args, noise_width):
     with pytest.raises(ValueError):
-        generator(*args, noise_width=-0.1)
+        generator(*args, noise_width=noise_width)
 
 
 class TestKnapsackData:
@@ -181,6 +182,11 @@ class TestPortfolioData:
         _, _, r0 = portfolio.genData(20, 3, 4, noise_level=0, seed=42)
         _, _, r1 = portfolio.genData(20, 3, 4, noise_level=2, seed=42)
         assert not np.array_equal(r0, r1)
+
+    @pytest.mark.parametrize("noise_level", [-0.1, np.nan, np.inf, True])
+    def test_invalid_noise_level_rejected(self, noise_level):
+        with pytest.raises(ValueError, match="noise_level"):
+            portfolio.genData(10, 3, 4, noise_level=noise_level)
 
     def test_higher_degree_finite(self):
         _, _, r = portfolio.genData(10, 3, 4, deg=3, seed=42)

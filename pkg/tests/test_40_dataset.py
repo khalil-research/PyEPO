@@ -164,7 +164,13 @@ class TestOptDatasetKNN:
     @pytest.mark.parametrize("k", [0, -1])
     def test_k_below_one_raises(self, k):
         model, x, c = self._model_data()
-        with pytest.raises(ValueError, match="1 <= k"):
+        with pytest.raises(ValueError, match="positive integer"):
+            optDatasetKNN(model, x, c, k=k)
+
+    @pytest.mark.parametrize("k", [1.5, True])
+    def test_k_must_be_an_integer(self, k):
+        model, x, c = self._model_data()
+        with pytest.raises(ValueError, match="positive integer"):
             optDatasetKNN(model, x, c, k=k)
 
     def test_k_equal_num_data_raises(self):
@@ -172,6 +178,12 @@ class TestOptDatasetKNN:
         model, x, c = self._model_data(n=12)
         with pytest.raises(ValueError, match="1 <= k"):
             optDatasetKNN(model, x, c, k=12)
+
+    @pytest.mark.parametrize("weight", [-0.1, 1.1, np.nan, np.inf, True])
+    def test_invalid_weight_raises(self, weight):
+        model, x, c = self._model_data()
+        with pytest.raises(ValueError, match="weight"):
+            optDatasetKNN(model, x, c, k=3, weight=weight)
 
     def test_valid_k_constructs(self):
         model, x, c = self._model_data(n=12)

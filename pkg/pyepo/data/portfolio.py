@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from pyepo.data._validation import validate_degree
+from pyepo.data._validation import validate_degree, validate_nonnegative
 
 
 def genData(
@@ -43,6 +43,7 @@ def genData(
         tuple: covariance matrix (np.ndarray), data features (np.ndarray), mean returns (np.ndarray)
     """
     validate_degree(deg)
+    validate_nonnegative(noise_level, "noise_level")
     # set seed
     rnd = np.random.RandomState(seed)
     # number of data points

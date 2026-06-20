@@ -15,6 +15,7 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 
 from pyepo import EPO
+from pyepo.data._validation import validate_positive_int, validate_probability
 from pyepo.model.opt import optModel
 
 if TYPE_CHECKING:
@@ -226,10 +227,10 @@ class optDatasetKNN(optDataset):
         self.model = model
         # at most num_data-1 neighbours exist (self excluded), so k must stay below it
         num_data = len(feats)
-        if not 1 <= k < num_data:
+        validate_positive_int(k, "k")
+        if k >= num_data:
             raise ValueError(f"Invalid k={k}; must satisfy 1 <= k < num_data ({num_data}).")
-        if not 0.0 <= weight <= 1.0:
-            raise ValueError(f"Invalid weight={weight}; must satisfy 0 <= weight <= 1.")
+        validate_probability(weight, "weight")
         # kNN loss parameters
         self.k = k
         self.weight = weight
