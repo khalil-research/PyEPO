@@ -64,6 +64,34 @@ def normalize_regret(regret_sum: float, absolute_optimum_sum: float) -> float:
     return float(regret_sum) / (float(absolute_optimum_sum) + _EPS)
 
 
+def validate_prediction_batch(pred_cost, true_cost, num_cost: int | None = None) -> None:
+    """Validate matching, finite two-dimensional prediction and target batches."""
+    if pred_cost.ndim != 2 or true_cost.ndim != 2:
+        raise ValueError("Predicted and true costs must be two-dimensional batches.")
+    if pred_cost.shape != true_cost.shape:
+        raise ValueError("Shape of true and predicted cost batches does not match.")
+    if num_cost is not None and pred_cost.shape[1] != num_cost:
+        raise ValueError(f"Cost batch width must match optmodel.num_cost ({num_cost}).")
+
+    if isinstance(pred_cost, torch.Tensor) and isinstance(true_cost, torch.Tensor):
+        if (
+            pred_cost.is_complex()
+            or true_cost.is_complex()
+            or pred_cost.dtype == torch.bool
+            or true_cost.dtype == torch.bool
+        ):
+            raise ValueError("Predicted and true costs must be numerical batches.")
+        finite = torch.isfinite(pred_cost).all() and torch.isfinite(true_cost).all()
+    else:
+        pred = np.asarray(pred_cost)
+        true = np.asarray(true_cost)
+        if not is_real_numeric_array(pred) or not is_real_numeric_array(true):
+            raise ValueError("Predicted and true costs must be numerical batches.")
+        finite = np.isfinite(pred).all() and np.isfinite(true).all()
+    if not finite:
+        raise ValueError("Predicted and true costs must contain only finite values.")
+
+
 def validate_cost_vectors(
     pred_cost,
     true_cost,

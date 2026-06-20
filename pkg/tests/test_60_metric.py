@@ -8,6 +8,7 @@ regret() / unambRegret() / MSE() are run on a tiny untrained predictor to verify
 they return sane floats. MSE needs no solver.
 """
 
+import importlib
 from types import SimpleNamespace
 
 import numpy as np
@@ -19,7 +20,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from pyepo.metric._common import normalize_regret
 from pyepo.metric.metrics import SPOError, _validate_cost_batches, makeSkScorer
 from pyepo.metric.mse import MSE
-from pyepo.metric.regret import _regretFromObj, calRegret
+from pyepo.metric.regret import _regretFromObj, calRegret, regret
 from pyepo.metric.unambregret import calUnambRegret, unambRegret
 
 from .conftest import (
@@ -58,6 +59,22 @@ class _FailingModel(nn.Module):
 
     def forward(self, x):
         raise RuntimeError("prediction failed")
+
+
+class _WrongWidthModel(nn.Module):
+    """Predictor that drops one cost from every sample."""
+
+    def forward(self, x):
+        return x[:, :-1]
+
+
+class _NonfiniteModel(nn.Module):
+    """Predictor that returns a non-finite cost."""
+
+    def forward(self, x):
+        output = x.clone()
+        output[0, 0] = torch.nan
+        return output
 
 
 def _loader(n=16, d=4, batch_size=8):
@@ -110,6 +127,56 @@ class TestMSE:
         with pytest.raises(RuntimeError, match="prediction failed"):
             MSE(model, _loader())
         assert model.training is training
+
+
+class TestDataloaderPredictionValidation:
+    optmodel = SimpleNamespace(num_cost=4)
+
+    def test_mse_rejects_wrong_prediction_shape(self):
+        model = _WrongWidthModel()
+        with pytest.raises(ValueError, match="does not match"):
+            MSE(model, _loader())
+        assert model.training
+
+    def test_mse_rejects_nonfinite_prediction(self):
+        with pytest.raises(ValueError, match="finite"):
+            MSE(_NonfiniteModel(), _loader())
+
+    @pytest.mark.parametrize("metric", [regret, unambRegret])
+    def test_regret_metrics_reject_wrong_prediction_width_before_solver(self, metric):
+        model = _WrongWidthModel()
+        with pytest.raises(ValueError, match="does not match"):
+            metric(model, self.optmodel, _loader())
+        assert model.training
+
+    @pytest.mark.parametrize("metric", [regret, unambRegret])
+    def test_regret_metrics_reject_nonfinite_prediction_before_solver(self, metric):
+        with pytest.raises(ValueError, match="finite"):
+            metric(_NonfiniteModel(), self.optmodel, _loader())
+
+    def test_callable_regret_rejects_wrong_prediction_width_before_solver(self, monkeypatch):
+        def predict(x):
+            return np.ones((x.shape[0], 3), dtype=np.float32)
+
+        def fail_pool_creation(*args, **kwargs):
+            pytest.fail("solver pool initialized before prediction validation")
+
+        regret_module = importlib.import_module("pyepo.metric.regret")
+        monkeypatch.setattr(regret_module, "create_solver_pool", fail_pool_creation)
+        with pytest.raises(ValueError, match="does not match"):
+            regret(predict, self.optmodel, _loader())
+
+    @pytest.mark.parametrize("metric", [MSE, regret, unambRegret])
+    def test_rejects_complex_prediction(self, metric):
+        class ComplexModel(nn.Module):
+            def forward(self, x):
+                return x.to(torch.complex64)
+
+        args = (ComplexModel(), _loader())
+        if metric is not MSE:
+            args = (ComplexModel(), self.optmodel, _loader())
+        with pytest.raises(ValueError, match="numerical"):
+            metric(*args)
 
 
 class TestRegretFromObj:

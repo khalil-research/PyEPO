@@ -16,6 +16,7 @@ from pyepo.metric._common import (
     normalize_regret,
     torch_evaluation,
     validate_cost_vectors,
+    validate_prediction_batch,
     validate_retry_count,
     validate_tolerance,
 )
@@ -75,6 +76,7 @@ def unambRegret(
             with torch.no_grad():
                 cp = costToNumpy(predmodel(x))
             c_np = costToNumpy(c)
+            validate_prediction_batch(cp, c_np, optmodel.num_cost)
             # solve
             for j in range(cp.shape[0]):
                 # accumulate loss

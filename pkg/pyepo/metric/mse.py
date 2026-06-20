@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, cast
 
 import torch
 
-from pyepo.metric._common import torch_evaluation
+from pyepo.metric._common import torch_evaluation, validate_prediction_batch
 
 if TYPE_CHECKING:
     from collections.abc import Sized
@@ -37,5 +37,6 @@ def MSE(predmodel: nn.Module, dataloader: DataLoader) -> float:
             x, c = x.to(device), c.to(device)
             # predict
             cp = predmodel(x)
+            validate_prediction_batch(cp, c)
             loss += ((cp - c) ** 2).mean(dim=1).sum().item()
     return loss / len(cast("Sized", dataloader.dataset))

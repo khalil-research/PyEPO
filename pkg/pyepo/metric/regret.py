@@ -14,7 +14,12 @@ import torch
 from pyepo import EPO
 from pyepo.func.runtime import create_solver_pool, normalize_processes
 from pyepo.func.utils import _close_pool, _solve_batch
-from pyepo.metric._common import normalize_regret, torch_evaluation, validate_cost_vectors
+from pyepo.metric._common import (
+    normalize_regret,
+    torch_evaluation,
+    validate_cost_vectors,
+    validate_prediction_batch,
+)
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
@@ -123,8 +128,8 @@ def regret(
     losses = []
     optsum = 0.0
     torch_model = cast("nn.Module", predmodel) if isinstance(predmodel, torch.nn.Module) else None
-    # multi-core: each worker builds its own optmodel once via the initializer
-    pool = create_solver_pool(optmodel, processes)
+    pool = None
+    pool_initialized = False
     try:
         with torch_evaluation(torch_model) as device:
             # load data
@@ -137,6 +142,11 @@ def regret(
                 else:
                     # JAX callable: f(x_numpy) -> array-like
                     cp = torch.as_tensor(np.array(predmodel(x.numpy()), dtype=np.float32))
+                validate_prediction_batch(cp, c, optmodel.num_cost)
+                if not pool_initialized:
+                    # defer worker startup until the first prediction batch is valid
+                    pool = create_solver_pool(optmodel, processes)
+                    pool_initialized = True
                 # full cost so the MPAX backend can batch-set the objective in one call
                 sols, _ = _solve_batch(
                     optmodel._fullCost(cp), optmodel, processes=processes, pool=pool
