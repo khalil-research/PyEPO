@@ -14,6 +14,7 @@ import torch
 from pyepo import EPO
 from pyepo.func.runtime import create_solver_pool, normalize_processes
 from pyepo.func.utils import _close_pool, _solve_batch
+from pyepo.metric._common import torch_evaluation
 from pyepo.utils import _EPS, costToNumpy
 
 if TYPE_CHECKING:
@@ -122,44 +123,35 @@ def regret(
     losses = []
     optsum = 0.0
     torch_model = cast("nn.Module", predmodel) if isinstance(predmodel, torch.nn.Module) else None
-    # get device (cpu fallback for parameterless predictors; JAX callables always use cpu)
-    device = torch.device("cpu")
-    if torch_model is not None:
-        param = next(torch_model.parameters(), None)
-        device = param.device if param is not None else torch.device("cpu")
     # multi-core: each worker builds its own optmodel once via the initializer
     pool = create_solver_pool(optmodel, processes)
-    # evaluate under eval(); the original mode is restored afterwards
-    was_training = torch_model.training if torch_model is not None else False
-    if torch_model is not None:
-        torch_model.eval()
     try:
-        # load data
-        for data in dataloader:
-            x, c, _, z = data
-            if torch_model is not None:
-                x, c, z = x.to(device), c.to(device), z.to(device)
-                with torch.no_grad():
-                    cp = torch_model(x)
-            else:
-                # JAX callable: f(x_numpy) -> array-like
-                cp = torch.as_tensor(np.array(predmodel(x.numpy()), dtype=np.float32))
-            # full cost so the MPAX backend can batch-set the objective in one call
-            sols, _ = _solve_batch(optmodel._fullCost(cp), optmodel, processes=processes, pool=pool)
-            # vectorized regret accumulation (one host sync per batch)
-            sols_np = costToNumpy(sols)
-            c_np = costToNumpy(optmodel._fullCost(c))
-            z_np = costToNumpy(z).reshape(-1)
-            # bare objective constants live outside the dot product
-            obj = np.einsum("bi,bi->b", sols_np, c_np) + _objOffset(optmodel)
-            losses.append(_regretFromObj(obj, z_np, optmodel.modelSense))
-            optsum += float(np.abs(z_np).sum())
+        with torch_evaluation(torch_model) as device:
+            # load data
+            for data in dataloader:
+                x, c, _, z = data
+                if torch_model is not None:
+                    x, c, z = x.to(device), c.to(device), z.to(device)
+                    with torch.no_grad():
+                        cp = torch_model(x)
+                else:
+                    # JAX callable: f(x_numpy) -> array-like
+                    cp = torch.as_tensor(np.array(predmodel(x.numpy()), dtype=np.float32))
+                # full cost so the MPAX backend can batch-set the objective in one call
+                sols, _ = _solve_batch(
+                    optmodel._fullCost(cp), optmodel, processes=processes, pool=pool
+                )
+                # vectorized regret accumulation (one host sync per batch)
+                sols_np = costToNumpy(sols)
+                c_np = costToNumpy(optmodel._fullCost(c))
+                z_np = costToNumpy(z).reshape(-1)
+                # bare objective constants live outside the dot product
+                obj = np.einsum("bi,bi->b", sols_np, c_np) + _objOffset(optmodel)
+                losses.append(_regretFromObj(obj, z_np, optmodel.modelSense))
+                optsum += float(np.abs(z_np).sum())
     finally:
         if pool is not None:
             _close_pool(pool)
-        # restore the original mode even if evaluation raises
-        if torch_model is not None:
-            torch_model.train(was_training)
     loss = np.concatenate(losses) if losses else np.empty(0)
     # reduce
     if reduction == "normalized":

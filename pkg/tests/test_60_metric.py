@@ -50,6 +50,13 @@ class _NoParamModel(nn.Module):
         return x
 
 
+class _FailingModel(nn.Module):
+    """Predictor used to verify evaluation cleanup after an exception."""
+
+    def forward(self, x):
+        raise RuntimeError("prediction failed")
+
+
 def _loader(n=16, d=4, batch_size=8):
     ds = TensorDataset(torch.randn(n, d), torch.randn(n, d), torch.randn(n, d), torch.randn(n, 1))
     return DataLoader(ds, batch_size=batch_size)
@@ -92,6 +99,14 @@ class TestMSE:
 
     def test_parameterless_model(self):
         assert MSE(_NoParamModel(), _loader()) >= 0
+
+    @pytest.mark.parametrize("training", [True, False])
+    def test_restores_mode_after_prediction_error(self, training):
+        model = _FailingModel()
+        model.train(training)
+        with pytest.raises(RuntimeError, match="prediction failed"):
+            MSE(model, _loader())
+        assert model.training is training
 
 
 class TestRegretFromObj:

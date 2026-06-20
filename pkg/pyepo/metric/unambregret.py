@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 from pyepo import EPO
-from pyepo.metric._validation import validate_retry_count, validate_tolerance
+from pyepo.metric._common import torch_evaluation, validate_retry_count, validate_tolerance
 from pyepo.metric.regret import _checkLinearObj, _objOffset, _regretFromObj
 from pyepo.utils import _EPS, costToNumpy
 
@@ -58,15 +58,9 @@ def unambRegret(
     validate_tolerance(tolerance)
     validate_retry_count(max_iter)
     _checkLinearObj(optmodel)
-    # evaluate under eval(); the original mode is restored afterwards
-    was_training = predmodel.training
-    predmodel.eval()
     loss = 0
     optsum = 0
-    # get device (cpu fallback for parameterless predictors)
-    param = next(predmodel.parameters(), None)
-    device = param.device if param is not None else torch.device("cpu")
-    try:
+    with torch_evaluation(predmodel) as device:
         # load data
         for data in dataloader:
             x, c, w, z = data
@@ -82,9 +76,6 @@ def unambRegret(
                     optmodel, cp[j], c_np[j], z[j].item(), tolerance, max_iter=max_iter
                 )
             optsum += abs(z).sum().item()
-    finally:
-        # restore the original mode even if evaluation raises
-        predmodel.train(was_training)
     # normalized
     return loss / (optsum + _EPS)
 

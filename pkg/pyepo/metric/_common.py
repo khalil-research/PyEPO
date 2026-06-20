@@ -1,7 +1,35 @@
-"""Validation helpers for metric configuration."""
+"""Shared helpers for metric configuration and evaluation."""
+
+from __future__ import annotations
 
 import math
+from contextlib import contextmanager
 from numbers import Real
+from typing import TYPE_CHECKING
+
+import torch
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from torch import nn
+
+
+@contextmanager
+def torch_evaluation(model: nn.Module | None) -> Iterator[torch.device]:
+    """Yield the model device while temporarily enabling evaluation mode."""
+    if model is None:
+        yield torch.device("cpu")
+        return
+
+    was_training = model.training
+    parameter = next(model.parameters(), None)
+    device = parameter.device if parameter is not None else torch.device("cpu")
+    model.eval()
+    try:
+        yield device
+    finally:
+        model.train(was_training)
 
 
 def validate_tolerance(tolerance: float) -> None:
