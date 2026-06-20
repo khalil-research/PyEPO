@@ -16,6 +16,7 @@ try:
 except ImportError:
     pass
 
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import tspABBase
 from pyepo.model.grb.grbmodel import _promote_lazy_cuts, optGrbModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, unionFind
@@ -38,8 +39,7 @@ class tspABModel(tspABBase, optGrbModel):
         Args:
             c: cost vector
         """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost)
         c = costToNumpy(c)
         # each undirected edge maps to 2 directed Vars; both get coefficient c[k]
         self._model.setAttr("Obj", self._cost_vars, np.repeat(c, 2).tolist())
@@ -240,8 +240,7 @@ class tspDFJModel(tspABModel):
         Args:
             c: cost vector
         """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost)
         c = costToNumpy(c)
         self._model.setAttr("Obj", self._cost_vars, c.tolist())
 

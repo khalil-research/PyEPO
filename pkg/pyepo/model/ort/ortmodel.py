@@ -18,6 +18,7 @@ except ImportError:
     _HAS_ORTOOLS = False
 
 from pyepo import EPO
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
@@ -82,8 +83,7 @@ class optOrtModel(optModel):
         Args:
             c: cost of objective function
         """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost)
         c = costToNumpy(c)
         obj = self._model.Objective()
         for v, coef in zip(self._vars_list, c.tolist()):

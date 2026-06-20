@@ -16,6 +16,7 @@ import pytest
 
 from pyepo import EPO
 from pyepo.model import predefined
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.opt import optModel
 
 from .conftest import (
@@ -62,6 +63,26 @@ class TestOptModelBase:
         assert len(first._cost_vars) == 1
         assert len(second._cost_vars) == 1
         assert first._cost_vars is not second._cost_vars
+
+    @pytest.mark.parametrize(
+        "cost",
+        [
+            np.ones((4, 1)),
+            np.ones((1, 4)),
+            np.ones((1, 1, 4)),
+            [[1.0], [2.0], [3.0], [4.0]],
+        ],
+    )
+    def test_objective_shape_rejects_nonvector(self, cost):
+        with pytest.raises(ValueError, match="one-dimensional"):
+            validate_objective_shape(cost, 4)
+
+    def test_objective_shape_accepts_explicit_batch(self):
+        validate_objective_shape(np.ones((3, 4)), 4, allow_batch=True)
+
+    def test_objective_shape_rejects_wrong_batch_width(self):
+        with pytest.raises(ValueError, match="cost variables"):
+            validate_objective_shape(np.ones((3, 5)), 4, allow_batch=True)
 
 
 # ============================================================
@@ -151,6 +172,16 @@ class TestKnapsack:
         m, _ = _make_knapsack(backend)
         with pytest.raises(ValueError):
             m.setObj(np.ones(10))
+
+    def test_setObj_batch_contract(self, backend):
+        m, _ = _make_knapsack(backend)
+        batch = np.ones((2, m.num_cost))
+        if backend == "mpax":
+            m.setObj(batch)
+            assert tuple(m.c.shape) == batch.shape
+        else:
+            with pytest.raises(ValueError, match="one-dimensional"):
+                m.setObj(batch)
 
     def test_copy_isolation(self, backend):
         m, meta = _make_knapsack(backend)
@@ -504,6 +535,11 @@ class TestTSP:
         with pytest.raises(ValueError):
             m.setObj(np.ones(3))
 
+    def test_setObj_rejects_batch(self, backend, formulation):
+        m, _ = _make_tsp(backend, formulation)
+        with pytest.raises(ValueError, match="one-dimensional"):
+            m.setObj(np.ones((2, m.num_cost)))
+
     def test_copy_isolation(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         cost = np.random.RandomState(42).rand(m.num_cost)
@@ -635,6 +671,11 @@ class TestVRP:
         m, _ = _make_vrp(backend, formulation)
         with pytest.raises(ValueError):
             m.setObj(np.ones(3))
+
+    def test_setObj_rejects_batch(self, backend, formulation):
+        m, _ = _make_vrp(backend, formulation)
+        with pytest.raises(ValueError, match="one-dimensional"):
+            m.setObj(np.ones((2, m.num_cost)))
 
     def test_copy_isolation(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)

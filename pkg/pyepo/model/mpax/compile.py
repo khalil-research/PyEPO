@@ -25,6 +25,7 @@ except ImportError:
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.mpax.mpaxmodel import _warn_if_not_optimal, optMpaxModel
 
 
@@ -93,20 +94,17 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
     def setObj(self, c):
         """Set the objective from a predicted cost of length ``num_cost``, scattered onto the known fixed costs."""
         prob = self.problem
+        validate_objective_shape(c, (prob.num_cost, prob.num_vars), allow_batch=True)
         n = c.shape[-1] if hasattr(c, "shape") else len(c)
         # scatter onto fixed costs; an unambiguous full-length vector passes through
         if n == prob.num_cost:
             self._write_cost(c, is_full=False)
-        elif n == prob.num_vars:
-            self._write_cost(c, is_full=True)
         else:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+            self._write_cost(c, is_full=True)
 
     def _setFullObj(self, c):
         """Set the objective from full-space coefficients (length ``num_vars``), bypassing the predicted-cost scatter."""
-        n = c.shape[-1] if hasattr(c, "shape") else len(c)
-        if n != self.problem.num_vars:
-            raise ValueError("Size of cost vector does not match number of variables.")
+        validate_objective_shape(c, self.problem.num_vars, allow_batch=True, full=True)
         self._write_cost(c, is_full=True)
 
     def _write_cost(self, c, is_full):

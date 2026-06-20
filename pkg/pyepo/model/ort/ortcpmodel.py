@@ -18,6 +18,7 @@ except ImportError:
     _HAS_ORTOOLS = False
 
 from pyepo import EPO
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
@@ -67,8 +68,7 @@ class optOrtCpModel(optModel):
         Args:
             c: cost of objective function
         """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost)
         # float64 so the scaling keeps full precision
         c = np.asarray(costToNumpy(c), dtype=np.float64)
         # scale float to int (round to match addConstr; truncation biases the objective)

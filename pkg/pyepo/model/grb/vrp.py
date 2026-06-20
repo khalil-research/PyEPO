@@ -15,6 +15,7 @@ try:
 except ImportError:
     pass
 
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import vrpABBase
 from pyepo.model.grb.grbmodel import _promote_lazy_cuts, optGrbModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, _uf_components, unionFind
@@ -114,8 +115,7 @@ class vrpRCIModel(vrpABModel):
         Args:
             c: cost vector aligned with ``self.edges``
         """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost)
         c = costToNumpy(c)
         # batch C-level coefficient update
         self._model.setAttr("Obj", self._cost_vars, c.tolist())
@@ -229,8 +229,7 @@ class vrpMTZModel(vrpABModel):
         Args:
             c: cost vector aligned with ``self.edges`` (one cost per undirected edge)
         """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost)
         c = costToNumpy(c)
         # each undirected edge maps to 2 directed vars; both get coefficient c[k]
         self._model.setAttr("Obj", self._cost_vars, np.repeat(c, 2).tolist())

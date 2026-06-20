@@ -19,6 +19,7 @@ except ImportError:
     _HAS_GUROBI = False
 
 from pyepo import EPO
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
@@ -78,8 +79,7 @@ class optGrbModel(optModel):
         Args:
             c: cost of objective function
         """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost)
         c = costToNumpy(c)
         if isinstance(self.x, gp.MVar):
             # direct Obj attr write skips MLinExpr allocation

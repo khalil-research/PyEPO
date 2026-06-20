@@ -23,6 +23,7 @@ except ImportError:
     _CoptMVar = None
 
 from pyepo import EPO
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.opt import optModel
 from pyepo.utils import costToNumpy
 
@@ -86,8 +87,7 @@ class optCoptModel(optModel):
         Args:
             c: cost of objective function
         """
-        if len(c) != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost)
         c = costToNumpy(c)
         if _is_mvar(self.x):
             # direct Obj attr write skips MLinExpr allocation

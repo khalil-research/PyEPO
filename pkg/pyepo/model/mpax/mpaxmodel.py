@@ -24,6 +24,7 @@ except ImportError:
     _HAS_MPAX = False
 
 from pyepo import EPO
+from pyepo.model._common import validate_objective_shape
 from pyepo.model.opt import optModel
 
 if TYPE_CHECKING:
@@ -178,10 +179,7 @@ class optMpaxModel(optModel):
         Args:
             c: cost of objective function
         """
-        # validate shape before assignment
-        c_len = c.shape[-1] if hasattr(c, "shape") else len(c)
-        if c_len != self.num_cost:
-            raise ValueError("Size of cost vector does not match number of cost variables.")
+        validate_objective_shape(c, self.num_cost, allow_batch=True)
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):
             # move to cpu if JAX has no GPU support
