@@ -21,7 +21,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: ModelSpec
+.. py:class:: ModelSpec(model_type: type[optModel], config: dict)
 
    Serializable recipe for building a fresh optimization model.
 
@@ -30,8 +30,11 @@ Module Contents
       :type:  type[optModel]
 
 
-   .. py:attribute:: config
-      :type:  dict
+   .. py:property:: config
+      :type: dict
+
+
+      Return an independent copy of the constructor configuration.
 
 
    .. py:method:: build() -> optModel

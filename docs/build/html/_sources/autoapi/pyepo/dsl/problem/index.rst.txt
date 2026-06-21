@@ -68,6 +68,12 @@ Module Contents
    .. py:attribute:: cost_var
 
 
+   .. py:attribute:: modelSense
+
+
+   .. py:attribute:: cost_var_name
+
+
    .. py:property:: num_cost
       :type: int
 
