@@ -66,7 +66,9 @@ class optGrbModel(optModel):
         # turn off output
         self._model.Params.outputFlag = 0
         # cache ordered Var list once for setAttr/getAttr batch paths
-        self._vars_list = None if isinstance(self.x, gp.MVar) else list(self.x.values())
+        self._vars_list: list[gp.Var] | None = (
+            None if isinstance(self.x, gp.MVar) else list(self.x.values())
+        )
 
     def __repr__(self) -> str:
         return "optGRBModel " + self.__class__.__name__
@@ -160,18 +162,20 @@ class optGrbModel(optModel):
             optModel: new model with the added constraint
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
-        coefs = costToNumpy(coefs).copy()
+        coefs_np: np.ndarray = costToNumpy(coefs).copy()
         # copy
         new_model = self.copy()
         # add constraint
         if isinstance(new_model.x, gp.MVar):
-            new_model._model.addConstr(coefs @ new_model.x <= rhs)
+            new_model._model.addConstr(coefs_np @ new_model.x <= rhs)
         else:
             # LinExpr(coeffs, vars) builds the affine expression in one C call
-            expr = gp.LinExpr(coefs.tolist(), new_model._vars_list) <= rhs
+            vars_list = new_model._vars_list
+            assert vars_list is not None
+            expr = gp.LinExpr(coefs_np.tolist(), vars_list) <= rhs
             new_model._model.addConstr(expr)
         # track for replay on relax
-        new_model._extra_constrs = [*self._extra_constrs, (coefs, rhs)]
+        new_model._extra_constrs = [*self._extra_constrs, (coefs_np, rhs)]
         return new_model
 
 
