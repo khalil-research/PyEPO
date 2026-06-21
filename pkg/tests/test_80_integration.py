@@ -76,51 +76,72 @@ def test_train_minimize(name, sp_data):
 
 @requires_gurobi
 class TestMaximizeEndToEnd:
-
     def test_spo_plus_knapsack(self, ks_data):
         optmodel, _ds, loader = ks_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        _train_loop(F.SPOPlus(optmodel, processes=1), loader, predmodel,
-                    lambda fn, cp, c, w, z: fn(cp, c, w, z))
+        _train_loop(
+            F.SPOPlus(optmodel, processes=1),
+            loader,
+            predmodel,
+            lambda fn, cp, c, w, z: fn(cp, c, w, z),
+        )
 
     def test_blackbox_knapsack(self, ks_data):
         optmodel, _ds, loader = ks_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        _train_loop(F.DBB(optmodel, lambd=10, processes=1), loader, predmodel,
-                    lambda fn, cp, c, w, z: -(fn(cp) * c).sum(1).mean())
+        _train_loop(
+            F.DBB(optmodel, lambd=10, processes=1),
+            loader,
+            predmodel,
+            lambda fn, cp, c, w, z: -(fn(cp) * c).sum(1).mean(),
+        )
 
 
 @requires_gurobi
 class TestSpecialDatasets:
-
     def test_knn_dataset(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         x, c = pyepo.data.shortestpath.genData(NUM_DATA, NUM_FEAT, GRID, seed=42)
         optmodel = shortestPathModel(grid=GRID)
         dataset = optDatasetKNN(optmodel, x, c, k=3, weight=0.5)
         assert len(dataset) == NUM_DATA
         loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        _train_loop(F.SPOPlus(optmodel, processes=1), loader, predmodel,
-                    lambda fn, cp, c_b, w, z: fn(cp, c_b, w, z))
+        _train_loop(
+            F.SPOPlus(optmodel, processes=1),
+            loader,
+            predmodel,
+            lambda fn, cp, c_b, w, z: fn(cp, c_b, w, z),
+        )
 
     def test_portfolio_qp(self):
         from pyepo.model.grb.portfolio import portfolioModel
+
         cov, x, c = pyepo.data.portfolio.genData(NUM_DATA, NUM_FEAT, 8, deg=1, seed=42)
         optmodel = portfolioModel(num_assets=8, covariance=cov)
         loader = DataLoader(optDataset(optmodel, x, c), batch_size=BATCH, shuffle=False)
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        _train_loop(F.SPOPlus(optmodel, processes=1), loader, predmodel,
-                    lambda fn, cp, c_b, w, z: fn(cp, c_b, w, z))
+        _train_loop(
+            F.SPOPlus(optmodel, processes=1),
+            loader,
+            predmodel,
+            lambda fn, cp, c_b, w, z: fn(cp, c_b, w, z),
+        )
 
     def test_tsp_dfj_lazy_callback(self):
         from pyepo.model.grb.tsp import tspDFJModel
+
         x, c = pyepo.data.tsp.genData(NUM_DATA, NUM_FEAT, 5, deg=1, seed=42)
         optmodel = tspDFJModel(num_nodes=5)
         loader = DataLoader(optDataset(optmodel, x, c), batch_size=BATCH, shuffle=False)
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        _train_loop(F.DBB(optmodel, lambd=10, processes=1), loader, predmodel,
-                    lambda fn, cp, c_b, w, z: (fn(cp) * c_b).sum(1).mean())
+        _train_loop(
+            F.DBB(optmodel, lambd=10, processes=1),
+            loader,
+            predmodel,
+            lambda fn, cp, c_b, w, z: (fn(cp) * c_b).sum(1).mean(),
+        )
 
 
 @requires_gurobi
@@ -148,8 +169,8 @@ class TestCaVEEndToEnd:
 @pytest.mark.skipif(
     sys.platform == "win32",
     reason="pathos spawn-based pool segfaults at interpreter teardown once JAX is "
-           "loaded in-process on Windows; the multiprocessing path is validated on "
-           "Linux CI (fork)",
+    "loaded in-process on Windows; the multiprocessing path is validated on "
+    "Linux CI (fork)",
 )
 class TestParallelSolving:
     """Multiprocessing solve path (processes>1). Marked slow: process spawn
@@ -158,5 +179,9 @@ class TestParallelSolving:
     def test_spo_plus_parallel(self, sp_data):
         optmodel, _ds, loader = sp_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
-        _train_loop(F.SPOPlus(optmodel, processes=2), loader, predmodel,
-                    lambda fn, cp, c, w, z: fn(cp, c, w, z))
+        _train_loop(
+            F.SPOPlus(optmodel, processes=2),
+            loader,
+            predmodel,
+            lambda fn, cp, c, w, z: fn(cp, c, w, z),
+        )

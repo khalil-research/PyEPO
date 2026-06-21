@@ -606,7 +606,9 @@ class TestImplicitMLE:
         from pyepo.func.jax import adaptiveImplicitMLE
 
         model, pred, target, ptb_c = self._setup()
-        aimle = adaptiveImplicitMLE(model, n_samples=5, sigma=1.0, kappa=5.0, two_sides=True, seed=0)
+        aimle = adaptiveImplicitMLE(
+            model, n_samples=5, sigma=1.0, kappa=5.0, two_sides=True, seed=0
+        )
         lambd = aimle.alpha * float(np.linalg.norm(pred)) / float(np.linalg.norm(target))
         expected = self._resolve_grad_two_sides(aimle, target, ptb_c, lambd)
         g = np.array(jax.grad(lambda p: jnp.sum(jnp.asarray(target) * aimle(p)))(jnp.asarray(pred)))
@@ -990,9 +992,7 @@ def _partial_model():
     extra = dsl.Variable(2, vtype=EPO.BINARY)
     cost = dsl.Parameter(3)
     dfix = np.array([1.0, 2.0])
-    prob = dsl.Problem(
-        dsl.Maximize(cost @ items + dfix @ extra), [items.sum() + extra.sum() <= 3]
-    )
+    prob = dsl.Problem(dsl.Maximize(cost @ items + dfix @ extra), [items.sum() + extra.sum() <= 3])
     return prob.compile(backend="gurobi")
 
 
@@ -1050,7 +1050,9 @@ class TestPartialPredictionParity:
         # torch reference (lifts internally via _fullCost)
         top = tbuild(model, ds, "mean")
         cpt = torch.tensor(cn, requires_grad=True)
-        out_t = call_op(top, sig, cpt, torch.as_tensor(ct), torch.as_tensor(wt), torch.as_tensor(zt))
+        out_t = call_op(
+            top, sig, cpt, torch.as_tensor(ct), torch.as_tensor(wt), torch.as_tensor(zt)
+        )
         (out_t if out_t.dim() == 0 else out_t.sum()).backward()
         g_t = cpt.grad.numpy()
         # jax grad on the short predicted cost

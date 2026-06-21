@@ -28,7 +28,8 @@ from .conftest import (
 _DEVICE = torch.device("cuda" if _HAS_CUDA else "cpu")
 
 requires_cuda_gurobi = pytest.mark.skipif(
-    not (_HAS_CUDA and _HAS_GUROBI), reason="CUDA or Gurobi not available")
+    not (_HAS_CUDA and _HAS_GUROBI), reason="CUDA or Gurobi not available"
+)
 
 
 def _cuda_batch(loader, n=4):
@@ -48,7 +49,6 @@ def _assert_grads_cuda(model):
 
 @requires_cuda
 class TestModelDevice:
-
     def test_parameters_and_forward_on_cuda(self):
         pred = LinearPred(5, 10).to(_DEVICE)
         for name, p in pred.named_parameters():
@@ -59,7 +59,6 @@ class TestModelDevice:
 
 @requires_cuda_gurobi
 class TestSolutionLossesCUDA:
-
     @pytest.mark.parametrize("name", SOLUTION_OPS)
     def test_output_and_grad_on_cuda(self, name, sp_data):
         optmodel, dataset, loader = sp_data
@@ -74,7 +73,6 @@ class TestSolutionLossesCUDA:
 
 @requires_cuda_gurobi
 class TestLossesCUDA:
-
     @pytest.mark.parametrize("name", LOSS_OPS)
     def test_loss_and_grad_on_cuda(self, name, sp_data):
         optmodel, dataset, loader = sp_data
@@ -89,7 +87,6 @@ class TestLossesCUDA:
 
 @requires_cuda_gurobi
 class TestMaximizeCUDA:
-
     def test_spo_plus_knapsack(self, ks_data):
         optmodel, _ds, loader = ks_data
         x, c, w, z = _cuda_batch(loader)
@@ -102,7 +99,6 @@ class TestMaximizeCUDA:
 
 @requires_cuda_gurobi
 class TestMetricsCUDA:
-
     def test_regret_and_mse(self, sp_data):
         optmodel, _ds, loader = sp_data
         pred = LinearPred(NUM_FEAT, optmodel.num_cost).to(_DEVICE)
@@ -125,6 +121,7 @@ class TestMpaxGpuBridge:
     def test_spoplus_loss_and_grad_on_cuda(self):
         from pyepo.data.shortestpath import genData
         from pyepo.model.mpax.shortestpath import shortestPathModel
+
         optmodel = shortestPathModel(grid=(3, 3))
         x, c = genData(8, NUM_FEAT, (3, 3), seed=42)
         pred = LinearPred(NUM_FEAT, optmodel.num_cost).to(_DEVICE)

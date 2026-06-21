@@ -42,12 +42,13 @@ class ConfigModel(optModel):
     def solve(self):
         return np.zeros(len(self.values)), 0.0
 
+
 # ============================================================
 # unionFind (pure)
 # ============================================================
 
-class TestUnionFind:
 
+class TestUnionFind:
     def test_initial_each_singleton(self):
         uf = unionFind(5)
         for i in range(5):
@@ -81,8 +82,8 @@ class TestUnionFind:
 # getTspTour (pure)
 # ============================================================
 
-class TestGetTspTour:
 
+class TestGetTspTour:
     @staticmethod
     def _all_edges(n):
         return [(i, j) for i in range(n) for j in range(i + 1, n)]
@@ -129,8 +130,8 @@ class TestGetTspTour:
 # costToNumpy (pure)
 # ============================================================
 
-class TestCostToNumpy:
 
+class TestCostToNumpy:
     def test_torch_tensor_detached(self):
         c = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
         out = costToNumpy(c)
@@ -163,8 +164,8 @@ class TestCostToNumpy:
 # explicit model reconstruction protocol (pure)
 # ============================================================
 
-class TestModelSpec:
 
+class TestModelSpec:
     def test_get_config_and_compatibility_wrapper(self):
         model = ConfigModel([1, 2, 3], label="x")
         config = model.get_config()
@@ -226,12 +227,13 @@ class TestModelSpec:
 # getArgs (needs a real optModel)
 # ============================================================
 
+
 @requires_gurobi
 class TestGetArgs:
-
     def _models(self):
         from pyepo.model.grb.knapsack import knapsackModel
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         return knapsackModel, shortestPathModel
 
     def test_knapsack_args(self):

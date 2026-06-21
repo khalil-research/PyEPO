@@ -32,15 +32,16 @@ from .conftest import (
 
 # omo models here always use solver="gurobi", so they need both backends
 requires_omo = pytest.mark.skipif(
-    not (_HAS_PYOMO and _HAS_GUROBI), reason="Pyomo or Gurobi not installed")
+    not (_HAS_PYOMO and _HAS_GUROBI), reason="Pyomo or Gurobi not installed"
+)
 
 
 # ============================================================
 # optModel base class
 # ============================================================
 
-class TestOptModelBase:
 
+class TestOptModelBase:
     def test_cannot_instantiate_abstract(self):
         with pytest.raises(TypeError):
             optModel()
@@ -112,8 +113,8 @@ class TestOptModelBase:
 # Problem constructor validation
 # ============================================================
 
-class TestProblemConstructorValidation:
 
+class TestProblemConstructorValidation:
     @pytest.mark.parametrize("grid", [(1, 1), (0, 3), (2,), (2, 3, 4), (2.5, 3)])
     def test_shortestpath_rejects_invalid_grid(self, grid):
         from pyepo.model.grb.shortestpath import shortestPathModel
@@ -168,7 +169,6 @@ class TestProblemConstructorValidation:
 
 
 class TestProblemConfigIsolation:
-
     def test_knapsack_config_is_independent(self):
         from pyepo.model.grb.knapsack import knapsackModel
 
@@ -216,22 +216,27 @@ def _make_knapsack(backend, weights=_KNAP_W, capacity=_KNAP_CAP):
     """Return (model, meta) for a knapsack on the given backend."""
     if backend == "grb":
         from pyepo.model.grb.knapsack import knapsackModel, knapsackModelRel
+
         m = knapsackModel(weights=weights, capacity=capacity)
         return m, {"relax": knapsackModelRel, "binary": True, "tol": 1e-6}
     if backend == "copt":
         from pyepo.model.copt.knapsack import knapsackModel, knapsackModelRel
+
         m = knapsackModel(weights=weights, capacity=capacity)
         return m, {"relax": knapsackModelRel, "binary": True, "tol": 1e-6}
     if backend == "omo":
         from pyepo.model.omo.knapsack import knapsackModel, knapsackModelRel
+
         m = knapsackModel(weights=weights, capacity=capacity, solver="gurobi")
         return m, {"relax": knapsackModelRel, "binary": True, "tol": 1e-6}
     if backend == "ort":
         from pyepo.model.ort.knapsack import knapsackModel, knapsackModelRel
+
         m = knapsackModel(weights=weights, capacity=capacity)
         return m, {"relax": knapsackModelRel, "binary": True, "tol": 1e-6}
     if backend == "ortcp":
         from pyepo.model.ort.knapsack import knapsackCpModel
+
         m = knapsackCpModel(
             weights=np.asarray(weights).astype(int),
             capacity=np.asarray(capacity).astype(int),
@@ -239,6 +244,7 @@ def _make_knapsack(backend, weights=_KNAP_W, capacity=_KNAP_CAP):
         return m, {"relax": None, "binary": True, "tol": 1e-2}
     if backend == "mpax":
         from pyepo.model.mpax.knapsack import knapsackModel
+
         m = knapsackModel(weights=weights, capacity=capacity)
         return m, {"relax": None, "binary": False, "tol": 1e-2}  # LP relaxation
     raise ValueError(backend)
@@ -256,7 +262,6 @@ _KNAP_BACKENDS = [
 
 @pytest.mark.parametrize("backend", _KNAP_BACKENDS)
 class TestKnapsack:
-
     def test_init_and_num_cost(self, backend):
         m, _ = _make_knapsack(backend)
         assert m.modelSense == EPO.MAXIMIZE
@@ -400,25 +405,32 @@ def _make_knapsack_multidim(backend):
     cap = np.array([8.0, 7.0])
     if backend == "grb":
         from pyepo.model.grb.knapsack import knapsackModel
+
         return knapsackModel(weights=w, capacity=cap), w, cap
     if backend == "copt":
         from pyepo.model.copt.knapsack import knapsackModel
+
         return knapsackModel(weights=w, capacity=cap), w, cap
     if backend == "omo":
         from pyepo.model.omo.knapsack import knapsackModel
+
         return knapsackModel(weights=w, capacity=cap, solver="gurobi"), w, cap
     if backend == "ort":
         from pyepo.model.ort.knapsack import knapsackModel
+
         return knapsackModel(weights=w, capacity=cap), w, cap
     raise ValueError(backend)
 
 
-@pytest.mark.parametrize("backend", [
-    pytest.param("grb", marks=requires_gurobi),
-    pytest.param("copt", marks=requires_copt),
-    pytest.param("omo", marks=requires_omo),
-    pytest.param("ort", marks=requires_ortools),
-])
+@pytest.mark.parametrize(
+    "backend",
+    [
+        pytest.param("grb", marks=requires_gurobi),
+        pytest.param("copt", marks=requires_copt),
+        pytest.param("omo", marks=requires_omo),
+        pytest.param("ort", marks=requires_ortools),
+    ],
+)
 def test_knapsack_multidimensional(backend):
     m, w, cap = _make_knapsack_multidim(backend)
     assert m.num_cost == 3
@@ -433,24 +445,31 @@ def test_knapsack_multidimensional(backend):
 # Shortest path (MINIMIZE, LP) — parametrized over backends
 # ============================================================
 
+
 def _make_shortestpath(backend, grid=(3, 3)):
     if backend == "grb":
         from pyepo.model.grb.shortestpath import shortestPathModel
+
         return shortestPathModel(grid=grid), {"integral": True, "tol": 1e-6}
     if backend == "copt":
         from pyepo.model.copt.shortestpath import shortestPathModel
+
         return shortestPathModel(grid=grid), {"integral": True, "tol": 1e-6}
     if backend == "omo":
         from pyepo.model.omo.shortestpath import shortestPathModel
+
         return shortestPathModel(grid=grid, solver="gurobi"), {"integral": True, "tol": 1e-6}
     if backend == "ort":
         from pyepo.model.ort.shortestpath import shortestPathModel
+
         return shortestPathModel(grid=grid), {"integral": True, "tol": 1e-6}
     if backend == "ortcp":
         from pyepo.model.ort.shortestpath import shortestPathCpModel
+
         return shortestPathCpModel(grid=grid), {"integral": True, "tol": 1e-2}
     if backend == "mpax":
         from pyepo.model.mpax.shortestpath import shortestPathModel
+
         return shortestPathModel(grid=grid), {"integral": False, "tol": 1e-2}
     raise ValueError(backend)
 
@@ -467,7 +486,6 @@ _SP_BACKENDS = [
 
 @pytest.mark.parametrize("backend", _SP_BACKENDS)
 class TestShortestPath:
-
     def test_init_and_num_cost(self, backend):
         m, _ = _make_shortestpath(backend)
         assert m.modelSense == EPO.MINIMIZE
@@ -539,8 +557,10 @@ def test_shortestpath_addConstr_no_improvement(backend):
 # Portfolio (MAXIMIZE, QP) — parametrized over backends
 # ============================================================
 
+
 def _portfolio_data(num_assets=10):
     from pyepo.data.portfolio import genData
+
     cov, _, revenue = genData(num_data=10, num_features=4, num_assets=num_assets, deg=1)
     return cov, revenue
 
@@ -548,12 +568,15 @@ def _portfolio_data(num_assets=10):
 def _make_portfolio(backend, cov, num_assets=10):
     if backend == "grb":
         from pyepo.model.grb.portfolio import portfolioModel
+
         return portfolioModel(num_assets=num_assets, covariance=cov)
     if backend == "copt":
         from pyepo.model.copt.portfolio import portfolioModel
+
         return portfolioModel(num_assets=num_assets, covariance=cov)
     if backend == "omo":
         from pyepo.model.omo.portfolio import portfolioModel
+
         return portfolioModel(num_assets=num_assets, covariance=cov, solver="gurobi")
     raise ValueError(backend)
 
@@ -567,7 +590,6 @@ _PORTFOLIO_BACKENDS = [
 
 @pytest.mark.parametrize("backend", _PORTFOLIO_BACKENDS)
 class TestPortfolio:
-
     def test_init_and_num_cost(self, backend):
         cov, _ = _portfolio_data()
         m = _make_portfolio(backend, cov)
@@ -626,10 +648,12 @@ class TestPortfolio:
 # TSP (MINIMIZE, binary) — parametrized over (backend, formulation)
 # ============================================================
 
+
 def _make_tsp(backend, formulation, num_nodes=4):
     """Return (model, relax_cls_or_None)."""
     if backend == "grb":
         from pyepo.model.grb import tsp as t
+
         cls = {"GG": t.tspGGModel, "DFJ": t.tspDFJModel, "MTZ": t.tspMTZModel}[formulation]
         rel = {"GG": t.tspGGModelRel, "DFJ": None, "MTZ": t.tspMTZModelRel}[formulation]
         m = cls(num_nodes=num_nodes)
@@ -637,11 +661,13 @@ def _make_tsp(backend, formulation, num_nodes=4):
         return m, rel
     if backend == "copt":
         from pyepo.model.copt import tsp as t
+
         cls = {"GG": t.tspGGModel, "DFJ": t.tspDFJModel, "MTZ": t.tspMTZModel}[formulation]
         rel = {"GG": t.tspGGModelRel, "DFJ": None, "MTZ": t.tspMTZModelRel}[formulation]
         return cls(num_nodes=num_nodes), rel
     if backend == "omo":
         from pyepo.model.omo import tsp as t
+
         cls = {"GG": t.tspGGModel, "MTZ": t.tspMTZModel}[formulation]
         rel = {"GG": t.tspGGModelRel, "MTZ": t.tspMTZModelRel}[formulation]
         return cls(num_nodes=num_nodes, solver="gurobi"), rel
@@ -662,7 +688,6 @@ _TSP_PARAMS = [
 
 @pytest.mark.parametrize("backend,formulation", _TSP_PARAMS)
 class TestTSP:
-
     def test_init_and_num_cost(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         assert m.num_nodes == 4
@@ -799,20 +824,27 @@ _VRP_COST = np.random.RandomState(0).rand(_VRP_NUM_EDGES)
 
 def _make_vrp(backend, formulation, demands=_VRP_DEMANDS):
     """Return (model, relax_cls_or_None)."""
-    kw = {"num_nodes": _VRP_NUM_NODES, "demands": demands,
-          "capacity": _VRP_CAPACITY, "num_vehicle": _VRP_NUM_VEHICLES}
+    kw = {
+        "num_nodes": _VRP_NUM_NODES,
+        "demands": demands,
+        "capacity": _VRP_CAPACITY,
+        "num_vehicle": _VRP_NUM_VEHICLES,
+    }
     if backend == "grb":
         from pyepo.model.grb import vrp as v
+
         if formulation == "RCI":
             return v.vrpRCIModel(**kw), None
         return v.vrpMTZModel(**kw), v.vrpMTZModelRel
     if backend == "copt":
         from pyepo.model.copt import vrp as v
+
         if formulation == "RCI":
             return v.vrpRCIModel(**kw), None
         return v.vrpMTZModel(**kw), v.vrpMTZModelRel
     if backend == "omo":
         from pyepo.model.omo import vrp as v
+
         return v.vrpMTZModel(solver="gurobi", **kw), v.vrpMTZModelRel
     raise ValueError(backend)
 
@@ -828,7 +860,6 @@ _VRP_PARAMS = [
 
 @pytest.mark.parametrize("backend,formulation", _VRP_PARAMS)
 class TestVRP:
-
     def test_init_and_num_cost(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)
         assert m.num_nodes == _VRP_NUM_NODES
@@ -1008,6 +1039,7 @@ def test_vrp_rci_lazy_constrs_tracked():
 def test_lazy_buffer_holds_current_solve_only(problem):
     if problem == "tsp":
         from pyepo.model.grb.tsp import tspDFJModel
+
         m = tspDFJModel(num_nodes=5)
     else:
         m, _ = _make_vrp("grb", "RCI")
@@ -1127,21 +1159,24 @@ def test_parity_vs_gurobi(problem, backend):
 # OR-Tools CP-SAT integer guard
 # ============================================================
 
+
 @requires_ortools
 class TestOrtCpSatGuards:
-
     def test_float_weights_raise(self):
         from pyepo.model.ort.knapsack import knapsackCpModel
+
         with pytest.raises(ValueError, match="integer weights"):
             knapsackCpModel(weights=np.array([[3.5, 4.0, 5.0, 6.0]]), capacity=np.array([10]))
 
     def test_float_capacity_raise(self):
         from pyepo.model.ort.knapsack import knapsackCpModel
+
         with pytest.raises(ValueError, match="integer capacity"):
             knapsackCpModel(weights=np.array([[3, 4, 5, 6]]), capacity=np.array([10.5]))
 
     def test_relax_not_supported(self):
         from pyepo.model.ort.knapsack import knapsackCpModel
+
         m = knapsackCpModel(weights=np.array([[3, 4, 5, 6]]), capacity=np.array([10]))
         with pytest.raises(RuntimeError):
             m.relax()
@@ -1162,6 +1197,7 @@ if _HAS_MPAX:
         Diagonal Q; the slack inequality is non-binding and exists only to give
         PDHG a non-empty dual block. Unconstrained optimum x*_i = -c_i / Q_ii.
         """
+
         use_sparse_matrix = False
 
         def __init__(self, Q_diag, lb=-10.0, ub=10.0):
@@ -1183,7 +1219,6 @@ if _HAS_MPAX:
 
 @requires_mpax
 class TestMpaxQP:
-
     @pytest.fixture
     def model(self):
         return _MpaxBoxQP(Q_diag=[2.0, 4.0, 6.0, 8.0])
@@ -1222,6 +1257,7 @@ class TestMpaxQP:
     def test_qp_rejects_maximize(self):
         class _BadMaxQP(_MpaxBoxQP):
             modelSense = EPO.MAXIMIZE
+
         with pytest.raises(ValueError, match="MINIMIZE"):
             _BadMaxQP(Q_diag=[1.0, 1.0])
 
@@ -1295,13 +1331,19 @@ class TestFactory:
     def test_vrp_formulation_dispatch(self):
         grb = _fac_submodule("gurobi")
         demands, cap, k = [1, 2, 1, 2, 1], 5.0, 2
-        assert isinstance(predefined.vrpModel(6, demands, cap, k, formulation="RCI"), grb.vrpRCIModel)
-        assert isinstance(predefined.vrpModel(6, demands, cap, k, formulation="MTZ"), grb.vrpMTZModel)
+        assert isinstance(
+            predefined.vrpModel(6, demands, cap, k, formulation="RCI"), grb.vrpRCIModel
+        )
+        assert isinstance(
+            predefined.vrpModel(6, demands, cap, k, formulation="MTZ"), grb.vrpMTZModel
+        )
 
     @requires_gurobi
     def test_portfolio_dispatch(self):
         cov = np.cov(np.random.RandomState(0).randn(20, 10), rowvar=False)
-        assert isinstance(predefined.portfolioModel(10, cov), _fac_submodule("gurobi").portfolioModel)
+        assert isinstance(
+            predefined.portfolioModel(10, cov), _fac_submodule("gurobi").portfolioModel
+        )
 
     @requires_gurobi
     def test_dispatched_instance_solves(self):

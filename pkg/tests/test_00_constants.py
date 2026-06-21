@@ -10,7 +10,6 @@ from pyepo.EPO import MAXIMIZE, MINIMIZE, ModelSense
 
 
 class TestModelSense:
-
     def test_integer_values(self):
         # losses rely on these exact signs to flip min/max
         assert int(MINIMIZE) == 1
