@@ -157,8 +157,6 @@ Module Contents
 
 
    .. py:attribute:: gamma
-      :value: 2.25
-
 
 
    .. py:method:: get_config() -> dict
@@ -299,6 +297,8 @@ Module Contents
 
 
    .. py:attribute:: demands
+      :value: []
+
 
 
    .. py:attribute:: capacity
