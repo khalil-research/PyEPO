@@ -144,7 +144,7 @@ def _solve_batch_np(
         obj = np.asarray(obj_list, dtype=np.float32)
     # multi-core (workers pre-loaded with optmodel via pool initializer)
     else:
-        res = pool.amap(_solveWithObj4Par, cp).get()
+        res = pool.amap(_solve_with_obj_in_worker, cp).get()
         sol = np.stack([r[0] for r in res]).astype(np.float32)
         obj = np.asarray([r[1] for r in res], dtype=np.float32)
     return sol, obj
@@ -194,7 +194,7 @@ def _cache_in_pass(
 
 
 # per-worker optmodel, built by `_init_worker_model` at pool startup
-_worker_model = None
+_worker_model: optModel | None = None
 
 
 def _init_worker_model(spec: ModelSpec) -> None:
@@ -203,7 +203,7 @@ def _init_worker_model(spec: ModelSpec) -> None:
     _worker_model = spec.build()
 
 
-def _solveWithObj4Par(cost: np.ndarray) -> tuple[np.ndarray, float]:
+def _solve_with_obj_in_worker(cost: np.ndarray) -> tuple[np.ndarray, float]:
     """Solve a single instance in a pool worker using the pre-built optmodel."""
     if _worker_model is None:
         raise RuntimeError("_init_worker_model must run before solving in a worker")

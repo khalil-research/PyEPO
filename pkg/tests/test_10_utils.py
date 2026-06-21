@@ -209,11 +209,14 @@ class TestModelSpec:
         np.testing.assert_array_equal(rebuilt.values, model.values)
 
     def test_worker_initializer_builds_from_spec(self):
-        from pyepo.func.utils import _init_worker_model, _solveWithObj4Par
+        from pyepo.func.utils import (
+            _init_worker_model,
+            _solve_with_obj_in_worker,
+        )
 
         model = ConfigModel([1, 2, 3])
         _init_worker_model(model.to_spec())
-        sol, obj = _solveWithObj4Par(np.array([3.0, 2.0, 1.0]))
+        sol, obj = _solve_with_obj_in_worker(np.array([3.0, 2.0, 1.0]))
 
         np.testing.assert_array_equal(sol, [0.0, 0.0, 0.0])
         assert obj == 0.0
