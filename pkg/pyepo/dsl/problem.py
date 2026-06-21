@@ -160,7 +160,7 @@ class Problem:
         Return a new Problem with all integer / binary variables continuous
         (bounds preserved: binary ⇒ [0, 1]); objective and constraints unchanged.
         """
-        new = _copy.copy(self)
+        new = _copy.deepcopy(self)
         new.var_type = np.full(self.num_vars, EPO.CONTINUOUS, dtype=object)
         return new
 

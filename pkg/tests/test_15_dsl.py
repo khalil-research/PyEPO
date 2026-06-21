@@ -257,6 +257,21 @@ def test_relax_clears_vtypes_keeps_bounds():
     assert (prob.var_type == EPO.BINARY).all()              # original unchanged
 
 
+def test_relax_is_independent_of_original_problem():
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    prob = dsl.Problem(dsl.Minimize(c @ x + np.ones(3) @ x), [x.sum() <= 2])
+    rel = prob.relax()
+
+    rel.fixed_cost[0] = 99
+    rel.var_lb[0] = 99
+    rel.constrs[0][1].data[0] = 99
+
+    np.testing.assert_array_equal(prob.fixed_cost, np.ones(3))
+    np.testing.assert_array_equal(prob.var_lb, np.zeros(3))
+    assert not np.any(prob.constrs[0][1].data == 99)
+
+
 # ============================================================
 # Validation
 # ============================================================
