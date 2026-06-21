@@ -384,15 +384,17 @@ class TestShortestPath:
         with pytest.raises(ValueError):
             m.setObj(np.ones(5))
 
-    def test_copy_isolation(self, backend):
+    def test_copy_preserves_objective_and_is_independent(self, backend):
         m, meta = _make_shortestpath(backend)
         cost = np.random.RandomState(42).rand(m.num_cost)
         m.setObj(cost)
-        _, obj1 = m.solve()
         m2 = m.copy()
-        m2.setObj(cost)
         _, obj2 = m2.solve()
+        _, obj1 = m.solve()
         np.testing.assert_allclose(obj1, obj2, atol=meta["tol"])
+
+        m2.setObj(-cost)
+        np.testing.assert_allclose(m.solve()[1], obj1, atol=meta["tol"])
 
     def test_grid_sizes_num_cost(self, backend):
         for grid in [(2, 2), (3, 4), (5, 5)]:
@@ -408,10 +410,9 @@ def test_shortestpath_addConstr_no_improvement(backend):
     # MINIMIZE: a tighter constraint cannot decrease the objective
     m, meta = _make_shortestpath(backend)
     cost = np.random.RandomState(42).rand(m.num_cost)
-    m2 = m.addConstr(np.ones(m.num_cost), 5)
-    m2.setObj(cost)
-    _, obj2 = m2.solve()
     m.setObj(cost)
+    m2 = m.addConstr(np.ones(m.num_cost), 5)
+    _, obj2 = m2.solve()
     _, obj1 = m.solve()
     assert obj2 >= obj1 - max(meta["tol"], 1e-6)
 
@@ -472,15 +473,17 @@ class TestPortfolio:
         # budget: weights sum to 1
         np.testing.assert_allclose(np.sum(sol), 1.0, atol=1e-4)
 
-    def test_copy_isolation(self, backend):
+    def test_copy_preserves_objective_and_is_independent(self, backend):
         cov, revenue = _portfolio_data()
         m = _make_portfolio(backend, cov)
         m.setObj(revenue[0])
-        _, obj1 = m.solve()
         m2 = m.copy()
-        m2.setObj(revenue[0])
         _, obj2 = m2.solve()
+        _, obj1 = m.solve()
         np.testing.assert_allclose(obj1, obj2, atol=1e-6)
+
+        m2.setObj(-revenue[0])
+        np.testing.assert_allclose(m.solve()[1], obj1, atol=1e-6)
 
     def test_addConstr_no_improvement(self, backend):
         cov, revenue = _portfolio_data()
@@ -490,7 +493,6 @@ class TestPortfolio:
         coefs = np.zeros(m.num_cost)
         coefs[:3] = 1.0
         m2 = m.addConstr(coefs, 0.5)
-        m2.setObj(revenue[0])
         _, obj2 = m2.solve()
         assert obj2 <= obj1 + 1e-6
 
