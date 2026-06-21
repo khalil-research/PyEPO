@@ -10,8 +10,9 @@ backend-specific class.
 from __future__ import annotations
 
 import importlib
+from typing import Any
 
-_BACKENDS = {
+_BACKENDS: dict[str, str] = {
     "gurobi": "pyepo.model.grb",
     "copt": "pyepo.model.copt",
     "pyomo": "pyepo.model.omo",
@@ -19,12 +20,12 @@ _BACKENDS = {
     "mpax": "pyepo.model.mpax",
 }
 
-_TSP = {"DFJ": "tspDFJModel", "GG": "tspGGModel", "MTZ": "tspMTZModel"}
-_VRP = {"RCI": "vrpRCIModel", "MTZ": "vrpMTZModel"}
+_TSP: dict[str, str] = {"DFJ": "tspDFJModel", "GG": "tspGGModel", "MTZ": "tspMTZModel"}
+_VRP: dict[str, str] = {"RCI": "vrpRCIModel", "MTZ": "vrpMTZModel"}
 
 
-def _classFor(backend, name):
-    # resolve a problem class by name on the chosen backend
+def _class_for(backend: str, name: str) -> type[Any]:
+    """Resolve a problem class by name on the selected backend."""
     try:
         module = _BACKENDS[backend]
     except KeyError:
@@ -35,8 +36,8 @@ def _classFor(backend, name):
     return cls
 
 
-def _formulation(table, name, kind):
-    # resolve a formulation name to its class name
+def _formulation(table: dict[str, str], name: str, kind: str) -> str:
+    """Resolve a formulation name to its backend class name."""
     try:
         return table[name]
     except KeyError:
@@ -53,7 +54,7 @@ def shortestPathModel(grid, *, backend="gurobi", **kwargs):
         grid (tuple): grid size ``(h, w)``
         backend (str): solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``, ``"mpax"``
     """
-    return _classFor(backend, "shortestPathModel")(grid, **kwargs)
+    return _class_for(backend, "shortestPathModel")(grid, **kwargs)
 
 
 def knapsackModel(weights, capacity, *, backend="gurobi", **kwargs):
@@ -65,7 +66,7 @@ def knapsackModel(weights, capacity, *, backend="gurobi", **kwargs):
         capacity (ndarray): per-dimension capacity with length ``dim``
         backend (str): solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``, ``"mpax"``
     """
-    return _classFor(backend, "knapsackModel")(weights, capacity, **kwargs)
+    return _class_for(backend, "knapsackModel")(weights, capacity, **kwargs)
 
 
 def portfolioModel(num_assets, covariance, *, backend="gurobi", **kwargs):
@@ -77,7 +78,7 @@ def portfolioModel(num_assets, covariance, *, backend="gurobi", **kwargs):
         covariance (ndarray): covariance matrix of the asset returns
         backend (str): solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``
     """
-    return _classFor(backend, "portfolioModel")(num_assets, covariance, **kwargs)
+    return _class_for(backend, "portfolioModel")(num_assets, covariance, **kwargs)
 
 
 def tspModel(num_nodes, *, backend="gurobi", formulation="DFJ", **kwargs):
@@ -89,7 +90,7 @@ def tspModel(num_nodes, *, backend="gurobi", formulation="DFJ", **kwargs):
         backend (str): solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``
         formulation (str): ILP formulation; one of ``"DFJ"``, ``"GG"``, ``"MTZ"`` (``"DFJ"`` on gurobi and copt only)
     """
-    return _classFor(backend, _formulation(_TSP, formulation, "TSP"))(num_nodes, **kwargs)
+    return _class_for(backend, _formulation(_TSP, formulation, "TSP"))(num_nodes, **kwargs)
 
 
 def vrpModel(
@@ -106,5 +107,5 @@ def vrpModel(
         backend (str): solver backend; one of ``"gurobi"``, ``"copt"``, ``"pyomo"``
         formulation (str): ILP formulation; ``"RCI"`` or ``"MTZ"`` (``"RCI"`` on gurobi and copt only)
     """
-    cls = _classFor(backend, _formulation(_VRP, formulation, "VRP"))
+    cls = _class_for(backend, _formulation(_VRP, formulation, "VRP"))
     return cls(num_nodes, demands, capacity, num_vehicle, **kwargs)
