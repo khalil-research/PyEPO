@@ -563,6 +563,20 @@ def test_addconstr_cost_space(backend):
     assert np.asarray(sol)[:3].sum() <= 1 + 1e-6
 
 
+@pytest.mark.parametrize("backend", _ALL)
+def test_addconstr_snapshots_coefficients(backend):
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    comp = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 2]).compile(
+        backend=backend, **_kw(backend)
+    )
+    coefs = np.array([1.0, 0.0, 0.0])
+    constrained = comp.addConstr(coefs, 1.0)
+    coefs.fill(9)
+
+    np.testing.assert_array_equal(constrained._extra_constrs[-1][0], [1.0, 0.0, 0.0])
+
+
 @pytest.mark.parametrize("backend", [*_BACKENDS, pytest.param("mpax", marks=requires_mpax)])
 def test_setobj_scatters_when_dims_coincide(backend):
     # full coverage with a known base: setObj input is the predicted cost, not the full one

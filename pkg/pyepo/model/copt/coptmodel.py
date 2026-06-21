@@ -168,8 +168,8 @@ class optCoptModel(optModel):
             optModel: new model with the added constraint
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
+        coefs = costToNumpy(coefs).copy()
         new_model = self.copy()
-        coefs = costToNumpy(coefs)
         if _is_mvar(new_model.x):
             new_model._model.addConstr(coefs @ new_model.x <= rhs)
         else:

@@ -160,7 +160,7 @@ class optGrbModel(optModel):
             optModel: new model with the added constraint
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
-        coefs = costToNumpy(coefs)
+        coefs = costToNumpy(coefs).copy()
         # copy
         new_model = self.copy()
         # add constraint

@@ -234,8 +234,9 @@ class tspABBase(optModel):
 
     def _replay_extras(self, other: tspABBase) -> None:
         for coefs, rhs in self._extra_constrs:
-            other._extra_constrs.append((coefs, rhs))
-            other._addExtraConstr(coefs, rhs)
+            snapshot = coefs.copy()
+            other._extra_constrs.append((snapshot, rhs))
+            other._addExtraConstr(snapshot, rhs)
 
     def addConstr(
         self,
@@ -251,7 +252,7 @@ class tspABBase(optModel):
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
         # normalize to numpy so replay on copy/relax avoids per-element GPU sync
-        coefs = np.asarray(coefs)
+        coefs = np.array(coefs, copy=True)
         new_model = self.copy()
         new_model._extra_constrs.append((coefs, rhs))
         new_model._addExtraConstr(coefs, rhs)
@@ -381,8 +382,9 @@ class vrpABBase(optModel):
     def _replay_extras(self, other: vrpABBase) -> None:
         # re-add tracked extra constraints to a fresh copy
         for coefs, rhs in self._extra_constrs:
-            other._extra_constrs.append((coefs, rhs))
-            other._addExtraConstr(coefs, rhs)
+            snapshot = coefs.copy()
+            other._extra_constrs.append((snapshot, rhs))
+            other._addExtraConstr(snapshot, rhs)
 
     def addConstr(
         self,
@@ -398,7 +400,7 @@ class vrpABBase(optModel):
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
         # normalize to numpy so replay on copy avoids per-element solver-var sync
-        coefs = np.asarray(coefs)
+        coefs = np.array(coefs, copy=True)
         new_model = self.copy()
         new_model._extra_constrs.append((coefs, rhs))
         new_model._addExtraConstr(coefs, rhs)

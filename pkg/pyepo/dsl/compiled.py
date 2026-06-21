@@ -92,7 +92,7 @@ class compiledBase(optModel):
     def addConstr(self, coefs, rhs):
         # add a cut coefs @ x <= rhs over the full variable vector
         rhs = validate_constraint(coefs, rhs, self.problem.num_vars, full=True)
-        coefs = np.asarray(coefs, dtype=float).reshape(-1)
+        coefs = np.array(coefs, dtype=float, copy=True).reshape(-1)
         new_model = self._add_cut(coefs, rhs)
         # track for replay on relax
         new_model._extra_constrs = [*self._extra_constrs, (coefs, rhs)]

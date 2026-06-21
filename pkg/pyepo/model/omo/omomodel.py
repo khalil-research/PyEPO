@@ -167,11 +167,12 @@ class optOmoModel(optModel):
             optModel: new model with the added constraint
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
+        coefs = costToNumpy(coefs).copy()
         # copy
         new_model = self.copy()
         # add constraint
         expr = sum(coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= rhs
         new_model._model.cons.add(expr)
         # track for replay on relax
-        new_model._extra_constrs = [*self._extra_constrs, (costToNumpy(coefs), rhs)]
+        new_model._extra_constrs = [*self._extra_constrs, (coefs, rhs)]
         return new_model

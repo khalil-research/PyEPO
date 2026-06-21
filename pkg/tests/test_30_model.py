@@ -240,6 +240,16 @@ class TestKnapsack:
         with pytest.raises(ValueError, match=match):
             m.addConstr(coefs, rhs)
 
+    def test_addConstr_snapshots_coefficients(self, backend):
+        if backend in ("ortcp", "mpax"):
+            pytest.skip("backend converts constraints to its own immutable representation")
+        m, _ = _make_knapsack(backend)
+        coefs = np.ones(m.num_cost, dtype=np.float32)
+        constrained = m.addConstr(coefs, 1.0)
+        coefs.fill(0)
+
+        np.testing.assert_array_equal(constrained._extra_constrs[-1][0], np.ones(m.num_cost))
+
     def test_relax(self, backend):
         m, meta = _make_knapsack(backend)
         if meta["relax"] is None:
@@ -599,6 +609,21 @@ class TestTSP:
         m2 = m.addConstr(np.zeros(m.num_cost), 0)
         np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
 
+    def test_addConstr_snapshot_isolated_across_copy(self, backend, formulation):
+        m, _ = _make_tsp(backend, formulation)
+        coefs = np.arange(m.num_cost, dtype=float)
+        constrained = m.addConstr(coefs, float(coefs.sum()))
+        coefs.fill(-1)
+        copied = constrained.copy()
+
+        expected = np.arange(m.num_cost, dtype=float)
+        np.testing.assert_array_equal(constrained._extra_constrs[-1][0], expected)
+        np.testing.assert_array_equal(copied._extra_constrs[-1][0], expected)
+        assert not np.shares_memory(
+            constrained._extra_constrs[-1][0],
+            copied._extra_constrs[-1][0],
+        )
+
     def test_addConstr_infeasible(self, backend, formulation):
         # 4-node tour needs 4 edges; sum(edges) <= 3 is infeasible
         m, _ = _make_tsp(backend, formulation)
@@ -742,6 +767,21 @@ class TestVRP:
         m.setObj(_VRP_COST)
         m2 = m.addConstr(np.zeros(m.num_cost), 0)
         np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
+
+    def test_addConstr_snapshot_isolated_across_copy(self, backend, formulation):
+        m, _ = _make_vrp(backend, formulation)
+        coefs = np.arange(m.num_cost, dtype=float)
+        constrained = m.addConstr(coefs, float(coefs.sum()))
+        coefs.fill(-1)
+        copied = constrained.copy()
+
+        expected = np.arange(m.num_cost, dtype=float)
+        np.testing.assert_array_equal(constrained._extra_constrs[-1][0], expected)
+        np.testing.assert_array_equal(copied._extra_constrs[-1][0], expected)
+        assert not np.shares_memory(
+            constrained._extra_constrs[-1][0],
+            copied._extra_constrs[-1][0],
+        )
 
     def test_addConstr_no_improvement(self, backend, formulation):
         # MINIMIZE: re-imposing the optimal edge count cannot decrease the objective
