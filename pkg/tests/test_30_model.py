@@ -109,6 +109,65 @@ class TestOptModelBase:
 
 
 # ============================================================
+# Problem constructor validation
+# ============================================================
+
+class TestProblemConstructorValidation:
+
+    @pytest.mark.parametrize("grid", [(1, 1), (0, 3), (2,), (2, 3, 4), (2.5, 3)])
+    def test_shortestpath_rejects_invalid_grid(self, grid):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        with pytest.raises(ValueError, match="grid"):
+            shortestPathModel(grid)
+
+    def test_knapsack_rejects_invalid_data(self):
+        from pyepo.model.grb.knapsack import knapsackModel
+
+        cases = [
+            (([1, 2, 3], [3]), "2-dimensional"),
+            (([[1, 2], [3, 4]], [3]), "capacity length"),
+            (([[1, np.nan]], [3]), "finite"),
+            ((np.empty((0, 2)), []), "at least one dimension"),
+        ]
+        for (weights, capacity), match in cases:
+            with pytest.raises(ValueError, match=match):
+                knapsackModel(weights, capacity)
+
+    def test_portfolio_rejects_invalid_data(self):
+        from pyepo.model.grb.portfolio import portfolioModel
+
+        cases = [
+            ((0, np.eye(1), 1.0), "num_assets"),
+            ((3, np.eye(2), 1.0), "covariance shape"),
+            ((2, np.array([[1.0, np.nan], [0.0, 1.0]]), 1.0), "finite"),
+            ((2, np.eye(2), -1.0), "gamma"),
+        ]
+        for args, match in cases:
+            with pytest.raises(ValueError, match=match):
+                portfolioModel(*args)
+
+    def test_tsp_rejects_too_few_nodes(self):
+        from pyepo.model.grb.tsp import tspGGModel
+
+        with pytest.raises(ValueError, match="num_nodes"):
+            tspGGModel(2)
+
+    def test_vrp_rejects_invalid_data(self):
+        from pyepo.model.grb.vrp import vrpMTZModel
+
+        cases = [
+            ((5, [1, 2], 4.0, 2), "demands length"),
+            ((5, [1, -2, 1, 2], 4.0, 2), "nonnegative"),
+            ((5, [1, 2, 1, 2], 0.0, 2), "capacity"),
+            ((5, [1, 2, 1, 2], 4.0, 0), "num_vehicle"),
+        ]
+        for args, match in cases:
+            with pytest.raises(ValueError, match=match):
+                vrpMTZModel(*args)
+
+
+# ============================================================
 # Knapsack (MAXIMIZE, binary) — parametrized over backends
 # ============================================================
 

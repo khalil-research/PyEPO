@@ -14,9 +14,10 @@ problem base listed first so its ``__init__`` runs before the backend's::
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
-from copy import deepcopy
 from itertools import combinations
+from numbers import Integral, Real
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -29,6 +30,40 @@ from pyepo.model.utils import _EDGE_ACTIVE_TOL, _get_grid_arcs, getTspTour
 if TYPE_CHECKING:
     import torch
     from typing_extensions import Self
+
+
+def _real_array(value, name: str, *, ndim: int) -> np.ndarray:
+    """Return a finite real array with the requested dimensionality."""
+    try:
+        array = np.asarray(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be a NumPy-compatible array.") from exc
+    if array.ndim != ndim:
+        raise ValueError(f"{name} must be a {ndim}-dimensional array.")
+    if not np.issubdtype(array.dtype, np.number) or np.issubdtype(array.dtype, np.complexfloating):
+        raise ValueError(f"{name} must contain real numbers.")
+    if not np.isfinite(array).all():
+        raise ValueError(f"{name} must contain only finite values.")
+    return np.array(array, copy=True)
+
+
+def _positive_int(value, name: str, *, minimum: int = 1) -> int:
+    """Validate a non-boolean integer lower bound."""
+    if not isinstance(value, Integral) or isinstance(value, bool) or value < minimum:
+        raise ValueError(f"{name} must be an integer greater than or equal to {minimum}.")
+    return int(value)
+
+
+def _finite_real(value, name: str, *, positive: bool = False) -> float:
+    """Validate a finite non-boolean real scalar."""
+    if not isinstance(value, Real) or isinstance(value, bool):
+        raise ValueError(f"{name} must be a finite real number.")
+    scalar = float(value)
+    if not math.isfinite(scalar):
+        raise ValueError(f"{name} must be a finite real number.")
+    if positive and scalar <= 0:
+        raise ValueError(f"{name} must be greater than zero.")
+    return scalar
 
 
 class shortestPathBase(optModel):
@@ -51,8 +86,21 @@ class shortestPathBase(optModel):
         Args:
             grid: grid dimensions ``(rows, cols)``
         """
-        self.grid = grid
-        self.arcs = _get_grid_arcs(grid)
+        try:
+            dimensions = tuple(grid)
+        except TypeError as exc:
+            raise ValueError("grid must contain exactly two positive integer dimensions.") from exc
+        if (
+            len(dimensions) != 2
+            or any(
+                not isinstance(value, Integral) or isinstance(value, bool) or value < 1
+                for value in dimensions
+            )
+            or dimensions[0] * dimensions[1] < 2
+        ):
+            raise ValueError("grid must contain exactly two positive integer dimensions.")
+        self.grid = (int(dimensions[0]), int(dimensions[1]))
+        self.arcs = _get_grid_arcs(self.grid)
         super().__init__(*args, **kwargs)
 
     def get_config(self) -> dict:
@@ -93,8 +141,12 @@ class knapsackBase(optModel):
             weights: item weights with shape ``(dim, n_items)``
             capacity: per-dimension capacity with length ``dim``
         """
-        self.weights = np.array(weights, copy=True)
-        self.capacity = np.array(capacity, copy=True)
+        self.weights = _real_array(weights, "weights", ndim=2)
+        self.capacity = _real_array(capacity, "capacity", ndim=1)
+        if self.weights.shape[0] == 0 or self.weights.shape[1] == 0:
+            raise ValueError("weights must contain at least one dimension and one item.")
+        if len(self.capacity) != self.weights.shape[0]:
+            raise ValueError("capacity length must match the number of weight dimensions.")
         self.items = list(range(self.weights.shape[1]))
         super().__init__(*args, **kwargs)
 
@@ -145,9 +197,13 @@ class portfolioBase(optModel):
             covariance: covariance matrix of the asset returns
             gamma: risk tolerance multiplier on the mean covariance
         """
-        self.num_assets = num_assets
-        self.covariance = np.array(covariance, copy=True)
-        self.gamma = gamma
+        self.num_assets = _positive_int(num_assets, "num_assets")
+        self.covariance = _real_array(covariance, "covariance", ndim=2)
+        if self.covariance.shape != (self.num_assets, self.num_assets):
+            raise ValueError("covariance shape must be (num_assets, num_assets).")
+        self.gamma = _finite_real(gamma, "gamma")
+        if self.gamma < 0:
+            raise ValueError("gamma must be greater than or equal to zero.")
         super().__init__(*args, **kwargs)
 
     def get_config(self) -> dict:
@@ -199,8 +255,8 @@ class tspABBase(optModel):
         Args:
             num_nodes: number of nodes (cities)
         """
-        self.num_nodes = num_nodes
-        self.nodes = list(range(num_nodes))
+        self.num_nodes = _positive_int(num_nodes, "num_nodes", minimum=3)
+        self.nodes = list(range(self.num_nodes))
         self.edges = list(combinations(self.nodes, 2))
         self._extra_constrs: list = []
         super().__init__(*args, **kwargs)
@@ -309,12 +365,17 @@ class vrpABBase(optModel):
             num_vehicle: number of vehicles
         """
         # problem parameters
-        self.num_nodes = num_nodes
-        self.nodes = list(range(num_nodes))
+        self.num_nodes = _positive_int(num_nodes, "num_nodes", minimum=2)
+        self.nodes = list(range(self.num_nodes))
         self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
-        self.demands = deepcopy(demands)
-        self.capacity = deepcopy(capacity)
-        self.num_vehicle = num_vehicle
+        demand_array = _real_array(demands, "demands", ndim=1)
+        if len(demand_array) != self.num_nodes - 1:
+            raise ValueError("demands length must equal num_nodes - 1.")
+        if (demand_array < 0).any():
+            raise ValueError("demands must be nonnegative.")
+        self.demands = demand_array.tolist() if isinstance(demands, list) else demand_array
+        self.capacity = _finite_real(capacity, "capacity", positive=True)
+        self.num_vehicle = _positive_int(num_vehicle, "num_vehicle")
         self._extra_constrs: list = []
         super().__init__(*args, **kwargs)
 
