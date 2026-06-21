@@ -137,6 +137,7 @@ class optGrbModel(optModel):
 
     def _copy_objective_to(self, other: optGrbModel) -> None:
         """Copy Gurobi objective coefficients aligned with predicted costs."""
+        self._model.update()
         if self._cost_vars:
             coefs = np.asarray(self._model.getAttr("Obj", self._cost_vars))
             if coefs.size != self.num_cost:

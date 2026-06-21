@@ -582,9 +582,9 @@ class TestTSP:
         m, _ = _make_tsp(backend, formulation)
         cost = np.random.RandomState(42).rand(m.num_cost)
         m.setObj(cost)
-        _, obj1 = m.solve()
         m2 = m.copy()
         _, obj2 = m2.solve()
+        _, obj1 = m.solve()
         np.testing.assert_allclose(obj1, obj2, atol=1e-4)
 
         m2.setObj(-cost)
@@ -594,9 +594,8 @@ class TestTSP:
         m, _ = _make_tsp(backend, formulation)
         cost = np.random.RandomState(42).rand(m.num_cost)
         m.setObj(cost)
-        _, obj = m.solve()
         m2 = m.addConstr(np.zeros(m.num_cost), 0)
-        np.testing.assert_allclose(m2.solve()[1], obj, atol=1e-4)
+        np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
 
     def test_addConstr_infeasible(self, backend, formulation):
         # 4-node tour needs 4 edges; sum(edges) <= 3 is infeasible
@@ -728,13 +727,19 @@ class TestVRP:
     def test_copy_preserves_objective_and_is_independent(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)
         m.setObj(_VRP_COST)
-        _, obj1 = m.solve()
         m2 = m.copy()
         _, obj2 = m2.solve()
+        _, obj1 = m.solve()
         np.testing.assert_allclose(obj1, obj2, atol=1e-4)
 
         m2.setObj(-_VRP_COST)
         np.testing.assert_allclose(m.solve()[1], obj1, atol=1e-4)
+
+    def test_addConstr_preserves_objective(self, backend, formulation):
+        m, _ = _make_vrp(backend, formulation)
+        m.setObj(_VRP_COST)
+        m2 = m.addConstr(np.zeros(m.num_cost), 0)
+        np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
 
     def test_addConstr_no_improvement(self, backend, formulation):
         # MINIMIZE: re-imposing the optimal edge count cannot decrease the objective
