@@ -12,6 +12,8 @@ rebuilding the expression.
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 import numpy as np
 
 try:
@@ -66,7 +68,7 @@ class compiledOmoProblem(compiledBase, optOmoModel):
 
     def __init__(self, problem, params=None, solver="glpk"):
         # the source DSL Problem, solver options, and Pyomo solver name
-        self.problem = problem
+        self.problem = deepcopy(problem)
         self.params = dict(params) if params else {}
         self.solver = solver
         optModel.__init__(self)  # builds the model via _getModel

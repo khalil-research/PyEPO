@@ -11,6 +11,8 @@ subclass builds the solver model and provides the read / write hooks.
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 import numpy as np
 import torch
 
@@ -26,7 +28,7 @@ class compiledBase(optModel):
 
     def __init__(self, problem, params=None):
         # the source DSL Problem and backend solver parameters
-        self.problem = problem
+        self.problem = deepcopy(problem)
         self.params = dict(params) if params else {}
         super().__init__()
         self._apply_params()
@@ -34,8 +36,8 @@ class compiledBase(optModel):
     def get_config(self) -> dict:
         return {
             **super().get_config(),
-            "problem": self.problem,
-            "params": self.params,
+            "problem": deepcopy(self.problem),
+            "params": self.params.copy(),
         }
 
     @property

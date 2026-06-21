@@ -11,6 +11,8 @@ LP / MIP only — quadratic objectives or constraints raise ``NotImplementedErro
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 import numpy as np
 
 try:
@@ -36,7 +38,7 @@ class compiledOrtProblem(compiledBase, optOrtModel):
 
     def __init__(self, problem, params=None, solver="scip"):
         # the source DSL Problem, solver options, and pywraplp backend name
-        self.problem = problem
+        self.problem = deepcopy(problem)
         self.params = dict(params) if params else {}
         self.solver = solver
         self._extra_constrs = []  # (coef, rhs) cuts replayed on copy

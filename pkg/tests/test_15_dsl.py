@@ -422,6 +422,22 @@ def test_compiled_model_rebuild_preserves_problem_and_backend_config(backend):
 
 
 @pytest.mark.parametrize("backend", _ALL)
+def test_compiled_constructor_and_config_are_independent(backend):
+    x = dsl.Variable(3, vtype=EPO.BINARY)
+    c = dsl.Parameter(3)
+    problem = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 2])
+    comp = problem.compile(backend=backend, **_kw(backend))
+
+    problem.fixed_cost[0] = 99
+    config = comp.get_config()
+    config["problem"].fixed_cost[1] = 99
+    config["params"]["sentinel"] = 99
+
+    np.testing.assert_array_equal(comp.problem.fixed_cost, np.zeros(3))
+    assert "sentinel" not in comp.params
+
+
+@pytest.mark.parametrize("backend", _ALL)
 def test_compiled_copy_preserves_objective(backend):
     x = dsl.Variable(3, vtype=EPO.BINARY)
     c = dsl.Parameter(3)
