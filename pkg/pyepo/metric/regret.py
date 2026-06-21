@@ -11,11 +11,13 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 import torch
 
-from pyepo import EPO
 from pyepo.func.runtime import create_solver_pool, normalize_processes
 from pyepo.func.utils import _close_pool, _solve_batch
 from pyepo.metric._common import (
     normalize_regret,
+    objective_offset,
+    regret_from_objective,
+    require_linear_objective,
     torch_evaluation,
     validate_cost_vectors,
     validate_prediction_batch,
@@ -31,53 +33,6 @@ if TYPE_CHECKING:
     from pyepo.model.opt import optModel
 
 logger = logging.getLogger(__name__)
-
-
-def _regretFromObj(obj, true_obj, modelSense):
-    """
-    Signed regret gap between a realized objective and the true optimum.
-
-    Operates elementwise on scalars or numpy arrays.
-
-    Args:
-        obj: objective value(s) of the evaluated decision under the true cost
-        true_obj: true optimal objective value(s)
-        modelSense: ``EPO.MINIMIZE`` or ``EPO.MAXIMIZE``
-
-    Returns:
-        float or np.ndarray: regret gap(s)
-    """
-    if modelSense == EPO.MINIMIZE:
-        return obj - true_obj
-    if modelSense == EPO.MAXIMIZE:
-        return true_obj - obj
-    raise ValueError("Invalid modelSense.")
-
-
-def _objOffset(optmodel) -> float:
-    """
-    Bare objective constant carried by a compiled DSL problem, 0 otherwise.
-
-    Args:
-        optmodel: optimization model
-
-    Returns:
-        float: objective constant
-    """
-    problem = getattr(optmodel, "problem", None)
-    return float(problem.obj_offset) if problem is not None else 0.0
-
-
-def _checkLinearObj(optmodel) -> None:
-    """
-    Raise if the model carries a quadratic objective term.
-
-    Args:
-        optmodel: optimization model
-    """
-    problem = getattr(optmodel, "problem", None)
-    if problem is not None and getattr(problem, "obj_Q", None) is not None:
-        raise ValueError("Regret metrics require a linear objective.")
 
 
 def regret(
@@ -123,7 +78,7 @@ def regret(
     """
     if reduction not in ("normalized", "sum", "mean", "none"):
         raise ValueError(f"Invalid reduction '{reduction}'.")
-    _checkLinearObj(optmodel)
+    require_linear_objective(optmodel)
     processes = normalize_processes(optmodel, processes, logger)
     losses = []
     optsum = 0.0
@@ -156,8 +111,8 @@ def regret(
                 c_np = costToNumpy(optmodel._fullCost(c))
                 z_np = costToNumpy(z).reshape(-1)
                 # bare objective constants live outside the dot product
-                obj = np.einsum("bi,bi->b", sols_np, c_np) + _objOffset(optmodel)
-                losses.append(_regretFromObj(obj, z_np, optmodel.modelSense))
+                obj = np.einsum("bi,bi->b", sols_np, c_np) + objective_offset(optmodel)
+                losses.append(regret_from_objective(obj, z_np, optmodel.modelSense))
                 optsum += float(np.abs(z_np).sum())
     finally:
         if pool is not None:
@@ -194,7 +149,7 @@ def calRegret(
     pred_cost, true_cost, true_obj = validate_cost_vectors(
         pred_cost, true_cost, true_obj, optmodel.num_cost
     )
-    _checkLinearObj(optmodel)
+    require_linear_objective(optmodel)
     # opt sol for pred cost
     optmodel._setFullObj(optmodel._fullCost(pred_cost))
     sol, _ = optmodel.solve()
@@ -202,5 +157,7 @@ def calRegret(
     if isinstance(sol, torch.Tensor):
         sol = sol.detach().cpu().numpy()
     # full objective of the predicted decision at the true cost
-    obj = np.dot(sol, optmodel._fullCost(np.asarray(true_cost, dtype=float))) + _objOffset(optmodel)
-    return float(_regretFromObj(obj, true_obj, optmodel.modelSense))
+    obj = np.dot(sol, optmodel._fullCost(np.asarray(true_cost, dtype=float))) + objective_offset(
+        optmodel
+    )
+    return float(regret_from_objective(obj, true_obj, optmodel.modelSense))

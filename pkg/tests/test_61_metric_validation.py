@@ -6,26 +6,30 @@ import numpy as np
 import pytest
 
 from pyepo import EPO
-from pyepo.metric._common import normalize_regret, validate_numpy_cost_batches
+from pyepo.metric._common import (
+    normalize_regret,
+    regret_from_objective,
+    validate_numpy_cost_batches,
+)
 from pyepo.metric.metrics import SPOError
-from pyepo.metric.regret import _regretFromObj, calRegret
+from pyepo.metric.regret import calRegret
 from pyepo.metric.unambregret import calUnambRegret, unambRegret
 
 
 class TestRegretFromObj:
     def test_minimize(self):
-        assert _regretFromObj(3.0, 1.0, EPO.MINIMIZE) == 2.0
+        assert regret_from_objective(3.0, 1.0, EPO.MINIMIZE) == 2.0
 
     def test_maximize(self):
-        assert _regretFromObj(3.0, 5.0, EPO.MAXIMIZE) == 2.0
+        assert regret_from_objective(3.0, 5.0, EPO.MAXIMIZE) == 2.0
 
     def test_vectorized(self):
-        out = _regretFromObj(np.array([3.0, 4.0]), np.array([1.0, 1.0]), EPO.MINIMIZE)
+        out = regret_from_objective(np.array([3.0, 4.0]), np.array([1.0, 1.0]), EPO.MINIMIZE)
         np.testing.assert_allclose(out, [2.0, 3.0])
 
     def test_invalid_sense(self):
         with pytest.raises(ValueError):
-            _regretFromObj(1.0, 1.0, "bad")
+            regret_from_objective(1.0, 1.0, "bad")
 
 
 class TestNormalizeRegret:

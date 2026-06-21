@@ -9,8 +9,12 @@ from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
-from pyepo.metric._common import normalize_regret, validate_numpy_cost_batches
-from pyepo.metric.regret import _checkLinearObj, calRegret
+from pyepo.metric._common import (
+    normalize_regret,
+    require_linear_objective,
+    validate_numpy_cost_batches,
+)
+from pyepo.metric.regret import calRegret
 
 if TYPE_CHECKING:
     from pyepo.model.opt import ModelSpec, optModel
@@ -37,7 +41,7 @@ def SPOError(
         float: normalized regret
     """
     pred_cost, true_cost = validate_numpy_cost_batches(pred_cost, true_cost, optmodel.num_cost)
-    _checkLinearObj(optmodel)
+    require_linear_objective(optmodel)
     # init sum
     regret_sum = 0.0
     optobj_sum = 0.0
@@ -52,7 +56,7 @@ def SPOError(
     return normalize_regret(regret_sum, optobj_sum)
 
 
-def _SPOErrorScore(
+def _spo_error_score(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     model_spec: ModelSpec,
@@ -86,7 +90,9 @@ def makeSkScorer(optmodel: optModel) -> Callable:
     from sklearn.metrics import make_scorer
 
     # build score
-    SPO_scorer = make_scorer(_SPOErrorScore, greater_is_better=False, model_spec=optmodel.to_spec())
+    SPO_scorer = make_scorer(
+        _spo_error_score, greater_is_better=False, model_spec=optmodel.to_spec()
+    )
     return SPO_scorer
 
 
@@ -105,7 +111,7 @@ def makeAutoSkScorer(optmodel: optModel) -> Callable:
     # build score
     SPO_scorer = make_scorer(
         name="SPO_error",
-        score_func=_SPOErrorScore,
+        score_func=_spo_error_score,
         greater_is_better=False,
         needs_proba=False,
         needs_threshold=False,

@@ -14,13 +14,15 @@ import torch
 from pyepo import EPO
 from pyepo.metric._common import (
     normalize_regret,
+    objective_offset,
+    regret_from_objective,
+    require_linear_objective,
     torch_evaluation,
     validate_cost_vectors,
     validate_prediction_batch,
     validate_retry_count,
     validate_tolerance,
 )
-from pyepo.metric.regret import _checkLinearObj, _objOffset, _regretFromObj
 from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
@@ -64,7 +66,7 @@ def unambRegret(
     """
     validate_tolerance(tolerance)
     validate_retry_count(max_iter)
-    _checkLinearObj(optmodel)
+    require_linear_objective(optmodel)
     loss = 0
     optsum = 0
     with torch_evaluation(predmodel) as device:
@@ -115,7 +117,7 @@ def calUnambRegret(
     pred_cost, true_cost, true_obj = validate_cost_vectors(
         pred_cost, true_cost, true_obj, optmodel.num_cost
     )
-    _checkLinearObj(optmodel)
+    require_linear_objective(optmodel)
     # lift to the full objective space, then change precision
     cp = np.around(optmodel._fullCost(np.asarray(pred_cost, dtype=float)) / tolerance)
     # opt sol for pred cost
@@ -154,5 +156,5 @@ def calUnambRegret(
     if isinstance(wst_sol, torch.Tensor):
         wst_sol = wst_sol.detach().cpu().numpy()
     # worst-case full objective of the tied decisions at the true cost
-    obj = np.dot(np.asarray(wst_sol), c_full) + _objOffset(optmodel)
-    return float(_regretFromObj(obj, true_obj, optmodel.modelSense))
+    obj = np.dot(np.asarray(wst_sol), c_full) + objective_offset(optmodel)
+    return float(regret_from_objective(obj, true_obj, optmodel.modelSense))
