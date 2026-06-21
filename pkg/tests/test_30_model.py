@@ -167,6 +167,42 @@ class TestProblemConstructorValidation:
                 vrpMTZModel(*args)
 
 
+class TestProblemConfigIsolation:
+
+    def test_knapsack_config_is_independent(self):
+        from pyepo.model.grb.knapsack import knapsackModel
+
+        model = knapsackModel([[1.0, 2.0]], [2.0])
+        config = model.get_config()
+        config["weights"].fill(99)
+        config["capacity"].fill(99)
+
+        np.testing.assert_array_equal(model.weights, [[1.0, 2.0]])
+        np.testing.assert_array_equal(model.capacity, [2.0])
+
+    def test_portfolio_config_is_independent(self):
+        from pyepo.model.grb.portfolio import portfolioModel
+
+        model = portfolioModel(2, np.eye(2))
+        model.get_config()["covariance"].fill(99)
+
+        np.testing.assert_array_equal(model.covariance, np.eye(2))
+
+    @pytest.mark.parametrize("demands", [[1.0, 1.0], np.array([1.0, 1.0])])
+    def test_vrp_config_preserves_type_and_is_independent(self, demands):
+        from pyepo.model.grb.vrp import vrpMTZModel
+
+        model = vrpMTZModel(3, demands, 2.0, 1)
+        exported = model.get_config()["demands"]
+        assert type(exported) is type(model.demands)
+        if isinstance(exported, list):
+            exported[0] = 99
+        else:
+            exported.fill(99)
+
+        np.testing.assert_array_equal(model.demands, [1.0, 1.0])
+
+
 # ============================================================
 # Knapsack (MAXIMIZE, binary) — parametrized over backends
 # ============================================================

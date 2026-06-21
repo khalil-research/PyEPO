@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
+from copy import deepcopy
 from itertools import combinations
 from numbers import Integral, Real
 from typing import TYPE_CHECKING
@@ -153,8 +154,8 @@ class knapsackBase(optModel):
     def get_config(self) -> dict:
         return {
             **super().get_config(),
-            "weights": self.weights,
-            "capacity": self.capacity,
+            "weights": self.weights.copy(),
+            "capacity": self.capacity.copy(),
         }
 
     @property
@@ -210,7 +211,7 @@ class portfolioBase(optModel):
         return {
             **super().get_config(),
             "num_assets": self.num_assets,
-            "covariance": self.covariance,
+            "covariance": self.covariance.copy(),
             "gamma": self.gamma,
         }
 
@@ -383,7 +384,7 @@ class vrpABBase(optModel):
         return {
             **super().get_config(),
             "num_nodes": self.num_nodes,
-            "demands": self.demands,
+            "demands": deepcopy(self.demands),
             "capacity": self.capacity,
             "num_vehicle": self.num_vehicle,
         }
