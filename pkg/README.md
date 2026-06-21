@@ -4,11 +4,17 @@
 
 ## Features
 
-- Implement **SPO+**, **DBB**, **NID**, **DPO** (additive and multiplicative perturbations), **PFYL** (additive and multiplicative perturbations), L2-regularized **RFWO/RFYL**, **NCE**, **LTR**, **I-MLE**, **AI-MLE**, and **PG**
+- Implement **SPO+**, **PG**, **DPO** (additive and multiplicative perturbations), **PFYL** (additive and multiplicative perturbations), **I-MLE**, **AI-MLE**, L2-regularized **RFWO/RFYL**, **DBB**, **NID**, **CaVE**, **NCE**, and **LTR**
 - Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
+- Symbolic modeling with `pyepo.dsl`: define an LP, MIP, or QP once, then compile it to any backend
+- JAX frontend (`pyepo.func.jax`): train any loss in JAX/Flax with `jax.grad`
 - Support parallel computing for optimization solvers
 - Support solution caching to speed up training
 - Support kNN robust loss to improve decision quality
+
+## CaVE for Binary Linear Programs
+
+For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, ...), ``PyEPO`` ships **CaVE**. CaVE replaces the per-step ILP solve with a cone-alignment projection onto the binding-constraint normals at the true optimum, backed by an interior-point QP solver (Clarabel). Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at TSP scale.
 
 ## GPU-Accelerated Solving with MPAX
 
