@@ -37,7 +37,7 @@ class compiledCoptProblem(compiledBase, optCoptModel):
         prob = self.problem
         m = _get_envr().createModel("dsl")
         # objective sense (EPO -> COPT)
-        sense = COPT.MAXIMIZE if prob.objective.modelSense == EPO.MAXIMIZE else COPT.MINIMIZE
+        sense = COPT.MAXIMIZE if prob.modelSense == EPO.MAXIMIZE else COPT.MINIMIZE
         m.setObjSense(sense)
         x = self._build_flat_vars(m)
         self._emit_constraints(m, x)
@@ -82,7 +82,7 @@ class compiledCoptProblem(compiledBase, optCoptModel):
         }
         vtype = [copt_vtype[t] for t in prob.var_type]
         return m.addMVar(
-            prob.num_vars, lb=lb, ub=ub, vtype=vtype, nameprefix=prob.cost_var.name or "x"
+            prob.num_vars, lb=lb, ub=ub, vtype=vtype, nameprefix=prob.cost_var_name or "x"
         )
 
     def _emit_constraints(self, m, x):

@@ -243,6 +243,20 @@ def test_objective_constant_becomes_offset():
     assert prob.obj_offset == pytest.approx(2.0)            # (x-1)@(x-1) carries +2
 
 
+def test_problem_finalization_snapshots_sense_and_variable_name():
+    x = dsl.Variable(2, vtype=EPO.BINARY, name="original")
+    c = dsl.Parameter(2)
+    objective = dsl.Minimize(c @ x)
+    prob = dsl.Problem(objective, [x.sum() <= 1])
+
+    objective.modelSense = EPO.MAXIMIZE
+    x.name = "mutated"
+
+    assert prob.modelSense == EPO.MINIMIZE
+    assert prob.cost_var_name == "original"
+    assert "min" in repr(prob)
+
+
 # ============================================================
 # relax
 # ============================================================
@@ -434,6 +448,19 @@ def test_compiled_model_rebuild_preserves_problem_and_backend_config(backend):
     assert rebuilt.params == comp.params
     if hasattr(comp, "solver"):
         assert rebuilt.solver == comp.solver
+
+
+@pytest.mark.parametrize("backend", _ALL)
+def test_compilers_use_finalized_problem_sense(backend):
+    x = dsl.Variable(2, vtype=EPO.BINARY)
+    c = dsl.Parameter(2)
+    objective = dsl.Minimize(c @ x)
+    problem = dsl.Problem(objective, [x.sum() <= 1])
+    objective.modelSense = EPO.MAXIMIZE
+
+    compiled = problem.compile(backend=backend, **_kw(backend))
+
+    assert compiled.modelSense == EPO.MINIMIZE
 
 
 @pytest.mark.parametrize("backend", _ALL)

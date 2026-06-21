@@ -44,7 +44,7 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
     def _getModel(self) -> tuple:
         # assemble MPAX standard-form matrices from the finalized IR
         prob = self.problem
-        self.modelSense = prob.objective.modelSense
+        self.modelSense = prob.modelSense
         self._emit_constraints()
         self.l = jnp.asarray(
             np.where(np.isneginf(prob.var_lb), -np.inf, prob.var_lb).astype(np.float32)

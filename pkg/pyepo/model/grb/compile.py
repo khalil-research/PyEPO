@@ -39,7 +39,7 @@ class compiledGrbProblem(compiledBase, optGrbModel):
         m = gp.Model()
         m.Params.outputFlag = 0  # type: ignore[attr-defined]
         # objective sense (EPO -> Gurobi)
-        m.modelSense = GRB.MAXIMIZE if prob.objective.modelSense == EPO.MAXIMIZE else GRB.MINIMIZE
+        m.modelSense = GRB.MAXIMIZE if prob.modelSense == EPO.MAXIMIZE else GRB.MINIMIZE
         x = self._build_flat_vars(m)
         self._emit_constraints(m, x)
         # parameter-free quadratic objective term
@@ -81,7 +81,7 @@ class compiledGrbProblem(compiledBase, optGrbModel):
             EPO.CONTINUOUS: GRB.CONTINUOUS,
         }
         vtype = [grb_vtype[t] for t in prob.var_type]
-        return m.addMVar(prob.num_vars, lb=lb, ub=ub, vtype=vtype, name=prob.cost_var.name or "x")
+        return m.addMVar(prob.num_vars, lb=lb, ub=ub, vtype=vtype, name=prob.cost_var_name or "x")
 
     def _emit_constraints(self, m, x):
         # linear (Q is None) or quadratic constraints from the finalized IR

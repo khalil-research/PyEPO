@@ -62,6 +62,8 @@ class Problem:
         # objective cost layout
         self.cost_param = objective.cost_param
         self.cost_var = objective.cost_var
+        self.modelSense = objective.modelSense
+        self.cost_var_name = objective.cost_var.name
         # assign flat slices in encounter order (objective var first)
         self._assign_flat()
         # finalize IR
@@ -69,7 +71,7 @@ class Problem:
 
     def __repr__(self) -> str:
         # one-line summary of the finalized problem
-        sense = "min" if self.objective.modelSense == EPO.MINIMIZE else "max"
+        sense = "min" if self.modelSense == EPO.MINIMIZE else "max"
         n_quad = sum(1 for Q, *_ in self.constrs if Q is not None)
         quad = f" [{n_quad} quad]" if n_quad else ""
         obj_q = " +quad obj" if self.obj_Q is not None else ""

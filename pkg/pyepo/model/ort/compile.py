@@ -53,7 +53,7 @@ class compiledOrtProblem(compiledBase, optOrtModel):
         prob = self.problem
         if prob.obj_Q is not None:
             raise NotImplementedError("OR-Tools (pywraplp) does not support quadratic objectives.")
-        self.modelSense = prob.objective.modelSense
+        self.modelSense = prob.modelSense
         m = pywraplp.Solver.CreateSolver(self.solver.upper())
         if m is None:
             raise RuntimeError(f"OR-Tools solver {self.solver!r} is not available.")

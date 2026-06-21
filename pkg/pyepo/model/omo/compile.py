@@ -78,7 +78,7 @@ class compiledOmoProblem(compiledBase, optOmoModel):
     def _getModel(self) -> tuple:
         # build the Pyomo model from the finalized IR
         prob = self.problem
-        self.modelSense = prob.objective.modelSense
+        self.modelSense = prob.modelSense
         m = pe.ConcreteModel()
         x = self._build_flat_vars(m)
         # objective: full coefficient as a mutable Param, plus the fixed quadratic
@@ -86,7 +86,7 @@ class compiledOmoProblem(compiledBase, optOmoModel):
         expr = sum(m.coef[j] * x[j] for j in range(prob.num_vars))
         if prob.obj_Q is not None:
             expr = expr + _quad(prob.obj_Q, x)
-        sense = pe.minimize if prob.objective.modelSense == EPO.MINIMIZE else pe.maximize
+        sense = pe.minimize if prob.modelSense == EPO.MINIMIZE else pe.maximize
         m.obj = pe.Objective(expr=expr, sense=sense)
         self._emit_constraints(m, x)
         return m, x
