@@ -191,6 +191,14 @@ class TestModelSpec:
         rebuilt = spec.build()
         np.testing.assert_array_equal(rebuilt.values, [1, 2, 3])
 
+    def test_spec_config_export_is_independent(self):
+        spec = ConfigModel([1, 2, 3]).to_spec()
+        exported = spec.config
+        exported["values"][0] = 99
+
+        np.testing.assert_array_equal(spec.config["values"], [1, 2, 3])
+        np.testing.assert_array_equal(spec.build().values, [1, 2, 3])
+
     def test_spec_is_pickleable(self):
         model = ConfigModel([1, 2, 3], label="pickled")
         spec = pickle.loads(pickle.dumps(model.to_spec()))

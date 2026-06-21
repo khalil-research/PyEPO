@@ -20,16 +20,25 @@ if TYPE_CHECKING:
     from pyepo.EPO import ModelSense
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class ModelSpec:
     """Serializable recipe for building a fresh optimization model."""
 
     model_type: type[optModel]
-    config: dict
+    _config: dict
+
+    def __init__(self, model_type: type[optModel], config: dict) -> None:
+        object.__setattr__(self, "model_type", model_type)
+        object.__setattr__(self, "_config", deepcopy(config))
+
+    @property
+    def config(self) -> dict:
+        """Return an independent copy of the constructor configuration."""
+        return deepcopy(self._config)
 
     def build(self) -> optModel:
         """Build a fresh model without sharing mutable configuration values."""
-        return self.model_type.from_config(self.config)
+        return self.model_type.from_config(self._config)
 
 
 class optModel(ABC):
@@ -87,7 +96,7 @@ class optModel(ABC):
 
     def to_spec(self) -> ModelSpec:
         """Return a serializable, immutable-snapshot rebuild recipe."""
-        return ModelSpec(type(self), deepcopy(self.get_config()))
+        return ModelSpec(type(self), self.get_config())
 
     def rebuild(self) -> Self:
         """Build a structurally equivalent model with clean runtime state."""
