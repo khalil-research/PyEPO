@@ -65,6 +65,18 @@ class _BadReturnModel(_GoodModel):
         return np.ones(self._num_cost, dtype=np.float32)
 
 
+class _SolutionTypeModel(_GoodModel):
+    """Returns the same solution through a selected public solve type."""
+
+    def __init__(self, solution_type):
+        self._solution_type = solution_type
+        super().__init__()
+
+    def solve(self):
+        sol = self._solution_type(np.ones(self._num_cost, dtype=np.float32))
+        return sol, float(self._c.sum())
+
+
 # ============================================================
 # optDataset
 # ============================================================
@@ -131,6 +143,15 @@ class TestOptDatasetConcrete:
             ds.costs.numpy().sum(axis=1),
             atol=1e-4,
         )
+
+    @pytest.mark.parametrize("solution_type", [np.asarray, torch.as_tensor, list])
+    def test_normalizes_supported_solution_types(self, solution_type):
+        x = np.zeros((2, NUM_FEAT), dtype=np.float32)
+        c = np.ones((2, 4), dtype=np.float32)
+        ds = optDataset(_SolutionTypeModel(solution_type), x, c)
+
+        assert ds.sols.dtype == torch.float32
+        torch.testing.assert_close(ds.sols, torch.ones((2, 4)))
 
 
 @requires_gurobi

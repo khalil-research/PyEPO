@@ -48,6 +48,15 @@ def _as_float_tensor(data) -> torch.Tensor:
     return torch.as_tensor(data, dtype=torch.float32)
 
 
+def _solution_to_numpy(
+    solution: np.ndarray | torch.Tensor | list,
+) -> np.ndarray:
+    """Normalize a solver solution to a NumPy array."""
+    if isinstance(solution, torch.Tensor):
+        solution = solution.detach().cpu().numpy()
+    return np.asarray(solution)
+
+
 class optDataset(Dataset):
     """
     PyTorch ``Dataset`` for predict-then-optimize problems.
@@ -106,10 +115,7 @@ class optDataset(Dataset):
         logger.info("Optimizing for optDataset...")
         for c in tqdm(self.costs):
             sol, obj = self._solve(c)
-            # to numpy
-            if isinstance(sol, torch.Tensor):
-                sol = sol.detach().cpu().numpy()
-            sols.append(np.asarray(sol))
+            sols.append(_solution_to_numpy(sol))
             objs.append(obj)
         return np.stack(sols), np.asarray(objs).reshape(-1, 1)
 
@@ -259,9 +265,7 @@ class optDatasetKNN(optDataset):
             obj_knn = np.zeros(self.k)
             for i, c in enumerate(c_knn.T):
                 sol_i, obj_i = self._solve(c)
-                if isinstance(sol_i, torch.Tensor):
-                    sol_i = sol_i.detach().cpu().numpy()
-                sol_knn[:, i] = sol_i
+                sol_knn[:, i] = _solution_to_numpy(sol_i)
                 obj_knn[i] = obj_i
             # get average
             sol = sol_knn.mean(axis=1)
