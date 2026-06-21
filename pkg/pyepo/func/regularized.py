@@ -198,7 +198,7 @@ class regularizedFrankWolfeOpt(optModule):
         return 0.5 * self.lambd * (y**2).sum(dim=-1)
 
     @torch.no_grad()
-    def _frankWolfe(
+    def _frank_wolfe(
         self,
         theta: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -236,7 +236,7 @@ class regularizedFrankWolfeOptFunc(Function):
         scale = sign / module.lambd
         theta = scale * cp
         # batched Frank-Wolfe
-        mu, vertices, weights = module._frankWolfe(theta)
+        mu, vertices, weights = module._frank_wolfe(theta)
         # save active set
         ctx.save_for_backward(vertices, weights)
         # add other objects to ctx
@@ -335,7 +335,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         return self._reduce(loss)
 
     @torch.no_grad()
-    def _frankWolfe(
+    def _frank_wolfe(
         self,
         theta: torch.Tensor,
     ) -> torch.Tensor:
@@ -375,10 +375,10 @@ class regularizedFrankWolfeFenchelYoungFunc(Function):
         w = true_sol.detach()
         # batched Frank-Wolfe
         if is_minimize(module.optmodel.modelSense):
-            r_sol = module._frankWolfe(-cp / module.lambd)
+            r_sol = module._frank_wolfe(-cp / module.lambd)
             diff = w - r_sol
         else:
-            r_sol = module._frankWolfe(cp / module.lambd)
+            r_sol = module._frank_wolfe(cp / module.lambd)
             diff = r_sol - w
         # regularizers
         omega_w = 0.5 * module.lambd * (w**2).sum(dim=-1)

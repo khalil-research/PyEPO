@@ -814,14 +814,14 @@ class TestRegularizedFrankWolfe:
         monkeypatch.setattr(regularized, "_solve_or_cache", fake_solve_or_cache)
         m = RFWO(_fw_knapsack(), max_iter=3, tol=1e-6)
         theta = torch.tensor([[0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0]])
-        m._frankWolfe(theta)
+        m._frank_wolfe(theta)
         assert batch_sizes and all(bs == 2 for bs in batch_sizes)
 
     def test_extreme_theta_collapses_to_vertex(self):
         from pyepo.func.regularized import RFWO
 
         m = RFWO(_fw_knapsack(), max_iter=10, tol=1e-6)
-        mu, _vertices, weights = m._frankWolfe(torch.tensor([[100.0, -100.0, -100.0, -100.0]]))
+        mu, _vertices, weights = m._frank_wolfe(torch.tensor([[100.0, -100.0, -100.0, -100.0]]))
         assert mu.shape == (1, 4)
         assert mu[0, 0].item() > 0.99
         assert weights.sum(dim=1)[0].item() == pytest.approx(1.0, abs=1e-5)
@@ -831,7 +831,7 @@ class TestRegularizedFrankWolfe:
 
         m = RFWO(_fw_knapsack(), max_iter=12, tol=1e-6)
         theta = torch.tensor([[1.0, 1.5, 2.0, 0.5], [2.0, 1.0, 1.0, 2.0]])
-        mu, V, w = m._frankWolfe(theta)
+        mu, V, w = m._frank_wolfe(theta)
         assert torch.allclose(mu, (w.unsqueeze(-1) * V).sum(dim=1), atol=1e-5)
 
     def test_smaller_lambd_closer_to_vertex(self):
@@ -881,7 +881,7 @@ class TestAwayStepFrankWolfe:
         m = self._sp_module()
         _, c = pyepo.data.shortestpath.genData(5, 5, (5, 5), seed=42)
         theta = (-1.0 / m.lambd) * torch.tensor(np.asarray(c, np.float64) * 1.3)
-        mu, V, W = m._frankWolfe(theta)
+        mu, V, W = m._frank_wolfe(theta)
         # mu is exactly the weighted active set and the weights form a simplex
         recon = torch.einsum("bc,bcv->bv", W, V)
         assert float((recon - mu).norm(dim=-1).max()) < 1e-10
@@ -910,7 +910,7 @@ class TestAwayStepFrankWolfe:
 
         g_ref, _ = grad_at(10000)
         g, m = grad_at(2000)
-        _, _, w = m._frankWolfe(-1.0 * pred)
+        _, _, w = m._frank_wolfe(-1.0 * pred)
         # gradient is stable to the converged reference (vanilla floors ~3% off)
         assert float((g - g_ref).norm() / g_ref.norm()) < 1e-4
         # the active set is the true support, not a bloated one
@@ -923,7 +923,7 @@ class TestAwayStepFrankWolfe:
         m = self._sp_module(max_iter=10000, tol=1e-7)
         _, c = pyepo.data.shortestpath.genData(8, 5, (5, 5), seed=7)
         theta = (-1.0 / m.lambd) * torch.tensor(np.asarray(c, np.float64) * 1.3)
-        mu, V, W = m._frankWolfe(theta)
+        mu, V, W = m._frank_wolfe(theta)
         # active set never spilled past the bounded buffer
         assert int((W > 0).sum(-1).max()) < V.shape[1]
         # converged well within the cap (early-exit fired, did not run 10000 iters)
@@ -941,7 +941,7 @@ class TestRegularizedFrankWolfeFenchelYoung:
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]])
         w = torch.tensor([[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]])
         loss = fy(cp, w)
-        r_sol = fy._frankWolfe(cp / lambd)
+        r_sol = fy._frank_wolfe(cp / lambd)
         omega_w = 0.5 * lambd * (w**2).sum(dim=-1)
         omega_r = 0.5 * lambd * (r_sol**2).sum(dim=-1)
         expected = omega_w - omega_r + torch.sum(cp * (r_sol - w), dim=1)
@@ -956,7 +956,7 @@ class TestRegularizedFrankWolfeFenchelYoung:
         w = torch.tensor([[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]])
         fy(cp, w).backward()
         with torch.no_grad():
-            expected = (fy._frankWolfe(cp.detach() / lambd) - w) / cp.shape[0]
+            expected = (fy._frank_wolfe(cp.detach() / lambd) - w) / cp.shape[0]
         assert torch.allclose(cp.grad, expected, atol=1e-5)
 
 
