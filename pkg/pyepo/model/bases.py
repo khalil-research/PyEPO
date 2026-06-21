@@ -15,6 +15,7 @@ problem base listed first so its ``__init__`` runs before the backend's::
 from __future__ import annotations
 
 from collections import defaultdict
+from copy import deepcopy
 from itertools import combinations
 from typing import TYPE_CHECKING
 
@@ -92,8 +93,8 @@ class knapsackBase(optModel):
             weights: item weights with shape ``(dim, n_items)``
             capacity: per-dimension capacity with length ``dim``
         """
-        self.weights = np.asarray(weights)
-        self.capacity = np.asarray(capacity)
+        self.weights = np.array(weights, copy=True)
+        self.capacity = np.array(capacity, copy=True)
         self.items = list(range(self.weights.shape[1]))
         super().__init__(*args, **kwargs)
 
@@ -145,7 +146,7 @@ class portfolioBase(optModel):
             gamma: risk tolerance multiplier on the mean covariance
         """
         self.num_assets = num_assets
-        self.covariance = np.asarray(covariance)
+        self.covariance = np.array(covariance, copy=True)
         self.gamma = gamma
         super().__init__(*args, **kwargs)
 
@@ -311,8 +312,8 @@ class vrpABBase(optModel):
         self.num_nodes = num_nodes
         self.nodes = list(range(num_nodes))
         self.edges = [(i, j) for i in self.nodes for j in self.nodes if i < j]
-        self.demands = demands
-        self.capacity = capacity
+        self.demands = deepcopy(demands)
+        self.capacity = deepcopy(capacity)
         self.num_vehicle = num_vehicle
         self._extra_constrs: list = []
         super().__init__(*args, **kwargs)

@@ -117,31 +117,34 @@ _KNAP_CAP = np.array([10.0])
 _KNAP_COST = np.array([10.0, 6.0, 3.0, 2.0])  # unique optimum [1, 1, 0, 0]
 
 
-def _make_knapsack(backend):
+def _make_knapsack(backend, weights=_KNAP_W, capacity=_KNAP_CAP):
     """Return (model, meta) for a knapsack on the given backend."""
     if backend == "grb":
         from pyepo.model.grb.knapsack import knapsackModel, knapsackModelRel
-        m = knapsackModel(weights=_KNAP_W, capacity=_KNAP_CAP)
+        m = knapsackModel(weights=weights, capacity=capacity)
         return m, {"relax": knapsackModelRel, "binary": True, "tol": 1e-6}
     if backend == "copt":
         from pyepo.model.copt.knapsack import knapsackModel, knapsackModelRel
-        m = knapsackModel(weights=_KNAP_W, capacity=_KNAP_CAP)
+        m = knapsackModel(weights=weights, capacity=capacity)
         return m, {"relax": knapsackModelRel, "binary": True, "tol": 1e-6}
     if backend == "omo":
         from pyepo.model.omo.knapsack import knapsackModel, knapsackModelRel
-        m = knapsackModel(weights=_KNAP_W, capacity=_KNAP_CAP, solver="gurobi")
+        m = knapsackModel(weights=weights, capacity=capacity, solver="gurobi")
         return m, {"relax": knapsackModelRel, "binary": True, "tol": 1e-6}
     if backend == "ort":
         from pyepo.model.ort.knapsack import knapsackModel, knapsackModelRel
-        m = knapsackModel(weights=_KNAP_W, capacity=_KNAP_CAP)
+        m = knapsackModel(weights=weights, capacity=capacity)
         return m, {"relax": knapsackModelRel, "binary": True, "tol": 1e-6}
     if backend == "ortcp":
         from pyepo.model.ort.knapsack import knapsackCpModel
-        m = knapsackCpModel(weights=_KNAP_W.astype(int), capacity=_KNAP_CAP.astype(int))
+        m = knapsackCpModel(
+            weights=np.asarray(weights).astype(int),
+            capacity=np.asarray(capacity).astype(int),
+        )
         return m, {"relax": None, "binary": True, "tol": 1e-2}
     if backend == "mpax":
         from pyepo.model.mpax.knapsack import knapsackModel
-        m = knapsackModel(weights=_KNAP_W, capacity=_KNAP_CAP)
+        m = knapsackModel(weights=weights, capacity=capacity)
         return m, {"relax": None, "binary": False, "tol": 1e-2}  # LP relaxation
     raise ValueError(backend)
 
@@ -175,6 +178,16 @@ class TestKnapsack:
         np.testing.assert_array_equal(rebuilt.capacity, m.capacity)
         if hasattr(m, "solver"):
             assert rebuilt.solver == m.solver
+
+    def test_constructor_snapshots_problem_data(self, backend):
+        weights = _KNAP_W.copy()
+        capacity = _KNAP_CAP.copy()
+        m, _ = _make_knapsack(backend, weights, capacity)
+        weights.fill(99)
+        capacity.fill(99)
+
+        np.testing.assert_array_equal(m.weights, _KNAP_W)
+        np.testing.assert_array_equal(m.capacity, _KNAP_CAP)
 
     def test_setObj_and_solve(self, backend):
         m, meta = _make_knapsack(backend)
@@ -466,6 +479,13 @@ class TestPortfolio:
         assert m.modelSense == EPO.MAXIMIZE
         assert m.num_cost == 10
 
+    def test_constructor_snapshots_covariance(self, backend):
+        covariance = np.eye(3)
+        m = _make_portfolio(backend, covariance, num_assets=3)
+        covariance.fill(99)
+
+        np.testing.assert_array_equal(m.covariance, np.eye(3))
+
     def test_setObj_wrong_size_raises(self, backend):
         cov, _ = _portfolio_data()
         m = _make_portfolio(backend, cov)
@@ -682,9 +702,9 @@ _VRP_NUM_EDGES = _VRP_NUM_NODES * (_VRP_NUM_NODES - 1) // 2
 _VRP_COST = np.random.RandomState(0).rand(_VRP_NUM_EDGES)
 
 
-def _make_vrp(backend, formulation):
+def _make_vrp(backend, formulation, demands=_VRP_DEMANDS):
     """Return (model, relax_cls_or_None)."""
-    kw = {"num_nodes": _VRP_NUM_NODES, "demands": _VRP_DEMANDS,
+    kw = {"num_nodes": _VRP_NUM_NODES, "demands": demands,
           "capacity": _VRP_CAPACITY, "num_vehicle": _VRP_NUM_VEHICLES}
     if backend == "grb":
         from pyepo.model.grb import vrp as v
@@ -731,6 +751,13 @@ class TestVRP:
         np.testing.assert_array_equal(rebuilt.demands, m.demands)
         if hasattr(m, "solver"):
             assert rebuilt.solver == m.solver
+
+    def test_constructor_snapshots_demands(self, backend, formulation):
+        demands = np.asarray(_VRP_DEMANDS)
+        m, _ = _make_vrp(backend, formulation, demands)
+        demands.fill(99)
+
+        np.testing.assert_array_equal(m.demands, _VRP_DEMANDS)
 
     def test_setObj_solve_binary(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)
