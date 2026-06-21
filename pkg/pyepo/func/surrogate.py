@@ -191,13 +191,15 @@ class perturbationGradient(optModule):
         # lift costs to the full objective space (no-op without partial prediction)
         pred_cost = self.optmodel._fullCost(pred_cost)
         true_cost = self.optmodel._fullCost(true_cost)
-        loss = self._finiteDifference(pred_cost, true_cost)
+        loss = self._finite_difference(pred_cost, true_cost)
         return self._reduce(loss)
 
-    def _finiteDifference(self, pred_cost: torch.Tensor, true_cost: torch.Tensor) -> torch.Tensor:
-        """
-        Zeroth order approximations for surrogate objective value
-        """
+    def _finite_difference(
+        self,
+        pred_cost: torch.Tensor,
+        true_cost: torch.Tensor,
+    ) -> torch.Tensor:
+        """Estimate the objective-value directional derivative."""
         # convert tensor
         cp = pred_cost.detach()
         c = true_cost.detach()
