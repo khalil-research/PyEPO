@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.mpax.knapsack.cost
+   pyepo.model.mpax.knapsack.jnp
 
 
 Classes
@@ -27,6 +27,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: jnp
+   :value: None
+
 
 .. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
@@ -49,6 +53,4 @@ Module Contents
       :value: False
 
 
-
-.. py:data:: cost
 

@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.ort.shortestpath.cost
+   pyepo.model.ort.shortestpath.pywraplp
 
 
 Classes
@@ -28,6 +28,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: pywraplp
+   :value: None
+
 
 .. py:class:: shortestPathModel(grid: tuple[int, int], solver: str = 'glop')
 
@@ -62,6 +66,4 @@ Module Contents
 
    :vartype arcs: list
 
-
-.. py:data:: cost
 

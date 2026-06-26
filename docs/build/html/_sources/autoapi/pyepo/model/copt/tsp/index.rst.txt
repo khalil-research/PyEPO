@@ -14,8 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.copt.tsp.CallbackBase
-   pyepo.model.copt.tsp.num_nodes
+   pyepo.model.copt.tsp.COPT
 
 
 Classes
@@ -34,7 +33,9 @@ Classes
 Module Contents
 ---------------
 
-.. py:data:: CallbackBase
+.. py:data:: COPT
+   :value: None
+
 
 .. py:class:: tspABModel(num_nodes: int, *args, **kwargs)
 
@@ -163,9 +164,5 @@ Module Contents
 
       A forbidden method to get a tour from solution
 
-
-
-.. py:data:: num_nodes
-   :value: 5
 
 

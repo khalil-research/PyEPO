@@ -15,6 +15,14 @@ pyepo.model.ort.compile
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.ort.compile.pywraplp
+
+
 Classes
 -------
 
@@ -33,6 +41,10 @@ Functions
 
 Module Contents
 ---------------
+
+.. py:data:: pywraplp
+   :value: None
+
 
 .. py:function:: compileProblem(problem, solver='scip', **params) -> compiledOrtProblem
 

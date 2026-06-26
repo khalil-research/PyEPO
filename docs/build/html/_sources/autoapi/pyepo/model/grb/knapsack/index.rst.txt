@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.grb.knapsack.cost
+   pyepo.model.grb.knapsack.gp
 
 
 Classes
@@ -28,6 +28,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: gp
+   :value: None
+
 
 .. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
@@ -66,6 +70,4 @@ Module Contents
       A forbidden method to relax MIP model
 
 
-
-.. py:data:: cost
 

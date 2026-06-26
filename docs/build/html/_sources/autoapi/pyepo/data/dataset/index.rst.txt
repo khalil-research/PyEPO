@@ -14,7 +14,6 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.data.dataset.optMpaxModel
    pyepo.data.dataset.logger
 
 
@@ -38,10 +37,6 @@ Functions
 
 Module Contents
 ---------------
-
-.. py:data:: optMpaxModel
-   :value: None
-
 
 .. py:data:: logger
 

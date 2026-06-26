@@ -14,6 +14,14 @@ pyepo.model.grb.compile
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.grb.compile.gp
+
+
 Classes
 -------
 
@@ -32,6 +40,10 @@ Functions
 
 Module Contents
 ---------------
+
+.. py:data:: gp
+   :value: None
+
 
 .. py:function:: compileProblem(problem, **params) -> compiledGrbProblem
 

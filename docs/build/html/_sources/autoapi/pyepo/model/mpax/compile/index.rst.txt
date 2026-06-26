@@ -18,6 +18,14 @@ pyepo.model.mpax.compile
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.mpax.compile.jax
+
+
 Classes
 -------
 
@@ -36,6 +44,10 @@ Functions
 
 Module Contents
 ---------------
+
+.. py:data:: jax
+   :value: None
+
 
 .. py:function:: compileProblem(problem, **params) -> compiledMpaxProblem
 

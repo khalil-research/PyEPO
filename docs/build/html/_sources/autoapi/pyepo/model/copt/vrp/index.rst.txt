@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.copt.vrp.CallbackBase
+   pyepo.model.copt.vrp.COPT
 
 
 Classes
@@ -31,7 +31,9 @@ Classes
 Module Contents
 ---------------
 
-.. py:data:: CallbackBase
+.. py:data:: COPT
+   :value: None
+
 
 .. py:class:: vrpABModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int, *args, **kwargs)
 

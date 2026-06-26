@@ -9,14 +9,6 @@ pyepo.model.ort.ortmodel
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.ort.ortmodel.num_vars
-
-
 Classes
 -------
 
@@ -97,9 +89,5 @@ Module Contents
       :returns: new model with the added constraint
       :rtype: optModel
 
-
-
-.. py:data:: num_vars
-   :value: 10
 
 

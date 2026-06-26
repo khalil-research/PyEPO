@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.omo.tsp.num_nodes
+   pyepo.model.omo.tsp.pe
 
 
 Classes
@@ -31,6 +31,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: pe
+   :value: None
+
 
 .. py:class:: tspABModel(num_nodes: int, solver: str = 'glpk')
 
@@ -126,9 +130,5 @@ Module Contents
 
       A forbidden method to get a tour from solution
 
-
-
-.. py:data:: num_nodes
-   :value: 5
 
 

@@ -381,6 +381,18 @@ to turn a finalized DSL <code class="docutils literal notranslate"><span class="
 solver (<code class="docutils literal notranslate"><span class="pre">solver=</span></code>, default SCIP). It builds the model and provides the OR-Tools
 read / write hooks; the objective handling lives in <code class="docutils literal notranslate"><span class="pre">compiledBase</span></code>. pywraplp is
 LP / MIP only — quadratic objectives or constraints raise <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code>.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.model.ort.compile.pywraplp" title="pyepo.model.ort.compile.pywraplp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pywraplp</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -407,6 +419,11 @@ LP / MIP only — quadratic objectives or constraints raise <code class="docutil
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="pyepo.model.ort.compile.pywraplp">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.compile.</span></span><span class="sig-name descname"><span class="pre">pywraplp</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pyepo.model.ort.compile.pywraplp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="pyepo.model.ort.compile.compileProblem">
 <span class="sig-prename descclassname"><span class="pre">pyepo.model.ort.compile.</span></span><span class="sig-name descname"><span class="pre">compileProblem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scip'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyepo.model.ort.compile.compiledOrtProblem" title="pyepo.model.ort.compile.compiledOrtProblem"><span class="pre">compiledOrtProblem</span></a></span></span><a class="headerlink" href="#pyepo.model.ort.compile.compileProblem" title="Link to this definition">¶</a></dt>
@@ -494,9 +511,11 @@ LP / MIP only — quadratic objectives or constraints raise <code class="docutil
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">pyepo.model.ort.compile</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#pyepo.model.ort.compile.pywraplp"><code class="docutils literal notranslate"><span class="pre">pywraplp</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.ort.compile.compileProblem"><code class="docutils literal notranslate"><span class="pre">compileProblem()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.ort.compile.compiledOrtProblem"><code class="docutils literal notranslate"><span class="pre">compiledOrtProblem</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.model.ort.compile.compiledOrtProblem.problem"><code class="docutils literal notranslate"><span class="pre">compiledOrtProblem.problem</span></code></a></li>

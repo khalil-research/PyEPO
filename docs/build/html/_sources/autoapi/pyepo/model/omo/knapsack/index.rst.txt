@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.omo.knapsack.cost
+   pyepo.model.omo.knapsack.pe
 
 
 Classes
@@ -28,6 +28,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: pe
+   :value: None
+
 
 .. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, solver: str = 'glpk')
 
@@ -68,6 +72,4 @@ Module Contents
       A forbidden method to relax MIP model
 
 
-
-.. py:data:: cost
 

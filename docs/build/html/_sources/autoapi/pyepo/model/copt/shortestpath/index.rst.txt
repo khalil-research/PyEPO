@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.copt.shortestpath.cost
+   pyepo.model.copt.shortestpath.COPT
 
 
 Classes
@@ -27,6 +27,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: COPT
+   :value: None
+
 
 .. py:class:: shortestPathModel(grid: tuple[int, int], *args, **kwargs)
 
@@ -43,6 +47,4 @@ Module Contents
 
    :vartype arcs: list
 
-
-.. py:data:: cost
 

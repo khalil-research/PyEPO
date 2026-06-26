@@ -16,6 +16,14 @@ pyepo.model.omo.compile
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.omo.compile.pe
+
+
 Classes
 -------
 
@@ -34,6 +42,10 @@ Functions
 
 Module Contents
 ---------------
+
+.. py:data:: pe
+   :value: None
+
 
 .. py:function:: compileProblem(problem, solver='glpk', **params) -> compiledOmoProblem
 

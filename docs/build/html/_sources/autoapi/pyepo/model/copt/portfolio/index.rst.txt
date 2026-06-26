@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.copt.portfolio.optmodel
+   pyepo.model.copt.portfolio.COPT
 
 
 Classes
@@ -27,6 +27,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: COPT
+   :value: None
+
 
 .. py:class:: portfolioModel(num_assets: int, covariance: numpy.ndarray, gamma: float = 2.25, *args, **kwargs)
 
@@ -45,6 +49,4 @@ Module Contents
 
    :vartype risk_level: float
 
-
-.. py:data:: optmodel
 

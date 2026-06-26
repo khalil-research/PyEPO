@@ -9,6 +9,14 @@ pyepo.model.grb.tsp
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.grb.tsp.gp
+
+
 Classes
 -------
 
@@ -24,6 +32,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: gp
+   :value: None
+
 
 .. py:class:: tspABModel(num_nodes: int, *args, **kwargs)
 

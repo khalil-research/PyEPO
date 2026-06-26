@@ -9,6 +9,14 @@ pyepo.model.grb.vrp
 
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   pyepo.model.grb.vrp.gp
+
+
 Classes
 -------
 
@@ -22,6 +30,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: gp
+   :value: None
+
 
 .. py:class:: vrpABModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int, *args, **kwargs)
 
