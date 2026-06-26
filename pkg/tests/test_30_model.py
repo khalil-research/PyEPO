@@ -1267,6 +1267,14 @@ class TestMpaxQP:
         assert np.sum(to_np(sol)) <= 2.0 + 1e-2
         assert obj1 > obj0 - 1e-3  # MINIMIZE: binding constraint worsens objective
 
+    def test_qp_addConstr_accepts_torch_coefficients(self, model):
+        model.setObj(np.array([-2.0, -4.0, -6.0, -8.0]))
+        constrained = model.addConstr(torch.ones(model.num_cost), 2.0)
+        constrained.setObj(np.array([-2.0, -4.0, -6.0, -8.0]))
+        sol, _ = constrained.solve()
+
+        assert np.sum(to_np(sol)) <= 2.0 + 1e-2
+
     def test_qp_rejects_maximize(self):
         class _BadMaxQP(_MpaxBoxQP):
             modelSense = EPO.MAXIMIZE

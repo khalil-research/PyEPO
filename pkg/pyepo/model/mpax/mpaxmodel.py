@@ -26,6 +26,7 @@ except ImportError:
 from pyepo import EPO
 from pyepo.model._common import validate_constraint, validate_objective_shape
 from pyepo.model.opt import optModel
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import numpy as np
@@ -302,8 +303,9 @@ class optMpaxModel(optModel):
             optModel: new model with the added constraint
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
+        coefs_np = costToNumpy(coefs).copy()
         # flip sign: PyEPO convention is `coefs · x <= rhs`, MPAX stores `G x >= h`
-        coefs = -jnp.array(coefs, dtype=jnp.float32).reshape(1, -1)
+        coefs = -jnp.array(coefs_np, dtype=jnp.float32).reshape(1, -1)
         rhs = -rhs
         # copy
         new_model = self.copy()
