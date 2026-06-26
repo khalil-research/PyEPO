@@ -97,19 +97,19 @@ class optDataset(Dataset):
         self.feats = feats
         self.costs = costs
         # find optimal solutions
-        sols, objs = self._getSols()
+        sols, objs = self._get_sols()
         self.feats = _as_float_tensor(feats)
         self.costs = _as_float_tensor(costs)
         self.sols = _as_float_tensor(sols)
         self.objs = _as_float_tensor(objs)
 
-    def _getSols(self) -> tuple[np.ndarray, np.ndarray]:
+    def _get_sols(self) -> tuple[np.ndarray, np.ndarray]:
         """
         A method to get optimal solutions for all cost vectors
         """
         # MPAX fast path: vmap-solve the whole dataset in a single dispatch
         if optMpaxModel is not None and isinstance(self.model, optMpaxModel):
-            return self._getSolsMpaxBatch()
+            return self._get_sols_mpax_batch()
         sols = []
         objs = []
         logger.info("Optimizing for optDataset...")
@@ -119,7 +119,7 @@ class optDataset(Dataset):
             objs.append(obj)
         return np.stack(sols), np.asarray(objs).reshape(-1, 1)
 
-    def _getSolsMpaxBatch(self) -> tuple[np.ndarray, np.ndarray]:
+    def _get_sols_mpax_batch(self) -> tuple[np.ndarray, np.ndarray]:
         """
         A method to batch-solve every cost vector in one MPAX vmap call.
         """
@@ -244,13 +244,13 @@ class optDatasetKNN(optDataset):
         self.feats = feats
         self.costs = costs
         # find optimal solutions
-        sols, objs = self._getSols()
+        sols, objs = self._get_sols()
         self.feats = _as_float_tensor(self.feats)
         self.costs = _as_float_tensor(self.costs)
         self.sols = _as_float_tensor(sols)
         self.objs = _as_float_tensor(objs)
 
-    def _getSols(self) -> tuple[np.ndarray, np.ndarray]:
+    def _get_sols(self) -> tuple[np.ndarray, np.ndarray]:
         """
         A method to get optimal solutions for all cost vectors
         """
@@ -258,7 +258,7 @@ class optDatasetKNN(optDataset):
         objs = []
         logger.info("Optimizing for optDataset...")
         # get kNN costs
-        costs_knn = self._getKNN()
+        costs_knn = self._get_knn()
         # solve optimization
         for c_knn in tqdm(costs_knn):
             sol_knn = np.zeros((self.costs.shape[1], self.k))
@@ -276,7 +276,7 @@ class optDatasetKNN(optDataset):
         self.costs = costs_knn.mean(axis=2)
         return np.stack(sols), np.asarray(objs).reshape(-1, 1)
 
-    def _getKNN(self) -> np.ndarray:
+    def _get_knn(self) -> np.ndarray:
         """
         A method to get kNN costs
         """
@@ -353,7 +353,7 @@ class optDatasetConstrs(optDataset):
         self.feats = feats
         self.costs = costs
         # find optimal solutions and binding constraints
-        sols, objs, ctrs, valid = self._getSols()
+        sols, objs, ctrs, valid = self._get_sols()
         # pre-convert to tensors (on CPU) to avoid repeated numpy→tensor copies
         self.feats = _as_float_tensor(self.feats[valid])
         self.costs = _as_float_tensor(self.costs[valid])
@@ -361,7 +361,7 @@ class optDatasetConstrs(optDataset):
         self.objs = _as_float_tensor(objs)
         self.ctrs = [_as_float_tensor(c) for c in ctrs]
 
-    def _getSols(  # type: ignore[override]
+    def _get_sols(  # type: ignore[override]
         self,
     ) -> tuple[np.ndarray, np.ndarray, list[np.ndarray], list[int]]:
         """

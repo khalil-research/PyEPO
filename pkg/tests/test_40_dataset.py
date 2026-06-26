@@ -215,14 +215,14 @@ class TestOptDatasetKNN:
         assert sol.shape == (model.num_cost,)
         assert obj.shape == (1,)
 
-    def test_getKNN_shape_and_weight_boundary(self):
+    def test_get_knn_shape_and_weight_boundary(self):
         # weight=1 => smoothed cost equals the self cost for every neighbour
         ds = object.__new__(optDatasetKNN)
         n, d, k = 10, 3, 2
         ds.feats = np.random.RandomState(0).randn(n, d).astype(np.float32)
         ds.costs = np.random.RandomState(1).randn(n, d).astype(np.float32)
         ds.k, ds.weight = k, 1.0
-        knn = ds._getKNN()
+        knn = ds._get_knn()
         assert knn.shape == (n, d, k)
         for i in range(n):
             for j in range(k):
