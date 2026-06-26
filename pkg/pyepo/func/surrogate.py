@@ -133,10 +133,7 @@ class SPOPlusFunc(Function):
         """
         w, wq = ctx.saved_tensors
         optmodel = ctx.optmodel
-        if is_minimize(optmodel.modelSense):
-            grad = 2 * (w - wq)
-        else:
-            grad = 2 * (wq - w)
+        grad = 2 * (w - wq) if is_minimize(optmodel.modelSense) else 2 * (wq - w)
         return grad_output.unsqueeze(1) * grad, None, None, None, None
 
 

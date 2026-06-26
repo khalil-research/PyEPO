@@ -597,10 +597,7 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
         dl = grad_output.detach()
         # calculate λ
         dl_norm = torch.norm(dl)
-        if dl_norm > 0:
-            lambd = module.alpha * torch.norm(cp) / dl_norm
-        else:
-            lambd = 0.0
+        lambd = module.alpha * torch.norm(cp) / dl_norm if dl_norm > 0 else 0.0
         delta = (lambd * dl).unsqueeze(1)
         if module.two_sides:
             # batch positive and negative perturbations into one solve

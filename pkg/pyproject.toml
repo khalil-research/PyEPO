@@ -168,13 +168,9 @@ select = [
 ignore = [
     "E501",    # line too long (formatter handles)
     "E741",    # ambiguous variable names (l/I/o ok in math contexts)
-    "B008",    # function calls in defaults (np.float32 etc. intentional)
     "RUF002",  # ambiguous unicode in docstrings (× α – intentional)
     "RUF003",  # ambiguous unicode in comments
-    "RUF012",  # mutable class attrs (ABC patterns)
-    "SIM108",  # ternary not always clearer than if/else
-    "RET504",  # assign-then-return is stylistic
-    "PERF203", # try/except in loop is fine for solver retries
+    "RET504",  # assign-then-return is stylistic for long expressions
 ]
 
 [tool.ruff.lint.per-file-ignores]

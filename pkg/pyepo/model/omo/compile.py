@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import contextlib
 from copy import deepcopy
+from typing import ClassVar
 
 import numpy as np
 
@@ -54,7 +55,7 @@ class compiledOmoProblem(compiledBase, optOmoModel):
     """
 
     # canonical `timelimit` (seconds) -> each solver's own option name
-    _TIMELIMIT_OPT = {
+    _TIMELIMIT_OPT: ClassVar[dict[str, str]] = {
         "glpk": "tmlim",
         "cbc": "seconds",
         "scip": "limits/time",

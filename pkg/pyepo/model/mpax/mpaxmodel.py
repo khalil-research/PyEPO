@@ -184,10 +184,7 @@ class optMpaxModel(optModel):
         # check if c is a PyTorch tensor
         if isinstance(c, torch.Tensor):
             # move to cpu if JAX has no GPU support
-            if not self._has_jax_gpu:
-                c = c.cpu().detach()
-            else:
-                c = c.detach()
+            c = c.cpu().detach() if not self._has_jax_gpu else c.detach()
             # match float32 constraints; no-op (no copy) if already float32
             c = c.to(torch.float32)
             # convert PyTorch tensor to JAX array using DLPack

@@ -70,7 +70,7 @@ class optModel(ABC):
 
     modelSense: ModelSense = EPO.MINIMIZE
     # populated by problem-level bases (shortestPathBase / tspABBase) or _getModel
-    arcs: list = []
+    arcs: list
     _cost_vars: list
 
     def __init__(self) -> None:
@@ -159,8 +159,7 @@ class optModel(ABC):
         Returns:
             optModel: new copied model
         """
-        new_model = deepcopy(self)
-        return new_model
+        return deepcopy(self)
 
     def addConstr(self, coefs: np.ndarray | torch.Tensor | list, rhs: float) -> Self:
         """
