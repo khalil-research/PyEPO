@@ -30,7 +30,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1.0, reduction='mean', dataset=None)
+.. py:class:: SPOPlus(optmodel, processes=1, solve_ratio=1.0, reduction: pyepo.func.runtime.Reduction = 'mean', dataset=None)
 
    Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
 
@@ -53,7 +53,7 @@ Module Contents
 
 
 
-.. py:class:: perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1.0, reduction='mean', dataset=None)
+.. py:class:: perturbationGradient(optmodel, sigma=0.1, two_sides=False, processes=1, solve_ratio=1.0, reduction: pyepo.func.runtime.Reduction = 'mean', dataset=None)
 
    Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
 

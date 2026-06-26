@@ -9,14 +9,6 @@ pyepo.model.grb.shortestpath
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.grb.shortestpath.gp
-
-
 Classes
 -------
 
@@ -27,10 +19,6 @@ Classes
 
 Module Contents
 ---------------
-
-.. py:data:: gp
-   :value: None
-
 
 .. py:class:: shortestPathModel(grid: tuple[int, int], *args, **kwargs)
 

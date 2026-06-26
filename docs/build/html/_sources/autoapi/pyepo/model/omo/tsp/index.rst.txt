@@ -9,14 +9,6 @@ pyepo.model.omo.tsp
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.omo.tsp.pe
-
-
 Classes
 -------
 
@@ -31,10 +23,6 @@ Classes
 
 Module Contents
 ---------------
-
-.. py:data:: pe
-   :value: None
-
 
 .. py:class:: tspABModel(num_nodes: int, solver: str = 'glpk')
 

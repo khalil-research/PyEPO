@@ -14,14 +14,6 @@ pyepo.model.copt.compile
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.copt.compile.COPT
-
-
 Classes
 -------
 
@@ -40,10 +32,6 @@ Functions
 
 Module Contents
 ---------------
-
-.. py:data:: COPT
-   :value: None
-
 
 .. py:function:: compileProblem(problem, **params) -> compiledCoptProblem
 

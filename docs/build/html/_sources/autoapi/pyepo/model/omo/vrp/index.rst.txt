@@ -9,14 +9,6 @@ pyepo.model.omo.vrp
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.omo.vrp.pe
-
-
 Classes
 -------
 
@@ -29,10 +21,6 @@ Classes
 
 Module Contents
 ---------------
-
-.. py:data:: pe
-   :value: None
-
 
 .. py:class:: vrpABModel(num_nodes: int, demands: list[float] | numpy.ndarray, capacity: float, num_vehicle: int, solver: str = 'glpk')
 

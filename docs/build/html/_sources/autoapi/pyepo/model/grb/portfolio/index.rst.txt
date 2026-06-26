@@ -9,14 +9,6 @@ pyepo.model.grb.portfolio
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.grb.portfolio.gp
-
-
 Classes
 -------
 
@@ -27,10 +19,6 @@ Classes
 
 Module Contents
 ---------------
-
-.. py:data:: gp
-   :value: None
-
 
 .. py:class:: portfolioModel(num_assets: int, covariance: numpy.ndarray, gamma: float = 2.25, *args, **kwargs)
 

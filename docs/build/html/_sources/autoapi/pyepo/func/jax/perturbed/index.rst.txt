@@ -88,7 +88,7 @@ Module Contents
    Reference: Dalle et al. (2022) `<https://arxiv.org/abs/2207.13513>`_
 
 
-.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1.0, reduction='mean', dataset=None)
+.. py:class:: perturbedFenchelYoung(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1.0, reduction: pyepo.func.runtime.Reduction = 'mean', dataset=None)
 
    Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
 
@@ -120,7 +120,7 @@ Module Contents
 
 
 
-.. py:class:: perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1.0, reduction='mean', dataset=None)
+.. py:class:: perturbedFenchelYoungMul(optmodel, n_samples=10, sigma=1.0, processes=1, seed=135, solve_ratio=1.0, reduction: pyepo.func.runtime.Reduction = 'mean', dataset=None)
 
    Bases: :py:obj:`perturbedFenchelYoung`
 

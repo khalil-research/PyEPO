@@ -9,14 +9,6 @@ pyepo.model.omo.shortestpath
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.omo.shortestpath.pe
-
-
 Classes
 -------
 
@@ -27,10 +19,6 @@ Classes
 
 Module Contents
 ---------------
-
-.. py:data:: pe
-   :value: None
-
 
 .. py:class:: shortestPathModel(grid: tuple[int, int], solver: str = 'glpk')
 

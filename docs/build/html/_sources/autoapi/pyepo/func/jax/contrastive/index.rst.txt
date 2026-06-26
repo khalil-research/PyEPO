@@ -30,7 +30,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: noiseContrastiveEstimation(optmodel, processes=1, solve_ratio=1.0, reduction='mean', dataset=None)
+.. py:class:: noiseContrastiveEstimation(optmodel, processes=1, solve_ratio=1.0, reduction: pyepo.func.runtime.Reduction = 'mean', dataset=None)
 
    Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
 
@@ -49,7 +49,7 @@ Module Contents
 
 
 
-.. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1.0, reduction='mean', dataset=None)
+.. py:class:: contrastiveMAP(optmodel, processes=1, solve_ratio=1.0, reduction: pyepo.func.runtime.Reduction = 'mean', dataset=None)
 
    Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
 

@@ -9,14 +9,6 @@ pyepo.model.ort.knapsack
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.ort.knapsack.pywraplp
-
-
 Classes
 -------
 
@@ -29,10 +21,6 @@ Classes
 
 Module Contents
 ---------------
-
-.. py:data:: pywraplp
-   :value: None
-
 
 .. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 

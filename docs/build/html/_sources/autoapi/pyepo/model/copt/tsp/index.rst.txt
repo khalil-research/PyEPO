@@ -14,7 +14,7 @@ Attributes
 
 .. autoapisummary::
 
-   pyepo.model.copt.tsp.COPT
+   pyepo.model.copt.tsp.CallbackBase
 
 
 Classes
@@ -33,9 +33,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:data:: COPT
-   :value: None
-
+.. py:data:: CallbackBase
 
 .. py:class:: tspABModel(num_nodes: int, *args, **kwargs)
 

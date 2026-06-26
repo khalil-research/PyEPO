@@ -65,7 +65,7 @@ Module Contents
 
 
 
-.. py:class:: regularizedFrankWolfeFenchelYoung(optmodel, lambd=1.0, max_iter=10000, tol=1e-06, processes=1, solve_ratio=1.0, reduction='mean', dataset=None)
+.. py:class:: regularizedFrankWolfeFenchelYoung(optmodel, lambd=1.0, max_iter=10000, tol=1e-06, processes=1, solve_ratio=1.0, reduction: pyepo.func.runtime.Reduction = 'mean', dataset=None)
 
    Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
 

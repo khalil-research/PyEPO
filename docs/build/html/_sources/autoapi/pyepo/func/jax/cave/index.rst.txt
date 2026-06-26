@@ -28,7 +28,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: coneAlignedCosine(optmodel, max_iter=3, solve_ratio=1.0, inner_ratio=0.2, processes=1, reduction='mean')
+.. py:class:: coneAlignedCosine(optmodel, max_iter=3, solve_ratio=1.0, inner_ratio=0.2, processes=1, reduction: pyepo.func.runtime.Reduction = 'mean')
 
    Bases: :py:obj:`pyepo.func.jax.abcmodule.optModule`
 

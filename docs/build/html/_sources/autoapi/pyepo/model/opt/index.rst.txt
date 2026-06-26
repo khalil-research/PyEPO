@@ -81,8 +81,6 @@ Module Contents
 
    .. py:attribute:: arcs
       :type:  list
-      :value: []
-
 
 
    .. py:method:: get_config() -> dict

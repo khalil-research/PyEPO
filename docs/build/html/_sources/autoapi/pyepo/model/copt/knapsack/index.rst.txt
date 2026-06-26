@@ -9,14 +9,6 @@ pyepo.model.copt.knapsack
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   pyepo.model.copt.knapsack.COPT
-
-
 Classes
 -------
 
@@ -28,10 +20,6 @@ Classes
 
 Module Contents
 ---------------
-
-.. py:data:: COPT
-   :value: None
-
 
 .. py:class:: knapsackModel(weights: numpy.ndarray | list, capacity: numpy.ndarray | list, *args, **kwargs)
 
