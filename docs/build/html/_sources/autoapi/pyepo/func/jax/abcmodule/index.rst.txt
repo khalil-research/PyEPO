@@ -30,7 +30,7 @@ Module Contents
 
 .. py:data:: logger
 
-.. py:class:: optModule(optmodel, processes=1, solve_ratio=1.0, reduction='mean', dataset=None, require_solpool=False, seed=None)
+.. py:class:: optModule(optmodel: pyepo.model.opt.optModel, processes: int = 1, solve_ratio: float = 1.0, reduction: pyepo.func.runtime.Reduction = 'mean', dataset: pyepo.data.dataset.optDataset | None = None, require_solpool: bool = False, seed: int | None = None)
 
    Bases: :py:obj:`abc.ABC`
 
@@ -38,6 +38,26 @@ Module Contents
    An abstract module for differentiable optimization losses in end-to-end
    predict-then-optimize. It provides shared init validation, loss reduction,
    and the solution pool for all loss modules.
+
+
+   .. py:attribute:: optmodel
+      :type:  pyepo.model.opt.optModel
+
+
+   .. py:attribute:: processes
+      :type:  int
+
+
+   .. py:attribute:: pool
+      :type:  pathos.multiprocessing.ProcessingPool | None
+
+
+   .. py:attribute:: solve_ratio
+      :type:  float
+
+
+   .. py:attribute:: reduction
+      :type:  pyepo.func.runtime.Reduction
 
 
    .. py:attribute:: solpool
