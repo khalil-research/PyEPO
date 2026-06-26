@@ -562,13 +562,12 @@ def _parse_temp_constraint(
     """
     Parse a Gurobi TempConstr into (coefs, rhs, sense) over the cost-vector dim
     """
-    # TempConstr internals
-    lhs = getattr(tc, "_lhs", None)
-    rhs = getattr(tc, "_rhs", None)
-    sense = getattr(tc, "_sense", None)
-    # unparseable fallback
-    if lhs is None or rhs is None or sense is None:
+    from pyepo.model.grb.grbmodel import _temp_constr_fields
+
+    fields = _temp_constr_fields(tc)
+    if fields is None:
         return None
+    lhs, rhs, sense = fields
     # project LinExpr terms onto cost-vector dim
     coefs = np.zeros(num_cost, dtype=np.float64)
     for i in range(lhs.size()):

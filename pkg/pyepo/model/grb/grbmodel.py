@@ -179,13 +179,22 @@ class optGrbModel(optModel):
         return new_model
 
 
-def _lazy_cut_key(tc) -> tuple | None:
-    """Structural identity of a TempConstr: sorted (var, coef) terms with sense and rhs."""
+def _temp_constr_fields(tc):
+    """Read a Gurobi TempConstr's internal ``(lhs, rhs, sense)``; ``None`` if any is missing."""
     lhs = getattr(tc, "_lhs", None)
     rhs = getattr(tc, "_rhs", None)
     sense = getattr(tc, "_sense", None)
     if lhs is None or rhs is None or sense is None:
         return None
+    return lhs, rhs, sense
+
+
+def _lazy_cut_key(tc) -> tuple | None:
+    """Structural identity of a TempConstr: sorted (var, coef) terms with sense and rhs."""
+    fields = _temp_constr_fields(tc)
+    if fields is None:
+        return None
+    lhs, rhs, sense = fields
     terms = tuple(
         sorted((lhs.getVar(i).VarName, round(lhs.getCoeff(i), 9)) for i in range(lhs.size()))
     )
