@@ -5,14 +5,13 @@ Knapsack problem
 
 from __future__ import annotations
 
+import contextlib
+
 import numpy as np
 
-try:
+with contextlib.suppress(ImportError):
     from ortools.linear_solver import pywraplp
     from ortools.sat.python import cp_model
-except ImportError:
-    pywraplp = None
-    cp_model = None
 
 from pyepo.model.bases import knapsackBase
 from pyepo.model.ort.ortcpmodel import optOrtCpModel

@@ -5,15 +5,14 @@ Portfolio problem
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING
 
 from pyepo.model.bases import portfolioBase
 from pyepo.model.omo.omomodel import optOmoModel
 
-try:
+with contextlib.suppress(ImportError):
     from pyomo import environ as pe
-except ImportError:
-    pe = None
 
 if TYPE_CHECKING:
     import numpy as np

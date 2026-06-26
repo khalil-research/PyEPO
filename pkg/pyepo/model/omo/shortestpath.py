@@ -5,15 +5,14 @@ Shortest path problem
 
 from __future__ import annotations
 
+import contextlib
 from collections import defaultdict
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.omo.omomodel import optOmoModel
 
-try:
+with contextlib.suppress(ImportError):
     from pyomo import environ as pe
-except ImportError:
-    pe = None
 
 
 class shortestPathModel(shortestPathBase, optOmoModel):

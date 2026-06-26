@@ -5,6 +5,7 @@ Capacitated vehicle routing problem
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
@@ -16,10 +17,8 @@ from pyepo.model.utils import _EDGE_ACTIVE_TOL
 if TYPE_CHECKING:
     import torch
 
-try:
+with contextlib.suppress(ImportError):
     from pyomo import environ as pe
-except ImportError:
-    pe = None
 
 
 class vrpABModel(vrpABBase, optOmoModel):

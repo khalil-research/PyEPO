@@ -5,10 +5,10 @@ Knapsack problem
 
 from __future__ import annotations
 
-try:
+import contextlib
+
+with contextlib.suppress(ImportError):
     from coptpy import COPT
-except ImportError:
-    COPT = None
 
 from pyepo.model.bases import knapsackBase
 from pyepo.model.copt.coptmodel import _get_envr, optCoptModel

@@ -12,16 +12,14 @@ rebuilding the expression.
 
 from __future__ import annotations
 
+import contextlib
 from copy import deepcopy
 
 import numpy as np
 
-try:
+with contextlib.suppress(ImportError):
     from pyomo import environ as pe
     from pyomo import opt as po
-except ImportError:
-    pe = None
-    po = None
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase

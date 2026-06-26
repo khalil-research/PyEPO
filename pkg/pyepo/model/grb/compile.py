@@ -10,14 +10,13 @@ and provides the Gurobi read / write hooks; the objective handling lives in
 
 from __future__ import annotations
 
+import contextlib
+
 import numpy as np
 
-try:
+with contextlib.suppress(ImportError):
     import gurobipy as gp
     from gurobipy import GRB
-except ImportError:
-    gp = None
-    GRB = None
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase

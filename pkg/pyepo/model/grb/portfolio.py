@@ -5,12 +5,11 @@ Portfolio problem
 
 from __future__ import annotations
 
-try:
+import contextlib
+
+with contextlib.suppress(ImportError):
     import gurobipy as gp
     from gurobipy import GRB
-except ImportError:
-    gp = None
-    GRB = None
 
 from pyepo.model.bases import portfolioBase
 from pyepo.model.grb.grbmodel import optGrbModel

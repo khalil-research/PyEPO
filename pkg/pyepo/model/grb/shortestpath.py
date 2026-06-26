@@ -5,14 +5,13 @@ Shortest path problem
 
 from __future__ import annotations
 
+import contextlib
+
 import numpy as np
 
-try:
+with contextlib.suppress(ImportError):
     import gurobipy as gp
     from gurobipy import GRB
-except ImportError:
-    gp = None
-    GRB = None
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.grb.grbmodel import optGrbModel

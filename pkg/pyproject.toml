@@ -172,7 +172,6 @@ ignore = [
     "RUF002",  # ambiguous unicode in docstrings (× α – intentional)
     "RUF003",  # ambiguous unicode in comments
     "RUF012",  # mutable class attrs (ABC patterns)
-    "SIM105",  # try/except/pass for ImportError sentinels is fine
     "SIM108",  # ternary not always clearer than if/else
     "RET504",  # assign-then-return is stylistic
     "PERF203", # try/except in loop is fine for solver retries

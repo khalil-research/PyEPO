@@ -5,16 +5,14 @@ Capacitated vehicle routing problem with binding-constraint tracking for CaVE
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
 
-try:
+with contextlib.suppress(ImportError):
     import gurobipy as gp
     from gurobipy import GRB
-except ImportError:
-    gp = None
-    GRB = None
 
 from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import vrpABBase

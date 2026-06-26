@@ -5,14 +5,12 @@ Shortest path problem
 
 from __future__ import annotations
 
+import contextlib
 from collections import defaultdict
 
-try:
+with contextlib.suppress(ImportError):
     from ortools.linear_solver import pywraplp
     from ortools.sat.python import cp_model
-except ImportError:
-    pywraplp = None
-    cp_model = None
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.ort.ortcpmodel import optOrtCpModel

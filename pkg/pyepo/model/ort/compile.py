@@ -11,14 +11,13 @@ LP / MIP only — quadratic objectives or constraints raise ``NotImplementedErro
 
 from __future__ import annotations
 
+import contextlib
 from copy import deepcopy
 
 import numpy as np
 
-try:
+with contextlib.suppress(ImportError):
     from ortools.linear_solver import pywraplp
-except ImportError:
-    pywraplp = None
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase

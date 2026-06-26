@@ -10,12 +10,12 @@ in ``compiledBase``.
 
 from __future__ import annotations
 
+import contextlib
+
 import numpy as np
 
-try:
+with contextlib.suppress(ImportError):
     from coptpy import COPT
-except ImportError:
-    COPT = None
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase

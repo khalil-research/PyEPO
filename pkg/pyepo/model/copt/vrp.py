@@ -5,15 +5,10 @@ Capacitated vehicle routing problem
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
-
-try:
-    from coptpy import COPT, CallbackBase
-except ImportError:
-    COPT = None
-    CallbackBase = object  # placeholder so class bodies evaluate without coptpy
 
 from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import vrpABBase
@@ -23,6 +18,10 @@ from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
+
+CallbackBase = object  # placeholder so class bodies evaluate without coptpy
+with contextlib.suppress(ImportError):
+    from coptpy import COPT, CallbackBase
 
 
 class vrpABModel(vrpABBase, optCoptModel):
