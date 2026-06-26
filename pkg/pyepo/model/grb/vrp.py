@@ -133,7 +133,7 @@ class vrpRCIModel(vrpABModel):
         # the cut buffer tracks the current solve only
         self._model._lazy_constrs = []
         # optimize
-        self._model.optimize(self._vrpCallback)
+        self._model.optimize(self._vrp_callback)
         _require_solution(self._model)
         # threshold to binary selection
         xvals = np.asarray(self._model.getAttr("X", self._cost_vars))
@@ -141,7 +141,7 @@ class vrpRCIModel(vrpABModel):
         return sol, self._model.objVal
 
     @staticmethod
-    def _vrpCallback(model, where):
+    def _vrp_callback(model, where):
         """
         A static method to add lazy constraints for rounded capacity / subtour
         """
