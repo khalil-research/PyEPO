@@ -2,6 +2,8 @@
 Optimization Model based on solvers
 """
 
+from importlib import import_module
+
 from pyepo.model import opt
 from pyepo.model.opt import ModelSpec
 from pyepo.model.predefined import (
@@ -22,33 +24,18 @@ __all__ = [
     "vrpModel",
 ]
 
-try:
-    from pyepo.model import grb
 
-    __all__ += ["grb"]
-except ImportError:
-    pass
-try:
-    from pyepo.model import copt
+def _try_import_backend(name: str) -> bool:
+    """Expose an optional solver backend if its dependencies are available."""
+    try:
+        globals()[name] = import_module(f"pyepo.model.{name}")
+    except ImportError:
+        return False
+    return True
 
-    __all__ += ["copt"]
-except ImportError:
-    pass
-try:
-    from pyepo.model import omo
 
-    __all__ += ["omo"]
-except ImportError:
-    pass
-try:
-    from pyepo.model import mpax
+for _backend in ("grb", "copt", "omo", "mpax", "ort"):
+    if _try_import_backend(_backend):
+        __all__ += [_backend]
 
-    __all__ += ["mpax"]
-except ImportError:
-    pass
-try:
-    from pyepo.model import ort
-
-    __all__ += ["ort"]
-except ImportError:
-    pass
+del _backend, _try_import_backend
