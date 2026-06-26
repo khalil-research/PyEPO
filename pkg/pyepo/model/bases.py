@@ -27,6 +27,7 @@ from pyepo import EPO
 from pyepo.model._common import validate_constraint
 from pyepo.model.opt import optModel
 from pyepo.model.utils import _EDGE_ACTIVE_TOL, _get_grid_arcs, getTspTour
+from pyepo.utils import costToNumpy
 
 if TYPE_CHECKING:
     import torch
@@ -310,7 +311,7 @@ class tspABBase(optModel):
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
         # normalize to numpy so replay on copy/relax avoids per-element GPU sync
-        coefs = np.array(coefs, copy=True)
+        coefs = costToNumpy(coefs).copy()
         new_model = self.copy()
         new_model._extra_constrs.append((coefs, rhs))
         new_model._addExtraConstr(coefs, rhs)
@@ -463,7 +464,7 @@ class vrpABBase(optModel):
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
         # normalize to numpy so replay on copy avoids per-element solver-var sync
-        coefs = np.array(coefs, copy=True)
+        coefs = costToNumpy(coefs).copy()
         new_model = self.copy()
         new_model._extra_constrs.append((coefs, rhs))
         new_model._addExtraConstr(coefs, rhs)

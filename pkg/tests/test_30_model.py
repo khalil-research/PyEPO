@@ -762,6 +762,14 @@ class TestTSP:
         m2 = m.addConstr(np.zeros(m.num_cost), 0)
         np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
 
+    def test_addConstr_accepts_torch_coefficients(self, backend, formulation):
+        m, _ = _make_tsp(backend, formulation)
+        cost = np.random.RandomState(42).rand(m.num_cost)
+        m.setObj(cost)
+        m2 = m.addConstr(torch.zeros(m.num_cost), 0)
+
+        np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
+
     def test_addConstr_snapshot_isolated_across_copy(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         coefs = np.arange(m.num_cost, dtype=float)
@@ -932,6 +940,13 @@ class TestVRP:
         m, _ = _make_vrp(backend, formulation)
         m.setObj(_VRP_COST)
         m2 = m.addConstr(np.zeros(m.num_cost), 0)
+        np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
+
+    def test_addConstr_accepts_torch_coefficients(self, backend, formulation):
+        m, _ = _make_vrp(backend, formulation)
+        m.setObj(_VRP_COST)
+        m2 = m.addConstr(torch.zeros(m.num_cost), 0)
+
         np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
 
     def test_addConstr_snapshot_isolated_across_copy(self, backend, formulation):
