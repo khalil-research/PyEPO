@@ -40,21 +40,6 @@ Module Contents
    and the solution pool for all loss modules.
 
 
-   .. py:attribute:: optmodel
-
-
-   .. py:attribute:: processes
-
-
-   .. py:attribute:: pool
-
-
-   .. py:attribute:: solve_ratio
-
-
-   .. py:attribute:: reduction
-
-
    .. py:attribute:: solpool
       :value: None
 

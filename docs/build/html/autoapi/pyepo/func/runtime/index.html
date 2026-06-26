@@ -408,16 +408,19 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.runtime.normalize_processes" title="pyepo.func.runtime.normalize_processes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_processes</span></code></a>(→ int)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.runtime.bind_runtime_state" title="pyepo.func.runtime.bind_runtime_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bind_runtime_state</span></code></a>(→ None)</p></td>
+<td><p>Attach validated runtime state to a frontend module.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.runtime.normalize_processes" title="pyepo.func.runtime.normalize_processes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_processes</span></code></a>(→ int)</p></td>
 <td><p>Validate and normalize a requested solver-process count.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.runtime.create_solver_pool" title="pyepo.func.runtime.create_solver_pool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_solver_pool</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.runtime.create_solver_pool" title="pyepo.func.runtime.create_solver_pool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_solver_pool</span></code></a>(...)</p></td>
 <td><p>Create a worker pool, optionally tied to an owner's lifetime.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.runtime.init_solution_pool" title="pyepo.func.runtime.init_solution_pool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_solution_pool</span></code></a>(→ T | None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.runtime.init_solution_pool" title="pyepo.func.runtime.init_solution_pool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_solution_pool</span></code></a>(→ T | None)</p></td>
 <td><p>Initialize a frontend-specific solution pool from an <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> when needed.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyepo.func.runtime.init_runtime" title="pyepo.func.runtime.init_runtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_runtime</span></code></a>(→ RuntimeState)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyepo.func.runtime.init_runtime" title="pyepo.func.runtime.init_runtime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_runtime</span></code></a>(→ RuntimeState)</p></td>
 <td><p>Validate common module arguments and initialize solver runtime state.</p></td>
 </tr>
 </tbody>
@@ -470,6 +473,12 @@
 <span class="sig-name descname"><span class="pre">branch_rng</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v2.4)"><span class="pre">numpy.random.RandomState</span></a></span><a class="headerlink" href="#pyepo.func.runtime.RuntimeState.branch_rng" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.func.runtime.bind_runtime_state">
+<span class="sig-prename descclassname"><span class="pre">pyepo.func.runtime.</span></span><span class="sig-name descname"><span class="pre">bind_runtime_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">owner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyepo.func.runtime.RuntimeState" title="pyepo.func.runtime.RuntimeState"><span class="pre">RuntimeState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#pyepo.func.runtime.bind_runtime_state" title="Link to this definition">¶</a></dt>
+<dd><p>Attach validated runtime state to a frontend module.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -570,6 +579,7 @@
 <li><a class="reference internal" href="#pyepo.func.runtime.RuntimeState.branch_rng"><code class="docutils literal notranslate"><span class="pre">RuntimeState.branch_rng</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#pyepo.func.runtime.bind_runtime_state"><code class="docutils literal notranslate"><span class="pre">bind_runtime_state()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.runtime.normalize_processes"><code class="docutils literal notranslate"><span class="pre">normalize_processes()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.runtime.create_solver_pool"><code class="docutils literal notranslate"><span class="pre">create_solver_pool()</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.func.runtime.init_solution_pool"><code class="docutils literal notranslate"><span class="pre">init_solution_pool()</span></code></a></li>

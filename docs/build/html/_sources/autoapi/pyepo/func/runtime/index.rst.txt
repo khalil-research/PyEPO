@@ -31,6 +31,7 @@ Functions
 
 .. autoapisummary::
 
+   pyepo.func.runtime.bind_runtime_state
    pyepo.func.runtime.normalize_processes
    pyepo.func.runtime.create_solver_pool
    pyepo.func.runtime.init_solution_pool
@@ -71,6 +72,11 @@ Module Contents
 
    .. py:attribute:: branch_rng
       :type:  numpy.random.RandomState
+
+
+.. py:function:: bind_runtime_state(owner: Any, runtime: RuntimeState) -> None
+
+   Attach validated runtime state to a frontend module.
 
 
 .. py:function:: normalize_processes(optmodel: pyepo.model.opt.optModel, processes: int, logger: logging.Logger) -> int
