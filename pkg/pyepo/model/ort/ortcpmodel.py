@@ -142,16 +142,17 @@ class optOrtCpModel(optModel):
             optModel: new model with the added constraint
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
+        coefs_np = costToNumpy(coefs).copy()
         # scale to int
         scale = self._OBJ_SCALE
-        scaled_coefs = [round(float(c) * scale) for c in coefs]
+        scaled_coefs = [round(float(c) * scale) for c in coefs_np]
         scaled_rhs = round(float(rhs) * scale)
         # copy
         new_model = self.copy()
         # store and add constraint
         new_model._extra_constrs.append((scaled_coefs, scaled_rhs))
         new_model._model.Add(
-            sum(scaled_coefs[i] * new_model.x[k] for i, k in enumerate(new_model.x)) <= scaled_rhs
+            cp_model.LinearExpr.weighted_sum(new_model._vars_list, scaled_coefs) <= scaled_rhs
         )
         return new_model
 

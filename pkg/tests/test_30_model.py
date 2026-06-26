@@ -13,6 +13,7 @@ import importlib
 
 import numpy as np
 import pytest
+import torch
 
 from pyepo import EPO
 from pyepo.model import predefined
@@ -397,6 +398,18 @@ class TestKnapsack:
         rel.setObj(_KNAP_COST)
         sol, _ = rel.solve()
         assert to_np(sol).sum() <= 1.0 + 1e-4
+
+
+@requires_ortools
+@pytest.mark.parametrize("backend", ["ort", "ortcp"])
+def test_ort_addConstr_accepts_torch_coefficients(backend):
+    m, meta = _make_knapsack(backend)
+    m.setObj(_KNAP_COST)
+    constrained = m.addConstr(torch.ones(m.num_cost), 1.0)
+    constrained.setObj(_KNAP_COST)
+    sol, _ = constrained.solve()
+
+    assert to_np(sol).sum() <= 1.0 + meta["tol"]
 
 
 def _make_knapsack_multidim(backend):

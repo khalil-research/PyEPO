@@ -152,32 +152,12 @@ class optOrtModel(optModel):
             optModel: new model with the added constraint
         """
         rhs = validate_constraint(coefs, rhs, self.num_cost)
+        coefs_np = costToNumpy(coefs).copy()
         # copy
         new_model = self.copy()
         # store and add constraint
-        new_model._extra_constrs.append((list(coefs), rhs))
+        new_model._extra_constrs.append((coefs_np, rhs))
         ct = new_model._model.Constraint(-new_model._model.infinity(), rhs)
-        for i, k in enumerate(new_model.x):
-            ct.SetCoefficient(new_model.x[k], float(coefs[i]))
+        for v, coef in zip(new_model._vars_list, coefs_np):
+            ct.SetCoefficient(v, float(coef))
         return new_model
-
-
-if __name__ == "__main__":
-    import random
-
-    # random seed
-    random.seed(42)
-    np.random.seed(42)
-    # number of variables
-    num_vars = 10
-    # create a simple LP model for testing
-    solver = pywraplp.Solver.CreateSolver("GLOP")
-    x = {i: solver.NumVar(0, 10, f"x_{i}") for i in range(num_vars)}
-    for i in range(num_vars):
-        solver.Add(x[i] <= 5)
-    solver.Maximize(sum(x[i] for i in range(num_vars)))
-    status = solver.Solve()
-    print(f"Status: {status}")
-    print(f"Objective: {solver.Objective().Value()}")
-    for i in range(num_vars):
-        print(f"x_{i} = {x[i].solution_value()}")
