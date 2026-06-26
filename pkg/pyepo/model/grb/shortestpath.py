@@ -11,7 +11,8 @@ try:
     import gurobipy as gp
     from gurobipy import GRB
 except ImportError:
-    pass
+    gp = None
+    GRB = None
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.grb.grbmodel import optGrbModel
