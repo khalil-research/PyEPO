@@ -46,19 +46,14 @@ def _train_loop(loss_fn, loader, predmodel, call, steps=_STEPS):
 
 
 def _scalar_loss_call(name):
-    """Adapt a registry op to a scalar training loss: loss-ops return their
-    scalar directly; solution-ops are paired with the decision loss c·w."""
-    kind, _build, sig = LOSS_REGISTRY[name]
-    if kind == "loss":
-        return lambda fn, cp, c, w, z: call_op(fn, sig, cp, c, w, z)
-    return lambda fn, cp, c, w, z: (call_op(fn, sig, cp, c, w, z) * c).sum(1).mean()
+    """Adapt a registry op to a scalar training loss."""
+    entry = LOSS_REGISTRY[name]
+    if entry.kind == "loss":
+        return lambda fn, cp, c, w, z: call_op(fn, entry.sig, cp, c, w, z)
+    return lambda fn, cp, c, w, z: (call_op(fn, entry.sig, cp, c, w, z) * c).sum(1).mean()
 
 
-# Per-loss forward/backward is gated exhaustively in test_50; the e2e loop only
-# adds the optimizer.step + multi-batch path, which is identical across losses.
-# Sample one loss per mechanism: the three scalar-loss sigs (cp,c,w,z / cp,c /
-# cp,w), the blackbox / perturbed / Frank-Wolfe solution-ops, and one pool loss
-# (NCE) whose cached solution pool grows across batches.
+# One end-to-end smoke per major loss mechanism.
 _E2E_LOSSES = ["SPOPlus", "PG", "PFY", "DBB", "DPO", "RFWO", "NCE"]
 
 
@@ -66,7 +61,7 @@ _E2E_LOSSES = ["SPOPlus", "PG", "PFY", "DBB", "DPO", "RFWO", "NCE"]
 @pytest.mark.parametrize("name", _E2E_LOSSES)
 def test_train_minimize(name, sp_data):
     optmodel, dataset, loader = sp_data
-    build = LOSS_REGISTRY[name][1]
+    build = LOSS_REGISTRY[name].build
     predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
     before = predmodel.linear.weight.detach().clone()
     _train_loop(build(optmodel, dataset, "mean"), loader, predmodel, _scalar_loss_call(name))

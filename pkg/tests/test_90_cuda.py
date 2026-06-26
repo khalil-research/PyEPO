@@ -62,10 +62,10 @@ class TestSolutionLossesCUDA:
     @pytest.mark.parametrize("name", SOLUTION_OPS)
     def test_output_and_grad_on_cuda(self, name, sp_data):
         optmodel, dataset, loader = sp_data
-        _kind, build, sig = LOSS_REGISTRY[name]
+        entry = LOSS_REGISTRY[name]
         x, c, w, z = _cuda_batch(loader)
         pred = LinearPred(NUM_FEAT, optmodel.num_cost).to(_DEVICE)
-        out = call_op(build(optmodel, dataset, "mean"), sig, pred(x), c, w, z)
+        out = call_op(entry.build(optmodel, dataset, "mean"), entry.sig, pred(x), c, w, z)
         _assert_cuda(out, "output")
         out.mean().backward()
         _assert_grads_cuda(pred)
@@ -76,10 +76,10 @@ class TestLossesCUDA:
     @pytest.mark.parametrize("name", LOSS_OPS)
     def test_loss_and_grad_on_cuda(self, name, sp_data):
         optmodel, dataset, loader = sp_data
-        _kind, build, sig = LOSS_REGISTRY[name]
+        entry = LOSS_REGISTRY[name]
         x, c, w, z = _cuda_batch(loader)
         pred = LinearPred(NUM_FEAT, optmodel.num_cost).to(_DEVICE)
-        loss = call_op(build(optmodel, dataset, "mean"), sig, pred(x), c, w, z)
+        loss = call_op(entry.build(optmodel, dataset, "mean"), entry.sig, pred(x), c, w, z)
         _assert_cuda(loss, "loss")
         loss.backward()
         _assert_grads_cuda(pred)

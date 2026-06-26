@@ -1,20 +1,5 @@
 #!/usr/bin/env python
-"""Tests for pyepo.func autograd losses, helpers, and the optModule base.
-
-Grouped neutral -> both -> torch:
-
-1. neutral: pure / mock helpers (solution pool, cache selection, sum-of-gamma
-   noise, solution check, perturbed estimator internals) — no solver.
-2. both: the forward/backward contract applied to every loss on both frontends
-   via `contract_backend` over LOSS_REGISTRY / JAX_LOSS_REGISTRY. Solution ops
-   return (batch, vars) with finite gradients; loss ops return a scalar that
-   backpropagates and honours reduction = mean/sum/none.
-3. torch: init validation, MAXIMIZE/caching behaviour, and deep correctness
-   gates comparing an autograd gradient to its closed form or a finite-
-   difference Jacobian (SPO+, regularized Frank-Wolfe, the estimator ops, CaVE).
-
-The jax-only correctness gates live in test_55_jax.py.
-"""
+"""Tests for pyepo.func losses, helpers, and optModule runtime."""
 
 from unittest.mock import MagicMock
 
@@ -40,8 +25,12 @@ from pyepo.model.opt import optModel
 
 from .conftest import (
     FD_LOSSES,
+    JAX_LOSS_REGISTRY,
     LOSS_OPS,
     LOSS_REGISTRY,
+    OP_SPECS,
+    PARTIAL_PREDICTION_PARITY_OPS,
+    PARTIAL_PREDICTION_SMOKE_OPS,
     SOLUTION_OPS,
     call_op,
     finite_diff_grad,
@@ -52,9 +41,38 @@ from .conftest import (
     take_batch,
 )
 
+INVALID_COUNTS = [0, -1, 1.5, True]
+INVALID_POSITIVE_FLOATS = [0.0, -1.0, np.nan, np.inf, True]
+INVALID_RATIOS = [-0.1, 1.1, np.nan, np.inf, True]
+
 # ============================================================
 # neutral: pure helpers (no solver)
 # ============================================================
+
+
+class TestLossRegistry:
+    """Shared declarative loss registry."""
+
+    def test_op_lists_are_derived_from_specs(self):
+        assert [name for name, spec in OP_SPECS.items() if spec.kind == "solution"] == SOLUTION_OPS
+        assert [name for name, spec in OP_SPECS.items() if spec.kind == "loss"] == LOSS_OPS
+        assert [name for name, spec in OP_SPECS.items() if spec.finite_diff_truth] == FD_LOSSES
+        assert [
+            name for name, spec in OP_SPECS.items() if spec.partial_prediction == "parity"
+        ] == PARTIAL_PREDICTION_PARITY_OPS
+        assert [
+            name for name, spec in OP_SPECS.items() if spec.partial_prediction == "smoke"
+        ] == PARTIAL_PREDICTION_SMOKE_OPS
+
+    def test_torch_registry_covers_specs(self):
+        assert list(LOSS_REGISTRY) == list(OP_SPECS)
+
+    def test_jax_registry_matches_torch_when_available(self):
+        if JAX_LOSS_REGISTRY:
+            assert list(JAX_LOSS_REGISTRY) == list(LOSS_REGISTRY)
+            for name in OP_SPECS:
+                assert JAX_LOSS_REGISTRY[name].kind == LOSS_REGISTRY[name].kind
+                assert JAX_LOSS_REGISTRY[name].sig == LOSS_REGISTRY[name].sig
 
 
 class TestCacheInPass:
@@ -63,19 +81,18 @@ class TestCacheInPass:
         m.modelSense = sense
         return m
 
-    def test_minimize_selects_min_obj(self):
+    @pytest.mark.parametrize(
+        "sense, expected",
+        [
+            (EPO.MINIMIZE, [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]]),
+            (EPO.MAXIMIZE, [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]),
+        ],
+    )
+    def test_selects_best_cached_solution(self, sense, expected):
         cp = torch.tensor([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]])
         solpool = torch.tensor([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
-        sol, _obj, _ = _cache_in_pass(cp, self._mock_model(EPO.MINIMIZE), solpool)
-        assert torch.allclose(sol[0], solpool[0])
-        assert torch.allclose(sol[1], solpool[1])
-
-    def test_maximize_selects_max_obj(self):
-        cp = torch.tensor([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]])
-        solpool = torch.tensor([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
-        sol, _obj, _ = _cache_in_pass(cp, self._mock_model(EPO.MAXIMIZE), solpool)
-        assert torch.allclose(sol[0], solpool[1])
-        assert torch.allclose(sol[1], solpool[0])
+        sol, _obj, _ = _cache_in_pass(cp, self._mock_model(sense), solpool)
+        assert torch.allclose(sol, torch.tensor(expected))
 
     def test_invalid_sense_raises(self):
         m = MagicMock()
@@ -107,15 +124,20 @@ class TestCheckSol:
 
 
 class TestSumGammaDistribution:
-    @pytest.mark.parametrize("kappa", [0.0, -1.0])
-    def test_rejects_nonpositive_kappa(self, kappa):
-        with pytest.raises(ValueError, match="kappa"):
-            sumGammaDistribution(kappa=kappa)
-
-    @pytest.mark.parametrize("n_iterations", [0, -1, 1.5, True])
-    def test_rejects_invalid_iteration_count(self, n_iterations):
-        with pytest.raises(ValueError, match="n_iterations"):
-            sumGammaDistribution(kappa=1.0, n_iterations=n_iterations)
+    @pytest.mark.parametrize(
+        "kwargs, match",
+        [
+            ({"kappa": 0.0}, "kappa"),
+            ({"kappa": -1.0}, "kappa"),
+            ({"kappa": 1.0, "n_iterations": 0}, "n_iterations"),
+            ({"kappa": 1.0, "n_iterations": -1}, "n_iterations"),
+            ({"kappa": 1.0, "n_iterations": 1.5}, "n_iterations"),
+            ({"kappa": 1.0, "n_iterations": True}, "n_iterations"),
+        ],
+    )
+    def test_rejects_invalid_inputs(self, kwargs, match):
+        with pytest.raises(ValueError, match=match):
+            sumGammaDistribution(**kwargs)
 
     def test_sample_shape(self):
         dist = sumGammaDistribution(kappa=1.0, n_iterations=10, seed=42)
@@ -143,48 +165,31 @@ class TestSolutionPool:
         with pytest.raises(RuntimeError, match="Solution pool is unavailable"):
             require_solution_pool(None)
 
-    def test_init_pool(self):
-        pool = _update_solution_pool(torch.tensor([[1.0, 0.0], [0.0, 1.0]]), None)
-        assert pool.shape == (2, 2)
-
-    def test_dedup_identical(self):
-        sol = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
-        pool = _update_solution_pool(sol, None)
-        pool = _update_solution_pool(sol, pool)
-        assert pool.shape[0] == 2
-
-    def test_append_new(self):
-        pool = _update_solution_pool(torch.tensor([[1.0, 0.0]]), None)
-        pool = _update_solution_pool(torch.tensor([[0.0, 1.0]]), pool)
-        assert pool.shape[0] == 2
-
-    def test_mixed_new_and_dup(self):
-        pool = _update_solution_pool(torch.tensor([[1.0, 0.0], [0.0, 1.0]]), None)
-        pool = _update_solution_pool(torch.tensor([[1.0, 0.0], [1.0, 1.0]]), pool)
-        assert pool.shape[0] == 3
-
-    def test_near_duplicate_within_tolerance_deduped(self):
-        # first-order solver noise must not grow the pool
-        pool = _update_solution_pool(torch.tensor([[1.0, 0.0]]), None)
-        pool = _update_solution_pool(torch.tensor([[1.0 + 1e-6, 1e-6]]), pool)
-        assert pool.shape[0] == 1
+    @pytest.mark.parametrize(
+        "updates, expected_rows",
+        [
+            ([[[1.0, 0.0], [0.0, 1.0]]], 2),
+            ([[[1.0, 0.0], [0.0, 1.0]], [[1.0, 0.0], [0.0, 1.0]]], 2),
+            ([[[1.0, 0.0]], [[0.0, 1.0]]], 2),
+            ([[[1.0, 0.0], [0.0, 1.0]], [[1.0, 0.0], [1.0, 1.0]]], 3),
+            ([[[1.0, 0.0]], [[1.0 + 1e-6, 1e-6]]], 1),
+        ],
+    )
+    def test_update_pool_dedups_and_appends(self, updates, expected_rows):
+        pool = None
+        for update in updates:
+            pool = _update_solution_pool(torch.tensor(update), pool)
+        assert pool.shape[0] == expected_rows
 
 
 class TestFrankWolfeFreeSlot:
-    """Active-set slot pick: the first free slot, else the smallest-weight atom."""
+    """Active-set slot selection."""
 
-    def test_picks_first_free_slot(self):
+    def test_matches_expected_slots(self):
         from pyepo.func.regularized import _fw_free_slot
 
-        w = torch.tensor([[0.5, 0.0, 0.5, 0.0]])
-        assert _fw_free_slot(w).tolist() == [1]
-
-    def test_full_buffer_picks_smallest_atom(self):
-        from pyepo.func.regularized import _fw_free_slot
-
-        # a full buffer merges into the smallest atom instead of clobbering slot 0
-        w = torch.tensor([[0.4, 0.3, 0.1, 0.2]])
-        assert _fw_free_slot(w).tolist() == [2]
+        w = torch.tensor([[0.5, 0.0, 0.5, 0.0], [0.4, 0.3, 0.1, 0.2]])
+        assert _fw_free_slot(w).tolist() == [1, 2]
 
 
 class TestPerturbedInternals:
@@ -225,30 +230,27 @@ class TestPerturbedInternals:
 
 
 # ============================================================
-# both: forward/backward contract for every loss (torch & jax frontends)
+# both: forward/backward contracts
 # ============================================================
-# `contract_backend` selects the frontend (LOSS_REGISTRY / JAX_LOSS_REGISTRY);
-# the assertions are identical. Solution-returning ops yield (batch, vars);
-# loss-returning ops yield a scalar and honour reduction = mean/sum/none.
+# `contract_backend` runs the same assertions on Torch and JAX.
 
 
 @requires_gurobi
 class TestForwardBackwardContract:
-    """Solution ops return (batch, vars) with finite grad; loss ops return a
-    scalar that backpropagates and honours the reduction modes."""
+    """Shared forward/backward contract."""
 
     @pytest.mark.parametrize("name", SOLUTION_OPS)
     def test_solution_forward_and_backward(self, name, contract_backend, sp_data):
         be = contract_backend
         optmodel, dataset, loader = sp_data
-        _kind, build, sig = be.registry[name]
+        entry = be.registry[name]
         _x, c, w, z = take_batch(loader)
         cp, c2, w2, z2 = be.inputs(c, w, z)
-        op = build(optmodel, dataset, "mean")
-        out = be.forward(op, sig, cp, c2, w2, z2)
+        op = entry.build(optmodel, dataset, "mean")
+        out = be.forward(op, entry.sig, cp, c2, w2, z2)
         assert be.shape(out) == be.shape(cp)
         assert be.finite(out)
-        g = be.grad(op, sig, cp, c2, w2, z2)
+        g = be.grad(op, entry.sig, cp, c2, w2, z2)
         assert be.shape(g) == be.shape(cp)
         assert be.finite(g)
 
@@ -256,27 +258,27 @@ class TestForwardBackwardContract:
     def test_loss_scalar_and_backward(self, name, contract_backend, sp_data):
         be = contract_backend
         optmodel, dataset, loader = sp_data
-        _kind, build, sig = be.registry[name]
+        entry = be.registry[name]
         _x, c, w, z = take_batch(loader)
         cp, c2, w2, z2 = be.inputs(c, w, z)
-        op = build(optmodel, dataset, "mean")
-        out = be.forward(op, sig, cp, c2, w2, z2)
+        op = entry.build(optmodel, dataset, "mean")
+        out = be.forward(op, entry.sig, cp, c2, w2, z2)
         assert be.ndim(out) == 0
-        g = be.grad(op, sig, cp, c2, w2, z2)
+        g = be.grad(op, entry.sig, cp, c2, w2, z2)
         assert be.finite(g)
 
     @pytest.mark.parametrize("name", LOSS_OPS)
     def test_loss_reduction_modes(self, name, contract_backend, sp_data):
         be = contract_backend
         optmodel, dataset, loader = sp_data
-        _kind, build, sig = be.registry[name]
+        entry = be.registry[name]
         _x, c, w, z = take_batch(loader)
         cp, c2, w2, z2 = be.inputs(c, w, z)
         # most losses reduce to (batch,); lsLTR keeps a (batch, pool) grid
-        none = be.forward(build(optmodel, dataset, "none"), sig, cp, c2, w2, z2)
+        none = be.forward(entry.build(optmodel, dataset, "none"), entry.sig, cp, c2, w2, z2)
         assert be.shape(none)[0] == be.shape(cp)[0]
-        mean = be.forward(build(optmodel, dataset, "mean"), sig, cp, c2, w2, z2)
-        total = be.forward(build(optmodel, dataset, "sum"), sig, cp, c2, w2, z2)
+        mean = be.forward(entry.build(optmodel, dataset, "mean"), entry.sig, cp, c2, w2, z2)
+        total = be.forward(entry.build(optmodel, dataset, "sum"), entry.sig, cp, c2, w2, z2)
         np.testing.assert_allclose(float(be.to_np(mean)), float(be.to_np(none).mean()), atol=1e-5)
         np.testing.assert_allclose(float(be.to_np(total)), float(be.to_np(none).sum()), atol=1e-5)
 
@@ -418,7 +420,7 @@ class TestSharedRuntime:
 
 @pytest.fixture(params=[pytest.param("torch"), pytest.param("jax", marks=requires_jax)])
 def func_frontend(request):
-    """The pyepo.func / pyepo.func.jax module; init validation is identical."""
+    """Torch or JAX func frontend."""
     if request.param == "torch":
         import pyepo.func as mod
     else:
@@ -441,7 +443,7 @@ class TestOptModuleInit:
         with pytest.raises(ValueError):
             func_frontend.SPOPlus(self._model(), processes=-1)
 
-    @pytest.mark.parametrize("ratio", [1.5, -0.1, np.nan, np.inf, True])
+    @pytest.mark.parametrize("ratio", INVALID_RATIOS)
     def test_invalid_solve_ratio_raises(self, func_frontend, ratio):
         with pytest.raises(ValueError, match="solve_ratio"):
             func_frontend.SPOPlus(self._model(), solve_ratio=ratio)
@@ -453,7 +455,13 @@ class TestOptModuleInit:
 
 @requires_gurobi
 class TestConstructorGuards:
-    """Constructor validation shared across the Torch and JAX frontends."""
+    """Shared constructor validation."""
+
+    @pytest.fixture
+    def model(self):
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
+        return shortestPathModel(grid=(3, 3))
 
     @pytest.mark.parametrize(
         "name",
@@ -464,45 +472,36 @@ class TestConstructorGuards:
             "regularizedFrankWolfeFenchelYoung",
         ],
     )
-    def test_rejects_nonpositive_lambda(self, func_frontend, name):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        model = shortestPathModel(grid=(3, 3))
-        for bad in (0.0, -1.0, np.nan, np.inf, True):
+    def test_rejects_nonpositive_lambda(self, func_frontend, model, name):
+        for bad in INVALID_POSITIVE_FLOATS:
             with pytest.raises(ValueError):
                 getattr(func_frontend, name)(model, processes=1, lambd=bad)
 
     @pytest.mark.parametrize("name", ["perturbedOpt", "perturbedFenchelYoung", "implicitMLE"])
-    @pytest.mark.parametrize("n_samples", [0, -1, 1.5, True])
-    def test_rejects_invalid_sample_count(self, func_frontend, name, n_samples):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
+    @pytest.mark.parametrize("n_samples", INVALID_COUNTS)
+    def test_rejects_invalid_sample_count(self, func_frontend, model, name, n_samples):
         with pytest.raises(ValueError, match="n_samples"):
             getattr(func_frontend, name)(
-                shortestPathModel(grid=(3, 3)),
+                model,
                 processes=1,
                 n_samples=n_samples,
             )
 
     @pytest.mark.parametrize("name", ["perturbedOpt", "perturbedFenchelYoung", "implicitMLE"])
-    @pytest.mark.parametrize("sigma", [0.0, -1.0, np.nan, np.inf, True])
-    def test_rejects_nonpositive_sigma(self, func_frontend, name, sigma):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
+    @pytest.mark.parametrize("sigma", INVALID_POSITIVE_FLOATS)
+    def test_rejects_nonpositive_sigma(self, func_frontend, model, name, sigma):
         with pytest.raises(ValueError, match="sigma"):
             getattr(func_frontend, name)(
-                shortestPathModel(grid=(3, 3)),
+                model,
                 processes=1,
                 sigma=sigma,
             )
 
-    @pytest.mark.parametrize("sigma", [0.0, -1.0, np.nan, np.inf, True])
-    def test_pg_rejects_invalid_sigma(self, func_frontend, sigma):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
+    @pytest.mark.parametrize("sigma", INVALID_POSITIVE_FLOATS)
+    def test_pg_rejects_invalid_sigma(self, func_frontend, model, sigma):
         with pytest.raises(ValueError, match="sigma"):
             func_frontend.PG(
-                shortestPathModel(grid=(3, 3)),
+                model,
                 processes=1,
                 sigma=sigma,
             )
@@ -511,13 +510,11 @@ class TestConstructorGuards:
         "name",
         ["regularizedFrankWolfeOpt", "regularizedFrankWolfeFenchelYoung"],
     )
-    @pytest.mark.parametrize("max_iter", [0, -1, 1.5, True])
-    def test_rejects_invalid_iteration_cap(self, func_frontend, name, max_iter):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
+    @pytest.mark.parametrize("max_iter", INVALID_COUNTS)
+    def test_rejects_invalid_iteration_cap(self, func_frontend, model, name, max_iter):
         with pytest.raises(ValueError, match="max_iter"):
             getattr(func_frontend, name)(
-                shortestPathModel(grid=(3, 3)),
+                model,
                 processes=1,
                 max_iter=max_iter,
             )
@@ -527,35 +524,29 @@ class TestConstructorGuards:
         ["regularizedFrankWolfeOpt", "regularizedFrankWolfeFenchelYoung"],
     )
     @pytest.mark.parametrize("tol", [-1e-6, np.nan, np.inf, True])
-    def test_rejects_invalid_tolerance(self, func_frontend, name, tol):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
+    def test_rejects_invalid_tolerance(self, func_frontend, model, name, tol):
         with pytest.raises(ValueError, match="tol"):
             getattr(func_frontend, name)(
-                shortestPathModel(grid=(3, 3)),
+                model,
                 processes=1,
                 tol=tol,
             )
 
-    @pytest.mark.parametrize("max_iter", [0, -1, 1.5, True])
-    def test_cave_rejects_invalid_iteration_cap(self, func_frontend, max_iter):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
+    @pytest.mark.parametrize("max_iter", INVALID_COUNTS)
+    def test_cave_rejects_invalid_iteration_cap(self, func_frontend, model, max_iter):
         with pytest.raises(ValueError, match="max_iter"):
             func_frontend.CaVE(
-                shortestPathModel(grid=(3, 3)),
+                model,
                 processes=1,
                 max_iter=max_iter,
             )
 
     @pytest.mark.parametrize("name", ["solve_ratio", "inner_ratio"])
-    @pytest.mark.parametrize("value", [-0.1, 1.1, np.nan, np.inf, True])
-    def test_cave_rejects_invalid_ratio(self, func_frontend, name, value):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
+    @pytest.mark.parametrize("value", INVALID_RATIOS)
+    def test_cave_rejects_invalid_ratio(self, func_frontend, model, name, value):
         with pytest.raises(ValueError, match=name):
             func_frontend.CaVE(
-                shortestPathModel(grid=(3, 3)),
+                model,
                 processes=1,
                 **{name: value},
             )
@@ -585,7 +576,7 @@ class TestConstructorGuards:
 
 @requires_gurobi
 class TestMaximizeSense:
-    """Losses must handle a MAXIMIZE problem (knapsack); SPO+ stays non-negative."""
+    """MAXIMIZE loss behavior."""
 
     def test_spoplus_nonnegative(self, ks_data):
         from pyepo.func.surrogate import SPOPlus
@@ -638,7 +629,7 @@ class TestMaximizeSense:
         target = torch.randn_like(cp)
         cpg = cp.clone().requires_grad_(True)
         (mod(cpg) * target).sum().backward()
-        # perturbed costs sharing the module's Sum-of-Gamma noise (fresh draw, same default seed)
+        # Same default Sum-of-Gamma draw as the module.
         noises = sumGammaDistribution(kappa=5).sample(
             size=(cp.shape[0], mod.n_samples, cp.shape[1]),
             device=torch.device("cpu"),
@@ -672,7 +663,7 @@ class TestPGLabelGradient:
 
 @requires_gurobi
 class TestMultiplicativePerturbPartial:
-    """Multiplicative perturbation under partial prediction: fixed costs keep factor 1."""
+    """Multiplicative partial-prediction perturbation."""
 
     @staticmethod
     def _model():
@@ -725,7 +716,7 @@ class TestMultiplicativePerturbPartial:
 
 @requires_gurobi
 class TestListwiseLTRTarget:
-    """Listwise LTR cross-entropy: the target is the Boltzmann distribution over the pool."""
+    """Listwise LTR target distribution."""
 
     @staticmethod
     def _expected(mod, cp, c, sign):
@@ -744,7 +735,7 @@ class TestListwiseLTRTarget:
         mod = listwiseLearningToRank(optmodel, processes=1, dataset=dataset)
         cp = (c * 1.2).clone().detach()
         loss = mod(cp, c)
-        # MINIMIZE: target softmax(-obj) puts its mass on the cheapest pool members
+        # MINIMIZE targets cheapest pool members.
         assert torch.allclose(loss, self._expected(mod, cp, c, -1.0), atol=1e-6)
 
     def test_maximize_favors_high_objective(self):
@@ -759,15 +750,15 @@ class TestListwiseLTRTarget:
         c = torch.as_tensor(costs[:4])
         cp = (c * 1.2).clone().detach()
         loss = mod(cp, c)
-        # >= 3 distinct pool members: with 2 the softmax reversal identity hides the sign
+        # Need >=3 pool members to expose the sign.
         assert mod.solpool.shape[0] >= 3
-        # MAXIMIZE: target softmax(+obj) puts its mass on the most valuable pool members
+        # MAXIMIZE targets highest-value pool members.
         assert torch.allclose(loss, self._expected(mod, cp, c, 1.0), atol=1e-6)
 
 
 @requires_gurobi
 class TestSolveRatioCaching:
-    """solve_ratio < 1 routes some passes through the cached solution pool."""
+    """solve_ratio caching path."""
 
     def test_spoplus_with_caching_runs(self, sp_data):
         from pyepo.func.surrogate import SPOPlus
@@ -789,7 +780,7 @@ class TestSolveRatioCaching:
 
 @requires_gurobi
 class TestSPOPlusGradient:
-    """SPO+ autograd subgradient against its closed form 2·(w_true - w_spo)/n."""
+    """SPO+ subgradient closed form."""
 
     def _setup(self, seed=0):
         from pyepo.func.surrogate import SPOPlus
@@ -829,8 +820,7 @@ class TestSPOPlusGradient:
 
 
 def _fw_knapsack():
-    """Knapsack shared by the Frank-Wolfe tests: weights [3,4,2,5], capacity 7,
-    so the IP optimum picks items {0, 1}."""
+    """Knapsack shared by Frank-Wolfe tests."""
     from pyepo.model.grb.knapsack import knapsackModel
 
     return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
@@ -847,8 +837,7 @@ class TestRegularizedFrankWolfe:
         assert torch.allclose(m.compute_regularization(y), torch.tensor([0.75]))
 
     def test_all_instances_solved_each_step(self, monkeypatch):
-        # away-step FW solves every instance each step: its FW gap is non-monotone,
-        # so a per-instance skip would stall convergence -- no batch is sliced down
+        # Away-step FW keeps every instance active each step.
         import pyepo.func.regularized as regularized
         from pyepo.func.regularized import RFWO
 
@@ -934,8 +923,7 @@ class TestAwayStepFrankWolfe:
         recon = torch.einsum("bc,bcv->bv", W, V)
         assert float((recon - mu).norm(dim=-1).max()) < 1e-10
         assert torch.allclose(W.sum(-1), torch.ones(W.shape[0], dtype=W.dtype), atol=1e-9)
-        # converged far past vanilla's ~2e-3 stall (a fresh-LMO gap re-measure is
-        # tie-break-noisy at the 1e-7 level, so check well above tol)
+        # Gap is far below vanilla FW's stall.
         v_fw, _ = regularized._solve_or_cache(-1.0 * (theta - mu), m)
         gap = ((mu - theta) * (mu - v_fw.to(mu))).sum(-1)
         assert float(gap.max()) < 1e-5
@@ -959,7 +947,7 @@ class TestAwayStepFrankWolfe:
         g_ref, _ = grad_at(10000)
         g, m = grad_at(2000)
         _, _, w = m._frank_wolfe(-1.0 * pred)
-        # gradient is stable to the converged reference (vanilla floors ~3% off)
+        # Gradient matches the converged reference.
         assert float((g - g_ref).norm() / g_ref.norm()) < 1e-4
         # the active set is the true support, not a bloated one
         assert int((w > 0).sum(-1).max()) <= pred.shape[1] + 1
@@ -974,7 +962,7 @@ class TestAwayStepFrankWolfe:
         mu, V, W = m._frank_wolfe(theta)
         # active set never spilled past the bounded buffer
         assert int((W > 0).sum(-1).max()) < V.shape[1]
-        # converged well within the cap (early-exit fired, did not run 10000 iters)
+        # Early exit converged before the cap.
         v_fw, _ = regularized._solve_or_cache(-1.0 * (theta - mu), m)
         assert float(((mu - theta) * (mu - v_fw.to(mu))).sum(-1).max()) < 1e-5
 
@@ -1011,9 +999,7 @@ class TestRegularizedFrankWolfeFenchelYoung:
 # ------------------------------------------------------------
 # Independent ground-truth gates for the remaining losses
 # ------------------------------------------------------------
-# Autograd gradient checked against an independent reference, per loss kind:
-#   - value-differentiable losses -> finite difference of the loss value
-#   - estimator-gradient ops       -> a separate re-solve of the estimator
+# Independent references: finite difference or separate re-solve.
 
 
 class TestGradientTruthFD:
@@ -1022,23 +1008,25 @@ class TestGradientTruthFD:
     @pytest.mark.parametrize("name", FD_LOSSES)
     def test_grad_matches_finite_difference(self, name, sp_truth):
         optmodel, dataset, loader = sp_truth
-        _kind, build, sig = LOSS_REGISTRY[name]
+        entry = LOSS_REGISTRY[name]
         _x, c, w, z = take_batch(loader)
-        mod = build(optmodel, dataset, "mean")
+        mod = entry.build(optmodel, dataset, "mean")
         mod.solve_ratio = 0.0  # freeze the pool: keeps the FD value deterministic
 
         def value(cp_np):
             with torch.no_grad():
-                return float(call_op(mod, sig, torch.tensor(cp_np, dtype=torch.float32), c, w, z))
+                return float(
+                    call_op(mod, entry.sig, torch.tensor(cp_np, dtype=torch.float32), c, w, z)
+                )
 
         cp0 = (c * 1.2).numpy()
         cp = torch.tensor(cp0, dtype=torch.float32, requires_grad=True)
-        call_op(mod, sig, cp, c, w, z).backward()
+        call_op(mod, entry.sig, cp, c, w, z).backward()
         np.testing.assert_allclose(cp.grad.numpy(), finite_diff_grad(value, cp0), atol=3e-2)
 
 
 def _gaussian_noise(mod, cp):
-    """Additive Gaussian noise for a perturbed* op (seeded from mod.seed)."""
+    """Seeded additive Gaussian noise."""
     gen = torch.Generator()
     gen.manual_seed(mod.seed)
     return torch.randn(
@@ -1047,7 +1035,7 @@ def _gaussian_noise(mod, cp):
 
 
 def _solve_3d_batch(optmodel, ptb_c):
-    """Solve perturbed 3D costs (batch, n_samples, vars) via the shared solver."""
+    """Solve perturbed 3D costs."""
     from pyepo.func.utils import _solve_batch
 
     b, n, d = ptb_c.shape
@@ -1056,14 +1044,14 @@ def _solve_3d_batch(optmodel, ptb_c):
 
 
 def _perturb_torch(cp, noises, sigma, mul):
-    """Additive or multiplicative log-normal perturbation of clean cost (b, d)."""
+    """Additive or multiplicative perturbation."""
     if mul:
         return cp.unsqueeze(1) * torch.exp(sigma * noises - 0.5 * sigma**2)
     return cp.unsqueeze(1) + sigma * noises
 
 
 def _grad_scale_torch(cp, n, sigma, mul):
-    """Divisor of the perturbed reward estimator: n*sigma (additive) or n*denom_safe (multiplicative)."""
+    """Divisor of the perturbed reward estimator."""
     from pyepo.utils import _EPS
 
     if not mul:
@@ -1078,15 +1066,13 @@ def _grad_scale_torch(cp, n, sigma, mul):
 
 
 class TestSolutionGradientTruth:
-    """Estimator solution-ops: autograd gradient == the estimator's closed form,
-    reconstructed from an independent re-solve (or, for DPO, from the module's
-    recorded solutions, since a first-order GPU solve is not reproducible)."""
+    """Estimator solution-ops vs closed-form gradients."""
 
     def _setup(self, sp_truth, name):
         optmodel, dataset, loader = sp_truth
-        _kind, build, _sig = LOSS_REGISTRY[name]
+        entry = LOSS_REGISTRY[name]
         _x, c, _w, _z = take_batch(loader)
-        mod = build(optmodel, dataset, None)
+        mod = entry.build(optmodel, dataset, None)
         cp = (c * 1.2).clone().detach()
         torch.manual_seed(0)
         target = torch.randn_like(cp)
@@ -1095,7 +1081,7 @@ class TestSolutionGradientTruth:
 
     @staticmethod
     def _imle_noise_ptb(cp, mod):
-        """Perturbed costs sharing the module's Sum-of-Gamma noise (fresh draw, same default seed)."""
+        """Perturbed costs sharing the module's noise."""
         from pyepo.func.utils import sumGammaDistribution
 
         noises = sumGammaDistribution(kappa=5).sample(
@@ -1107,7 +1093,7 @@ class TestSolutionGradientTruth:
 
     @staticmethod
     def _resolve_two_sides(optmodel, ptb_c, target, lambd):
-        """Central-difference re-solve estimator: (w(+) - w(-)) / (2*lambd)."""
+        """Central-difference re-solve estimator."""
         from pyepo.utils import _EPS
 
         delta = lambd * target.unsqueeze(1)
@@ -1136,11 +1122,7 @@ class TestSolutionGradientTruth:
 
     @pytest.mark.parametrize("mul", [False, True])
     def test_perturbed_opt(self, sp_truth, mul, monkeypatch):
-        # this gate records the solutions the module actually used instead of
-        # re-solving: MPAX's GPU PDHG is not run-to-run reproducible on near-tie
-        # vertices (~3e-2 between two solves of identical costs), so the
-        # independently reconstructed perturbed costs are asserted against the
-        # recorded solver input, and the estimator math is then checked exactly
+        # Record actual solves to avoid MPAX re-solve noise.
         import pyepo.func.perturbed as perturbed
 
         _optmodel, mod, cp, target = self._setup(sp_truth, "DPOMul" if mul else "DPO")
@@ -1158,7 +1140,7 @@ class TestSolutionGradientTruth:
         (mod(cpg) * target).sum().backward()
         noises = _gaussian_noise(mod, cp)
         rec_c, ptb_sols = recorded[0]
-        # the module solved exactly the perturbed costs the formula prescribes
+        # The module solved the expected perturbed costs.
         assert torch.allclose(rec_c, _perturb_torch(cp, noises, sigma, mul), atol=1e-6)
         reward = torch.einsum("bnd,bd->bn", ptb_sols, target)
         if mod.variance_reduction and n > 1:  # leave-one-out baseline
@@ -1220,13 +1202,13 @@ class TestSolutionGradientTruth:
 
 
 class TestLossGradientTruth:
-    """Solve-in-forward losses: autograd gradient == an independent re-solve of the subgradient."""
+    """Solve-in-forward loss gradients."""
 
     def _setup(self, sp_truth, name):
         optmodel, dataset, loader = sp_truth
-        _kind, build, _sig = LOSS_REGISTRY[name]
+        entry = LOSS_REGISTRY[name]
         _x, c, w, _z = take_batch(loader)
-        mod = build(optmodel, dataset, "mean")
+        mod = entry.build(optmodel, dataset, "mean")
         cp = (c * 1.2).clone().detach()
         self.atol = solver_atol(optmodel)
         return optmodel, mod, cp, c, w
@@ -1239,7 +1221,7 @@ class TestLossGradientTruth:
         b = cp.shape[0]
         cpg = cp.clone().requires_grad_(True)
         mod(cpg, c).backward()
-        # backward differencing: (w*(cp) - w*(cp - sigma*c)) / sigma, mean -> /b
+        # Backward difference, averaged over the batch.
         w_sol, _ = _solve_batch(cp, optmodel, 1, None)
         wm_sol, _ = _solve_batch(cp - mod.sigma * c, optmodel, 1, None)
         expected = (w_sol - wm_sol) / (mod.sigma + _EPS) / b  # sign = +1 (MINIMIZE)

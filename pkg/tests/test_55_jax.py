@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""Tests for the JAX training frontend (pyepo.func.jax).
-
-Grouped jax -> both:
-
-- jax: helpers / infrastructure / validation, then independent correctness
-  gates. The gate is the closed form (an independent re-solve) or a finite
-  difference, never torch-vs-jax, so a bug shared by both frontends is still
-  caught. Covers both _solve_batch backends: the universal pure_callback path
-  and the native MPAX path.
-- both: torch-vs-jax parity for the few features (CaVE, PG central differencing,
-  the partial-prediction lift) where an independent reference is impractical and
-  the torch implementation is the reference.
-"""
+"""Tests for the JAX training frontend."""
 
 import numpy as np
 import pytest
@@ -21,6 +9,8 @@ from .conftest import (
     JAX_LOSS_REGISTRY,
     LOSS_REGISTRY,
     NUM_FEAT,
+    PARTIAL_PREDICTION_PARITY_OPS,
+    PARTIAL_PREDICTION_SMOKE_OPS,
     call_op,
     finite_diff_grad,
     requires_clarabel,
@@ -51,27 +41,29 @@ def _sp_mpax(n):
 class TestSolveCacheHelpers:
     """Solution-pool caching helpers (pure jnp, no solver)."""
 
-    def test_update_pool_dedups_and_appends(self):
+    @pytest.mark.parametrize(
+        "pool, update, expected_rows",
+        [
+            ([[1.0, 0.0], [0.0, 1.0]], [[1.0, 0.0], [1.0, 1.0]], 3),
+            ([[1.0, 0.0]], [[1.0 + 1e-6, 1e-6]], 1),
+        ],
+    )
+    def test_update_pool_dedups_and_appends(self, pool, update, expected_rows):
         import jax.numpy as jnp
 
         from pyepo.func.jax.utils import _update_solution_pool
 
-        pool = jnp.array([[1.0, 0.0], [0.0, 1.0]])
-        # one duplicate row, one new row
-        out = _update_solution_pool(jnp.array([[1.0, 0.0], [1.0, 1.0]]), pool)
-        assert int(out.shape[0]) == 3
+        out = _update_solution_pool(jnp.array(update), jnp.array(pool))
+        assert int(out.shape[0]) == expected_rows
 
-    def test_update_pool_dedups_near_duplicates(self):
-        import jax.numpy as jnp
-
-        from pyepo.func.jax.utils import _update_solution_pool
-
-        pool = jnp.array([[1.0, 0.0]])
-        # first-order solver noise must not grow the pool
-        out = _update_solution_pool(jnp.array([[1.0 + 1e-6, 1e-6]]), pool)
-        assert int(out.shape[0]) == 1
-
-    def test_cache_in_pass_minimize_picks_min_obj(self):
+    @pytest.mark.parametrize(
+        "sense, expected_sol, expected_obj",
+        [
+            pytest.param("min", [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], [1.0, 1.0]),
+            pytest.param("max", [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0]], [3.0, 3.0]),
+        ],
+    )
+    def test_cache_in_pass_picks_best_obj(self, sense, expected_sol, expected_obj):
         from unittest.mock import MagicMock
 
         import jax.numpy as jnp
@@ -80,30 +72,12 @@ class TestSolveCacheHelpers:
         from pyepo.func.jax.utils import _cache_in_pass
 
         m = MagicMock()
-        m.modelSense = EPO.MINIMIZE
+        m.modelSense = EPO.MINIMIZE if sense == "min" else EPO.MAXIMIZE
         cost = jnp.array([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]])
         pool = jnp.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
         sol, obj = _cache_in_pass(cost, m, pool)
-        np.testing.assert_allclose(np.array(sol[0]), [1.0, 0.0, 0.0])
-        np.testing.assert_allclose(np.array(sol[1]), [0.0, 0.0, 1.0])
-        np.testing.assert_allclose(np.array(obj), [1.0, 1.0])
-
-    def test_cache_in_pass_maximize_picks_max_obj(self):
-        from unittest.mock import MagicMock
-
-        import jax.numpy as jnp
-
-        from pyepo import EPO
-        from pyepo.func.jax.utils import _cache_in_pass
-
-        m = MagicMock()
-        m.modelSense = EPO.MAXIMIZE
-        cost = jnp.array([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]])
-        pool = jnp.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
-        sol, obj = _cache_in_pass(cost, m, pool)
-        np.testing.assert_allclose(np.array(sol[0]), [0.0, 0.0, 1.0])
-        np.testing.assert_allclose(np.array(sol[1]), [1.0, 0.0, 0.0])
-        np.testing.assert_allclose(np.array(obj), [3.0, 3.0])
+        np.testing.assert_allclose(np.array(sol), expected_sol)
+        np.testing.assert_allclose(np.array(obj), expected_obj)
 
     def test_cache_in_pass_rejects_invalid_sense(self):
         from unittest.mock import MagicMock
@@ -141,23 +115,29 @@ class TestSolveCacheHelpers:
 
 @requires_jax
 class TestFrankWolfeFreeSlot:
-    """Active-set slot pick: the first free slot, else the smallest-weight atom."""
+    """Active-set slot selection."""
 
     def test_matches_expected_slots(self):
         import jax.numpy as jnp
 
         from pyepo.func.jax.regularized import _fw_free_slot
 
-        # row 1 has a free slot; row 2 is full and merges into the smallest atom
         w = jnp.asarray([[0.5, 0.0, 0.5, 0.0], [0.4, 0.3, 0.1, 0.2]])
         np.testing.assert_array_equal(np.array(_fw_free_slot(w)), [1, 2])
 
 
 @requires_jax
 class TestMaskPred:
-    """Partial-prediction masking: zero perturbation on non-predicted cost positions."""
+    """Partial-prediction perturbation mask."""
 
-    def test_none_is_noop(self):
+    @pytest.mark.parametrize(
+        "c_pred_index, expected",
+        [
+            (None, np.ones((1, 2, 4))),
+            (np.array([0, 2]), np.array([[[1.0, 0.0, 1.0, 0.0], [1.0, 0.0, 1.0, 0.0]]])),
+        ],
+    )
+    def test_masks_fixed_positions(self, c_pred_index, expected):
         from unittest.mock import MagicMock
 
         import jax.numpy as jnp
@@ -165,22 +145,9 @@ class TestMaskPred:
         from pyepo.func.jax.utils import _mask_pred
 
         m = MagicMock()
-        m.c_pred_index = None
+        m.c_pred_index = c_pred_index
         noises = jnp.ones((1, 2, 4))
-        np.testing.assert_array_equal(np.array(_mask_pred(noises, m)), np.ones((1, 2, 4)))
-
-    def test_masks_non_predicted_positions(self):
-        from unittest.mock import MagicMock
-
-        import jax.numpy as jnp
-
-        from pyepo.func.jax.utils import _mask_pred
-
-        m = MagicMock()
-        m.c_pred_index = np.array([0, 2])
-        out = np.array(_mask_pred(jnp.ones((1, 2, 4)), m))
-        np.testing.assert_array_equal(out[..., [0, 2]], 1.0)  # predicted positions kept
-        np.testing.assert_array_equal(out[..., [1, 3]], 0.0)  # fixed positions zeroed
+        np.testing.assert_array_equal(np.array(_mask_pred(noises, m)), expected)
 
 
 # optModule init validation is shared with the torch frontend in
@@ -207,7 +174,7 @@ class TestBatchSolve:
 @requires_jax
 @requires_gurobi
 class TestMultiprocessing:
-    """processes > 1 parallelizes the callback-path solves (results identical to single-core)."""
+    """Callback-path multiprocessing."""
 
     def _model(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
@@ -244,7 +211,7 @@ class TestMultiprocessing:
 @requires_mpax
 class TestJit:
     def test_spoplus_jit_matches_eager(self):
-        """jax.jit of the loss gradient (model closed over) equals the eager gradient."""
+        """jit gradient matches eager."""
         import jax
         import jax.numpy as jnp
 
@@ -263,7 +230,7 @@ class TestJit:
         np.testing.assert_allclose(g_jit, g_eager, atol=1e-4)
 
     def test_jit_caching_raises_clear_error(self):
-        """A caching loss under jax.jit raises a clear error, not a cryptic tracer crash."""
+        """Caching loss rejects jit."""
         import jax
         import jax.numpy as jnp
 
@@ -283,7 +250,7 @@ class TestJit:
 @requires_jax
 @requires_gurobi
 class TestJitKeyGuard:
-    """Implicit RNG (key=None) is rejected under jit; explicit keys match eager."""
+    """JIT requires explicit RNG keys."""
 
     def test_perturbed_jit_requires_explicit_key(self):
         import jax
@@ -303,7 +270,7 @@ class TestJitKeyGuard:
 
 
 # ============================================================
-# jax: independent correctness gates (closed-form re-solve or finite difference)
+# jax: independent correctness gates
 # ============================================================
 
 
@@ -335,8 +302,7 @@ def _spo_closed_form(model, pred, true_cost, true_sol):
     return 2.0 * (true_sol - np.array(w_spo))
 
 
-# SPO+ closed form on each backend: native MPAX and the Gurobi pure_callback
-# path; the MPAX atol covers two independent first-order PDHG solves
+# SPO+ closed form on native MPAX and Gurobi callback.
 SPO_CLOSED_FORM = [
     pytest.param("mpax", 16, 1e-2, marks=requires_mpax),
     pytest.param("grb", 8, 1e-4, marks=requires_gurobi),
@@ -345,7 +311,7 @@ SPO_CLOSED_FORM = [
 
 @requires_jax
 class TestSPOPlusClosedForm:
-    """SPO+ subgradient vs the independent 2*(w_true - w_spo) ground truth, per backend."""
+    """SPO+ closed-form subgradient."""
 
     @pytest.mark.parametrize("backend,n,atol", SPO_CLOSED_FORM)
     def test_grad_matches_closed_form(self, backend, n, atol):
@@ -404,7 +370,7 @@ class TestBlackbox:
 
 
 def _perturbed_setup(sense):
-    """(model, base cost c) for a MINIMIZE (MPAX shortest path) or MAXIMIZE (Gurobi knapsack) test."""
+    """Model and base costs for MINIMIZE or MAXIMIZE tests."""
     import pyepo
 
     if sense == "min":
@@ -419,7 +385,7 @@ def _perturbed_setup(sense):
     return model, c
 
 
-# sense -> backend: MINIMIZE on MPAX (native), MAXIMIZE on Gurobi (callback)
+# MINIMIZE on MPAX, MAXIMIZE on Gurobi.
 PERTURBED_SENSE = [
     pytest.param("min", marks=requires_mpax),
     pytest.param("max", marks=requires_gurobi),
@@ -428,11 +394,7 @@ PERTURBED_SENSE = [
 
 @requires_jax
 class TestPerturbed:
-    """DPO/PFY (additive + multiplicative) closed-form parity from seed-derived noise.
-
-    Gate is an independent re-solve of the same perturbed costs, not torch-vs-jax.
-    Covers both senses (MINIMIZE via MPAX, MAXIMIZE via the Gurobi callback path).
-    """
+    """DPO/PFY gradients from seed-derived noise."""
 
     @staticmethod
     def _gauss(shape):
@@ -444,7 +406,7 @@ class TestPerturbed:
 
     @staticmethod
     def _perturb(pred, noises, sigma, mul):
-        # jnp throughout so ptb_c matches the impl bit-for-bit (multiplicative vertex-flip gotcha)
+        # Match the implementation path exactly.
         import jax.numpy as jnp
 
         p = jnp.asarray(pred)[:, None, :]
@@ -515,10 +477,10 @@ class TestPerturbed:
 
 @requires_mpax
 class TestImplicitMLE:
-    """I-MLE / AI-MLE: gradient == an independent re-solve along the seed-derived noise."""
+    """I-MLE / AI-MLE gradients."""
 
     def _setup(self):
-        """Returns (model, pred, target, ptb_c) sharing the seed-0 Sum-of-Gamma noise."""
+        """Model, costs, target, and perturbed costs."""
         import jax
         import jax.numpy as jnp
 
@@ -618,7 +580,7 @@ class TestImplicitMLE:
 @requires_jax
 @requires_gurobi
 class TestMaximizeSenseEstimators:
-    """DBB / one-sided I-MLE on a MAXIMIZE knapsack: the perturbation direction flips sign."""
+    """MAXIMIZE estimator gradients."""
 
     def _setup(self):
         model, c = _perturbed_setup("max")
@@ -670,7 +632,7 @@ class TestMaximizeSenseEstimators:
 
 @requires_mpax
 class TestPG:
-    """PG one-sided backward differencing: grad == (w(pred) - w(pred - sigma*c)) / sigma / B."""
+    """PG backward-difference gradient."""
 
     def test_grad_matches_backward_difference(self):
         import jax
@@ -694,7 +656,7 @@ class TestPG:
 @requires_jax
 @requires_gurobi
 class TestRegularized:
-    """Regularized FW over an exact Gurobi LMO, gated against a finite difference / Danskin residual."""
+    """Regularized FW gradients."""
 
     def _knapsack(self):
         from pyepo.model.grb.knapsack import knapsackModel
@@ -740,7 +702,7 @@ class TestRegularized:
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
     def test_caching_reads_pool_and_grows(self):
-        # solve_ratio<1 seeds a vertex pool: cached passes read it, exact passes grow it
+        # Cached passes read the pool; exact passes may grow it.
         import jax
         import jax.numpy as jnp
 
@@ -792,7 +754,7 @@ class TestRegularized:
 
 @requires_mpax
 class TestRankContrastive:
-    """Pool/contrastive losses gated by finite difference (reused from conftest)."""
+    """Pool and contrastive loss gradients."""
 
     def _data(self):
         model, ds, pred, tc, ts, _to = sp_jax_pred("mpax", 12)
@@ -815,7 +777,7 @@ class TestRankContrastive:
         import pyepo.func.jax as J
 
         model, ds, pred, true_cost, true_sol = self._data()
-        # solve_ratio=0 freezes the pool so the finite difference is deterministic
+        # Freeze the pool for deterministic finite difference.
         loss = getattr(J, name)(model, dataset=ds, solve_ratio=0)
         second = jnp.asarray(true_cost if arg == "cost" else true_sol)
 
@@ -827,13 +789,13 @@ class TestRankContrastive:
 
 
 # ============================================================
-# both: torch-vs-jax parity (no practical independent reference; torch is the reference)
+# both: Torch-vs-JAX parity
 # ============================================================
 
 
 @requires_jax
 class TestListwiseLTRParity:
-    """Listwise LTR loss on a frozen pool, torch parity on MINIMIZE and MAXIMIZE."""
+    """Listwise LTR Torch parity."""
 
     @pytest.mark.parametrize("sense", PERTURBED_SENSE)
     def test_loss_matches_torch(self, sense):
@@ -859,7 +821,7 @@ class TestListwiseLTRParity:
 @requires_jax
 @requires_gurobi
 class TestPGTwoSidesParity:
-    """PG central differencing (two_sides=True), torch parity on MINIMIZE and MAXIMIZE."""
+    """PG central-difference Torch parity."""
 
     def _model(self, sense):
         if sense == "min":
@@ -899,7 +861,7 @@ class TestPGTwoSidesParity:
 @requires_gurobi
 @requires_clarabel
 class TestCaVEParity:
-    """CaVE cosine-distance gradient cross-checked against torch (projection detached)."""
+    """CaVE Torch parity."""
 
     def _setup(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
@@ -985,7 +947,7 @@ class TestCaVEGuards:
 
 
 def _partial_model():
-    """DSL model with 3 predicted-cost vars and 2 fixed-cost vars (num_cost < num_vars)."""
+    """Partial-prediction DSL model."""
     from pyepo import EPO, dsl
 
     items = dsl.Variable(3, vtype=EPO.BINARY)
@@ -1009,16 +971,7 @@ def _partial_data(n=4):
 @requires_jax
 @requires_gurobi
 class TestPartialPredictionParity:
-    """`_full_cost` lift parity for partial prediction (num_cost < num_vars).
-
-    Every other test uses full prediction, where the lift is a no-op, so a
-    missing lift in surrogate/perturbed/blackbox/regularized was invisible: the
-    short predicted cost would mismatch the full-dimension solution. The lifted
-    gradient must still map back to the short cost.
-    """
-
-    PARITY = ["SPOPlus", "PG", "DBB", "NID", "RFWO", "RFY"]
-    SMOKE = ["DPO", "DPOMul", "IMLE", "AIMLE", "PFY", "PFYMul"]
+    """Partial-prediction lift parity."""
 
     def test_multiplicative_perturb_keeps_fixed_costs(self):
         import jax.numpy as jnp
@@ -1036,7 +989,7 @@ class TestPartialPredictionParity:
         expected = np.broadcast_to(np.array(full)[:, None, fixed], (2, 3, fixed.size))
         np.testing.assert_allclose(ptb_c[:, :, fixed], expected, atol=1e-7)
 
-    @pytest.mark.parametrize("name", PARITY)
+    @pytest.mark.parametrize("name", PARTIAL_PREDICTION_PARITY_OPS)
     def test_deterministic_grad_matches_torch(self, name):
         import jax
         import jax.numpy as jnp
@@ -1045,27 +998,31 @@ class TestPartialPredictionParity:
         model, ds, c = _partial_data()
         cn = (c * 1.2).astype(np.float32)
         ct, wt, zt = (np.asarray(a, np.float32) for a in (ds.costs, ds.sols, ds.objs))
-        _k, jbuild, sig = JAX_LOSS_REGISTRY[name]
-        _tk, tbuild, _ts = LOSS_REGISTRY[name]
-        # torch reference (lifts internally via _fullCost)
-        top = tbuild(model, ds, "mean")
+        jentry = JAX_LOSS_REGISTRY[name]
+        tentry = LOSS_REGISTRY[name]
+        # Torch reference for lifted full costs
+        top = tentry.build(model, ds, "mean")
         cpt = torch.tensor(cn, requires_grad=True)
         out_t = call_op(
-            top, sig, cpt, torch.as_tensor(ct), torch.as_tensor(wt), torch.as_tensor(zt)
+            top,
+            jentry.sig,
+            cpt,
+            torch.as_tensor(ct),
+            torch.as_tensor(wt),
+            torch.as_tensor(zt),
         )
         (out_t if out_t.dim() == 0 else out_t.sum()).backward()
         g_t = cpt.grad.numpy()
-        # jax grad on the short predicted cost
-        jop = jbuild(model, ds, "mean")
+        # JAX gradient on the short cost
+        jop = jentry.build(model, ds, "mean")
         cj, cc, ww, zz = (jnp.asarray(a) for a in (cn, ct, wt, zt))
-        g_j = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, sig, p, cc, ww, zz)))(cj))
+        g_j = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, jentry.sig, p, cc, ww, zz)))(cj))
         assert g_j.shape == cn.shape
         np.testing.assert_allclose(g_j, g_t, atol=1e-3)
 
-    @pytest.mark.parametrize("name", SMOKE)
+    @pytest.mark.parametrize("name", PARTIAL_PREDICTION_SMOKE_OPS)
     def test_perturbed_lifts_and_grad_is_finite(self, name):
-        # independent per-framework RNG -> no torch parity; gate is the absence
-        # of a shape crash plus a finite gradient on the short predicted cost
+        # Smoke-test perturbed partial prediction
         import jax
         import jax.numpy as jnp
 
@@ -1073,9 +1030,11 @@ class TestPartialPredictionParity:
         cn = (c * 1.2).astype(np.float32)
         args = (jnp.asarray(np.asarray(a, np.float32)) for a in (ds.costs, ds.sols, ds.objs))
         cc, ww, zz = args
-        _k, jbuild, sig = JAX_LOSS_REGISTRY[name]
-        jop = jbuild(model, ds, "mean")
-        g = np.array(jax.grad(lambda p: jnp.sum(call_op(jop, sig, p, cc, ww, zz)))(jnp.asarray(cn)))
+        entry = JAX_LOSS_REGISTRY[name]
+        jop = entry.build(model, ds, "mean")
+        g = np.array(
+            jax.grad(lambda p: jnp.sum(call_op(jop, entry.sig, p, cc, ww, zz)))(jnp.asarray(cn))
+        )
         assert g.shape == cn.shape
         assert np.isfinite(g).all()
 
@@ -1083,7 +1042,7 @@ class TestPartialPredictionParity:
 @requires_jax
 @requires_gurobi
 def test_full_prediction_lift_includes_offset():
-    """`_full_cost` adds the fixed-cost offset when every variable is predicted (c_pred_index is None)."""
+    """Full-prediction lift includes fixed offsets."""
     import jax.numpy as jnp
     import torch
 
