@@ -6,6 +6,7 @@ Perturbed optimization function
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import jax
 import jax.numpy as jnp
@@ -21,6 +22,9 @@ from pyepo.func.jax.utils import (
     _sum_gamma_sample,
 )
 from pyepo.utils import _EPS
+
+if TYPE_CHECKING:
+    from pyepo.func.runtime import Reduction
 
 
 class perturbedOpt(optModule):
@@ -164,7 +168,7 @@ class perturbedFenchelYoung(optModule):
         processes=1,
         seed=135,
         solve_ratio=1.0,
-        reduction="mean",
+        reduction: Reduction = "mean",
         dataset=None,
     ):
         """

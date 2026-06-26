@@ -5,12 +5,17 @@ Learning to rank Losses
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import jax
 import jax.numpy as jnp
 
 from pyepo.func._common import is_minimize
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost
+
+if TYPE_CHECKING:
+    from pyepo.func.runtime import Reduction
 
 
 class listwiseLearningToRank(optModule):
@@ -25,7 +30,9 @@ class listwiseLearningToRank(optModule):
     `<https://proceedings.mlr.press/v162/mandi22a.html>`_
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1.0, reduction="mean", dataset=None):
+    def __init__(
+        self, optmodel, processes=1, solve_ratio=1.0, reduction: Reduction = "mean", dataset=None
+    ):
         """
         Args:
             optmodel: a PyEPO optimization model
@@ -73,7 +80,9 @@ class pairwiseLearningToRank(optModule):
     `<https://proceedings.mlr.press/v162/mandi22a.html>`_
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1.0, reduction="mean", dataset=None):
+    def __init__(
+        self, optmodel, processes=1, solve_ratio=1.0, reduction: Reduction = "mean", dataset=None
+    ):
         """
         Args:
             optmodel: a PyEPO optimization model
@@ -123,7 +132,9 @@ class pointwiseLearningToRank(optModule):
     `<https://proceedings.mlr.press/v162/mandi22a.html>`_
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1.0, reduction="mean", dataset=None):
+    def __init__(
+        self, optmodel, processes=1, solve_ratio=1.0, reduction: Reduction = "mean", dataset=None
+    ):
         """
         Args:
             optmodel: a PyEPO optimization model

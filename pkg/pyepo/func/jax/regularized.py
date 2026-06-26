@@ -6,6 +6,7 @@ Regularized differentiable optimization function (L2 Frank-Wolfe)
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import jax
 import jax.numpy as jnp
@@ -26,6 +27,9 @@ from pyepo.func.jax.utils import (
     _solve_batch,
     _update_solution_pool,
 )
+
+if TYPE_CHECKING:
+    from pyepo.func.runtime import Reduction
 
 
 def _sense_sign(optmodel):
@@ -258,7 +262,7 @@ class regularizedFrankWolfeFenchelYoung(optModule):
         tol=1e-6,
         processes=1,
         solve_ratio=1.0,
-        reduction="mean",
+        reduction: Reduction = "mean",
         dataset=None,
     ):
         """

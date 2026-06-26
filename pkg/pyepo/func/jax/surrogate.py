@@ -6,6 +6,7 @@ Surrogate Loss function
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import jax
 import jax.numpy as jnp
@@ -14,6 +15,9 @@ from pyepo.func._common import is_minimize, validate_positive
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost, _solve_or_cache
 from pyepo.utils import _EPS
+
+if TYPE_CHECKING:
+    from pyepo.func.runtime import Reduction
 
 
 class SPOPlus(optModule):
@@ -30,7 +34,9 @@ class SPOPlus(optModule):
     `<https://doi.org/10.1287/mnsc.2020.3922>`_
     """
 
-    def __init__(self, optmodel, processes=1, solve_ratio=1.0, reduction="mean", dataset=None):
+    def __init__(
+        self, optmodel, processes=1, solve_ratio=1.0, reduction: Reduction = "mean", dataset=None
+    ):
         """
         Args:
             optmodel: a PyEPO optimization model
@@ -112,7 +118,7 @@ class perturbationGradient(optModule):
         two_sides=False,
         processes=1,
         solve_ratio=1.0,
-        reduction="mean",
+        reduction: Reduction = "mean",
         dataset=None,
     ):
         """

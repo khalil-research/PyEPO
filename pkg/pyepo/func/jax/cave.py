@@ -6,6 +6,7 @@ Cone-aligned vector estimation (CaVE) loss for binary linear programs
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import jax
 import jax.numpy as jnp
@@ -15,6 +16,9 @@ from pyepo.func._common import is_minimize, validate_positive_int, validate_prob
 from pyepo.func.cave import _HAS_CLARABEL, _project_one
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _concretizable
+
+if TYPE_CHECKING:
+    from pyepo.func.runtime import Reduction
 
 
 class coneAlignedCosine(optModule):
@@ -31,7 +35,13 @@ class coneAlignedCosine(optModule):
     """
 
     def __init__(
-        self, optmodel, max_iter=3, solve_ratio=1.0, inner_ratio=0.2, processes=1, reduction="mean"
+        self,
+        optmodel,
+        max_iter=3,
+        solve_ratio=1.0,
+        inner_ratio=0.2,
+        processes=1,
+        reduction: Reduction = "mean",
     ):
         """
         Args:
