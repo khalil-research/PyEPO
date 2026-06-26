@@ -15,6 +15,7 @@ Attributes
 .. autoapisummary::
 
    pyepo.func.runtime.Reduction
+   pyepo.func.runtime.T
 
 
 Classes
@@ -32,6 +33,7 @@ Functions
 
    pyepo.func.runtime.normalize_processes
    pyepo.func.runtime.create_solver_pool
+   pyepo.func.runtime.init_solution_pool
    pyepo.func.runtime.init_runtime
 
 
@@ -39,6 +41,8 @@ Module Contents
 ---------------
 
 .. py:data:: Reduction
+
+.. py:data:: T
 
 .. py:class:: RuntimeState
 
@@ -77,6 +81,11 @@ Module Contents
 .. py:function:: create_solver_pool(optmodel: pyepo.model.opt.optModel, processes: int, *, owner=None) -> pathos.multiprocessing.ProcessingPool | None
 
    Create a worker pool, optionally tied to an owner's lifetime.
+
+
+.. py:function:: init_solution_pool(dataset: pyepo.data.dataset.optDataset | None, solve_ratio: float, require_solpool: bool, unique: Callable[[object], T]) -> T | None
+
+   Initialize a frontend-specific solution pool from an ``optDataset`` when needed.
 
 
 .. py:function:: init_runtime(owner, optmodel: pyepo.model.opt.optModel, processes: int, solve_ratio: float, reduction: str, seed: int | None, logger: logging.Logger) -> RuntimeState
