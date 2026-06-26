@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 import jax.numpy as jnp
 
 from pyepo.func._common import require_solution_pool
-from pyepo.func.runtime import init_runtime, init_solution_pool
+from pyepo.func.runtime import bind_runtime_state, init_runtime, init_solution_pool
 
 logger = logging.getLogger(__name__)
 
@@ -44,12 +44,7 @@ class optModule(ABC):
             seed: seed for the per-pass solve-vs-cache branch RNG
         """
         runtime = init_runtime(self, optmodel, processes, solve_ratio, reduction, seed, logger)
-        self.optmodel = runtime.optmodel
-        self.processes = runtime.processes
-        self.pool = runtime.pool
-        self.solve_ratio = runtime.solve_ratio
-        self.reduction = runtime.reduction
-        self._branch_rng = runtime.branch_rng
+        bind_runtime_state(self, runtime)
         # framework-specific solution pool
         self.solpool = init_solution_pool(
             dataset,

@@ -24,6 +24,7 @@ import torch
 
 from pyepo import EPO
 from pyepo.func.runtime import (
+    bind_runtime_state,
     create_solver_pool,
     init_runtime,
     init_solution_pool,
@@ -353,6 +354,28 @@ class TestSharedRuntime:
         assert runtime.reduction == "sum"
         expected = np.random.RandomState(17).uniform()
         assert runtime.branch_rng.uniform() == expected
+
+    def test_runtime_state_binds_to_frontend_owner(self):
+        optmodel = _RuntimeModel()
+        runtime = init_runtime(
+            object(),
+            optmodel,
+            processes=1,
+            solve_ratio=0.25,
+            reduction="none",
+            seed=23,
+            logger=MagicMock(),
+        )
+        owner = MagicMock()
+
+        bind_runtime_state(owner, runtime)
+
+        assert owner.optmodel is optmodel
+        assert owner.processes == 1
+        assert owner.pool is None
+        assert owner.solve_ratio == 0.25
+        assert owner.reduction == "none"
+        assert owner._branch_rng is runtime.branch_rng
 
     @pytest.mark.parametrize("reduction", ["bad", "", None])
     def test_invalid_reduction_raises(self, reduction):

@@ -5,7 +5,7 @@ from __future__ import annotations
 import multiprocessing as mp
 import weakref
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable, Literal, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Callable, Literal, TypeVar, cast
 
 import numpy as np
 from pathos.multiprocessing import ProcessingPool
@@ -34,6 +34,16 @@ class RuntimeState:
     solve_ratio: float
     reduction: Reduction
     branch_rng: np.random.RandomState
+
+
+def bind_runtime_state(owner: Any, runtime: RuntimeState) -> None:
+    """Attach validated runtime state to a frontend module."""
+    owner.optmodel = runtime.optmodel
+    owner.processes = runtime.processes
+    owner.pool = runtime.pool
+    owner.solve_ratio = runtime.solve_ratio
+    owner.reduction = runtime.reduction
+    owner._branch_rng = runtime.branch_rng
 
 
 def normalize_processes(
