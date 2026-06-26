@@ -15,7 +15,7 @@ import numpy as np
 try:
     from coptpy import COPT
 except ImportError:
-    pass
+    COPT = None
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase

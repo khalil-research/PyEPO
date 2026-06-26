@@ -10,7 +10,7 @@ import numpy as np
 try:
     from coptpy import COPT
 except ImportError:
-    pass
+    COPT = None
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.copt.coptmodel import _get_envr, optCoptModel

@@ -12,6 +12,7 @@ import numpy as np
 try:
     from coptpy import COPT, CallbackBase
 except ImportError:
+    COPT = None
     CallbackBase = object  # placeholder so class bodies evaluate without coptpy
 
 from pyepo.model._common import validate_objective_shape

@@ -8,7 +8,7 @@ from __future__ import annotations
 try:
     from coptpy import COPT
 except ImportError:
-    pass
+    COPT = None
 
 from pyepo.model.bases import portfolioBase
 from pyepo.model.copt.coptmodel import _get_envr, optCoptModel
