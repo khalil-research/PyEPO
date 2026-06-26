@@ -43,33 +43,3 @@ class shortestPathModel(shortestPathBase, optCoptModel):
         b[num_nodes - 1] = 1.0
         m.addConstr(A @ x == b)
         return m, x
-
-
-if __name__ == "__main__":
-    import random
-
-    # random seed
-    random.seed(42)
-    # set random cost for test
-    cost = [random.random() for _ in range(40)]
-
-    # solve model
-    optmodel = shortestPathModel(grid=(5, 5))  # init model
-    optmodel = optmodel.copy()
-    optmodel.setObj(cost)  # set objective function
-    sol, obj = optmodel.solve()  # solve
-    # print res
-    print(f"Obj: {obj}")
-    for i, e in enumerate(optmodel.arcs):
-        if sol[i] > 1e-3:
-            print(e)
-
-    # add constraint
-    optmodel = optmodel.addConstr([1] * 40, 30)
-    optmodel.setObj(cost)  # set objective function
-    sol, obj = optmodel.solve()  # solve
-    # print res
-    print(f"Obj: {obj}")
-    for i, e in enumerate(optmodel.arcs):
-        if sol[i] > 1e-3:
-            print(e)
