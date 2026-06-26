@@ -567,7 +567,10 @@ class TestDataloaderMetricsJax:
         import pyepo
 
         optmodel, _ds, loader = mpax_data
-        fn = lambda x: np.ones((x.shape[0], optmodel.num_cost), dtype=np.float32)  # noqa: E731
+
+        def fn(x):
+            return np.ones((x.shape[0], optmodel.num_cost), dtype=np.float32)
+
         reg = pyepo.metric.regret(fn, optmodel, loader)
         assert isinstance(reg, float) and reg >= 0
 
@@ -575,7 +578,10 @@ class TestDataloaderMetricsJax:
         import pyepo
 
         optmodel, ds, loader = mpax_data
-        fn = lambda x: np.ones((x.shape[0], optmodel.num_cost), dtype=np.float32)  # noqa: E731
+
+        def fn(x):
+            return np.ones((x.shape[0], optmodel.num_cost), dtype=np.float32)
+
         per = pyepo.metric.regret(fn, optmodel, loader, reduction="none")
         total = pyepo.metric.regret(fn, optmodel, loader, reduction="sum")
         assert isinstance(per, np.ndarray) and len(per) == len(ds)
