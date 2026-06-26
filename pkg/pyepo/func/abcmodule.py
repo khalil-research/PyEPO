@@ -17,6 +17,9 @@ from pyepo.func.runtime import Reduction, bind_runtime_state, init_runtime, init
 from pyepo.func.utils import _solve_in_pass
 
 if TYPE_CHECKING:
+    import numpy as np
+    from pathos.multiprocessing import ProcessingPool
+
     from pyepo.data.dataset import optDataset
     from pyepo.model.opt import optModel
 
@@ -29,6 +32,13 @@ class optModule(nn.Module):
     predict-then-optimize. It provides common functionality (multiprocessing,
     solution pooling, loss reduction) for all loss modules.
     """
+
+    optmodel: optModel
+    processes: int
+    pool: ProcessingPool | None
+    solve_ratio: float
+    reduction: Reduction
+    _branch_rng: np.random.RandomState
 
     def __init__(
         self,

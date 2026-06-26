@@ -15,7 +15,6 @@ try:
 except ImportError:
     COPT = None
     CallbackBase = object  # placeholder so class bodies evaluate without coptpy
-    LinExpr = None
 
 from pyepo.model._common import validate_objective_shape
 from pyepo.model.bases import tspABBase

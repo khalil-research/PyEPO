@@ -7,11 +7,19 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import jax.numpy as jnp
 
 from pyepo.func._common import require_solution_pool
-from pyepo.func.runtime import bind_runtime_state, init_runtime, init_solution_pool
+from pyepo.func.runtime import Reduction, bind_runtime_state, init_runtime, init_solution_pool
+
+if TYPE_CHECKING:
+    import numpy as np
+    from pathos.multiprocessing import ProcessingPool
+
+    from pyepo.data.dataset import optDataset
+    from pyepo.model.opt import optModel
 
 logger = logging.getLogger(__name__)
 
@@ -23,16 +31,23 @@ class optModule(ABC):
     and the solution pool for all loss modules.
     """
 
+    optmodel: optModel
+    processes: int
+    pool: ProcessingPool | None
+    solve_ratio: float
+    reduction: Reduction
+    _branch_rng: np.random.RandomState
+
     def __init__(
         self,
-        optmodel,
-        processes=1,
-        solve_ratio=1.0,
-        reduction="mean",
-        dataset=None,
-        require_solpool=False,
-        seed=None,
-    ):
+        optmodel: optModel,
+        processes: int = 1,
+        solve_ratio: float = 1.0,
+        reduction: Reduction = "mean",
+        dataset: optDataset | None = None,
+        require_solpool: bool = False,
+        seed: int | None = None,
+    ) -> None:
         """
         Args:
             optmodel: a PyEPO optimization model
