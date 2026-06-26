@@ -5,7 +5,7 @@ Knapsack problem
 
 from __future__ import annotations
 
-import numpy as np
+from typing import TYPE_CHECKING
 
 from pyepo.model.bases import knapsackBase
 from pyepo.model.omo.omomodel import optOmoModel
@@ -14,6 +14,9 @@ try:
     from pyomo import environ as pe
 except ImportError:
     pass
+
+if TYPE_CHECKING:
+    import numpy as np
 
 
 class knapsackModel(knapsackBase, optOmoModel):
@@ -97,45 +100,3 @@ class knapsackModelRel(knapsackModel):
         A forbidden method to relax MIP model
         """
         raise RuntimeError("Model has already been relaxed.")
-
-
-if __name__ == "__main__":
-    import random
-
-    # random seed
-    random.seed(42)
-    # set random cost for test
-    cost = [random.random() for _ in range(16)]
-    weights = np.random.choice(range(300, 800), size=(2, 16)) / 100
-    capacity = [20, 20]
-
-    # solve model
-    optmodel = knapsackModel(weights=weights, capacity=capacity, solver="gurobi")  # init model
-    optmodel = optmodel.copy()
-    optmodel.setObj(cost)  # set objective function
-    sol, obj = optmodel.solve()  # solve
-    # print res
-    print(f"Obj: {obj}")
-    for i in range(16):
-        if sol[i] > 1e-3:
-            print(i)
-
-    # relax
-    optmodel = optmodel.relax()
-    optmodel.setObj(cost)  # set objective function
-    sol, obj = optmodel.solve()  # solve
-    # print res
-    print(f"Obj: {obj}")
-    for i in range(16):
-        if sol[i] > 1e-3:
-            print(i)
-
-    # add constraint
-    optmodel = optmodel.addConstr([weights[0, i] for i in range(16)], 10)
-    optmodel.setObj(cost)  # set objective function
-    sol, obj = optmodel.solve()  # solve
-    # print res
-    print(f"Obj: {obj}")
-    for i in range(16):
-        if sol[i] > 1e-3:
-            print(i)
