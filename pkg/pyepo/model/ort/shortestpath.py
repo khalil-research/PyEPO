@@ -11,7 +11,8 @@ try:
     from ortools.linear_solver import pywraplp
     from ortools.sat.python import cp_model
 except ImportError:
-    pass
+    pywraplp = None
+    cp_model = None
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.ort.ortcpmodel import optOrtCpModel

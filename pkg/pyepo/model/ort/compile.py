@@ -18,7 +18,7 @@ import numpy as np
 try:
     from ortools.linear_solver import pywraplp
 except ImportError:
-    pass
+    pywraplp = None
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase
