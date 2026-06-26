@@ -22,9 +22,9 @@ if TYPE_CHECKING:
     from pyepo.model.mpax import optMpaxModel as _optMpaxModelT
 
 try:
-    from pyepo.model.mpax import optMpaxModel
+    from pyepo.model.mpax import optMpaxModel as _opt_mpax_model_cls
 except ImportError:
-    optMpaxModel = None  # type: ignore[assignment]
+    _opt_mpax_model_cls = None
 
 logger = logging.getLogger(__name__)
 
@@ -108,7 +108,7 @@ class optDataset(Dataset):
         A method to get optimal solutions for all cost vectors
         """
         # MPAX fast path: vmap-solve the whole dataset in a single dispatch
-        if optMpaxModel is not None and isinstance(self.model, optMpaxModel):
+        if _opt_mpax_model_cls is not None and isinstance(self.model, _opt_mpax_model_cls):
             return self._get_sols_mpax_batch()
         sols = []
         objs = []
