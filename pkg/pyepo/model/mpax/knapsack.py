@@ -45,23 +45,3 @@ class knapsackModel(knapsackBase, optMpaxModel):
         self.l = jnp.zeros(num_items, dtype=jnp.float32)
         self.u = jnp.ones(num_items, dtype=jnp.float32)
         return None, []
-
-
-if __name__ == "__main__":
-    # random seed
-    np.random.seed(42)
-    # set random cost for test
-    cost = np.random.random(16)
-    weights = np.random.choice(range(300, 800), size=(2, 16)) / 100
-    capacity = [20, 20]
-
-    # solve model
-    optmodel = knapsackModel(weights=weights, capacity=capacity)  # init model
-    optmodel = optmodel.copy()
-    optmodel.setObj(cost)  # set objective function
-    sol, obj = optmodel.solve()  # solve
-    # print res
-    print(f"Obj: {obj}")
-    for i in range(16):
-        if sol[i] > 1e-3:
-            print(i)

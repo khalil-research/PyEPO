@@ -51,33 +51,3 @@ class shortestPathModel(shortestPathBase, optMpaxModel):
         self.l = jnp.zeros(num_arcs, dtype=jnp.float32)
         self.u = jnp.ones(num_arcs, dtype=jnp.float32)
         return None, []
-
-
-if __name__ == "__main__":
-    import random
-
-    # random seed
-    random.seed(42)
-    # set random cost for test
-    cost = [random.random() for _ in range(40)]
-
-    # solve model
-    optmodel = shortestPathModel(grid=(5, 5))  # init model
-    optmodel = optmodel.copy()
-    optmodel.setObj(cost)  # set objective function
-    sol, obj = optmodel.solve()  # solve
-    # print res
-    print(f"Obj: {obj}")
-    for i, e in enumerate(optmodel.arcs):
-        if sol[i] > 1e-3:
-            print(e)
-
-    # add constraint
-    optmodel = optmodel.addConstr([1] * 40, 30)
-    optmodel.setObj(cost)  # set objective function
-    sol, obj = optmodel.solve()  # solve
-    # print res
-    print(f"Obj: {obj}")
-    for i, e in enumerate(optmodel.arcs):
-        if sol[i] > 1e-3:
-            print(e)
