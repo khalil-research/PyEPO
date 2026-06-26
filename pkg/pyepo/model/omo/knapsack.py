@@ -13,7 +13,7 @@ from pyepo.model.omo.omomodel import optOmoModel
 try:
     from pyomo import environ as pe
 except ImportError:
-    pass
+    pe = None
 
 if TYPE_CHECKING:
     import numpy as np

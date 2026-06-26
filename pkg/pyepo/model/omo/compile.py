@@ -20,7 +20,8 @@ try:
     from pyomo import environ as pe
     from pyomo import opt as po
 except ImportError:
-    pass
+    pe = None
+    po = None
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase

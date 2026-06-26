@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 try:
     from pyomo import environ as pe
 except ImportError:
-    pass
+    pe = None
 
 
 class tspABModel(tspABBase, optOmoModel):
