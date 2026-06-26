@@ -12,12 +12,12 @@ from typing import TYPE_CHECKING
 import torch
 from torch import nn
 
-from pyepo.data.dataset import optDataset
 from pyepo.func._common import require_solution_pool
-from pyepo.func.runtime import Reduction, init_runtime
+from pyepo.func.runtime import Reduction, init_runtime, init_solution_pool
 from pyepo.func.utils import _solve_in_pass
 
 if TYPE_CHECKING:
+    from pyepo.data.dataset import optDataset
     from pyepo.model.opt import optModel
 
 logger = logging.getLogger(__name__)
@@ -59,12 +59,12 @@ class optModule(nn.Module):
         self.reduction = runtime.reduction
         self._branch_rng = runtime.branch_rng
         # framework-specific solution pool
-        self.solpool = None
-        if self.solve_ratio < 1 or require_solpool:  # init solution pool
-            if not isinstance(dataset, optDataset):  # type checking
-                raise TypeError("dataset is not an optDataset")
-            # dedup on dataset.sols' device
-            self.solpool = torch.unique(dataset.sols, dim=0).clone()
+        self.solpool = init_solution_pool(
+            dataset,
+            self.solve_ratio,
+            require_solpool,
+            lambda sols: torch.unique(sols, dim=0).clone(),
+        )
 
     @abstractmethod
     def forward(self, *args: torch.Tensor) -> torch.Tensor:

@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 import jax.numpy as jnp
 
 from pyepo.func._common import require_solution_pool
-from pyepo.func.runtime import init_runtime
+from pyepo.func.runtime import init_runtime, init_solution_pool
 
 logger = logging.getLogger(__name__)
 
@@ -51,13 +51,12 @@ class optModule(ABC):
         self.reduction = runtime.reduction
         self._branch_rng = runtime.branch_rng
         # framework-specific solution pool
-        self.solpool = None
-        if self.solve_ratio < 1 or require_solpool:  # init solution pool
-            from pyepo.data.dataset import optDataset
-
-            if not isinstance(dataset, optDataset):  # type checking
-                raise TypeError("dataset is not an optDataset")
-            self.solpool = jnp.unique(jnp.asarray(dataset.sols), axis=0)
+        self.solpool = init_solution_pool(
+            dataset,
+            self.solve_ratio,
+            require_solpool,
+            lambda sols: jnp.unique(jnp.asarray(sols), axis=0),
+        )
 
     def __call__(self, *args, **kwargs):
         return self.forward(*args, **kwargs)

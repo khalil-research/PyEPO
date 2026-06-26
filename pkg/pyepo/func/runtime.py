@@ -5,7 +5,7 @@ from __future__ import annotations
 import multiprocessing as mp
 import weakref
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Callable, Literal, TypeVar, cast
 
 import numpy as np
 from pathos.multiprocessing import ProcessingPool
@@ -18,7 +18,10 @@ from pyepo.model.opt import optModel
 if TYPE_CHECKING:
     import logging
 
+    from pyepo.data.dataset import optDataset
+
 Reduction = Literal["mean", "sum", "none"]
+T = TypeVar("T")
 
 
 @dataclass(frozen=True)
@@ -67,6 +70,23 @@ def create_solver_pool(
     if owner is not None:
         weakref.finalize(owner, _close_pool, pool)
     return pool
+
+
+def init_solution_pool(
+    dataset: optDataset | None,
+    solve_ratio: float,
+    require_solpool: bool,
+    unique: Callable[[object], T],
+) -> T | None:
+    """Initialize a frontend-specific solution pool from an ``optDataset`` when needed."""
+    if solve_ratio >= 1 and not require_solpool:
+        return None
+
+    from pyepo.data.dataset import optDataset
+
+    if not isinstance(dataset, optDataset):
+        raise TypeError("dataset is not an optDataset")
+    return unique(dataset.sols)
 
 
 def init_runtime(

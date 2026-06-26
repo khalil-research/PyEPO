@@ -23,7 +23,12 @@ import pytest
 import torch
 
 from pyepo import EPO
-from pyepo.func.runtime import create_solver_pool, init_runtime, normalize_processes
+from pyepo.func.runtime import (
+    create_solver_pool,
+    init_runtime,
+    init_solution_pool,
+    normalize_processes,
+)
 from pyepo.func.utils import (
     _cache_in_pass,
     _check_sol,
@@ -360,6 +365,26 @@ class TestSharedRuntime:
                 reduction=reduction,
                 seed=None,
                 logger=MagicMock(),
+            )
+
+    def test_solution_pool_not_initialized_when_unneeded(self):
+        assert (
+            init_solution_pool(
+                None,
+                solve_ratio=1.0,
+                require_solpool=False,
+                unique=lambda x: x,
+            )
+            is None
+        )
+
+    def test_solution_pool_requires_dataset_when_needed(self):
+        with pytest.raises(TypeError, match="optDataset"):
+            init_solution_pool(
+                None,
+                solve_ratio=0.5,
+                require_solpool=False,
+                unique=lambda x: x,
             )
 
 
