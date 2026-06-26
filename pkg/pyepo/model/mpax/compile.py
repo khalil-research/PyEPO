@@ -21,7 +21,8 @@ try:
     import jax
     from jax import numpy as jnp
 except ImportError:
-    pass
+    jax = None
+    jnp = None
 
 from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase

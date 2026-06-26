@@ -10,7 +10,7 @@ import numpy as np
 try:
     import jax.numpy as jnp
 except ImportError:
-    pass
+    jnp = None
 
 from pyepo.model.bases import shortestPathBase
 from pyepo.model.mpax.mpaxmodel import optMpaxModel
