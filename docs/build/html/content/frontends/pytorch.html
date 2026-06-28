@@ -218,7 +218,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/model.html">Optimization Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/data.html">Data and Datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/function.html">Training Methods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_started/training.html">Training Loops</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/evaluation.html">Evaluation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Frontends and Backends</span></p>
@@ -400,8 +399,7 @@
 <p>The PyTorch frontend lives in <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code>. Each training method wraps an <code class="docutils literal notranslate"><span class="pre">optModel</span></code> and can be used with PyTorch optimizers.</p>
 <p>Start with:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../getting_started/function.html"><span class="doc">Training Methods</span></a> for method selection and API details.</p></li>
-<li><p><a class="reference internal" href="../getting_started/training.html"><span class="doc">Training Loops</span></a> for training-loop templates.</p></li>
+<li><p><a class="reference internal" href="../getting_started/function.html"><span class="doc">Training Methods</span></a> for method selection, training-loop templates, and API details.</p></li>
 </ul>
 <section id="basic-pattern">
 <h2>Basic Pattern<a class="headerlink" href="#basic-pattern" title="Link to this heading">¶</a></h2>
@@ -448,7 +446,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">dataset</span></code> seeds the solution pool for contrastive and ranking methods.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">reduction</span></code> controls how per-instance losses are aggregated when the method supports it.</p></li>
 </ul>
-<p>For training examples, use <a class="reference internal" href="../getting_started/training.html"><span class="doc">Training Loops</span></a>.</p>
+<p>For training examples, use the <span class="xref std std-ref">training-loops</span> section.</p>
 </section>
 </section>
 

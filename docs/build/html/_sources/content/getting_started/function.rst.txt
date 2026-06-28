@@ -11,7 +11,7 @@ The modules fall into two interfaces:
 * **Loss-returning modules** produce a scalar loss and feed straight into ``.backward()``.
 * **Solution-returning modules** produce predicted, expected, or regularized solutions; the user defines a task loss on top.
 
-For training-loop templates, see :doc:`training`.
+Each method below is presented with its definition followed by a runnable training loop; all loops build on the shared **Common Setup**.
 
 
 Choosing a Method
@@ -19,8 +19,8 @@ Choosing a Method
 
 The modules differ in what they return, which determines how you use them:
 
-* **Loss-returning** — return a scalar loss, passed directly to ``.backward()``: SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE.
-* **Solution-returning** — return a predicted, expected, or regularized solution, on which you define a task loss: DPO, DBB, NID, RFWO, I-MLE, AI-MLE.
+* **Loss-returning**: return a scalar loss, passed directly to ``.backward()``: SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE.
+* **Solution-returning**: return a predicted, expected, or regularized solution, on which you define a task loss: DPO, DBB, NID, RFWO, I-MLE, AI-MLE.
 
 A combined name like ``DPO+MSE`` or ``NID+L1`` denotes a solution-returning module (DPO, NID) followed by a task loss (here MSE or L1) on its output.
 
@@ -80,6 +80,46 @@ The table below summarizes each module's return type, typical supervision, and n
      - learning-to-rank formulations over feasible solutions
 
 
+Common Setup
+============
+
+All training loops below share the same setup: a linear predictor on knapsack data defined with the DSL. The examples use PyTorch; JAX follows the same method families, see :doc:`../frontends/jax`. For a runnable walkthrough, see the `03 Training and Testing <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_ notebook.
+
+.. code-block:: python
+
+   import pyepo
+   from pyepo import EPO, dsl
+   import torch
+   from torch import nn
+   from torch.utils.data import DataLoader
+
+   # generate data
+   num_data, num_feat, num_item, num_dim = 1000, 5, 10, 3
+   weights, feat, costs = pyepo.data.knapsack.genData(
+       num_data, num_feat, num_item, num_dim, deg=4, noise_width=0.5, seed=135,
+   )
+   capacity = (weights.sum(axis=1) * 0.5).astype(int)
+
+   # define the optimization problem
+   x = dsl.Variable(num_item, vtype=EPO.BINARY)
+   c = dsl.Parameter(num_item)
+   optmodel = dsl.Problem(
+       dsl.Maximize(c @ x),
+       [weights @ x <= capacity],
+   ).compile(backend="gurobi")
+
+   # dataset and data loader
+   dataset = pyepo.data.dataset.optDataset(optmodel, feat, costs)
+   dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+   # prediction model
+   predmodel = nn.Linear(num_feat, num_item)
+   optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
+
+   # for multiplicative perturbed variants
+   positive_predmodel = nn.Sequential(nn.Linear(num_feat, num_item), nn.Softplus())
+
+
 Surrogate Losses
 ================
 
@@ -115,6 +155,20 @@ which is convex in :math:`\hat{\mathbf{c}}` and upper-bounds the regret. By Dans
 
 ``processes`` sets the number of solver processes (``0`` uses all available cores).
 
+Training loop:
+
+.. code-block:: python
+
+   spo = pyepo.func.SPOPlus(optmodel, processes=2)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = spo(cp, c, w, z)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Perturbation Gradient (PG)
 --------------------------
@@ -139,6 +193,20 @@ where :math:`\sigma > 0` is the finite-difference width (the ``sigma`` parameter
     :members:
 
 ``sigma`` controls the finite-difference width. ``two_sides`` enables central differencing.
+
+Training loop:
+
+.. code-block:: python
+
+   pg = pyepo.func.PG(optmodel, sigma=0.1, two_sides=False, processes=2)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = pg(cp, c)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 Perturbed Methods
@@ -176,6 +244,25 @@ with :math:`\odot` the Hadamard product. The exponential factor preserves the si
     :noindex:
     :members:
 
+Training loop (swap ``predmodel`` for ``positive_predmodel`` when using ``DPOMul``):
+
+.. code-block:: python
+
+   dpo = pyepo.func.DPO(optmodel, n_samples=10, sigma=0.5, processes=2)
+   # if using DPOMul, replace predmodel with positive_predmodel below
+   # dpo = pyepo.func.DPOMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+
+   criterion = nn.MSELoss()
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           we = dpo(cp)
+           loss = criterion(we, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Perturbed Fenchel-Young Loss (PFYL)
 -----------------------------------
@@ -208,6 +295,22 @@ The multiplicative variant uses the same sign-preserving perturbation,
     :noindex:
     :members:
 
+Training loop (swap ``predmodel`` for ``positive_predmodel`` when using ``PFYMul``):
+
+.. code-block:: python
+
+   pfy = pyepo.func.PFY(optmodel, n_samples=10, sigma=0.5, processes=2)
+   # if using PFYMul, replace predmodel with positive_predmodel below
+   # pfy = pyepo.func.PFYMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = pfy(cp, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Implicit Maximum Likelihood Estimator (I-MLE)
 ---------------------------------------------
@@ -226,6 +329,22 @@ where :math:`\sigma` smooths the solution map and :math:`\lambda` (``lambd``) is
     :noindex:
     :members:
 
+Training loop:
+
+.. code-block:: python
+
+   imle = pyepo.func.IMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=2)
+   criterion = nn.L1Loss()
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           we = imle(cp)
+           loss = criterion(we, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)
 -------------------------------------------------------
@@ -243,6 +362,22 @@ where :math:`\mathbf{d}` is the upstream task gradient and :math:`\alpha_t > 0` 
 .. autoclass:: pyepo.func.AIMLE
     :noindex:
     :members:
+
+Training loop:
+
+.. code-block:: python
+
+   aimle = pyepo.func.AIMLE(optmodel, n_samples=2, sigma=1.0, processes=2)
+   criterion = nn.L1Loss()
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           we = aimle(cp)
+           loss = criterion(we, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 Regularized Methods
@@ -271,6 +406,22 @@ RFWO [#f6]_ exposes :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})` directly 
 .. autoclass:: pyepo.func.RFWO
     :noindex:
     :members:
+
+Training loop:
+
+.. code-block:: python
+
+   rfwo = pyepo.func.RFWO(optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
+   criterion = nn.MSELoss()
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           wr = rfwo(cp)
+           loss = criterion(wr, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)
@@ -308,11 +459,25 @@ a "compare regularizers + linear residual" form. The gradient remains :math:`\ma
     :noindex:
     :members:
 
+Training loop:
+
+.. code-block:: python
+
+   rfyl = pyepo.func.RFY(optmodel, lambd=1.0, max_iter=20, tol=1e-6, processes=2)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = rfyl(cp, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Black-Box Methods
 =================
 
-Black-box methods replace the zero gradient of the discrete solver with a surrogate backward rule.
+Black-box methods replace the zero gradient of the discrete solver with a surrogate backward rule. The training loops below define an objective-value loss on the returned solution.
 
 
 Differentiable Black-Box Optimizer (DBB)
@@ -332,6 +497,23 @@ Larger :math:`\lambda` smooths more aggressively. Unlike SPO+, the resulting sur
     :noindex:
     :members:
 
+Training loop:
+
+.. code-block:: python
+
+   dbb = pyepo.func.DBB(optmodel, lambd=10, processes=2)
+   criterion = nn.L1Loss()
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           wp = dbb(cp)
+           zp = (wp * c).sum(1).view(-1, 1)
+           loss = criterion(zp, z)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Negative Identity Backpropagation (NID)
 ---------------------------------------
@@ -349,6 +531,23 @@ For minimization, this rule decreases :math:`\hat{\mathbf{c}}` along directions 
 .. autoclass:: pyepo.func.NID
     :noindex:
     :members:
+
+Training loop:
+
+.. code-block:: python
+
+   nid = pyepo.func.NID(optmodel, processes=2)
+   criterion = nn.L1Loss()
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           wp = nid(cp)
+           zp = (wp * c).sum(1).view(-1, 1)
+           loss = criterion(zp, z)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 Cone-Aligned Estimation
@@ -387,6 +586,30 @@ Training data comes from ``pyepo.data.dataset.optDatasetConstrs``, which extract
 .. autoclass:: pyepo.func.CaVE
     :noindex:
     :members:
+
+Training loop (the batch carries ``tight_ctrs`` in addition to ``(x, c, w, z)``):
+
+.. code-block:: python
+
+   from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
+
+   dataset = optDatasetConstrs(optmodel, feat, costs)
+   dataloader = DataLoader(
+       dataset,
+       batch_size=32,
+       shuffle=True,
+       collate_fn=collate_tight_constraints,
+   )
+
+   cave = pyepo.func.CaVE(optmodel, processes=2)
+
+   for epoch in range(20):
+       for x, c, w, z, tight_ctrs in dataloader:
+           cp = predmodel(x)
+           loss = cave(cp, tight_ctrs)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 If you use the **CaVE** loss, please cite:
 
@@ -431,6 +654,20 @@ For a fixed :math:`\Gamma`, this update direction stays constant per instance. `
     :noindex:
     :members:
 
+Training loop:
+
+.. code-block:: python
+
+   nce = pyepo.func.NCE(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = nce(cp, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Contrastive MAP (CMAP)
 ----------------------
@@ -449,6 +686,20 @@ If :math:`\mathbf{w}^*(\mathbf{c}) \in \Gamma`, that entry contributes a zero ma
     :noindex:
     :members:
 
+Training loop:
+
+.. code-block:: python
+
+   cmap = pyepo.func.CMAP(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = cmap(cp, w)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Learning to Rank
 ================
@@ -457,7 +708,7 @@ Learning to rank [#f8]_ treats predict-then-optimize training as ranking a pool 
 
 * **Pointwise** regresses each predicted score :math:`\hat{\mathbf{c}}^\top \mathbf{w}` toward the true value :math:`\mathbf{c}^\top \mathbf{w}` for every :math:`\mathbf{w} \in \Gamma`.
 * **Pairwise** enforces a margin between the optimal solution and each suboptimal one.
-* **Listwise** models the full ranking distribution with a SoftMax over the negative predicted costs (for a minimization problem, so the lowest-cost solution gets the highest probability),
+* **Listwise** models the entire ranking distribution with a SoftMax over the negative predicted costs (for a minimization problem, so the lowest-cost solution gets the highest probability),
 
   .. math::
 
@@ -485,6 +736,20 @@ Pointwise loss computes ranking scores for individual solutions.
     :noindex:
     :members:
 
+Training loop:
+
+.. code-block:: python
+
+   ltr = pyepo.func.ptLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = ltr(cp, c)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Pairwise LTR
 ------------
@@ -495,6 +760,20 @@ Pairwise loss learns the relative ordering between pairs of solutions.
     :noindex:
     :members:
 
+Training loop:
+
+.. code-block:: python
+
+   ltr = pyepo.func.prLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = ltr(cp, c)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
 
 Listwise LTR
 ------------
@@ -504,6 +783,20 @@ Listwise loss evaluates scores over the entire ranked list.
 .. autoclass:: pyepo.func.lsLTR
     :noindex:
     :members:
+
+Training loop:
+
+.. code-block:: python
+
+   ltr = pyepo.func.lsLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+
+   for epoch in range(20):
+       for x, c, w, z in dataloader:
+           cp = predmodel(x)
+           loss = ltr(cp, c)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
 Parallel Computation

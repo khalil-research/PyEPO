@@ -9,7 +9,7 @@ Getting Started
 
 * `01 Optimization Model <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_: build an ``optModel`` from a GurobiPy / COPT / Pyomo / OR-Tools / MPAX backend. Pairs with :doc:`getting_started/model`.
 * `02 Optimization Dataset <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb>`_: generate synthetic data and wrap it in ``optDataset``. Pairs with :doc:`getting_started/data`.
-* `03 Training and Testing <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_: train method families on a shortest-path dataset. Pairs with :doc:`getting_started/training` and :doc:`getting_started/evaluation`.
+* `03 Training and Testing <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_: train method families on a shortest-path dataset. Pairs with :doc:`getting_started/function` and :doc:`getting_started/evaluation`.
 
 
 Method Deep Dives
