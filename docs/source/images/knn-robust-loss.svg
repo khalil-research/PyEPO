@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="260" viewBox="0 0 880 260" role="img" aria-labelledby="title desc">
+  <title id="title">kNN robust loss label aggregation</title>
+  <desc id="desc">A feature vector selects nearest neighbors, neighbor costs are solved, neighbor solutions are aggregated, and the aggregate label is used by the training loss.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569" />
+    </marker>
+    <style>
+      .box { fill: #f8fafc; stroke: #334155; stroke-width: 1.6; rx: 12; }
+      .accent { fill: #eef2ff; stroke: #4f46e5; stroke-width: 1.8; rx: 12; }
+      .label { font: 16px sans-serif; fill: #0f172a; }
+      .small { font: 13px sans-serif; fill: #475569; }
+      .arrow { stroke: #475569; stroke-width: 1.8; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="26" y="74" width="140" height="86" class="accent" />
+  <text x="96" y="108" text-anchor="middle" class="label">feature</text>
+  <text x="96" y="132" text-anchor="middle" class="label">x_i</text>
+
+  <line x1="166" y1="117" x2="236" y2="117" class="arrow" />
+
+  <rect x="244" y="42" width="168" height="150" class="box" />
+  <text x="328" y="74" text-anchor="middle" class="label">k nearest</text>
+  <text x="328" y="98" text-anchor="middle" class="label">neighbors</text>
+  <circle cx="292" cy="135" r="12" fill="#dbeafe" stroke="#2563eb" />
+  <circle cx="328" cy="135" r="12" fill="#dbeafe" stroke="#2563eb" />
+  <circle cx="364" cy="135" r="12" fill="#dbeafe" stroke="#2563eb" />
+  <text x="328" y="170" text-anchor="middle" class="small">nearby feature vectors</text>
+
+  <line x1="412" y1="117" x2="482" y2="117" class="arrow" />
+
+  <rect x="490" y="62" width="150" height="110" class="box" />
+  <text x="565" y="96" text-anchor="middle" class="label">solve</text>
+  <text x="565" y="120" text-anchor="middle" class="label">neighbor costs</text>
+  <text x="565" y="150" text-anchor="middle" class="small">w_j, z_j</text>
+
+  <line x1="640" y1="117" x2="710" y2="117" class="arrow" />
+
+  <rect x="718" y="62" width="136" height="110" class="accent" />
+  <text x="786" y="96" text-anchor="middle" class="label">aggregate</text>
+  <text x="786" y="120" text-anchor="middle" class="label">labels</text>
+  <text x="786" y="150" text-anchor="middle" class="small">mean solution/objective</text>
+</svg>

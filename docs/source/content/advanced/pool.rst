@@ -1,7 +1,12 @@
 Solution Pool
 +++++++++++++
 
-End-to-end predict-then-optimize training involves repeated solving of optimization problems. A solution pool [#f1]_ serves as an inner approximation of the feasible region, reducing computation by reusing previously computed solutions. Instead of solving the full linear/integer program, PyEPO selects the lowest-objective cached solution from the pool.
+End-to-end predict-then-optimize training involves repeated solving of
+optimization problems. A solution pool [#f1]_ stores previously computed
+solutions and uses them as an inner approximation of the feasible region.
+
+When the pool is used, PyEPO selects the lowest-objective cached solution
+instead of solving the original linear/integer program.
 
 The algorithm is shown below.
 
@@ -30,11 +35,17 @@ The algorithm is shown below.
    14: & \textbf{end for} \\
    \end{array}
 
-In the algorithm, :math:`\omega` are the predictor weights, :math:`m(\omega, x) = \hat{c}` the predicted cost, :math:`t(\cdot)` an optional cost transform, :math:`v^*(c)` the optimum for cost :math:`c`, :math:`S` the solution pool, :math:`f(v, \tilde{c}) = \tilde{c}^\top v` the objective value, Eq. (1) the optimization problem :math:`\min_{v} \tilde{c}^\top v` over :math:`\{v : A v \le b\}`, and :math:`p_{\text{solve}}` the ``solve_ratio``.
+In the algorithm, :math:`\omega` are the predictor weights,
+:math:`m(\omega, x) = \hat{c}` is the predicted cost, :math:`t(\cdot)` is an
+optional cost transform, :math:`v^*(c)` is the optimum for cost :math:`c`, and
+:math:`S` is the solution pool. The probability :math:`p_{\text{solve}}`
+corresponds to ``solve_ratio``.
 
 The solution pool is integrated into all ``pyepo.func`` modules.
 
-``solve_ratio`` controls the fraction of instances solved exactly during training. The default is 1.0 (no caching). When ``solve_ratio`` is less than 1, pass ``dataset`` to seed the pool with initial solutions.
+``solve_ratio`` controls the fraction of instances solved exactly during
+training. The default is 1.0 (no caching). When ``solve_ratio`` is less than 1,
+pass ``dataset`` to seed the pool with initial solutions.
 
 Example with SPO+ (other functions work the same way):
 
