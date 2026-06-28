@@ -17,37 +17,14 @@ For training-loop templates, see :doc:`training`.
 Choosing a Method
 =================
 
-**Method selection**
+The modules differ in what they return, which determines how you use them:
 
-* When :math:`\mathbf{w}^*` labels are available, start with **SPO+**.
-* When the loss-returning style is preferred and labels include :math:`\mathbf{w}^*`, **PFYL** returns a scalar loss directly.
-* For **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), use **CaVE** with ``optDatasetConstrs``.
-* For LPs on GPU, use an **MPAX** model with **SPO+** or **PFYL**.
+* **Loss-returning** — return a scalar loss, passed directly to ``.backward()``: SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE.
+* **Solution-returning** — return a predicted, expected, or regularized solution, on which you define a task loss: DPO, DBB, NID, RFWO, I-MLE, AI-MLE.
 
-For finer choices, the right method depends on three questions.
+A combined name like ``DPO+MSE`` or ``NID+L1`` denotes a solution-returning module (DPO, NID) followed by a task loss (here MSE or L1) on its output.
 
-**1. What supervision do you have at training time?**
-
-* **True optimal solutions** :math:`\mathbf{w}^*`: SPO+, PFYL, RFYL, DPO+MSE, RFWO+MSE, I-MLE+L1, AI-MLE+L1; NCE and CMAP also need a solution pool
-* **Just true costs** :math:`\mathbf{c}`: PG, LTR variants
-* **True optimal objective values** :math:`z^*`: DBB+L1, NID+L1 (objective-value loss)
-* **Binding constraints at the optimum**: CaVE (binary linear programs, Gurobi backend only)
-
-A combined name like ``DPO+MSE`` or ``NID+L1`` means a solution-returning module (DPO, NID) followed by a task loss (here MSE or L1) that you add on its output.
-
-**2. Should the module return a loss or a solution?**
-
-* **A loss** (use directly in ``.backward()``): SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE
-* **A solution** (define your own task loss): DPO, DBB, NID, RFWO, I-MLE, AI-MLE
-
-**3. Any special constraints?**
-
-* **Sign-sensitive oracle** (e.g., negative costs must stay negative): use ``DPOMul`` or ``PFYMul`` with a positive-output predictor.
-* **Large LP on GPU**: pair an ``optMpaxModel`` with SPO+ or PFYL.
-* **Cached negative pool**: NCE / CMAP.
-* **Ranking interpretation**: LTR variants.
-
-The table below summarizes inputs and return types.
+The table below summarizes each module's return type, typical supervision, and notes.
 
 .. list-table::
    :header-rows: 1

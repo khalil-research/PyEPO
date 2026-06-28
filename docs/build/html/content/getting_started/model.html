@@ -505,7 +505,7 @@
 <span class="n">x</span> <span class="o">@</span> <span class="n">Q</span> <span class="o">@</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">gamma</span>                             <span class="c1"># quadratic (Gurobi and COPT)</span>
 </pre></div>
 </div>
-<p>A 2-D objective uses <code class="docutils literal notranslate"><span class="pre">dsl.sum(c</span> <span class="pre">*</span> <span class="pre">x)</span></code> (<code class="docutils literal notranslate"><span class="pre">c</span> <span class="pre">&#64;</span> <span class="pre">x</span></code> is a 1-D inner product, so it does not apply). For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level <code class="docutils literal notranslate"><span class="pre">optModel</span></code> interface for cases it cannot express.</p>
+<p>For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level <code class="docutils literal notranslate"><span class="pre">optModel</span></code> interface for cases it cannot express.</p>
 </section>
 </section>
 <section id="the-optmodel-interface">

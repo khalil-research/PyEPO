@@ -409,35 +409,13 @@
 </section>
 <section id="choosing-a-method">
 <h2>Choosing a Method<a class="headerlink" href="#choosing-a-method" title="Link to this heading">¶</a></h2>
-<p><strong>Method selection</strong></p>
+<p>The modules differ in what they return, which determines how you use them:</p>
 <ul class="simple">
-<li><p>When <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span> labels are available, start with <strong>SPO+</strong>.</p></li>
-<li><p>When the loss-returning style is preferred and labels include <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span>, <strong>PFYL</strong> returns a scalar loss directly.</p></li>
-<li><p>For <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges), use <strong>CaVE</strong> with <code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code>.</p></li>
-<li><p>For LPs on GPU, use an <strong>MPAX</strong> model with <strong>SPO+</strong> or <strong>PFYL</strong>.</p></li>
+<li><p><strong>Loss-returning</strong> — return a scalar loss, passed directly to <code class="docutils literal notranslate"><span class="pre">.backward()</span></code>: SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE.</p></li>
+<li><p><strong>Solution-returning</strong> — return a predicted, expected, or regularized solution, on which you define a task loss: DPO, DBB, NID, RFWO, I-MLE, AI-MLE.</p></li>
 </ul>
-<p>For finer choices, the right method depends on three questions.</p>
-<p><strong>1. What supervision do you have at training time?</strong></p>
-<ul class="simple">
-<li><p><strong>True optimal solutions</strong> <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span>: SPO+, PFYL, RFYL, DPO+MSE, RFWO+MSE, I-MLE+L1, AI-MLE+L1; NCE and CMAP also need a solution pool</p></li>
-<li><p><strong>Just true costs</strong> <span class="math notranslate nohighlight">\(\mathbf{c}\)</span>: PG, LTR variants</p></li>
-<li><p><strong>True optimal objective values</strong> <span class="math notranslate nohighlight">\(z^*\)</span>: DBB+L1, NID+L1 (objective-value loss)</p></li>
-<li><p><strong>Binding constraints at the optimum</strong>: CaVE (binary linear programs, Gurobi backend only)</p></li>
-</ul>
-<p>A combined name like <code class="docutils literal notranslate"><span class="pre">DPO+MSE</span></code> or <code class="docutils literal notranslate"><span class="pre">NID+L1</span></code> means a solution-returning module (DPO, NID) followed by a task loss (here MSE or L1) that you add on its output.</p>
-<p><strong>2. Should the module return a loss or a solution?</strong></p>
-<ul class="simple">
-<li><p><strong>A loss</strong> (use directly in <code class="docutils literal notranslate"><span class="pre">.backward()</span></code>): SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE</p></li>
-<li><p><strong>A solution</strong> (define your own task loss): DPO, DBB, NID, RFWO, I-MLE, AI-MLE</p></li>
-</ul>
-<p><strong>3. Any special constraints?</strong></p>
-<ul class="simple">
-<li><p><strong>Sign-sensitive oracle</strong> (e.g., negative costs must stay negative): use <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code> or <code class="docutils literal notranslate"><span class="pre">PFYMul</span></code> with a positive-output predictor.</p></li>
-<li><p><strong>Large LP on GPU</strong>: pair an <code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code> with SPO+ or PFYL.</p></li>
-<li><p><strong>Cached negative pool</strong>: NCE / CMAP.</p></li>
-<li><p><strong>Ranking interpretation</strong>: LTR variants.</p></li>
-</ul>
-<p>The table below summarizes inputs and return types.</p>
+<p>A combined name like <code class="docutils literal notranslate"><span class="pre">DPO+MSE</span></code> or <code class="docutils literal notranslate"><span class="pre">NID+L1</span></code> denotes a solution-returning module (DPO, NID) followed by a task loss (here MSE or L1) on its output.</p>
+<p>The table below summarizes each module’s return type, typical supervision, and notes.</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>

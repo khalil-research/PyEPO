@@ -15,6 +15,6 @@ Core Steps
   #. :doc:`training` - training loop templates
   #. :doc:`evaluation` - decision-quality metrics
 
-* **Want to pick a method**: jump to the *Choosing a Method* section of :doc:`function`. It asks what supervision you have, whether you want a loss or a solution, and whether your problem has special constraints.
+* **Want to pick a method**: the *Choosing a Method* section of :doc:`function` groups the methods by whether they return a loss or a solution, with a summary table of return types and inputs.
 * **Training in JAX/Flax**: :doc:`../frontends/jax` follows the PyTorch loss API for ``jax.grad``-based training. MPAX runs natively; non-JAX backends run through ``jax.pure_callback``.
 * **Notebooks**: runnable Colab examples are listed in :doc:`../notebooks`.
