@@ -63,4 +63,4 @@ Common constructor options:
 * ``dataset`` seeds the solution pool for contrastive and ranking methods.
 * ``reduction`` controls how per-instance losses are aggregated when the method supports it.
 
-For training examples, use the :ref:`training-loops` section.
+For training examples, see :doc:`../getting_started/function`.
