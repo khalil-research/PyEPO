@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Model" href="examples/model.html"><link rel="prev" title="Installation" href="install.html">
 
     <link rel="shortcut icon" href="../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Tutorial - PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
+        <title>Tutorial - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -391,7 +391,7 @@
 </ol>
 </li>
 <li><p><strong>Want to pick a method</strong>: jump to the <em>Choosing a Method</em> section of <a class="reference internal" href="examples/function.html"><span class="doc">Autograd Functions</span></a>. It poses three questions (what supervision you have, whether you want a loss or a solution, special constraints) and points you at the right module.</p></li>
-<li><p><strong>Training in JAX/Flax</strong>: <a class="reference internal" href="examples/jax.html"><span class="doc">JAX Frontend</span></a> mirrors every loss for <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code>-based end-to-end training, on MPAX (GPU-native) or any solver via <code class="docutils literal notranslate"><span class="pre">jax.pure_callback</span></code>.</p></li>
+<li><p><strong>Training in JAX/Flax</strong>: <a class="reference internal" href="examples/jax.html"><span class="doc">JAX Frontend</span></a> mirrors every loss for <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code>-based end-to-end training. MPAX runs natively; non-JAX backends run through <code class="docutils literal notranslate"><span class="pre">jax.pure_callback</span></code>.</p></li>
 <li><p><strong>Prefer hands-on</strong>: jump to the <em>Notebooks</em> section below for runnable Colab examples grouped by purpose.</p></li>
 </ul>
 </section>
@@ -417,7 +417,7 @@
 <h3>GPU Acceleration<a class="headerlink" href="#gpu-acceleration" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb">09 Solving on MPAX with PDHG</a>: batch-solve LPs on GPU via MPAX, end-to-end without CPU round-trips. See the MPAX backend (<code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code>) in the <em>Solver Backend Subclass</em> section of <a class="reference internal" href="examples/model.html"><span class="doc">Model</span></a>.</p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb">10 JAX Frontend</a>: train any loss in JAX/Flax with <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code> — on MPAX (GPU-native, jittable) or any solver via <code class="docutils literal notranslate"><span class="pre">jax.pure_callback</span></code>. Pairs with <a class="reference internal" href="examples/jax.html"><span class="doc">JAX Frontend</span></a>.</p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb">10 JAX Frontend</a>: train PyEPO losses in JAX/Flax with <code class="docutils literal notranslate"><span class="pre">jax.grad</span></code>. MPAX is GPU-native and jittable; non-JAX backends run through <code class="docutils literal notranslate"><span class="pre">jax.pure_callback</span></code>. Pairs with <a class="reference internal" href="examples/jax.html"><span class="doc">JAX Frontend</span></a>.</p></li>
 </ul>
 </section>
 <section id="applied-examples">

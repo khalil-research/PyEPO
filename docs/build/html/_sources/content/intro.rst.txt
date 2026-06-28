@@ -4,7 +4,7 @@
 Introduction
 ++++++++++++
 
-``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python library for modeling and solving predict-then-optimize problems with linear objective functions.
+``PyEPO`` is a Python library for predict-then-optimize. It focuses on problems where a model predicts objective coefficients and the feasible region is fixed, then trains the predictor against downstream decision quality rather than prediction error alone.
 
 End-to-End Predict-then-Optimize Framework
 ------------------------------------------
@@ -19,7 +19,7 @@ New to predict-then-optimize? The :doc:`tutorial` opens with a *Where to Start* 
 Solvers and Methods
 -------------------
 
-``PyEPO`` builds optimization models with `GurobiPy <https://www.gurobi.com/>`_, `COPT <https://shanshu.ai/copt>`_, `Pyomo <http://www.pyomo.org/>`_, `Google OR-Tools <https://developers.google.com/optimization>`_, `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, or any custom solver or algorithm, and embeds them into neural networks for end-to-end training. All decision-focused learning methods are implemented as `PyTorch <https://pytorch.org/>`_ autograd modules, grouped into the following families:
+``PyEPO`` builds optimization models with `GurobiPy <https://www.gurobi.com/>`_, `COPT <https://shanshu.ai/copt>`_, `Pyomo <http://www.pyomo.org/>`_, `Google OR-Tools <https://developers.google.com/optimization>`_, and `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, and exposes them through PyTorch and JAX training frontends. Training methods are grouped into the following families:
 
 * **Surrogate losses**: smart predict-then-optimize+ (SPO+), perturbation gradient (PG)
 * **Perturbed methods**: differentiable perturbed optimizer (DPO), perturbed Fenchel-Young loss (PFYL), implicit maximum likelihood estimator (I-MLE), adaptive implicit maximum likelihood estimator (AI-MLE)
@@ -36,7 +36,7 @@ Highlights
 
 For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges), ``PyEPO`` ships **CaVE**, a cone-alignment loss that projects the predicted cost onto the cone of binding-constraint normals at the true optimum. Backed by an interior-point QP solver (Clarabel) with a low iteration cap, CaVE delivers paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.
 
-``PyEPO`` also integrates `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, a JAX-based solver that runs the first-order PDHG (Primal-Dual Hybrid Gradient) method on GPU. Because both the prediction network and the solver stay on the GPU, MPAX solves a whole mini-batch of instances at once and avoids the GPU-to-CPU transfer that CPU solvers like Gurobi pay at every step.
+``PyEPO`` also integrates `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, a JAX-based solver that runs the first-order PDHG (Primal-Dual Hybrid Gradient) method on GPU. With MPAX, the prediction network and solver stay on the GPU, so a whole mini-batch can be solved without the GPU-to-CPU transfer used by CPU solvers such as Gurobi.
 
 Publication
 -----------

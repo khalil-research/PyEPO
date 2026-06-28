@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Installation" href="install.html"><link rel="prev" title="Welcome to PyEPO’s documentation!" href="../index.html">
 
     <link rel="shortcut icon" href="../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Introduction - PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
+        <title>Introduction - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -377,7 +377,7 @@
 </a>
 <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python library for modeling and solving predict-then-optimize problems with linear objective functions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> is a Python library for predict-then-optimize. It focuses on problems where a model predicts objective coefficients and the feasible region is fixed, then trains the predictor against downstream decision quality rather than prediction error alone.</p>
 <section id="end-to-end-predict-then-optimize-framework">
 <h2>End-to-End Predict-then-Optimize Framework<a class="headerlink" href="#end-to-end-predict-then-optimize-framework" title="Link to this heading">¶</a></h2>
 <p>Given a labeled dataset <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> of feature-cost pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{c})\)</span> or feature-solution pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{w})\)</span>, a neural network is trained to directly minimize the decision error, rather than the prediction error of cost coefficients.</p>
@@ -387,7 +387,7 @@
 </section>
 <section id="solvers-and-methods">
 <h2>Solvers and Methods<a class="headerlink" href="#solvers-and-methods" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> builds optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, or any custom solver or algorithm, and embeds them into neural networks for end-to-end training. All decision-focused learning methods are implemented as <a class="reference external" href="https://pytorch.org/">PyTorch</a> autograd modules, grouped into the following families:</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> builds optimization models with <a class="reference external" href="https://www.gurobi.com/">GurobiPy</a>, <a class="reference external" href="https://shanshu.ai/copt">COPT</a>, <a class="reference external" href="http://www.pyomo.org/">Pyomo</a>, <a class="reference external" href="https://developers.google.com/optimization">Google OR-Tools</a>, and <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, and exposes them through PyTorch and JAX training frontends. Training methods are grouped into the following families:</p>
 <ul class="simple">
 <li><p><strong>Surrogate losses</strong>: smart predict-then-optimize+ (SPO+), perturbation gradient (PG)</p></li>
 <li><p><strong>Perturbed methods</strong>: differentiable perturbed optimizer (DPO), perturbed Fenchel-Young loss (PFYL), implicit maximum likelihood estimator (I-MLE), adaptive implicit maximum likelihood estimator (AI-MLE)</p></li>
@@ -402,7 +402,7 @@
 <section id="highlights">
 <h2>Highlights<a class="headerlink" href="#highlights" title="Link to this heading">¶</a></h2>
 <p>For end-to-end learning on <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges), <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> ships <strong>CaVE</strong>, a cone-alignment loss that projects the predicted cost onto the cone of binding-constraint normals at the true optimum. Backed by an interior-point QP solver (Clarabel) with a low iteration cap, CaVE delivers paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.</p>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> also integrates <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, a JAX-based solver that runs the first-order PDHG (Primal-Dual Hybrid Gradient) method on GPU. Because both the prediction network and the solver stay on the GPU, MPAX solves a whole mini-batch of instances at once and avoids the GPU-to-CPU transfer that CPU solvers like Gurobi pay at every step.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> also integrates <a class="reference external" href="https://github.com/MIT-Lu-Lab/MPAX">MPAX</a>, a JAX-based solver that runs the first-order PDHG (Primal-Dual Hybrid Gradient) method on GPU. With MPAX, the prediction network and solver stay on the GPU, so a whole mini-batch can be solved without the GPU-to-CPU transfer used by CPU solvers such as Gurobi.</p>
 </section>
 <section id="publication">
 <h2>Publication<a class="headerlink" href="#publication" title="Link to this heading">¶</a></h2>

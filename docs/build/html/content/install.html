@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Tutorial" href="tutorial.html"><link rel="prev" title="Introduction" href="intro.html">
 
     <link rel="shortcut icon" href="../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Installation - PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
+        <title>Installation - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -377,25 +377,25 @@
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
 <section id="install-from-source">
 <h2>Install from Source<a class="headerlink" href="#install-from-source" title="Link to this heading">¶</a></h2>
-<p>You can download <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> from our <a class="reference external" href="https://github.com/khalil-research/PyEPO">GitHub repository</a>.</p>
+<p>Clone <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> from GitHub.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git</span>
 </pre></div>
 </div>
-<p>Then install it.</p>
+<p>Install the package from the local checkout.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install PyEPO/pkg/.</span>
 </pre></div>
 </div>
 </section>
 <section id="pip-install">
 <h2>Pip Install<a class="headerlink" href="#pip-install" title="Link to this heading">¶</a></h2>
-<p>The package is now available on <a class="reference external" href="https://pypi.org/project/pyepo">PyPI</a> for installation. You can easily install <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> using pip by running the following command:</p>
+<p>Install the <a class="reference external" href="https://pypi.org/project/pyepo">PyPI</a> release with:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install pyepo</span>
 </pre></div>
 </div>
 </section>
 <section id="conda-install">
 <h2>Conda Install<a class="headerlink" href="#conda-install" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> is also available on <a class="reference external" href="https://anaconda.org/pyepo/pyepo">Anaconda Cloud</a>. If you prefer to use conda for installation, you can install <code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> with the following command:</p>
+<p>Install the <a class="reference external" href="https://anaconda.org/pyepo/pyepo">Anaconda Cloud</a> package with:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">conda install -c pyepo pyepo</span>
 </pre></div>
 </div>
@@ -411,7 +411,7 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>A bare <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyepo</span></code> does not pull in any solver. Building a model with the default Gurobi backend then requires a Gurobi license; for a license-free setup, use the Pyomo or OR-Tools backend.</p>
+<p>A bare <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyepo</span></code> does not install a solver backend. Building a model with the default Gurobi backend then requires a Gurobi license; for a license-free setup, use the Pyomo or OR-Tools backend.</p>
 </div>
 </section>
 </section>

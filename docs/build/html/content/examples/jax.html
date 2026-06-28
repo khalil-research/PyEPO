@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Training" href="training.html"><link rel="prev" title="Autograd Functions" href="function.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>JAX Frontend - PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
+        <title>JAX Frontend - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -178,7 +178,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -199,7 +199,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PyTorch-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -390,7 +390,7 @@ hand-derived gradient rule, so the solver never has to be differentiable. See
 behave identically.</p>
 <section id="solver-backends">
 <h2>Solver Backends<a class="headerlink" href="#solver-backends" title="Link to this heading">¶</a></h2>
-<p>The frontend works with <strong>any</strong> PyEPO solver backend:</p>
+<p>The frontend works with PyEPO solver backends:</p>
 <ul class="simple">
 <li><p><strong>MPAX</strong> is solved natively — the PDHG solve is JAX-traceable, so the whole
 training step is <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>-able and GPU-native, with no CPU round-trip.</p></li>
@@ -412,7 +412,7 @@ loss, using a Flax linear layer and an optax optimizer:</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.func.jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">SPOPlus</span>
 
-<span class="c1"># optimization model: 5x5 grid shortest path (any PyEPO solver works)</span>
+<span class="c1"># optimization model: 5x5 grid shortest path</span>
 <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
 
@@ -445,7 +445,7 @@ it; on the MPAX backend it runs GPU-native.</p>
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyepo[mpax]</span></code> — the loss frontend and the MPAX fast path.</p></li>
-<li><p>The any-solver callback path needs only a JAX install.</p></li>
+<li><p>The callback path for non-JAX backends needs only a JAX install.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyepo[jaxdev]</span></code> — the Flax and optax dependencies for the
 example above.</p></li>
 </ul>
