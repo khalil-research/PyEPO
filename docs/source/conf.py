@@ -16,7 +16,7 @@ except PackageNotFoundError:
     release = "0.0.0+unknown"
 version = ".".join(release.split(".")[:2])
 
-# optional solver backends — mock so autoapi doesn't choke when they're absent
+# optional solver backends; mock so autoapi doesn't choke when they're absent
 autodoc_mock_imports = [
     "coptpy",
     "mpax",
