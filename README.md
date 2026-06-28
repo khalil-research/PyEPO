@@ -53,35 +53,35 @@ If you use the **CaVE** loss, please also cite:
 
 ## Introduction
 
-``PyEPO`` is a Python library for predict-then-optimize. It focuses on problems where a model predicts objective coefficients and the feasible region is fixed, then trains the predictor against downstream decision quality rather than prediction error alone.
+`PyEPO` is a Python library for predict-then-optimize. It focuses on problems where a model predicts objective coefficients and the feasible region is fixed, then trains the predictor against downstream decision quality rather than prediction error alone.
 
-``PyEPO`` models optimization problems with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), or [MPAX](https://github.com/MIT-Lu-Lab/MPAX), and exposes the optimization layer through PyTorch and JAX training frontends. The symbolic `pyepo.dsl` frontend can define LPs, MIPs, and supported fixed-quadratic objective terms, then compile the same model to a PyEPO backend.
+`PyEPO` models optimization problems with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), or [MPAX](https://github.com/MIT-Lu-Lab/MPAX), and exposes the optimization layer through PyTorch and JAX training frontends. The symbolic `pyepo.dsl` frontend can define LPs, MIPs, and supported fixed-quadratic objective terms, then compile the same model to a PyEPO backend.
 
-For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, ...), ``PyEPO`` ships **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12). CaVE replaces the per-step ILP solve with a cone-alignment projection onto the binding-constraint normals at the true optimum; backed by an interior-point QP solver (Clarabel) with a low iteration cap, this delivers paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.
+For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, ...), `PyEPO` includes **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12), a cone-alignment loss that uses binding-constraint normals at the true optimum. CaVE requires `optDatasetConstrs` and a Gurobi-backed `optModel` for extracting binding constraints. In the CVRP-20 setup from notebook 04 (`num_data=1000`, 10 epochs, single process), CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with `solve_ratio=0.3` trains 10.5x faster with higher final regret.
 
-``PyEPO`` also integrates [MPAX](https://github.com/MIT-Lu-Lab/MPAX), a JAX solver that runs the first-order PDHG method on GPU. With MPAX, the prediction network and solver stay on the GPU, so a whole mini-batch can be solved without the GPU-to-CPU transfer used by CPU solvers such as Gurobi.
+`PyEPO` also integrates [MPAX](https://github.com/MIT-Lu-Lab/MPAX), a JAX-based solver for GPU batch solving of linear and quadratic programs.
 
 
 ## Documentation
 
-The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
+The official `PyEPO` docs can be found at [https://khalil-research.github.io/PyEPO](https://khalil-research.github.io/PyEPO).
 
 ## Slides
 
 A PyEPO tutorial was presented at the ACC 2024 conference. The talk slides are available [here](https://github.com/khalil-research/PyEPO/blob/main/slides/PyEPO.pdf).
 
-## Tutorial
+## Notebooks
 
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb) **01 Optimization Model:** Build an optimization solver
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb) **02 Optimization Dataset:** Generate synthetic data and use optDataset
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb) **03 Training and Testing:** Train and test different approaches
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb) **04 CaVE for Binary Linear Programs:** Train with the cone-aligned CaVE loss vs SPO+ on TSP
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb) **03 Training and Testing:** Train method families on a shortest-path dataset
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb) **04 CaVE for Binary Linear Programs:** Train with the cone-aligned CaVE loss on TSP
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%202D%20Knapsack%20Solution%20Visualization.ipynb) **05 2D Knapsack Solution Visualization:** Visualize solutions for the knapsack problem
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Warcraft%20Shortest%20Path.ipynb) **06 Warcraft Shortest Path:** Train shortest path models on the Warcraft terrains dataset
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20Real-World%20Energy%20Scheduling.ipynb) **07 Real-World Energy Scheduling:** Apply PyEPO to real energy data
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20Real-World%20Energy%20Scheduling.ipynb) **07 Real-World Energy Scheduling:** Apply PyEPO to an energy scheduling dataset
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb) **08 kNN Robust Losses:** Use optDatasetKNN for robust losses
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb) **09 Solving on MPAX with PDHG:** Use MPAX for GPU-accelerated batch solving
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb) **10 JAX Frontend:** Train PyEPO losses in JAX/Flax with `jax.grad` (MPAX runs natively; non-JAX backends run through callback)
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb) **10 JAX Frontend:** Train PyEPO losses in JAX/Flax with `jax.grad`
 
 
 ## Experiments
@@ -92,34 +92,20 @@ To **reproduce the experiments** in the original paper, use the code and instruc
 ## Features
 
 - **End-to-end gradient surrogates** for predict-then-optimize, covering the seven families in the docs:
-  - *Surrogate losses* — convex upper bound on regret (**SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922)) and finite-difference directional gradient (**PG** [[11]](https://arxiv.org/abs/2402.03256)).
-  - *Perturbed methods* — Monte-Carlo gradients over random cost perturbations: **DPO** and **PFYL** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), **I-MLE** [[9]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[10]](https://ojs.aaai.org/index.php/AAAI/article/view/26103).
-  - *Regularized methods* — L2-regularized Frank-Wolfe over the convex hull of feasible solutions: **RFWO** and **RFYL** [[6]](https://arxiv.org/abs/2207.13513).
-  - *Black-box methods* — informative gradient estimates that replace the solver's zero gradient: **DBB** [[3]](https://arxiv.org/abs/1912.02175) (interpolation) and **NID** [[4]](https://arxiv.org/abs/2205.15213) (signed identity).
-  - *Cone-aligned estimation* — supervise the predicted cost by projecting onto the binding-constraint normals at the true optimum; binary linear programs only: **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12) — an order of magnitude faster than SPO+ at TSP scale.
-  - *Contrastive methods* — margin against a cached pool of non-optimal solutions: **NCE** and **CMAP** [[7]](https://www.ijcai.org/proceedings/2021/390).
-  - *Learning to rank* — rank the true optimum highest among the pool: pointwise / pairwise / listwise **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html).
+  - *Surrogate losses*: convex upper bound on regret (**SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922)) and finite-difference directional gradient (**PG** [[11]](https://arxiv.org/abs/2402.03256)).
+  - *Perturbed methods*: Monte Carlo gradients over random cost perturbations: **DPO** and **PFYL** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), **I-MLE** [[9]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[10]](https://ojs.aaai.org/index.php/AAAI/article/view/26103).
+  - *Regularized methods*: L2-regularized Frank-Wolfe over the convex hull of feasible solutions: **RFWO** and **RFYL** [[6]](https://arxiv.org/abs/2207.13513).
+  - *Black-box methods*: surrogate backward rules for discrete solvers: **DBB** [[3]](https://arxiv.org/abs/1912.02175) (interpolation) and **NID** [[4]](https://arxiv.org/abs/2205.15213) (signed identity).
+  - *Cone-aligned estimation*: project the predicted cost onto binding-constraint normals at the true optimum; binary linear programs only: **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12).
+  - *Contrastive methods*: margin against a cached pool of non-optimal solutions: **NCE** and **CMAP** [[7]](https://www.ijcai.org/proceedings/2021/390).
+  - *Learning to rank*: rank the true optimum highest among the pool: pointwise / pairwise / listwise **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html).
 - **Multi-solver backend** under a unified `optModel` API: [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and the GPU-native [MPAX](https://github.com/MIT-Lu-Lab/MPAX) PDHG solver.
-- **Symbolic modeling** with `pyepo.dsl`: define an LP, MIP, or supported fixed-quadratic objective once with `Variable`, `Parameter`, and constraints, then compile it to a PyEPO backend. The compiled model is a standard `optModel`, so every loss above works unchanged.
+- **Symbolic modeling** with `pyepo.dsl`: define an LP, MIP, or supported fixed-quadratic objective once with `Variable`, `Parameter`, and constraints, then compile it to a PyEPO backend. The compiled model is an `optModel` and works with PyEPO training methods.
 - **Parallel solving** via a Pathos worker pool to amortize per-instance ILP solves across a mini-batch.
 - **Solution caching** [[7]](https://www.ijcai.org/proceedings/2021/390) reuses previously computed optima to skip redundant solver calls in contrastive and ranking training.
 - **kNN-smoothed targets** [[12]](https://arxiv.org/abs/2310.04328) replace each label with a neighborhood aggregate for noise-robust regret.
 
 ## Installation
-
-### Clone and Install from this Repo
-
-Clone ``PyEPO`` from GitHub.
-
-```bash
-git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
-```
-
-Install the package from the local checkout.
-
-```bash
-pip install PyEPO/pkg/.
-```
 
 ### Pip Install
 
@@ -137,17 +123,37 @@ Install the Anaconda Cloud package with:
 conda install -c pyepo pyepo
 ```
 
+### Install from Source
+
+Clone `PyEPO` from GitHub.
+
+```bash
+git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
+```
+
+Install the package from the local checkout.
+
+```bash
+pip install PyEPO/pkg/.
+```
+
+### Solver Backends
+
+`PyEPO` compiles optimization models onto a solver backend. A bare `pip install pyepo` does not install a solver backend. The default backend is Gurobi; for a license-free setup, use Pyomo or OR-Tools with an open solver.
+
 
 ## Dependencies
+
+Core dependencies include:
 
 * [NumPy](https://numpy.org/)
 * [SciPy](https://scipy.org/)
 * [Pathos](https://pathos.readthedocs.io/)
 * [tqdm](https://tqdm.github.io/)
-* [Pyomo](http://www.pyomo.org/)
-* [Gurobi](https://www.gurobi.com/)
 * [Scikit Learn](https://scikit-learn.org/)
 * [PyTorch](http://pytorch.org/)
+
+Solver and frontend packages depend on the backend you use: GurobiPy, COPT, Pyomo, OR-Tools, MPAX, JAX, Flax, and optax are installed as needed.
 
 
 ## Sample Code
@@ -155,9 +161,6 @@ conda install -c pyepo pyepo
 An end-to-end predict-then-optimize example. The optimization model is defined with `pyepo.dsl` and compiled to Gurobi; change `backend` to use another PyEPO backend such as COPT, Pyomo, OR-Tools, or MPAX.
 
 ```python
-#!/usr/bin/env python
-# coding: utf-8
-
 import numpy as np
 import pyepo
 from pyepo import EPO, dsl
@@ -165,62 +168,35 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
+# generate knapsack data
+num_item = 10
+weights, feat, costs = pyepo.data.knapsack.genData(
+    1000, 5, num_item, 3, deg=4, noise_width=0.5, seed=135,
+)
+capacity = (weights.sum(axis=1) * 0.5).astype(int)
 
-# prediction model
-class LinearRegression(nn.Module):
+# define the optimization problem
+x = dsl.Variable(num_item, vtype=EPO.BINARY)
+c = dsl.Parameter(num_item)
+optmodel = dsl.Problem(dsl.Maximize(c @ x), [weights @ x <= capacity]).compile(backend="gurobi")
 
-    def __init__(self):
-        super(LinearRegression, self).__init__()
-        self.linear = nn.Linear(num_feat, num_item)
+# build dataset
+dataset = pyepo.data.dataset.optDataset(optmodel, feat, costs)
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-    def forward(self, x):
-        out = self.linear(x)
-        return out
+# train a linear predictor with SPO+
+predmodel = nn.Linear(5, num_item)
+spo = pyepo.func.SPOPlus(optmodel, processes=1)
+optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
+for epoch in range(10):
+    for xb, cb, wb, zb in dataloader:
+        loss = spo(predmodel(xb), cb, wb, zb)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-if __name__ == "__main__":
-
-    # generate data
-    num_data = 1000 # number of data
-    num_feat = 5 # size of feature
-    num_item = 10 # number of items
-    weights, x, c = pyepo.data.knapsack.genData(num_data, num_feat, num_item,
-                                                dim=3, deg=4, noise_width=0.5, seed=135)
-
-    # optimization model: define symbolically, compile to Gurobi
-    items = dsl.Variable(num_item, vtype=EPO.BINARY)
-    cost = dsl.Parameter(num_item)
-    optmodel = dsl.Problem(dsl.Maximize(cost @ items),
-                           [weights @ items <= np.array([7, 8, 9])]).compile(backend="gurobi")
-
-    # init prediction model
-    predmodel = LinearRegression()
-    # set optimizer
-    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-2)
-    # init SPO+ loss
-    spop = pyepo.func.SPOPlus(optmodel, processes=1)
-
-    # build dataset
-    dataset = pyepo.data.dataset.optDataset(optmodel, x, c)
-    # get data loader
-    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
-
-    # training
-    num_epochs = 10
-    for epoch in range(num_epochs):
-        for data in dataloader:
-            x, c, w, z = data
-            # forward pass
-            cp = predmodel(x)
-            loss = spop(cp, c, w, z)
-            # backward pass
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-    # eval
-    regret = pyepo.metric.regret(predmodel, optmodel, dataloader)
-    print("Regret on Training Set: {:.4f}".format(regret))
+print("Training regret:", pyepo.metric.regret(predmodel, optmodel, dataloader))
 
 ```
 
@@ -266,9 +242,9 @@ for epoch in range(10):
 
 
 ## Reference
-* [1] [Elmachtoub, A. N., & Grigas, P. (2021). Smart “predict, then optimize”. Management Science.](https://doi.org/10.1287/mnsc.2020.3922)
+* [1] [Elmachtoub, A. N., & Grigas, P. (2021). Smart "predict, then optimize". Management Science.](https://doi.org/10.1287/mnsc.2020.3922)
 * [2] [Mandi, J., Stuckey, P. J., & Guns, T. (2020). Smart predict-and-optimize for hard combinatorial optimization problems. In Proceedings of the AAAI Conference on Artificial Intelligence.](https://doi.org/10.1609/aaai.v34i02.5521)
-* [3] [Vlastelica, M., Paulus, A., Musil, V., Martius, G., & Rolínek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.](https://arxiv.org/abs/1912.02175)
+* [3] [Vlastelica, M., Paulus, A., Musil, V., Martius, G., & Rolinek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.](https://arxiv.org/abs/1912.02175)
 * [4] [Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.](https://arxiv.org/abs/2205.15213)
 * [5] [Berthet, Q., Blondel, M., Teboul, O., Cuturi, M., Vert, J. P., & Bach, F. (2020). Learning with differentiable perturbed optimizers. Advances in neural information processing systems, 33, 9508-9519.](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
 * [6] [Dalle, G., Baty, L., Bouvier, L., & Parmentier, A. (2022). Learning with Combinatorial Optimization Layers: a Probabilistic Approach. arXiv:2207.13513.](https://arxiv.org/abs/2207.13513)
