@@ -1,7 +1,7 @@
 Solution Pool
 +++++++++++++
 
-End-to-end predict-then-optimize training involves repeated solving of optimization problems. A solution pool [#f1]_ serves as an inner approximation of the feasible region, reducing computation by reusing previously computed solutions. Instead of solving the full linear/integer program, PyEPO selects the best cached solution from the pool.
+End-to-end predict-then-optimize training involves repeated solving of optimization problems. A solution pool [#f1]_ serves as an inner approximation of the feasible region, reducing computation by reusing previously computed solutions. Instead of solving the full linear/integer program, PyEPO selects the lowest-objective cached solution from the pool.
 
 The algorithm is shown below.
 

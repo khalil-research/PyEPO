@@ -90,7 +90,7 @@ Notes
   ``adaptiveImplicitMLE`` is eager-only.
 * **Caching and pool growth**: solution-pool caching (``solve_ratio < 1``) and
   the online pool growth of the contrastive / ranking losses are supported and
-  follow the PyTorch implementation, but eager-only; they cannot be ``jax.jit``-ed.
+  eager-only; they cannot be ``jax.jit``-ed.
 * **API**: JAX losses follow the PyTorch signatures, except ``implicitMLE`` /
   ``adaptiveImplicitMLE``, which take ``kappa`` / ``n_iterations`` / ``seed``
   scalars instead of a PyTorch ``distribution`` object.

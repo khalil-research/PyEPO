@@ -244,4 +244,4 @@ The DSL is a one-shot model definition and cannot express this, so such problems
            self._model.optimize(self._subtourCallback)   # add subtours lazily
            # ... read the tour from the active edges ...
 
-``pyepo.model.grb.tspDFJModel`` is a complete implementation for the TSP.
+``pyepo.model.grb.tspDFJModel`` implements this pattern for the TSP.
