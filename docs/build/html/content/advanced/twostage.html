@@ -189,7 +189,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -231,7 +231,7 @@
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Two-stage Baseline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pool.html">Solution Pool</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cave.html">CaVE Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cave.html">CaVE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="knn.html">kNN Robust Losses</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Notebooks</span></p>
@@ -390,14 +390,30 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
           <section id="two-stage-baseline">
 <h1>Two-stage Baseline<a class="headerlink" href="#two-stage-baseline" title="Link to this heading">¶</a></h1>
-<p>The two-stage approach trains a regression model <span class="math notranslate nohighlight">\(\hat{\mathbf{c}} = g(\mathbf{x}; \boldsymbol{\theta})\)</span> by minimizing a prediction error such as mean squared error <span class="math notranslate nohighlight">\(l_{MSE}(\hat{\mathbf{c}}, \mathbf{c}) = \frac{1}{n} \sum_i^n \| \hat{\mathbf{c}}_i - \mathbf{c}_i \| ^ 2\)</span>. At inference time, the model first predicts <span class="math notranslate nohighlight">\(\hat{\mathbf{c}} = g(\mathbf{x}; \boldsymbol{\theta})\)</span>, then the predicted costs are used to solve the optimization problem.</p>
+<p>The two-stage approach trains a regression model
+<span class="math notranslate nohighlight">\(\hat{\mathbf{c}} = g(\mathbf{x}; \boldsymbol{\theta})\)</span> with a
+prediction loss such as mean squared error. At inference time, the model first
+predicts <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>, then the predicted costs are used to solve
+the optimization problem.</p>
+<p>The two-stage model does not train through the optimization model, but it is
+evaluated with the same decision-quality metrics as end-to-end methods.</p>
+<section id="when-to-use-it">
+<h2>When to Use It<a class="headerlink" href="#when-to-use-it" title="Link to this heading">¶</a></h2>
+<p>Use a two-stage baseline when:</p>
+<ul class="simple">
+<li><p>true cost labels are available;</p></li>
+<li><p>the prediction model can be trained with a standard regression loss;</p></li>
+<li><p>the experiment needs a non-end-to-end baseline.</p></li>
+</ul>
+<p>After training, evaluate the predictor with <code class="docutils literal notranslate"><span class="pre">pyepo.metric.regret</span></code> or
+<code class="docutils literal notranslate"><span class="pre">pyepo.metric.unambRegret</span></code>.</p>
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.twostage.</span></span><span class="sig-name descname"><span class="pre">sklearnPred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseEstimator</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MultiOutputRegressor</span></span></span></dt>
@@ -422,33 +438,36 @@ regressor suitable for predicting the full cost vector.</p>
 </dd></dl>
 
 <p><code class="docutils literal notranslate"><span class="pre">pyepo.twostage.sklearnPred</span></code> is a helper function that wraps a scikit-learn estimator into a multi-output regressor.</p>
+</section>
+<section id="minimal-example">
+<h2>Minimal Example<a class="headerlink" href="#minimal-example" title="Link to this heading">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
-<span class="c1"># model for shortest path</span>
-<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
 
-<span class="c1"># generate data</span>
-<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
-<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
-<span class="n">deg</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># polynomial degree</span>
-<span class="n">noise_width</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># noise width</span>
-<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">noise_width</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+<span class="n">feat</span><span class="p">,</span> <span class="n">costs</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span>
+    <span class="n">num_data</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">num_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span>
+    <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">noise_width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="c1"># sklearn regressor</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearRegression</span>
-<span class="n">reg</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span> <span class="c1"># linear regression</span>
-
-<span class="c1"># build model</span>
+<span class="n">reg</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
 <span class="n">twostage_model</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">twostage</span><span class="o">.</span><span class="n">sklearnPred</span><span class="p">(</span><span class="n">reg</span><span class="p">)</span>
+<span class="n">twostage_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">costs</span><span class="p">)</span>
 
-<span class="c1"># training</span>
-<span class="n">twostage_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-
-<span class="c1"># prediction</span>
-<span class="n">c_pred</span> <span class="o">=</span> <span class="n">twostage_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDataset</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">costs</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># regret takes a callable mapping features to costs; pass the predictor&#39;s .predict</span>
+<span class="n">regret</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">regret</span><span class="p">(</span><span class="n">twostage_model</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
 </section>
 
         </article>
@@ -494,8 +513,28 @@ regressor suitable for predicting the full cost vector.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Two-stage Baseline</a><ul>
+<li><a class="reference internal" href="#when-to-use-it">When to Use It</a></li>
+<li><a class="reference internal" href="#minimal-example">Minimal Example</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Notebooks" href="../notebooks.html"><link rel="prev" title="CaVE Datasets" href="cave.html">
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Notebooks" href="../notebooks.html"><link rel="prev" title="CaVE" href="cave.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>kNN Robust Losses - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
@@ -189,7 +189,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -231,7 +231,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="twostage.html">Two-stage Baseline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pool.html">Solution Pool</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cave.html">CaVE Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cave.html">CaVE</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">kNN Robust Losses</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Notebooks</span></p>
@@ -390,20 +390,79 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
           <section id="knn-robust-losses">
 <h1>kNN Robust Losses<a class="headerlink" href="#knn-robust-losses" title="Link to this heading">¶</a></h1>
-<p>The kNN robust losses replace each label with a neighborhood aggregate over nearby feature vectors.</p>
-<p>Use these pages together:</p>
+<p>The kNN robust loss makes the training labels more robust to noise. For each
+instance it mixes the cost vector with the costs of its nearest neighbors in
+feature space and re-solves on the mixed costs, so the stored solution and
+objective labels are local averages rather than single-instance values.</p>
+<section id="what-changes">
+<h2>What Changes<a class="headerlink" href="#what-changes" title="Link to this heading">¶</a></h2>
+<p>The usual <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> stores one optimal solution and objective value for
+each instance. <code class="docutils literal notranslate"><span class="pre">optDatasetKNN</span></code> instead computes neighborhood labels:</p>
+<a class="reference internal image-reference" href="../../_images/knn-robust-loss.svg"><img alt="kNN robust loss label aggregation" src="../../_images/knn-robust-loss.svg" width="760" />
+</a>
+<p>This setting applies when nearby feature vectors are expected to have similar
+decisions, but individual labels may be noisy.</p>
+</section>
+<section id="minimal-example">
+<h2>Minimal Example<a class="headerlink" href="#minimal-example" title="Link to this heading">¶</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetKNN</span></code> in place of <code class="docutils literal notranslate"><span class="pre">optDataset</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">feat</span><span class="p">,</span> <span class="n">costs</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span>
+    <span class="n">num_data</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">num_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+    <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">noise_width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDatasetKNN</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">costs</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">predmodel</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">optmodel</span><span class="o">.</span><span class="n">num_cost</span><span class="p">)</span>
+<span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">predmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">spo</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">k</span></code> sets the number of neighbors used for each aggregate label.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">weight</span></code> is the self-weight in the mix: <code class="docutils literal notranslate"><span class="pre">weight=1</span></code> keeps the original cost
+(no smoothing), and smaller values pull the cost toward the neighbors.</p></li>
+</ul>
+<p>The batch format is the same as <code class="docutils literal notranslate"><span class="pre">optDataset</span></code>: <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code>. Methods that
+already consume <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> batches can consume <code class="docutils literal notranslate"><span class="pre">optDatasetKNN</span></code> batches
+without changing the training loop.</p>
+</section>
+<section id="related-pages">
+<h2>Related Pages<a class="headerlink" href="#related-pages" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../getting_started/data.html"><span class="doc">Data and Datasets</span></a> explains <code class="docutils literal notranslate"><span class="pre">optDatasetKNN</span></code>.</p></li>
 <li><p><a class="reference internal" href="../getting_started/function.html"><span class="doc">Training Methods</span></a> covers the training methods that consume the dataset.</p></li>
 <li><p><a class="reference internal" href="../notebooks.html"><span class="doc">Notebooks</span></a> links to the kNN robust-loss Colab walkthrough.</p></li>
 </ul>
+</section>
 </section>
 
         </article>
@@ -427,7 +486,7 @@
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">CaVE Datasets</div>
+                <div class="title">CaVE</div>
                 
               </div>
             </a>
@@ -449,8 +508,30 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">kNN Robust Losses</a><ul>
+<li><a class="reference internal" href="#what-changes">What Changes</a></li>
+<li><a class="reference internal" href="#minimal-example">Minimal Example</a></li>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+<li><a class="reference internal" href="#related-pages">Related Pages</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

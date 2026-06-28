@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="CaVE Datasets" href="cave.html"><link rel="prev" title="Two-stage Baseline" href="twostage.html">
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="CaVE" href="cave.html"><link rel="prev" title="Two-stage Baseline" href="twostage.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Solution Pool - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
@@ -231,7 +231,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="twostage.html">Two-stage Baseline</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Solution Pool</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cave.html">CaVE Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cave.html">CaVE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="knn.html">kNN Robust Losses</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Notebooks</span></p>
@@ -397,7 +397,11 @@
         <article role="main" id="furo-main-content">
           <section id="solution-pool">
 <h1>Solution Pool<a class="headerlink" href="#solution-pool" title="Link to this heading">¶</a></h1>
-<p>End-to-end predict-then-optimize training involves repeated solving of optimization problems. A solution pool <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> serves as an inner approximation of the feasible region, reducing computation by reusing previously computed solutions. Instead of solving the full linear/integer program, PyEPO selects the lowest-objective cached solution from the pool.</p>
+<p>End-to-end predict-then-optimize training involves repeated solving of
+optimization problems. A solution pool <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> stores previously computed
+solutions and uses them as an inner approximation of the feasible region.</p>
+<p>When the pool is used, PyEPO selects the lowest-objective cached solution
+instead of solving the original linear/integer program.</p>
 <p>The algorithm is shown below.</p>
 <p><strong>Algorithm</strong>: Gradient descent with inner approximation (numbering follows <a class="footnote-reference brackets" href="#f1" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>)</p>
 <p><strong>Input:</strong> <span class="math notranslate nohighlight">\(A, b\)</span>; training data <span class="math notranslate nohighlight">\(\mathcal{D} \equiv \{(x_i, c_i)\}_{i=1}^n\)</span></p>
@@ -421,9 +425,15 @@
 14: &amp; \textbf{end for} \\
 \end{array}\end{split}\]</div>
 </div>
-<p>In the algorithm, <span class="math notranslate nohighlight">\(\omega\)</span> are the predictor weights, <span class="math notranslate nohighlight">\(m(\omega, x) = \hat{c}\)</span> the predicted cost, <span class="math notranslate nohighlight">\(t(\cdot)\)</span> an optional cost transform, <span class="math notranslate nohighlight">\(v^*(c)\)</span> the optimum for cost <span class="math notranslate nohighlight">\(c\)</span>, <span class="math notranslate nohighlight">\(S\)</span> the solution pool, <span class="math notranslate nohighlight">\(f(v, \tilde{c}) = \tilde{c}^\top v\)</span> the objective value, Eq. (1) the optimization problem <span class="math notranslate nohighlight">\(\min_{v} \tilde{c}^\top v\)</span> over <span class="math notranslate nohighlight">\(\{v : A v \le b\}\)</span>, and <span class="math notranslate nohighlight">\(p_{\text{solve}}\)</span> the <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code>.</p>
+<p>In the algorithm, <span class="math notranslate nohighlight">\(\omega\)</span> are the predictor weights,
+<span class="math notranslate nohighlight">\(m(\omega, x) = \hat{c}\)</span> is the predicted cost, <span class="math notranslate nohighlight">\(t(\cdot)\)</span> is an
+optional cost transform, <span class="math notranslate nohighlight">\(v^*(c)\)</span> is the optimum for cost <span class="math notranslate nohighlight">\(c\)</span>, and
+<span class="math notranslate nohighlight">\(S\)</span> is the solution pool. The probability <span class="math notranslate nohighlight">\(p_{\text{solve}}\)</span>
+corresponds to <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code>.</p>
 <p>The solution pool is integrated into all <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules.</p>
-<p><code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls the fraction of instances solved exactly during training. The default is 1.0 (no caching). When <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> is less than 1, pass <code class="docutils literal notranslate"><span class="pre">dataset</span></code> to seed the pool with initial solutions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls the fraction of instances solved exactly during
+training. The default is 1.0 (no caching). When <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> is less than 1,
+pass <code class="docutils literal notranslate"><span class="pre">dataset</span></code> to seed the pool with initial solutions.</p>
 <p>Example with SPO+ (other functions work the same way):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
 
@@ -449,7 +459,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">CaVE Datasets</div>
+                <div class="title">CaVE</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
