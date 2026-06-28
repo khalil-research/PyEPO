@@ -51,7 +51,7 @@ The table below summarizes each module's return type, typical supervision, and n
      - true optimal solutions
      - PFYL; use the multiplicative variant for sign-sensitive oracles
    * - ``IMLE`` / ``AIMLE``
-     - perturbed solutions
+     - expected perturbed solutions
      - task loss chosen by the user
      - perturb-and-MAP with Sum-of-Gamma noise
    * - ``RFWO``
@@ -125,14 +125,14 @@ By Danskin's theorem, regret can be written as the directional derivative of :ma
 
 .. math::
 
-   \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c}) &\approx \frac{z^*(\hat{\mathbf{c}}) - z^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{\lambda}, \\
-   \mathcal{L}_{\mathrm{PG}}^{\mathrm{cent}}(\hat{\mathbf{c}}, \mathbf{c}) &\approx \frac{z^*(\hat{\mathbf{c}} + \lambda \mathbf{c}) - z^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{2 \lambda},
+   \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c}) &\approx \frac{z^*(\hat{\mathbf{c}}) - z^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{\sigma}, \\
+   \mathcal{L}_{\mathrm{PG}}^{\mathrm{cent}}(\hat{\mathbf{c}}, \mathbf{c}) &\approx \frac{z^*(\hat{\mathbf{c}} + \sigma \mathbf{c}) - z^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{2 \sigma},
 
-where :math:`\lambda > 0` is the finite-difference width (the ``sigma`` parameter). The corresponding gradient estimate is
+where :math:`\sigma > 0` is the finite-difference width (the ``sigma`` parameter). The corresponding gradient estimate is
 
 .. math::
 
-   \frac{\partial \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} \approx \frac{\mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{w}^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{\lambda}.
+   \frac{\partial \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} \approx \frac{\mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{w}^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{\sigma}.
 
 .. autoclass:: pyepo.func.PG
     :noindex:
@@ -238,7 +238,7 @@ AI-MLE uses the same finite-difference estimator as I-MLE but replaces the fixed
 
    \lambda_t = \alpha_t \cdot \frac{\|\hat{\mathbf{c}}\|_2}{\|\mathbf{d}\|_2},
 
-where :math:`\mathbf{d}` is the upstream task gradient and :math:`\alpha_t > 0` is tuned online: when an exponential moving average of the gradient sparsity (fraction of nonzero entries) drops below one, :math:`\alpha_t` is increased; otherwise it is decreased. This rescaling keeps the perturbation magnitude commensurate with :math:`\hat{\mathbf{c}}` and decouples the step from the absolute scale of :math:`\mathbf{d}`, removing the need to tune :math:`\lambda` by hand.
+where :math:`\mathbf{d}` is the upstream task gradient and :math:`\alpha_t > 0` is tuned online: when an exponential moving average of the fraction of nonzero gradient entries drops below one, :math:`\alpha_t` is increased; otherwise it is decreased. This rescaling keeps the perturbation magnitude commensurate with :math:`\hat{\mathbf{c}}` and decouples the step from the absolute scale of :math:`\mathbf{d}`, removing the need to tune :math:`\lambda` by hand.
 
 .. autoclass:: pyepo.func.AIMLE
     :noindex:
@@ -405,7 +405,7 @@ If you use the **CaVE** loss, please cite:
 Contrastive Methods
 ===================
 
-Contrastive methods train against a pool of cached non-optimal solutions, treated as negative examples. ``solve_ratio`` controls how often new instances are solved exactly during training; ``dataset`` seeds the pool. See :doc:`../advanced/pool` for details on the solution-pool mechanism.
+Contrastive methods train against a pool of cached non-optimal solutions, treated as negative examples. ``solve_ratio`` controls how often new instances are solved exactly during training; ``dataset`` seeds the pool and is required by these methods. See :doc:`../advanced/pool` for details on the solution-pool mechanism.
 
 
 Noise Contrastive Estimation (NCE)
@@ -417,13 +417,13 @@ Let :math:`\Gamma` be the cached pool of feasible solutions. For a minimization 
 
 .. math::
 
-   \mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{c}) = \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big).
+   \mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c})) = \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big).
 
 (If :math:`\mathbf{w}^*(\mathbf{c}) \in \Gamma`, its term contributes zero and the sum effectively averages over the negatives.) The gradient has a closed form that requires no solver call in the backward pass,
 
 .. math::
 
-   \frac{\partial \mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} = \mathbf{w}^*(\mathbf{c}) - \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \mathbf{w}.
+   \frac{\partial \mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c}))}{\partial \hat{\mathbf{c}}} = \mathbf{w}^*(\mathbf{c}) - \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \mathbf{w}.
 
 For a fixed :math:`\Gamma`, this update direction stays constant per instance. ``solve_ratio`` controls how often the pool is refreshed.
 
@@ -441,7 +441,7 @@ CMAP keeps only the most-violating member of the pool, the one with the smallest
 
 .. math::
 
-   \mathcal{L}_{\mathrm{CMAP}}(\hat{\mathbf{c}}, \mathbf{c}) = \max_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big) = \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \min_{\mathbf{w} \in \Gamma} \hat{\mathbf{c}}^\top \mathbf{w}.
+   \mathcal{L}_{\mathrm{CMAP}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c})) = \max_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big) = \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \min_{\mathbf{w} \in \Gamma} \hat{\mathbf{c}}^\top \mathbf{w}.
 
 If :math:`\mathbf{w}^*(\mathbf{c}) \in \Gamma`, that entry contributes a zero margin, so the loss is non-negative and vanishes precisely when the predicted costs already make :math:`\mathbf{w}^*(\mathbf{c})` the minimizer over :math:`\Gamma`.
 
@@ -457,23 +457,23 @@ Learning to rank [#f8]_ treats predict-then-optimize training as ranking a pool 
 
 * **Pointwise** regresses each predicted score :math:`\hat{\mathbf{c}}^\top \mathbf{w}` toward the true value :math:`\mathbf{c}^\top \mathbf{w}` for every :math:`\mathbf{w} \in \Gamma`.
 * **Pairwise** enforces a margin between the optimal solution and each suboptimal one.
-* **Listwise** models the full ranking distribution with a SoftMax over predicted scores,
+* **Listwise** models the full ranking distribution with a SoftMax over the negative predicted costs (for a minimization problem, so the lowest-cost solution gets the highest probability),
 
   .. math::
 
-     P(\mathbf{w}' \mid \hat{\mathbf{c}}) = \frac{\exp(\hat{\mathbf{c}}^\top \mathbf{w}')}{\sum_{\mathbf{w} \in \Gamma} \exp(\hat{\mathbf{c}}^\top \mathbf{w})},
+     P(\mathbf{w}' \mid \hat{\mathbf{c}}) = \frac{\exp(-\hat{\mathbf{c}}^\top \mathbf{w}')}{\sum_{\mathbf{w} \in \Gamma} \exp(-\hat{\mathbf{c}}^\top \mathbf{w})},
 
   and minimizes the cross-entropy against the true ranking distribution,
 
   .. math::
 
-     \mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c}) = -\frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c}) \log P(\mathbf{w} \mid \hat{\mathbf{c}}).
+     \mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c}) = - \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c}) \log P(\mathbf{w} \mid \hat{\mathbf{c}}).
 
   The gradient has a closed form,
 
   .. math::
 
-     \frac{\partial \mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} = \frac{1}{|\Gamma|} \Big( \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \hat{\mathbf{c}})\, \mathbf{w} - \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c})\, \mathbf{w} \Big).
+     \frac{\partial \mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} = \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c})\, \mathbf{w} - \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \hat{\mathbf{c}})\, \mathbf{w}.
 
 
 Pointwise LTR

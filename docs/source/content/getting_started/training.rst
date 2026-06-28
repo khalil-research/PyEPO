@@ -281,7 +281,7 @@ CaVE requires a dedicated dataset class that extracts binding-constraint normals
 
    from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
 
-   dataset = optDatasetConstrs(optmodel, x, c)
+   dataset = optDatasetConstrs(optmodel, feat, costs)
    dataloader = DataLoader(
        dataset, batch_size=32, shuffle=True, collate_fn=collate_tight_constraints,
    )

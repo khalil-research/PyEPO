@@ -50,7 +50,7 @@ Loss-returning and Solution-returning Methods
 
 PyEPO methods use two interfaces:
 
-* **Loss-returning methods** return a scalar loss. Call ``loss.backward()`` directly. Examples: ``SPOPlus``, ``PFY``, ``NCE``, ``LTR``, ``CaVE``.
+* **Loss-returning methods** return a scalar loss. Call ``loss.backward()`` directly. Examples: ``SPOPlus``, ``PFY``, ``NCE``, ``lsLTR``, ``CaVE``.
 * **Solution-returning methods** return a predicted or perturbed solution. Define a task loss on top, then backpropagate through that loss. Examples: ``DPO``, ``DBB``, ``NID``, ``RFWO``, ``IMLE``.
 
 

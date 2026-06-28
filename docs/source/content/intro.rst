@@ -30,7 +30,7 @@ The main objects in a PyEPO training pipeline are:
 Backends and Training Methods
 -----------------------------
 
-``PyEPO`` builds optimization models with `GurobiPy <https://www.gurobi.com/>`_, `COPT <https://shanshu.ai/copt>`_, `Pyomo <http://www.pyomo.org/>`_, `Google OR-Tools <https://developers.google.com/optimization>`_, and `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, and exposes them through PyTorch and JAX training frontends. Training methods are grouped into the following families:
+``PyEPO`` builds optimization models with `GurobiPy <https://www.gurobi.com/>`_, `COPT <https://www.shanshu.ai/copt>`_, `Pyomo <http://www.pyomo.org/>`_, `Google OR-Tools <https://developers.google.com/optimization>`_, and `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, and exposes them through PyTorch and JAX training frontends. Training methods are grouped into the following families:
 
 * **Surrogate losses**: smart predict-then-optimize+ (SPO+), perturbation gradient (PG)
 * **Perturbed methods**: differentiable perturbed optimizer (DPO), perturbed Fenchel-Young loss (PFYL), implicit maximum likelihood estimator (I-MLE), adaptive implicit maximum likelihood estimator (AI-MLE)
