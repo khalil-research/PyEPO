@@ -171,7 +171,8 @@ class optGrbModel(optModel):
         else:
             # LinExpr(coeffs, vars) builds the affine expression in one C call
             vars_list = new_model._vars_list
-            assert vars_list is not None
+            if vars_list is None:
+                raise RuntimeError("Gurobi variable list is unavailable.")
             expr = gp.LinExpr(coefs_np.tolist(), vars_list) <= rhs
             new_model._model.addConstr(expr)
         # track for replay on relax
