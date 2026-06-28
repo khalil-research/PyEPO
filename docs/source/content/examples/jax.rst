@@ -21,7 +21,7 @@ behave identically.
 Solver Backends
 ===============
 
-The frontend works with **any** PyEPO solver backend:
+The frontend works with PyEPO solver backends:
 
 * **MPAX** is solved natively — the PDHG solve is JAX-traceable, so the whole
   training step is ``jax.jit``-able and GPU-native, with no CPU round-trip.
@@ -47,7 +47,7 @@ loss, using a Flax linear layer and an optax optimizer:
    from pyepo.data.dataset import optDataset
    from pyepo.func.jax import SPOPlus
 
-   # optimization model: 5x5 grid shortest path (any PyEPO solver works)
+   # optimization model: 5x5 grid shortest path
    grid = (5, 5)
    optmodel = pyepo.model.shortestPathModel(grid)
 
@@ -80,7 +80,7 @@ Installation
 ============
 
 * ``pip install pyepo[mpax]`` — the loss frontend and the MPAX fast path.
-* The any-solver callback path needs only a JAX install.
+* The callback path for non-JAX backends needs only a JAX install.
 * ``pip install pyepo[jaxdev]`` — the Flax and optax dependencies for the
   example above.
 

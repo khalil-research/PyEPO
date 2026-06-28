@@ -18,7 +18,7 @@ Where to Start
   #. :doc:`examples/evaluation` — decision-quality metrics
 
 * **Want to pick a method**: jump to the *Choosing a Method* section of :doc:`examples/function`. It poses three questions (what supervision you have, whether you want a loss or a solution, special constraints) and points you at the right module.
-* **Training in JAX/Flax**: :doc:`examples/jax` mirrors every loss for ``jax.grad``-based end-to-end training, on MPAX (GPU-native) or any solver via ``jax.pure_callback``.
+* **Training in JAX/Flax**: :doc:`examples/jax` mirrors every loss for ``jax.grad``-based end-to-end training. MPAX runs natively; non-JAX backends run through ``jax.pure_callback``.
 * **Prefer hands-on**: jump to the *Notebooks* section below for runnable Colab examples grouped by purpose.
 
 
@@ -44,7 +44,7 @@ GPU Acceleration
 ----------------
 
 * `09 Solving on MPAX with PDHG <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb>`_: batch-solve LPs on GPU via MPAX, end-to-end without CPU round-trips. See the MPAX backend (``optMpaxModel``) in the *Solver Backend Subclass* section of :doc:`examples/model`.
-* `10 JAX Frontend <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb>`_: train any loss in JAX/Flax with ``jax.grad`` — on MPAX (GPU-native, jittable) or any solver via ``jax.pure_callback``. Pairs with :doc:`examples/jax`.
+* `10 JAX Frontend <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb>`_: train PyEPO losses in JAX/Flax with ``jax.grad``. MPAX is GPU-native and jittable; non-JAX backends run through ``jax.pure_callback``. Pairs with :doc:`examples/jax`.
 
 Applied Examples
 ----------------

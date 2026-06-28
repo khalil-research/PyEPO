@@ -124,7 +124,7 @@ Switch the solver with ``backend``. The generic backends take a ``solver=`` argu
    model.shortestPathModel(grid, backend="pyomo", solver="glpk")
    model.shortestPathModel(grid, backend="mpax")             # LP on GPU
 
-.. note:: In end-to-end training, ``setObj`` and ``solve`` run automatically inside the ``pyepo.func`` modules.
+.. note:: In end-to-end training, ``pyepo.func`` modules call ``setObj`` and ``solve`` during the forward pass.
 
 
 Shortest Path Model

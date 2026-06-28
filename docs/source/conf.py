@@ -6,7 +6,7 @@ from importlib.metadata import PackageNotFoundError, version
 
 sys.path.insert(0, os.path.abspath("../../pkg"))
 
-project = "PyTorch-based End-to-End Predict-then-Optimize Tool"
+project = "PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool"
 copyright = "2021, Bo Tang"
 author = "Bo Tang"
 
@@ -38,7 +38,7 @@ extensions = [
     "autoapi.extension",
 ]
 
-# autoapi reads the package AST, so inline type annotations show up automatically
+# autoapi reads the package AST, so inline type annotations appear in generated docs
 autoapi_dirs = ["../../pkg/pyepo"]
 autoapi_python_class_content = "class"
 autoapi_options = [

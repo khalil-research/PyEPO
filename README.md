@@ -1,4 +1,4 @@
-# PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Tool
+# PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/khalil-research/PyEPO?style=flat-square)](https://github.com/khalil-research/PyEPO/stargazers)
@@ -22,7 +22,7 @@
 ## Publication
 
 This repository is the official implementation of the paper:
-[PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming](https://link.springer.com/article/10.1007/s12532-024-00255-x) (Accepted to Mathematical Programming Computation (MPC))
+[PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Library for Linear and Integer Programming](https://link.springer.com/article/10.1007/s12532-024-00255-x) (Mathematical Programming Computation, 2024)
 
 Citation:
 ```
@@ -53,11 +53,13 @@ If you use the **CaVE** loss, please also cite:
 
 ## Introduction
 
-``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with linear objective functions. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), [MPAX](https://github.com/MIT-Lu-Lab/MPAX) or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules.
+``PyEPO`` is a Python library for predict-then-optimize. It focuses on problems where a model predicts objective coefficients and the feasible region is fixed, then trains the predictor against downstream decision quality rather than prediction error alone.
+
+``PyEPO`` models optimization problems with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), or [MPAX](https://github.com/MIT-Lu-Lab/MPAX), and exposes the optimization layer through PyTorch and JAX training frontends. The symbolic `pyepo.dsl` frontend can define LPs, MIPs, and supported fixed-quadratic objective terms, then compile the same model to a PyEPO backend.
 
 For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, ...), ``PyEPO`` ships **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12). CaVE replaces the per-step ILP solve with a cone-alignment projection onto the binding-constraint normals at the true optimum; backed by an interior-point QP solver (Clarabel) with a low iteration cap, this delivers paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.
 
-``PyEPO`` also integrates [MPAX](https://github.com/MIT-Lu-Lab/MPAX), a JAX solver that runs the first-order PDHG method on GPU. Because both the prediction network and the solver stay on the GPU, MPAX solves a whole mini-batch of instances at once and avoids the GPU-to-CPU transfer that CPU solvers like Gurobi pay at every training step.
+``PyEPO`` also integrates [MPAX](https://github.com/MIT-Lu-Lab/MPAX), a JAX solver that runs the first-order PDHG method on GPU. With MPAX, the prediction network and solver stay on the GPU, so a whole mini-batch can be solved without the GPU-to-CPU transfer used by CPU solvers such as Gurobi.
 
 
 ## Documentation
@@ -66,25 +68,25 @@ The official ``PyEPO`` docs can be found at [https://khalil-research.github.io/P
 
 ## Slides
 
-Our recent tutorial was at the ACC 2024 conference. You can view the talk slides [here](https://github.com/khalil-research/PyEPO/blob/main/slides/PyEPO.pdf).
+A PyEPO tutorial was presented at the ACC 2024 conference. The talk slides are available [here](https://github.com/khalil-research/PyEPO/blob/main/slides/PyEPO.pdf).
 
 ## Tutorial
 
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb)**01 Optimization Model:** Build an optimization solver
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb)**02 Optimization Dataset:** Generate synthetic data and use optDataset
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb)**03 Training and Testing:** Train and test different approaches
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb)**04 CaVE for Binary Linear Programs:** Train with the cone-aligned CaVE loss vs SPO+ on TSP
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%202D%20Knapsack%20Solution%20Visualization.ipynb)**05 2D Knapsack Solution Visualization:** Visualize solutions for the knapsack problem
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Warcraft%20Shortest%20Path.ipynb)**06 Warcraft Shortest Path:** Train shortest path models on the Warcraft terrains dataset
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20Real-World%20Energy%20Scheduling.ipynb)**07 Real-World Energy Scheduling:** Apply PyEPO to real energy data
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb)**08 kNN Robust Losses:** Use optDatasetKNN for robust losses
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb)**09 Solving on MPAX with PDHG:** Use MPAX for GPU-accelerated batch solving
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb)**10 JAX Frontend:** Train any loss in JAX/Flax with `jax.grad` (MPAX or any solver)
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb) **01 Optimization Model:** Build an optimization solver
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb) **02 Optimization Dataset:** Generate synthetic data and use optDataset
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb) **03 Training and Testing:** Train and test different approaches
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb) **04 CaVE for Binary Linear Programs:** Train with the cone-aligned CaVE loss vs SPO+ on TSP
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/05%202D%20Knapsack%20Solution%20Visualization.ipynb) **05 2D Knapsack Solution Visualization:** Visualize solutions for the knapsack problem
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/06%20Warcraft%20Shortest%20Path.ipynb) **06 Warcraft Shortest Path:** Train shortest path models on the Warcraft terrains dataset
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/07%20Real-World%20Energy%20Scheduling.ipynb) **07 Real-World Energy Scheduling:** Apply PyEPO to real energy data
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb) **08 kNN Robust Losses:** Use optDatasetKNN for robust losses
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb) **09 Solving on MPAX with PDHG:** Use MPAX for GPU-accelerated batch solving
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb) **10 JAX Frontend:** Train PyEPO losses in JAX/Flax with `jax.grad` (MPAX runs natively; non-JAX backends run through callback)
 
 
 ## Experiments
 
-To **reproduce the experiments** in the original paper, please use the code and follow the instructions in this [branch](https://github.com/khalil-research/PyEPO/tree/MPC). Please note that this branch is a very early version.
+To **reproduce the experiments** in the original paper, use the code and instructions in the [MPC branch](https://github.com/khalil-research/PyEPO/tree/MPC). That branch reflects an early PyEPO version and is intended for reproduction rather than current development.
 
 
 ## Features
@@ -98,7 +100,7 @@ To **reproduce the experiments** in the original paper, please use the code and 
   - *Contrastive methods* — margin against a cached pool of non-optimal solutions: **NCE** and **CMAP** [[7]](https://www.ijcai.org/proceedings/2021/390).
   - *Learning to rank* — rank the true optimum highest among the pool: pointwise / pairwise / listwise **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html).
 - **Multi-solver backend** under a unified `optModel` API: [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and the GPU-native [MPAX](https://github.com/MIT-Lu-Lab/MPAX) PDHG solver.
-- **Symbolic modeling** with `pyepo.dsl`: define an LP, MIP, or QP once with `Variable`, `Parameter`, and constraints, then compile it to any backend. The compiled model is a standard `optModel`, so every loss above works unchanged.
+- **Symbolic modeling** with `pyepo.dsl`: define an LP, MIP, or supported fixed-quadratic objective once with `Variable`, `Parameter`, and constraints, then compile it to a PyEPO backend. The compiled model is a standard `optModel`, so every loss above works unchanged.
 - **Parallel solving** via a Pathos worker pool to amortize per-instance ILP solves across a mini-batch.
 - **Solution caching** [[7]](https://www.ijcai.org/proceedings/2021/390) reuses previously computed optima to skip redundant solver calls in contrastive and ranking training.
 - **kNN-smoothed targets** [[12]](https://arxiv.org/abs/2310.04328) replace each label with a neighborhood aggregate for noise-robust regret.
@@ -107,13 +109,13 @@ To **reproduce the experiments** in the original paper, please use the code and 
 
 ### Clone and Install from this Repo
 
-You can download ``PyEPO`` from our GitHub repository.
+Clone ``PyEPO`` from GitHub.
 
 ```bash
 git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
 ```
 
-And install it.
+Install the package from the local checkout.
 
 ```bash
 pip install PyEPO/pkg/.
@@ -121,7 +123,7 @@ pip install PyEPO/pkg/.
 
 ### Pip Install
 
-The package is now available for installation on [PyPI](https://pypi.org/project/pyepo/). You can easily install `PyEPO` using pip by running the following command:
+Install the PyPI release with:
 
 ```bash
 pip install pyepo
@@ -129,7 +131,7 @@ pip install pyepo
 
 ### Conda Install
 
-`PyEPO` is also available on [Anaconda Cloud](https://anaconda.org/pyepo/pyepo). If you prefer to use conda for installation, you can install `PyEPO` with the following command:
+Install the Anaconda Cloud package with:
 
 ```bash
 conda install -c pyepo pyepo
@@ -150,7 +152,7 @@ conda install -c pyepo pyepo
 
 ## Sample Code
 
-An end-to-end predict-then-optimize example. The optimization model is defined with `pyepo.dsl` and compiled to Gurobi; change `backend` to run the same model on COPT, Pyomo, OR-Tools, or MPAX.
+An end-to-end predict-then-optimize example. The optimization model is defined with `pyepo.dsl` and compiled to Gurobi; change `backend` to use another PyEPO backend such as COPT, Pyomo, OR-Tools, or MPAX.
 
 ```python
 #!/usr/bin/env python
@@ -236,7 +238,7 @@ import pyepo
 from pyepo.data.dataset import optDataset
 from pyepo.func.jax import SPOPlus
 
-# optimization model: 5x5 grid shortest path (any PyEPO solver works)
+# optimization model: 5x5 grid shortest path
 grid = (5, 5)
 optmodel = pyepo.model.shortestPathModel(grid)
 

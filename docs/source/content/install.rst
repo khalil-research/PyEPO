@@ -5,13 +5,13 @@ Installation
 Install from Source
 ===================
 
-You can download ``PyEPO`` from our `GitHub repository <https://github.com/khalil-research/PyEPO>`_.
+Clone ``PyEPO`` from GitHub.
 
 .. code-block:: console
 
    git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
 
-Then install it.
+Install the package from the local checkout.
 
 .. code-block:: console
 
@@ -22,7 +22,7 @@ Then install it.
 Pip Install
 ===========
 
-The package is now available on `PyPI <https://pypi.org/project/pyepo>`_ for installation. You can easily install ``PyEPO`` using pip by running the following command:
+Install the `PyPI <https://pypi.org/project/pyepo>`_ release with:
 
 .. code-block:: console
 
@@ -33,7 +33,7 @@ The package is now available on `PyPI <https://pypi.org/project/pyepo>`_ for ins
 Conda Install
 =============
 
-``PyEPO`` is also available on `Anaconda Cloud <https://anaconda.org/pyepo/pyepo>`_. If you prefer to use conda for installation, you can install ``PyEPO`` with the following command:
+Install the `Anaconda Cloud <https://anaconda.org/pyepo/pyepo>`_ package with:
 
 .. code-block:: console
 
@@ -51,4 +51,4 @@ Solvers
 * `Google OR-Tools <https://developers.google.com/optimization>`_, open (``pip install ortools``).
 * `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, open and JAX-based, for GPU and batch solving (``pip install mpax``).
 
-.. note:: A bare ``pip install pyepo`` does not pull in any solver. Building a model with the default Gurobi backend then requires a Gurobi license; for a license-free setup, use the Pyomo or OR-Tools backend.
+.. note:: A bare ``pip install pyepo`` does not install a solver backend. Building a model with the default Gurobi backend then requires a Gurobi license; for a license-free setup, use the Pyomo or OR-Tools backend.
