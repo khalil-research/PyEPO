@@ -6,7 +6,7 @@ The PyTorch frontend lives in ``pyepo.func``. Each training method wraps an ``op
 Start with:
 
 * :doc:`../getting_started/function` for method selection and API details.
-* :doc:`../getting_started/training` for complete training-loop templates.
+* :doc:`../getting_started/training` for training-loop templates.
 
 
 Basic Pattern
@@ -64,4 +64,4 @@ Common constructor options:
 * ``dataset`` seeds the solution pool for contrastive and ranking methods.
 * ``reduction`` controls how per-instance losses are aggregated when the method supports it.
 
-For complete examples, use :doc:`../getting_started/training`.
+For training examples, use :doc:`../getting_started/training`.

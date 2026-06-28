@@ -477,7 +477,7 @@ losses (the perturbed family and <code class="docutils literal notranslate"><spa
 <code class="docutils literal notranslate"><span class="pre">adaptiveImplicitMLE</span></code> is eager-only.</p></li>
 <li><p><strong>Caching and pool growth</strong>: solution-pool caching (<code class="docutils literal notranslate"><span class="pre">solve_ratio</span> <span class="pre">&lt;</span> <span class="pre">1</span></code>) and
 the online pool growth of the contrastive / ranking losses are supported and
-follow the PyTorch implementation, but eager-only; they cannot be <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>-ed.</p></li>
+eager-only; they cannot be <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>-ed.</p></li>
 <li><p><strong>API</strong>: JAX losses follow the PyTorch signatures, except <code class="docutils literal notranslate"><span class="pre">implicitMLE</span></code> /
 <code class="docutils literal notranslate"><span class="pre">adaptiveImplicitMLE</span></code>, which take <code class="docutils literal notranslate"><span class="pre">kappa</span></code> / <code class="docutils literal notranslate"><span class="pre">n_iterations</span></code> / <code class="docutils literal notranslate"><span class="pre">seed</span></code>
 scalars instead of a PyTorch <code class="docutils literal notranslate"><span class="pre">distribution</span></code> object.</p></li>

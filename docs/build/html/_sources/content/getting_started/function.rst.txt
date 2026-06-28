@@ -230,7 +230,7 @@ where :math:`\sigma` smooths the solution map and :math:`\lambda` (``lambd``) is
 Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)
 -------------------------------------------------------
 
-AI-MLE [#f10]_ extends I-MLE with an adaptive interpolation step for better gradient estimates.
+AI-MLE [#f10]_ extends I-MLE with an adaptive interpolation step.
 
 AI-MLE uses the same finite-difference estimator as I-MLE but replaces the fixed step size :math:`\lambda` with an adaptive choice driven by the magnitudes of the predicted cost and the upstream gradient,
 
@@ -262,7 +262,7 @@ PyEPO implements the L2 special case :math:`\Omega(\mathbf{w}) = \tfrac{\lambda}
 L2 Regularized Frank-Wolfe (RFWO)
 ---------------------------------
 
-RFWO [#f6]_ exposes :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})` directly as a differentiable layer. Since it returns a (regularized) solution rather than a loss, the user defines a task loss on the output, most commonly an MSE against :math:`\mathbf{w}^*(\mathbf{c})`, matching the imitation setting in the original paper.
+RFWO [#f6]_ exposes :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})` directly as a differentiable layer. Since it returns a regularized solution rather than a loss, the user defines a task loss on the output. A common choice is MSE against :math:`\mathbf{w}^*(\mathbf{c})`.
 
 .. math::
 
@@ -344,7 +344,7 @@ NID approximates the solver Jacobian by the (signed) identity, :math:`\partial \
 
    \frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx -\mathbf{d} \quad (\text{minimization}), \qquad \frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx \mathbf{d} \quad (\text{maximization}).
 
-Intuitively, for minimization this rule decreases :math:`\hat{\mathbf{c}}` along directions where :math:`\mathbf{w}^*(\hat{\mathbf{c}})` tends to increase and vice versa, driving the predicted decision toward :math:`\mathbf{w}^*(\mathbf{c})`. NID is the special case of DBB in which :math:`\lambda` is chosen so that the interpolated solution coincides with the negative-identity update, but it saves the extra solver call required by DBB.
+For minimization, this rule decreases :math:`\hat{\mathbf{c}}` along directions where :math:`\mathbf{w}^*(\hat{\mathbf{c}})` tends to increase, and vice versa. NID is the special case of DBB in which :math:`\lambda` is chosen so that the interpolated solution coincides with the negative-identity update, but it saves the extra solver call required by DBB.
 
 .. autoclass:: pyepo.func.NID
     :noindex:
@@ -435,7 +435,7 @@ For a fixed :math:`\Gamma`, this update direction stays constant per instance. `
 Contrastive MAP (CMAP)
 ----------------------
 
-CMAP [#f7]_ is a special case of NCE that uses only the single best negative sample.
+CMAP [#f7]_ is a special case of NCE that uses only the lowest predicted-cost negative sample.
 
 CMAP keeps only the most-violating member of the pool, the one with the smallest predicted-cost objective, yielding a max-margin contrast against the true optimum. For a minimization problem,
 
@@ -515,7 +515,7 @@ All ``pyepo.func`` modules support parallel solving during training via the ``pr
    :width: 650
    :class: light-bg
 
-The figure shows that increasing the number of processes reduces runtime.
+The figure reports runtime for different values of ``processes``.
 
 
 .. rubric:: Footnotes

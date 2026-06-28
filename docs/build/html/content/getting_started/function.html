@@ -642,7 +642,7 @@ solver call.</p>
 </section>
 <section id="adaptive-implicit-maximum-likelihood-estimator-ai-mle">
 <h3>Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)<a class="headerlink" href="#adaptive-implicit-maximum-likelihood-estimator-ai-mle" title="Link to this heading">¶</a></h3>
-<p>AI-MLE <a class="footnote-reference brackets" href="#f10" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> extends I-MLE with an adaptive interpolation step for better gradient estimates.</p>
+<p>AI-MLE <a class="footnote-reference brackets" href="#f10" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> extends I-MLE with an adaptive interpolation step.</p>
 <p>AI-MLE uses the same finite-difference estimator as I-MLE but replaces the fixed step size <span class="math notranslate nohighlight">\(\lambda\)</span> with an adaptive choice driven by the magnitudes of the predicted cost and the upstream gradient,</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -668,7 +668,7 @@ solver call.</p>
 <p>PyEPO implements the L2 special case <span class="math notranslate nohighlight">\(\Omega(\mathbf{w}) = \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2\)</span> and solves the regularized program with batched Frank-Wolfe iteration. Frank-Wolfe accesses <span class="math notranslate nohighlight">\(\mathrm{conv}(\mathcal{S})\)</span> through the original LP/ILP solver of <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> (a <em>linear minimization oracle</em>). <code class="docutils literal notranslate"><span class="pre">lambd</span></code> is the L2 strength <span class="math notranslate nohighlight">\(\lambda\)</span>; <code class="docutils literal notranslate"><span class="pre">max_iter</span></code> caps Frank-Wolfe iterations and <code class="docutils literal notranslate"><span class="pre">tol</span></code> is the convergence tolerance.</p>
 <section id="l2-regularized-frank-wolfe-rfwo">
 <h3>L2 Regularized Frank-Wolfe (RFWO)<a class="headerlink" href="#l2-regularized-frank-wolfe-rfwo" title="Link to this heading">¶</a></h3>
-<p>RFWO <a class="footnote-reference brackets" href="#f6" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> exposes <span class="math notranslate nohighlight">\(\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})\)</span> directly as a differentiable layer. Since it returns a (regularized) solution rather than a loss, the user defines a task loss on the output, most commonly an MSE against <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span>, matching the imitation setting in the original paper.</p>
+<p>RFWO <a class="footnote-reference brackets" href="#f6" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> exposes <span class="math notranslate nohighlight">\(\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})\)</span> directly as a differentiable layer. Since it returns a regularized solution rather than a loss, the user defines a task loss on the output. A common choice is MSE against <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span>.</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}}) = \arg\min_{\mathbf{w} \in \mathrm{conv}(\mathcal{S})} \hat{\mathbf{c}}^\top \mathbf{w} + \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2.\]</div>
@@ -741,7 +741,7 @@ solver call.</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx -\mathbf{d} \quad (\text{minimization}), \qquad \frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx \mathbf{d} \quad (\text{maximization}).\]</div>
 </div>
-<p>Intuitively, for minimization this rule decreases <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> along directions where <span class="math notranslate nohighlight">\(\mathbf{w}^*(\hat{\mathbf{c}})\)</span> tends to increase and vice versa, driving the predicted decision toward <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span>. NID is the special case of DBB in which <span class="math notranslate nohighlight">\(\lambda\)</span> is chosen so that the interpolated solution coincides with the negative-identity update, but it saves the extra solver call required by DBB.</p>
+<p>For minimization, this rule decreases <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> along directions where <span class="math notranslate nohighlight">\(\mathbf{w}^*(\hat{\mathbf{c}})\)</span> tends to increase, and vice versa. NID is the special case of DBB in which <span class="math notranslate nohighlight">\(\lambda\)</span> is chosen so that the interpolated solution coincides with the negative-identity update, but it saves the extra solver call required by DBB.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">NID</span></span></dt>
@@ -818,7 +818,7 @@ solver call.</p>
 </section>
 <section id="contrastive-map-cmap">
 <h3>Contrastive MAP (CMAP)<a class="headerlink" href="#contrastive-map-cmap" title="Link to this heading">¶</a></h3>
-<p>CMAP <a class="footnote-reference brackets" href="#f7" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> is a special case of NCE that uses only the single best negative sample.</p>
+<p>CMAP <a class="footnote-reference brackets" href="#f7" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> is a special case of NCE that uses only the lowest predicted-cost negative sample.</p>
 <p>CMAP keeps only the most-violating member of the pool, the one with the smallest predicted-cost objective, yielding a max-margin contrast against the true optimum. For a minimization problem,</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -892,7 +892,7 @@ solver call.</p>
 <p>All <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules support parallel solving during training via the <code class="docutils literal notranslate"><span class="pre">processes</span></code> parameter (<code class="docutils literal notranslate"><span class="pre">0</span></code> uses all available cores).</p>
 <a class="light-bg reference internal image-reference" href="../../_images/parallel-tsp.png"><img alt="../../_images/parallel-tsp.png" class="light-bg" src="../../_images/parallel-tsp.png" width="650" />
 </a>
-<p>The figure shows that increasing the number of processes reduces runtime.</p>
+<p>The figure reports runtime for different values of <code class="docutils literal notranslate"><span class="pre">processes</span></code>.</p>
 <p class="rubric">Footnotes</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="f1" role="doc-footnote">

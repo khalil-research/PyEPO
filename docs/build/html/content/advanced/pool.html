@@ -397,7 +397,7 @@
         <article role="main" id="furo-main-content">
           <section id="solution-pool">
 <h1>Solution Pool<a class="headerlink" href="#solution-pool" title="Link to this heading">¶</a></h1>
-<p>End-to-end predict-then-optimize training involves repeated solving of optimization problems. A solution pool <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> serves as an inner approximation of the feasible region, reducing computation by reusing previously computed solutions. Instead of solving the full linear/integer program, PyEPO selects the best cached solution from the pool.</p>
+<p>End-to-end predict-then-optimize training involves repeated solving of optimization problems. A solution pool <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> serves as an inner approximation of the feasible region, reducing computation by reusing previously computed solutions. Instead of solving the full linear/integer program, PyEPO selects the lowest-objective cached solution from the pool.</p>
 <p>The algorithm is shown below.</p>
 <p><strong>Algorithm</strong>: Gradient descent with inner approximation (numbering follows <a class="footnote-reference brackets" href="#f1" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>)</p>
 <p><strong>Input:</strong> <span class="math notranslate nohighlight">\(A, b\)</span>; training data <span class="math notranslate nohighlight">\(\mathcal{D} \equiv \{(x_i, c_i)\}_{i=1}^n\)</span></p>
