@@ -1,0 +1,1012 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Training Methods" href="function.html"><link rel="prev" title="Optimization Models" href="model.html">
+
+    <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Data and Datasets - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=222d9bf0" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #B95B10;
+  --color-brand-content: #B95B10;
+  --color-admonition-title--tip: #1F8237;
+  --color-admonition-title-background--tip: #E8F5EA;
+  --color-api-name: #1F8237;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #F4B452;
+  --color-brand-content: #F4B452;
+  --color-admonition-title--tip: #7CD688;
+  --color-admonition-title-background--tip: rgba(124, 214, 136, 0.12);
+  --color-api-name: #7CD688;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #F4B452;
+  --color-brand-content: #F4B452;
+  --color-admonition-title--tip: #7CD688;
+  --color-admonition-title-background--tip: rgba(124, 214, 136, 0.12);
+  --color-api-name: #7CD688;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Optimization Models</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Data and Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="function.html">Training Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training.html">Training Loops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Frontends and Backends</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../frontends/pytorch.html">PyTorch Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../frontends/jax.html">JAX Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solver_backends.html">Solver Backends</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/twostage.html">Two-stage Baseline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pool.html">Solution Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cave.html">CaVE Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/knn.html">kNN Robust Losses</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Citation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ref.html">Citation and References</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/pyepo/index.html">pyepo</a><input aria-label="Toggle navigation of pyepo" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/pyepo/EPO/index.html">pyepo.EPO</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/data/index.html">pyepo.data</a><input aria-label="Toggle navigation of pyepo.data" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/dataset/index.html">pyepo.data.dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/knapsack/index.html">pyepo.data.knapsack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/portfolio/index.html">pyepo.data.portfolio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/shortestpath/index.html">pyepo.data.shortestpath</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/tsp/index.html">pyepo.data.tsp</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/dsl/index.html">pyepo.dsl</a><input aria-label="Toggle navigation of pyepo.dsl" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/compiled/index.html">pyepo.dsl.compiled</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/expression/index.html">pyepo.dsl.expression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/objective/index.html">pyepo.dsl.objective</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/problem/index.html">pyepo.dsl.problem</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/abcmodule/index.html">pyepo.func.abcmodule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/blackbox/index.html">pyepo.func.blackbox</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/cave/index.html">pyepo.func.cave</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/contrastive/index.html">pyepo.func.contrastive</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/jax/index.html">pyepo.func.jax</a><input aria-label="Toggle navigation of pyepo.func.jax" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/abcmodule/index.html">pyepo.func.jax.abcmodule</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/blackbox/index.html">pyepo.func.jax.blackbox</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/cave/index.html">pyepo.func.jax.cave</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/contrastive/index.html">pyepo.func.jax.contrastive</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/perturbed/index.html">pyepo.func.jax.perturbed</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/rank/index.html">pyepo.func.jax.rank</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/regularized/index.html">pyepo.func.jax.regularized</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/surrogate/index.html">pyepo.func.jax.surrogate</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/utils/index.html">pyepo.func.jax.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/perturbed/index.html">pyepo.func.perturbed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/rank/index.html">pyepo.func.rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/regularized/index.html">pyepo.func.regularized</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/runtime/index.html">pyepo.func.runtime</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/surrogate/index.html">pyepo.func.surrogate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/utils/index.html">pyepo.func.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/metrics/index.html">pyepo.metric.metrics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/mse/index.html">pyepo.metric.mse</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/regret/index.html">pyepo.metric.regret</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/unambregret/index.html">pyepo.metric.unambregret</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/bases/index.html">pyepo.model.bases</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/compile/index.html">pyepo.model.copt.compile</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/knapsack/index.html">pyepo.model.copt.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/portfolio/index.html">pyepo.model.copt.portfolio</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/shortestpath/index.html">pyepo.model.copt.shortestpath</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/tsp/index.html">pyepo.model.copt.tsp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/vrp/index.html">pyepo.model.copt.vrp</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/compile/index.html">pyepo.model.grb.compile</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/grbmodel/index.html">pyepo.model.grb.grbmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/knapsack/index.html">pyepo.model.grb.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/portfolio/index.html">pyepo.model.grb.portfolio</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/shortestpath/index.html">pyepo.model.grb.shortestpath</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/tsp/index.html">pyepo.model.grb.tsp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/vrp/index.html">pyepo.model.grb.vrp</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/compile/index.html">pyepo.model.mpax.compile</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/knapsack/index.html">pyepo.model.mpax.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/mpaxmodel/index.html">pyepo.model.mpax.mpaxmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/shortestpath/index.html">pyepo.model.mpax.shortestpath</a></li>
+</ul>
+</li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/compile/index.html">pyepo.model.omo.compile</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/knapsack/index.html">pyepo.model.omo.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/omomodel/index.html">pyepo.model.omo.omomodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/portfolio/index.html">pyepo.model.omo.portfolio</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/shortestpath/index.html">pyepo.model.omo.shortestpath</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/tsp/index.html">pyepo.model.omo.tsp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/vrp/index.html">pyepo.model.omo.vrp</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html">pyepo.model.opt</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/compile/index.html">pyepo.model.ort.compile</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/knapsack/index.html">pyepo.model.ort.knapsack</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/ortcpmodel/index.html">pyepo.model.ort.ortcpmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/ortmodel/index.html">pyepo.model.ort.ortmodel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/shortestpath/index.html">pyepo.model.ort.shortestpath</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/predefined/index.html">pyepo.model.predefined</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/utils/index.html">pyepo.model.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../autoapi/pyepo/utils/index.html">pyepo.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/content/getting_started/data.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="data-and-datasets">
+<h1>Data and Datasets<a class="headerlink" href="#data-and-datasets" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> provides synthetic data generators and the <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> class for wrapping data samples.</p>
+<p>For more details, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb">02 Optimization Dataset</a> notebook.</p>
+<section id="data-generator">
+<h2>Data Generator<a class="headerlink" href="#data-generator" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code> includes synthetic data generators for four optimization problems: shortest path, multi-dimensional knapsack, traveling salesperson, and portfolio optimization.</p>
+<p>Each generator produces feature-cost pairs <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{c})\)</span>. The feature vector <span class="math notranslate nohighlight">\(\mathbf{x}_i \in \mathbb{R}^p\)</span> follows a standard multivariate Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>, and the cost <span class="math notranslate nohighlight">\(\mathbf{c}_i \in \mathbb{R}^d\)</span> is computed from a polynomial function <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span> scaled by a multiplicative noise factor <span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})\)</span>.</p>
+<p>Common parameters across all generators:</p>
+<ul class="simple">
+<li><p><strong>num_data</strong> (<span class="math notranslate nohighlight">\(n\)</span>): number of data samples</p></li>
+<li><p><strong>num_features</strong> (<span class="math notranslate nohighlight">\(p\)</span>): feature dimension</p></li>
+<li><p><strong>deg</strong> (<span class="math notranslate nohighlight">\(deg\)</span>): polynomial degree of the mapping <span class="math notranslate nohighlight">\(f(\mathbf{x}_i)\)</span></p></li>
+<li><p><strong>noise_width</strong> (<span class="math notranslate nohighlight">\(\bar{\epsilon}\)</span>): noise half-width (shortest path, knapsack, TSP; portfolio uses <code class="docutils literal notranslate"><span class="pre">noise_level</span></code> instead; see below)</p></li>
+<li><p><strong>seed</strong>: random seed for reproducibility</p></li>
+</ul>
+<section id="shortest-path">
+<h3>Shortest Path<a class="headerlink" href="#shortest-path" title="Link to this heading">¶</a></h3>
+<p>A random matrix <span class="math notranslate nohighlight">\(\mathcal{B} \in \mathbb{R}^{d \times p}\)</span> with Bernoulli(0.5) entries maps the feature vector into the cost coefficients: <span class="math notranslate nohighlight">\(c_i^j = \big[\tfrac{1}{{3.5}^{deg}} \big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j\)</span>.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.shortestpath.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dd><p>Generate synthetic feature-cost pairs for the shortest path problem.</p>
+<p>Features are sampled from a standard multivariate Gaussian
+<span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>. A random Bernoulli(0.5) matrix
+<span class="math notranslate nohighlight">\(\mathcal{B}\)</span> maps each feature vector into the edge-cost
+coefficients via a polynomial of degree <code class="docutils literal notranslate"><span class="pre">deg</span></code>, scaled by multiplicative
+uniform noise of half-width <code class="docutils literal notranslate"><span class="pre">noise_width</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_data</strong> – number of data points</p></li>
+<li><p><strong>num_features</strong> – dimension of features</p></li>
+<li><p><strong>grid</strong> – size of grid network</p></li>
+<li><p><strong>deg</strong> – polynomial degree of the feature-to-cost mapping</p></li>
+<li><p><strong>noise_width</strong> – half-width of the multiplicative uniform noise</p></li>
+<li><p><strong>seed</strong> – random seed (default 135 for reproducibility)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data features (np.ndarray), costs (np.ndarray)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="knapsack">
+<h3>Knapsack<a class="headerlink" href="#knapsack" title="Link to this heading">¶</a></h3>
+<p>Only the cost coefficients are uncertain; item weights are fixed. Let <span class="math notranslate nohighlight">\(m\)</span> be the number of items and <span class="math notranslate nohighlight">\(k\)</span> the number of resource dimensions. The weights <span class="math notranslate nohighlight">\(\mathcal{W} \in \mathbb{R}^{k \times m}\)</span> are sampled from 3 to 8 with one decimal place of precision. The cost coefficients are <span class="math notranslate nohighlight">\(c_i^j = \big\lceil \big[\tfrac{5}{{3.5}^{deg}} \big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j \big\rceil\)</span>.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.knapsack.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dd><p>Generate synthetic feature-cost pairs for the multi-dimensional knapsack.</p>
+<p>Item weights are fixed across instances; only the value (cost) of each
+item depends on features. Features are sampled from a standard Gaussian
+<span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span>, mapped through a random Bernoulli(0.5)
+matrix <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> and a polynomial of degree <code class="docutils literal notranslate"><span class="pre">deg</span></code>, then
+scaled by multiplicative uniform noise of half-width <code class="docutils literal notranslate"><span class="pre">noise_width</span></code> and
+rounded up to the nearest integer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_data</strong> – number of data points</p></li>
+<li><p><strong>num_features</strong> – dimension of features</p></li>
+<li><p><strong>num_items</strong> – number of items</p></li>
+<li><p><strong>dim</strong> – dimension of multi-dimensional knapsack</p></li>
+<li><p><strong>deg</strong> – polynomial degree of the feature-to-cost mapping</p></li>
+<li><p><strong>noise_width</strong> – half-width of the multiplicative uniform noise</p></li>
+<li><p><strong>seed</strong> – random state seed (default 135 for reproducibility)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>weights of items (np.ndarray), data features (np.ndarray), costs (np.ndarray)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
+<span class="n">num_item</span> <span class="o">=</span> <span class="mi">32</span> <span class="c1"># number of items</span>
+<span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># dimension of knapsack</span>
+<span class="n">weights</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">knapsack</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">num_item</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="traveling-salesperson">
+<h3>Traveling Salesperson<a class="headerlink" href="#traveling-salesperson" title="Link to this heading">¶</a></h3>
+<p>The distance matrix has two components: a Euclidean distance term and a feature-encoded term. Coordinates are drawn from a mixture of a Gaussian distribution <span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span> and a uniform distribution <span class="math notranslate nohighlight">\(\mathbf{U}(-2, 2)\)</span>. The feature-encoded component is <span class="math notranslate nohighlight">\(\tfrac{1}{{3}^{deg - 1}} \big(\tfrac{1}{\sqrt{p}} (\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} \cdot \boldsymbol{\epsilon}_i\)</span>, where the elements of <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> are products of Bernoulli <span class="math notranslate nohighlight">\(\mathbf{B}(0.5)\)</span> and uniform <span class="math notranslate nohighlight">\(\mathbf{U}(-2, 2)\)</span> samples.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.tsp.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dd><p>Generate synthetic feature-cost pairs for the traveling salesperson problem.</p>
+<p>Edge costs combine a Euclidean component (node coordinates drawn from a
+mixture of a Gaussian <span class="math notranslate nohighlight">\(\mathcal{N}(0, \mathbf{I})\)</span> and a uniform
+<span class="math notranslate nohighlight">\(\mathbf{U}(-2, 2)\)</span> distribution) with a feature-encoded component
+obtained by mapping the standard-Gaussian feature vector through a random
+Bernoulli <span class="math notranslate nohighlight">\(\times\)</span> uniform matrix <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> and a polynomial
+of degree <code class="docutils literal notranslate"><span class="pre">deg</span></code>, scaled by multiplicative noise of half-width <code class="docutils literal notranslate"><span class="pre">noise_width</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_data</strong> – number of data points</p></li>
+<li><p><strong>num_features</strong> – dimension of features</p></li>
+<li><p><strong>num_nodes</strong> – number of nodes</p></li>
+<li><p><strong>deg</strong> – polynomial degree of the feature-to-cost mapping</p></li>
+<li><p><strong>noise_width</strong> – half-width of the multiplicative uniform noise</p></li>
+<li><p><strong>seed</strong> – random seed (default 135 for reproducibility)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data features (np.ndarray), costs (np.ndarray)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
+<span class="n">num_node</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># number of nodes</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tsp</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">num_node</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="portfolio">
+<h3>Portfolio<a class="headerlink" href="#portfolio" title="Link to this heading">¶</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(\bar{r}_{ij} = \big(\tfrac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}}\big)^{deg}\)</span>. The expected return is <span class="math notranslate nohighlight">\(\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \boldsymbol{\epsilon}\)</span>, and the covariance matrix is <span class="math notranslate nohighlight">\(\mathbf{\Sigma} = \mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{B}\)</span> follows a Bernoulli distribution, <span class="math notranslate nohighlight">\(\mathbf{L} \sim \mathbf{U}(-0.0025\tau, 0.0025\tau)\)</span>, and <span class="math notranslate nohighlight">\(\mathbf{f}, \boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})\)</span>.</p>
+<p>Unlike the other generators, portfolio noise is controlled by <strong>noise_level</strong> (<span class="math notranslate nohighlight">\(\tau\)</span>), which scales both the factor loadings <span class="math notranslate nohighlight">\(\mathbf{L}\)</span> and the residual noise; <code class="docutils literal notranslate"><span class="pre">noise_width</span></code> does not apply here.</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.portfolio.</span></span><span class="sig-name descname"><span class="pre">genData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_assets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">135</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dd><p>Generate synthetic feature-cost pairs for portfolio optimization.</p>
+<p>Returns the expected returns <span class="math notranslate nohighlight">\(\mathbf{r}\)</span> (the per-instance cost
+vectors) and a single shared covariance matrix <span class="math notranslate nohighlight">\(\mathbf{\Sigma}\)</span>
+used in the risk constraint of the predefined portfolio model. The mean
+returns follow a factor-model structure
+<span class="math notranslate nohighlight">\(\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L}\mathbf{f}
++ 0.01 \tau \boldsymbol{\epsilon}\)</span>, where the factor loadings
+<span class="math notranslate nohighlight">\(\mathbf{L}\)</span> and residual noise are both scaled by <code class="docutils literal notranslate"><span class="pre">noise_level</span></code>
+(<span class="math notranslate nohighlight">\(\tau\)</span>). Unlike the other generators in <code class="docutils literal notranslate"><span class="pre">pyepo.data</span></code>, portfolio
+noise is controlled by <code class="docutils literal notranslate"><span class="pre">noise_level</span></code> rather than <code class="docutils literal notranslate"><span class="pre">noise_width</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_data</strong> – number of data points</p></li>
+<li><p><strong>num_features</strong> – dimension of features</p></li>
+<li><p><strong>num_assets</strong> – number of assets</p></li>
+<li><p><strong>deg</strong> – polynomial degree of the feature-to-return mapping</p></li>
+<li><p><strong>noise_level</strong> – scales factor loadings L and residual noise (tau)</p></li>
+<li><p><strong>seed</strong> – random seed (default 135 for reproducibility)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>covariance matrix (np.ndarray), data features (np.ndarray), mean returns (np.ndarray)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># size of feature</span>
+<span class="n">num_assets</span> <span class="o">=</span> <span class="mi">50</span> <span class="c1"># number of assets</span>
+<span class="n">cov</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">portfolio</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">num_assets</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="built-in-problem-models">
+<h2>Built-in Problem Models<a class="headerlink" href="#built-in-problem-models" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">PyEPO</span></code> includes built-in models for several classic problems. Each is built by a factory that takes a <code class="docutils literal notranslate"><span class="pre">backend</span></code> keyword (default <code class="docutils literal notranslate"><span class="pre">&quot;gurobi&quot;</span></code>). Pair one with generated data and an <code class="docutils literal notranslate"><span class="pre">optDataset</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyepo</span><span class="w"> </span><span class="kn">import</span> <span class="n">model</span>
+
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>                  <span class="c1"># default Gurobi</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDataset</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Switch the solver with <code class="docutils literal notranslate"><span class="pre">backend</span></code>. The generic backends take a <code class="docutils literal notranslate"><span class="pre">solver=</span></code> argument naming the open solver to run:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;copt&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;pyomo&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;glpk&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;mpax&quot;</span><span class="p">)</span>             <span class="c1"># LP on GPU</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In end-to-end training, <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules call <code class="docutils literal notranslate"><span class="pre">setObj</span></code> and <code class="docutils literal notranslate"><span class="pre">solve</span></code> during the forward pass.</p>
+</div>
+<section id="shortest-path-model">
+<h3>Shortest Path Model<a class="headerlink" href="#shortest-path-model" title="Link to this heading">¶</a></h3>
+<p>Minimum-cost path from the northwest to the southeast corner of an <code class="docutils literal notranslate"><span class="pre">(h,</span> <span class="pre">w)</span></code> grid, formulated as a minimum-cost-flow LP. Backends: gurobi, copt, pyomo, ortools, mpax.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.model.shortestPathModel">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.</span></span><span class="sig-name descname"><span class="pre">shortestPathModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gurobi'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.shortestPathModel" title="Link to this definition">¶</a></dt>
+<dd><p>Shortest path on a grid network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – grid size <code class="docutils literal notranslate"><span class="pre">(h,</span> <span class="pre">w)</span></code></p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – solver backend; one of <code class="docutils literal notranslate"><span class="pre">&quot;gurobi&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;copt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;pyomo&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ortools&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;mpax&quot;</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="knapsack-model">
+<h3>Knapsack Model<a class="headerlink" href="#knapsack-model" title="Link to this heading">¶</a></h3>
+<p>Multi-dimensional 0/1 knapsack: maximize value subject to per-dimension capacities. <code class="docutils literal notranslate"><span class="pre">weights</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(dim,</span> <span class="pre">n_items)</span></code> and <code class="docutils literal notranslate"><span class="pre">capacity</span></code> has length <code class="docutils literal notranslate"><span class="pre">dim</span></code>. Backends: gurobi, copt, pyomo, ortools, mpax (LP relaxation).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">weights</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+<span class="n">capacity</span> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">knapsackModel</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">capacity</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.model.knapsackModel">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.</span></span><span class="sig-name descname"><span class="pre">knapsackModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gurobi'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.knapsackModel" title="Link to this definition">¶</a></dt>
+<dd><p>Multi-dimensional knapsack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>ndarray</em>) – item weights with shape <code class="docutils literal notranslate"><span class="pre">(dim,</span> <span class="pre">n_items)</span></code></p></li>
+<li><p><strong>capacity</strong> (<em>ndarray</em>) – per-dimension capacity with length <code class="docutils literal notranslate"><span class="pre">dim</span></code></p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – solver backend; one of <code class="docutils literal notranslate"><span class="pre">&quot;gurobi&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;copt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;pyomo&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ortools&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;mpax&quot;</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="traveling-salesperson-model">
+<h3>Traveling Salesperson Model<a class="headerlink" href="#traveling-salesperson-model" title="Link to this heading">¶</a></h3>
+<p>Shortest tour visiting each city once. <code class="docutils literal notranslate"><span class="pre">formulation</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;DFJ&quot;</span></code> (lazy subtour elimination), <code class="docutils literal notranslate"><span class="pre">&quot;GG&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;MTZ&quot;</span></code>. Backends: gurobi and copt (all three); pyomo (GG, MTZ). On gurobi, <code class="docutils literal notranslate"><span class="pre">recycle_cuts=True</span></code> keeps the subtour cuts found in one solve for later solves.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optmodel</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">tspModel</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">formulation</span><span class="o">=</span><span class="s2">&quot;DFJ&quot;</span><span class="p">,</span> <span class="n">recycle_cuts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.model.tspModel">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.</span></span><span class="sig-name descname"><span class="pre">tspModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gurobi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formulation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DFJ'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.tspModel" title="Link to this definition">¶</a></dt>
+<dd><p>Traveling salesperson.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of nodes</p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – solver backend; one of <code class="docutils literal notranslate"><span class="pre">&quot;gurobi&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;copt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;pyomo&quot;</span></code></p></li>
+<li><p><strong>formulation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – ILP formulation; one of <code class="docutils literal notranslate"><span class="pre">&quot;DFJ&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;GG&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;MTZ&quot;</span></code> (<code class="docutils literal notranslate"><span class="pre">&quot;DFJ&quot;</span></code> on gurobi and copt only)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="capacitated-vehicle-routing-model">
+<h3>Capacitated Vehicle Routing Model<a class="headerlink" href="#capacitated-vehicle-routing-model" title="Link to this heading">¶</a></h3>
+<p>Shortest vehicle routes from a depot that serve every customer within capacity. <code class="docutils literal notranslate"><span class="pre">formulation</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;RCI&quot;</span></code> (lazy rounded-capacity cuts) or <code class="docutils literal notranslate"><span class="pre">&quot;MTZ&quot;</span></code>. Backends: gurobi and copt (both); pyomo (MTZ). On gurobi, <code class="docutils literal notranslate"><span class="pre">&quot;RCI&quot;</span></code> also accepts <code class="docutils literal notranslate"><span class="pre">recycle_cuts=True</span></code> to keep the cuts found in one solve for later solves.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optmodel</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">vrpModel</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">demands</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                          <span class="n">capacity</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">num_vehicle</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">formulation</span><span class="o">=</span><span class="s2">&quot;RCI&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.model.vrpModel">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.</span></span><span class="sig-name descname"><span class="pre">vrpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_vehicle</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gurobi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formulation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RCI'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.vrpModel" title="Link to this definition">¶</a></dt>
+<dd><p>Capacitated vehicle routing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of nodes, with the depot as node 0</p></li>
+<li><p><strong>demands</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – per-customer demands with length <code class="docutils literal notranslate"><span class="pre">num_nodes</span> <span class="pre">-</span> <span class="pre">1</span></code></p></li>
+<li><p><strong>capacity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – vehicle capacity</p></li>
+<li><p><strong>num_vehicle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of vehicles</p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – solver backend; one of <code class="docutils literal notranslate"><span class="pre">&quot;gurobi&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;copt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;pyomo&quot;</span></code></p></li>
+<li><p><strong>formulation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – ILP formulation; <code class="docutils literal notranslate"><span class="pre">&quot;RCI&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;MTZ&quot;</span></code> (<code class="docutils literal notranslate"><span class="pre">&quot;RCI&quot;</span></code> on gurobi and copt only)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="portfolio-model">
+<h3>Portfolio Model<a class="headerlink" href="#portfolio-model" title="Link to this heading">¶</a></h3>
+<p>Mean-variance allocation that maximizes return under a risk budget. Backends: gurobi, copt, pyomo.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">covariance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">optmodel</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">portfolioModel</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">covariance</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyepo.model.portfolioModel">
+<span class="sig-prename descclassname"><span class="pre">pyepo.model.</span></span><span class="sig-name descname"><span class="pre">portfolioModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_assets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gurobi'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.portfolioModel" title="Link to this definition">¶</a></dt>
+<dd><p>Mean-variance portfolio optimization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_assets</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of assets</p></li>
+<li><p><strong>covariance</strong> (<em>ndarray</em>) – covariance matrix of the asset returns</p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – solver backend; one of <code class="docutils literal notranslate"><span class="pre">&quot;gurobi&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;copt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;pyomo&quot;</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="optdataset">
+<h2>optDataset<a class="headerlink" href="#optdataset" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDataset</span></code> is a PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> that stores features and cost coefficients, and <strong>solves the optimization problem to obtain optimal solutions and objective values</strong>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">optDataset</span></code> precomputes <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> and <span class="math notranslate nohighlight">\(z^*(\mathbf{c})\)</span> at construction time. If those labels are already available, batches can be passed directly to <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span></dt>
+<dd><p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for predict-then-optimize problems.</p>
+<p>At construction time it solves the optimization problem for every cost
+vector and caches the optimal solution <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span>
+and objective value <span class="math notranslate nohighlight">\(z^*(\mathbf{c})\)</span>. This precomputation removes
+solver overhead from the training loop, making <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> the standard
+input format for end-to-end training in PyEPO. When labels are already
+available from another source, <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> can be skipped and batches
+fed directly to <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Optimization model</p></li>
+<li><p><strong>feats</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Data features</p></li>
+<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cost vectors</p></li>
+<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cached optimal solutions w*(c)</p></li>
+<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cached optimal objective values z*(c)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The following example shows how to use <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> with a PyTorch <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="c1"># model for shortest path</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+
+<span class="c1"># generate data</span>
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
+<span class="n">deg</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># polynomial degree</span>
+<span class="n">noise_width</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># noise width</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">noise_width</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+
+<span class="c1"># build dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDataset</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+<span class="c1"># get data loader</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="optdatasetknn">
+<h2>optDatasetKNN<a class="headerlink" href="#optdatasetknn" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.optDatasetKNN</span></code> is a PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> that implements the k-nearest neighbors (kNN) robust loss <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for predict-then-optimize training. It stores features and cost coefficients, and computes the <strong>mean k-nearest-neighbor solutions and the corresponding optimal objective values</strong>.</p>
+<p>For a runnable walkthrough, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb">08 kNN Robust Losses</a> notebook.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetKNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for the kNN-robust decision-focused loss.</p>
+<p>For each instance the cost vector is replaced with a convex combination of
+its k nearest neighbours in feature space, and the optimization problem is
+solved on the smoothed costs. The mean kNN solutions and objective values
+are cached for training, providing a robust supervision signal under noisy
+or out-of-distribution feature observations.</p>
+<p>Reference: Schutte et al. (2023) <a class="reference external" href="https://arxiv.org/abs/2310.04328">https://arxiv.org/abs/2310.04328</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Optimization model</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – number of nearest neighbours selected</p></li>
+<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – self-weight in the kNN convex combination (1.0 = no smoothing)</p></li>
+<li><p><strong>feats</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Data features</p></li>
+<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – kNN-smoothed cost vectors</p></li>
+<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Mean kNN optimal solutions</p></li>
+<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Mean kNN optimal objective values</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="c1"># model for shortest path</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># grid size</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">shortestPathModel</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+
+<span class="c1"># generate data</span>
+<span class="n">num_data</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># number of data</span>
+<span class="n">num_feat</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># size of feature</span>
+<span class="n">deg</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># polynomial degree</span>
+<span class="n">noise_width</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># noise width</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shortestpath</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">noise_width</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+
+<span class="c1"># build dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDatasetKNN</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># get data loader</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="optdatasetconstrs">
+<h2>optDatasetConstrs<a class="headerlink" href="#optdatasetconstrs" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code> is a PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for the CaVE <a class="footnote-reference brackets" href="#f2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> cone-aligned loss. In addition to the features, costs, optimal solutions, and objective values stored by <code class="docutils literal notranslate"><span class="pre">optDataset</span></code>, it also extracts the <strong>normals of the binding constraints at the optimal vertex</strong> for each instance. CaVE then projects the sense-flipped predicted cost vector onto the cone spanned by these normals.</p>
+<p><code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code> currently requires a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code>. The dataset also checks that the optimal vertex is binary, since CaVE is defined for binary linear programs.</p>
+<p>For a runnable walkthrough that uses <code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code> end-to-end with the CaVE loss, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb">04 CaVE for Binary Linear Programs</a> notebook.</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">optDatasetConstrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_infeas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> for the CaVE cone-aligned loss.</p>
+<p>Stores features and cost coefficients, solves each instance, and extracts
+the <strong>normals of the binding constraints at the optimal vertex</strong> in
+canonical <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> orientation.
+These normals span the polyhedral cone onto which <code class="docutils literal notranslate"><span class="pre">coneAlignedCosine</span></code>
+projects the predicted cost vector during training.</p>
+<p>CaVE is defined for binary linear programs only, so the optimal vertex
+must be binary; instances that are infeasible or have non-binary optima
+raise (or are skipped when <code class="docutils literal notranslate"><span class="pre">skip_infeas=True</span></code>). Binding-constraint
+extraction uses Gurobi’s sparse-matrix API, which is why this dataset
+currently requires a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code>.</p>
+<p>Per-instance row counts differ (different constraints bind at different
+vertices), so batches must be assembled with <code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>.</p>
+<p>Reference: Tang &amp; Khalil (2024)
+<a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12">https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><em>optModel</em></a>) – Gurobi-backed optimization model</p></li>
+<li><p><strong>feats</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Data features</p></li>
+<li><p><strong>costs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Cost vectors</p></li>
+<li><p><strong>sols</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal solutions</p></li>
+<li><p><strong>objs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a>) – Optimal objective values</p></li>
+<li><p><strong>ctrs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><em>torch.Tensor</em></a><em>]</em>) – Per-instance binding-constraint normals
+in canonical <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> orientation (ragged row counts)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Per-instance constraint matrices have different row counts (different sets of constraints are tight at different vertices), so batching requires a custom <code class="docutils literal notranslate"><span class="pre">collate_fn</span></code>:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyepo.data.dataset.</span></span><span class="sig-name descname"><span class="pre">collate_tight_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Collate function for <code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code> batches.</p>
+<p>Stacks the standard <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code> tensors and zero-pads the ragged
+per-instance binding-constraint matrices to a common row count so they
+can be assembled into a single <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">max_rows,</span> <span class="pre">num_cost)</span></code> tensor
+for <code class="docutils literal notranslate"><span class="pre">coneAlignedCosine</span></code>.</p>
+</dd></dl>
+
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDatasetConstrs</span><span class="p">,</span> <span class="n">collate_tight_constraints</span>
+
+<span class="c1"># model for TSP (Gurobi backend required)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tspModel</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">formulation</span><span class="o">=</span><span class="s2">&quot;DFJ&quot;</span><span class="p">)</span>
+
+<span class="c1"># generate data</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tsp</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span><span class="n">num_data</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span><span class="p">)</span>
+
+<span class="c1"># build CaVE dataset (extracts tight binding-constraint normals at the optimum)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">optDatasetConstrs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+<span class="c1"># collate_fn pads ragged per-instance constraint matrices</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_tight_constraints</span><span class="p">)</span>
+</pre></div>
+</div>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="f1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Schutte, N., Postek, K., &amp; Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.</p>
+</aside>
+<aside class="footnote brackets" id="f2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Tang, B., &amp; Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).</p>
+</aside>
+</aside>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="function.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Training Methods</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="model.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Optimization Models</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021, Bo Tang
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Data and Datasets</a><ul>
+<li><a class="reference internal" href="#data-generator">Data Generator</a><ul>
+<li><a class="reference internal" href="#shortest-path">Shortest Path</a></li>
+<li><a class="reference internal" href="#knapsack">Knapsack</a></li>
+<li><a class="reference internal" href="#traveling-salesperson">Traveling Salesperson</a></li>
+<li><a class="reference internal" href="#portfolio">Portfolio</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#built-in-problem-models">Built-in Problem Models</a><ul>
+<li><a class="reference internal" href="#shortest-path-model">Shortest Path Model</a><ul>
+<li><a class="reference internal" href="#pyepo.model.shortestPathModel"><code class="docutils literal notranslate"><span class="pre">shortestPathModel()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#knapsack-model">Knapsack Model</a><ul>
+<li><a class="reference internal" href="#pyepo.model.knapsackModel"><code class="docutils literal notranslate"><span class="pre">knapsackModel()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#traveling-salesperson-model">Traveling Salesperson Model</a><ul>
+<li><a class="reference internal" href="#pyepo.model.tspModel"><code class="docutils literal notranslate"><span class="pre">tspModel()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#capacitated-vehicle-routing-model">Capacitated Vehicle Routing Model</a><ul>
+<li><a class="reference internal" href="#pyepo.model.vrpModel"><code class="docutils literal notranslate"><span class="pre">vrpModel()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#portfolio-model">Portfolio Model</a><ul>
+<li><a class="reference internal" href="#pyepo.model.portfolioModel"><code class="docutils literal notranslate"><span class="pre">portfolioModel()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optdataset">optDataset</a></li>
+<li><a class="reference internal" href="#optdatasetknn">optDatasetKNN</a></li>
+<li><a class="reference internal" href="#optdatasetconstrs">optDatasetConstrs</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=90dbff6b"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Solution Pool" href="pool.html"><link rel="prev" title="JAX Frontend" href="jax.html">
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Training - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
+        <title>Training Loops - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -189,7 +189,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -207,26 +207,48 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../tutorial.html">Tutorial</a><input aria-label="Toggle navigation of Tutorial" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html">Autograd Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="jax.html">JAX Frontend</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Training</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
-<li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/pyepo/index.html">pyepo</a><input aria-label="Toggle navigation of pyepo" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/model.html">Optimization Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data.html">Data and Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/function.html">Training Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/training.html">Training Loops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/evaluation.html">Evaluation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Frontends and Backends</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../frontends/pytorch.html">PyTorch Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../frontends/jax.html">JAX Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solver_backends.html">Solver Backends</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/twostage.html">Two-stage Baseline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pool.html">Solution Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cave.html">CaVE Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/knn.html">kNN Robust Losses</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Citation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ref.html">Citation and References</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/pyepo/index.html">pyepo</a><input aria-label="Toggle navigation of pyepo" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/pyepo/EPO/index.html">pyepo.EPO</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/data/index.html">pyepo.data</a><input aria-label="Toggle navigation of pyepo.data" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/data/index.html">pyepo.data</a><input aria-label="Toggle navigation of pyepo.data" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/dataset/index.html">pyepo.data.dataset</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/knapsack/index.html">pyepo.data.knapsack</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/portfolio/index.html">pyepo.data.portfolio</a></li>
@@ -234,19 +256,19 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/tsp/index.html">pyepo.data.tsp</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/dsl/index.html">pyepo.dsl</a><input aria-label="Toggle navigation of pyepo.dsl" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/dsl/index.html">pyepo.dsl</a><input aria-label="Toggle navigation of pyepo.dsl" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/compiled/index.html">pyepo.dsl.compiled</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/expression/index.html">pyepo.dsl.expression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/objective/index.html">pyepo.dsl.objective</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/problem/index.html">pyepo.dsl.problem</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/abcmodule/index.html">pyepo.func.abcmodule</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/blackbox/index.html">pyepo.func.blackbox</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/cave/index.html">pyepo.func.cave</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/contrastive/index.html">pyepo.func.contrastive</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/jax/index.html">pyepo.func.jax</a><input aria-label="Toggle navigation of pyepo.func.jax" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/jax/index.html">pyepo.func.jax</a><input aria-label="Toggle navigation of pyepo.func.jax" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/abcmodule/index.html">pyepo.func.jax.abcmodule</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/blackbox/index.html">pyepo.func.jax.blackbox</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/cave/index.html">pyepo.func.jax.cave</a></li>
@@ -266,16 +288,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/utils/index.html">pyepo.func.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/metrics/index.html">pyepo.metric.metrics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/mse/index.html">pyepo.metric.mse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/regret/index.html">pyepo.metric.regret</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/unambregret/index.html">pyepo.metric.unambregret</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/bases/index.html">pyepo.model.bases</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/compile/index.html">pyepo.model.copt.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/knapsack/index.html">pyepo.model.copt.knapsack</a></li>
@@ -285,7 +307,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/vrp/index.html">pyepo.model.copt.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/compile/index.html">pyepo.model.grb.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/grbmodel/index.html">pyepo.model.grb.grbmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/knapsack/index.html">pyepo.model.grb.knapsack</a></li>
@@ -295,14 +317,14 @@
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/vrp/index.html">pyepo.model.grb.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/compile/index.html">pyepo.model.mpax.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/knapsack/index.html">pyepo.model.mpax.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/mpaxmodel/index.html">pyepo.model.mpax.mpaxmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/shortestpath/index.html">pyepo.model.mpax.shortestpath</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/compile/index.html">pyepo.model.omo.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/knapsack/index.html">pyepo.model.omo.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/omomodel/index.html">pyepo.model.omo.omomodel</a></li>
@@ -313,7 +335,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html">pyepo.model.opt</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/compile/index.html">pyepo.model.ort.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/knapsack/index.html">pyepo.model.ort.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/ortcpmodel/index.html">pyepo.model.ort.ortcpmodel</a></li>
@@ -325,7 +347,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/utils/index.html">pyepo.model.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
 </ul>
@@ -368,353 +390,14 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="training">
-<h1>Training<a class="headerlink" href="#training" title="Link to this heading">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> extends PyTorch autograd modules to support automatic differentiation through optimization. This page collects training-loop templates for each method. See <a class="reference internal" href="function.html"><span class="doc">Autograd Functions</span></a> for the method API and selection guide.</p>
-<p>For a runnable walkthrough, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb">03 Training and Testing</a> notebook.</p>
-<section id="common-setup">
-<h2>Common Setup<a class="headerlink" href="#common-setup" title="Link to this heading">¶</a></h2>
-<p>All examples below share the same setup: a linear prediction model trained on knapsack data defined with the DSL.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyepo</span><span class="w"> </span><span class="kn">import</span> <span class="n">EPO</span><span class="p">,</span> <span class="n">dsl</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
-
-<span class="c1"># generate data</span>
-<span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">num_item</span><span class="p">,</span> <span class="n">num_dim</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span>
-<span class="n">weights</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">costs</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">knapsack</span><span class="o">.</span><span class="n">genData</span><span class="p">(</span>
-    <span class="n">num_data</span><span class="p">,</span> <span class="n">num_feat</span><span class="p">,</span> <span class="n">num_item</span><span class="p">,</span> <span class="n">num_dim</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise_width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">135</span>
-<span class="p">)</span>
-<span class="n">capacity</span> <span class="o">=</span> <span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-
-<span class="c1"># define the knapsack problem with the DSL</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">dsl</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">num_item</span><span class="p">,</span> <span class="n">vtype</span><span class="o">=</span><span class="n">EPO</span><span class="o">.</span><span class="n">BINARY</span><span class="p">)</span>
-<span class="n">c</span> <span class="o">=</span> <span class="n">dsl</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">num_item</span><span class="p">)</span>
-<span class="n">optmodel</span> <span class="o">=</span> <span class="n">dsl</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">dsl</span><span class="o">.</span><span class="n">Maximize</span><span class="p">(</span><span class="n">c</span> <span class="o">@</span> <span class="n">x</span><span class="p">),</span> <span class="p">[</span><span class="n">weights</span> <span class="o">@</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">capacity</span><span class="p">])</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;gurobi&quot;</span><span class="p">)</span>
-
-<span class="c1"># dataset and data loader</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">optDataset</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">costs</span><span class="p">)</span>
-<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># build linear prediction model</span>
-<span class="n">predmodel</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_feat</span><span class="p">,</span> <span class="n">num_item</span><span class="p">)</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">predmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
-
-<span class="c1"># a positive-output predictor, for the multiplicative perturbed variants below</span>
-<span class="n">positive_predmodel</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_feat</span><span class="p">,</span> <span class="n">num_item</span><span class="p">),</span> <span class="n">nn</span><span class="o">.</span><span class="n">Softplus</span><span class="p">())</span>
-</pre></div>
-</div>
-<p>Each recipe below is a self-contained training loop: pick the method you want and copy its block as-is.</p>
-</section>
-<section id="surrogate-losses">
-<h2>Surrogate Losses<a class="headerlink" href="#surrogate-losses" title="Link to this heading">¶</a></h2>
-<section id="smart-predict-then-optimize-loss-spo">
-<h3>Smart Predict-then-Optimize+ Loss (SPO+)<a class="headerlink" href="#smart-predict-then-optimize-loss-spo" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">SPOPlus</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">spo</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="perturbation-gradient-pg">
-<h3>Perturbation Gradient (PG)<a class="headerlink" href="#perturbation-gradient-pg" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">PG</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">two_sides</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">pg</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="perturbed-methods">
-<h2>Perturbed Methods<a class="headerlink" href="#perturbed-methods" title="Link to this heading">¶</a></h2>
-<section id="differentiable-perturbed-optimizer-dpo">
-<h3>Differentiable Perturbed Optimizer (DPO)<a class="headerlink" href="#differentiable-perturbed-optimizer-dpo" title="Link to this heading">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">DPO</span></code> is the additive Gaussian version. <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code> is the multiplicative version for sign-sensitive oracles; it requires a positive-output predictor (<code class="docutils literal notranslate"><span class="pre">positive_predmodel</span></code> in Common Setup, a linear layer followed by <code class="docutils literal notranslate"><span class="pre">nn.Softplus()</span></code>) so that predicted costs keep their sign.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># additive</span>
-<span class="n">ptb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">DPO</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="c1"># multiplicative: swap predmodel for positive_predmodel below</span>
-<span class="c1"># ptb = pyepo.func.DPOMul(optmodel, n_samples=10, sigma=0.5, processes=2)</span>
-
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">we</span> <span class="o">=</span> <span class="n">ptb</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="perturbed-fenchel-young-loss-pfyl">
-<h3>Perturbed Fenchel-Young Loss (PFYL)<a class="headerlink" href="#perturbed-fenchel-young-loss-pfyl" title="Link to this heading">¶</a></h3>
-<p>The multiplicative variant <code class="docutils literal notranslate"><span class="pre">PFYMul</span></code> shares the sign convention of <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code> and requires a positive-output predictor.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># additive</span>
-<span class="n">pfy</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">PFY</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="c1"># multiplicative: swap predmodel for positive_predmodel below</span>
-<span class="c1"># pfy = pyepo.func.PFYMul(optmodel, n_samples=10, sigma=0.5, processes=2)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">pfy</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="implicit-maximum-likelihood-estimator-i-mle">
-<h3>Implicit Maximum Likelihood Estimator (I-MLE)<a class="headerlink" href="#implicit-maximum-likelihood-estimator-i-mle" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">imle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">IMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">we</span> <span class="o">=</span> <span class="n">imle</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="adaptive-implicit-maximum-likelihood-estimator-ai-mle">
-<h3>Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)<a class="headerlink" href="#adaptive-implicit-maximum-likelihood-estimator-ai-mle" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aimle</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">AIMLE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">we</span> <span class="o">=</span> <span class="n">aimle</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="regularized-methods">
-<h2>Regularized Methods<a class="headerlink" href="#regularized-methods" title="Link to this heading">¶</a></h2>
-<section id="l2-regularized-frank-wolfe-rfwo">
-<h3>L2 Regularized Frank-Wolfe (RFWO)<a class="headerlink" href="#l2-regularized-frank-wolfe-rfwo" title="Link to this heading">¶</a></h3>
-<p>RFWO returns a regularized solution; solution-level MSE against <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> matches the imitation setting in the paper.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfwo</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">RFWO</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">wr</span> <span class="o">=</span> <span class="n">rfwo</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">wr</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="l2-regularized-frank-wolfe-with-fenchel-young-loss-rfyl">
-<h3>L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)<a class="headerlink" href="#l2-regularized-frank-wolfe-with-fenchel-young-loss-rfyl" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rfyl</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">RFY</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">rfyl</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="black-box-methods">
-<h2>Black-Box Methods<a class="headerlink" href="#black-box-methods" title="Link to this heading">¶</a></h2>
-<p>Black-box methods return a predicted solution. An objective-value loss <span class="math notranslate nohighlight">\(|\langle \mathbf{c}, \hat{\mathbf{w}} \rangle - \mathbf{c}^\top \mathbf{w}^*(\mathbf{c})|\)</span> is the standard pairing.</p>
-<section id="differentiable-black-box-optimizer-dbb">
-<h3>Differentiable Black-Box Optimizer (DBB)<a class="headerlink" href="#differentiable-black-box-optimizer-dbb" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dbb</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">DBB</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">lambd</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">wp</span> <span class="o">=</span> <span class="n">dbb</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="n">zp</span> <span class="o">=</span> <span class="p">(</span><span class="n">wp</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">zp</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="negative-identity-backpropagation-nid">
-<h3>Negative Identity Backpropagation (NID)<a class="headerlink" href="#negative-identity-backpropagation-nid" title="Link to this heading">¶</a></h3>
-<p>NID is hyperparameter-free and uses the same training loop as DBB.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nid</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">NID</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">L1Loss</span><span class="p">()</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">wp</span> <span class="o">=</span> <span class="n">nid</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-        <span class="n">zp</span> <span class="o">=</span> <span class="p">(</span><span class="n">wp</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">zp</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="cone-aligned-estimation">
-<h2>Cone-Aligned Estimation<a class="headerlink" href="#cone-aligned-estimation" title="Link to this heading">¶</a></h2>
-<section id="cone-aligned-vector-estimation-cave">
-<h3>Cone-Aligned Vector Estimation (CaVE)<a class="headerlink" href="#cone-aligned-vector-estimation-cave" title="Link to this heading">¶</a></h3>
-<p>CaVE requires a dedicated dataset class that extracts binding-constraint normals at the optimum (<code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code>) and a custom collate function (<code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>) to handle ragged per-instance constraint counts. The batch yields an extra <code class="docutils literal notranslate"><span class="pre">tight_ctrs</span></code> element on top of the usual <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDatasetConstrs</span><span class="p">,</span> <span class="n">collate_tight_constraints</span>
-
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">optDatasetConstrs</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
-    <span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_tight_constraints</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">cave</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">CaVE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">tight_ctrs</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">cave</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">tight_ctrs</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="contrastive-methods">
-<h2>Contrastive Methods<a class="headerlink" href="#contrastive-methods" title="Link to this heading">¶</a></h2>
-<p>Contrastive methods train against a cached pool of solutions. <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls how often new instances are solved exactly during training, and <code class="docutils literal notranslate"><span class="pre">dataset</span></code> seeds the pool with optimal solutions. See <a class="reference internal" href="pool.html"><span class="doc">Solution Pool</span></a> for details on the solution-pool mechanism.</p>
-<section id="noise-contrastive-estimation-nce">
-<h3>Noise Contrastive Estimation (NCE)<a class="headerlink" href="#noise-contrastive-estimation-nce" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nce</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">NCE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">nce</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="contrastive-map-cmap">
-<h3>Contrastive MAP (CMAP)<a class="headerlink" href="#contrastive-map-cmap" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">CMAP</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="learning-to-rank-ltr">
-<h2>Learning to Rank (LTR)<a class="headerlink" href="#learning-to-rank-ltr" title="Link to this heading">¶</a></h2>
-<p>LTR variants share the same pool configuration as the contrastive methods (<code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code>, <code class="docutils literal notranslate"><span class="pre">dataset</span></code>). Pick one based on how it scores the ranking.</p>
-<section id="pointwise-ltr">
-<h3>Pointwise LTR<a class="headerlink" href="#pointwise-ltr" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">ptLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">ltr</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="pairwise-ltr">
-<h3>Pairwise LTR<a class="headerlink" href="#pairwise-ltr" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">prLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">ltr</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-<section id="listwise-ltr">
-<h3>Listwise LTR<a class="headerlink" href="#listwise-ltr" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ltr</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">lsLTR</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">solve_ratio</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
-
-<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">cp</span> <span class="o">=</span> <span class="n">predmodel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">ltr</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
-</section>
+          <section id="training-loops">
+<h1>Training Loops<a class="headerlink" href="#training-loops" title="Link to this heading">¶</a></h1>
+<p>This page moved to <a class="reference internal" href="../getting_started/training.html"><span class="doc">Training Loops</span></a>.</p>
 </section>
 
         </article>
@@ -722,26 +405,8 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pool.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Solution Pool</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="jax.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">JAX Frontend</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -760,64 +425,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Training</a><ul>
-<li><a class="reference internal" href="#common-setup">Common Setup</a></li>
-<li><a class="reference internal" href="#surrogate-losses">Surrogate Losses</a><ul>
-<li><a class="reference internal" href="#smart-predict-then-optimize-loss-spo">Smart Predict-then-Optimize+ Loss (SPO+)</a></li>
-<li><a class="reference internal" href="#perturbation-gradient-pg">Perturbation Gradient (PG)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#perturbed-methods">Perturbed Methods</a><ul>
-<li><a class="reference internal" href="#differentiable-perturbed-optimizer-dpo">Differentiable Perturbed Optimizer (DPO)</a></li>
-<li><a class="reference internal" href="#perturbed-fenchel-young-loss-pfyl">Perturbed Fenchel-Young Loss (PFYL)</a></li>
-<li><a class="reference internal" href="#implicit-maximum-likelihood-estimator-i-mle">Implicit Maximum Likelihood Estimator (I-MLE)</a></li>
-<li><a class="reference internal" href="#adaptive-implicit-maximum-likelihood-estimator-ai-mle">Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#regularized-methods">Regularized Methods</a><ul>
-<li><a class="reference internal" href="#l2-regularized-frank-wolfe-rfwo">L2 Regularized Frank-Wolfe (RFWO)</a></li>
-<li><a class="reference internal" href="#l2-regularized-frank-wolfe-with-fenchel-young-loss-rfyl">L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#black-box-methods">Black-Box Methods</a><ul>
-<li><a class="reference internal" href="#differentiable-black-box-optimizer-dbb">Differentiable Black-Box Optimizer (DBB)</a></li>
-<li><a class="reference internal" href="#negative-identity-backpropagation-nid">Negative Identity Backpropagation (NID)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cone-aligned-estimation">Cone-Aligned Estimation</a><ul>
-<li><a class="reference internal" href="#cone-aligned-vector-estimation-cave">Cone-Aligned Vector Estimation (CaVE)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#contrastive-methods">Contrastive Methods</a><ul>
-<li><a class="reference internal" href="#noise-contrastive-estimation-nce">Noise Contrastive Estimation (NCE)</a></li>
-<li><a class="reference internal" href="#contrastive-map-cmap">Contrastive MAP (CMAP)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#learning-to-rank-ltr">Learning to Rank (LTR)</a><ul>
-<li><a class="reference internal" href="#pointwise-ltr">Pointwise LTR</a></li>
-<li><a class="reference internal" href="#pairwise-ltr">Pairwise LTR</a></li>
-<li><a class="reference internal" href="#listwise-ltr">Listwise LTR</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
@@ -826,6 +435,5 @@
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

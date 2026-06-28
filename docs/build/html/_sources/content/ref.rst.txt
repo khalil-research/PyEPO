@@ -1,5 +1,37 @@
-Reference
-+++++++++
+Citation and References
++++++++++++++++++++++++
+
+If you use ``PyEPO`` in your research, please cite:
+
+.. code-block:: bibtex
+
+   @article{tang2024,
+     title={PyEPO: a PyTorch-based end-to-end predict-then-optimize library for linear and integer programming},
+     author={Tang, Bo and Khalil, Elias B},
+     journal={Mathematical Programming Computation},
+     issn={1867-2957},
+     doi={10.1007/s12532-024-00255-x},
+     year={2024},
+     month={July},
+     publisher={Springer}
+   }
+
+If you use the ``CaVE`` loss, please also cite:
+
+.. code-block:: bibtex
+
+   @inproceedings{tang2024cave,
+     title={CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs},
+     author={Tang, Bo and Khalil, Elias B},
+     booktitle={Integration of Constraint Programming, Artificial Intelligence, and Operations Research},
+     pages={193--210},
+     year={2024},
+     publisher={Springer}
+   }
+
+
+References
+==========
 
 * [1] `Elmachtoub, A. N., & Grigas, P. (2021). Smart "predict, then optimize". Management Science. <https://doi.org/10.1287/mnsc.2020.3922>`_
 * [2] `Mandi, J., Stuckey, P. J., & Guns, T. (2020). Smart predict-and-optimize for hard combinatorial optimization problems. Proceedings of the AAAI Conference on Artificial Intelligence. <https://doi.org/10.1609/aaai.v34i02.5521>`_

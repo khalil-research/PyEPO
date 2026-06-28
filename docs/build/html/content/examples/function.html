@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="JAX Frontend" href="jax.html"><link rel="prev" title="Two-Stage Method" href="twostage.html">
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Autograd Functions - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
+        <title>Training Methods - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -189,7 +189,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -207,26 +207,48 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../tutorial.html">Tutorial</a><input aria-label="Toggle navigation of Tutorial" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Autograd Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="jax.html">JAX Frontend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
-<li class="toctree-l2"><a class="reference internal" href="evaluation.html">Evaluation</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/pyepo/index.html">pyepo</a><input aria-label="Toggle navigation of pyepo" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/model.html">Optimization Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data.html">Data and Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/function.html">Training Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/training.html">Training Loops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/evaluation.html">Evaluation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Frontends and Backends</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../frontends/pytorch.html">PyTorch Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../frontends/jax.html">JAX Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solver_backends.html">Solver Backends</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/twostage.html">Two-stage Baseline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pool.html">Solution Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cave.html">CaVE Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/knn.html">kNN Robust Losses</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Citation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ref.html">Citation and References</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/pyepo/index.html">pyepo</a><input aria-label="Toggle navigation of pyepo" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/pyepo/EPO/index.html">pyepo.EPO</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/data/index.html">pyepo.data</a><input aria-label="Toggle navigation of pyepo.data" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/data/index.html">pyepo.data</a><input aria-label="Toggle navigation of pyepo.data" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/dataset/index.html">pyepo.data.dataset</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/knapsack/index.html">pyepo.data.knapsack</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/portfolio/index.html">pyepo.data.portfolio</a></li>
@@ -234,19 +256,19 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/tsp/index.html">pyepo.data.tsp</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/dsl/index.html">pyepo.dsl</a><input aria-label="Toggle navigation of pyepo.dsl" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/dsl/index.html">pyepo.dsl</a><input aria-label="Toggle navigation of pyepo.dsl" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/compiled/index.html">pyepo.dsl.compiled</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/expression/index.html">pyepo.dsl.expression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/objective/index.html">pyepo.dsl.objective</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/problem/index.html">pyepo.dsl.problem</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/abcmodule/index.html">pyepo.func.abcmodule</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/blackbox/index.html">pyepo.func.blackbox</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/cave/index.html">pyepo.func.cave</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/contrastive/index.html">pyepo.func.contrastive</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/jax/index.html">pyepo.func.jax</a><input aria-label="Toggle navigation of pyepo.func.jax" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/jax/index.html">pyepo.func.jax</a><input aria-label="Toggle navigation of pyepo.func.jax" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/abcmodule/index.html">pyepo.func.jax.abcmodule</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/blackbox/index.html">pyepo.func.jax.blackbox</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/cave/index.html">pyepo.func.jax.cave</a></li>
@@ -266,16 +288,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/utils/index.html">pyepo.func.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/metrics/index.html">pyepo.metric.metrics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/mse/index.html">pyepo.metric.mse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/regret/index.html">pyepo.metric.regret</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/unambregret/index.html">pyepo.metric.unambregret</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/bases/index.html">pyepo.model.bases</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/compile/index.html">pyepo.model.copt.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/knapsack/index.html">pyepo.model.copt.knapsack</a></li>
@@ -285,7 +307,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/vrp/index.html">pyepo.model.copt.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/compile/index.html">pyepo.model.grb.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/grbmodel/index.html">pyepo.model.grb.grbmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/knapsack/index.html">pyepo.model.grb.knapsack</a></li>
@@ -295,14 +317,14 @@
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/vrp/index.html">pyepo.model.grb.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/compile/index.html">pyepo.model.mpax.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/knapsack/index.html">pyepo.model.mpax.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/mpaxmodel/index.html">pyepo.model.mpax.mpaxmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/shortestpath/index.html">pyepo.model.mpax.shortestpath</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/compile/index.html">pyepo.model.omo.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/knapsack/index.html">pyepo.model.omo.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/omomodel/index.html">pyepo.model.omo.omomodel</a></li>
@@ -313,7 +335,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html">pyepo.model.opt</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/compile/index.html">pyepo.model.ort.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/knapsack/index.html">pyepo.model.ort.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/ortcpmodel/index.html">pyepo.model.ort.ortcpmodel</a></li>
@@ -325,7 +347,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/utils/index.html">pyepo.model.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
 </ul>
@@ -368,586 +390,14 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="autograd-functions">
-<h1>Autograd Functions<a class="headerlink" href="#autograd-functions" title="Link to this heading">¶</a></h1>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> provides PyTorch autograd modules that wrap an optimization solver and supply informative gradients for end-to-end training. All modules assume a linear objective with known, fixed constraints; the cost vector is predicted from contextual features.</p>
-<p>The modules fall into two interfaces:</p>
-<ul class="simple">
-<li><p><strong>Loss-returning modules</strong> produce a scalar loss and feed straight into <code class="docutils literal notranslate"><span class="pre">.backward()</span></code>.</p></li>
-<li><p><strong>Solution-returning modules</strong> produce predicted, expected, or regularized solutions; the user defines a task loss on top.</p></li>
-</ul>
-<p>For training-loop templates, see <a class="reference internal" href="training.html"><span class="doc">Training</span></a>.</p>
-</section>
-<section id="choosing-a-method">
-<h2>Choosing a Method<a class="headerlink" href="#choosing-a-method" title="Link to this heading">¶</a></h2>
-<p><strong>Strong defaults (when in doubt)</strong></p>
-<ul class="simple">
-<li><p>When <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span> labels are available, start with <strong>SPO+</strong>: convex, has a nonzero subgradient, and is well-studied as a baseline.</p></li>
-<li><p>When the loss-returning style is preferred and labels include <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span>, <strong>PFYL</strong> avoids the extra task loss.</p></li>
-<li><p>For <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges), use <strong>CaVE</strong>: a cone-alignment loss whose projection (an interior-point QP via Clarabel) replaces the per-step ILP solve, with paper-faithful regret on TSP-scale binary LPs. Because the cone projection is far cheaper than the per-instance ILP solve, CaVE trains an order of magnitude faster than SPO+ at this scale.</p></li>
-<li><p>For very large LPs on GPU, combine <strong>MPAX</strong> models with <strong>SPO+</strong> or <strong>PFYL</strong>.</p></li>
-</ul>
-<p>For finer choices, the right method depends on three questions.</p>
-<p><strong>1. What supervision do you have at training time?</strong></p>
-<ul class="simple">
-<li><p><strong>True optimal solutions</strong> <span class="math notranslate nohighlight">\(\mathbf{w}^*\)</span>: SPO+, PFYL, RFYL, DPO+MSE, RFWO+MSE, I-MLE+L1, AI-MLE+L1; NCE and CMAP also need a solution pool</p></li>
-<li><p><strong>Just true costs</strong> <span class="math notranslate nohighlight">\(\mathbf{c}\)</span>: PG, LTR variants</p></li>
-<li><p><strong>True optimal objective values</strong> <span class="math notranslate nohighlight">\(z^*\)</span>: DBB+L1, NID+L1 (objective-value loss)</p></li>
-<li><p><strong>Binding constraints at the optimum</strong>: CaVE (binary linear programs, Gurobi backend only)</p></li>
-</ul>
-<p>A combined name like <code class="docutils literal notranslate"><span class="pre">DPO+MSE</span></code> or <code class="docutils literal notranslate"><span class="pre">NID+L1</span></code> means a solution-returning module (DPO, NID) followed by a task loss (here MSE or L1) that you add on its output.</p>
-<p><strong>2. Should the module return a loss or a solution?</strong></p>
-<ul class="simple">
-<li><p><strong>A loss</strong> (use directly in <code class="docutils literal notranslate"><span class="pre">.backward()</span></code>): SPO+, PFYL, RFYL, NCE, CMAP, LTR, PG, CaVE</p></li>
-<li><p><strong>A solution</strong> (define your own task loss): DPO, DBB, NID, RFWO, I-MLE, AI-MLE</p></li>
-</ul>
-<p><strong>3. Any special constraints?</strong></p>
-<ul class="simple">
-<li><p><strong>Sign-sensitive oracle</strong> (e.g., negative costs must stay negative): use <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code> or <code class="docutils literal notranslate"><span class="pre">PFYMul</span></code> with a positive-output predictor.</p></li>
-<li><p><strong>Large LP on GPU</strong>: pair an <code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code> with SPO+ or PFYL.</p></li>
-<li><p><strong>Cached negative pool</strong>: NCE / CMAP.</p></li>
-<li><p><strong>Ranking interpretation</strong>: LTR variants.</p></li>
-</ul>
-<p>The table below summarizes inputs and return types.</p>
-<div class="table-wrapper colwidths-given docutils container">
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 18.0%" />
-<col style="width: 28.0%" />
-<col style="width: 28.0%" />
-<col style="width: 26.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Module</p></th>
-<th class="head"><p>Returns</p></th>
-<th class="head"><p>Typical supervision</p></th>
-<th class="head"><p>Notes</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SPOPlus</span></code></p></td>
-<td><p>loss</p></td>
-<td><p>true costs, true optimal solutions, true objective values</p></td>
-<td><p>strong default for linear objectives</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PG</span></code></p></td>
-<td><p>loss</p></td>
-<td><p>true costs</p></td>
-<td><p>directional finite differences along the true cost</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DPO</span></code> / <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code></p></td>
-<td><p>expected perturbed solutions</p></td>
-<td><p>task loss chosen by the user</p></td>
-<td><p>DPO; use the multiplicative variant for sign-sensitive oracles</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PFY</span></code> / <code class="docutils literal notranslate"><span class="pre">PFYMul</span></code></p></td>
-<td><p>loss</p></td>
-<td><p>true optimal solutions</p></td>
-<td><p>PFYL; use the multiplicative variant for sign-sensitive oracles</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IMLE</span></code> / <code class="docutils literal notranslate"><span class="pre">AIMLE</span></code></p></td>
-<td><p>perturbed solutions</p></td>
-<td><p>task loss chosen by the user</p></td>
-<td><p>perturb-and-MAP with Sum-of-Gamma noise</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RFWO</span></code></p></td>
-<td><p>regularized predicted solutions</p></td>
-<td><p>task loss chosen by the user</p></td>
-<td><p>L2-regularized smooth optimizer over the convex hull of feasible solutions</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RFY</span></code></p></td>
-<td><p>loss</p></td>
-<td><p>true optimal solutions</p></td>
-<td><p>Fenchel-Young loss paired with L2-regularized Frank-Wolfe</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DBB</span></code> / <code class="docutils literal notranslate"><span class="pre">NID</span></code></p></td>
-<td><p>predicted solutions</p></td>
-<td><p>task loss chosen by the user</p></td>
-<td><p>direct solution-level or objective-level losses</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CaVE</span></code></p></td>
-<td><p>loss</p></td>
-<td><p>tight binding-constraint normals at the true optimum (<code class="docutils literal notranslate"><span class="pre">optDatasetConstrs</span></code>)</p></td>
-<td><p>CaVE; binary linear programs, Gurobi backend only</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NCE</span></code> / <code class="docutils literal notranslate"><span class="pre">CMAP</span></code></p></td>
-<td><p>loss</p></td>
-<td><p>true optimal solutions and a solution pool</p></td>
-<td><p>contrastive training with cached negative solutions</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ptLTR</span></code> / <code class="docutils literal notranslate"><span class="pre">prLTR</span></code> / <code class="docutils literal notranslate"><span class="pre">lsLTR</span></code></p></td>
-<td><p>loss</p></td>
-<td><p>true costs and a solution pool</p></td>
-<td><p>learning-to-rank formulations over feasible solutions</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="surrogate-losses">
-<h2>Surrogate Losses<a class="headerlink" href="#surrogate-losses" title="Link to this heading">¶</a></h2>
-<p>Surrogate losses replace the non-differentiable regret with a smooth surrogate that has informative gradients.</p>
-<section id="smart-predict-then-optimize-loss-spo">
-<h3>Smart Predict-then-Optimize+ Loss (SPO+)<a class="headerlink" href="#smart-predict-then-optimize-loss-spo" title="Link to this heading">¶</a></h3>
-<p>SPO+ <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> is a convex surrogate loss for the SPO Loss (regret), which measures the decision error of an optimization problem.</p>
-<p>The derivation starts from the observation that for any <span class="math notranslate nohighlight">\(\alpha \geq 0\)</span>,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathrm{regret}(\hat{\mathbf{c}}, \mathbf{c}) \leq \max_{\mathbf{w} \in \mathcal{S}} \big\{ \mathbf{c}^\top \mathbf{w} - \alpha\, \hat{\mathbf{c}}^\top \mathbf{w} \big\} + z^*(\alpha \hat{\mathbf{c}}) - z^*(\mathbf{c}).\]</div>
-</div>
-<p>Setting <span class="math notranslate nohighlight">\(\alpha = 2\)</span> and bounding <span class="math notranslate nohighlight">\(z^*(2 \hat{\mathbf{c}}) \leq 2 \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c})\)</span> via the concavity of <span class="math notranslate nohighlight">\(z^*\)</span> gives the SPO+ loss,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{SPO+}}(\hat{\mathbf{c}}, \mathbf{c}) = -z^*(2 \hat{\mathbf{c}} - \mathbf{c}) + 2\, \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - z^*(\mathbf{c}),\]</div>
-</div>
-<p>which is convex in <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> and upper-bounds the regret. By Danskin’s theorem, an informative subgradient is</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[2 \big( \mathbf{w}^*(\mathbf{c}) - \mathbf{w}^*(2 \hat{\mathbf{c}} - \mathbf{c}) \big) \in \frac{\partial \mathcal{L}_{\mathrm{SPO+}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}}.\]</div>
-</div>
-<dl class="py class">
-<dt class="sig sig-object py">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">SPOPlus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/func/runtime/index.html#pyepo.func.runtime.Reduction" title="pyepo.func.runtime.Reduction"><span class="pre">Reduction</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/data/dataset/index.html#pyepo.data.dataset.optDataset" title="pyepo.data.dataset.optDataset"><span class="pre">optDataset</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>SPO+ loss: a convex surrogate for the SPO regret of a linear-objective LP.</p>
-<p>SPO+ upper-bounds the SPO regret with a convex function of the predicted
-cost vector and provides an informative subgradient (via Danskin’s
-theorem) for end-to-end training. It is the strong default for
-predict-then-optimize when true optimal solutions
-<span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> are available as supervision.</p>
-<p>The forward pass solves the perturbed problem with cost
-<span class="math notranslate nohighlight">\(2\hat{\mathbf{c}} - \mathbf{c}\)</span> once per training instance and
-returns a scalar loss; the backward pass uses the cached solution to form
-the subgradient <span class="math notranslate nohighlight">\(2(\mathbf{w}^*(\mathbf{c}) -
-\mathbf{w}^*(2\hat{\mathbf{c}} - \mathbf{c}))\)</span> without any extra
-solver call.</p>
-<p>Reference: Elmachtoub &amp; Grigas (2022)
-<a class="reference external" href="https://doi.org/10.1287/mnsc.2020.3922">https://doi.org/10.1287/mnsc.2020.3922</a></p>
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_sol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.12)"><span class="pre">Tensor</span></a></span></span></dt>
-<dd><p>Forward pass</p>
-</dd></dl>
-
-</dd></dl>
-
-<p><code class="docutils literal notranslate"><span class="pre">processes</span></code> sets the number of solver processes (<code class="docutils literal notranslate"><span class="pre">0</span></code> uses all available cores).</p>
-</section>
-<section id="perturbation-gradient-pg">
-<h3>Perturbation Gradient (PG)<a class="headerlink" href="#perturbation-gradient-pg" title="Link to this heading">¶</a></h3>
-<p>PG <a class="footnote-reference brackets" href="#f11" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a> is a surrogate loss based on zeroth-order gradient approximation via Danskin’s theorem. It uses finite differences along the true cost direction to estimate informative gradients through the optimization solver.</p>
-<p>By Danskin’s theorem, regret can be written as the directional derivative of <span class="math notranslate nohighlight">\(z^*(\hat{\mathbf{c}})\)</span> along <span class="math notranslate nohighlight">\(\mathbf{c}\)</span> (up to a constant independent of <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>). PG approximates this directional derivative with finite differences. Two variants are available, backward (<code class="docutils literal notranslate"><span class="pre">two_sides=False</span></code>) and central (<code class="docutils literal notranslate"><span class="pre">two_sides=True</span></code>):</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\begin{split}\mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c}) &amp;\approx \frac{z^*(\hat{\mathbf{c}}) - z^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{\lambda}, \\
-\mathcal{L}_{\mathrm{PG}}^{\mathrm{cent}}(\hat{\mathbf{c}}, \mathbf{c}) &amp;\approx \frac{z^*(\hat{\mathbf{c}} + \lambda \mathbf{c}) - z^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{2 \lambda},\end{split}\]</div>
-</div>
-<p>where <span class="math notranslate nohighlight">\(\lambda &gt; 0\)</span> is the finite-difference width (the <code class="docutils literal notranslate"><span class="pre">sigma</span></code> parameter). The corresponding gradients fall out directly from the perturbed solutions, e.g.</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} \approx \frac{\mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{w}^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{\lambda}.\]</div>
-</div>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">PG</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/surrogate/index.html#pyepo.func.surrogate.perturbationGradient" title="pyepo.func.surrogate.perturbationGradient"><code class="xref py py-class docutils literal notranslate"><span class="pre">perturbationGradient</span></code></a></p>
-</dd></dl>
-
-<p><code class="docutils literal notranslate"><span class="pre">sigma</span></code> controls the finite-difference width. <code class="docutils literal notranslate"><span class="pre">two_sides</span></code> enables central differencing for more accurate gradient estimates.</p>
-</section>
-</section>
-<section id="perturbed-methods">
-<h2>Perturbed Methods<a class="headerlink" href="#perturbed-methods" title="Link to this heading">¶</a></h2>
-<p>Perturbed methods estimate gradients by Monte Carlo averaging over random perturbations of the cost vector. They share two design knobs: <code class="docutils literal notranslate"><span class="pre">n_samples</span></code> (number of Monte Carlo samples) and <code class="docutils literal notranslate"><span class="pre">sigma</span></code> (perturbation amplitude).</p>
-<section id="differentiable-perturbed-optimizer-dpo">
-<h3>Differentiable Perturbed Optimizer (DPO)<a class="headerlink" href="#differentiable-perturbed-optimizer-dpo" title="Link to this heading">¶</a></h3>
-<p>DPO <a class="footnote-reference brackets" href="#f5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> uses Monte Carlo sampling to estimate solutions by optimizing randomly perturbed costs. Its custom backward pass provides a gradient estimator for end-to-end training. <code class="docutils literal notranslate"><span class="pre">DPO</span></code> is the additive Gaussian version; <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code> is the multiplicative version for sign-sensitive oracles <a class="footnote-reference brackets" href="#f6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>. The multiplicative variant assumes predicted costs already have the intended nonzero sign. For nonnegative-cost problems, use a positive-output predictor such as <code class="docutils literal notranslate"><span class="pre">nn.Softplus()</span></code> plus a small epsilon.</p>
-<p>DPO replaces the piecewise-constant solution map <span class="math notranslate nohighlight">\(\hat{\mathbf{c}} \mapsto \mathbf{w}^*(\hat{\mathbf{c}})\)</span> with the expectation over a random perturbation,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathbb{E}_{\boldsymbol{\xi}} \big[ \mathbf{w}^*(\hat{\mathbf{c}} + \sigma \boldsymbol{\xi}) \big] \approx \frac{1}{K} \sum_{\kappa=1}^{K} \mathbf{w}^*(\hat{\mathbf{c}} + \sigma \boldsymbol{\xi}_\kappa),\]</div>
-</div>
-<p>where <span class="math notranslate nohighlight">\(\boldsymbol{\xi} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})\)</span> and <span class="math notranslate nohighlight">\(K\)</span> is <code class="docutils literal notranslate"><span class="pre">n_samples</span></code>. The expectation varies smoothly with <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> because small perturbations only shift the sampling distribution over active vertices of the feasible polytope, analogous to the smoothing role of SoftMax in classification.</p>
-<p>The multiplicative variant <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code> perturbs each entry of <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> as</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\hat{\mathbf{c}} \odot \exp\!\big(\sigma \boldsymbol{\xi} - \tfrac{1}{2} \sigma^2\big),\]</div>
-</div>
-<p>with <span class="math notranslate nohighlight">\(\odot\)</span> the Hadamard product. The exponential factor preserves the sign of each cost entry, which is required when the solver expects (say) nonnegative edge costs.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">DPO</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.perturbedOpt" title="pyepo.func.perturbed.perturbedOpt"><code class="xref py py-class docutils literal notranslate"><span class="pre">perturbedOpt</span></code></a></p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">DPOMul</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.perturbedOptMul" title="pyepo.func.perturbed.perturbedOptMul"><code class="xref py py-class docutils literal notranslate"><span class="pre">perturbedOptMul</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="perturbed-fenchel-young-loss-pfyl">
-<h3>Perturbed Fenchel-Young Loss (PFYL)<a class="headerlink" href="#perturbed-fenchel-young-loss-pfyl" title="Link to this heading">¶</a></h3>
-<p>PFYL <a class="footnote-reference brackets" href="#f5" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> uses the same perturbed expected solution as DPO inside a Fenchel-Young loss, comparing it directly with the true optimal solution. It returns a loss, so no external task loss is needed. <code class="docutils literal notranslate"><span class="pre">PFY</span></code> is the additive Gaussian version; <code class="docutils literal notranslate"><span class="pre">PFYMul</span></code> is the multiplicative sign-preserving variant with the same sign convention as <code class="docutils literal notranslate"><span class="pre">DPOMul</span></code>.</p>
-<p>Let <span class="math notranslate nohighlight">\(F(\hat{\mathbf{c}}) = \mathbb{E}_{\boldsymbol{\xi}}\big[ \min_{\mathbf{w} \in \mathcal{S}} (\hat{\mathbf{c}} + \sigma \boldsymbol{\xi})^\top \mathbf{w} \big]\)</span> be the expected perturbed minimum, and let <span class="math notranslate nohighlight">\(\Omega(\mathbf{w}^*(\mathbf{c}))\)</span> be its Fenchel conjugate. The perturbed Fenchel-Young loss is</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{PFYL}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c})) = \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - F(\hat{\mathbf{c}}) - \Omega(\mathbf{w}^*(\mathbf{c})).\]</div>
-</div>
-<p>The dual term <span class="math notranslate nohighlight">\(\Omega(\mathbf{w}^*(\mathbf{c}))\)</span> does not depend on <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>, so the gradient collapses to a simple difference of solutions,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_{\mathrm{PFYL}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c}))}{\partial \hat{\mathbf{c}}} = \mathbf{w}^*(\mathbf{c}) - \mathbb{E}_{\boldsymbol{\xi}} \big[\mathbf{w}^*(\hat{\mathbf{c}} + \sigma \boldsymbol{\xi})\big] \approx \mathbf{w}^*(\mathbf{c}) - \frac{1}{K} \sum_{\kappa=1}^{K} \mathbf{w}^*(\hat{\mathbf{c}} + \sigma \boldsymbol{\xi}_\kappa).\]</div>
-</div>
-<p>Compared with DPO, PFYL avoids an explicit Jacobian computation and yields a theoretically grounded loss tied to the duality gap. The multiplicative variant uses the same sign-preserving perturbation,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\hat{\mathbf{c}} \odot \exp\!\big(\sigma \boldsymbol{\xi} - \tfrac{1}{2} \sigma^2\big).\]</div>
-</div>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">PFY</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.perturbedFenchelYoung" title="pyepo.func.perturbed.perturbedFenchelYoung"><code class="xref py py-class docutils literal notranslate"><span class="pre">perturbedFenchelYoung</span></code></a></p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">PFYMul</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.perturbedFenchelYoungMul" title="pyepo.func.perturbed.perturbedFenchelYoungMul"><code class="xref py py-class docutils literal notranslate"><span class="pre">perturbedFenchelYoungMul</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="implicit-maximum-likelihood-estimator-i-mle">
-<h3>Implicit Maximum Likelihood Estimator (I-MLE)<a class="headerlink" href="#implicit-maximum-likelihood-estimator-i-mle" title="Link to this heading">¶</a></h3>
-<p>I-MLE <a class="footnote-reference brackets" href="#f9" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a> uses the perturb-and-MAP framework, sampling noise from a Sum-of-Gamma distribution and interpolating the loss function to approximate finite differences. <code class="docutils literal notranslate"><span class="pre">lambd</span></code> controls the interpolation step.</p>
-<p>I-MLE is framed as imitation learning: bring the model distribution <span class="math notranslate nohighlight">\(p(\mathbf{w} \mid \hat{\mathbf{c}})\)</span> closer to a target distribution <span class="math notranslate nohighlight">\(q(\mathbf{w} \mid \hat{\mathbf{c}})\)</span> by minimizing their KL divergence. An upstream task gradient <span class="math notranslate nohighlight">\(\mathbf{d} = \nabla_{\mathbf{w}} \mathcal{L}(\hat{\mathbf{c}}, \cdot) \big|_{\mathbf{w} = \mathbf{w}^*(\hat{\mathbf{c}})}\)</span> induces a virtual update <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}' = \hat{\mathbf{c}} + \lambda \mathbf{d}\)</span>, and the gradient is estimated by a directional finite difference between the smoothed solutions at <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}'\)</span> and <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_{\mathrm{IMLE}}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx \frac{1}{K \lambda} \sum_{\kappa=1}^{K} \Big( \mathbf{w}^*(\hat{\mathbf{c}} + \lambda \mathbf{d} + \sigma \boldsymbol{\xi}_\kappa) - \mathbf{w}^*(\hat{\mathbf{c}} + \sigma \boldsymbol{\xi}_\kappa) \Big),\]</div>
-</div>
-<p>where <span class="math notranslate nohighlight">\(\sigma\)</span> smooths the solution map and <span class="math notranslate nohighlight">\(\lambda\)</span> (<code class="docutils literal notranslate"><span class="pre">lambd</span></code>) is the finite-difference step. The same noise realization <span class="math notranslate nohighlight">\(\boldsymbol{\xi}_\kappa\)</span> is shared across the two perturbed evaluations to reduce variance.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">IMLE</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.implicitMLE" title="pyepo.func.perturbed.implicitMLE"><code class="xref py py-class docutils literal notranslate"><span class="pre">implicitMLE</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="adaptive-implicit-maximum-likelihood-estimator-ai-mle">
-<h3>Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)<a class="headerlink" href="#adaptive-implicit-maximum-likelihood-estimator-ai-mle" title="Link to this heading">¶</a></h3>
-<p>AI-MLE <a class="footnote-reference brackets" href="#f10" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> extends I-MLE with an adaptive interpolation step for better gradient estimates.</p>
-<p>AI-MLE uses the same finite-difference estimator as I-MLE but replaces the fixed step size <span class="math notranslate nohighlight">\(\lambda\)</span> with an adaptive choice driven by the magnitudes of the predicted cost and the upstream gradient,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\lambda_t = \alpha_t \cdot \frac{\|\hat{\mathbf{c}}\|_2}{\|\mathbf{d}\|_2},\]</div>
-</div>
-<p>where <span class="math notranslate nohighlight">\(\mathbf{d}\)</span> is the upstream task gradient and <span class="math notranslate nohighlight">\(\alpha_t &gt; 0\)</span> is tuned online: when an exponential moving average of the gradient sparsity (fraction of nonzero entries) drops below one, <span class="math notranslate nohighlight">\(\alpha_t\)</span> is increased; otherwise it is decreased. This rescaling keeps the perturbation magnitude commensurate with <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> and decouples the step from the absolute scale of <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, removing the need to tune <span class="math notranslate nohighlight">\(\lambda\)</span> by hand.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">AIMLE</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/perturbed/index.html#pyepo.func.perturbed.adaptiveImplicitMLE" title="pyepo.func.perturbed.adaptiveImplicitMLE"><code class="xref py py-class docutils literal notranslate"><span class="pre">adaptiveImplicitMLE</span></code></a></p>
-</dd></dl>
-
-</section>
-</section>
-<section id="regularized-methods">
-<h2>Regularized Methods<a class="headerlink" href="#regularized-methods" title="Link to this heading">¶</a></h2>
-<p>A pure linear optimization layer is not differentiable: the optimal solution <span class="math notranslate nohighlight">\(\mathbf{w}^*(\hat{\mathbf{c}}) = \arg\min_{\mathbf{w} \in \mathcal{S}} \hat{\mathbf{c}}^\top \mathbf{w}\)</span> is piecewise constant in <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>, it jumps between vertices of <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> and its derivative is zero almost everywhere. Regularized methods fix this by adding a strongly convex regularizer <span class="math notranslate nohighlight">\(\Omega\)</span> to the linear objective, yielding a regularized solution</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\hat{\mathbf{w}}_\Omega(\hat{\mathbf{c}}) = \arg\min_{\mathbf{w} \in \mathrm{conv}(\mathcal{S})} \hat{\mathbf{c}}^\top \mathbf{w} + \Omega(\mathbf{w}),\]</div>
-</div>
-<p>which is unique, lies inside <span class="math notranslate nohighlight">\(\mathrm{conv}(\mathcal{S})\)</span>, and varies continuously with <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>. This deterministic smoothing is dual to the stochastic smoothing of the perturbed methods above: both replace the piecewise-constant solution map with a continuous surrogate, the former via a convex regularizer and the latter via Monte Carlo averaging over a noise distribution <a class="footnote-reference brackets" href="#f6" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
-<p>PyEPO implements the L2 special case <span class="math notranslate nohighlight">\(\Omega(\mathbf{w}) = \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2\)</span> and solves the regularized program with batched Frank-Wolfe iteration. Frank-Wolfe is the natural choice here: it accesses <span class="math notranslate nohighlight">\(\mathrm{conv}(\mathcal{S})\)</span> only through the original LP/ILP solver of <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> (a <em>linear minimization oracle</em>), so no explicit polytope representation is needed; the same Gurobi/COPT/OR-Tools/MPAX backend used elsewhere in PyEPO supplies the LMO. <code class="docutils literal notranslate"><span class="pre">lambd</span></code> is the L2 strength <span class="math notranslate nohighlight">\(\lambda\)</span>; <code class="docutils literal notranslate"><span class="pre">max_iter</span></code> caps Frank-Wolfe iterations and <code class="docutils literal notranslate"><span class="pre">tol</span></code> is the convergence tolerance.</p>
-<section id="l2-regularized-frank-wolfe-rfwo">
-<h3>L2 Regularized Frank-Wolfe (RFWO)<a class="headerlink" href="#l2-regularized-frank-wolfe-rfwo" title="Link to this heading">¶</a></h3>
-<p>RFWO <a class="footnote-reference brackets" href="#f6" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> exposes <span class="math notranslate nohighlight">\(\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})\)</span> directly as a differentiable layer. Since it returns a (regularized) solution rather than a loss, the user defines a task loss on the output, most commonly an MSE against <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span>, matching the imitation setting in the original paper.</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}}) = \arg\min_{\mathbf{w} \in \mathrm{conv}(\mathcal{S})} \hat{\mathbf{c}}^\top \mathbf{w} + \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2.\]</div>
-</div>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">RFWO</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/regularized/index.html#pyepo.func.regularized.regularizedFrankWolfeOpt" title="pyepo.func.regularized.regularizedFrankWolfeOpt"><code class="xref py py-class docutils literal notranslate"><span class="pre">regularizedFrankWolfeOpt</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="l2-regularized-frank-wolfe-with-fenchel-young-loss-rfyl">
-<h3>L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)<a class="headerlink" href="#l2-regularized-frank-wolfe-with-fenchel-young-loss-rfyl" title="Link to this heading">¶</a></h3>
-<p>RFYL <a class="footnote-reference brackets" href="#f6" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> pairs the RFWO layer with the <strong>Fenchel-Young loss</strong> <a class="footnote-reference brackets" href="#f13" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>12<span class="fn-bracket">]</span></a> of the regularizer <span class="math notranslate nohighlight">\(\Omega\)</span>, returning a scalar loss that compares the predicted cost <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> to the true optimum <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> directly, with no external task loss needed.</p>
-<p>For any convex regularizer <span class="math notranslate nohighlight">\(\Omega: \mathrm{conv}(\mathcal{S}) \to \mathbb{R}\)</span> with conjugate <span class="math notranslate nohighlight">\(\Omega^*(\boldsymbol{\theta}) = \sup_{\mathbf{w}} \boldsymbol{\theta}^\top \mathbf{w} - \Omega(\mathbf{w})\)</span>, the Fenchel-Young loss is</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathcal{L}_\Omega^{\mathrm{FY}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c})) = \Omega(\mathbf{w}^*(\mathbf{c})) + \Omega^*(-\hat{\mathbf{c}}) + \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}).\]</div>
-</div>
-<p>The Fenchel-Young inequality guarantees three properties that make it ideal for end-to-end training:</p>
-<ol class="arabic">
-<li><p><strong>Non-negative</strong>, with equality iff <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) = \hat{\mathbf{w}}_\Omega(\hat{\mathbf{c}})\)</span>.</p></li>
-<li><p><strong>Convex</strong> in <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>.</p></li>
-<li><p>By Danskin’s theorem, the gradient is the residual between the regularized prediction and the target,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_\Omega^{\mathrm{FY}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c}))}{\partial \hat{\mathbf{c}}} = \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{w}}_\Omega(\hat{\mathbf{c}}),\]</div>
-</div>
-<p>so no implicit differentiation through the Frank-Wolfe iterate is needed.</p>
-</li>
-</ol>
-<p>PyEPO specializes this to <span class="math notranslate nohighlight">\(\Omega(\mathbf{w}) = \tfrac{\lambda}{2}\|\mathbf{w}\|_2^2\)</span>. Substituting the closed form of <span class="math notranslate nohighlight">\(\Omega^*\)</span> and the definition of <span class="math notranslate nohighlight">\(\hat{\mathbf{w}}_\lambda\)</span> collapses the loss to</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{RFYL}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c})) = \Omega(\mathbf{w}^*(\mathbf{c})) - \Omega(\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})) + \hat{\mathbf{c}}^\top \big( \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}}) \big),\]</div>
-</div>
-<p>a transparent “compare regularizers + linear residual” form. The gradient remains <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})\)</span>.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">RFY</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/regularized/index.html#pyepo.func.regularized.regularizedFrankWolfeFenchelYoung" title="pyepo.func.regularized.regularizedFrankWolfeFenchelYoung"><code class="xref py py-class docutils literal notranslate"><span class="pre">regularizedFrankWolfeFenchelYoung</span></code></a></p>
-</dd></dl>
-
-</section>
-</section>
-<section id="black-box-methods">
-<h2>Black-Box Methods<a class="headerlink" href="#black-box-methods" title="Link to this heading">¶</a></h2>
-<p>Black-box methods substitute informative gradient estimates for the zero gradient of the discrete solver.</p>
-<section id="differentiable-black-box-optimizer-dbb">
-<h3>Differentiable Black-Box Optimizer (DBB)<a class="headerlink" href="#differentiable-black-box-optimizer-dbb" title="Link to this heading">¶</a></h3>
-<p>DBB <a class="footnote-reference brackets" href="#f3" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> estimates gradients via interpolation, replacing the zero gradients of the combinatorial solver. <code class="docutils literal notranslate"><span class="pre">lambd</span></code> is a smoothing hyperparameter (recommended range: <strong>10</strong> to <strong>20</strong>).</p>
-<p>Given an upstream gradient <span class="math notranslate nohighlight">\(\mathbf{d} = \nabla_{\mathbf{w}} \mathcal{L}(\hat{\mathbf{c}}, \cdot) \big|_{\mathbf{w} = \mathbf{w}^*(\hat{\mathbf{c}})}\)</span>, DBB approximates the vector-Jacobian product by interpolating the loss between <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> and a perturbed cost <span class="math notranslate nohighlight">\(\hat{\mathbf{c}} + \lambda \mathbf{d}\)</span>, yielding</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx \frac{\mathbf{w}^*(\hat{\mathbf{c}} + \lambda \mathbf{d}) - \mathbf{w}^*(\hat{\mathbf{c}})}{\lambda}.\]</div>
-</div>
-<p>Larger <span class="math notranslate nohighlight">\(\lambda\)</span> smooths more aggressively. Unlike SPO+, the resulting surrogate is nonconvex in <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>, which weakens convergence guarantees even when the predictor is convex in its parameters.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">DBB</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/blackbox/index.html#pyepo.func.blackbox.blackboxOpt" title="pyepo.func.blackbox.blackboxOpt"><code class="xref py py-class docutils literal notranslate"><span class="pre">blackboxOpt</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="negative-identity-backpropagation-nid">
-<h3>Negative Identity Backpropagation (NID)<a class="headerlink" href="#negative-identity-backpropagation-nid" title="Link to this heading">¶</a></h3>
-<p>NID <a class="footnote-reference brackets" href="#f4" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> treats the solver as a negative identity mapping during backpropagation. This is equivalent to DBB with a specific hyperparameter setting. NID is hyperparameter-free and requires no additional solver calls during the backward pass.</p>
-<p>NID approximates the solver Jacobian by the (signed) identity, <span class="math notranslate nohighlight">\(\partial \mathbf{w}^*(\hat{\mathbf{c}}) / \partial \hat{\mathbf{c}} \approx -\mathbf{I}\)</span> for a minimization problem (and <span class="math notranslate nohighlight">\(+\mathbf{I}\)</span> for maximization). Given an upstream gradient <span class="math notranslate nohighlight">\(\mathbf{d} = \partial \mathcal{L}(\hat{\mathbf{c}}, \cdot) / \partial \mathbf{w}^*(\hat{\mathbf{c}})\)</span>, the chain rule gives a sign-flipped straight-through estimator,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx -\mathbf{d} \quad (\text{minimization}), \qquad \frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx \mathbf{d} \quad (\text{maximization}).\]</div>
-</div>
-<p>Intuitively, for minimization this rule decreases <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> along directions where <span class="math notranslate nohighlight">\(\mathbf{w}^*(\hat{\mathbf{c}})\)</span> tends to increase and vice versa, driving the predicted decision toward <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span>. NID is the special case of DBB in which <span class="math notranslate nohighlight">\(\lambda\)</span> is chosen so that the interpolated solution coincides with the negative-identity update, but it saves the extra solver call required by DBB.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">NID</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/blackbox/index.html#pyepo.func.blackbox.negativeIdentity" title="pyepo.func.blackbox.negativeIdentity"><code class="xref py py-class docutils literal notranslate"><span class="pre">negativeIdentity</span></code></a></p>
-</dd></dl>
-
-</section>
-</section>
-<section id="cone-aligned-estimation">
-<h2>Cone-Aligned Estimation<a class="headerlink" href="#cone-aligned-estimation" title="Link to this heading">¶</a></h2>
-<p>Cone-aligned losses supervise the <em>predicted cost vector</em> directly by aligning it with the polyhedral cone of binding-constraint normals at the true optimum, rather than supervising on the optimal solution itself.</p>
-<section id="cone-aligned-vector-estimation-cave">
-<h3>Cone-Aligned Vector Estimation (CaVE)<a class="headerlink" href="#cone-aligned-vector-estimation-cave" title="Link to this heading">¶</a></h3>
-<p>CaVE <a class="footnote-reference brackets" href="#f12" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></a> is a surrogate loss for <strong>binary linear programs</strong> (TSP, CVRP, knapsack, shortest path with binary edges, etc.). For each instance, it projects the sense-flipped predicted cost vector onto the polyhedral cone spanned by the binding-constraint normals at the true optimal vertex, then minimizes <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">cos(pred,</span> <span class="pre">proj)</span></code>. Because the supervision is the cone of binding-constraint normals at the optimum, not the optimal solution itself, CaVE side-steps the zero-gradient pathology of solver layers without requiring a Monte Carlo perturbation or a solution pool.</p>
-<p>For a runnable walkthrough that compares CaVE against SPO+ on TSP, see the <a class="reference external" href="https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb">04 CaVE for Binary Linear Programs</a> notebook.</p>
-<p>Let <span class="math notranslate nohighlight">\(K(\mathbf{w}^*(\mathbf{c}))\)</span> be the polyhedral cone spanned by the constraint normals that bind at the true optimal vertex. For a minimization problem, the KKT conditions require <span class="math notranslate nohighlight">\(-\hat{\mathbf{c}} \in K(\mathbf{w}^*(\mathbf{c}))\)</span> for <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> to remain optimal under the predicted cost. CaVE measures this alignment via a cosine loss against the cone projection <span class="math notranslate nohighlight">\(\mathbf{p} = \mathrm{proj}_{K}(-\hat{\mathbf{c}})\)</span>,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{CaVE}}(\hat{\mathbf{c}}, K) = 1 - \frac{(-\hat{\mathbf{c}})^\top \mathbf{p}}{\|\hat{\mathbf{c}}\|_2\, \|\mathbf{p}\|_2}.\]</div>
-</div>
-<p>When <span class="math notranslate nohighlight">\(-\hat{\mathbf{c}}\)</span> already lies inside the cone, <span class="math notranslate nohighlight">\(\mathbf{p} = -\hat{\mathbf{c}}\)</span> and the loss is zero; the further <span class="math notranslate nohighlight">\(-\hat{\mathbf{c}}\)</span> strays outside the cone, the larger the loss.</p>
-<p>CaVE relies on two solvers at different stages: a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code> extracts the binding-constraint normals once when the dataset is built, and Clarabel (an interior-point QP solver bundled with PyEPO) projects the predicted cost onto that cone during training. The default <code class="docutils literal notranslate"><span class="pre">max_iter=3</span></code> is the paper’s <strong>CaVE+</strong> preset: under-converging the QP on purpose keeps the projection interior to the cone and yields a richer gradient than the exact boundary projection.</p>
-<p>For larger problems, setting <code class="docutils literal notranslate"><span class="pre">solve_ratio</span> <span class="pre">&lt;</span> <span class="pre">1</span></code> enables the <strong>CaVE Hybrid</strong> preset: each batch goes through the QP projection with probability <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> and through a cheap heuristic (a blend of the normalized predicted cost and the average binding-constraint normal, controlled by <code class="docutils literal notranslate"><span class="pre">inner_ratio</span></code>) otherwise. This cuts the per-epoch QP cost without measurable regret loss in the paper’s experiments.</p>
-<figure class="align-center" id="id18">
-<a class="reference internal image-reference" href="../../_images/cave_vrp20.png"><img alt="../../_images/cave_vrp20.png" src="../../_images/cave_vrp20.png" style="width: 100%;" />
-</a>
-<figcaption>
-<p><span class="caption-text">CVRP-20 head-to-head from notebook 04 (<code class="docutils literal notranslate"><span class="pre">num_data=1000</span></code>, 10 epochs, single-process). CaVE+ trains 8.2x faster than SPO+ at slightly lower final regret; CaVE-Hybrid (<code class="docutils literal notranslate"><span class="pre">solve_ratio=0.3</span></code>) is 10.5x faster, trading ~1.7 pp of regret.</span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
-</figcaption>
-</figure>
-<p>Training data must come from <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code>, which extracts the binding-constraint normals at the optimum for each instance. Batches must be collated with <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.collate_tight_constraints</span></code> to zero-pad ragged per-instance constraint counts. CaVE currently requires a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code> (binding-constraint extraction relies on Gurobi’s sparse matrix API).</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">CaVE</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/cave/index.html#pyepo.func.cave.coneAlignedCosine" title="pyepo.func.cave.coneAlignedCosine"><code class="xref py py-class docutils literal notranslate"><span class="pre">coneAlignedCosine</span></code></a></p>
-</dd></dl>
-
-<p>If you use the <strong>CaVE</strong> loss, please cite:</p>
-<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">tang2024cave</span><span class="p">,</span>
-<span class="w">  </span><span class="na">title</span><span class="p">=</span><span class="s">{CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">author</span><span class="p">=</span><span class="s">{Tang, Bo and Khalil, Elias B}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">booktitle</span><span class="p">=</span><span class="s">{Integration of Constraint Programming, Artificial Intelligence, and Operations Research}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">pages</span><span class="p">=</span><span class="s">{193--210}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">year</span><span class="p">=</span><span class="s">{2024}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">publisher</span><span class="p">=</span><span class="s">{Springer}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="contrastive-methods">
-<h2>Contrastive Methods<a class="headerlink" href="#contrastive-methods" title="Link to this heading">¶</a></h2>
-<p>Contrastive methods train against a pool of cached non-optimal solutions, treated as negative examples. <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls how often new instances are solved exactly during training; <code class="docutils literal notranslate"><span class="pre">dataset</span></code> seeds the pool. See <a class="reference internal" href="pool.html"><span class="doc">Solution Pool</span></a> for details on the solution-pool mechanism.</p>
-<section id="noise-contrastive-estimation-nce">
-<h3>Noise Contrastive Estimation (NCE)<a class="headerlink" href="#noise-contrastive-estimation-nce" title="Link to this heading">¶</a></h3>
-<p>NCE <a class="footnote-reference brackets" href="#f7" id="id15" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> is a surrogate loss based on negative examples. It uses a small set of non-optimal solutions as negative samples to maximize the probability gap between the optimal solution and the rest.</p>
-<p>Let <span class="math notranslate nohighlight">\(\Gamma\)</span> be the cached pool of feasible solutions. For a minimization problem, NCE averages the predicted-cost margin between <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> and every member of the pool,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{c}) = \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big).\]</div>
-</div>
-<p>(If <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) \in \Gamma\)</span>, its term contributes zero and the sum effectively averages over the negatives.) The gradient has a closed form that requires no solver call in the backward pass,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} = \mathbf{w}^*(\mathbf{c}) - \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \mathbf{w}.\]</div>
-</div>
-<p>For a fixed <span class="math notranslate nohighlight">\(\Gamma\)</span> this update direction stays constant per instance, so periodically refreshing <span class="math notranslate nohighlight">\(\Gamma\)</span> (controlled by <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code>) is essential to keep the gradient signal informative.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">NCE</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/contrastive/index.html#pyepo.func.contrastive.noiseContrastiveEstimation" title="pyepo.func.contrastive.noiseContrastiveEstimation"><code class="xref py py-class docutils literal notranslate"><span class="pre">noiseContrastiveEstimation</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="contrastive-map-cmap">
-<h3>Contrastive MAP (CMAP)<a class="headerlink" href="#contrastive-map-cmap" title="Link to this heading">¶</a></h3>
-<p>CMAP <a class="footnote-reference brackets" href="#f7" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> is a special case of NCE that uses only the single best negative sample. It is simpler and often equally effective.</p>
-<p>CMAP keeps only the most-violating member of the pool, the one with the smallest predicted-cost objective, yielding a max-margin contrast against the true optimum. For a minimization problem,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{CMAP}}(\hat{\mathbf{c}}, \mathbf{c}) = \max_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big) = \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \min_{\mathbf{w} \in \Gamma} \hat{\mathbf{c}}^\top \mathbf{w}.\]</div>
-</div>
-<p>If <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) \in \Gamma\)</span>, that entry contributes a zero margin, so the loss is non-negative and vanishes precisely when the predicted costs already make <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> the minimizer over <span class="math notranslate nohighlight">\(\Gamma\)</span>.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">CMAP</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/contrastive/index.html#pyepo.func.contrastive.contrastiveMAP" title="pyepo.func.contrastive.contrastiveMAP"><code class="xref py py-class docutils literal notranslate"><span class="pre">contrastiveMAP</span></code></a></p>
-</dd></dl>
-
-</section>
-</section>
-<section id="learning-to-rank">
-<h2>Learning to Rank<a class="headerlink" href="#learning-to-rank" title="Link to this heading">¶</a></h2>
-<p>Learning to rank <a class="footnote-reference brackets" href="#f8" id="id17" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a> treats decision-focused learning as ranking a pool of feasible solutions: predicted costs assign scores to solutions, and the loss encourages the optimal solution to rank highest. Each variant differs in how it scores the ranking. Like contrastive methods, LTR uses <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> and <code class="docutils literal notranslate"><span class="pre">dataset</span></code> to manage the pool.</p>
-<ul>
-<li><p><strong>Pointwise</strong> regresses each predicted score <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}^\top \mathbf{w}\)</span> toward the true value <span class="math notranslate nohighlight">\(\mathbf{c}^\top \mathbf{w}\)</span> for every <span class="math notranslate nohighlight">\(\mathbf{w} \in \Gamma\)</span>.</p></li>
-<li><p><strong>Pairwise</strong> enforces a margin: the optimal solution should rank above each suboptimal one.</p></li>
-<li><p><strong>Listwise</strong> models the full ranking distribution with a SoftMax over predicted scores,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[P(\mathbf{w}' \mid \hat{\mathbf{c}}) = \frac{\exp(\hat{\mathbf{c}}^\top \mathbf{w}')}{\sum_{\mathbf{w} \in \Gamma} \exp(\hat{\mathbf{c}}^\top \mathbf{w})},\]</div>
-</div>
-<p>and minimizes the cross-entropy against the true ranking distribution,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c}) = -\frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c}) \log P(\mathbf{w} \mid \hat{\mathbf{c}}).\]</div>
-</div>
-<p>The gradient has a closed form,</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} = \frac{1}{|\Gamma|} \Big( \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \hat{\mathbf{c}})\, \mathbf{w} - \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c})\, \mathbf{w} \Big).\]</div>
-</div>
-</li>
-</ul>
-<section id="pointwise-ltr">
-<h3>Pointwise LTR<a class="headerlink" href="#pointwise-ltr" title="Link to this heading">¶</a></h3>
-<p>Pointwise loss computes ranking scores for individual solutions.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">ptLTR</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/rank/index.html#pyepo.func.rank.pointwiseLearningToRank" title="pyepo.func.rank.pointwiseLearningToRank"><code class="xref py py-class docutils literal notranslate"><span class="pre">pointwiseLearningToRank</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="pairwise-ltr">
-<h3>Pairwise LTR<a class="headerlink" href="#pairwise-ltr" title="Link to this heading">¶</a></h3>
-<p>Pairwise loss learns the relative ordering between pairs of solutions.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">prLTR</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/rank/index.html#pyepo.func.rank.pairwiseLearningToRank" title="pyepo.func.rank.pairwiseLearningToRank"><code class="xref py py-class docutils literal notranslate"><span class="pre">pairwiseLearningToRank</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="listwise-ltr">
-<h3>Listwise LTR<a class="headerlink" href="#listwise-ltr" title="Link to this heading">¶</a></h3>
-<p>Listwise loss evaluates scores over the entire ranked list.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">lsLTR</span></span></dt>
-<dd><p>alias of <a class="reference internal" href="../../autoapi/pyepo/func/rank/index.html#pyepo.func.rank.listwiseLearningToRank" title="pyepo.func.rank.listwiseLearningToRank"><code class="xref py py-class docutils literal notranslate"><span class="pre">listwiseLearningToRank</span></code></a></p>
-</dd></dl>
-
-</section>
-</section>
-<section id="parallel-computation">
-<h2>Parallel Computation<a class="headerlink" href="#parallel-computation" title="Link to this heading">¶</a></h2>
-<p>All <code class="docutils literal notranslate"><span class="pre">pyepo.func</span></code> modules support parallel solving during training via the <code class="docutils literal notranslate"><span class="pre">processes</span></code> parameter (<code class="docutils literal notranslate"><span class="pre">0</span></code> uses all available cores).</p>
-<a class="light-bg reference internal image-reference" href="../../_images/parallel-tsp.png"><img alt="../../_images/parallel-tsp.png" class="light-bg" src="../../_images/parallel-tsp.png" width="650" />
-</a>
-<p>The figure shows that increasing the number of processes reduces runtime.</p>
-<p class="rubric">Footnotes</p>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="f1" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>Elmachtoub, A. N., &amp; Grigas, P. (2021). Smart “predict, then optimize”. Management Science.</p>
-</aside>
-<aside class="footnote brackets" id="f3" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">2</a><span class="fn-bracket">]</span></span>
-<p>Vlastelica, M., Paulus, A., Musil, V., Martius, G., &amp; Rolinek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.</p>
-</aside>
-<aside class="footnote brackets" id="f4" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">3</a><span class="fn-bracket">]</span></span>
-<p>Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., &amp; Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.</p>
-</aside>
-<aside class="footnote brackets" id="f5" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
-<p>Berthet, Q., Blondel, M., Teboul, O., Cuturi, M., Vert, J. P., &amp; Bach, F. (2020). Learning with differentiable perturbed optimizers. Advances in Neural Information Processing Systems, 33, 9508-9519.</p>
-</aside>
-<aside class="footnote brackets" id="f6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id8">2</a>,<a role="doc-backlink" href="#id9">3</a>,<a role="doc-backlink" href="#id10">4</a>)</span>
-<p>Dalle, G., Baty, L., Bouvier, L., &amp; Parmentier, A. (2022). Learning with Combinatorial Optimization Layers: a Probabilistic Approach. arXiv preprint arXiv:2207.13513.</p>
-</aside>
-<aside class="footnote brackets" id="f7" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id15">1</a>,<a role="doc-backlink" href="#id16">2</a>)</span>
-<p>Mulamba, M., Mandi, J., Diligenti, M., Lombardi, M., Bucarey, V., &amp; Guns, T. (2021). Contrastive losses and solution caching for predict-and-optimize. Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence.</p>
-</aside>
-<aside class="footnote brackets" id="f8" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id17">7</a><span class="fn-bracket">]</span></span>
-<p>Mandi, J., Bucarey, V., Mulamba, M., &amp; Guns, T. (2022). Decision-focused learning: through the lens of learning to rank. Proceedings of the 39th International Conference on Machine Learning.</p>
-</aside>
-<aside class="footnote brackets" id="f9" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">8</a><span class="fn-bracket">]</span></span>
-<p>Niepert, M., Minervini, P., &amp; Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.</p>
-</aside>
-<aside class="footnote brackets" id="f10" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">9</a><span class="fn-bracket">]</span></span>
-<p>Minervini, P., Franceschi, L., &amp; Niepert, M. (2023). Adaptive perturbation-based gradient estimation for discrete latent variable models. Proceedings of the AAAI Conference on Artificial Intelligence.</p>
-</aside>
-<aside class="footnote brackets" id="f11" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">10</a><span class="fn-bracket">]</span></span>
-<p>Gupta, V., &amp; Huang, M. (2024). Decision-Focused Learning with Directional Gradients. arXiv preprint arXiv:2402.03256.</p>
-</aside>
-<aside class="footnote brackets" id="f12" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id14">11</a><span class="fn-bracket">]</span></span>
-<p>Tang, B., &amp; Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).</p>
-</aside>
-<aside class="footnote brackets" id="f13" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">12</a><span class="fn-bracket">]</span></span>
-<p>Blondel, M., Martins, A. F. T., &amp; Niculae, V. (2020). Learning with Fenchel-Young losses. Journal of Machine Learning Research, 21(35), 1-69.</p>
-</aside>
-</aside>
-</section>
+          <section id="training-methods">
+<h1>Training Methods<a class="headerlink" href="#training-methods" title="Link to this heading">¶</a></h1>
+<p>This page moved to <a class="reference internal" href="../getting_started/function.html"><span class="doc">Training Methods</span></a>.</p>
 </section>
 
         </article>
@@ -955,26 +405,8 @@ solver call.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="jax.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">JAX Frontend</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="twostage.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">Two-Stage Method</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -993,66 +425,8 @@ solver call.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Autograd Functions</a><ul>
-<li><a class="reference internal" href="#overview">Overview</a></li>
-<li><a class="reference internal" href="#choosing-a-method">Choosing a Method</a></li>
-<li><a class="reference internal" href="#surrogate-losses">Surrogate Losses</a><ul>
-<li><a class="reference internal" href="#smart-predict-then-optimize-loss-spo">Smart Predict-then-Optimize+ Loss (SPO+)</a></li>
-<li><a class="reference internal" href="#perturbation-gradient-pg">Perturbation Gradient (PG)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#perturbed-methods">Perturbed Methods</a><ul>
-<li><a class="reference internal" href="#differentiable-perturbed-optimizer-dpo">Differentiable Perturbed Optimizer (DPO)</a></li>
-<li><a class="reference internal" href="#perturbed-fenchel-young-loss-pfyl">Perturbed Fenchel-Young Loss (PFYL)</a></li>
-<li><a class="reference internal" href="#implicit-maximum-likelihood-estimator-i-mle">Implicit Maximum Likelihood Estimator (I-MLE)</a></li>
-<li><a class="reference internal" href="#adaptive-implicit-maximum-likelihood-estimator-ai-mle">Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#regularized-methods">Regularized Methods</a><ul>
-<li><a class="reference internal" href="#l2-regularized-frank-wolfe-rfwo">L2 Regularized Frank-Wolfe (RFWO)</a></li>
-<li><a class="reference internal" href="#l2-regularized-frank-wolfe-with-fenchel-young-loss-rfyl">L2 Regularized Frank-Wolfe with Fenchel-Young Loss (RFYL)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#black-box-methods">Black-Box Methods</a><ul>
-<li><a class="reference internal" href="#differentiable-black-box-optimizer-dbb">Differentiable Black-Box Optimizer (DBB)</a></li>
-<li><a class="reference internal" href="#negative-identity-backpropagation-nid">Negative Identity Backpropagation (NID)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cone-aligned-estimation">Cone-Aligned Estimation</a><ul>
-<li><a class="reference internal" href="#cone-aligned-vector-estimation-cave">Cone-Aligned Vector Estimation (CaVE)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#contrastive-methods">Contrastive Methods</a><ul>
-<li><a class="reference internal" href="#noise-contrastive-estimation-nce">Noise Contrastive Estimation (NCE)</a></li>
-<li><a class="reference internal" href="#contrastive-map-cmap">Contrastive MAP (CMAP)</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#learning-to-rank">Learning to Rank</a><ul>
-<li><a class="reference internal" href="#pointwise-ltr">Pointwise LTR</a></li>
-<li><a class="reference internal" href="#pairwise-ltr">Pairwise LTR</a></li>
-<li><a class="reference internal" href="#listwise-ltr">Listwise LTR</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#parallel-computation">Parallel Computation</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
@@ -1061,6 +435,5 @@ solver call.</p>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

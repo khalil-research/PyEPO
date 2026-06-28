@@ -1,20 +1,19 @@
-.. PyEPO documentation master file, created by
-   sphinx-quickstart on Mon Aug  9 14:15:50 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 .. image:: ./images/logo1.png
    :width: 1000
 
-Welcome to PyEPO's documentation!
-=================================
-This is the documentation of ``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Library), which provides decision-focused learning methods for predict-then-optimize tasks.
+PyEPO Documentation
+===================
+``PyEPO`` is a PyTorch/JAX-based library for end-to-end predict-then-optimize training.
+
+New to PyEPO? Start with :doc:`content/intro`, install ``PyEPO`` and a solver backend, then follow the :doc:`content/getting_started/workflow`.
 
 
 Quick Example
 +++++++++++++
 
-End-to-end training of a knapsack predictor defined with the DSL, using the SPO+ loss:
+End-to-end training of a knapsack predictor defined with the DSL and trained with the SPO+ loss:
+
+This example uses Gurobi as the backend. If you do not have a Gurobi license, install a different PyEPO backend and change ``backend=`` accordingly.
 
 .. code-block:: python
 
@@ -57,18 +56,60 @@ End-to-end training of a knapsack predictor defined with the DSL, using the SPO+
    # decision quality (on the training set here; split off a test set for real evaluation)
    print("Training regret:", pyepo.metric.regret(predmodel, optmodel, dataloader))
 
-Prefer JAX? ``pyepo.func.jax`` mirrors every loss for ``jax.grad``-based end-to-end training — see :doc:`content/examples/jax`.
-
-New to PyEPO? Start with :doc:`content/intro` for the framework, then the *Where to Start* guide in :doc:`content/tutorial`.
+Prefer JAX? ``pyepo.func.jax`` follows the PyTorch loss API for ``jax.grad``-based training; see :doc:`content/frontends/jax`.
 
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Basics
 
    content/intro
    content/install
-   content/tutorial
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Getting Started
+
+   content/getting_started/workflow
+   content/getting_started/model
+   content/getting_started/data
+   content/getting_started/function
+   content/getting_started/training
+   content/getting_started/evaluation
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Frontends and Backends
+
+   content/frontends/pytorch
+   content/frontends/jax
+   content/solver_backends
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Advanced Topics
+
+   content/advanced/twostage
+   content/advanced/pool
+   content/advanced/cave
+   content/advanced/knn
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Notebooks
+
+   content/notebooks
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference
+
+   content/api
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Citation
+
    content/ref
 
 

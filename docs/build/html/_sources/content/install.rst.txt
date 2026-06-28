@@ -2,6 +2,27 @@ Installation
 ++++++++++++
 
 
+Pip Install
+===========
+
+Install from `PyPI <https://pypi.org/project/pyepo>`_ with:
+
+.. code-block:: console
+
+   pip install pyepo
+
+
+
+Conda Install
+=============
+
+Install from `Anaconda Cloud <https://anaconda.org/pyepo/pyepo>`_ with:
+
+.. code-block:: console
+
+   conda install -c pyepo pyepo
+
+
 Install from Source
 ===================
 
@@ -16,28 +37,6 @@ Install the package from the local checkout.
 .. code-block:: console
 
    pip install PyEPO/pkg/.
-
-
-
-Pip Install
-===========
-
-Install the `PyPI <https://pypi.org/project/pyepo>`_ release with:
-
-.. code-block:: console
-
-   pip install pyepo
-
-
-
-Conda Install
-=============
-
-Install the `Anaconda Cloud <https://anaconda.org/pyepo/pyepo>`_ package with:
-
-.. code-block:: console
-
-   conda install -c pyepo pyepo
 
 
 

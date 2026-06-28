@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Reference" href="../ref.html"><link rel="prev" title="Solution Pool" href="pool.html">
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Evaluation - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.3 documentation</title>
@@ -189,7 +189,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -207,26 +207,48 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../tutorial.html">Tutorial</a><input aria-label="Toggle navigation of Tutorial" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="model.html">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="twostage.html">Two-Stage Method</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html">Autograd Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="jax.html">JAX Frontend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="training.html">Training</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pool.html">Solution Pool</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Evaluation</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../ref.html">Reference</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/pyepo/index.html">pyepo</a><input aria-label="Toggle navigation of pyepo" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/model.html">Optimization Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/data.html">Data and Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/function.html">Training Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/training.html">Training Loops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/evaluation.html">Evaluation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Frontends and Backends</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../frontends/pytorch.html">PyTorch Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../frontends/jax.html">JAX Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solver_backends.html">Solver Backends</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced Topics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/twostage.html">Two-stage Baseline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pool.html">Solution Pool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cave.html">CaVE Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/knn.html">kNN Robust Losses</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Citation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ref.html">Citation and References</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../autoapi/pyepo/index.html">pyepo</a><input aria-label="Toggle navigation of pyepo" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../autoapi/pyepo/EPO/index.html">pyepo.EPO</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/data/index.html">pyepo.data</a><input aria-label="Toggle navigation of pyepo.data" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/data/index.html">pyepo.data</a><input aria-label="Toggle navigation of pyepo.data" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/dataset/index.html">pyepo.data.dataset</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/knapsack/index.html">pyepo.data.knapsack</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/portfolio/index.html">pyepo.data.portfolio</a></li>
@@ -234,19 +256,19 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/data/tsp/index.html">pyepo.data.tsp</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/dsl/index.html">pyepo.dsl</a><input aria-label="Toggle navigation of pyepo.dsl" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/dsl/index.html">pyepo.dsl</a><input aria-label="Toggle navigation of pyepo.dsl" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/compiled/index.html">pyepo.dsl.compiled</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/expression/index.html">pyepo.dsl.expression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/objective/index.html">pyepo.dsl.objective</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/dsl/problem/index.html">pyepo.dsl.problem</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/index.html">pyepo.func</a><input aria-label="Toggle navigation of pyepo.func" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/abcmodule/index.html">pyepo.func.abcmodule</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/blackbox/index.html">pyepo.func.blackbox</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/cave/index.html">pyepo.func.cave</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/contrastive/index.html">pyepo.func.contrastive</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/jax/index.html">pyepo.func.jax</a><input aria-label="Toggle navigation of pyepo.func.jax" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/func/jax/index.html">pyepo.func.jax</a><input aria-label="Toggle navigation of pyepo.func.jax" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/abcmodule/index.html">pyepo.func.jax.abcmodule</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/blackbox/index.html">pyepo.func.jax.blackbox</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/func/jax/cave/index.html">pyepo.func.jax.cave</a></li>
@@ -266,16 +288,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/func/utils/index.html">pyepo.func.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/metric/index.html">pyepo.metric</a><input aria-label="Toggle navigation of pyepo.metric" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/metrics/index.html">pyepo.metric.metrics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/mse/index.html">pyepo.metric.mse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/regret/index.html">pyepo.metric.regret</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/metric/unambregret/index.html">pyepo.metric.unambregret</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/index.html">pyepo.model</a><input aria-label="Toggle navigation of pyepo.model" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/bases/index.html">pyepo.model.bases</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/copt/index.html">pyepo.model.copt</a><input aria-label="Toggle navigation of pyepo.model.copt" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/compile/index.html">pyepo.model.copt.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/coptmodel/index.html">pyepo.model.copt.coptmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/knapsack/index.html">pyepo.model.copt.knapsack</a></li>
@@ -285,7 +307,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/copt/vrp/index.html">pyepo.model.copt.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/grb/index.html">pyepo.model.grb</a><input aria-label="Toggle navigation of pyepo.model.grb" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/compile/index.html">pyepo.model.grb.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/grbmodel/index.html">pyepo.model.grb.grbmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/knapsack/index.html">pyepo.model.grb.knapsack</a></li>
@@ -295,14 +317,14 @@
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/grb/vrp/index.html">pyepo.model.grb.vrp</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/index.html">pyepo.model.mpax</a><input aria-label="Toggle navigation of pyepo.model.mpax" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/compile/index.html">pyepo.model.mpax.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/knapsack/index.html">pyepo.model.mpax.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/mpaxmodel/index.html">pyepo.model.mpax.mpaxmodel</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/mpax/shortestpath/index.html">pyepo.model.mpax.shortestpath</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/omo/index.html">pyepo.model.omo</a><input aria-label="Toggle navigation of pyepo.model.omo" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/compile/index.html">pyepo.model.omo.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/knapsack/index.html">pyepo.model.omo.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/omo/omomodel/index.html">pyepo.model.omo.omomodel</a></li>
@@ -313,7 +335,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html">pyepo.model.opt</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../autoapi/pyepo/model/ort/index.html">pyepo.model.ort</a><input aria-label="Toggle navigation of pyepo.model.ort" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/compile/index.html">pyepo.model.ort.compile</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/knapsack/index.html">pyepo.model.ort.knapsack</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../autoapi/pyepo/model/ort/ortcpmodel/index.html">pyepo.model.ort.ortcpmodel</a></li>
@@ -325,7 +347,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/model/utils/index.html">pyepo.model.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../autoapi/pyepo/twostage/index.html">pyepo.twostage</a><input aria-label="Toggle navigation of pyepo.twostage" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/autosklearnpred/index.html">pyepo.twostage.autosklearnpred</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../autoapi/pyepo/twostage/sklearnpred/index.html">pyepo.twostage.sklearnpred</a></li>
 </ul>
@@ -368,108 +390,14 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
           <section id="evaluation">
 <h1>Evaluation<a class="headerlink" href="#evaluation" title="Link to this heading">¶</a></h1>
-<section id="regret">
-<h2>Regret<a class="headerlink" href="#regret" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pyepo.metric.regret</span></code> evaluates the decision quality of a prediction model. Regret is defined as <span class="math notranslate nohighlight">\(l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^\top \mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{c}^\top \mathbf{w}^*(\mathbf{c})\)</span>, which measures the excess cost of the predicted solution over the true optimum. By default the instances are aggregated as the normalized regret <span class="math notranslate nohighlight">\(\sum_i l_i \, / \, \sum_i |\mathbf{c}_i^\top \mathbf{w}^*(\mathbf{c}_i)|\)</span>, dimensionless and comparable across problem scales; <code class="docutils literal notranslate"><span class="pre">reduction</span></code> switches to <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code> (per-instance array).</p>
-<dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.metric.</span></span><span class="sig-name descname"><span class="pre">regret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">nn.Module</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normalized'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span></span></span></dt>
-<dd><p>True regret (SPO loss) of a trained predictor.</p>
-<p>Solves the optimization problem on the predicted cost vector
-<span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>, then measures the excess true objective
-incurred by that decision:
-<span class="math notranslate nohighlight">\(l_i = \mathbf{c}_i^\top \mathbf{w}^*(\hat{\mathbf{c}}_i) -
-z^*(\mathbf{c}_i)\)</span>. With the default <code class="docutils literal notranslate"><span class="pre">reduction=&quot;normalized&quot;</span></code> the
-result is <span class="math notranslate nohighlight">\(\sum_i l_i / \sum_i |z^*(\mathbf{c}_i)|\)</span>,
-dimensionless and comparable across problem scales; instances with
-near-zero true optima inflate the ratio. PyTorch predictors are
-evaluated under <code class="docutils literal notranslate"><span class="pre">eval()</span></code>; the original mode is restored afterwards.</p>
-<p><code class="docutils literal notranslate"><span class="pre">predmodel</span></code> may also be a plain callable <code class="docutils literal notranslate"><span class="pre">f(x:</span> <span class="pre">np.ndarray)</span> <span class="pre">-&gt;</span>
-<span class="pre">array-like</span></code> for JAX/Flax models; pass a <code class="docutils literal notranslate"><span class="pre">functools.partial</span></code> that
-closes over the current parameter pytree, e.g.
-<code class="docutils literal notranslate"><span class="pre">functools.partial(model.apply,</span> <span class="pre">params)</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>predmodel</strong> – a PyTorch <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> for cost prediction, or a
-JAX callable <code class="docutils literal notranslate"><span class="pre">f(x_numpy)</span> <span class="pre">-&gt;</span> <span class="pre">cost_array</span></code></p></li>
-<li><p><strong>optmodel</strong> – a PyEPO optimization model</p></li>
-<li><p><strong>dataloader</strong> – PyTorch DataLoader over an <code class="docutils literal notranslate"><span class="pre">optDataset</span></code> (yielding
-<code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code> tuples)</p></li>
-<li><p><strong>processes</strong> – number of processors, 1 for single-core, 0 for all of
-cores; a fresh worker pool is spawned per call, each worker
-rebuilding the model from its constructor args</p></li>
-<li><p><strong>reduction</strong> – “normalized” (sum of regrets over sum of absolute true
-optima), “sum”, “mean”, or “none” (per-instance array)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>aggregated regret, or per-instance regrets
-when <code class="docutils literal notranslate"><span class="pre">reduction=&quot;none&quot;</span></code></p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
-
-<span class="n">regret</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">regret</span><span class="p">(</span><span class="n">predmodel</span><span class="p">,</span> <span class="n">optmodel</span><span class="p">,</span> <span class="n">testloader</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="unambiguous-regret">
-<h2>Unambiguous Regret<a class="headerlink" href="#unambiguous-regret" title="Link to this heading">¶</a></h2>
-<p>When a predicted cost vector <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> yields multiple optimal solutions for <span class="math notranslate nohighlight">\(\underset{\mathbf{w} \in S}{\min}\;\hat{\mathbf{c}}^T \mathbf{w}\)</span>, the regret depends on which optimum the solver happens to return. The unambiguous regret removes this ambiguity by scoring the worst case: <span class="math notranslate nohighlight">\(l_{URegret}(\hat{\mathbf{c}}, \mathbf{c}) = \underset{\mathbf{w} \in W^*(\hat{\mathbf{c}})}{\max} \mathbf{w}^\top \mathbf{c} - \mathbf{c}^\top \mathbf{w}^*(\mathbf{c})\)</span>.</p>
-<a class="light-bg reference internal image-reference" href="../../_images/regret.png"><img alt="learning curves" class="light-bg" src="../../_images/regret.png" width="650" />
-</a>
-<p>As the figure shows, regret and unambiguous regret are nearly identical across all training procedures. While the unambiguous regret is more theoretically rigorous, it is rarely necessary in practice.</p>
-<dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">pyepo.metric.</span></span><span class="sig-name descname"><span class="pre">unambRegret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">nn.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optmodel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span></dt>
-<dd><p>Normalized unambiguous regret (worst-case-tie SPO loss).</p>
-<p>When the predicted cost vector <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> yields multiple
-optimal solutions, <code class="docutils literal notranslate"><span class="pre">regret</span></code> reports the realized one while
-<code class="docutils literal notranslate"><span class="pre">unambRegret</span></code> reports the <strong>worst case over all optima</strong>:
-<span class="math notranslate nohighlight">\(l_{\mathrm{URegret}}(\hat{\mathbf{c}}, \mathbf{c}) =
-\max_{\mathbf{w} \in W^*(\hat{\mathbf{c}})} \mathbf{c}^\top
-\mathbf{w} - z^*(\mathbf{c})\)</span>. More theoretically rigorous than
-<code class="docutils literal notranslate"><span class="pre">regret</span></code>, but in practice the two are nearly identical and
-<code class="docutils literal notranslate"><span class="pre">unambRegret</span></code> is rarely required.
-The result is normalized by <span class="math notranslate nohighlight">\(\sum_i |z^*(\mathbf{c}_i)|\)</span>; instances with near-zero true optima inflate the ratio.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>predmodel</strong> – a regression neural network for cost prediction</p></li>
-<li><p><strong>optmodel</strong> – a PyEPO optimization model</p></li>
-<li><p><strong>dataloader</strong> – PyTorch DataLoader over an <code class="docutils literal notranslate"><span class="pre">optDataset</span></code></p></li>
-<li><p><strong>tolerance</strong> – precision used when rounding predicted costs to find ties</p></li>
-<li><p><strong>max_iter</strong> – maximum number of solve retries with relaxed tolerance</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>normalized unambiguous regret</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyepo</span>
-
-<span class="n">regret</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">unambRegret</span><span class="p">(</span><span class="n">predmodel</span><span class="p">,</span> <span class="n">optmodel</span><span class="p">,</span> <span class="n">testloader</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
+<p>This page moved to <a class="reference internal" href="../getting_started/evaluation.html"><span class="doc">Evaluation</span></a>.</p>
 </section>
 
         </article>
@@ -477,26 +405,8 @@ The result is normalized by <span class="math notranslate nohighlight">\(\sum_i 
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../ref.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Reference</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="pool.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">Solution Pool</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -515,28 +425,8 @@ The result is normalized by <span class="math notranslate nohighlight">\(\sum_i 
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Evaluation</a><ul>
-<li><a class="reference internal" href="#regret">Regret</a></li>
-<li><a class="reference internal" href="#unambiguous-regret">Unambiguous Regret</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
@@ -545,6 +435,5 @@ The result is normalized by <span class="math notranslate nohighlight">\(\sum_i 
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>
