@@ -118,7 +118,7 @@ Constraints are fixed across instances; only the cost is predicted. Pass them as
    x.sum(axis=1) == 1                             # per-axis sums, e.g. an assignment
    x @ Q @ x <= gamma                             # quadratic (Gurobi and COPT)
 
-A 2-D objective uses ``dsl.sum(c * x)`` (``c @ x`` is a 1-D inner product, so it does not apply). For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level ``optModel`` interface for cases it cannot express.
+For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level ``optModel`` interface for cases it cannot express.
 
 
 The optModel Interface
