@@ -453,7 +453,7 @@
 <td><p>PFYL; use the multiplicative variant for sign-sensitive oracles</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IMLE</span></code> / <code class="docutils literal notranslate"><span class="pre">AIMLE</span></code></p></td>
-<td><p>perturbed solutions</p></td>
+<td><p>expected perturbed solutions</p></td>
 <td><p>task loss chosen by the user</p></td>
 <td><p>perturb-and-MAP with Sum-of-Gamma noise</p></td>
 </tr>
@@ -545,13 +545,13 @@ solver call.</p>
 <p>By Danskin’s theorem, regret can be written as the directional derivative of <span class="math notranslate nohighlight">\(z^*(\hat{\mathbf{c}})\)</span> along <span class="math notranslate nohighlight">\(\mathbf{c}\)</span> (up to a constant independent of <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span>). PG approximates this directional derivative with finite differences. Two variants are available, backward (<code class="docutils literal notranslate"><span class="pre">two_sides=False</span></code>) and central (<code class="docutils literal notranslate"><span class="pre">two_sides=True</span></code>):</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}\mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c}) &amp;\approx \frac{z^*(\hat{\mathbf{c}}) - z^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{\lambda}, \\
-\mathcal{L}_{\mathrm{PG}}^{\mathrm{cent}}(\hat{\mathbf{c}}, \mathbf{c}) &amp;\approx \frac{z^*(\hat{\mathbf{c}} + \lambda \mathbf{c}) - z^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{2 \lambda},\end{split}\]</div>
+\[\begin{split}\mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c}) &amp;\approx \frac{z^*(\hat{\mathbf{c}}) - z^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{\sigma}, \\
+\mathcal{L}_{\mathrm{PG}}^{\mathrm{cent}}(\hat{\mathbf{c}}, \mathbf{c}) &amp;\approx \frac{z^*(\hat{\mathbf{c}} + \sigma \mathbf{c}) - z^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{2 \sigma},\end{split}\]</div>
 </div>
-<p>where <span class="math notranslate nohighlight">\(\lambda &gt; 0\)</span> is the finite-difference width (the <code class="docutils literal notranslate"><span class="pre">sigma</span></code> parameter). The corresponding gradient estimate is</p>
+<p>where <span class="math notranslate nohighlight">\(\sigma &gt; 0\)</span> is the finite-difference width (the <code class="docutils literal notranslate"><span class="pre">sigma</span></code> parameter). The corresponding gradient estimate is</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} \approx \frac{\mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{w}^*(\hat{\mathbf{c}} - \lambda \mathbf{c})}{\lambda}.\]</div>
+\[\frac{\partial \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} \approx \frac{\mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{w}^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{\sigma}.\]</div>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py">
@@ -648,7 +648,7 @@ solver call.</p>
 <div class="math notranslate nohighlight">
 \[\lambda_t = \alpha_t \cdot \frac{\|\hat{\mathbf{c}}\|_2}{\|\mathbf{d}\|_2},\]</div>
 </div>
-<p>where <span class="math notranslate nohighlight">\(\mathbf{d}\)</span> is the upstream task gradient and <span class="math notranslate nohighlight">\(\alpha_t &gt; 0\)</span> is tuned online: when an exponential moving average of the gradient sparsity (fraction of nonzero entries) drops below one, <span class="math notranslate nohighlight">\(\alpha_t\)</span> is increased; otherwise it is decreased. This rescaling keeps the perturbation magnitude commensurate with <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> and decouples the step from the absolute scale of <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, removing the need to tune <span class="math notranslate nohighlight">\(\lambda\)</span> by hand.</p>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{d}\)</span> is the upstream task gradient and <span class="math notranslate nohighlight">\(\alpha_t &gt; 0\)</span> is tuned online: when an exponential moving average of the fraction of nonzero gradient entries drops below one, <span class="math notranslate nohighlight">\(\alpha_t\)</span> is increased; otherwise it is decreased. This rescaling keeps the perturbation magnitude commensurate with <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}\)</span> and decouples the step from the absolute scale of <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, removing the need to tune <span class="math notranslate nohighlight">\(\lambda\)</span> by hand.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">AIMLE</span></span></dt>
@@ -794,19 +794,19 @@ solver call.</p>
 </section>
 <section id="contrastive-methods">
 <h2>Contrastive Methods<a class="headerlink" href="#contrastive-methods" title="Link to this heading">¶</a></h2>
-<p>Contrastive methods train against a pool of cached non-optimal solutions, treated as negative examples. <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls how often new instances are solved exactly during training; <code class="docutils literal notranslate"><span class="pre">dataset</span></code> seeds the pool. See <a class="reference internal" href="../advanced/pool.html"><span class="doc">Solution Pool</span></a> for details on the solution-pool mechanism.</p>
+<p>Contrastive methods train against a pool of cached non-optimal solutions, treated as negative examples. <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls how often new instances are solved exactly during training; <code class="docutils literal notranslate"><span class="pre">dataset</span></code> seeds the pool and is required by these methods. See <a class="reference internal" href="../advanced/pool.html"><span class="doc">Solution Pool</span></a> for details on the solution-pool mechanism.</p>
 <section id="noise-contrastive-estimation-nce">
 <h3>Noise Contrastive Estimation (NCE)<a class="headerlink" href="#noise-contrastive-estimation-nce" title="Link to this heading">¶</a></h3>
 <p>NCE <a class="footnote-reference brackets" href="#f7" id="id15" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> is a surrogate loss based on negative examples. It uses a small set of non-optimal solutions as negative samples to maximize the probability gap between the optimal solution and the rest.</p>
 <p>Let <span class="math notranslate nohighlight">\(\Gamma\)</span> be the cached pool of feasible solutions. For a minimization problem, NCE averages the predicted-cost margin between <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> and every member of the pool,</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{c}) = \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big).\]</div>
+\[\mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c})) = \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big).\]</div>
 </div>
 <p>(If <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) \in \Gamma\)</span>, its term contributes zero and the sum effectively averages over the negatives.) The gradient has a closed form that requires no solver call in the backward pass,</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} = \mathbf{w}^*(\mathbf{c}) - \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \mathbf{w}.\]</div>
+\[\frac{\partial \mathcal{L}_{\mathrm{NCE}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c}))}{\partial \hat{\mathbf{c}}} = \mathbf{w}^*(\mathbf{c}) - \frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} \mathbf{w}.\]</div>
 </div>
 <p>For a fixed <span class="math notranslate nohighlight">\(\Gamma\)</span>, this update direction stays constant per instance. <code class="docutils literal notranslate"><span class="pre">solve_ratio</span></code> controls how often the pool is refreshed.</p>
 <dl class="py attribute">
@@ -822,7 +822,7 @@ solver call.</p>
 <p>CMAP keeps only the most-violating member of the pool, the one with the smallest predicted-cost objective, yielding a max-margin contrast against the true optimum. For a minimization problem,</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{CMAP}}(\hat{\mathbf{c}}, \mathbf{c}) = \max_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big) = \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \min_{\mathbf{w} \in \Gamma} \hat{\mathbf{c}}^\top \mathbf{w}.\]</div>
+\[\mathcal{L}_{\mathrm{CMAP}}(\hat{\mathbf{c}}, \mathbf{w}^*(\mathbf{c})) = \max_{\mathbf{w} \in \Gamma} \big( \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \hat{\mathbf{c}}^\top \mathbf{w} \big) = \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c}) - \min_{\mathbf{w} \in \Gamma} \hat{\mathbf{c}}^\top \mathbf{w}.\]</div>
 </div>
 <p>If <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c}) \in \Gamma\)</span>, that entry contributes a zero margin, so the loss is non-negative and vanishes precisely when the predicted costs already make <span class="math notranslate nohighlight">\(\mathbf{w}^*(\mathbf{c})\)</span> the minimizer over <span class="math notranslate nohighlight">\(\Gamma\)</span>.</p>
 <dl class="py attribute">
@@ -839,20 +839,20 @@ solver call.</p>
 <ul>
 <li><p><strong>Pointwise</strong> regresses each predicted score <span class="math notranslate nohighlight">\(\hat{\mathbf{c}}^\top \mathbf{w}\)</span> toward the true value <span class="math notranslate nohighlight">\(\mathbf{c}^\top \mathbf{w}\)</span> for every <span class="math notranslate nohighlight">\(\mathbf{w} \in \Gamma\)</span>.</p></li>
 <li><p><strong>Pairwise</strong> enforces a margin between the optimal solution and each suboptimal one.</p></li>
-<li><p><strong>Listwise</strong> models the full ranking distribution with a SoftMax over predicted scores,</p>
+<li><p><strong>Listwise</strong> models the full ranking distribution with a SoftMax over the negative predicted costs (for a minimization problem, so the lowest-cost solution gets the highest probability),</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[P(\mathbf{w}' \mid \hat{\mathbf{c}}) = \frac{\exp(\hat{\mathbf{c}}^\top \mathbf{w}')}{\sum_{\mathbf{w} \in \Gamma} \exp(\hat{\mathbf{c}}^\top \mathbf{w})},\]</div>
+\[P(\mathbf{w}' \mid \hat{\mathbf{c}}) = \frac{\exp(-\hat{\mathbf{c}}^\top \mathbf{w}')}{\sum_{\mathbf{w} \in \Gamma} \exp(-\hat{\mathbf{c}}^\top \mathbf{w})},\]</div>
 </div>
 <p>and minimizes the cross-entropy against the true ranking distribution,</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c}) = -\frac{1}{|\Gamma|} \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c}) \log P(\mathbf{w} \mid \hat{\mathbf{c}}).\]</div>
+\[\mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c}) = - \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c}) \log P(\mathbf{w} \mid \hat{\mathbf{c}}).\]</div>
 </div>
 <p>The gradient has a closed form,</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\frac{\partial \mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} = \frac{1}{|\Gamma|} \Big( \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \hat{\mathbf{c}})\, \mathbf{w} - \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c})\, \mathbf{w} \Big).\]</div>
+\[\frac{\partial \mathcal{L}_{\mathrm{LTR}}^{\mathrm{list}}(\hat{\mathbf{c}}, \mathbf{c})}{\partial \hat{\mathbf{c}}} = \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \mathbf{c})\, \mathbf{w} - \sum_{\mathbf{w} \in \Gamma} P(\mathbf{w} \mid \hat{\mathbf{c}})\, \mathbf{w}.\]</div>
 </div>
 </li>
 </ul>

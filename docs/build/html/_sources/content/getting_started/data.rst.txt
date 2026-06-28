@@ -29,7 +29,7 @@ Common parameters across all generators:
 Shortest Path
 -------------
 
-A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0.5) entries maps the feature vector into the cost coefficients: :math:`c_i^j = \big[\tfrac{1}{{3.5}^{deg}} \big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j`.
+A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0.5) entries maps the feature vector into the cost coefficients: :math:`c_i^j = \tfrac{1}{{3.5}^{deg}} \big[\big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j`.
 
 .. autofunction:: pyepo.data.shortestpath.genData
     :noindex:
@@ -47,7 +47,7 @@ A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0
 Knapsack
 --------
 
-Only the cost coefficients are uncertain; item weights are fixed. Let :math:`m` be the number of items and :math:`k` the number of resource dimensions. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are sampled from 3 to 8 with one decimal place of precision. The cost coefficients are :math:`c_i^j = \big\lceil \big[\tfrac{5}{{3.5}^{deg}} \big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j \big\rceil`.
+Only the cost coefficients are uncertain; item weights are fixed. Let :math:`m` be the number of items and :math:`k` the number of resource dimensions. The weights :math:`\mathcal{W} \in \mathbb{R}^{k \times m}` are drawn uniformly from the half-open range :math:`[3, 8)` to two decimal places. The cost coefficients are :math:`c_i^j = \big\lceil \tfrac{5}{{3.5}^{deg}} \big[\big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j \big\rceil`.
 
 .. autofunction:: pyepo.data.knapsack.genData
     :noindex:

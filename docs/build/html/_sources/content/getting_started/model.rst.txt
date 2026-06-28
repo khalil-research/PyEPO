@@ -36,7 +36,7 @@ The compiled model is an ``optModel``. During training, ``pyepo.func`` calls ``s
 
 All backends share this interface and are selected with ``backend=``. Gurobi and COPT are commercial solvers. Pyomo and OR-Tools can use open solvers such as HiGHS, GLPK, CBC, and SCIP. MPAX solves linear and quadratic programs on GPU. The generic backends take a ``solver=`` argument naming the solver to run.
 
-``compile`` forwards keyword arguments to the backend. ``solver=`` applies only to the generic backends (``pyomo`` / ``ortools``) and names the solver they run; ``timelimit=`` (seconds) sets a time limit where the backend supports one; any other keyword is passed to the solver as a native parameter:
+``compile`` forwards keyword arguments to the backend. ``solver=`` applies only to the generic backends (``pyomo`` / ``ortools``) and names the solver they run; ``timelimit=`` (seconds) sets a time limit where the backend supports one; any other keyword is passed through as a native solver parameter where the backend accepts one:
 
 .. list-table::
    :header-rows: 1
@@ -213,7 +213,7 @@ To use a solver's modeling API directly, inherit from a backend base class and i
            m.addConstr(5*x[0] + 4*x[1] + 6*x[2] + 2*x[3] + 3*x[4] <= 15)
            return m, x
 
-The other backends follow the same shape with their own APIs: ``optCoptModel`` (COPT), ``optOmoModel`` (Pyomo), and ``optOrtModel`` / ``optOrtCpModel`` (OR-Tools), which take a ``solver=`` argument. ``optMpaxModel`` is different: it has no solver model object, so ``_getModel`` fills the standard-form matrices ``A``, ``b``, ``G``, ``h``, ``l``, ``u`` (and an optional PSD ``Q``) and returns ``(None, [])``.
+The other backends follow the same shape with their own APIs: ``optCoptModel`` (COPT), ``optOmoModel`` (Pyomo), and ``optOrtModel`` / ``optOrtCpModel`` (OR-Tools). Of these, ``optOmoModel`` and ``optOrtModel`` take a ``solver=`` argument; ``optOrtCpModel`` (CP-SAT) is integer-only with a fixed solver. ``optMpaxModel`` is different: it has no solver model object, so ``_getModel`` fills the standard-form matrices ``A``, ``b``, ``G``, ``h``, ``l``, ``u`` (and an optional PSD ``Q``) and returns ``(None, [])``.
 
 .. autoclass:: pyepo.model.mpax.optMpaxModel
     :noindex:
