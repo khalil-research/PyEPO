@@ -113,6 +113,5 @@ Related Pages
 =============
 
 * :doc:`../getting_started/data` documents ``optDatasetConstrs``.
-* :doc:`../getting_started/function` documents the ``CaVE`` loss.
-* :doc:`../getting_started/training` includes the training-loop template.
+* :doc:`../getting_started/function` documents the ``CaVE`` loss and training-loop pattern.
 * :doc:`../notebooks` links to the CaVE Colab walkthrough.

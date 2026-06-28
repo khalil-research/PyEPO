@@ -74,7 +74,6 @@ Prefer JAX? ``pyepo.func.jax`` follows the PyTorch loss API for ``jax.grad``-bas
    content/getting_started/model
    content/getting_started/data
    content/getting_started/function
-   content/getting_started/training
    content/getting_started/evaluation
 
 .. toctree::
