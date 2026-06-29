@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyepo"
-version = "2.2.4"
+version = "2.2.5"
 description = "PyTorch/JAX-based End-to-End Predict-then-Optimize Tool"
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { text = "MIT" }
