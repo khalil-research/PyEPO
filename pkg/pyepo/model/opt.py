@@ -55,6 +55,14 @@ class ModelSpec:
         return self.model_type.from_config(self._config, self._args)
 
 
+def _snapshot(value):
+    """Deep-copy a constructor argument, keeping the reference if it cannot be copied."""
+    try:
+        return deepcopy(value)
+    except Exception:
+        return value
+
+
 def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
     """Flatten a constructor call into arguments that rebuild the model."""
     sig = inspect.signature(init)
@@ -66,15 +74,15 @@ def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
         if i == 0:
             continue
         kind = sig.parameters[name].kind
-        # **kwargs: merge captured keywords in directly
+        # snapshot each argument; values that cannot be deep-copied keep a reference
         if kind is inspect.Parameter.VAR_KEYWORD:
-            config.update(deepcopy(value))
+            config.update({k: _snapshot(v) for k, v in value.items()})
         elif kind is inspect.Parameter.VAR_POSITIONAL:
-            init_args.extend(deepcopy(value))
+            init_args.extend(_snapshot(v) for v in value)
         elif kind is inspect.Parameter.POSITIONAL_ONLY:
-            init_args.append(deepcopy(value))
+            init_args.append(_snapshot(value))
         else:
-            config[name] = deepcopy(value)
+            config[name] = _snapshot(value)
     return tuple(init_args), config
 
 
