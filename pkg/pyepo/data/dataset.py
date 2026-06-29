@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 import torch
 from scipy.spatial import distance
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
 from pyepo import EPO
@@ -315,7 +315,8 @@ class optDatasetConstrs(optDataset):
     currently requires a Gurobi-backed ``optModel``.
 
     Per-instance row counts differ (different constraints bind at different
-    vertices), so batches must be assembled with ``collate_tight_constraints``.
+    vertices), so batch with ``optDataLoader`` or pass
+    ``collate_tight_constraints`` to a PyTorch ``DataLoader``.
 
     Reference: Tang & Khalil (2024)
     `<https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>`_
@@ -453,6 +454,29 @@ def collate_tight_constraints(batch):
         torch.stack(z, dim=0),
         pad_sequence(list(t_ctrs), batch_first=True, padding_value=0),
     )
+
+
+# optDatasetConstrs yields ragged binding-constraint matrices; pad them when batching
+optDatasetConstrs.collate_fn = staticmethod(collate_tight_constraints)
+
+
+class optDataLoader(DataLoader):
+    """
+    ``DataLoader`` that applies a dataset's own ``collate_fn`` when present.
+
+    Datasets with ragged samples (e.g. ``optDatasetConstrs``, whose
+    binding-constraint matrices vary in row count) carry a ``collate_fn``; this
+    loader uses it so the caller never passes one explicitly. Plain datasets
+    fall back to the default PyTorch collation.
+    """
+
+    def __init__(self, dataset, *args, **kwargs):
+        # use the dataset's own collate_fn unless the caller supplies one
+        if len(args) <= 5 and "collate_fn" not in kwargs:
+            collate_fn = getattr(dataset, "collate_fn", None)
+            if collate_fn is not None:
+                kwargs["collate_fn"] = collate_fn
+        super().__init__(dataset, *args, **kwargs)
 
 
 def _extract_tight_normals(

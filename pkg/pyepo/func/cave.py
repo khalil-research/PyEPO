@@ -59,7 +59,8 @@ class coneAlignedCosine(optModule):
     cutting the per-epoch cost without measurable regret loss.
 
     Training data must come from ``pyepo.data.dataset.optDatasetConstrs``
-    (Gurobi-backed) and be collated with ``collate_tight_constraints``.
+    (Gurobi-backed) and be batched with ``pyepo.data.dataset.optDataLoader``
+    or a ``DataLoader`` using ``collate_tight_constraints``.
 
     Reference: Tang & Khalil (2024)
     `<https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>`_

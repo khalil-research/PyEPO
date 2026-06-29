@@ -267,16 +267,15 @@ For a runnable walkthrough that uses ``optDatasetConstrs`` end-to-end with the C
 .. autoclass:: pyepo.data.dataset.optDatasetConstrs
     :noindex:
 
-Per-instance constraint matrices have different row counts (different sets of constraints are tight at different vertices), so batching requires a custom ``collate_fn``:
+Per-instance constraint matrices have different row counts (different constraints bind at different vertices), so batch with ``optDataLoader``, which pads them automatically:
 
-.. autofunction:: pyepo.data.dataset.collate_tight_constraints
+.. autoclass:: pyepo.data.dataset.optDataLoader
     :noindex:
 
 .. code-block:: python
 
   import pyepo
-  from torch.utils.data import DataLoader
-  from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
+  from pyepo.data.dataset import optDatasetConstrs, optDataLoader
 
   # model for TSP (Gurobi backend required)
   model = pyepo.model.tspModel(num_nodes=10, formulation="DFJ")
@@ -287,8 +286,8 @@ Per-instance constraint matrices have different row counts (different sets of co
   # build CaVE dataset (extracts tight binding-constraint normals at the optimum)
   dataset = optDatasetConstrs(model, x, c)
 
-  # collate_fn pads ragged per-instance constraint matrices
-  dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=collate_tight_constraints)
+  # optDataLoader pads ragged per-instance constraint matrices
+  dataloader = optDataLoader(dataset, batch_size=32, shuffle=True)
 
 .. [#f1] Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.
 .. [#f2] Tang, B., & Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).

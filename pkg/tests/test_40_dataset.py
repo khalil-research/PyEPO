@@ -14,6 +14,7 @@ import torch
 from pyepo.data import shortestpath
 from pyepo.data.dataset import (
     collate_tight_constraints,
+    optDataLoader,
     optDataset,
     optDatasetConstrs,
     optDatasetKNN,
@@ -299,3 +300,51 @@ class TestCollateTightConstraints:
         assert padded.shape == (2, 5, 4)
         # the shorter matrix is zero-padded at the tail
         assert torch.allclose(padded[0, 2:], torch.zeros(3, 4))
+
+
+class TestOptDataLoader:
+    """Pure: optDataLoader applies a dataset's collate_fn automatically."""
+
+    def test_constrs_collate_fn_wired(self):
+        assert optDatasetConstrs.collate_fn is collate_tight_constraints
+
+    def test_uses_dataset_collate_fn(self):
+        class _Ragged(list):
+            collate_fn = staticmethod(lambda batch: ("auto", len(batch)))
+
+        loader = optDataLoader(_Ragged([0, 1, 2, 3]), batch_size=2)
+        assert next(iter(loader)) == ("auto", 2)
+
+    def test_accepts_positional_dataloader_args(self):
+        loader = optDataLoader([0, 1, 2, 3], 2)
+        assert torch.equal(next(iter(loader)), torch.tensor([0, 1]))
+
+    def test_explicit_collate_fn_wins(self):
+        class _Ragged(list):
+            collate_fn = staticmethod(lambda batch: ("auto", len(batch)))
+
+        loader = optDataLoader(
+            _Ragged([0, 1, 2, 3]), batch_size=2, collate_fn=lambda b: ("explicit", len(b))
+        )
+        assert next(iter(loader)) == ("explicit", 2)
+
+    def test_positional_collate_fn_wins(self):
+        class _Ragged(list):
+            collate_fn = staticmethod(lambda batch: ("auto", len(batch)))
+
+        loader = optDataLoader(
+            _Ragged([0, 1, 2, 3]),
+            2,
+            None,
+            None,
+            None,
+            0,
+            lambda b: ("positional", len(b)),
+        )
+        assert next(iter(loader)) == ("positional", 2)
+
+    def test_plain_dataset_uses_default_collate(self):
+        data = [(torch.tensor([float(i)]),) for i in range(4)]
+        loader = optDataLoader(data, batch_size=2)
+        (batch,) = next(iter(loader))
+        assert batch.shape == (2, 1)

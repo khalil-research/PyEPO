@@ -581,7 +581,7 @@ Setting ``solve_ratio < 1`` enables the hybrid update: each batch uses the QP pr
 
     CVRP-20 results from notebook 04: ``num_data=1000``, 10 epochs, single process. In this setup, CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with ``solve_ratio=0.3`` trains 10.5x faster with higher final regret.
 
-Training data comes from ``pyepo.data.dataset.optDatasetConstrs``, which extracts the binding-constraint normals at the optimum for each instance. Use ``pyepo.data.dataset.collate_tight_constraints`` to zero-pad ragged per-instance constraint counts. CaVE currently requires a Gurobi-backed ``optModel``.
+Training data comes from ``pyepo.data.dataset.optDatasetConstrs``, which extracts the binding-constraint normals at the optimum for each instance. Per-instance constraint counts are ragged, so batch it with ``pyepo.data.dataset.optDataLoader``, which zero-pads them automatically. CaVE currently requires a Gurobi-backed ``optModel``.
 
 .. autoclass:: pyepo.func.CaVE
     :noindex:
@@ -591,15 +591,10 @@ Training loop (the batch carries ``tight_ctrs`` in addition to ``(x, c, w, z)``)
 
 .. code-block:: python
 
-   from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
+   from pyepo.data.dataset import optDatasetConstrs, optDataLoader
 
    dataset = optDatasetConstrs(optmodel, feat, costs)
-   dataloader = DataLoader(
-       dataset,
-       batch_size=32,
-       shuffle=True,
-       collate_fn=collate_tight_constraints,
-   )
+   dataloader = optDataLoader(dataset, batch_size=32, shuffle=True)
 
    cave = pyepo.func.CaVE(optmodel, processes=2)
 

@@ -118,18 +118,13 @@ def sp_constrs_data():
     if not _HAS_GUROBI:
         pytest.skip("Gurobi not installed")
     import pyepo
-    from pyepo.data.dataset import collate_tight_constraints, optDatasetConstrs
+    from pyepo.data.dataset import optDataLoader, optDatasetConstrs
     from pyepo.model.grb.shortestpath import shortestPathModel
 
     x, c = pyepo.data.shortestpath.genData(8, NUM_FEAT, GRID, seed=42)
     optmodel = shortestPathModel(grid=GRID)
     dataset = optDatasetConstrs(optmodel, x, c)
-    loader = DataLoader(
-        dataset,
-        batch_size=4,
-        shuffle=False,
-        collate_fn=collate_tight_constraints,
-    )
+    loader = optDataLoader(dataset, batch_size=4, shuffle=False)
     return optmodel, dataset, loader
 
 

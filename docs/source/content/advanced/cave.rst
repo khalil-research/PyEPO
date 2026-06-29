@@ -38,16 +38,15 @@ Compared with ``optDataset``, it adds one item to each batch:
 * ``z``: true optimal objective value.
 * ``tight_ctrs``: binding-constraint normals at the true optimum.
 
-The number of binding constraints can differ across instances, so a custom
-collate function pads the batch:
+The number of binding constraints can differ across instances, so the batch
+needs padding; ``optDataLoader`` applies it automatically:
 
 .. code-block:: python
 
    import pyepo
    import torch
    from torch import nn
-   from torch.utils.data import DataLoader
-   from pyepo.data.dataset import optDatasetConstrs, collate_tight_constraints
+   from pyepo.data.dataset import optDatasetConstrs, optDataLoader
 
    # TSP model; Gurobi backend required for binding-constraint extraction
    optmodel = pyepo.model.tspModel(num_nodes=10, formulation="DFJ")
@@ -64,12 +63,7 @@ collate function pads the batch:
 
    # CaVE dataset and padded batches
    dataset = optDatasetConstrs(optmodel, feat, costs)
-   dataloader = DataLoader(
-       dataset,
-       batch_size=32,
-       shuffle=True,
-       collate_fn=collate_tight_constraints,
-   )
+   dataloader = optDataLoader(dataset, batch_size=32, shuffle=True)
 
    # linear predictor and CaVE loss
    predmodel = nn.Linear(5, optmodel.num_cost)
