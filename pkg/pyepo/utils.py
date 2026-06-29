@@ -21,7 +21,7 @@ _EPS: float = 1e-8
 
 def getArgs(model: optModel) -> dict:
     """
-    Compatibility wrapper for the explicit model configuration protocol.
+    Compatibility wrapper for model reconstruction configuration.
 
     Args:
         model: optimization model

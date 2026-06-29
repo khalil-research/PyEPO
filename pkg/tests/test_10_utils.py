@@ -61,6 +61,70 @@ class AutoConfigModel(optModel):
         return np.zeros(len(self.values)), 0.0
 
 
+class VarArgsConfigModel(optModel):
+    """Solver-free model whose constructor needs positional replay."""
+
+    def __init__(self, *values, label="default"):
+        self.values = values
+        self.label = label
+        super().__init__()
+
+    def _getModel(self):
+        return None, list(range(len(self.values)))
+
+    def setObj(self, c):
+        self.cost = np.asarray(c)
+
+    def solve(self):
+        return np.zeros(len(self.values)), 0.0
+
+
+class PosOnlyConfigModel(optModel):
+    """Solver-free model with a positional-only constructor argument."""
+
+    def __init__(self, values, /, label="default"):
+        self.values = values
+        self.label = label
+        super().__init__()
+
+    def _getModel(self):
+        return None, list(range(len(self.values)))
+
+    def setObj(self, c):
+        self.cost = np.asarray(c)
+
+    def solve(self):
+        return np.zeros(len(self.values)), 0.0
+
+
+class _NoDeepcopy:
+    def __init__(self, values):
+        self.values = values
+
+    def __deepcopy__(self, memo):
+        raise TypeError("not deepcopyable")
+
+
+class CustomConfigModel(optModel):
+    """Custom config should control reconstruction for unusual constructor inputs."""
+
+    def __init__(self, resource=None, values=None):
+        self.values = list(values if values is not None else resource.values)
+        super().__init__()
+
+    def get_config(self):
+        return {"values": self.values.copy()}
+
+    def _getModel(self):
+        return None, list(range(len(self.values)))
+
+    def setObj(self, c):
+        self.cost = np.asarray(c)
+
+    def solve(self):
+        return np.zeros(len(self.values)), 0.0
+
+
 # ============================================================
 # unionFind (pure)
 # ============================================================
@@ -261,6 +325,32 @@ class TestModelSpec:
         assert model.get_config()["values"] == [1, 2, 3]
         assert model.get_config()["nested"] == {"tag": ["x"]}
         assert model.rebuild().kwargs == {"nested": {"tag": ["x"]}}
+
+    def test_auto_config_replays_varargs(self):
+        model = VarArgsConfigModel(1, 2, 3, label="x")
+        spec = model.to_spec()
+
+        assert spec.args == (1, 2, 3)
+        assert spec.config == {"label": "x"}
+        rebuilt = model.rebuild()
+        assert rebuilt.values == (1, 2, 3)
+        assert rebuilt.label == "x"
+
+    def test_auto_config_replays_positional_only_args(self):
+        model = PosOnlyConfigModel([1, 2, 3], label="x")
+        spec = model.to_spec()
+
+        assert spec.args == ([1, 2, 3],)
+        assert spec.config == {"label": "x"}
+        rebuilt = model.rebuild()
+        assert rebuilt.values == [1, 2, 3]
+        assert rebuilt.label == "x"
+
+    def test_custom_get_config_accepts_uncopyable_constructor_input(self):
+        model = CustomConfigModel(_NoDeepcopy([1, 2, 3]))
+        rebuilt = model.rebuild()
+
+        assert rebuilt.values == [1, 2, 3]
 
 
 # ============================================================

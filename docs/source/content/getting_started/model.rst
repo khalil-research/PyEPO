@@ -142,7 +142,7 @@ For a maximization problem, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__
 
 .. autoclass:: pyepo.model.opt.optModel
     :noindex:
-    :members: __init__, _getModel, setObj, solve, num_cost, get_config, rebuild, to_spec
+    :members: __init__, _getModel, setObj, solve, num_cost, rebuild
 
 
 Custom Algorithm

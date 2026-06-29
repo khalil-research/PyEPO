@@ -27,26 +27,39 @@ class ModelSpec:
     """Serializable recipe for building a fresh optimization model."""
 
     model_type: type[optModel]
+    _args: tuple
     _config: dict
 
-    def __init__(self, model_type: type[optModel], config: dict) -> None:
+    def __init__(
+        self,
+        model_type: type[optModel],
+        config: dict,
+        args: tuple = (),
+    ) -> None:
         object.__setattr__(self, "model_type", model_type)
+        object.__setattr__(self, "_args", deepcopy(args))
         object.__setattr__(self, "_config", deepcopy(config))
 
     @property
+    def args(self) -> tuple:
+        """Return an independent copy of positional constructor arguments."""
+        return deepcopy(self._args)
+
+    @property
     def config(self) -> dict:
-        """Return an independent copy of the constructor configuration."""
+        """Return an independent copy of keyword constructor arguments."""
         return deepcopy(self._config)
 
     def build(self) -> optModel:
         """Build a fresh model without sharing mutable configuration values."""
-        return self.model_type.from_config(self._config)
+        return self.model_type.from_config(self._config, self._args)
 
 
-def _capture_init_config(init, args, kwargs) -> dict:
-    """Flatten a constructor call into keyword arguments that rebuild the model."""
+def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
+    """Flatten a constructor call into arguments that rebuild the model."""
     sig = inspect.signature(init)
     bound = sig.bind(None, *args, **kwargs)
+    init_args = []
     config = {}
     for i, (name, value) in enumerate(bound.arguments.items()):
         # the first bound argument is self
@@ -56,12 +69,13 @@ def _capture_init_config(init, args, kwargs) -> dict:
         # **kwargs: merge captured keywords in directly
         if kind is inspect.Parameter.VAR_KEYWORD:
             config.update(deepcopy(value))
-        # nameless positionals cannot replay by keyword; override get_config to keep them
-        elif kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.POSITIONAL_ONLY):
-            continue
+        elif kind is inspect.Parameter.VAR_POSITIONAL:
+            init_args.extend(deepcopy(value))
+        elif kind is inspect.Parameter.POSITIONAL_ONLY:
+            init_args.append(deepcopy(value))
         else:
             config[name] = deepcopy(value)
-    return config
+    return tuple(init_args), config
 
 
 class optModel(ABC):
@@ -93,8 +107,10 @@ class optModel(ABC):
 
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
-        # only wrap a subclass that defines its own __init__
-        if "__init__" not in cls.__dict__:
+        # Only wrap subclasses that define their own __init__ and use the
+        # default reconstruction config. Custom get_config implementations may
+        # intentionally accept objects that are not deepcopyable/rebuildable.
+        if "__init__" not in cls.__dict__ or "get_config" in cls.__dict__:
             return
         user_init = cls.__init__
 
@@ -102,7 +118,9 @@ class optModel(ABC):
         def _init_capturing(self, *args, **kwargs):
             # record only the outermost call; nested super().__init__ leaves it intact
             if "_init_config" not in self.__dict__:
-                self._init_config = _capture_init_config(user_init, args, kwargs)
+                self._init_args, self._init_config = _capture_init_config(
+                    user_init, args, kwargs
+                )
             user_init(self, *args, **kwargs)
 
         cls.__init__ = _init_capturing
@@ -124,13 +142,17 @@ class optModel(ABC):
         return deepcopy(self.__dict__.get("_init_config", {}))
 
     @classmethod
-    def from_config(cls, config: dict) -> Self:
+    def from_config(cls, config: dict, args: tuple = ()) -> Self:
         """Build a model from a configuration produced by ``get_config``."""
-        return cls(**deepcopy(config))
+        return cls(*deepcopy(args), **deepcopy(config))
 
     def to_spec(self) -> ModelSpec:
         """Return a serializable, immutable-snapshot rebuild recipe."""
-        return ModelSpec(type(self), self.get_config())
+        return ModelSpec(
+            type(self),
+            self.get_config(),
+            self.__dict__.get("_init_args", ()),
+        )
 
     def rebuild(self) -> Self:
         """Build a structurally equivalent model with clean runtime state."""
