@@ -70,9 +70,6 @@ class vrpRCIModel(vrpABModel):
         self._recycled_keys: set = set()
         super().__init__(num_nodes, demands, capacity, num_vehicle)
 
-    def get_config(self) -> dict:
-        return {**super().get_config(), "recycle_cuts": self.recycle_cuts}
-
     def _getModel(self) -> tuple:
         """
         A method to build Gurobi model

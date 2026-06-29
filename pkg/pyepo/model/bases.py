@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
-from copy import deepcopy
 from itertools import combinations
 from numbers import Integral, Real
 from typing import TYPE_CHECKING
@@ -104,9 +103,6 @@ class shortestPathBase(optModel):
         self.grid = (int(dimensions[0]), int(dimensions[1]))
         self.arcs = _get_grid_arcs(self.grid)
         super().__init__(*args, **kwargs)
-
-    def get_config(self) -> dict:
-        return {**super().get_config(), "grid": self.grid}
 
     @property
     def num_cost(self) -> int:
@@ -208,14 +204,6 @@ class portfolioBase(optModel):
             raise ValueError("gamma must be greater than or equal to zero.")
         super().__init__(*args, **kwargs)
 
-    def get_config(self) -> dict:
-        return {
-            **super().get_config(),
-            "num_assets": self.num_assets,
-            "covariance": self.covariance.copy(),
-            "gamma": self.gamma,
-        }
-
     @property
     def num_cost(self) -> int:
         return self.num_assets
@@ -262,9 +250,6 @@ class tspABBase(optModel):
         self.edges = list(combinations(self.nodes, 2))
         self._extra_constrs: list = []
         super().__init__(*args, **kwargs)
-
-    def get_config(self) -> dict:
-        return {**super().get_config(), "num_nodes": self.num_nodes}
 
     @property
     def num_cost(self) -> int:
@@ -380,15 +365,6 @@ class vrpABBase(optModel):
         self.num_vehicle = _positive_int(num_vehicle, "num_vehicle")
         self._extra_constrs: list = []
         super().__init__(*args, **kwargs)
-
-    def get_config(self) -> dict:
-        return {
-            **super().get_config(),
-            "num_nodes": self.num_nodes,
-            "demands": deepcopy(self.demands),
-            "capacity": self.capacity,
-            "num_vehicle": self.num_vehicle,
-        }
 
     @property
     def num_cost(self) -> int:

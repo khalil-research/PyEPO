@@ -43,6 +43,24 @@ class ConfigModel(optModel):
         return np.zeros(len(self.values)), 0.0
 
 
+class AutoConfigModel(optModel):
+    """Solver-free model that relies on optModel's automatic config capture."""
+
+    def __init__(self, values, **kwargs):
+        self.values = values
+        self.kwargs = kwargs
+        super().__init__()
+
+    def _getModel(self):
+        return None, list(range(len(self.values)))
+
+    def setObj(self, c):
+        self.cost = np.asarray(c)
+
+    def solve(self):
+        return np.zeros(len(self.values)), 0.0
+
+
 # ============================================================
 # unionFind (pure)
 # ============================================================
@@ -221,6 +239,28 @@ class TestModelSpec:
 
         np.testing.assert_array_equal(sol, [0.0, 0.0, 0.0])
         assert obj == 0.0
+
+    def test_auto_config_snapshots_constructor_inputs(self):
+        values = [1, 2, 3]
+        nested = {"tag": ["x"]}
+        model = AutoConfigModel(values, nested=nested)
+        values[0] = 99
+        nested["tag"][0] = "changed"
+
+        rebuilt = model.rebuild()
+
+        assert rebuilt.values == [1, 2, 3]
+        assert rebuilt.kwargs == {"nested": {"tag": ["x"]}}
+
+    def test_auto_config_export_is_independent(self):
+        model = AutoConfigModel([1, 2, 3], nested={"tag": ["x"]})
+        config = model.get_config()
+        config["values"][0] = 99
+        config["nested"]["tag"][0] = "changed"
+
+        assert model.get_config()["values"] == [1, 2, 3]
+        assert model.get_config()["nested"] == {"tag": ["x"]}
+        assert model.rebuild().kwargs == {"nested": {"tag": ["x"]}}
 
 
 # ============================================================

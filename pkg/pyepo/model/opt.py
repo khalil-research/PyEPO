@@ -5,6 +5,8 @@ Abstract optimization model
 
 from __future__ import annotations
 
+import functools
+import inspect
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
@@ -41,6 +43,27 @@ class ModelSpec:
         return self.model_type.from_config(self._config)
 
 
+def _capture_init_config(init, args, kwargs) -> dict:
+    """Flatten a constructor call into keyword arguments that rebuild the model."""
+    sig = inspect.signature(init)
+    bound = sig.bind(None, *args, **kwargs)
+    config = {}
+    for i, (name, value) in enumerate(bound.arguments.items()):
+        # the first bound argument is self
+        if i == 0:
+            continue
+        kind = sig.parameters[name].kind
+        # **kwargs: merge captured keywords in directly
+        if kind is inspect.Parameter.VAR_KEYWORD:
+            config.update(deepcopy(value))
+        # nameless positionals cannot replay by keyword; override get_config to keep them
+        elif kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.POSITIONAL_ONLY):
+            continue
+        else:
+            config[name] = deepcopy(value)
+    return config
+
+
 class optModel(ABC):
     """
     Abstract base class for predict-then-optimize models.
@@ -52,11 +75,6 @@ class optModel(ABC):
     COPT (``optCoptModel``), OR-Tools (``optOrtModel`` / ``optOrtCpModel``),
     and MPAX (``optMpaxModel``); subclass ``optModel`` directly to integrate
     any other solver or algorithm.
-
-    Models that take constructor arguments should override ``get_config`` and
-    cooperatively merge ``super().get_config()``. The resulting configuration
-    powers ``rebuild()``, multiprocessing workers, and sklearn scorers without
-    inspecting constructor signatures or runtime solver state.
 
     The default objective sense is minimization; set
     ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for
@@ -73,6 +91,22 @@ class optModel(ABC):
     arcs: list
     _cost_vars: list
 
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        # only wrap a subclass that defines its own __init__
+        if "__init__" not in cls.__dict__:
+            return
+        user_init = cls.__init__
+
+        @functools.wraps(user_init)
+        def _init_capturing(self, *args, **kwargs):
+            # record only the outermost call; nested super().__init__ leaves it intact
+            if "_init_config" not in self.__dict__:
+                self._init_config = _capture_init_config(user_init, args, kwargs)
+            user_init(self, *args, **kwargs)
+
+        cls.__init__ = _init_capturing
+
     def __init__(self) -> None:
         # Cache for models whose solver variables do not map one-to-one to
         # predicted costs (for example directed TSP/VRP formulations).
@@ -86,8 +120,8 @@ class optModel(ABC):
         return "optModel " + self.__class__.__name__
 
     def get_config(self) -> dict:
-        """Return the explicit constructor configuration for this model."""
-        return {}
+        """Return the constructor configuration for this model."""
+        return deepcopy(self.__dict__.get("_init_config", {}))
 
     @classmethod
     def from_config(cls, config: dict) -> Self:
