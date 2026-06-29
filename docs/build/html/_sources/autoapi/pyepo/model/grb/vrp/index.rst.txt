@@ -54,12 +54,6 @@ Module Contents
 
 
 
-   .. py:method:: get_config() -> dict
-
-      Return the explicit constructor configuration for this model.
-
-
-
    .. py:method:: setObj(c: numpy.ndarray | torch.Tensor | list) -> None
 
       A method to set the objective function

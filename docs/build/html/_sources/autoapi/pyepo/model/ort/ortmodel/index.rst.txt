@@ -49,7 +49,7 @@ Module Contents
 
    .. py:method:: get_config() -> dict
 
-      Return the explicit constructor configuration for this model.
+      Return the constructor configuration for this model.
 
 
 

@@ -61,12 +61,6 @@ Module Contents
 
 
 
-   .. py:method:: get_config() -> dict
-
-      Return the explicit constructor configuration for this model.
-
-
-
    .. py:property:: num_cost
       :type: int
 
@@ -110,7 +104,7 @@ Module Contents
 
    .. py:method:: get_config() -> dict
 
-      Return the explicit constructor configuration for this model.
+      Return the constructor configuration for this model.
 
 
 
@@ -157,12 +151,6 @@ Module Contents
 
 
    .. py:attribute:: gamma
-
-
-   .. py:method:: get_config() -> dict
-
-      Return the explicit constructor configuration for this model.
-
 
 
    .. py:property:: num_cost
@@ -216,12 +204,6 @@ Module Contents
 
 
    .. py:attribute:: edges
-
-
-   .. py:method:: get_config() -> dict
-
-      Return the explicit constructor configuration for this model.
-
 
 
    .. py:property:: num_cost
@@ -305,12 +287,6 @@ Module Contents
 
 
    .. py:attribute:: num_vehicle
-
-
-   .. py:method:: get_config() -> dict
-
-      Return the explicit constructor configuration for this model.
-
 
 
    .. py:property:: num_cost

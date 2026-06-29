@@ -446,10 +446,6 @@ provided for GurobiPy (<code class="docutils literal notranslate"><span class="p
 COPT (<code class="docutils literal notranslate"><span class="pre">optCoptModel</span></code>), OR-Tools (<code class="docutils literal notranslate"><span class="pre">optOrtModel</span></code> / <code class="docutils literal notranslate"><span class="pre">optOrtCpModel</span></code>),
 and MPAX (<code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code>); subclass <code class="docutils literal notranslate"><span class="pre">optModel</span></code> directly to integrate
 any other solver or algorithm.</p>
-<p>Models that take constructor arguments should override <code class="docutils literal notranslate"><span class="pre">get_config</span></code> and
-cooperatively merge <code class="docutils literal notranslate"><span class="pre">super().get_config()</span></code>. The resulting configuration
-powers <code class="docutils literal notranslate"><span class="pre">rebuild()</span></code>, multiprocessing workers, and sklearn scorers without
-inspecting constructor signatures or runtime solver state.</p>
 <p>The default objective sense is minimization; set
 <code class="docutils literal notranslate"><span class="pre">self.modelSense</span> <span class="pre">=</span> <span class="pre">EPO.MAXIMIZE</span></code> in <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> or <code class="docutils literal notranslate"><span class="pre">__init__</span></code> for
 maximization problems (some backends, e.g. Gurobi and COPT, detect this
@@ -475,7 +471,7 @@ automatically from the underlying solver model).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.opt.optModel.get_config">
 <span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#pyepo.model.opt.optModel.get_config" title="Link to this definition">¶</a></dt>
-<dd><p>Return the explicit constructor configuration for this model.</p>
+<dd><p>Return the constructor configuration for this model.</p>
 </dd></dl>
 
 <dl class="py method">

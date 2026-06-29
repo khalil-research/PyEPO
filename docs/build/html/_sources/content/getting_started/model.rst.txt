@@ -129,14 +129,14 @@ The DSL compiles to an ``optModel``. Implement one directly when you need:
 * a **custom solving algorithm**, for example a hand-written ADMM, a graph algorithm, or a heuristic, rather than a general solver;
 * **constraint generation** through solver callbacks (lazy constraints, cutting planes), which a one-shot model definition cannot express.
 
-A subclass implements the solving interface plus an explicit reconstruction
-configuration:
+A subclass implements the solving interface:
 
 * ``_getModel(self)``: build the model and return ``(model, variables)``. ``model`` is whatever ``solve`` needs (a solver model, a graph, or ``None``); ``variables`` sets ``num_cost``.
 * ``setObj(self, c)``: store the cost vector ``c`` of length ``num_cost``.
 * ``solve(self)``: solve and return ``(sol, obj)``. ``sol`` is a length-``num_cost`` array **aligned to the cost order** (``sol[i]`` is the value of the variable whose cost is ``c[i]``), and ``obj`` is the objective value.
 * ``num_cost``: number of cost coefficients; defaults to ``len(self.x)``.
-* ``get_config(self)``: return the constructor arguments needed to build a fresh equivalent model. This is used by multiprocessing, scorers, and ``rebuild()``; do not include solver state or the current objective.
+
+Constructor arguments are captured automatically for ``rebuild()`` and multiprocessing, so a subclass need not declare them; override ``get_config`` only when a model needs custom handling.
 
 For a maximization problem, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__`` or ``_getModel``; the default is minimization.
 
@@ -168,9 +168,6 @@ When the problem is solved by your own algorithm rather than a general solver, i
            g = nx.Graph()
            g.add_edges_from(self.arcs, cost=0)
            return g, g.edges                # variables set num_cost
-
-       def get_config(self):
-           return {**super().get_config(), "grid": self.grid}
 
        def setObj(self, c):
            for i, e in enumerate(self.arcs):

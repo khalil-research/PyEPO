@@ -511,15 +511,14 @@
 <li><p>a <strong>custom solving algorithm</strong>, for example a hand-written ADMM, a graph algorithm, or a heuristic, rather than a general solver;</p></li>
 <li><p><strong>constraint generation</strong> through solver callbacks (lazy constraints, cutting planes), which a one-shot model definition cannot express.</p></li>
 </ul>
-<p>A subclass implements the solving interface plus an explicit reconstruction
-configuration:</p>
+<p>A subclass implements the solving interface:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">_getModel(self)</span></code>: build the model and return <code class="docutils literal notranslate"><span class="pre">(model,</span> <span class="pre">variables)</span></code>. <code class="docutils literal notranslate"><span class="pre">model</span></code> is whatever <code class="docutils literal notranslate"><span class="pre">solve</span></code> needs (a solver model, a graph, or <code class="docutils literal notranslate"><span class="pre">None</span></code>); <code class="docutils literal notranslate"><span class="pre">variables</span></code> sets <code class="docutils literal notranslate"><span class="pre">num_cost</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">setObj(self,</span> <span class="pre">c)</span></code>: store the cost vector <code class="docutils literal notranslate"><span class="pre">c</span></code> of length <code class="docutils literal notranslate"><span class="pre">num_cost</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">solve(self)</span></code>: solve and return <code class="docutils literal notranslate"><span class="pre">(sol,</span> <span class="pre">obj)</span></code>. <code class="docutils literal notranslate"><span class="pre">sol</span></code> is a length-<code class="docutils literal notranslate"><span class="pre">num_cost</span></code> array <strong>aligned to the cost order</strong> (<code class="docutils literal notranslate"><span class="pre">sol[i]</span></code> is the value of the variable whose cost is <code class="docutils literal notranslate"><span class="pre">c[i]</span></code>), and <code class="docutils literal notranslate"><span class="pre">obj</span></code> is the objective value.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">num_cost</span></code>: number of cost coefficients; defaults to <code class="docutils literal notranslate"><span class="pre">len(self.x)</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">get_config(self)</span></code>: return the constructor arguments needed to build a fresh equivalent model. This is used by multiprocessing, scorers, and <code class="docutils literal notranslate"><span class="pre">rebuild()</span></code>; do not include solver state or the current objective.</p></li>
 </ul>
+<p>Constructor arguments are captured automatically for <code class="docutils literal notranslate"><span class="pre">rebuild()</span></code> and multiprocessing, so a subclass need not declare them; override <code class="docutils literal notranslate"><span class="pre">get_config</span></code> only when a model needs custom handling.</p>
 <p>For a maximization problem, set <code class="docutils literal notranslate"><span class="pre">self.modelSense</span> <span class="pre">=</span> <span class="pre">EPO.MAXIMIZE</span></code> in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> or <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>; the default is minimization.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
@@ -532,10 +531,6 @@ provided for GurobiPy (<code class="docutils literal notranslate"><span class="p
 COPT (<code class="docutils literal notranslate"><span class="pre">optCoptModel</span></code>), OR-Tools (<code class="docutils literal notranslate"><span class="pre">optOrtModel</span></code> / <code class="docutils literal notranslate"><span class="pre">optOrtCpModel</span></code>),
 and MPAX (<code class="docutils literal notranslate"><span class="pre">optMpaxModel</span></code>); subclass <code class="docutils literal notranslate"><span class="pre">optModel</span></code> directly to integrate
 any other solver or algorithm.</p>
-<p>Models that take constructor arguments should override <code class="docutils literal notranslate"><span class="pre">get_config</span></code> and
-cooperatively merge <code class="docutils literal notranslate"><span class="pre">super().get_config()</span></code>. The resulting configuration
-powers <code class="docutils literal notranslate"><span class="pre">rebuild()</span></code>, multiprocessing workers, and sklearn scorers without
-inspecting constructor signatures or runtime solver state.</p>
 <p>The default objective sense is minimization; set
 <code class="docutils literal notranslate"><span class="pre">self.modelSense</span> <span class="pre">=</span> <span class="pre">EPO.MAXIMIZE</span></code> in <code class="docutils literal notranslate"><span class="pre">_getModel</span></code> or <code class="docutils literal notranslate"><span class="pre">__init__</span></code> for
 maximization problems (some backends, e.g. Gurobi and COPT, detect this
@@ -570,7 +565,7 @@ automatically from the underlying solver model).</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span></dt>
-<dd><p>Return the explicit constructor configuration for this model.</p>
+<dd><p>Return the constructor configuration for this model.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -637,9 +632,6 @@ automatically from the underlying solver model).</p>
         <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
         <span class="n">g</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arcs</span><span class="p">,</span> <span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span>                <span class="c1"># variables set num_cost</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">(),</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">setObj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arcs</span><span class="p">):</span>

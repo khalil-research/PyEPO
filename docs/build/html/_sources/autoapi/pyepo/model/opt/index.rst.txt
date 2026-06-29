@@ -58,11 +58,6 @@ Module Contents
    and MPAX (``optMpaxModel``); subclass ``optModel`` directly to integrate
    any other solver or algorithm.
 
-   Models that take constructor arguments should override ``get_config`` and
-   cooperatively merge ``super().get_config()``. The resulting configuration
-   powers ``rebuild()``, multiprocessing workers, and sklearn scorers without
-   inspecting constructor signatures or runtime solver state.
-
    The default objective sense is minimization; set
    ``self.modelSense = EPO.MAXIMIZE`` in ``_getModel`` or ``__init__`` for
    maximization problems (some backends, e.g. Gurobi and COPT, detect this
@@ -85,7 +80,7 @@ Module Contents
 
    .. py:method:: get_config() -> dict
 
-      Return the explicit constructor configuration for this model.
+      Return the constructor configuration for this model.
 
 
 
