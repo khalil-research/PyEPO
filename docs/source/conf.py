@@ -76,13 +76,6 @@ html_theme_options = {
     # palette derived from the PyEPO logo:
     #   carrot-orange as the primary brand color (links, headings accents)
     #   leaf-green appears on `.. tip::` admonitions and on autoapi signature names
-    "light_css_variables": {
-        "color-brand-primary": "#B95B10",
-        "color-brand-content": "#B95B10",
-        "color-admonition-title--tip": "#1F8237",
-        "color-admonition-title-background--tip": "#E8F5EA",
-        "color-api-name": "#1F8237",
-    },
     "dark_css_variables": {
         "color-brand-primary": "#F4B452",
         "color-brand-content": "#F4B452",

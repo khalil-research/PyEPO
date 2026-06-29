@@ -1,0 +1,7 @@
+{% extends "!base.html" %}
+
+{# Dark-only site: seed the theme in localStorage before Furo's in-body script
+   reads it, so the page renders dark with no light-mode flash. #}
+{% block extrahead %}{{ super() }}
+    <script>try { localStorage.setItem("theme", "dark"); } catch (e) {}</script>
+{% endblock %}
