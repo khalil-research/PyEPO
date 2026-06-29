@@ -126,9 +126,7 @@ class optModel(ABC):
         def _init_capturing(self, *args, **kwargs):
             # record only the outermost call; nested super().__init__ leaves it intact
             if "_init_config" not in self.__dict__:
-                self._init_args, self._init_config = _capture_init_config(
-                    user_init, args, kwargs
-                )
+                self._init_args, self._init_config = _capture_init_config(user_init, args, kwargs)
             user_init(self, *args, **kwargs)
 
         cls.__init__ = _init_capturing
