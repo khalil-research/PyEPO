@@ -59,7 +59,7 @@ def _snapshot(value):
     """Deep-copy a constructor argument, keeping the reference if it cannot be copied."""
     try:
         return deepcopy(value)
-    except Exception:
+    except Exception:  # noqa: BLE001 -- any copy failure falls back to a reference
         return value
 
 
