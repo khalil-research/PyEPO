@@ -1,3 +1,8 @@
+/* Dark-only site: hide Furo's light / dark / auto toggle. */
+.theme-toggle {
+    display: none !important;
+}
+
 /* lock :visited links back to the brand link color so the browser default
    purple cannot leak through (notably on Furo's prev/next pager). */
 a:visited {
