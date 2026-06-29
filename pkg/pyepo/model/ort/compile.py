@@ -40,7 +40,6 @@ class compiledOrtProblem(compiledBase, optOrtModel):
         self.problem = deepcopy(problem)
         self.params = dict(params) if params else {}
         self.solver = solver
-        self._extra_constrs = []  # (coef, rhs) cuts replayed on copy
         optModel.__init__(self)  # builds the model via _getModel
         self._model.SuppressOutput()
         self._set_obj_sense()

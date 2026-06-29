@@ -54,7 +54,6 @@ class optOrtModel(optModel):
                 "OR-Tools is not installed. Please install ortools to use this feature."
             )
         self.solver = solver
-        self._extra_constrs = []
         super().__init__()
         # suppress output
         self._model.SuppressOutput()

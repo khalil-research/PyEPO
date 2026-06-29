@@ -53,7 +53,6 @@ class optOrtCpModel(optModel):
             raise ImportError(
                 "OR-Tools is not installed. Please install ortools to use this feature."
             )
-        self._extra_constrs = []
         self._objective_coefs: list[int] | None = None
         super().__init__()
         # cache ordered Var list for batched weighted_sum / per-Var Value() loop
