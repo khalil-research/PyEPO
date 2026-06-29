@@ -136,7 +136,7 @@ A subclass implements the solving interface:
 * ``solve(self)``: solve and return ``(sol, obj)``. ``sol`` is a length-``num_cost`` array **aligned to the cost order** (``sol[i]`` is the value of the variable whose cost is ``c[i]``), and ``obj`` is the objective value.
 * ``num_cost``: number of cost coefficients; defaults to ``len(self.x)``.
 
-Constructor arguments are captured automatically for ``rebuild()`` and multiprocessing, so a subclass need not declare them; override ``get_config`` only when a model needs custom handling.
+Constructor arguments are captured automatically for ``rebuild()`` and multiprocessing, so most subclasses only define the solving interface. Advanced models can customize reconstruction separately when their constructor needs special handling.
 
 For a maximization problem, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__`` or ``_getModel``; the default is minimization.
 

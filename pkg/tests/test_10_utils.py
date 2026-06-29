@@ -19,7 +19,7 @@ from .conftest import requires_gurobi
 
 
 class ConfigModel(optModel):
-    """Solver-free model for the explicit reconstruction protocol."""
+    """Solver-free model with custom reconstruction config."""
 
     def __init__(self, values, label="default"):
         self.values = np.asarray(values)
@@ -243,7 +243,7 @@ class TestCostToNumpy:
 
 
 # ============================================================
-# explicit model reconstruction protocol (pure)
+# model reconstruction config (pure)
 # ============================================================
 
 
