@@ -21,7 +21,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: ModelSpec(model_type: type[optModel], config: dict)
+.. py:class:: ModelSpec(model_type: type[optModel], config: dict, args: tuple = ())
 
    Serializable recipe for building a fresh optimization model.
 
@@ -30,11 +30,18 @@ Module Contents
       :type:  type[optModel]
 
 
+   .. py:property:: args
+      :type: tuple
+
+
+      Return an independent copy of positional constructor arguments.
+
+
    .. py:property:: config
       :type: dict
 
 
-      Return an independent copy of the constructor configuration.
+      Return an independent copy of keyword constructor arguments.
 
 
    .. py:method:: build() -> optModel
@@ -84,7 +91,7 @@ Module Contents
 
 
 
-   .. py:method:: from_config(config: dict) -> Self
+   .. py:method:: from_config(config: dict, args: tuple = ()) -> Self
       :classmethod:
 
 

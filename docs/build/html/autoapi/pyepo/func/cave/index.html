@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html"><link rel="next" title="pyepo.func.contrastive" href="../contrastive/index.html"><link rel="prev" title="pyepo.func.blackbox" href="../blackbox/index.html">
 
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>pyepo.func.cave - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</title>
+        <title>pyepo.func.cave - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
@@ -175,7 +175,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</div></a>
+      <a href="../../../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -196,7 +196,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
   
-  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</span>
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -450,7 +450,8 @@ heuristic (normalized predicted cost blended with the average
 binding-constraint normal) with probability <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">solve_ratio</span></code>,
 cutting the per-epoch cost without measurable regret loss.</p>
 <p>Training data must come from <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code>
-(Gurobi-backed) and be collated with <code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>.</p>
+(Gurobi-backed) and be batched with <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDataLoader</span></code>
+or a <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> using <code class="docutils literal notranslate"><span class="pre">collate_tight_constraints</span></code>.</p>
 <p>Reference: Tang &amp; Khalil (2024)
 <a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12">https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12</a></p>
 <dl class="py attribute">
@@ -564,7 +565,7 @@ cutting the per-epoch cost without measurable regret loss.</p>
       
     </aside>
   </div>
-</div><script src="../../../../_static/documentation_options.js?v=78f8bedb"></script>
+</div><script src="../../../../_static/documentation_options.js?v=d1b8cabd"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>

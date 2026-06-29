@@ -25,6 +25,7 @@ Classes
    pyepo.data.dataset.optDataset
    pyepo.data.dataset.optDatasetKNN
    pyepo.data.dataset.optDatasetConstrs
+   pyepo.data.dataset.optDataLoader
 
 
 Functions
@@ -160,7 +161,8 @@ Module Contents
    currently requires a Gurobi-backed ``optModel``.
 
    Per-instance row counts differ (different constraints bind at different
-   vertices), so batches must be assembled with ``collate_tight_constraints``.
+   vertices), so batch with ``optDataLoader`` or pass
+   ``collate_tight_constraints`` to a PyTorch ``DataLoader``.
 
    Reference: Tang & Khalil (2024)
    `<https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>`_
@@ -212,5 +214,18 @@ Module Contents
    per-instance binding-constraint matrices to a common row count so they
    can be assembled into a single ``(batch, max_rows, num_cost)`` tensor
    for ``coneAlignedCosine``.
+
+
+.. py:class:: optDataLoader(dataset, *args, **kwargs)
+
+   Bases: :py:obj:`torch.utils.data.DataLoader`
+
+
+   ``DataLoader`` that applies a dataset's own ``collate_fn`` when present.
+
+   Datasets with ragged samples (e.g. ``optDatasetConstrs``, whose
+   binding-constraint matrices vary in row count) carry a ``collate_fn``; this
+   loader uses it so the caller never passes one explicitly. Plain datasets
+   fall back to the default PyTorch collation.
 
 

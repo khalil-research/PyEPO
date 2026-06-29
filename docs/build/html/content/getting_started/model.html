@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Data and Datasets" href="data.html"><link rel="prev" title="Workflow" href="workflow.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Optimization Models - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</title>
+        <title>Optimization Models - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -175,7 +175,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -196,7 +196,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</span>
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -518,7 +518,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">solve(self)</span></code>: solve and return <code class="docutils literal notranslate"><span class="pre">(sol,</span> <span class="pre">obj)</span></code>. <code class="docutils literal notranslate"><span class="pre">sol</span></code> is a length-<code class="docutils literal notranslate"><span class="pre">num_cost</span></code> array <strong>aligned to the cost order</strong> (<code class="docutils literal notranslate"><span class="pre">sol[i]</span></code> is the value of the variable whose cost is <code class="docutils literal notranslate"><span class="pre">c[i]</span></code>), and <code class="docutils literal notranslate"><span class="pre">obj</span></code> is the objective value.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">num_cost</span></code>: number of cost coefficients; defaults to <code class="docutils literal notranslate"><span class="pre">len(self.x)</span></code>.</p></li>
 </ul>
-<p>Constructor arguments are captured automatically for <code class="docutils literal notranslate"><span class="pre">rebuild()</span></code> and multiprocessing, so a subclass need not declare them; override <code class="docutils literal notranslate"><span class="pre">get_config</span></code> only when a model needs custom handling.</p>
+<p>Constructor arguments are captured automatically for <code class="docutils literal notranslate"><span class="pre">rebuild()</span></code> and multiprocessing, so most subclasses only define the solving interface. Advanced models can customize reconstruction separately when their constructor needs special handling.</p>
 <p>For a maximization problem, set <code class="docutils literal notranslate"><span class="pre">self.modelSense</span> <span class="pre">=</span> <span class="pre">EPO.MAXIMIZE</span></code> in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> or <code class="docutils literal notranslate"><span class="pre">_getModel</span></code>; the default is minimization.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
@@ -562,12 +562,6 @@ automatically from the underlying solver model).</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span></dt>
-<dd><p>Return the constructor configuration for this model.</p>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">num_cost</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></dt>
@@ -603,12 +597,6 @@ automatically from the underlying solver model).</p>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">to_spec</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../autoapi/pyepo/model/opt/index.html#pyepo.model.opt.ModelSpec" title="pyepo.model.opt.ModelSpec"><span class="pre">ModelSpec</span></a></span></span></dt>
-<dd><p>Return a serializable, immutable-snapshot rebuild recipe.</p>
 </dd></dl>
 
 </dd></dl>
@@ -878,7 +866,7 @@ class attribute <code class="docutils literal notranslate"><span class="pre">use
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=78f8bedb"></script>
+</div><script src="../../_static/documentation_options.js?v=d1b8cabd"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

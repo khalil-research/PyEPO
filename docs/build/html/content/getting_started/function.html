@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="Evaluation" href="evaluation.html"><link rel="prev" title="Data and Datasets" href="data.html">
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Training Methods - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</title>
+        <title>Training Methods - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -175,7 +175,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -196,7 +196,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</span>
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -944,7 +944,7 @@ solver call.</p>
 <p><span class="caption-text">CVRP-20 results from notebook 04: <code class="docutils literal notranslate"><span class="pre">num_data=1000</span></code>, 10 epochs, single process. In this setup, CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with <code class="docutils literal notranslate"><span class="pre">solve_ratio=0.3</span></code> trains 10.5x faster with higher final regret.</span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
-<p>Training data comes from <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code>, which extracts the binding-constraint normals at the optimum for each instance. Use <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.collate_tight_constraints</span></code> to zero-pad ragged per-instance constraint counts. CaVE currently requires a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code>.</p>
+<p>Training data comes from <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDatasetConstrs</span></code>, which extracts the binding-constraint normals at the optimum for each instance. Per-instance constraint counts are ragged, so batch it with <code class="docutils literal notranslate"><span class="pre">pyepo.data.dataset.optDataLoader</span></code>, which zero-pads them automatically. CaVE currently requires a Gurobi-backed <code class="docutils literal notranslate"><span class="pre">optModel</span></code>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">pyepo.func.</span></span><span class="sig-name descname"><span class="pre">CaVE</span></span></dt>
@@ -952,15 +952,10 @@ solver call.</p>
 </dd></dl>
 
 <p>Training loop (the batch carries <code class="docutils literal notranslate"><span class="pre">tight_ctrs</span></code> in addition to <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">c,</span> <span class="pre">w,</span> <span class="pre">z)</span></code>):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDatasetConstrs</span><span class="p">,</span> <span class="n">collate_tight_constraints</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyepo.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">optDatasetConstrs</span><span class="p">,</span> <span class="n">optDataLoader</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">optDatasetConstrs</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">costs</span><span class="p">)</span>
-<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
-    <span class="n">dataset</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_tight_constraints</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">optDataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">cave</span> <span class="o">=</span> <span class="n">pyepo</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">CaVE</span><span class="p">(</span><span class="n">optmodel</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -1312,7 +1307,7 @@ solver call.</p>
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=78f8bedb"></script>
+</div><script src="../../_static/documentation_options.js?v=d1b8cabd"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

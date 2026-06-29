@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html"><link rel="next" title="pyepo.model.ort" href="../ort/index.html"><link rel="prev" title="pyepo.model.omo.vrp" href="../omo/vrp/index.html">
 
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>pyepo.model.opt - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</title>
+        <title>pyepo.model.opt - PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
@@ -175,7 +175,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</div></a>
+      <a href="../../../../index.html"><div class="brand">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -196,7 +196,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
   
-  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.4 documentation</span>
+  <span class="sidebar-brand-text">PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool 2.2.5 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -413,7 +413,7 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyepo.model.opt.ModelSpec">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">ModelSpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.ModelSpec" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyepo.model.opt.</span></span><span class="sig-name descname"><span class="pre">ModelSpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pyepo.model.opt.optModel" title="pyepo.model.opt.optModel"><span class="pre">optModel</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyepo.model.opt.ModelSpec" title="Link to this definition">¶</a></dt>
 <dd><p>Serializable recipe for building a fresh optimization model.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyepo.model.opt.ModelSpec.model_type">
@@ -421,9 +421,15 @@
 <dd></dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="pyepo.model.opt.ModelSpec.args">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">args</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span><a class="headerlink" href="#pyepo.model.opt.ModelSpec.args" title="Link to this definition">¶</a></dt>
+<dd><p>Return an independent copy of positional constructor arguments.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pyepo.model.opt.ModelSpec.config">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span><a class="headerlink" href="#pyepo.model.opt.ModelSpec.config" title="Link to this definition">¶</a></dt>
-<dd><p>Return an independent copy of the constructor configuration.</p>
+<dd><p>Return an independent copy of keyword constructor arguments.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -476,7 +482,7 @@ automatically from the underlying solver model).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyepo.model.opt.optModel.from_config">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pyepo.model.opt.optModel.from_config" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pyepo.model.opt.optModel.from_config" title="Link to this definition">¶</a></dt>
 <dd><p>Build a model from a configuration produced by <code class="docutils literal notranslate"><span class="pre">get_config</span></code>.</p>
 </dd></dl>
 
@@ -634,6 +640,7 @@ automatically from the underlying solver model).</p>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#pyepo.model.opt.ModelSpec"><code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul>
 <li><a class="reference internal" href="#pyepo.model.opt.ModelSpec.model_type"><code class="docutils literal notranslate"><span class="pre">ModelSpec.model_type</span></code></a></li>
+<li><a class="reference internal" href="#pyepo.model.opt.ModelSpec.args"><code class="docutils literal notranslate"><span class="pre">ModelSpec.args</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.opt.ModelSpec.config"><code class="docutils literal notranslate"><span class="pre">ModelSpec.config</span></code></a></li>
 <li><a class="reference internal" href="#pyepo.model.opt.ModelSpec.build"><code class="docutils literal notranslate"><span class="pre">ModelSpec.build()</span></code></a></li>
 </ul>
@@ -667,7 +674,7 @@ automatically from the underlying solver model).</p>
       
     </aside>
   </div>
-</div><script src="../../../../_static/documentation_options.js?v=78f8bedb"></script>
+</div><script src="../../../../_static/documentation_options.js?v=d1b8cabd"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>

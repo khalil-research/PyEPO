@@ -23,7 +23,7 @@ Module Contents
 
 .. py:function:: getArgs(model: pyepo.model.opt.optModel) -> dict
 
-   Compatibility wrapper for the explicit model configuration protocol.
+   Compatibility wrapper for model reconstruction configuration.
 
    :param model: optimization model
 
