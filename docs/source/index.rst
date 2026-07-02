@@ -11,13 +11,10 @@ New to PyEPO? Start with :doc:`content/intro`, install ``PyEPO`` and a solver ba
 Quick Example
 +++++++++++++
 
-End-to-end training of a knapsack predictor defined with the DSL and trained with the SPO+ loss:
-
-This example uses Gurobi as the backend. If you do not have a Gurobi license, install a different PyEPO backend and change ``backend=`` accordingly.
+End-to-end training of a knapsack predictor defined with the DSL and the SPO+ loss. The example uses Gurobi; without a license, install another backend and change ``backend=``:
 
 .. code-block:: python
 
-   import numpy as np
    import pyepo
    from pyepo import EPO, dsl
    import torch

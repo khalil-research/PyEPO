@@ -69,15 +69,24 @@ loss, using a Flax linear layer and an optax optimizer:
        updates, opt_state = optimizer.update(grads, opt_state)
        params = optax.apply_updates(params, updates)
 
-Wrap the training step in ``@jax.jit`` and close over ``optmodel`` when using
-the MPAX backend.
+The training step can be wrapped in ``@jax.jit`` on either path (close over
+``optmodel``); MPAX is where ``jit`` also accelerates the solve itself.
+
+Evaluation works as in PyTorch; ``pyepo.metric.regret`` accepts a JAX callable:
+
+.. code-block:: python
+
+   from torch.utils.data import DataLoader
+
+   dataloader = DataLoader(ds, batch_size=32)
+   pred_fn = lambda feats: predmodel.apply(params, jnp.asarray(feats))
+   total_regret = pyepo.metric.regret(pred_fn, optmodel, dataloader)
 
 
 Installation
 ============
 
 * ``pip install pyepo[mpax]``: the loss frontend and the MPAX fast path.
-* The callback path for non-JAX backends needs JAX plus the selected backend's solver package.
 * ``pip install pyepo[jaxdev]``: the Flax and optax dependencies for the
   example above.
 
@@ -86,11 +95,13 @@ Notes
 =====
 
 * **jax.jit**: jit the training step by closing over the model. The randomized
-  losses (the perturbed family and ``implicitMLE``) are jittable when you pass an explicit ``key``;
-  ``adaptiveImplicitMLE`` is eager-only.
+  losses (the perturbed family, including ``implicitMLE``) are jittable when you
+  pass an explicit ``key``; ``adaptiveImplicitMLE`` is eager-only.
 * **Caching and pool growth**: solution-pool caching (``solve_ratio < 1``) and
   the online pool growth of the contrastive / ranking losses are supported and
   eager-only; they cannot be ``jax.jit``-ed.
+* **CaVE**: the hybrid branch (``0 < solve_ratio < 1``) draws a per-batch coin
+  and raises under ``jax.jit``; run it eagerly or use ``solve_ratio`` of 0 or 1.
 * **API**: JAX losses follow the PyTorch signatures, except ``implicitMLE`` /
   ``adaptiveImplicitMLE``, which take ``kappa`` / ``n_iterations`` / ``seed``
   scalars instead of a PyTorch ``distribution`` object.

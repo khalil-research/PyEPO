@@ -5,7 +5,7 @@ Installation
 Pip Install
 ===========
 
-Install from `PyPI <https://pypi.org/project/pyepo>`_ with:
+``PyEPO`` requires Python 3.9 or later. Install from `PyPI <https://pypi.org/project/pyepo>`_ with:
 
 .. code-block:: console
 
@@ -36,18 +36,21 @@ Install the package from the local checkout.
 
 .. code-block:: console
 
-   pip install PyEPO/pkg/.
+   pip install ./PyEPO/pkg
 
 
 
 Solvers
 =======
 
-``PyEPO`` compiles optimization models onto a solver backend, so at least one solver must be installed. The default backend is `Gurobi <https://www.gurobi.com/>`_, a commercial solver with a free academic license. The other backends are:
+``PyEPO`` compiles optimization models onto a solver backend, so at least one solver must be installed. Each backend has a pip extra that installs its package alongside ``PyEPO``:
 
-* `COPT <https://www.shanshu.ai/copt>`_, commercial with a free academic license (``pip install coptpy``).
-* `Pyomo <http://www.pyomo.org/>`_, which drives open solvers such as GLPK, CBC, or HiGHS with no license (``pip install pyomo`` plus the solver binary).
-* `Google OR-Tools <https://developers.google.com/optimization>`_, open (``pip install ortools``).
-* `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, open and JAX-based, for GPU and batch solving (``pip install mpax``).
+* `Gurobi <https://www.gurobi.com/>`_, the default backend; commercial with a free academic license (``pip install pyepo[gurobi]``).
+* `COPT <https://www.shanshu.ai/copt>`_, commercial with a free academic license (``pip install pyepo[copt]``).
+* `Pyomo <http://www.pyomo.org/>`_, which drives open solvers such as GLPK, CBC, or HiGHS with no license (``pip install pyepo[pyomo]`` plus the solver binary).
+* `Google OR-Tools <https://developers.google.com/optimization>`_, open (``pip install pyepo[ortools]``).
+* `MPAX <https://github.com/MIT-Lu-Lab/MPAX>`_, open and JAX-based, for GPU and batch solving (``pip install pyepo[mpax]``).
 
-.. note:: A bare ``pip install pyepo`` does not install a solver backend. Building a model with the default Gurobi backend then requires a Gurobi license; for a license-free setup, use the Pyomo or OR-Tools backend.
+The ``CaVE`` loss additionally needs Clarabel (``pip install pyepo[cave]``), and ``pip install pyepo[all]`` installs every optional dependency at once.
+
+.. note:: A bare ``pip install pyepo`` does not install a solver backend, so building a model with the default Gurobi backend requires a Gurobi license; for a license-free setup, use the Pyomo or OR-Tools backend.

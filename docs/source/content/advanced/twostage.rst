@@ -21,12 +21,16 @@ Use a two-stage baseline when:
 * the experiment needs a non-end-to-end baseline.
 
 After training, evaluate the predictor with ``pyepo.metric.regret`` or
-``pyepo.metric.unambRegret``.
+``pyepo.metric.unambRegret``. For sklearn model selection,
+``pyepo.metric.makeSkScorer`` builds a regret-based scorer usable in
+cross-validation and grid search.
+
+
+sklearnPred
+===========
 
 .. autofunction:: pyepo.twostage.sklearnPred
     :noindex:
-
-``pyepo.twostage.sklearnPred`` is a helper function that wraps a scikit-learn estimator into a multi-output regressor.
 
 
 Minimal Example
@@ -58,3 +62,10 @@ Minimal Example
    dataloader = DataLoader(dataset, batch_size=32, shuffle=False)
    # regret takes a callable mapping features to costs; pass the predictor's .predict
    regret = pyepo.metric.regret(twostage_model.predict, model, dataloader)
+
+
+Related Pages
+=============
+
+* :doc:`../getting_started/evaluation` documents the decision-quality metrics.
+* :doc:`../getting_started/function` covers the end-to-end alternatives.

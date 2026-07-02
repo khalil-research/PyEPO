@@ -1,7 +1,7 @@
 Data and Datasets
 +++++++++++++++++
 
-``pyepo.data`` provides synthetic data generators and the ``optDataset`` class for wrapping data samples.
+This page covers the synthetic data generators in ``pyepo.data``, the built-in problem models, and the ``optDataset`` family for wrapping data samples.
 
 For more details, see the `02 Optimization Dataset <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb>`_ notebook.
 
@@ -182,7 +182,7 @@ Mean-variance allocation that maximizes return under a risk budget. Backends: gu
 .. code-block:: python
 
    import numpy as np
-   covariance = np.cov(np.random.randn(10, 50), rowvar=False)
+   covariance = np.cov(np.random.randn(1000, 50), rowvar=False)
    optmodel = model.portfolioModel(50, covariance)
 
 .. autofunction:: pyepo.model.portfolioModel
@@ -191,9 +191,9 @@ Mean-variance allocation that maximizes return under a risk budget. Backends: gu
 optDataset
 ==========
 
-``pyepo.data.optDataset`` is a PyTorch ``Dataset`` that stores features and cost coefficients, and **solves the optimization problem to obtain optimal solutions and objective values**.
+``pyepo.data.optDataset`` is a PyTorch ``Dataset`` that stores features and cost coefficients, and **solves the optimization problem to obtain optimal solutions and objective values**. The features and costs can be any arrays -- the generators above are just a convenience.
 
-``optDataset`` precomputes :math:`\mathbf{w}^*(\mathbf{c})` and :math:`z^*(\mathbf{c})` at construction time. If those labels are already available, batches can be passed directly to ``pyepo.func`` modules.
+``optDataset`` precomputes :math:`\mathbf{w}^*(\mathbf{c})` and :math:`z^*(\mathbf{c})` at construction time. If those labels already exist from another source, skip ``optDataset`` and feed ``(x, c, w, z)`` batches to ``pyepo.func`` modules directly.
 
 .. autoclass:: pyepo.data.dataset.optDataset
     :noindex:
@@ -260,7 +260,7 @@ optDatasetConstrs
 
 ``pyepo.data.dataset.optDatasetConstrs`` is a PyTorch ``Dataset`` for the CaVE [#f2]_ cone-aligned loss. In addition to the features, costs, optimal solutions, and objective values stored by ``optDataset``, it also extracts the **normals of the binding constraints at the optimal vertex** for each instance. CaVE then projects the sense-flipped predicted cost vector onto the cone spanned by these normals.
 
-``optDatasetConstrs`` currently requires a Gurobi-backed ``optModel``. The dataset also checks that the optimal vertex is binary, since CaVE is defined for binary linear programs.
+``optDatasetConstrs`` currently requires a Gurobi-backed ``optModel``. The dataset also checks that the optimal vertex is binary, since CaVE is defined for binary linear programs; it raises on infeasible instances or non-binary optima unless ``skip_infeas=True``, which drops them instead.
 
 For a runnable walkthrough that uses ``optDatasetConstrs`` end-to-end with the CaVE loss, see the `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_ notebook.
 
@@ -284,10 +284,10 @@ Per-instance constraint matrices have different row counts (different constraint
   x, c = pyepo.data.tsp.genData(num_data=1000, num_features=5, num_nodes=10, deg=4, seed=135)
 
   # build CaVE dataset (extracts tight binding-constraint normals at the optimum)
-  dataset = optDatasetConstrs(model, x, c)
+  dataset_constr = optDatasetConstrs(model, x, c)
 
   # optDataLoader pads ragged per-instance constraint matrices
-  dataloader = optDataLoader(dataset, batch_size=32, shuffle=True)
+  dataloader_constr = optDataLoader(dataset_constr, batch_size=32, shuffle=True)
 
 .. [#f1] Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.
 .. [#f2] Tang, B., & Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).

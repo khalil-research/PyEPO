@@ -1,11 +1,7 @@
 PyTorch Frontend
 ++++++++++++++++
 
-The PyTorch frontend lives in ``pyepo.func``. Each training method wraps an ``optModel`` and can be used with PyTorch optimizers.
-
-Start with:
-
-* :doc:`../getting_started/function` for method selection, training-loop templates, and API details.
+The PyTorch frontend lives in ``pyepo.func``. Each training method wraps an ``optModel`` and can be used with PyTorch optimizers. Method selection, training-loop templates, and API details are in :doc:`../getting_started/function`; this page summarizes the calling conventions.
 
 
 Basic Pattern
@@ -41,7 +37,7 @@ The tensors mean:
 * ``true_sol``: optimal solution under ``true_cost``.
 * ``true_obj``: optimal objective value under ``true_cost``.
 
-Some methods use only a subset of these values. See :doc:`../getting_started/function` for the per-method inputs.
+Some methods use only a subset of these values; the per-method inputs are listed in the summary table of :doc:`../getting_started/function`.
 
 
 Loss-returning and Solution-returning Methods
@@ -59,8 +55,6 @@ Shared Options
 Common constructor options:
 
 * ``processes`` controls the worker pool used for batch solving.
-* ``solve_ratio`` enables solution-pool caching when set below ``1``.
-* ``dataset`` seeds the solution pool for contrastive and ranking methods.
+* ``solve_ratio`` enables solution-pool caching when set below ``1`` (CaVE repurposes this knob for its projection branch; see :doc:`../advanced/cave`).
+* ``dataset`` seeds the solution pool whenever ``solve_ratio < 1``; contrastive and ranking methods require it always.
 * ``reduction`` controls how per-instance losses are aggregated when the method supports it.
-
-For training examples, see :doc:`../getting_started/function`.

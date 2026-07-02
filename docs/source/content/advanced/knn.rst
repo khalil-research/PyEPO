@@ -2,9 +2,9 @@ kNN Robust Losses
 +++++++++++++++++
 
 The kNN robust loss makes the training labels more robust to noise. For each
-instance it mixes the cost vector with the costs of its nearest neighbors in
-feature space and re-solves on the mixed costs, so the stored solution and
-objective labels are local averages rather than single-instance values.
+instance it builds k blended costs, one per nearest neighbor in feature space,
+solves each blend, and stores the averaged solution and objective, so the
+labels are local averages rather than single-instance values.
 
 
 What Changes
@@ -18,7 +18,9 @@ each instance. ``optDatasetKNN`` instead computes neighborhood labels:
    :alt: kNN robust loss label aggregation
 
 This setting applies when nearby feature vectors are expected to have similar
-decisions, but individual labels may be noisy.
+decisions, but individual labels may be noisy. It costs k solves per instance
+at construction time, and when labels are clean or neighborhoods are
+heterogeneous, the smoothing only biases them -- use ``optDataset`` then.
 
 
 Minimal Example
@@ -61,13 +63,15 @@ Use ``pyepo.data.dataset.optDatasetKNN`` in place of ``optDataset``:
 Parameters
 ==========
 
-* ``k`` sets the number of neighbors used for each aggregate label.
+* ``k`` sets the number of neighbors used for each aggregate label; the
+  instance itself is excluded, and ``1 <= k < num_data`` must hold.
 * ``weight`` is the self-weight in the mix: ``weight=1`` keeps the original cost
   (no smoothing), and smaller values pull the cost toward the neighbors.
 
-The batch format is the same as ``optDataset``: ``(x, c, w, z)``. Methods that
-already consume ``optDataset`` batches can consume ``optDatasetKNN`` batches
-without changing the training loop.
+The batch format is the same as ``optDataset``: ``(x, c, w, z)``, where ``c``
+is the smoothed cost (the average of the k blends), not the raw label. Methods
+that already consume ``optDataset`` batches can consume ``optDatasetKNN``
+batches without changing the training loop.
 
 
 Related Pages

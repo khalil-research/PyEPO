@@ -5,11 +5,13 @@ The API reference is generated from the package source during the documentation 
 
 Useful entry points:
 
+* :mod:`pyepo.dsl` for defining problems symbolically and compiling them to a backend.
 * :mod:`pyepo.model` for optimization model wrappers and built-in problem models.
 * :mod:`pyepo.func` for PyTorch training methods.
 * :mod:`pyepo.func.jax` for JAX training methods.
 * :mod:`pyepo.data` for data generators and optimization-aware datasets.
 * :mod:`pyepo.metric` for decision-quality metrics.
+* :mod:`pyepo.twostage` for two-stage baselines with scikit-learn estimators.
 
 Use the module index for the generated API pages:
 

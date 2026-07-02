@@ -5,7 +5,7 @@ Evaluation
 Regret
 ======
 
-``pyepo.metric.regret`` evaluates the decision quality of a prediction model. Regret is defined as :math:`l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^\top \mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{c}^\top \mathbf{w}^*(\mathbf{c})`, which measures the excess cost of the predicted solution over the true optimum. By default the instances are aggregated as the normalized regret :math:`\sum_i l_i \, / \, \sum_i |\mathbf{c}_i^\top \mathbf{w}^*(\mathbf{c}_i)|`, dimensionless and comparable across problem scales; ``reduction`` switches to ``"sum"``, ``"mean"``, or ``"none"`` (per-instance array).
+``pyepo.metric.regret`` evaluates the decision quality of a prediction model, usually on a held-out test set. Regret is defined as :math:`l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^\top \mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{c}^\top \mathbf{w}^*(\mathbf{c})`, which measures the excess cost of the predicted solution over the true optimum. By default the instances are aggregated as the normalized regret :math:`\sum_i l_i \, / \, \sum_i |\mathbf{c}_i^\top \mathbf{w}^*(\mathbf{c}_i)|`, dimensionless and comparable across problem scales; ``reduction`` switches to ``"sum"``, ``"mean"``, or ``"none"`` (per-instance array). ``processes`` parallelizes the solving, as in training (``0`` uses all available cores).
 
 .. autofunction:: pyepo.metric.regret
     :noindex:
@@ -27,7 +27,7 @@ When a predicted cost vector :math:`\hat{\mathbf{c}}` yields multiple optimal so
   :alt: learning curves
   :class: light-bg
 
-Regret depends on the solution returned by the solver when the predicted objective has multiple optima. Unambiguous regret evaluates the worst optimal solution under the predicted objective.
+``unambRegret`` returns only the normalized value (no ``reduction`` option). It enumerates the tie set by re-solving each instance with added constraints, so it is slower than ``regret`` and needs a backend that implements ``addConstr``.
 
 .. autofunction:: pyepo.metric.unambRegret
     :noindex:

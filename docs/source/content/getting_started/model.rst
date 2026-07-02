@@ -5,8 +5,6 @@ Optimization Models
 
 ``optModel`` is the interface that ``PyEPO`` trains against. It wraps an optimization solver or algorithm behind a ``setObj`` / ``solve`` contract. There are two ways to produce one. For linear and integer programs supported by the DSL, define the problem with ``pyepo.dsl`` and compile it to a backend. For a custom algorithm or constraint generation, write an ``optModel`` subclass directly. Both are covered below.
 
-When building a model, you do **not** specify the cost coefficients; they are predicted from data at training time.
-
 ``PyEPO`` also includes built-in problem models: shortest path, knapsack, traveling salesperson, capacitated vehicle routing, and portfolio. See :doc:`data` for running them with generated data.
 
 For a runnable walkthrough, see the `01 Optimization Model <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_ notebook.
@@ -34,7 +32,7 @@ Describe the problem once with ``Variable``, ``Parameter``, and constraints, the
 
 The compiled model is an ``optModel``. During training, ``pyepo.func`` calls ``setObj`` and ``solve``.
 
-All backends share this interface and are selected with ``backend=``. Gurobi and COPT are commercial solvers. Pyomo and OR-Tools can use open solvers such as HiGHS, GLPK, CBC, and SCIP. MPAX solves linear and quadratic programs on GPU. The generic backends take a ``solver=`` argument naming the solver to run.
+All backends share this interface and are selected with ``backend=``. Gurobi and COPT are commercial solvers. Pyomo and OR-Tools can use open solvers such as HiGHS, GLPK, CBC, and SCIP. MPAX solves linear and quadratic programs on GPU.
 
 ``compile`` forwards keyword arguments to the backend. ``solver=`` applies only to the generic backends (``pyomo`` / ``ortools``) and names the solver they run; ``timelimit=`` (seconds) sets a time limit where the backend supports one; any other keyword is passed through as a native solver parameter where the backend accepts one:
 
@@ -103,7 +101,7 @@ Whether a coefficient is predicted or known is decided by its type: a ``Paramete
    dsl.Minimize((d + c) @ x)                      # a known base d plus the predicted c
    dsl.Minimize(c @ x + x @ Q @ x)                # predicted linear plus a known quadratic
 
-``c @ x`` is a 1-D inner product; for a multi-dimensional cost use ``(c * x).sum()`` (elementwise, then reduced). A quadratic objective term needs a backend with QP support (Gurobi, COPT, or MPAX).
+``c @ x`` is a 1-D inner product; for a multi-dimensional cost use ``(c * x).sum()`` (elementwise, then reduced). A quadratic objective term needs a backend with QP support: Gurobi, COPT, MPAX, or Pyomo with a QP-capable solver.
 
 
 Constraints
@@ -116,7 +114,7 @@ Constraints are fixed across instances; only the cost is predicted. Pass them as
    A @ x <= b                                     # linear: <=, >=, ==
    x.sum() == 1                                   # reduction
    x.sum(axis=1) == 1                             # per-axis sums, e.g. an assignment
-   x @ Q @ x <= gamma                             # quadratic (Gurobi and COPT)
+   x @ Q @ x <= gamma                             # quadratic (Gurobi, COPT, or QP-capable Pyomo)
 
 For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level ``optModel`` interface for cases it cannot express.
 
@@ -136,9 +134,9 @@ A subclass implements the solving interface:
 * ``solve(self)``: solve and return ``(sol, obj)``. ``sol`` is a length-``num_cost`` array **aligned to the cost order** (``sol[i]`` is the value of the variable whose cost is ``c[i]``), and ``obj`` is the objective value.
 * ``num_cost``: number of cost coefficients; defaults to ``len(self.x)``.
 
-Constructor arguments are captured automatically for ``rebuild()`` and multiprocessing, so most subclasses only define the solving interface. Advanced models can customize reconstruction separately when their constructor needs special handling.
+Constructor arguments are captured automatically for ``rebuild()`` and multiprocessing, so most subclasses only define the solving interface. A model whose constructor needs special handling can override ``get_config`` instead.
 
-For a maximization problem, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__`` or ``_getModel``; the default is minimization.
+For a maximization problem, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__`` or ``_getModel``; the default is minimization. The Gurobi and COPT bases detect the sense from the solver model automatically.
 
 .. autoclass:: pyepo.model.opt.optModel
     :noindex:

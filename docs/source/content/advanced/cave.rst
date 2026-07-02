@@ -30,16 +30,12 @@ Minimal Example
 ===============
 
 CaVE uses ``pyepo.data.dataset.optDatasetConstrs`` instead of ``optDataset``.
-Compared with ``optDataset``, it adds one item to each batch:
-
-* ``x``: features.
-* ``c``: true cost.
-* ``w``: true optimal solution.
-* ``z``: true optimal objective value.
-* ``tight_ctrs``: binding-constraint normals at the true optimum.
+It adds ``tight_ctrs`` -- the binding-constraint normals at the true optimum --
+to the usual ``(x, c, w, z)`` batch.
 
 The number of binding constraints can differ across instances, so the batch
-needs padding; ``optDataLoader`` applies it automatically:
+needs padding; ``optDataLoader`` applies it automatically (an existing
+``DataLoader`` can instead pass ``collate_fn=collate_tight_constraints``):
 
 .. code-block:: python
 
@@ -62,15 +58,15 @@ needs padding; ``optDataLoader`` applies it automatically:
    )
 
    # CaVE dataset and padded batches
-   dataset = optDatasetConstrs(optmodel, feat, costs)
-   dataloader = optDataLoader(dataset, batch_size=32, shuffle=True)
+   dataset_constr = optDatasetConstrs(optmodel, feat, costs)
+   dataloader_constr = optDataLoader(dataset_constr, batch_size=32, shuffle=True)
 
    # linear predictor and CaVE loss
    predmodel = nn.Linear(5, optmodel.num_cost)
    cave = pyepo.func.CaVE(optmodel, processes=2)
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
-   for x, c, w, z, tight_ctrs in dataloader:
+   for x, c, w, z, tight_ctrs in dataloader_constr:
        cp = predmodel(x)
        loss = cave(cp, tight_ctrs)
        optimizer.zero_grad()
@@ -82,13 +78,17 @@ Solver Requirements
 ===================
 
 CaVE currently targets binary linear programs. Extracting binding-constraint
-normals requires a Gurobi-backed ``optModel``.
+normals requires a Gurobi-backed ``optModel``. ``optDatasetConstrs`` raises on
+infeasible instances or non-binary optima; pass ``skip_infeas=True`` to drop
+such instances instead.
 
 Clarabel is used internally by the ``CaVE`` loss for the cone projection during
-training. The ``max_iter`` parameter controls the number of Clarabel
-iterations. Setting ``solve_ratio < 1`` enables the hybrid update, which uses
-the QP projection only for a fraction of batches and uses a blended update for
-the remaining batches.
+training. ``max_iter`` caps the Clarabel iterations; the default ``max_iter=3``
+is the paper's **CaVE+** preset, which under-converges the projection on
+purpose so it stays interior to the cone. Raising it changes the loss, not
+just its precision. Setting ``solve_ratio < 1`` enables the **CaVE-Hybrid**
+update, which uses the QP projection only for a fraction of batches and a
+blended update for the remaining batches.
 
 
 Performance Example
