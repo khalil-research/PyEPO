@@ -19,19 +19,6 @@ if TYPE_CHECKING:
 _EPS: float = 1e-8
 
 
-def getArgs(model: optModel) -> dict:
-    """
-    Compatibility wrapper for model reconstruction configuration.
-
-    Args:
-        model: optimization model
-
-    Returns:
-        dict: model args
-    """
-    return model.get_config()
-
-
 def objective_offset(model: optModel) -> float:
     """
     Bare objective constant of a compiled DSL problem.

@@ -2,7 +2,8 @@
 """Tests for pyepo.utils and pyepo.model.utils helpers.
 
 Pure-logic layer: unionFind, getTspTour, costToNumpy need no solver and run
-fast. getArgs needs a real optModel (Gurobi) and is gated accordingly.
+fast. get_config round-trips need a real optModel (Gurobi) and are gated
+accordingly.
 """
 
 import pickle
@@ -13,7 +14,7 @@ import torch
 
 from pyepo.model.opt import ModelSpec, optModel
 from pyepo.model.utils import getTspTour, unionFind
-from pyepo.utils import costToNumpy, getArgs
+from pyepo.utils import costToNumpy
 
 from .conftest import requires_gurobi
 
@@ -248,10 +249,9 @@ class TestCostToNumpy:
 
 
 class TestModelSpec:
-    def test_get_config_and_compatibility_wrapper(self):
+    def test_get_config(self):
         model = ConfigModel([1, 2, 3], label="x")
         config = model.get_config()
-        assert getArgs(model) == config
         assert config["label"] == "x"
         np.testing.assert_array_equal(config["values"], [1, 2, 3])
 
@@ -354,12 +354,12 @@ class TestModelSpec:
 
 
 # ============================================================
-# getArgs (needs a real optModel)
+# get_config on real models (needs a real optModel)
 # ============================================================
 
 
 @requires_gurobi
-class TestGetArgs:
+class TestGetConfig:
     def _models(self):
         from pyepo.model.grb.knapsack import knapsackModel
         from pyepo.model.grb.shortestpath import shortestPathModel
@@ -370,19 +370,19 @@ class TestGetArgs:
         knapsackModel, _ = self._models()
         weights = np.array([[3.0, 4.0, 5.0]])
         capacity = np.array([10.0])
-        args = getArgs(knapsackModel(weights=weights, capacity=capacity))
+        args = knapsackModel(weights=weights, capacity=capacity).get_config()
         assert "weights" in args and "capacity" in args
         np.testing.assert_array_equal(args["weights"], weights)
         np.testing.assert_array_equal(args["capacity"], capacity)
 
     def test_shortestpath_args(self):
         _, shortestPathModel = self._models()
-        args = getArgs(shortestPathModel(grid=(4, 4)))
+        args = shortestPathModel(grid=(4, 4)).get_config()
         assert args["grid"] == (4, 4)
 
     def test_no_internal_state(self):
         _, shortestPathModel = self._models()
-        args = getArgs(shortestPathModel(grid=(3, 3)))
+        args = shortestPathModel(grid=(3, 3)).get_config()
         # introspects __init__ params only, not derived attrs / solver handle
         assert "arcs" not in args
         assert "_model" not in args
