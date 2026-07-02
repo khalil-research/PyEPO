@@ -139,16 +139,6 @@ class Affine:
         # accumulate a coefficient block for variable v
         blocks[v] = blocks[v] + b if v in blocks else sp.csr_matrix(b)
 
-    def _broadcast_to(self, shape):
-        # numpy-style broadcast: replicate rows via a selection matrix
-        if tuple(shape) == self.shape:
-            return self
-        idx = np.broadcast_to(np.arange(self.size).reshape(self.shape), shape).reshape(-1)
-        sel = sp.csr_matrix(
-            (np.ones(idx.size), (np.arange(idx.size), idx)), shape=(idx.size, self.size)
-        )
-        return Affine({v: sel @ b for v, b in self.blocks.items()}, self.const[idx], shape)
-
     def __add__(self, o):
         # Affine + (Affine | Quadratic | ParametricObjective | const)
         if isinstance(o, Quadratic):
@@ -158,19 +148,22 @@ class Affine:
         if isinstance(o, Variable):
             o = o._to_affine()
         if isinstance(o, Affine):
+            shape = self.shape
             if o.shape != self.shape:
-                # numpy broadcasting semantics, including its mismatch ValueError
+                # size-preserving unification only (e.g. () and (1,)); no implicit replication
+                if o.size != self.size:
+                    raise TypeError(
+                        f"cannot add expressions of shape {self.shape} and {o.shape}; "
+                        "lift explicitly, e.g. with a ones-matrix @."
+                    )
                 shape = np.broadcast_shapes(self.shape, o.shape)
-                return self._broadcast_to(shape) + o._broadcast_to(shape)
             blocks = {v: b.copy() for v, b in self.blocks.items()}
             for v, b in o.blocks.items():
                 self._add_block(blocks, v, b)
-            return Affine(blocks, self.const + o.const, self.shape)
+            return Affine(blocks, self.const + o.const, shape)
         if _is_num(o):
-            # broadcast the constant over the logical shape; a flat full-length vector is kept as-is
-            a = np.asarray(o, dtype=float)
-            if not (a.ndim == 1 and a.size == self.size):
-                a = np.broadcast_to(a, self.shape or (self.size,))
+            # conform the constant to the logical shape (numpy rules)
+            a = np.broadcast_to(np.asarray(o, dtype=float), self.shape or (self.size,))
             return Affine(self.blocks, self.const + a.reshape(-1), self.shape)
         return NotImplemented
 
@@ -198,8 +191,8 @@ class Affine:
         # elementwise scale by a scalar or shape-broadcast array
         if isinstance(o, (Affine, Variable, Quadratic, Parameter, ParametricObjective)):
             return NotImplemented  # expr*expr is nonlinear; use @ instead
-        # diagonal scaling matrix applied to each block and the constant
-        a = np.broadcast_to(np.asarray(o, dtype=float), self.shape).reshape(-1)
+        # conform the constant to the logical shape, applied as a diagonal scaling matrix
+        a = np.broadcast_to(np.asarray(o, dtype=float), self.shape or (self.size,)).reshape(-1)
         scale = sp.diags(a)
         return Affine({v: scale @ b for v, b in self.blocks.items()}, a * self.const, self.shape)
 
@@ -502,10 +495,9 @@ class ParametricCoef:
 
     def __init__(self, param, base):
         self.param = param
+        # conform the base to the parameter's logical shape (numpy rules)
         base = np.asarray(base, dtype=float)
-        # multi-dim bases broadcast over the parameter's logical shape, flat ones over its size
-        shape = param.shape if base.ndim > 1 else (param.size,)
-        self.base = np.broadcast_to(base, shape).reshape(-1).astype(float)
+        self.base = np.broadcast_to(base, param.shape or (param.size,)).reshape(-1).astype(float)
 
     __array_ufunc__ = None
 
@@ -683,9 +675,6 @@ class Constraint:
         return None, A, self.sense, self._rhs_vec(aff.size) - aff.const
 
     def _rhs_vec(self, m):
-        # broadcast the rhs over the LHS logical shape; a flat full-length vector is kept as-is
-        rhs = np.asarray(self.rhs, dtype=float)
-        if rhs.ndim == 1 and rhs.size == m:
-            return rhs.astype(float)
+        # conform the rhs to the LHS logical shape (numpy rules)
         shape = getattr(self.lhs, "shape", ()) or (m,)
-        return np.broadcast_to(rhs, shape).reshape(-1).astype(float)
+        return np.broadcast_to(np.asarray(self.rhs, dtype=float), shape).reshape(-1).astype(float)

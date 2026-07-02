@@ -107,28 +107,47 @@ def test_const_add_broadcasts_to_shape():
         _ = x + np.arange(6).reshape(3, 2)  # numpy rejects (2,3)+(3,2)
 
 
-def test_affine_add_broadcasts_like_numpy():
+def test_expression_add_requires_matching_shapes():
     x = dsl.Variable(3)
     y = dsl.Variable(2)
-    e = x + y.sum()  # scalar expression broadcasts over (3,)
-    assert e.shape == (3,)
-    _, A, _, b = (e <= 1.0).finalize({x: slice(0, 3), y: slice(3, 5)}, 5)
+    with pytest.raises(TypeError, match="shape"):
+        _ = x + y.sum()  # a scalar expression is not silently replicated
+    with pytest.raises(TypeError, match="shape"):
+        _ = dsl.Variable((2, 3)) + dsl.Variable(3)
+    # the explicit lift: a ones-matrix @ expression
+    e = x + np.ones((3, 2)) @ y
+    _, A, _, _ = (e <= 1.0).finalize({x: slice(0, 3), y: slice(3, 5)}, 5)
     np.testing.assert_allclose(A.toarray(), np.hstack([np.eye(3), np.ones((3, 2))]))
-    np.testing.assert_allclose(b, np.ones(3))
-    # the broadcast result stays a well-formed expression for later transforms
-    _, A2, _, _ = (e.sum() <= 1.0).finalize({x: slice(0, 3), y: slice(3, 5)}, 5)
-    np.testing.assert_allclose(A2.toarray(), [[1.0, 1, 1, 3, 3]])  # y summed once per row
 
 
-def test_affine_add_row_broadcast_and_mismatch():
+def test_scale_conforms_const_to_expression_shape():
     z = dsl.Variable((2, 3))
-    w = dsl.Variable(3)
-    e = z + w  # (2, 3) + (3,) row-broadcast like numpy
-    assert e.shape == (2, 3)
-    _, A, _, _ = (e <= 1.0).finalize({z: slice(0, 6), w: slice(6, 9)}, 9)
-    np.testing.assert_allclose(A.toarray(), np.hstack([np.eye(6), np.vstack([np.eye(3)] * 2)]))
+    e = z * np.array([1.0, 2.0, 3.0])  # row-broadcast like numpy
+    _, A, _, _ = (e <= 1.0).finalize({z: slice(0, 6)}, 6)
+    np.testing.assert_allclose(A.toarray(), np.diag(np.tile([1.0, 2.0, 3.0], 2)))
+    e = z / np.array([[2.0], [4.0]])  # column-broadcast divide
+    _, A, _, _ = (e <= 1.0).finalize({z: slice(0, 6)}, 6)
+    np.testing.assert_allclose(A.toarray(), np.diag(np.repeat([0.5, 0.25], 3)))
     with pytest.raises(ValueError):
-        _ = dsl.Variable((2, 3)) + dsl.Variable((3, 2))  # numpy rejects (2,3)+(3,2)
+        _ = dsl.Variable(3) * np.ones((2, 3))  # the constant cannot expand the expression
+    with pytest.raises(ValueError):
+        _ = dsl.Variable(3) + np.ones((2, 3))
+
+
+def test_flat_vector_against_multidim_shape_rejected():
+    # flat data reshapes to the logical shape; the flat convention lives at setObj/solve
+    z = dsl.Variable((2, 3))
+    v = np.arange(1.0, 7.0)
+    with pytest.raises(ValueError):
+        _ = z + v
+    with pytest.raises(ValueError):
+        _ = z * v
+    with pytest.raises(ValueError):
+        (z <= v).finalize({z: slice(0, 6)}, 6)
+    with pytest.raises(ValueError):
+        _ = dsl.Parameter((2, 3)) + v
+    e = z + v.reshape(2, 3)
+    np.testing.assert_allclose(e.const, v)
 
 
 def test_sum_negative_axis():

@@ -909,6 +909,7 @@ class TestRegularized:
         # x64 mode: the FW carry buffers must follow theta's dtype
         import jax
 
+        old_x64 = jax.config.jax_enable_x64
         jax.config.update("jax_enable_x64", True)
         try:
             import jax.numpy as jnp
@@ -920,7 +921,7 @@ class TestRegularized:
             sol = np.asarray(opt(jnp.asarray(cp)))
             assert sol.dtype == np.float64 and np.isfinite(sol).all()
         finally:
-            jax.config.update("jax_enable_x64", False)
+            jax.config.update("jax_enable_x64", old_x64)
 
     def test_caching_reads_pool_and_grows(self):
         # Cached passes read the pool; exact passes may grow it.
