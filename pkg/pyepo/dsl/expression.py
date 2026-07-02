@@ -139,6 +139,16 @@ class Affine:
         # accumulate a coefficient block for variable v
         blocks[v] = blocks[v] + b if v in blocks else sp.csr_matrix(b)
 
+    def _broadcast_to(self, shape):
+        # numpy-style broadcast: replicate rows via a selection matrix
+        if tuple(shape) == self.shape:
+            return self
+        idx = np.broadcast_to(np.arange(self.size).reshape(self.shape), shape).reshape(-1)
+        sel = sp.csr_matrix(
+            (np.ones(idx.size), (np.arange(idx.size), idx)), shape=(idx.size, self.size)
+        )
+        return Affine({v: sel @ b for v, b in self.blocks.items()}, self.const[idx], shape)
+
     def __add__(self, o):
         # Affine + (Affine | Quadratic | ParametricObjective | const)
         if isinstance(o, Quadratic):
@@ -148,6 +158,10 @@ class Affine:
         if isinstance(o, Variable):
             o = o._to_affine()
         if isinstance(o, Affine):
+            if o.shape != self.shape:
+                # numpy broadcasting semantics, including its mismatch ValueError
+                shape = np.broadcast_shapes(self.shape, o.shape)
+                return self._broadcast_to(shape) + o._broadcast_to(shape)
             blocks = {v: b.copy() for v, b in self.blocks.items()}
             for v, b in o.blocks.items():
                 self._add_block(blocks, v, b)

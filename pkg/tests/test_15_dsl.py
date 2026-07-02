@@ -107,6 +107,30 @@ def test_const_add_broadcasts_to_shape():
         _ = x + np.arange(6).reshape(3, 2)  # numpy rejects (2,3)+(3,2)
 
 
+def test_affine_add_broadcasts_like_numpy():
+    x = dsl.Variable(3)
+    y = dsl.Variable(2)
+    e = x + y.sum()  # scalar expression broadcasts over (3,)
+    assert e.shape == (3,)
+    _, A, _, b = (e <= 1.0).finalize({x: slice(0, 3), y: slice(3, 5)}, 5)
+    np.testing.assert_allclose(A.toarray(), np.hstack([np.eye(3), np.ones((3, 2))]))
+    np.testing.assert_allclose(b, np.ones(3))
+    # the broadcast result stays a well-formed expression for later transforms
+    _, A2, _, _ = (e.sum() <= 1.0).finalize({x: slice(0, 3), y: slice(3, 5)}, 5)
+    np.testing.assert_allclose(A2.toarray(), [[1.0, 1, 1, 3, 3]])  # y summed once per row
+
+
+def test_affine_add_row_broadcast_and_mismatch():
+    z = dsl.Variable((2, 3))
+    w = dsl.Variable(3)
+    e = z + w  # (2, 3) + (3,) row-broadcast like numpy
+    assert e.shape == (2, 3)
+    _, A, _, _ = (e <= 1.0).finalize({z: slice(0, 6), w: slice(6, 9)}, 9)
+    np.testing.assert_allclose(A.toarray(), np.hstack([np.eye(6), np.vstack([np.eye(3)] * 2)]))
+    with pytest.raises(ValueError):
+        _ = dsl.Variable((2, 3)) + dsl.Variable((3, 2))  # numpy rejects (2,3)+(3,2)
+
+
 def test_sum_negative_axis():
     x = dsl.Variable((2, 3))
     _, A1, _, _ = (x.sum(axis=-1) <= 1).finalize({x: slice(0, 6)}, 6)
@@ -908,6 +932,16 @@ def test_mpax_torch_cost_returns_tensor():
     mpx.setObj(torch.ones(3))
     w, _ = mpx.solve()
     assert isinstance(w, torch.Tensor) and len(w) == 3
+
+
+@requires_mpax
+def test_mpax_setobj_batched_list_scatters_fixed_cost():
+    # a batched Python-list cost dispatches on the cost dim, not the batch size
+    x = dsl.Variable(2, lb=0, ub=1)
+    c = dsl.Parameter(2)
+    comp = dsl.Problem(dsl.Minimize((c + 1.0) @ x), [x.sum() >= 0.0]).compile(backend="mpax")
+    comp.setObj([[1.0, -3.0]] * 3)  # full coefficients [2, -2] per row
+    np.testing.assert_allclose(np.asarray(comp.c), [[2.0, -2.0]] * 3)
 
 
 @requires_mpax

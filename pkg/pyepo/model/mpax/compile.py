@@ -106,7 +106,7 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
         """Set the objective from a predicted cost of length ``num_cost``, scattered onto the known fixed costs."""
         prob = self.problem
         validate_objective_shape(c, (prob.num_cost, prob.num_vars), allow_batch=True)
-        n = c.shape[-1] if hasattr(c, "shape") else len(c)
+        n = c.shape[-1] if hasattr(c, "shape") else np.shape(c)[-1]
         # scatter onto fixed costs; an unambiguous full-length vector passes through
         if n == prob.num_cost:
             self._write_cost(c, is_full=False)

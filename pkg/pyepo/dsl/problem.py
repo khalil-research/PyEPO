@@ -183,24 +183,24 @@ class Problem:
         # route to the backend compiler
         if backend == "gurobi":
             from pyepo.model.grb.compile import compileProblem
-
             return compileProblem(self, **kwargs)
+        
         if backend == "copt":
             from pyepo.model.copt.compile import compileProblem
-
             return compileProblem(self, **kwargs)
+        
         if backend == "pyomo":
             from pyepo.model.omo.compile import compileProblem
-
             return compileProblem(self, **kwargs)
+        
         if backend == "ortools":
             from pyepo.model.ort.compile import compileProblem
-
             return compileProblem(self, **kwargs)
+        
         if backend == "mpax":
             from pyepo.model.mpax.compile import compileProblem
-
             return compileProblem(self, **kwargs)
+        
         raise NotImplementedError(
             f"DSL backend {backend!r} is not supported "
             "(available: 'gurobi', 'copt', 'pyomo', 'ortools', 'mpax')."

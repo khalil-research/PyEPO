@@ -88,13 +88,13 @@ class optModule(nn.Module):
         return loss
 
     def _refresh_solution_pool(self, cost: torch.Tensor) -> torch.Tensor:
-        """Optionally solve, then return the initialized pool on ``cost``'s device."""
+        """Optionally solve, then return the initialized pool on ``cost``'s device and dtype."""
         if self._branch_rng.uniform() <= self.solve_ratio:
             _, _, self.solpool = _solve_in_pass(
                 cost, self.optmodel, self.processes, self.pool, self.solpool
             )
         solpool = require_solution_pool(self.solpool)
-        if solpool.device != cost.device:
-            solpool = solpool.to(cost.device)
+        if solpool.device != cost.device or solpool.dtype != cost.dtype:
+            solpool = solpool.to(device=cost.device, dtype=cost.dtype)
             self.solpool = solpool
         return solpool
