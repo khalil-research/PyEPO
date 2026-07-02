@@ -43,6 +43,10 @@ def _is_mvar(x) -> bool:
 
 def _read_solution(model, reader: Callable[[], _T]) -> tuple[_T, float]:
     """Read a COPT solution through one stable no-solution error boundary."""
+    # solution availability guard
+    has_sol = model.hasmipsol if model.ismip else model.haslpsol
+    if not has_sol:
+        raise RuntimeError(f"COPT found no solution (status {model.status}).")
     try:
         return reader(), model.objVal
     except Exception as e:  # coptpy raises generic errors on no-solution
