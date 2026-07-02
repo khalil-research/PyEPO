@@ -1291,3 +1291,24 @@ class TestCaVE:
             return float((1.0 - F.cosine_similarity(s, proj, dim=1)).mean())
 
         np.testing.assert_allclose(cp.grad.numpy(), finite_diff_grad(value, cp0), atol=3e-2)
+
+    def test_heuristic_branch_zero_loss_at_inner_zero(self, setup):
+        # inner_ratio 0 projects onto the normalized prediction itself
+        cave_cls, model, pred, ctrs = setup
+        cave = cave_cls(model, processes=1, solve_ratio=0.0, inner_ratio=0.0, reduction="none")
+        loss = cave(pred, ctrs)
+        np.testing.assert_allclose(loss.detach().numpy(), np.zeros(2), atol=1e-6)
+
+    def test_heuristic_branch_uses_average_normal(self, setup):
+        from torch.nn import functional as F
+
+        cave_cls, model, pred, ctrs = setup
+        cave = cave_cls(model, processes=1, solve_ratio=0.0, inner_ratio=1.0, reduction="none")
+        cp = pred.detach().clone().requires_grad_()
+        loss = cave(cp, ctrs)
+        # cosine distance to the average unit binding-constraint normal
+        avg = (ctrs / ctrs.norm(dim=2, keepdim=True).clamp(min=1e-8)).mean(dim=1)
+        expected = 1.0 - F.cosine_similarity(cave._sign * cp.detach(), avg, dim=1)
+        np.testing.assert_allclose(loss.detach().numpy(), expected.numpy(), atol=1e-6)
+        loss.sum().backward()
+        assert torch.isfinite(cp.grad).all()
