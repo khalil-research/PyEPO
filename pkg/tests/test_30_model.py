@@ -1033,7 +1033,7 @@ def test_vrp_rci_callback_records_tight_cuts_without_adding():
     from pyepo.model.grb.vrp import vrpRCIModel
 
     m = _make_vrp("grb", "RCI")[0]
-    zeros = {e: 0.0 for e in m._model._edges}
+    zeros = dict.fromkeys(m._model._edges, 0.0)
     # routes 0-1-2-4-0 (demand 5 = capacity) and 0-3-0: the RCI cut on {1,2,4} is tight
     routes = {**zeros, (0, 1): 1.0, (1, 2): 1.0, (2, 4): 1.0, (0, 4): 1.0, (0, 3): 2.0}
     stub = _VrpCallbackStub(m._model, routes)
