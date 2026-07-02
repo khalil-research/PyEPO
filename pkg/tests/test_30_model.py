@@ -300,10 +300,13 @@ class TestKnapsack:
         # feasible: weights @ sol <= capacity
         assert np.all(_KNAP_W @ sol <= _KNAP_CAP + 1e-3)
         np.testing.assert_allclose(obj, float(_KNAP_COST @ sol), atol=meta["tol"])
+        # unique optimum
         if meta["binary"]:
-            np.testing.assert_allclose(sol, np.round(sol), atol=1e-3)
+            np.testing.assert_allclose(sol, [1.0, 1.0, 0.0, 0.0], atol=1e-3)
+            np.testing.assert_allclose(obj, 16.0, atol=meta["tol"])
         else:
-            assert sol.min() >= -1e-3 and sol.max() <= 1.0 + 1e-3
+            np.testing.assert_allclose(sol, [1.0, 1.0, 0.6, 0.0], atol=meta["tol"])
+            np.testing.assert_allclose(obj, 17.8, atol=meta["tol"])
 
     def test_setObj_wrong_size_raises(self, backend):
         m, _ = _make_knapsack(backend)
@@ -652,9 +655,7 @@ def _make_tsp(backend, formulation, num_nodes=4):
 
         cls = {"GG": t.tspGGModel, "DFJ": t.tspDFJModel, "MTZ": t.tspMTZModel}[formulation]
         rel = {"GG": t.tspGGModelRel, "DFJ": None, "MTZ": t.tspMTZModelRel}[formulation]
-        m = cls(num_nodes=num_nodes)
-        m._model.Params.OutputFlag = 0
-        return m, rel
+        return cls(num_nodes=num_nodes), rel
     if backend == "copt":
         from pyepo.model.copt import tsp as t
 
