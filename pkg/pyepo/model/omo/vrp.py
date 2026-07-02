@@ -106,6 +106,9 @@ class vrpMTZModel(vrpABModel):
         # depot vehicle count (out and in)
         m.cons.add(sum(x[0, j] for j in self.nodes[1:]) <= self.num_vehicle)
         m.cons.add(sum(x[i, 0] for i in self.nodes[1:]) <= self.num_vehicle)
+        # no single-customer depot round trips
+        for j in self.nodes[1:]:
+            m.cons.add(x[0, j] + x[j, 0] <= 1)
         # MTZ capacity / subtour-free load propagation
         for i, j in directed_edges:
             if i == 0 or j == 0:
@@ -179,6 +182,9 @@ class vrpMTZModelRel(vrpMTZModel):
         # depot vehicle count (out and in)
         m.cons.add(sum(x[0, j] for j in self.nodes[1:]) <= self.num_vehicle)
         m.cons.add(sum(x[i, 0] for i in self.nodes[1:]) <= self.num_vehicle)
+        # no single-customer depot round trips
+        for j in self.nodes[1:]:
+            m.cons.add(x[0, j] + x[j, 0] <= 1)
         # MTZ capacity / subtour-free load propagation
         for i, j in directed_edges:
             if i == 0 or j == 0:
