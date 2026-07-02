@@ -32,7 +32,8 @@ from .conftest import (
 def test_variable_binary_bounds():
     x = dsl.Variable(4, vtype=EPO.BINARY)
     assert x.size == 4 and (x.vtype == EPO.BINARY).all()
-    assert np.allclose(x.lb, 0) and np.allclose(x.ub, 1)
+    np.testing.assert_allclose(x.lb, 0)
+    np.testing.assert_allclose(x.ub, 1)
 
 
 def test_variable_default_is_continuous():
@@ -48,13 +49,14 @@ def test_variable_invalid_vtype_rejected():
 def test_variable_multidim_and_bounds_broadcast():
     x = dsl.Variable((2, 3), lb=-1.0, ub=2.0)
     assert x.shape == (2, 3) and x.size == 6
-    assert np.allclose(x.lb, -1.0) and np.allclose(x.ub, 2.0)
+    np.testing.assert_allclose(x.lb, -1.0)
+    np.testing.assert_allclose(x.ub, 2.0)
 
 
 def test_variable_mixed_vtype_per_entry():
     x = dsl.Variable(4, vtype=[EPO.BINARY, EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS], lb=0, ub=7)
     assert list(x.vtype) == [EPO.BINARY, EPO.BINARY, EPO.INTEGER, EPO.CONTINUOUS]
-    assert np.allclose(x.ub, [1, 1, 7, 7])  # binary entries forced to [0, 1]
+    np.testing.assert_allclose(x.ub, [1, 1, 7, 7])  # binary entries forced to [0, 1]
 
 
 # ============================================================
@@ -69,16 +71,17 @@ def test_matmul_and_const_constraint():
     con = W @ x <= cap
     Q, A, sense, b = con.finalize({x: slice(0, 5)}, 5)
     assert Q is None and sense == "<="
-    assert np.allclose(A.toarray(), W)
-    assert np.allclose(b, cap)
+    np.testing.assert_allclose(A.toarray(), W)
+    np.testing.assert_allclose(b, cap)
 
 
 def test_affine_offset_absorbed_into_rhs():
     x = dsl.Variable(3)
     con = x.sum() + 2.0 == 5.0  # const folds into rhs (5 - 2)
     _, A, sense, b = con.finalize({x: slice(0, 3)}, 3)
-    assert sense == "==" and np.allclose(A.toarray(), np.ones((1, 3)))
-    assert np.allclose(b, 3.0)
+    assert sense == "=="
+    np.testing.assert_allclose(A.toarray(), np.ones((1, 3)))
+    np.testing.assert_allclose(b, 3.0)
 
 
 def test_indexing_selects_rows():
@@ -86,20 +89,20 @@ def test_indexing_selects_rows():
     _, A, _, _ = (x[[0, 2, 4]] <= 1).finalize({x: slice(0, 5)}, 5)
     expected = np.zeros((3, 5))
     expected[0, 0] = expected[1, 2] = expected[2, 4] = 1.0
-    assert np.allclose(A.toarray(), expected)
+    np.testing.assert_allclose(A.toarray(), expected)
 
 
 def test_scalar_scale_and_subtract():
     x = dsl.Variable(3)
     _, A, _, b = (2.0 * x - 1.0 <= 4.0).finalize({x: slice(0, 3)}, 3)
-    assert np.allclose(A.toarray(), 2.0 * np.eye(3))
-    assert np.allclose(b, 5.0)  # rhs 4 - const(-1) = 5
+    np.testing.assert_allclose(A.toarray(), 2.0 * np.eye(3))
+    np.testing.assert_allclose(b, 5.0)  # rhs 4 - const(-1) = 5
 
 
 def test_const_add_broadcasts_to_shape():
     x = dsl.Variable((2, 3))
     a = x + np.ones(3)  # row-broadcast like numpy
-    assert np.allclose(a.const, np.ones(6))
+    np.testing.assert_allclose(a.const, np.ones(6))
     with pytest.raises(ValueError):
         _ = x + np.arange(6).reshape(3, 2)  # numpy rejects (2,3)+(3,2)
 
@@ -108,7 +111,7 @@ def test_sum_negative_axis():
     x = dsl.Variable((2, 3))
     _, A1, _, _ = (x.sum(axis=-1) <= 1).finalize({x: slice(0, 6)}, 6)
     _, A2, _, _ = (x.sum(axis=1) <= 1).finalize({x: slice(0, 6)}, 6)
-    assert np.allclose(A1.toarray(), A2.toarray())
+    np.testing.assert_allclose(A1.toarray(), A2.toarray())
     with pytest.raises(ValueError):
         x.sum(axis=2)  # out of bounds
 
@@ -117,18 +120,19 @@ def test_matrix_rhs_broadcasts_to_lhs_shape():
     x = dsl.Variable((2, 3))
     _, _, _, b1 = (x <= np.ones((2, 3))).finalize({x: slice(0, 6)}, 6)
     _, _, _, b2 = (x <= np.array([1.0, 2.0, 3.0])).finalize({x: slice(0, 6)}, 6)
-    assert np.allclose(b1, np.ones(6))
-    assert np.allclose(b2, np.tile([1.0, 2.0, 3.0], 2))  # row-broadcast over 2 rows
+    np.testing.assert_allclose(b1, np.ones(6))
+    np.testing.assert_allclose(b2, np.tile([1.0, 2.0, 3.0], 2))  # row-broadcast over 2 rows
 
 
 def test_divide_and_quadratic_subtract():
     x = dsl.Variable(2)
     _, A, _, _ = (x / 2.0 <= 1).finalize({x: slice(0, 2)}, 2)
-    assert np.allclose(A.toarray(), 0.5 * np.eye(2))
+    np.testing.assert_allclose(A.toarray(), 0.5 * np.eye(2))
     con = x @ x - 1.0 <= 0.0  # Quadratic - const
     Q, _, sense, b = con.finalize({x: slice(0, 2)}, 2)
-    assert np.allclose(Q.toarray(), np.eye(2))
-    assert sense == "<=" and np.allclose(b, 1.0)  # rhs 0 - const(-1) = 1
+    np.testing.assert_allclose(Q.toarray(), np.eye(2))
+    assert sense == "<="
+    np.testing.assert_allclose(b, 1.0)  # rhs 0 - const(-1) = 1
 
 
 # ============================================================
@@ -146,7 +150,8 @@ def test_knapsack_ir():
     assert prob.objective.modelSense == EPO.MAXIMIZE
     Q, A, sense, b = prob.constrs[0]
     assert Q is None and sense == "<="
-    assert np.allclose(A.toarray(), W) and np.allclose(b, cap)
+    np.testing.assert_allclose(A.toarray(), W)
+    np.testing.assert_allclose(b, cap)
     assert (prob.var_type == EPO.BINARY).all()
 
 
@@ -158,7 +163,9 @@ def test_shortestpath_equality_ir():
     c = dsl.Parameter(4)
     prob = dsl.Problem(dsl.Minimize(c @ x), [A_eq @ x == b_eq])
     _, A, sense, b = prob.constrs[0]
-    assert sense == "==" and np.allclose(A.toarray(), A_eq) and np.allclose(b, b_eq)
+    assert sense == "=="
+    np.testing.assert_allclose(A.toarray(), A_eq)
+    np.testing.assert_allclose(b, b_eq)
     assert prob.objective.modelSense == EPO.MINIMIZE
 
 
@@ -169,8 +176,8 @@ def test_assignment_ir():
     assert prob.num_cost == 9
     _, Ar, _, _ = prob.constrs[0]
     _, Ac, _, _ = prob.constrs[1]
-    assert np.allclose(Ar.toarray(), np.kron(np.eye(3), np.ones((1, 3))))
-    assert np.allclose(Ac.toarray(), np.kron(np.ones((1, 3)), np.eye(3)))
+    np.testing.assert_allclose(Ar.toarray(), np.kron(np.eye(3), np.ones((1, 3))))
+    np.testing.assert_allclose(Ac.toarray(), np.kron(np.ones((1, 3)), np.eye(3)))
 
 
 def test_portfolio_quadratic_constraint_ir():
@@ -182,12 +189,13 @@ def test_portfolio_quadratic_constraint_ir():
     prob = dsl.Problem(dsl.Maximize(c @ x), [x.sum() == 1, x @ cov @ x <= budget])
     _, As, _, bs = prob.constrs[0]
     Qq, Aq, sq, bq = prob.constrs[1]
-    assert np.allclose(As.toarray(), np.ones((1, 5))) and np.allclose(bs, 1.0)
+    np.testing.assert_allclose(As.toarray(), np.ones((1, 5)))
+    np.testing.assert_allclose(bs, 1.0)
     assert sq == "<=" and Qq is not None
-    assert np.allclose(Qq.toarray(), (cov + cov.T) / 2)  # symmetric quadratic part
-    assert np.allclose(Aq.toarray(), 0.0)  # no linear part
-    assert np.allclose(bq, budget)
-    assert np.allclose(prob.var_lb, 0.0)
+    np.testing.assert_allclose(Qq.toarray(), (cov + cov.T) / 2)  # symmetric quadratic part
+    np.testing.assert_allclose(Aq.toarray(), 0.0)  # no linear part
+    np.testing.assert_allclose(bq, budget)
+    np.testing.assert_allclose(prob.var_lb, 0.0)
 
 
 def test_quadratic_equality_constraint():
@@ -197,7 +205,8 @@ def test_quadratic_equality_constraint():
     prob = dsl.Problem(dsl.Minimize(c @ x), [x @ cov @ x == 1.0])
     Q, _, sense, b = prob.constrs[0]  # `==` builds a real Constraint
     assert sense == "==" and Q is not None
-    assert np.allclose(Q.toarray(), cov) and np.allclose(b, 1.0)
+    np.testing.assert_allclose(Q.toarray(), cov)
+    np.testing.assert_allclose(b, 1.0)
 
 
 def test_xQx_finalizes_symmetric():
@@ -205,7 +214,7 @@ def test_xQx_finalizes_symmetric():
     M = rng.standard_normal((4, 4))
     x = dsl.Variable(4)
     q = (x @ M @ x).finalize_Q({x: slice(0, 4)}, 4)
-    assert np.allclose(q.toarray(), (M + M.T) / 2)  # x @ M @ x symmetrizes M
+    np.testing.assert_allclose(q.toarray(), (M + M.T) / 2)  # x @ M @ x symmetrizes M
 
 
 def test_quadratic_scale_and_add():
@@ -213,7 +222,7 @@ def test_quadratic_scale_and_add():
     A = np.eye(2)
     B = np.array([[0.0, 1.0], [1.0, 0.0]])
     Q = (0.5 * (x @ A @ x) + x @ B @ x).finalize_Q({x: slice(0, 2)}, 2)
-    assert np.allclose(Q.toarray(), 0.5 * A + B)  # scalar scale + merge
+    np.testing.assert_allclose(Q.toarray(), 0.5 * A + B)  # scalar scale + merge
 
 
 def test_qp_objective_offset():
@@ -224,7 +233,7 @@ def test_qp_objective_offset():
     c = dsl.Parameter(3)
     prob = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1])
     assert prob.obj_Q is not None
-    assert np.allclose(prob.obj_Q.toarray(), Sig)  # already symmetric
+    np.testing.assert_allclose(prob.obj_Q.toarray(), Sig)  # already symmetric
 
 
 def test_objective_only_variable_assigned():
@@ -233,7 +242,7 @@ def test_objective_only_variable_assigned():
     c = dsl.Parameter(3)
     prob = dsl.Problem(dsl.Minimize(c @ x + 2 * y.sum()), [x.sum() >= 1])
     assert prob.num_vars == 5  # y gets a flat slice
-    assert np.allclose(prob.fixed_cost, [0, 0, 0, 2, 2])
+    np.testing.assert_allclose(prob.fixed_cost, [0, 0, 0, 2, 2])
 
 
 def test_objective_constant_becomes_offset():
@@ -268,7 +277,8 @@ def test_relax_clears_vtypes_keeps_bounds():
     prob = dsl.Problem(dsl.Maximize(c @ x), [x.sum() <= 2])
     rel = prob.relax()
     assert (rel.var_type == EPO.CONTINUOUS).all()
-    assert np.allclose(rel.var_lb, 0.0) and np.allclose(rel.var_ub, 1.0)
+    np.testing.assert_allclose(rel.var_lb, 0.0)
+    np.testing.assert_allclose(rel.var_ub, 1.0)
     assert (prob.var_type == EPO.BINARY).all()  # original unchanged
 
 
@@ -372,7 +382,7 @@ def test_partial_prediction_ir():
     prob = dsl.Problem(dsl.Minimize(c @ x + d @ y), [x.sum() + y.sum() == 1])
     assert prob.num_cost == 3 and prob.num_vars == 5
     assert list(prob.c_pred_index) == [0, 1, 2]  # x predicted
-    assert np.allclose(prob.fixed_cost, [0, 0, 0, 1, 2])  # d fixed on y
+    np.testing.assert_allclose(prob.fixed_cost, [0, 0, 0, 1, 2])  # d fixed on y
 
 
 def test_slice_prediction_ir():
@@ -381,7 +391,7 @@ def test_slice_prediction_ir():
     d = np.array([3.0, 4.0, 5.0])
     prob = dsl.Problem(dsl.Minimize(c @ x[:2] + d @ x[2:]), [x.sum() == 1])
     assert list(prob.c_pred_index) == [0, 1]  # first 2 of x predicted
-    assert np.allclose(prob.fixed_cost, [0, 0, 3, 4, 5])  # rest of x fixed
+    np.testing.assert_allclose(prob.fixed_cost, [0, 0, 3, 4, 5])  # rest of x fixed
 
 
 def test_base_offset_equals_two_terms():
@@ -390,7 +400,8 @@ def test_base_offset_equals_two_terms():
     d = np.array([1.0, 2.0, 3.0])
     combined = dsl.Problem(dsl.Minimize((d + c) @ x), [x.sum() == 1])  # (d + c) @ x
     two_term = dsl.Problem(dsl.Minimize(c @ x + d @ x), [x.sum() == 1])  # c @ x + d @ x
-    assert np.allclose(combined.fixed_cost, d) and np.allclose(two_term.fixed_cost, d)
+    np.testing.assert_allclose(combined.fixed_cost, d)
+    np.testing.assert_allclose(two_term.fixed_cost, d)
     assert list(combined.c_pred_index) == list(two_term.c_pred_index) == [0, 1, 2]
 
 
@@ -582,7 +593,8 @@ def test_assignment_solves_to_permutation(backend):
     comp.setObj(rng.standard_normal(n * n))
     sol, _ = comp.solve()
     P = np.asarray(sol).reshape(n, n)
-    assert np.allclose(P.sum(axis=0), 1) and np.allclose(P.sum(axis=1), 1)  # permutation
+    np.testing.assert_allclose(P.sum(axis=0), 1)  # permutation
+    np.testing.assert_allclose(P.sum(axis=1), 1)
 
 
 @pytest.mark.parametrize("backend", _BACKENDS)
@@ -655,7 +667,7 @@ def test_setobj_scatters_when_dims_coincide(backend):
     comp.setObj(np.array([1.0, -3.0]))  # full coefficients [2, -2]
     sol, obj = comp.solve()
     atol = solver_atol(comp, exact=1e-6, first_order=1e-2)
-    assert np.allclose(to_np(sol), [0.0, 1.0], atol=atol)
+    np.testing.assert_allclose(to_np(sol), [0.0, 1.0], atol=atol)
     assert obj == pytest.approx(-2.0, abs=atol)
 
 
@@ -667,7 +679,7 @@ def test_setobj_applies_permutation():
     comp = dsl.Problem(dsl.Minimize(c @ x[[2, 1, 0]]), [x.sum() >= 0.0]).compile("gurobi")
     comp.setObj(np.array([1.0, 2.0, -1.0]))  # lands as [-1, 2, 1]
     sol, obj = comp.solve()
-    assert np.allclose(to_np(sol), [1.0, 0.0, 0.0], atol=1e-6)
+    np.testing.assert_allclose(to_np(sol), [1.0, 0.0, 0.0], atol=1e-6)
     assert obj == pytest.approx(-1.0, abs=1e-6)
 
 
@@ -731,7 +743,8 @@ def test_partial_prediction_solves(backend):
     comp.setObj(np.array([1.0, 1.0]))  # short predicted cost; setObj scatters it
     sol, obj = comp.solve()  # full: [x0, x1, y0, y1]
     atol = solver_atol(comp, exact=1e-6, first_order=1e-2)
-    assert len(sol) == 4 and np.allclose(to_np(sol), [1, 1, 0, 0], atol=atol)
+    assert len(sol) == 4
+    np.testing.assert_allclose(to_np(sol), [1, 1, 0, 0], atol=atol)
     assert obj == pytest.approx(2.0, abs=atol)  # full objective c @ x + d @ y
 
 
@@ -745,7 +758,7 @@ def test_objective_constant_in_solve(backend):
     comp.setObj(np.array([1.0, -1.0]))
     sol, obj = comp.solve()
     atol = solver_atol(comp, exact=1e-3, first_order=1e-2)
-    assert np.allclose(to_np(sol), [0.5, 1.0], atol=atol)
+    np.testing.assert_allclose(to_np(sol), [0.5, 1.0], atol=atol)
     assert obj == pytest.approx(-0.25, abs=atol)
 
 
@@ -760,7 +773,7 @@ def test_mpax_batch_dataset_includes_objective_constant():
     comp = prob.compile(backend="mpax")
     costs = np.tile([1.0, -1.0], (3, 1)).astype(np.float32)
     ds = optDataset(comp, np.zeros((3, 2), np.float32), costs)
-    assert np.allclose(ds.objs.numpy().ravel(), -0.25, atol=1e-2)
+    np.testing.assert_allclose(ds.objs.numpy().ravel(), -0.25, atol=1e-2)
 
 
 @pytest.mark.parametrize("backend", _ALL)
@@ -777,7 +790,7 @@ def test_full_prediction_fixed_cost_dataset_includes_offset(backend):
     feats = np.random.RandomState(0).rand(4, 3).astype(np.float32)
     costs = np.tile([1.0, 2.0, 3.0], (4, 1)).astype(np.float32)  # raw favors x0; (c+d) favors x1
     ds = optDataset(comp, feats, costs)
-    assert np.allclose(np.asarray(ds.sols[0]), [0, 1, 0])
+    np.testing.assert_allclose(np.asarray(ds.sols[0]), [0, 1, 0])
     assert float(ds.objs[0]) == pytest.approx(2.0)
 
 
@@ -852,7 +865,7 @@ def test_generic_matches_native(backend):
         grb.setObj(cost)
         sol_g, obj_g = grb.solve()
         assert obj_n == pytest.approx(obj_g, abs=1e-6)
-        assert np.allclose(sol_n, sol_g, atol=1e-6)
+        np.testing.assert_allclose(sol_n, sol_g, atol=1e-6)
 
 
 # ============================================================
