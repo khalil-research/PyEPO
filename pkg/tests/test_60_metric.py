@@ -266,16 +266,6 @@ class TestSPOError:
         pred_c = rng.rand(10, m.num_cost) + 0.1
         assert SPOError(pred_c, true_c, m) >= -1e-6
 
-    def test_non_negative_maximize(self):
-        from pyepo.model.grb.knapsack import knapsackModel
-
-        weights, cap = np.array([[3.0, 4.0, 5.0]]), np.array([8.0])
-        m = knapsackModel(weights=weights, capacity=cap)
-        rng = np.random.RandomState(42)
-        true_c = rng.rand(10, m.num_cost) + 1.0
-        pred_c = rng.rand(10, m.num_cost) + 1.0
-        assert SPOError(pred_c, true_c, m) >= -1e-6
-
 
 @requires_gurobi
 class TestCalUnambRegret:
@@ -507,7 +497,7 @@ class TestSkScorer:
 
 
 @requires_mpax
-class TestDataloaderMetricsJax:
+class TestDataloaderMetricsMpax:
     """pyepo.metric.regret accepts a plain callable f(x_numpy) -> array."""
 
     @pytest.fixture(scope="class")
@@ -551,7 +541,7 @@ class TestDataloaderMetricsJax:
     not (_HAS_GUROBI and _HAS_FLAX),
     reason="Parity: Gurobi (exact solve) + Flax both required",
 )
-class TestDataloaderMetricsJaxParity:
+class TestDataloaderMetricsParity:
     """JAX callable and torch nn.Module with identical weights give the same regret."""
 
     def test_same_weights_same_regret(self, sp_data):

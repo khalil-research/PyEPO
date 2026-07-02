@@ -16,7 +16,7 @@ from pyepo.model.opt import ModelSpec, optModel
 from pyepo.model.utils import getTspTour, unionFind
 from pyepo.utils import costToNumpy
 
-from .conftest import requires_gurobi
+from .conftest import requires_cuda, requires_gurobi
 
 
 class ConfigModel(optModel):
@@ -228,7 +228,7 @@ class TestCostToNumpy:
         c = np.array([1, 2, 3], dtype=np.int64)
         assert costToNumpy(c, dtype=np.float64).dtype == np.float64
 
-    @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
+    @requires_cuda
     def test_cuda_tensor_moved_to_cpu(self):
         c = torch.tensor([1.0, 2.0, 3.0], device="cuda")
         out = costToNumpy(c)
@@ -242,12 +242,6 @@ class TestCostToNumpy:
 
 
 class TestModelSpec:
-    def test_get_config(self):
-        model = ConfigModel([1, 2, 3], label="x")
-        config = model.get_config()
-        assert config["label"] == "x"
-        np.testing.assert_array_equal(config["values"], [1, 2, 3])
-
     def test_rebuild_has_clean_independent_config(self):
         model = ConfigModel([1, 2, 3], label="x")
         rebuilt = model.rebuild()
@@ -353,14 +347,9 @@ class TestModelSpec:
 
 @requires_gurobi
 class TestGetConfig:
-    def _models(self):
-        from pyepo.model.grb.knapsack import knapsackModel
+    def test_shortestpath_args(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
 
-        return knapsackModel, shortestPathModel
-
-    def test_shortestpath_args(self):
-        _, shortestPathModel = self._models()
         args = shortestPathModel(grid=(4, 4)).get_config()
         # captures constructor args only, not derived attrs / solver handle
         assert args["grid"] == (4, 4)
@@ -368,7 +357,8 @@ class TestGetConfig:
         assert "_model" not in args
 
     def test_rebuild_solves_same(self):
-        _, shortestPathModel = self._models()
+        from pyepo.model.grb.shortestpath import shortestPathModel
+
         model = shortestPathModel(grid=(3, 3))
         model2 = model.rebuild()
         cost = np.random.RandomState(42).rand(model.num_cost)

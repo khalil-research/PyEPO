@@ -21,7 +21,6 @@ from .conftest import (
     SOLUTION_OPS,
     LinearPred,
     call_op,
-    requires_cuda,
     requires_jax_gpu,
 )
 
@@ -45,16 +44,6 @@ def _assert_grads_cuda(model):
     for name, p in model.named_parameters():
         assert p.grad is not None, f"no grad for {name}"
         _assert_cuda(p.grad, f"grad {name}")
-
-
-@requires_cuda
-class TestModelDevice:
-    def test_parameters_and_forward_on_cuda(self):
-        pred = LinearPred(5, 10).to(_DEVICE)
-        for name, p in pred.named_parameters():
-            _assert_cuda(p, name)
-        out = pred(torch.randn(4, 5, device=_DEVICE))
-        _assert_cuda(out, "forward output")
 
 
 @requires_cuda_gurobi

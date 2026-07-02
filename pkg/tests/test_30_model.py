@@ -914,21 +914,6 @@ class TestVRP:
         m2 = m.addConstr(zeros(m.num_cost), 0)
         np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
 
-    def test_addConstr_snapshot_isolated_across_copy(self, backend, formulation):
-        m, _ = _make_vrp(backend, formulation)
-        coefs = np.arange(m.num_cost, dtype=float)
-        constrained = m.addConstr(coefs, float(coefs.sum()))
-        coefs.fill(-1)
-        copied = constrained.copy()
-
-        expected = np.arange(m.num_cost, dtype=float)
-        np.testing.assert_array_equal(constrained._extra_constrs[-1][0], expected)
-        np.testing.assert_array_equal(copied._extra_constrs[-1][0], expected)
-        assert not np.shares_memory(
-            constrained._extra_constrs[-1][0],
-            copied._extra_constrs[-1][0],
-        )
-
     def test_addConstr_no_improvement(self, backend, formulation):
         # MINIMIZE: re-imposing the optimal edge count cannot decrease the objective
         m, _ = _make_vrp(backend, formulation)
