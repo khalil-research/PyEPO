@@ -22,7 +22,7 @@ jobs:
         channels: conda-forge,pytorch,gurobi
         channel-priority: strict
     - name: Install Conda-Build and Anaconda-Client
-      run: conda install -n pyepo-build conda-build anaconda-client --yes
+      run: conda install -n base conda-build anaconda-client --yes
     - name: Build Conda Package
       run: conda build ./pkg -c conda-forge -c pytorch -c gurobi
     - name: Upload Conda Package
@@ -32,4 +32,4 @@ jobs:
         # --output only computes the path; the build above produced the package
         PKG_PATH=$(conda build --output ./pkg -c conda-forge -c pytorch -c gurobi)
         echo "Package path: $PKG_PATH"
-        conda run -n pyepo-build anaconda upload --user pyepo $PKG_PATH
+        anaconda upload --user pyepo $PKG_PATH
