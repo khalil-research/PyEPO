@@ -9,8 +9,6 @@ case. The multiprocessing path is exercised once, marked ``slow`` (Windows
 process spawn is the suite's main time sink).
 """
 
-import sys
-
 import pytest
 import torch
 from torch.utils.data import DataLoader
@@ -171,12 +169,6 @@ class TestCaVEEndToEnd:
 
 @requires_gurobi
 @pytest.mark.slow
-@pytest.mark.skipif(
-    sys.platform == "win32",
-    reason="pathos spawn-based pool segfaults at interpreter teardown once JAX is "
-    "loaded in-process on Windows; the multiprocessing path is validated on "
-    "Linux CI (fork)",
-)
 class TestParallelSolving:
     """Multiprocessing solve path (processes>1). Marked slow: process spawn
     dominates wall-clock; deselect with -m 'not slow'."""

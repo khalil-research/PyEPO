@@ -174,6 +174,7 @@ class TestBatchSolve:
 
 @requires_jax
 @requires_gurobi
+@pytest.mark.slow
 class TestMultiprocessing:
     """Callback-path multiprocessing."""
 
@@ -735,6 +736,7 @@ class TestRegularized:
         assert np.isfinite(g_exact).all()
         assert int(opt.solpool.shape[0]) >= n0
 
+    @pytest.mark.slow
     def test_multiprocessing_lmo_matches_single_core(self):
         import jax
         import jax.numpy as jnp

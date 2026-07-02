@@ -441,6 +441,7 @@ class TestDataloaderMetrics:
                 LinearPred(NUM_FEAT, optmodel.num_cost), optmodel, loader, reduction="bad"
             )
 
+    @pytest.mark.slow
     def test_regret_multiprocess_matches_single(self, sp_data):
         import pyepo
 
