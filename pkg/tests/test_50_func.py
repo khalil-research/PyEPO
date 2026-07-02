@@ -557,7 +557,7 @@ class TestConstructorGuards:
 
 
 # ============================================================
-# torch: MAXIMIZE sense and solve-ratio caching
+# torch: sense, partial prediction, and solve-ratio caching
 # ============================================================
 
 
@@ -1094,6 +1094,13 @@ class TestSolutionGradientTruth:
         (mod(cpg) * target).sum().backward()
         # MINIMIZE: signed-identity Jacobian
         assert torch.allclose(cpg.grad, -target, atol=1e-5)
+
+    def test_negative_identity_maximize(self, ks_data):
+        _om, mod, cp, target = self._setup(ks_data, "NID")
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        # MAXIMIZE: the signed-identity Jacobian flips
+        assert torch.allclose(cpg.grad, target, atol=1e-5)
 
     def test_blackbox_opt(self, sp_truth):
         from pyepo.func.utils import _solve_batch
