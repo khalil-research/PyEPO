@@ -14,8 +14,6 @@ from pyepo.twostage.autosklearnpred import _HAS_AUTO, autoSklearnPred
 
 from .conftest import NUM_FEAT, requires_gurobi
 
-requires_autosk = pytest.mark.skipif(not _HAS_AUTO, reason="auto-sklearn not installed")
-
 
 class TestSklearnPred:
     def test_wraps_into_multioutput(self):
@@ -88,9 +86,10 @@ class TestAutoSklearnPred:
         assert result == captured
         assert captured["metric"] is module.mean_squared_error
 
-    @requires_autosk
-    def test_invalid_metric_raises(self):
-        from pyepo.model.grb.shortestpath import shortestPathModel
+    def test_invalid_metric_raises(self, monkeypatch):
+        import pyepo.twostage.autosklearnpred as module
 
-        with pytest.raises(ValueError):
-            autoSklearnPred(shortestPathModel(grid=(3, 3)), seed=0, timelimit=30, metric="banana")
+        # the invalid-metric branch fires before any auto-sklearn object is built
+        monkeypatch.setattr(module, "_HAS_AUTO", True)
+        with pytest.raises(ValueError, match="Invalid metric"):
+            module.autoSklearnPred(optmodel=None, seed=0, timelimit=30, metric="banana")

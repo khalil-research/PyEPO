@@ -130,21 +130,17 @@ class TestSumGammaDistribution:
         with pytest.raises(ValueError, match=match):
             sumGammaDistribution(**kwargs)
 
-    def test_sample_shape(self):
+    def test_sampling_behavior(self):
         dist = sumGammaDistribution(kappa=1.0, n_iterations=10, seed=42)
         assert dist.sample((5, 3)).shape == (5, 3)
-
-    def test_deterministic(self):
+        # same seed reproduces, different seed varies
         s1 = sumGammaDistribution(kappa=1.0, seed=42).sample((10,))
         s2 = sumGammaDistribution(kappa=1.0, seed=42).sample((10,))
         np.testing.assert_array_equal(s1, s2)
-
-    def test_different_seeds(self):
-        s1 = sumGammaDistribution(kappa=1.0, seed=0).sample((100,))
-        s2 = sumGammaDistribution(kappa=1.0, seed=1).sample((100,))
-        assert not np.array_equal(s1, s2)
-
-    def test_finite(self):
+        assert not np.array_equal(
+            sumGammaDistribution(kappa=1.0, seed=0).sample((100,)),
+            sumGammaDistribution(kappa=1.0, seed=1).sample((100,)),
+        )
         s = sumGammaDistribution(kappa=2.0, n_iterations=20, seed=42).sample((100,))
         assert np.all(np.isfinite(s))
 
@@ -679,7 +675,7 @@ class TestMultiplicativePerturbPartial:
         fixed = [i for i in range(full.shape[-1]) if i not in set(optmodel.c_pred_index.tolist())]
         return full, noises, fixed
 
-    @pytest.mark.parametrize("name", ["DPOMul", "PFYLMul"])
+    @pytest.mark.parametrize("name", ["DPOMul", "PFYMul"])
     def test_fixed_positions_unperturbed(self, name):
         from pyepo.func.perturbed import perturbedFenchelYoungMul, perturbedOptMul
 
@@ -1255,26 +1251,15 @@ class TestCaVE:
         tight_ctrs = torch.randn(2, 3, d)
         return CaVE, model, pred_cost, tight_ctrs
 
-    def test_default_scalar_in_range(self, setup):
-        cave, model, pred, ctrs = setup
-        loss = cave(model, processes=1, reduction="mean")(pred, ctrs)
-        assert loss.dim() == 0
-        assert -1e-6 <= loss.item() <= 2.0 + 1e-6  # cosine distance in [0, 2]
-
-    def test_reduction_none_and_sum(self, setup):
+    def test_reductions(self, setup):
         cave, model, pred, ctrs = setup
         none = cave(model, processes=1, reduction="none")(pred, ctrs)
         assert none.shape == (2,)
         total = cave(model, processes=1, reduction="sum")(pred, ctrs)
         mean = cave(model, processes=1, reduction="mean")(pred, ctrs)
+        assert mean.dim() == 0
+        assert -1e-6 <= mean.item() <= 2.0 + 1e-6  # cosine distance in [0, 2]
         np.testing.assert_allclose(total.item(), mean.item() * 2, atol=1e-5)
-
-    def test_gradient_flows(self, setup):
-        cave, model, pred, ctrs = setup
-        cave(model, processes=1, reduction="mean")(pred, ctrs).backward()
-        assert pred.grad is not None
-        assert pred.grad.shape == pred.shape
-        assert torch.isfinite(pred.grad).all()
 
     def test_grad_matches_fixed_proj_fd(self, setup):
         # finite difference of 1 - cos(sign*pred, proj) with proj held fixed

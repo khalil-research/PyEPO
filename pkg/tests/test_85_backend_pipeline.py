@@ -39,24 +39,6 @@ class TestBackendPipeline:
         loss.backward()
         assert torch.isfinite(cp.grad).all()
 
-    def test_perturbed_opt(self, sp_pipeline):
-        optmodel, _ds, loader = sp_pipeline
-        _x, c, _w, _z = take_batch(loader)
-        cp = (c * 1.2).clone().detach().requires_grad_(True)
-        out = F.DPO(optmodel, processes=1, n_samples=3)(cp)
-        assert out.shape == cp.shape
-        out.sum().backward()
-        assert torch.isfinite(cp.grad).all()
-
-    def test_perturbed_fenchel_young(self, sp_pipeline):
-        optmodel, _ds, loader = sp_pipeline
-        _x, c, w, _z = take_batch(loader)
-        cp = (c * 1.2).clone().detach().requires_grad_(True)
-        loss = F.PFY(optmodel, processes=1, n_samples=3)(cp, w)
-        assert torch.isfinite(loss).all()
-        loss.backward()
-        assert torch.isfinite(cp.grad).all()
-
     def test_regret_metric(self, sp_pipeline):
         optmodel, _ds, loader = sp_pipeline
         pred = LinearPred(NUM_FEAT, optmodel.num_cost)

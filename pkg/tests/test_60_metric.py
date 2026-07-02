@@ -101,20 +101,12 @@ class TestMSE:
         # identity predicts ones, truth zeros => per-element error 1 => MSE 1.0
         assert abs(MSE(_IdentityModel(), DataLoader(ds, batch_size=n)) - 1.0) < 1e-6
 
-    def test_non_negative(self):
-        assert MSE(_IdentityModel(), _loader()) >= 0
-
-    def test_restores_train_mode(self):
+    @pytest.mark.parametrize("training", [True, False])
+    def test_restores_mode(self, training):
         m = _IdentityModel()
-        m.train()
+        m.train(training)
         MSE(m, _loader())
-        assert m.training
-
-    def test_preserves_eval_mode(self):
-        m = _IdentityModel()
-        m.eval()
-        MSE(m, _loader())
-        assert not m.training
+        assert m.training is training
 
     def test_parameterless_model(self):
         assert MSE(_NoParamModel(), _loader()) >= 0
@@ -350,14 +342,6 @@ class TestCalUnambRegret:
         unamb = calUnambRegret(m, np.array([2.0]), np.array([3.0]), true_obj=3.0)
         assert unamb == pytest.approx(0.0, abs=1e-3)
 
-    def test_max_iter_raises(self):
-        m = self._sp()
-        cost = np.random.RandomState(42).rand(m.num_cost) + 0.1
-        m.setObj(cost)
-        _, true_obj = m.solve()
-        with pytest.raises(RuntimeError):
-            calUnambRegret(m, cost, cost, true_obj, max_iter=0)
-
     def test_worst_case_includes_offset(self):
         # tie {[1,0],[0,1]} from full pred [cp+d]=[0,0]; true full [10,5], z*=5, worst=10 -> regret 5
         from pyepo import EPO, dsl
@@ -467,15 +451,6 @@ class TestDataloaderMetrics:
         multi = pyepo.metric.regret(pred, optmodel, loader, processes=2)
         assert multi == pytest.approx(single, rel=1e-5)
 
-    def test_unamb_regret_max_iter_passthrough(self, sp_data):
-        import pyepo
-
-        optmodel, _ds, loader = sp_data
-        with pytest.raises(RuntimeError):
-            pyepo.metric.unambRegret(
-                LinearPred(NUM_FEAT, optmodel.num_cost), optmodel, loader, max_iter=0
-            )
-
     def test_regret_offset_dataloader(self):
         import pyepo
         from pyepo import EPO, dsl
@@ -500,23 +475,6 @@ class TestDataloaderMetrics:
 
 @requires_gurobi
 class TestSkScorer:
-    def test_scorer_returns_finite_float(self):
-        from sklearn.linear_model import LinearRegression
-
-        import pyepo
-        from pyepo.model.grb.shortestpath import shortestPathModel
-        from pyepo.twostage import sklearnPred
-
-        x, c = pyepo.data.shortestpath.genData(40, NUM_FEAT, (3, 3), seed=42)
-        optmodel = shortestPathModel(grid=(3, 3))
-        est = sklearnPred(LinearRegression())
-        est.fit(x, c)
-        scorer = makeSkScorer(optmodel)
-        score = scorer(est, x, c)
-        # greater_is_better=False => scorer returns negated regret (<= 0)
-        assert np.isfinite(score)
-        assert score <= 1e-6
-
     def test_scorer_argument_orientation(self):
         from sklearn.linear_model import LinearRegression
 

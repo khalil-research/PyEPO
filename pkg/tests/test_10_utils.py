@@ -159,6 +159,8 @@ class TestUnionFind:
         root = uf.find(0)
         for i in range(4):
             assert uf.find(i) == root
+        # find flattened every node onto the root
+        assert uf.parent == [root] * 4
 
 
 # ============================================================
@@ -171,20 +173,14 @@ class TestGetTspTour:
     def _all_edges(n):
         return [(i, j) for i in range(n) for j in range(i + 1, n)]
 
-    def test_simple_4_node_tour(self):
+    @pytest.mark.parametrize("container", [list, torch.tensor])
+    def test_simple_4_node_tour(self, container):
         edges = self._all_edges(4)  # 6 edges
         active = {(0, 1), (1, 2), (2, 3), (0, 3)}
-        sol = [1.0 if e in active else 0.0 for e in edges]
+        sol = container([1.0 if e in active else 0.0 for e in edges])
         tour = getTspTour(edges, 4, sol)
         assert tour[0] == 0
         assert tour[-1] == 0
-        assert sorted(tour[:-1]) == [0, 1, 2, 3]
-
-    def test_accepts_tensor_solution(self):
-        edges = self._all_edges(4)
-        active = {(0, 1), (1, 2), (2, 3), (0, 3)}
-        sol = torch.tensor([1.0 if e in active else 0.0 for e in edges])
-        tour = getTspTour(edges, 4, sol)
         assert sorted(tour[:-1]) == [0, 1, 2, 3]
 
     def test_threshold_filters_fractional(self):
@@ -216,14 +212,11 @@ class TestGetTspTour:
 
 class TestCostToNumpy:
     def test_torch_tensor_detached(self):
-        c = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+        c = torch.tensor([1.0, 2.0, 3.0], dtype=torch.float64, requires_grad=True)
         out = costToNumpy(c)
         assert isinstance(out, np.ndarray)
         np.testing.assert_array_equal(out, [1.0, 2.0, 3.0])
-
-    def test_torch_tensor_preserves_dtype(self):
-        c = torch.tensor([1.0, 2.0, 3.0], dtype=torch.float64)
-        assert costToNumpy(c).dtype == np.float64
+        assert out.dtype == np.float64
 
     def test_list_default_float32(self):
         out = costToNumpy([1, 2, 3])
@@ -378,12 +371,8 @@ class TestGetConfig:
     def test_shortestpath_args(self):
         _, shortestPathModel = self._models()
         args = shortestPathModel(grid=(4, 4)).get_config()
+        # captures constructor args only, not derived attrs / solver handle
         assert args["grid"] == (4, 4)
-
-    def test_no_internal_state(self):
-        _, shortestPathModel = self._models()
-        args = shortestPathModel(grid=(3, 3)).get_config()
-        # introspects __init__ params only, not derived attrs / solver handle
         assert "arcs" not in args
         assert "_model" not in args
 

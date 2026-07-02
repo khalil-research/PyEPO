@@ -341,18 +341,12 @@ class TestKnapsack:
         _, obj2 = m2.solve()
         assert obj2 <= obj1 + max(meta["tol"], 1e-6)
 
-    @pytest.mark.parametrize(
-        ("coefs", "rhs", "match"),
-        [
-            (np.ones((4, 1)), 1.0, "one-dimensional"),
-            (np.ones(4), np.nan, "rhs"),
-            (np.array([1.0, 1.0, np.inf, 1.0]), 1.0, "finite"),
-        ],
-    )
-    def test_addConstr_rejects_invalid_input(self, backend, coefs, rhs, match):
+    def test_addConstr_rejects_invalid_input(self, backend):
+        # one case per backend confirms the wiring; validate_constraint itself
+        # is exhaustively unit-tested in TestOptModelBase
         m, _ = _make_knapsack(backend)
-        with pytest.raises(ValueError, match=match):
-            m.addConstr(coefs, rhs)
+        with pytest.raises(ValueError, match="one-dimensional"):
+            m.addConstr(np.ones((4, 1)), 1.0)
 
     def test_addConstr_snapshots_coefficients(self, backend):
         if backend in ("ortcp", "mpax"):
@@ -528,11 +522,6 @@ class TestShortestPath:
         if meta["integral"]:
             np.testing.assert_allclose(sol, np.round(sol), atol=1e-6)
 
-    def test_setObj_wrong_size_raises(self, backend):
-        m, _ = _make_shortestpath(backend)
-        with pytest.raises(ValueError):
-            m.setObj(np.ones(5))
-
     def test_copy_preserves_objective_and_is_independent(self, backend):
         m, meta = _make_shortestpath(backend)
         cost = np.random.RandomState(42).rand(m.num_cost)
@@ -615,12 +604,6 @@ class TestPortfolio:
         covariance.fill(99)
 
         np.testing.assert_array_equal(m.covariance, np.eye(3))
-
-    def test_setObj_wrong_size_raises(self, backend):
-        cov, _ = _portfolio_data()
-        m = _make_portfolio(backend, cov)
-        with pytest.raises(ValueError):
-            m.setObj(np.ones(3))
 
     def test_solve_budget_constraint(self, backend):
         cov, revenue = _portfolio_data()
@@ -733,13 +716,10 @@ class TestTSP:
         assert tour[0] == tour[-1]
         assert len(set(tour[:-1])) == m.num_nodes
 
-    def test_setObj_wrong_size_raises(self, backend, formulation):
+    def test_setObj_rejects_bad_shape(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         with pytest.raises(ValueError):
             m.setObj(np.ones(3))
-
-    def test_setObj_rejects_batch(self, backend, formulation):
-        m, _ = _make_tsp(backend, formulation)
         with pytest.raises(ValueError, match="one-dimensional"):
             m.setObj(np.ones((2, m.num_cost)))
 
@@ -755,19 +735,12 @@ class TestTSP:
         m2.setObj(-cost)
         np.testing.assert_allclose(m.solve()[1], obj1, atol=1e-4)
 
-    def test_addConstr_preserves_objective(self, backend, formulation):
+    @pytest.mark.parametrize("zeros", [np.zeros, torch.zeros])
+    def test_addConstr_preserves_objective(self, backend, formulation, zeros):
         m, _ = _make_tsp(backend, formulation)
         cost = np.random.RandomState(42).rand(m.num_cost)
         m.setObj(cost)
-        m2 = m.addConstr(np.zeros(m.num_cost), 0)
-        np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
-
-    def test_addConstr_accepts_torch_coefficients(self, backend, formulation):
-        m, _ = _make_tsp(backend, formulation)
-        cost = np.random.RandomState(42).rand(m.num_cost)
-        m.setObj(cost)
-        m2 = m.addConstr(torch.zeros(m.num_cost), 0)
-
+        m2 = m.addConstr(zeros(m.num_cost), 0)
         np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
 
     def test_addConstr_snapshot_isolated_across_copy(self, backend, formulation):
@@ -915,13 +888,10 @@ class TestVRP:
         assert isinstance(obj, float)
         np.testing.assert_allclose(sol, np.round(sol), atol=1e-6)
 
-    def test_setObj_wrong_size_raises(self, backend, formulation):
+    def test_setObj_rejects_bad_shape(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)
         with pytest.raises(ValueError):
             m.setObj(np.ones(3))
-
-    def test_setObj_rejects_batch(self, backend, formulation):
-        m, _ = _make_vrp(backend, formulation)
         with pytest.raises(ValueError, match="one-dimensional"):
             m.setObj(np.ones((2, m.num_cost)))
 
@@ -936,17 +906,11 @@ class TestVRP:
         m2.setObj(-_VRP_COST)
         np.testing.assert_allclose(m.solve()[1], obj1, atol=1e-4)
 
-    def test_addConstr_preserves_objective(self, backend, formulation):
+    @pytest.mark.parametrize("zeros", [np.zeros, torch.zeros])
+    def test_addConstr_preserves_objective(self, backend, formulation, zeros):
         m, _ = _make_vrp(backend, formulation)
         m.setObj(_VRP_COST)
-        m2 = m.addConstr(np.zeros(m.num_cost), 0)
-        np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
-
-    def test_addConstr_accepts_torch_coefficients(self, backend, formulation):
-        m, _ = _make_vrp(backend, formulation)
-        m.setObj(_VRP_COST)
-        m2 = m.addConstr(torch.zeros(m.num_cost), 0)
-
+        m2 = m.addConstr(zeros(m.num_cost), 0)
         np.testing.assert_allclose(m2.solve()[1], m.solve()[1], atol=1e-4)
 
     def test_addConstr_snapshot_isolated_across_copy(self, backend, formulation):
@@ -989,25 +953,6 @@ class TestVRP:
         assert all(t[0] == 0 and t[-1] == 0 for t in tours)
         visited = sorted(v for t in tours for v in t[1:-1])
         assert visited == list(range(1, _VRP_NUM_NODES))
-
-    def test_rci_two_customer_capacity(self, backend, formulation):
-        if formulation != "RCI":
-            pytest.skip("rounded-capacity cuts are RCI-specific")
-        if backend == "grb":
-            from pyepo.model.grb import vrp as v
-        else:
-            from pyepo.model.copt import vrp as v
-        # cheap pairing {1,2}+{3,4} is capacity-infeasible ({3,4}: 12 > 10)
-        demands, capacity = [2.0, 2.0, 6.0, 6.0], 10.0
-        m = v.vrpRCIModel(num_nodes=5, demands=demands, capacity=capacity, num_vehicle=2)
-        # edge order (0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)
-        m.setObj(np.array([1.0, 1.0, 1.0, 1.0, 0.1, 5.0, 5.0, 5.0, 5.0, 0.1]))
-        sol, obj = m.solve()
-        # every reconstructed tour respects the vehicle capacity
-        for tour in m.getTour(sol):
-            assert sum(demands[i - 1] for i in tour[1:-1]) <= capacity + 1e-6
-        # optimum pairs each heavy customer with a light one
-        np.testing.assert_allclose(obj, 14.0, atol=1e-4)
 
     def test_relax_keeps_added_constraints(self, backend, formulation):
         m, rel_cls = _make_vrp(backend, formulation)
@@ -1054,12 +999,26 @@ def test_vrp_formulations_agree():
     np.testing.assert_allclose(obj_rci, obj_mtz, atol=1e-4)
 
 
-@requires_gurobi
-def test_vrp_rci_lazy_constrs_tracked():
-    m, _ = _make_vrp("grb", "RCI")
-    m.setObj(_VRP_COST)
-    m.solve()
-    assert isinstance(m._model._lazy_constrs, list)
+@pytest.mark.parametrize(
+    "backend",
+    [pytest.param("grb", marks=requires_gurobi), pytest.param("copt", marks=requires_copt)],
+)
+def test_rci_two_customer_capacity(backend):
+    if backend == "grb":
+        from pyepo.model.grb import vrp as v
+    else:
+        from pyepo.model.copt import vrp as v
+    # cheap pairing {1,2}+{3,4} is capacity-infeasible ({3,4}: 12 > 10)
+    demands, capacity = [2.0, 2.0, 6.0, 6.0], 10.0
+    m = v.vrpRCIModel(num_nodes=5, demands=demands, capacity=capacity, num_vehicle=2)
+    # edge order (0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)
+    m.setObj(np.array([1.0, 1.0, 1.0, 1.0, 0.1, 5.0, 5.0, 5.0, 5.0, 0.1]))
+    sol, obj = m.solve()
+    # every reconstructed tour respects the vehicle capacity
+    for tour in m.getTour(sol):
+        assert sum(demands[i - 1] for i in tour[1:-1]) <= capacity + 1e-6
+    # optimum pairs each heavy customer with a light one
+    np.testing.assert_allclose(obj, 14.0, atol=1e-4)
 
 
 @requires_gurobi

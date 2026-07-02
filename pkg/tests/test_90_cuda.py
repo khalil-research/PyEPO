@@ -58,8 +58,9 @@ class TestModelDevice:
 
 
 @requires_cuda_gurobi
-class TestSolutionLossesCUDA:
-    @pytest.mark.parametrize("name", SOLUTION_OPS)
+class TestOpsCUDA:
+    # .mean() is an identity on the scalar losses, so one body covers both kinds
+    @pytest.mark.parametrize("name", [*SOLUTION_OPS, *LOSS_OPS])
     def test_output_and_grad_on_cuda(self, name, sp_data):
         optmodel, dataset, loader = sp_data
         entry = LOSS_REGISTRY[name]
@@ -68,20 +69,6 @@ class TestSolutionLossesCUDA:
         out = call_op(entry.build(optmodel, dataset, "mean"), entry.sig, pred(x), c, w, z)
         _assert_cuda(out, "output")
         out.mean().backward()
-        _assert_grads_cuda(pred)
-
-
-@requires_cuda_gurobi
-class TestLossesCUDA:
-    @pytest.mark.parametrize("name", LOSS_OPS)
-    def test_loss_and_grad_on_cuda(self, name, sp_data):
-        optmodel, dataset, loader = sp_data
-        entry = LOSS_REGISTRY[name]
-        x, c, w, z = _cuda_batch(loader)
-        pred = LinearPred(NUM_FEAT, optmodel.num_cost).to(_DEVICE)
-        loss = call_op(entry.build(optmodel, dataset, "mean"), entry.sig, pred(x), c, w, z)
-        _assert_cuda(loss, "loss")
-        loss.backward()
         _assert_grads_cuda(pred)
 
 

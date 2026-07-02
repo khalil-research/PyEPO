@@ -183,14 +183,8 @@ class TestOptDatasetKNN:
         x, c = shortestpath.genData(n, NUM_FEAT, GRID, seed=42)
         return shortestPathModel(grid=GRID), x, c
 
-    @pytest.mark.parametrize("k", [0, -1])
-    def test_k_below_one_raises(self, k):
-        model, x, c = self._model_data()
-        with pytest.raises(ValueError, match="positive integer"):
-            optDatasetKNN(model, x, c, k=k)
-
-    @pytest.mark.parametrize("k", [1.5, True])
-    def test_k_must_be_an_integer(self, k):
+    @pytest.mark.parametrize("k", [0, -1, 1.5, True])
+    def test_invalid_k_raises(self, k):
         model, x, c = self._model_data()
         with pytest.raises(ValueError, match="positive integer"):
             optDatasetKNN(model, x, c, k=k)

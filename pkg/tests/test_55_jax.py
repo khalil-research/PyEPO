@@ -858,23 +858,26 @@ class TestPGTwoSidesParity:
         np.testing.assert_allclose(g_j, g_t, atol=1e-3)
 
 
+def _cave_setup():
+    from pyepo.model.grb.shortestpath import shortestPathModel
+
+    model = shortestPathModel(grid=(2, 3))  # 7 edges
+    d = model.num_cost
+    rng = np.random.RandomState(0)
+    pred = rng.randn(2, d).astype(np.float32)
+    tight = rng.randn(2, 3, d).astype(np.float32)
+    return model, pred, tight
+
+
 @requires_jax
 @requires_gurobi
 @requires_clarabel
 class TestCaVEParity:
     """CaVE Torch parity."""
 
-    def _setup(self):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        model = shortestPathModel(grid=(2, 3))  # 7 edges
-        d = model.num_cost
-        rng = np.random.RandomState(0)
-        pred = rng.randn(2, d).astype(np.float32)
-        tight = rng.randn(2, 3, d).astype(np.float32)
-        return model, pred, tight
-
-    def test_grad_matches_torch(self):
+    # solve_ratio=0 -> always the cheap heuristic branch (deterministic)
+    @pytest.mark.parametrize("solve_ratio", [None, 0.0])
+    def test_grad_matches_torch(self, solve_ratio):
         import jax
         import jax.numpy as jnp
         import torch
@@ -882,27 +885,11 @@ class TestCaVEParity:
         from pyepo.func.cave import coneAlignedCosine as TCaVE
         from pyepo.func.jax import coneAlignedCosine as JCaVE
 
-        model, pred, tight = self._setup()
-        jcave = JCaVE(model, reduction="mean")
+        model, pred, tight = _cave_setup()
+        kwargs = {} if solve_ratio is None else {"solve_ratio": solve_ratio}
+        jcave = JCaVE(model, reduction="mean", **kwargs)
         g_j = np.array(jax.grad(lambda p: jcave(p, jnp.asarray(tight)))(jnp.asarray(pred)))
-        tcave = TCaVE(model, processes=1, reduction="mean")
-        pt = torch.tensor(pred, requires_grad=True)
-        tcave(pt, torch.as_tensor(tight)).backward()
-        np.testing.assert_allclose(g_j, pt.grad.numpy(), atol=1e-3)
-
-    def test_hybrid_heuristic_matches_torch(self):
-        import jax
-        import jax.numpy as jnp
-        import torch
-
-        from pyepo.func.cave import coneAlignedCosine as TCaVE
-        from pyepo.func.jax import coneAlignedCosine as JCaVE
-
-        model, pred, tight = self._setup()
-        # solve_ratio=0 -> always the cheap heuristic branch (deterministic)
-        jcave = JCaVE(model, solve_ratio=0.0, reduction="mean")
-        g_j = np.array(jax.grad(lambda p: jcave(p, jnp.asarray(tight)))(jnp.asarray(pred)))
-        tcave = TCaVE(model, processes=1, solve_ratio=0.0, reduction="mean")
+        tcave = TCaVE(model, processes=1, reduction="mean", **kwargs)
         pt = torch.tensor(pred, requires_grad=True)
         tcave(pt, torch.as_tensor(tight)).backward()
         np.testing.assert_allclose(g_j, pt.grad.numpy(), atol=1e-3)
@@ -915,13 +902,7 @@ class TestCaVEGuards:
     """CaVE: detached labels and the jit guard on the hybrid coin."""
 
     def _setup(self):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        model = shortestPathModel(grid=(2, 3))  # 7 edges
-        rng = np.random.RandomState(0)
-        pred = rng.randn(2, model.num_cost).astype(np.float32)
-        tight = rng.randn(2, 3, model.num_cost).astype(np.float32)
-        return model, pred, tight
+        return _cave_setup()
 
     def test_tight_ctrs_grad_is_zero(self):
         import jax

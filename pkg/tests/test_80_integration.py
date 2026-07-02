@@ -33,6 +33,13 @@ from .conftest import (
 _STEPS = 2
 
 
+@pytest.fixture(autouse=True)
+def _seed_torch():
+    # deterministic predictor init and batch order; DBB can otherwise draw an
+    # init whose two SGD steps produce identical perturbed solutions (zero grad)
+    torch.manual_seed(42)
+
+
 def _train_loop(loss_fn, loader, predmodel, call, steps=_STEPS):
     opt = torch.optim.SGD(predmodel.parameters(), lr=1e-2)
     for i, (x, c, w, z) in enumerate(loader):
@@ -74,22 +81,26 @@ class TestMaximizeEndToEnd:
     def test_spo_plus_knapsack(self, ks_data):
         optmodel, _ds, loader = ks_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
+        before = predmodel.linear.weight.detach().clone()
         _train_loop(
             F.SPOPlus(optmodel, processes=1),
             loader,
             predmodel,
             lambda fn, cp, c, w, z: fn(cp, c, w, z),
         )
+        assert not torch.equal(before, predmodel.linear.weight.detach())
 
     def test_blackbox_knapsack(self, ks_data):
         optmodel, _ds, loader = ks_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
+        before = predmodel.linear.weight.detach().clone()
         _train_loop(
             F.DBB(optmodel, lambd=10, processes=1),
             loader,
             predmodel,
             lambda fn, cp, c, w, z: -(fn(cp) * c).sum(1).mean(),
         )
+        assert not torch.equal(before, predmodel.linear.weight.detach())
 
 
 @requires_gurobi

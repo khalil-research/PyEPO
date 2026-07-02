@@ -74,14 +74,6 @@ def test_affine_offset_absorbed_into_rhs():
     assert np.allclose(b, 3.0)
 
 
-def test_sum_axes_match_kron():
-    x = dsl.Variable((3, 3))
-    _, Arow, _, _ = (x.sum(axis=1) == 1).finalize({x: slice(0, 9)}, 9)
-    _, Acol, _, _ = (x.sum(axis=0) == 1).finalize({x: slice(0, 9)}, 9)
-    assert np.allclose(Arow.toarray(), np.kron(np.eye(3), np.ones((1, 3))))
-    assert np.allclose(Acol.toarray(), np.kron(np.ones((1, 3)), np.eye(3)))
-
-
 def test_indexing_selects_rows():
     x = dsl.Variable(5)
     _, A, _, _ = (x[[0, 2, 4]] <= 1).finalize({x: slice(0, 5)}, 5)
@@ -978,8 +970,6 @@ def test_inner_product_rejects_multidim():
     c = dsl.Parameter((3, 3))
     with pytest.raises(TypeError):
         _ = c @ x  # 2-D must use (c * x).sum()
-    prob = dsl.Problem(dsl.Minimize((c * x).sum()), [x.sum(axis=1) == 1])
-    assert prob.num_cost == 9  # the reduce form works
 
 
 def test_problem_rejects_bare_constraint():

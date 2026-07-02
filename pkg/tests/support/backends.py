@@ -75,12 +75,10 @@ except Exception:  # noqa: BLE001
     _HAS_JAX_GPU = False
 
 requires_gurobi = pytest.mark.skipif(not _HAS_GUROBI, reason="Gurobi not installed")
-requires_pyomo = pytest.mark.skipif(not _HAS_PYOMO, reason="Pyomo not installed")
 requires_copt = pytest.mark.skipif(not _HAS_COPT, reason="COPT not installed")
 requires_ortools = pytest.mark.skipif(not _HAS_ORTOOLS, reason="OR-Tools not installed")
 requires_jax = pytest.mark.skipif(not _HAS_JAX, reason="JAX not installed")
 requires_mpax = pytest.mark.skipif(not _HAS_MPAX, reason="MPAX (jax + mpax) not installed")
-requires_flax = pytest.mark.skipif(not _HAS_FLAX, reason="Flax (jax + flax) not installed")
 requires_clarabel = pytest.mark.skipif(not _HAS_CLARABEL, reason="Clarabel not installed")
 requires_cuda = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA not available")
 requires_jax_gpu = pytest.mark.skipif(
@@ -102,11 +100,9 @@ __all__ = [
     "requires_clarabel",
     "requires_copt",
     "requires_cuda",
-    "requires_flax",
     "requires_gurobi",
     "requires_jax",
     "requires_jax_gpu",
     "requires_mpax",
     "requires_ortools",
-    "requires_pyomo",
 ]

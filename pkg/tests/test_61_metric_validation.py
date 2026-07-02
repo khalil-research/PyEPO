@@ -144,13 +144,17 @@ class TestSingleRegretValidation:
 
 
 class TestUnambRegretValidation:
-    def test_public_metric_rejects_invalid_tolerance_before_model_access(self):
-        with pytest.raises(ValueError, match="tolerance"):
-            unambRegret(None, None, None, tolerance=0.0)
-
-    def test_public_metric_rejects_invalid_retry_count_before_model_access(self):
-        with pytest.raises(ValueError, match="max_iter"):
-            unambRegret(None, None, None, max_iter=True)
+    @pytest.mark.parametrize(
+        ("kwargs", "exc", "match"),
+        [
+            ({"tolerance": 0.0}, ValueError, "tolerance"),
+            ({"max_iter": True}, ValueError, "max_iter"),
+            ({"max_iter": 0}, RuntimeError, "Max iterations"),
+        ],
+    )
+    def test_public_metric_rejects_invalid_kwargs_before_model_access(self, kwargs, exc, match):
+        with pytest.raises(exc, match=match):
+            unambRegret(None, None, None, **kwargs)
 
     @pytest.mark.parametrize("tolerance", [0.0, -1.0, np.nan, np.inf, True])
     def test_rejects_invalid_tolerance_before_model_access(self, tolerance):
