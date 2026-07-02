@@ -116,12 +116,9 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
             if is_full:
                 coef = c.contiguous()
             else:
-                coef = torch.as_tensor(
-                    prob.fixed_cost, dtype=torch.float32, device=c.device
-                ).clone()
-                coef.index_add_(
-                    0, torch.as_tensor(prob.c_pred_index, dtype=torch.long, device=c.device), c
-                )
+                index = torch.as_tensor(prob.c_pred_index, dtype=torch.long, device=c.device)
+                coef = c.new_zeros((*c.shape[:-1], prob.num_vars)).index_add_(-1, index, c)
+                coef += torch.as_tensor(prob.fixed_cost, dtype=torch.float32, device=c.device)
             self.c = jnp.from_dlpack(coef)
             if self._gpu_device is not None:
                 self.c = jax.device_put(self.c, self._gpu_device)
@@ -132,8 +129,10 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
             if is_full:
                 coef = arr
             else:
-                coef = prob.fixed_cost.astype(np.float32)
-                np.add.at(coef, prob.c_pred_index, arr)
+                coef = np.broadcast_to(
+                    prob.fixed_cost, (*arr.shape[:-1], prob.num_vars)
+                ).astype(np.float32)
+                coef[..., prob.c_pred_index] += arr
             self.c = jnp.asarray(coef)
         if self.modelSense == EPO.MAXIMIZE:
             self.c = -self.c
