@@ -66,6 +66,9 @@ class coneAlignedCosine(optModule):
     `<https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12>`_
     """
 
+    # workers run Clarabel projections only, never the optmodel
+    _pool_needs_optmodel = False
+
     def __init__(
         self,
         optmodel: optModel,

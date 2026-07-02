@@ -73,16 +73,18 @@ def create_solver_pool(
     processes: int,
     *,
     owner=None,
+    with_solver: bool = True,
 ) -> ProcessingPool | None:
     """Create a worker pool, optionally tied to an owner's lifetime."""
     if processes == 1:
         return None
-    pool = ProcessingPool(
-        processes,
-        id=f"pyepo-{next(_pool_ids)}",
-        initializer=_init_worker_model,
-        initargs=(optmodel.to_spec(),),
+    # preload the optmodel per worker unless the owner never solves in workers
+    init_kwargs = (
+        {"initializer": _init_worker_model, "initargs": (optmodel.to_spec(),)}
+        if with_solver
+        else {}
     )
+    pool = ProcessingPool(processes, id=f"pyepo-{next(_pool_ids)}", **init_kwargs)
     if owner is not None:
         weakref.finalize(owner, _close_pool, pool)
     return pool
@@ -123,7 +125,12 @@ def init_runtime(
         raise ValueError(f"No reduction '{reduction}'.")
 
     normalized_processes = normalize_processes(optmodel, processes, logger)
-    pool = create_solver_pool(optmodel, normalized_processes, owner=owner)
+    pool = create_solver_pool(
+        optmodel,
+        normalized_processes,
+        owner=owner,
+        with_solver=getattr(owner, "_pool_needs_optmodel", True),
+    )
     logger.info("Num of cores: %d", normalized_processes)
     return RuntimeState(
         optmodel=optmodel,
