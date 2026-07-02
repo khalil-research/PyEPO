@@ -6,8 +6,7 @@ from numbers import Real
 
 def validate_degree(deg: int) -> None:
     """Validate a positive integer polynomial degree."""
-    if not isinstance(deg, int) or isinstance(deg, bool) or deg <= 0:
-        raise ValueError(f"deg = {deg} should be a positive integer.")
+    validate_positive_int(deg, "deg")
 
 
 def validate_nonnegative(value: float, name: str) -> None:

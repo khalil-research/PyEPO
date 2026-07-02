@@ -191,11 +191,10 @@ class tspDFJModel(tspABModel):
         A callback class for subtour elimination
         """
 
-        def __init__(self, x, n, edges):
+        def __init__(self, x, n):
             super().__init__()
             self._x = x
             self._n = n
-            self._edges = edges
 
         def callback(self):
             if self.where() == COPT.CBCONTEXT_MIPSOL:
@@ -250,7 +249,7 @@ class tspDFJModel(tspABModel):
         """
         A method to solve model
         """
-        cb = self._SubtourCallback(self.x, len(self.nodes), self.edges)
+        cb = self._SubtourCallback(self.x, len(self.nodes))
         self._model.setCallback(cb, COPT.CBCONTEXT_MIPSOL)
         self._model.solve()
         xvals, obj = _read_solution(

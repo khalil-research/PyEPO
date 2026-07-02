@@ -89,7 +89,6 @@ class compiledOrtProblem(compiledBase, optOrtModel):
     def _add_cut(self, coef, rhs):
         # pywraplp has no clone; copy() rebuilds + replays cuts, then add the new one
         new_model = self.copy()
-        new_model._extra_constrs.append((np.asarray(coef, dtype=float), float(rhs)))
         ct = new_model._model.Constraint(-new_model._model.infinity(), float(rhs))
         for j in range(self.problem.num_vars):
             ct.SetCoefficient(new_model.x[j], float(coef[j]))
