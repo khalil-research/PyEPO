@@ -717,6 +717,21 @@ class TestSolveRatioCaching:
         assert spo.solpool.shape[0] >= 1
         assert torch.isfinite(cp.grad).all()
 
+    def test_cached_pool_follows_cost_dtype(self):
+        # a cache-only float64 forward must not mix in the float32 seeded pool
+        from pyepo.data.dataset import optDataset
+        from pyepo.func.contrastive import noiseContrastiveEstimation
+
+        model = max_knapsack()
+        rng = np.random.RandomState(0)
+        c = (rng.rand(4, model.num_cost) + 0.5).astype(np.float32)
+        x = rng.rand(4, 3).astype(np.float32)
+        ds = optDataset(model, x, c)
+        nce = noiseContrastiveEstimation(model, solve_ratio=0.5, dataset=ds)
+        nce.solve_ratio = 0.0  # force the cache-only branch
+        loss = nce(torch.tensor(c, dtype=torch.float64), ds.sols.to(torch.float64))
+        assert torch.isfinite(loss)
+
 
 # ============================================================
 # torch: deep correctness gates
@@ -793,6 +808,14 @@ class TestRegularizedFrankWolfe:
         theta = torch.tensor([[0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0]])
         m._frank_wolfe(theta)
         assert batch_sizes and all(bs == 2 for bs in batch_sizes)
+
+    def test_float64_costs_run(self):
+        # the FW carry buffers follow the cost dtype
+        from pyepo.func.regularized import RFWO
+
+        m = RFWO(fw_knapsack(), lambd=1.0, max_iter=30, tol=1e-8)
+        sol = m(torch.tensor([[4.0, 3.0, 2.0, 1.0]], dtype=torch.float64))
+        assert sol.dtype == torch.float64 and torch.isfinite(sol).all()
 
     def test_extreme_theta_collapses_to_vertex(self):
         from pyepo.func.regularized import RFWO

@@ -21,7 +21,7 @@ from pyepo.data.dataset import (
 )
 from pyepo.model.opt import optModel
 
-from .conftest import GRID, NUM_FEAT, requires_gurobi
+from .conftest import GRID, NUM_FEAT, partial_dsl_model, requires_gurobi
 
 _N = 6  # tiny: each sample triggers a solve at construction
 
@@ -215,6 +215,15 @@ class TestOptDatasetKNN:
         assert cost.shape == (model.num_cost,)
         assert sol.shape == (model.num_cost,)
         assert obj.shape == (1,)
+
+    def test_partial_prediction_solution_keeps_full_length(self):
+        # DSL models with fixed variables return solutions longer than the cost
+        model = partial_dsl_model()
+        rng = np.random.default_rng(42)
+        feats = rng.standard_normal((_N, NUM_FEAT)).astype(np.float32)
+        costs = rng.uniform(1, 2, (_N, model.num_cost)).astype(np.float32)
+        ds = optDatasetKNN(model, feats, costs, k=3)
+        assert ds.sols.shape == (_N, 5)
 
     def test_get_knn_shape_and_weight_boundary(self):
         # weight=1 => smoothed cost equals the self cost for every neighbour

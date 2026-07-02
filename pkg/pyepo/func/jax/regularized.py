@@ -91,10 +91,10 @@ def _away_step_frank_wolfe(theta, module, use_cache=False):
     b, d = theta.shape
     width = 2 * d + 2
     bidx = jnp.arange(b)
-    v0 = _linear_minimization_oracle(ss * theta, module, use_cache)
-    vertices = jnp.zeros((b, width, d)).at[:, 0].set(v0)
-    weights = jnp.zeros((b, width)).at[:, 0].set(1.0)
-    vnorms = jnp.zeros((b, width)).at[:, 0].set(jnp.sum(v0 * v0, axis=-1))
+    v0 = _linear_minimization_oracle(ss * theta, module, use_cache).astype(theta.dtype)
+    vertices = jnp.zeros((b, width, d), theta.dtype).at[:, 0].set(v0)
+    weights = jnp.zeros((b, width), theta.dtype).at[:, 0].set(1.0)
+    vnorms = jnp.zeros((b, width), theta.dtype).at[:, 0].set(jnp.sum(v0 * v0, axis=-1))
 
     def cond(state):
         k, _mu, _vt, _w, _vn, unconverged = state

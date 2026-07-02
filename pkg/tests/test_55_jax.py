@@ -905,6 +905,23 @@ class TestRegularized:
         expected = (r_sol - w) / B
         np.testing.assert_allclose(g, expected, atol=1e-3)
 
+    def test_x64_costs_run(self):
+        # x64 mode: the FW carry buffers must follow theta's dtype
+        import jax
+
+        jax.config.update("jax_enable_x64", True)
+        try:
+            import jax.numpy as jnp
+
+            from pyepo.func.jax import regularizedFrankWolfeOpt as JOpt
+
+            cp = np.array([[4.0, 3.0, 2.0, 1.0]], np.float64)
+            opt = JOpt(self._knapsack(), lambd=1.0, max_iter=30, tol=1e-8)
+            sol = np.asarray(opt(jnp.asarray(cp)))
+            assert sol.dtype == np.float64 and np.isfinite(sol).all()
+        finally:
+            jax.config.update("jax_enable_x64", False)
+
     def test_caching_reads_pool_and_grows(self):
         # Cached passes read the pool; exact passes may grow it.
         import jax

@@ -267,17 +267,15 @@ class optDatasetKNN(optDataset):
         costs_knn = self._get_knn()
         # solve optimization
         for c_knn in tqdm(costs_knn):
-            sol_knn = np.zeros((self.costs.shape[1], self.k))
-            obj_knn = np.zeros(self.k)
-            for i, c in enumerate(c_knn.T):
+            sol_knn = []
+            obj_knn = []
+            for c in c_knn.T:
                 sol_i, obj_i = self._solve(c)
-                sol_knn[:, i] = _solution_to_numpy(sol_i)
-                obj_knn[i] = obj_i
+                sol_knn.append(_solution_to_numpy(sol_i))
+                obj_knn.append(obj_i)
             # get average
-            sol = sol_knn.mean(axis=1)
-            obj = obj_knn.mean()
-            sols.append(sol)
-            objs.append(obj)
+            sols.append(np.stack(sol_knn).mean(axis=0))
+            objs.append(np.mean(obj_knn))
         # update cost as average kNN
         self.costs = costs_knn.mean(axis=2)
         return np.stack(sols), np.asarray(objs).reshape(-1, 1)
