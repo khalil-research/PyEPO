@@ -38,8 +38,8 @@ A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0
 
    import pyepo
 
-   num_data = 1000 # number of data
-   num_feat = 5 # size of feature
+   num_data = 1000 # number of samples
+   num_feat = 5 # number of features
    grid = (5,5) # grid size
    x, c = pyepo.data.shortestpath.genData(num_data, num_feat, grid, deg=4, noise_width=0, seed=135)
 
@@ -56,8 +56,8 @@ Only the cost coefficients are uncertain; item weights are fixed. Let :math:`m` 
 
    import pyepo
 
-   num_data = 1000 # number of data
-   num_feat = 5 # size of feature
+   num_data = 1000 # number of samples
+   num_feat = 5 # number of features
    num_item = 32 # number of items
    dim = 3 # dimension of knapsack
    weights, x, c = pyepo.data.knapsack.genData(num_data, num_feat, num_item, dim, deg=4, noise_width=0, seed=135)
@@ -66,7 +66,7 @@ Only the cost coefficients are uncertain; item weights are fixed. Let :math:`m` 
 Traveling Salesperson
 ---------------------
 
-The distance matrix has two components: a Euclidean distance term and a feature-encoded term. Coordinates are drawn from a mixture of a Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})` and a uniform distribution :math:`\mathbf{U}(-2, 2)`. The feature-encoded component is :math:`\tfrac{1}{{3}^{deg - 1}} \big(\tfrac{1}{\sqrt{p}} (\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} \cdot \boldsymbol{\epsilon}_i`, where the elements of :math:`\mathcal{B}` are products of Bernoulli :math:`\mathbf{B}(0.5)` and uniform :math:`\mathbf{U}(-2, 2)` samples.
+The distance matrix has two components: a Euclidean distance term and a feature-encoded term. Coordinates are drawn from a mixture of a Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})` and a uniform distribution :math:`U(-2, 2)`. The feature-encoded component is :math:`\tfrac{1}{{3}^{deg - 1}} \big(\tfrac{1}{\sqrt{p}} (\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} \cdot \boldsymbol{\epsilon}_i`, where the elements of :math:`\mathcal{B}` are products of Bernoulli(0.5) and uniform :math:`U(-2, 2)` samples.
 
 .. autofunction:: pyepo.data.tsp.genData
     :noindex:
@@ -75,8 +75,8 @@ The distance matrix has two components: a Euclidean distance term and a feature-
 
    import pyepo
 
-   num_data = 1000 # number of data
-   num_feat = 5 # size of feature
+   num_data = 1000 # number of samples
+   num_feat = 5 # number of features
    num_node = 20 # number of nodes
    x, c = pyepo.data.tsp.genData(num_data, num_feat, num_node, deg=4, noise_width=0, seed=135)
 
@@ -84,7 +84,7 @@ The distance matrix has two components: a Euclidean distance term and a feature-
 Portfolio
 ---------
 
-Let :math:`\bar{r}_{ij} = \big(\tfrac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}}\big)^{deg}`. The expected return is :math:`\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \boldsymbol{\epsilon}`, and the covariance matrix is :math:`\mathbf{\Sigma} = \mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}`, where :math:`\mathcal{B}` follows a Bernoulli distribution, :math:`\mathbf{L} \sim \mathbf{U}(-0.0025\tau, 0.0025\tau)`, and :math:`\mathbf{f}, \boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})`.
+Let :math:`\bar{r}_{ij} = \big(\tfrac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}}\big)^{deg}`. The expected return is :math:`\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \boldsymbol{\epsilon}`, and the covariance matrix is :math:`\mathbf{\Sigma} = \mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}`, where :math:`\mathcal{B}` has Bernoulli(0.5) entries, :math:`\mathbf{L} \sim U(-0.0025\tau, 0.0025\tau)`, and :math:`\mathbf{f}, \boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})`.
 
 Unlike the other generators, portfolio noise is controlled by **noise_level** (:math:`\tau`), which scales both the factor loadings :math:`\mathbf{L}` and the residual noise; ``noise_width`` does not apply here.
 
@@ -95,8 +95,8 @@ Unlike the other generators, portfolio noise is controlled by **noise_level** (:
 
    import pyepo
 
-   num_data = 1000 # number of data
-   num_feat = 4 # size of feature
+   num_data = 1000 # number of samples
+   num_feat = 4 # number of features
    num_assets = 50 # number of assets
    cov, x, r = pyepo.data.portfolio.genData(num_data, num_feat, num_assets, deg=4, noise_level=1, seed=135)
 
@@ -210,8 +210,8 @@ The following example shows how to use ``optDataset`` with a PyTorch ``DataLoade
    model = pyepo.model.shortestPathModel(grid)
 
    # generate data
-   num_data = 1000 # number of data
-   num_feat = 5 # size of feature
+   num_data = 1000 # number of samples
+   num_feat = 5 # number of features
    deg = 4 # polynomial degree
    noise_width = 0 # noise width
    x, c = pyepo.data.shortestpath.genData(num_data, num_feat, grid, deg, noise_width, seed=135)
@@ -243,8 +243,8 @@ For a runnable walkthrough, see the `08 kNN Robust Losses <https://colab.researc
   model = pyepo.model.shortestPathModel(grid)
 
   # generate data
-  num_data = 1000 # number of data
-  num_feat = 5 # size of feature
+  num_data = 1000 # number of samples
+  num_feat = 5 # number of features
   deg = 4 # polynomial degree
   noise_width = 0 # noise width
   x, c = pyepo.data.shortestpath.genData(num_data, num_feat, grid, deg, noise_width, seed=135)

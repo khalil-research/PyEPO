@@ -6,7 +6,7 @@ Overview
 
 ``pyepo.func`` provides PyTorch autograd modules that wrap an optimization solver for end-to-end training. All modules assume a linear objective with known, fixed constraints; the cost vector is predicted from contextual features.
 
-Every module accepts ``processes`` for parallel solving, and all except ``CaVE`` accept ``solve_ratio < 1`` with ``dataset`` for solution-pool caching (see :doc:`../advanced/pool`); modules that return a loss also accept ``reduction`` (``"mean"``, ``"sum"``, or ``"none"``).
+Every module accepts ``processes`` for parallel solving. All except ``CaVE`` accept ``solve_ratio < 1`` with ``dataset`` for solution-pool caching (see :doc:`../advanced/pool`); ``CaVE`` repurposes ``solve_ratio`` for its projection branch. Modules that return a loss also accept ``reduction`` (``"mean"``, ``"sum"``, or ``"none"``).
 
 Each method below is presented with its definition followed by a runnable training loop; all loops build on the shared **Common Setup**.
 
@@ -134,7 +134,7 @@ The derivation starts from the observation that for any :math:`\alpha \geq 0`,
 
    \mathrm{regret}(\hat{\mathbf{c}}, \mathbf{c}) \leq \max_{\mathbf{w} \in \mathcal{S}} \big\{ \mathbf{c}^\top \mathbf{w} - \alpha\, \hat{\mathbf{c}}^\top \mathbf{w} \big\} + z^*(\alpha \hat{\mathbf{c}}) - z^*(\mathbf{c}).
 
-Setting :math:`\alpha = 2` and bounding :math:`z^*(2 \hat{\mathbf{c}}) \leq 2 \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c})` via the concavity of :math:`z^*` gives the SPO+ loss,
+Setting :math:`\alpha = 2` and bounding :math:`z^*(2 \hat{\mathbf{c}}) \leq 2 \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c})`, since :math:`z^*` is a minimum and :math:`\mathbf{w}^*(\mathbf{c})` is feasible, gives the SPO+ loss,
 
 .. math::
 
@@ -176,8 +176,8 @@ By Danskin's theorem, regret can be written as the directional derivative of :ma
 
 .. math::
 
-   \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c}) &\approx \frac{z^*(\hat{\mathbf{c}}) - z^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{\sigma}, \\
-   \mathcal{L}_{\mathrm{PG}}^{\mathrm{cent}}(\hat{\mathbf{c}}, \mathbf{c}) &\approx \frac{z^*(\hat{\mathbf{c}} + \sigma \mathbf{c}) - z^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{2 \sigma},
+   \mathcal{L}_{\mathrm{PG}}^{\mathrm{back}}(\hat{\mathbf{c}}, \mathbf{c}) &= \frac{z^*(\hat{\mathbf{c}}) - z^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{\sigma}, \\
+   \mathcal{L}_{\mathrm{PG}}^{\mathrm{cent}}(\hat{\mathbf{c}}, \mathbf{c}) &= \frac{z^*(\hat{\mathbf{c}} + \sigma \mathbf{c}) - z^*(\hat{\mathbf{c}} - \sigma \mathbf{c})}{2 \sigma},
 
 where :math:`\sigma > 0` is the finite-difference width (the ``sigma`` parameter). The corresponding gradient estimate is
 
@@ -266,7 +266,7 @@ Perturbed Fenchel-Young Loss (PFYL)
 
 PFYL [#f5]_ uses the same perturbed expected solution as DPO inside a Fenchel-Young loss, comparing it directly with the true optimal solution. It returns a scalar loss. ``PFY`` is the additive Gaussian version; ``PFYMul`` is the multiplicative sign-preserving variant with the same sign convention as ``DPOMul``.
 
-Let :math:`F(\hat{\mathbf{c}}) = \mathbb{E}_{\boldsymbol{\xi}}\big[ \min_{\mathbf{w} \in \mathcal{S}} (\hat{\mathbf{c}} + \sigma \boldsymbol{\xi})^\top \mathbf{w} \big]` be the expected perturbed minimum, and let :math:`\Omega(\mathbf{w}^*(\mathbf{c}))` be its Fenchel conjugate. The perturbed Fenchel-Young loss is
+Let :math:`F(\hat{\mathbf{c}}) = \mathbb{E}_{\boldsymbol{\xi}}\big[ \min_{\mathbf{w} \in \mathcal{S}} (\hat{\mathbf{c}} + \sigma \boldsymbol{\xi})^\top \mathbf{w} \big]` be the expected perturbed minimum, and let :math:`\Omega` be its Fenchel conjugate. The perturbed Fenchel-Young loss is
 
 .. math::
 
@@ -391,8 +391,8 @@ which is unique, lies inside :math:`\mathrm{conv}(\mathcal{S})`, and varies cont
 PyEPO implements the L2 special case :math:`\Omega(\mathbf{w}) = \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2` and solves the regularized program with batched Frank-Wolfe iteration. Frank-Wolfe accesses :math:`\mathrm{conv}(\mathcal{S})` through the original LP/ILP solver of :math:`\mathcal{S}` (a *linear minimization oracle*). ``lambd`` is the L2 strength :math:`\lambda`; ``max_iter`` caps Frank-Wolfe iterations and ``tol`` is the convergence tolerance.
 
 
-L2 Regularized Frank-Wolfe (RFWO)
----------------------------------
+L2 Regularized Frank-Wolfe Optimizer (RFWO)
+-------------------------------------------
 
 RFWO [#f6]_ exposes :math:`\hat{\mathbf{w}}_\lambda(\hat{\mathbf{c}})` directly as a differentiable layer. Since it returns a regularized solution rather than a loss, the user defines a task loss on the output. A common choice is MSE against :math:`\mathbf{w}^*(\mathbf{c})`.
 
@@ -576,7 +576,7 @@ Setting ``solve_ratio < 1`` enables the **CaVE-Hybrid** update: each batch uses 
     :width: 100%
     :align: center
 
-    CVRP-20 results from notebook 04: ``num_data=1000``, 10 epochs, single process. In this setup, CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with ``solve_ratio=0.3`` trains 10.5x faster with higher final regret.
+    CVRP-20 results from notebook 04: ``num_data=1000``, 10 epochs, single process. In this setup, CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with ``solve_ratio=0.3`` trains 10.5x faster than SPO+, at a final regret higher than both.
 
 Training data comes from ``pyepo.data.dataset.optDatasetConstrs``, which extracts the binding-constraint normals at the optimum for each instance. Per-instance constraint counts are ragged, so batch it with ``pyepo.data.dataset.optDataLoader``, which zero-pads them automatically. CaVE currently requires a Gurobi-backed ``optModel``.
 

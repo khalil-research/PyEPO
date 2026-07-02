@@ -100,7 +100,8 @@ Performance Example
 
    CVRP-20 results from notebook 04: ``num_data=1000``, 10 epochs, single process.
    In this setup, CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with
-   ``solve_ratio=0.3`` trains 10.5x faster with higher final regret.
+   ``solve_ratio=0.3`` trains 10.5x faster than SPO+, at a final regret higher
+   than both.
 
 
 Related Pages

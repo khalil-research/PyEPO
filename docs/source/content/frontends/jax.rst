@@ -162,8 +162,8 @@ Notes
   eager-only; they cannot be ``jax.jit``-ed.
 * **CaVE**: the hybrid branch (``0 < solve_ratio < 1``) draws a per-batch coin
   and raises under ``jax.jit``; run it eagerly or use ``solve_ratio`` of 0 or 1.
-* **adaptiveImplicitMLE** is eager-only; the other randomized losses are
-  jittable with an explicit ``key``.
-* **API**: JAX losses follow the PyTorch signatures, except ``implicitMLE`` /
-  ``adaptiveImplicitMLE``, which take ``kappa`` / ``n_iterations`` / ``seed``
-  scalars instead of a PyTorch ``distribution`` object.
+* **AIMLE** is eager-only; the other randomized losses are jittable with an
+  explicit ``key``.
+* **API**: JAX losses follow the PyTorch signatures, except ``IMLE`` /
+  ``AIMLE``, which take ``kappa`` / ``n_iterations`` / ``seed`` scalars
+  instead of a PyTorch ``distribution`` object.

@@ -35,7 +35,7 @@ Backends and Training Methods
 
 * **Surrogate losses**: smart predict-then-optimize+ (SPO+), perturbation gradient (PG)
 * **Perturbed methods**: differentiable perturbed optimizer (DPO), perturbed Fenchel-Young loss (PFYL), implicit maximum likelihood estimator (I-MLE), adaptive implicit maximum likelihood estimator (AI-MLE)
-* **Regularized methods**: L2-regularized Frank-Wolfe (RFWO), L2-regularized Frank-Wolfe with Fenchel-Young loss (RFYL)
+* **Regularized methods**: L2-regularized Frank-Wolfe optimizer (RFWO), L2-regularized Frank-Wolfe with Fenchel-Young loss (RFYL)
 * **Black-box methods**: differentiable black-box optimizer (DBB), negative identity backpropagation (NID)
 * **Cone-aligned estimation**: cone-aligned vector estimation (CaVE); binary linear programs only, with binding constraints extracted by a Gurobi-backed model
 * **Contrastive methods**: noise contrastive estimation (NCE), contrastive MAP (CMAP)

@@ -84,10 +84,11 @@ reproducibility.
 GPU
 ===
 
-The predictor and the batch can live on CUDA; the optimization solve always
-runs on the CPU. The losses expect all tensor inputs on one device, so move
-the whole batch. The solver receives CPU copies internally, and the loss and
-gradients come back on the batch's device:
+The predictor and the batch can live on CUDA. Every backend except MPAX
+solves on the CPU; MPAX solves the batch on the GPU (see
+:doc:`../solver_backends`). The losses expect all tensor inputs on one
+device, so move the whole batch. A CPU backend receives CPU copies
+internally, and the loss and gradients come back on the batch's device:
 
 .. code-block:: python
 

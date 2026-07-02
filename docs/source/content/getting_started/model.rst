@@ -54,7 +54,7 @@ All backends share this interface and are selected with ``backend=``. Gurobi and
      - any native COPT parameter
    * - ``pyomo``
      - open solver name (default ``"glpk"``)
-     - maps to the chosen solver's own option (known for GLPK, CBC, SCIP, HiGHS, Ipopt, Gurobi, CPLEX; for other solvers pass the native option)
+     - maps to the chosen solver's own option (GLPK, CBC, SCIP, HiGHS, Ipopt, Gurobi, CPLEX); with any other solver it raises, so pass the native option as a keyword instead
      - passed through as solver options
    * - ``ortools``
      - pywraplp solver name (default ``"scip"``)

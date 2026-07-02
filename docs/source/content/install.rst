@@ -43,7 +43,7 @@ Install the package from the local checkout.
 Solvers
 =======
 
-``PyEPO`` compiles optimization models onto a solver backend, so at least one solver must be installed. Each backend has a pip extra that installs its package alongside ``PyEPO``:
+``PyEPO`` compiles optimization models to a solver backend, so at least one solver must be installed. Each backend has a pip extra that installs its package alongside ``PyEPO``:
 
 * `Gurobi <https://www.gurobi.com/>`_, the default backend; commercial with a free academic license (``pip install pyepo[gurobi]``).
 * `COPT <https://www.shanshu.ai/copt>`_, commercial with a free academic license (``pip install pyepo[copt]``).
@@ -53,4 +53,4 @@ Solvers
 
 The ``CaVE`` loss additionally needs Clarabel (``pip install pyepo[cave]``), and ``pip install pyepo[all]`` installs every optional dependency at once.
 
-.. note:: A bare ``pip install pyepo`` does not install a solver backend, so building a model with the default Gurobi backend requires a Gurobi license; for a license-free setup, use the Pyomo or OR-Tools backend.
+.. note:: A bare ``pip install pyepo`` does not install a solver backend. The default Gurobi backend needs ``pip install pyepo[gurobi]`` and a Gurobi license; for a license-free setup, use the Pyomo or OR-Tools backend.
