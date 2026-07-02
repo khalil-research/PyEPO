@@ -18,9 +18,9 @@ each instance. ``optDatasetKNN`` instead computes neighborhood labels:
    :alt: kNN robust loss label aggregation
 
 This setting applies when nearby feature vectors are expected to have similar
-decisions, but individual labels may be noisy. It costs k solves per instance
-at construction time, and when labels are clean or neighborhoods are
-heterogeneous, the smoothing only biases them -- use ``optDataset`` then.
+decisions, but individual labels may be noisy. Construction costs k solves per
+instance. When labels are clean or neighborhoods are heterogeneous, the
+smoothing only biases them; use ``optDataset`` then.
 
 
 Minimal Example

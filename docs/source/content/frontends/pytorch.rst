@@ -1,52 +1,116 @@
 PyTorch Frontend
 ++++++++++++++++
 
-The PyTorch frontend lives in ``pyepo.func``. Each training method wraps an ``optModel`` and can be used with PyTorch optimizers. Method selection, training-loop templates, and API details are in :doc:`../getting_started/function`; this page summarizes the calling conventions.
+``pyepo.func`` provides the PyTorch training methods. Each method is an
+autograd module that wraps an ``optModel``. The forward pass solves the
+optimization problem; the backward pass applies the method's gradient rule.
+Training uses standard PyTorch optimizers.
+
+Method selection and per-method training loops are in
+:doc:`../getting_started/function`; this page shows the calling conventions.
 
 
-Basic Pattern
-=============
+Training
+========
 
-Instantiate a method, call it inside the PyTorch training loop, and backpropagate through the returned loss:
+End-to-end training of a shortest-path predictor on a 5x5 grid with the SPO+
+loss:
 
 .. code-block:: python
 
+   import torch
+   from torch import nn
+   from torch.utils.data import DataLoader
+
+   import pyepo
+   from pyepo.data.dataset import optDataset
+
+   # optimization model: 5x5 grid shortest path
+   grid = (5, 5)
+   optmodel = pyepo.model.shortestPathModel(grid)
+
+   # synthetic data
+   x, c = pyepo.data.shortestpath.genData(
+       num_data=1000, num_features=5, grid=grid, deg=4, noise_width=0.5, seed=135,
+   )
+   dataset = optDataset(optmodel, x, c)
+   dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+   # linear predictor and SPO+ loss
+   predmodel = nn.Linear(5, optmodel.num_cost)
    spo = pyepo.func.SPOPlus(optmodel, processes=1)
-   loss = spo(pred_cost, true_cost, true_sol, true_obj)
-   loss.backward()
+   optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
-The ``optModel`` defines the feasible region. The prediction model produces ``pred_cost``; ``pyepo.func`` updates the optimization objective, solves the problem, and supplies the gradient rule used by PyTorch.
+   # end-to-end training
+   for epoch in range(10):
+       for xb, cb, wb, zb in dataloader:
+           loss = spo(predmodel(xb), cb, wb, zb)
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
+The ``optDataset`` batch is ``(x, c, w, z)``:
+
+* ``x``: input features for the prediction model.
+* ``c``: ground-truth objective coefficients.
+* ``w``: optimal solution under ``c``.
+* ``z``: optimal objective value under ``c``.
+
+Some methods use only a subset of these values; the per-method inputs are
+listed in the summary table of :doc:`../getting_started/function`.
 
 
-Batch Inputs
-============
+Solution-Returning Modules
+==========================
 
-The usual batch format comes from ``optDataset``:
+Solution-returning modules such as ``DPO`` are trained through a task loss on
+their output. The perturbed modules draw noise internally; pass ``seed=`` for
+reproducibility.
 
 .. code-block:: python
 
-   for feat, true_cost, true_sol, true_obj in dataloader:
-       pred_cost = predmodel(feat)
-       loss = spo(pred_cost, true_cost, true_sol, true_obj)
+   dpo = pyepo.func.DPO(optmodel, n_samples=10, sigma=0.5, processes=1)
+   criterion = nn.MSELoss()
 
-The tensors mean:
-
-* ``feat``: input features for the prediction model.
-* ``pred_cost``: predicted objective coefficients.
-* ``true_cost``: ground-truth objective coefficients.
-* ``true_sol``: optimal solution under ``true_cost``.
-* ``true_obj``: optimal objective value under ``true_cost``.
-
-Some methods use only a subset of these values; the per-method inputs are listed in the summary table of :doc:`../getting_started/function`.
+   for epoch in range(10):
+       for xb, cb, wb, zb in dataloader:
+           we = dpo(predmodel(xb))     # expected perturbed solutions
+           loss = criterion(we, wb)    # task loss on the solutions
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
 
 
-Loss-returning and Solution-returning Methods
-=============================================
+GPU
+===
 
-PyEPO methods use two interfaces:
+The predictor and the batch can live on CUDA; the optimization solve always
+runs on the CPU. The losses expect all tensor inputs on one device, so move
+the whole batch. The solver receives CPU copies internally, and the loss and
+gradients come back on the batch's device:
 
-* **Loss-returning methods** return a scalar loss. Call ``loss.backward()`` directly. Examples: ``SPOPlus``, ``PFY``, ``NCE``, ``lsLTR``, ``CaVE``.
-* **Solution-returning methods** return a predicted or perturbed solution. Define a task loss on top, then backpropagate through that loss. Examples: ``DPO``, ``DBB``, ``NID``, ``RFWO``, ``IMLE``.
+.. code-block:: python
+
+   device = "cuda"
+   predmodel = predmodel.to(device)
+
+   for xb, cb, wb, zb in dataloader:
+       xb, cb, wb, zb = (t.to(device) for t in (xb, cb, wb, zb))
+       loss = spo(predmodel(xb), cb, wb, zb)
+       optimizer.zero_grad()
+       loss.backward()
+       optimizer.step()
+
+
+Evaluation
+==========
+
+``pyepo.metric.regret`` evaluates decision quality, usually on a held-out
+test set:
+
+.. code-block:: python
+
+   total_regret = pyepo.metric.regret(predmodel, optmodel, testloader)
 
 
 Shared Options

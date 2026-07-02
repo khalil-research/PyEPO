@@ -30,7 +30,7 @@ Minimal Example
 ===============
 
 CaVE uses ``pyepo.data.dataset.optDatasetConstrs`` instead of ``optDataset``.
-It adds ``tight_ctrs`` -- the binding-constraint normals at the true optimum --
+It adds ``tight_ctrs``, the binding-constraint normals at the true optimum,
 to the usual ``(x, c, w, z)`` batch.
 
 The number of binding constraints can differ across instances, so the batch

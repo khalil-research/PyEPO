@@ -191,7 +191,7 @@ Mean-variance allocation that maximizes return under a risk budget. Backends: gu
 optDataset
 ==========
 
-``pyepo.data.optDataset`` is a PyTorch ``Dataset`` that stores features and cost coefficients, and **solves the optimization problem to obtain optimal solutions and objective values**. The features and costs can be any arrays -- the generators above are just a convenience.
+``pyepo.data.optDataset`` is a PyTorch ``Dataset`` that stores features and cost coefficients, and **solves the optimization problem to obtain optimal solutions and objective values**. The features and costs can be any arrays; the generators above are just a convenience.
 
 ``optDataset`` precomputes :math:`\mathbf{w}^*(\mathbf{c})` and :math:`z^*(\mathbf{c})` at construction time. If those labels already exist from another source, skip ``optDataset`` and feed ``(x, c, w, z)`` batches to ``pyepo.func`` modules directly.
 
