@@ -140,7 +140,9 @@ class optCoptModel(optModel):
             new_model.x = _CoptMVar.fromlist(new_vars)  # type: ignore[union-attr]
             new_model._vars_list = None
         else:
-            new_model.x = {key: new_vars[i] for i, key in enumerate(self.x)}
+            # map by var name so auxiliary vars or ordering can't misalign the dict
+            new_by_name = {v.getName(): v for v in new_vars}
+            new_model.x = {key: new_by_name[var.getName()] for key, var in self.x.items()}
             new_model._vars_list = list(new_model.x.values())
         return new_model
 
