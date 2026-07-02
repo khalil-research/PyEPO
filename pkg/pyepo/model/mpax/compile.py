@@ -139,9 +139,9 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
             if is_full:
                 coef = arr
             else:
-                coef = np.broadcast_to(
-                    prob.fixed_cost, (*arr.shape[:-1], prob.num_vars)
-                ).astype(np.float32)
+                coef = np.broadcast_to(prob.fixed_cost, (*arr.shape[:-1], prob.num_vars)).astype(
+                    np.float32
+                )
                 coef[..., prob.c_pred_index] += arr
             self.c = jnp.asarray(coef)
         if self.modelSense == EPO.MAXIMIZE:

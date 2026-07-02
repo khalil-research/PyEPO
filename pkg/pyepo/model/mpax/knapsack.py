@@ -40,9 +40,7 @@ class knapsackModel(knapsackBase, optMpaxModel):
         """
         num_items = self.weights.shape[1]
         # warn on relaxed integrality
-        logger.warning(
-            "MPAX knapsack is an LP relaxation; item selections may be fractional."
-        )
+        logger.warning("MPAX knapsack is an LP relaxation; item selections may be fractional.")
         # no equality constraints
         self.A = jnp.zeros((0, num_items), dtype=jnp.float32)
         self.b = jnp.zeros((0,), dtype=jnp.float32)
