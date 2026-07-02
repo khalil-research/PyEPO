@@ -22,6 +22,24 @@ if TYPE_CHECKING:
     from pyepo.EPO import ModelSense
 
 
+def _snapshot(value):
+    """Deep-copy a constructor argument, keeping the reference if it cannot be copied."""
+    try:
+        return deepcopy(value)
+    except Exception:  # noqa: BLE001 -- any copy failure falls back to a reference
+        return value
+
+
+def _snapshot_args(args: tuple) -> tuple:
+    """Snapshot a tuple of positional constructor arguments."""
+    return tuple(_snapshot(v) for v in args)
+
+
+def _snapshot_config(config: dict) -> dict:
+    """Snapshot a dict of keyword constructor arguments."""
+    return {k: _snapshot(v) for k, v in config.items()}
+
+
 @dataclass(frozen=True, init=False)
 class ModelSpec:
     """Serializable recipe for building a fresh optimization model."""
@@ -37,30 +55,22 @@ class ModelSpec:
         args: tuple = (),
     ) -> None:
         object.__setattr__(self, "model_type", model_type)
-        object.__setattr__(self, "_args", deepcopy(args))
-        object.__setattr__(self, "_config", deepcopy(config))
+        object.__setattr__(self, "_args", _snapshot_args(args))
+        object.__setattr__(self, "_config", _snapshot_config(config))
 
     @property
     def args(self) -> tuple:
         """Return an independent copy of positional constructor arguments."""
-        return deepcopy(self._args)
+        return _snapshot_args(self._args)
 
     @property
     def config(self) -> dict:
         """Return an independent copy of keyword constructor arguments."""
-        return deepcopy(self._config)
+        return _snapshot_config(self._config)
 
     def build(self) -> optModel:
         """Build a fresh model without sharing mutable configuration values."""
         return self.model_type.from_config(self._config, self._args)
-
-
-def _snapshot(value):
-    """Deep-copy a constructor argument, keeping the reference if it cannot be copied."""
-    try:
-        return deepcopy(value)
-    except Exception:  # noqa: BLE001 -- any copy failure falls back to a reference
-        return value
 
 
 def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
@@ -69,6 +79,11 @@ def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
     bound = sig.bind(None, *args, **kwargs)
     init_args = []
     config = {}
+    # non-empty *args pin every preceding parameter to its position
+    has_extras = any(
+        sig.parameters[name].kind is inspect.Parameter.VAR_POSITIONAL and value
+        for name, value in bound.arguments.items()
+    )
     for i, (name, value) in enumerate(bound.arguments.items()):
         # the first bound argument is self
         if i == 0:
@@ -79,7 +94,9 @@ def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
             config.update({k: _snapshot(v) for k, v in value.items()})
         elif kind is inspect.Parameter.VAR_POSITIONAL:
             init_args.extend(_snapshot(v) for v in value)
-        elif kind is inspect.Parameter.POSITIONAL_ONLY:
+        elif kind is inspect.Parameter.POSITIONAL_ONLY or (
+            kind is inspect.Parameter.POSITIONAL_OR_KEYWORD and has_extras
+        ):
             init_args.append(_snapshot(value))
         else:
             config[name] = _snapshot(value)
@@ -145,12 +162,12 @@ class optModel(ABC):
 
     def get_config(self) -> dict:
         """Return the constructor configuration for this model."""
-        return deepcopy(self.__dict__.get("_init_config", {}))
+        return _snapshot_config(self.__dict__.get("_init_config", {}))
 
     @classmethod
     def from_config(cls, config: dict, args: tuple = ()) -> Self:
         """Build a model from a configuration produced by ``get_config``."""
-        return cls(*deepcopy(args), **deepcopy(config))
+        return cls(*_snapshot_args(args), **_snapshot_config(config))
 
     def to_spec(self) -> ModelSpec:
         """Return a serializable, immutable-snapshot rebuild recipe."""
