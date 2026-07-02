@@ -54,11 +54,6 @@ except Exception:  # noqa: BLE001
     _HAS_FLAX = False
 
 try:
-    from pyepo.twostage.autosklearnpred import _HAS_AUTO
-except Exception:  # noqa: BLE001
-    _HAS_AUTO = False
-
-try:
     import clarabel  # noqa: F401
 
     _HAS_CLARABEL = True
@@ -86,7 +81,6 @@ requires_jax_gpu = pytest.mark.skipif(
 )
 
 __all__ = [
-    "_HAS_AUTO",
     "_HAS_CLARABEL",
     "_HAS_COPT",
     "_HAS_CUDA",

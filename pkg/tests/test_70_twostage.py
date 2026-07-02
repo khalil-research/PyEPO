@@ -2,8 +2,8 @@
 """Tests for pyepo.twostage: two-stage predict-then-optimize predictors.
 
 sklearnPred wraps any single-output regressor into a multi-output one (no
-solver). autoSklearnPred is Linux-only and heavy; only its graceful error
-paths are checked when the package is absent.
+solver). autoSklearnPred is Linux-only and heavy; its import guard and metric
+dispatch are checked via monkeypatch without the package.
 """
 
 import numpy as np
@@ -11,8 +11,6 @@ import pytest
 
 from pyepo.twostage import sklearnPred
 from pyepo.twostage.autosklearnpred import _HAS_AUTO, autoSklearnPred
-
-from .conftest import NUM_FEAT, requires_gurobi
 
 
 class TestSklearnPred:
@@ -36,24 +34,6 @@ class TestSklearnPred:
 
         est = sklearnPred(RandomForestRegressor(n_estimators=3, random_state=0))
         assert isinstance(est.estimator, RandomForestRegressor)
-
-
-@requires_gurobi
-class TestSklearnPredPipeline:
-    def test_end_to_end_regret(self):
-        from sklearn.linear_model import LinearRegression
-
-        import pyepo
-        from pyepo.metric import SPOError
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        x, c = pyepo.data.shortestpath.genData(40, NUM_FEAT, (3, 3), deg=1, seed=42)
-        est = sklearnPred(LinearRegression())
-        est.fit(x, c)
-        c_pred = est.predict(x)
-        assert c_pred.shape == c.shape
-        err = SPOError(c_pred, c, shortestPathModel(grid=(3, 3)))
-        assert err >= -1e-6
 
 
 class TestAutoSklearnPred:

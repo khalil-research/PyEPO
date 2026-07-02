@@ -145,5 +145,4 @@ __all__ = [
     "PARTIAL_PREDICTION_PARITY_OPS",
     "PARTIAL_PREDICTION_SMOKE_OPS",
     "SOLUTION_OPS",
-    "RegistryEntry",
 ]

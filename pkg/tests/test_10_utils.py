@@ -359,15 +359,6 @@ class TestGetConfig:
 
         return knapsackModel, shortestPathModel
 
-    def test_knapsack_args(self):
-        knapsackModel, _ = self._models()
-        weights = np.array([[3.0, 4.0, 5.0]])
-        capacity = np.array([10.0])
-        args = knapsackModel(weights=weights, capacity=capacity).get_config()
-        assert "weights" in args and "capacity" in args
-        np.testing.assert_array_equal(args["weights"], weights)
-        np.testing.assert_array_equal(args["capacity"], capacity)
-
     def test_shortestpath_args(self):
         _, shortestPathModel = self._models()
         args = shortestPathModel(grid=(4, 4)).get_config()

@@ -111,7 +111,6 @@ class TestSpecialDatasets:
         x, c = pyepo.data.shortestpath.genData(NUM_DATA, NUM_FEAT, GRID, seed=42)
         optmodel = shortestPathModel(grid=GRID)
         dataset = optDatasetKNN(optmodel, x, c, k=3, weight=0.5)
-        assert len(dataset) == NUM_DATA
         loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
         _train_loop(

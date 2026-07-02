@@ -184,6 +184,5 @@ __all__ = [
     "solver_atol",
     "sp_jax_pred",
     "take_batch",
-    "to_jax",
     "to_np",
 ]

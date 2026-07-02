@@ -39,7 +39,7 @@ def _sp_mpax(n):
 
 @requires_jax
 class TestSolveCacheHelpers:
-    """Solution-pool caching helpers (pure jnp, no solver)."""
+    """Solution-pool caching: pure jnp helpers plus one eager MPAX loss run."""
 
     @pytest.mark.parametrize(
         "pool, update, expected_rows",
@@ -901,16 +901,13 @@ class TestCaVEParity:
 class TestCaVEGuards:
     """CaVE: detached labels and the jit guard on the hybrid coin."""
 
-    def _setup(self):
-        return _cave_setup()
-
     def test_tight_ctrs_grad_is_zero(self):
         import jax
         import jax.numpy as jnp
 
         from pyepo.func.jax import coneAlignedCosine as JCaVE
 
-        model, pred, tight = self._setup()
+        model, pred, tight = _cave_setup()
         jcave = JCaVE(model, reduction="mean")
         # labels carry no gradient
         g = jax.grad(lambda t: jcave(jnp.asarray(pred), t), argnums=0)(jnp.asarray(tight))
@@ -922,7 +919,7 @@ class TestCaVEGuards:
 
         from pyepo.func.jax import coneAlignedCosine as JCaVE
 
-        model, pred, tight = self._setup()
+        model, pred, tight = _cave_setup()
         jcave = JCaVE(model, solve_ratio=0.5, reduction="mean")
         with pytest.raises(RuntimeError, match="jit"):
             jax.jit(lambda p: jcave(p, jnp.asarray(tight)))(jnp.asarray(pred))
@@ -952,8 +949,8 @@ def _partial_data(n=4):
 
 @requires_jax
 @requires_gurobi
-class TestPartialPredictionParity:
-    """Partial-prediction lift parity."""
+class TestPartialPrediction:
+    """Partial-prediction lift: torch parity plus per-op smoke."""
 
     def test_multiplicative_perturb_keeps_fixed_costs(self):
         import jax.numpy as jnp

@@ -78,9 +78,7 @@ def _sp_dataset(backend):
 
 
 def _ks_optmodel(backend, weights):
-    if backend == "grb":
-        from pyepo.model.grb.knapsack import knapsackModel
-    elif backend == "copt":
+    if backend == "copt":
         from pyepo.model.copt.knapsack import knapsackModel
     elif backend == "ort":
         from pyepo.model.ort.knapsack import knapsackModel
