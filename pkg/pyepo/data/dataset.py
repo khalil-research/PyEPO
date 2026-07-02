@@ -33,14 +33,20 @@ def _validate_inputs(
     model: optModel,
     feats: np.ndarray | torch.Tensor,
     costs: np.ndarray | torch.Tensor,
-) -> None:
-    """Validate the common constructor contract for optimization datasets."""
+) -> tuple[np.ndarray | torch.Tensor, np.ndarray | torch.Tensor]:
+    """Validate and normalize the common constructor contract for optimization datasets."""
     if not isinstance(model, optModel):
         raise TypeError("arg model is not an optModel")
+    # array-likes become numpy arrays
+    if not isinstance(feats, (np.ndarray, torch.Tensor)):
+        feats = np.asarray(feats)
+    if not isinstance(costs, (np.ndarray, torch.Tensor)):
+        costs = np.asarray(costs)
     if len(feats) != len(costs):
         raise ValueError(
             f"feats and costs must have the same number of instances: {len(feats)} vs {len(costs)}."
         )
+    return feats, costs
 
 
 def _as_float_tensor(data) -> torch.Tensor:
@@ -91,7 +97,7 @@ class optDataset(Dataset):
             feats: data features
             costs: costs of objective function
         """
-        _validate_inputs(model, feats, costs)
+        feats, costs = _validate_inputs(model, feats, costs)
         self.model = model
         # data
         self.feats = feats
@@ -229,7 +235,7 @@ class optDatasetKNN(optDataset):
             k: number of nearest neighbours selected
             weight: self-weight in the kNN convex combination (1.0 = no smoothing)
         """
-        _validate_inputs(model, feats, costs)
+        feats, costs = _validate_inputs(model, feats, costs)
         self.model = model
         # at most num_data-1 neighbours exist (self excluded), so k must stay below it
         num_data = len(feats)
@@ -347,7 +353,7 @@ class optDatasetConstrs(optDataset):
             costs: costs of objective function
             skip_infeas: if True, drop infeasible instances instead of raising
         """
-        _validate_inputs(model, feats, costs)
+        feats, costs = _validate_inputs(model, feats, costs)
         self.model = model
         self.skip_infeas = skip_infeas
         # data
