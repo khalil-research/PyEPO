@@ -13,19 +13,15 @@ from torch.autograd import Function
 
 from pyepo.func._common import (
     is_minimize,
-    require_solution_pool,
     validate_positive,
     validate_positive_int,
 )
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import (
     _mask_pred,
+    _solve_or_cache,
     _torch_generator,
-    _update_solution_pool,
     sumGammaDistribution,
-)
-from pyepo.func.utils import (
-    _solve_batch as _solve_batch_2d,
 )
 from pyepo.utils import _EPS
 
@@ -625,76 +621,12 @@ class adaptiveImplicitMLEFunc(implicitMLEFunc):
 
 def _solve_or_cache_3d(ptb_c: torch.Tensor, module: optModule) -> torch.Tensor:
     """
-    Solve or use cached solutions for perturbed costs (3D: n_samples × batch × vars).
-    Delegates to the shared 2D functions in utils after flattening.
+    Solve or use cached solutions for perturbed costs (batch × n_samples × vars).
+    Flattens the sample axis and delegates to the shared 2D path in utils.
     """
-    optmodel = module.optmodel
-    processes = module.processes
-    pool = module.pool
-    solpool = module.solpool
-    if module._branch_rng.uniform() <= module.solve_ratio:
-        ptb_sols, solpool = _solve_in_pass_3d(ptb_c, optmodel, processes, pool, solpool)
-    else:
-        solpool = require_solution_pool(solpool)
-        ptb_sols, solpool = _cache_in_pass_3d(ptb_c, optmodel, solpool)
-    module.solpool = solpool
-    return ptb_sols
-
-
-def _solve_in_pass_3d(
-    ptb_c: torch.Tensor,
-    optmodel: optModel,
-    processes: int,
-    pool,
-    solpool: torch.Tensor | None = None,
-) -> tuple[torch.Tensor, torch.Tensor | None]:
-    """
-    Solve optimization for perturbed 3D costs and update solution pool.
-
-    Args:
-        ptb_c: perturbed costs, shape (batch, n_samples, vars)
-        optmodel: optimization model
-        processes: number of processors
-        pool: process pool
-        solpool: solution pool
-
-    Returns:
-        tuple: (solutions shape (batch, n_samples, vars), updated solpool)
-    """
-    ins_num, n_samples, num_vars = ptb_c.shape
-    # flatten (batch, n_samples, vars) → (batch * n_samples, vars)
-    flat_c = ptb_c.reshape(-1, num_vars)
-    # solve using shared 2D function
-    flat_sols, _ = _solve_batch_2d(flat_c, optmodel, processes, pool)
-    # update pool while flat_sols is still contiguous
-    if solpool is not None:
-        solpool = _update_solution_pool(flat_sols, solpool)
-        if solpool.device != ptb_c.device:
-            solpool = solpool.to(ptb_c.device)
-    # reshape (batch * n_samples, vars) → (batch, n_samples, vars)
-    ptb_sols = flat_sols.reshape(ins_num, n_samples, num_vars)
-    return ptb_sols, solpool
-
-
-def _cache_in_pass_3d(
-    ptb_c: torch.Tensor,
-    optmodel: optModel,
-    solpool: torch.Tensor,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """
-    Use solution pool for perturbed 3D costs (batch × n_samples × vars).
-    Unlike the 2D version in utils, this handles the extra sample dimension.
-    """
-    # move solpool to the correct device
-    if solpool.device != ptb_c.device:
-        solpool = solpool.to(ptb_c.device)
-    # compute objective values: (batch, n_samples, pool_size)
-    solpool_obj = torch.einsum("bnd,sd->bns", ptb_c, solpool)
-    # best solution in pool
-    select = torch.argmin if is_minimize(optmodel.modelSense) else torch.argmax
-    best_inds = select(solpool_obj, dim=2)
-    ptb_sols = solpool[best_inds]
-    return ptb_sols, solpool
+    batch, n_samples, num_vars = ptb_c.shape
+    sol, _ = _solve_or_cache(ptb_c.reshape(-1, num_vars), module)
+    return sol.reshape(batch, n_samples, num_vars)
 
 
 # acronym aliases
