@@ -87,8 +87,9 @@ def _solve_batch(
     """
     A function to solve optimization in the forward/backward pass
     """
-    # get device
+    # get device and dtype
     device = cp.device if isinstance(cp, torch.Tensor) else torch.device("cpu")
+    dtype = cp.dtype if isinstance(cp, torch.Tensor) else torch.float32
     # MPAX batch solving
     if isinstance(optmodel, optMpaxModel):
         # get params
@@ -113,11 +114,13 @@ def _solve_batch(
         # obj sense
         if not is_minimize(optmodel.modelSense):
             obj = -obj
+        # match input dtype
+        sol, obj = sol.to(dtype), obj.to(dtype)
     # host solving on numpy costs
     else:
         sol_np, obj_np = _solve_batch_np(costToNumpy(cp), optmodel, processes, pool)
-        sol = torch.as_tensor(sol_np).to(device)
-        obj = torch.as_tensor(obj_np).to(device)
+        sol = torch.as_tensor(sol_np).to(device=device, dtype=dtype)
+        obj = torch.as_tensor(obj_np).to(device=device, dtype=dtype)
     return sol, obj
 
 
@@ -130,6 +133,8 @@ def _solve_batch_np(
     """
     A function to solve a batch of numpy costs on the host, shared by both frontends
     """
+    # match input precision
+    out_dtype = np.result_type(cp.dtype, np.float32)
     # single-core
     if processes == 1:
         sol_list: list = []
@@ -140,13 +145,13 @@ def _solve_batch_np(
             sol_list.append(solp)
             obj_list.append(objp)
         # stack + dtype convert in a single call
-        sol = np.asarray(sol_list, dtype=np.float32)
-        obj = np.asarray(obj_list, dtype=np.float32)
+        sol = np.asarray(sol_list, dtype=out_dtype)
+        obj = np.asarray(obj_list, dtype=out_dtype)
     # multi-core (workers pre-loaded with optmodel via pool initializer)
     else:
         res = pool.amap(_solve_with_obj_in_worker, cp).get()
-        sol = np.stack([r[0] for r in res]).astype(np.float32)
-        obj = np.asarray([r[1] for r in res], dtype=np.float32)
+        sol = np.stack([r[0] for r in res]).astype(out_dtype)
+        obj = np.asarray([r[1] for r in res], dtype=out_dtype)
     return sol, obj
 
 
@@ -163,6 +168,9 @@ def _update_solution_pool(
         return torch.unique(sol, dim=0).clone()
     if sol.device != solpool.device:
         sol = sol.to(solpool.device)
+    # match pool dtype
+    if solpool.dtype != sol.dtype:
+        solpool = solpool.to(sol.dtype)
     sol_uniq = torch.unique(sol, dim=0)
     # capped L1-tolerance dedup: first-order solvers re-emit near-identical vertices
     tol = solution_pool_tolerance(sol.shape[-1])
@@ -181,9 +189,9 @@ def _cache_in_pass(
     """
     A function to use solution pool in the forward/backward pass
     """
-    # move solpool to the correct device
-    if solpool.device != cp.device:
-        solpool = solpool.to(cp.device)
+    # move solpool to the correct device and dtype
+    if solpool.device != cp.device or solpool.dtype != cp.dtype:
+        solpool = solpool.to(device=cp.device, dtype=cp.dtype)
     # best solution in pool
     solpool_obj = torch.matmul(cp, solpool.T)
     select = torch.argmin if is_minimize(optmodel.modelSense) else torch.argmax
