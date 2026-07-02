@@ -5,6 +5,8 @@ Knapsack problem
 
 from __future__ import annotations
 
+import logging
+
 import numpy as np
 
 try:
@@ -14,6 +16,8 @@ except ImportError:
 
 from pyepo.model.bases import knapsackBase
 from pyepo.model.mpax.mpaxmodel import optMpaxModel
+
+logger = logging.getLogger(__name__)
 
 
 class knapsackModel(knapsackBase, optMpaxModel):
@@ -35,6 +39,10 @@ class knapsackModel(knapsackBase, optMpaxModel):
         which encodes W x <= c. Variables relaxed to x in [0, 1].
         """
         num_items = self.weights.shape[1]
+        # warn on relaxed integrality
+        logger.warning(
+            "MPAX knapsack is an LP relaxation; item selections may be fractional."
+        )
         # no equality constraints
         self.A = jnp.zeros((0, num_items), dtype=jnp.float32)
         self.b = jnp.zeros((0,), dtype=jnp.float32)

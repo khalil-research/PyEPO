@@ -14,6 +14,8 @@ their bounds, and quadratic *constraints* are not expressible.
 
 from __future__ import annotations
 
+import logging
+
 import numpy as np
 import torch
 
@@ -28,6 +30,8 @@ from pyepo import EPO
 from pyepo.dsl.compiled import compiledBase
 from pyepo.model._common import validate_objective_shape
 from pyepo.model.mpax.mpaxmodel import _warn_if_not_optimal, optMpaxModel
+
+logger = logging.getLogger(__name__)
 
 
 def compileProblem(problem, **params) -> compiledMpaxProblem:
@@ -46,6 +50,12 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
         # assemble MPAX standard-form matrices from the finalized IR
         prob = self.problem
         self.modelSense = prob.modelSense
+        # warn on relaxed integrality
+        if np.any(np.asarray(prob.var_type) != EPO.CONTINUOUS):
+            logger.warning(
+                "MPAX is a continuous solver; integer/binary variables are relaxed "
+                "to their bounds and solutions may be fractional."
+            )
         self._emit_constraints()
         self.l = jnp.asarray(
             np.where(np.isneginf(prob.var_lb), -np.inf, prob.var_lb).astype(np.float32)
