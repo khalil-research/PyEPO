@@ -75,6 +75,9 @@ class optOrtModel(optModel):
         else:
             obj.SetMinimization()
 
+    def _apply_params(self) -> None:
+        """Apply solver params to the underlying model; no-op without params."""
+
     def setObj(self, c: np.ndarray | torch.Tensor | list) -> None:
         """
         A method to set the objective function
@@ -128,6 +131,7 @@ class optOrtModel(optModel):
         new_model._model, new_model.x = new_model._getModel()
         new_model._model.SuppressOutput()
         new_model._set_obj_sense()
+        new_model._apply_params()
         new_model._vars_list = list(new_model.x.values())
         new_obj = new_model._model.Objective()
         for v, coef in zip(new_model._vars_list, objective_coefs):
