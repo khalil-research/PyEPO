@@ -14,7 +14,7 @@ import jax.numpy as jnp
 from pyepo.func._common import is_minimize, validate_positive
 from pyepo.func.jax.abcmodule import optModule
 from pyepo.func.jax.utils import _full_cost, _solve_or_cache
-from pyepo.utils import _EPS
+from pyepo.utils import _EPS, objective_offset
 
 if TYPE_CHECKING:
     from pyepo.func.runtime import Reduction
@@ -68,6 +68,11 @@ def _spoplus_value_and_grad(pred_cost, true_cost, true_sol, true_obj, module):
     # solve the perturbed problem
     sol, obj = _solve_or_cache(2.0 * pred_cost - true_cost, module)
     z = jnp.squeeze(true_obj, axis=-1) if true_obj.ndim > 1 else true_obj
+    # drop the bare objective constant
+    offset = objective_offset(module.optmodel)
+    if offset:
+        obj = obj - offset
+        z = z - offset
     inner = 2.0 * jnp.einsum("bi,bi->b", pred_cost, true_sol)
     # loss and subgradient
     if is_minimize(module.optmodel.modelSense):

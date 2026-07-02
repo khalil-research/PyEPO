@@ -79,20 +79,22 @@ class TestCacheInPass:
     def _mock_model(self, sense):
         m = MagicMock()
         m.modelSense = sense
+        m.problem = None
         return m
 
     @pytest.mark.parametrize(
-        "sense, expected",
+        "sense, expected, expected_obj",
         [
-            (EPO.MINIMIZE, [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]]),
-            (EPO.MAXIMIZE, [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]),
+            (EPO.MINIMIZE, [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], [1.0, 1.0]),
+            (EPO.MAXIMIZE, [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0]], [3.0, 3.0]),
         ],
     )
-    def test_selects_best_cached_solution(self, sense, expected):
+    def test_selects_best_cached_solution(self, sense, expected, expected_obj):
         cp = torch.tensor([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]])
         solpool = torch.tensor([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
-        sol, _obj, _ = _cache_in_pass(cp, self._mock_model(sense), solpool)
+        sol, obj, _ = _cache_in_pass(cp, self._mock_model(sense), solpool)
         assert torch.allclose(sol, torch.tensor(expected))
+        assert torch.allclose(obj, torch.tensor(expected_obj))
 
     def test_invalid_sense_raises(self):
         m = MagicMock()

@@ -30,12 +30,6 @@ def regret_from_objective(obj, true_obj, model_sense):
     raise ValueError("Invalid modelSense.")
 
 
-def objective_offset(optmodel: optModel) -> float:
-    """Return a compiled DSL problem's bare objective constant, if present."""
-    problem = getattr(optmodel, "problem", None)
-    return float(problem.obj_offset) if problem is not None else 0.0
-
-
 def require_linear_objective(optmodel: optModel) -> None:
     """Reject models carrying a quadratic objective term."""
     problem = getattr(optmodel, "problem", None)

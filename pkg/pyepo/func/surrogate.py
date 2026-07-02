@@ -13,7 +13,7 @@ from torch.autograd import Function
 from pyepo.func._common import is_minimize, validate_positive
 from pyepo.func.abcmodule import optModule
 from pyepo.func.utils import _solve_or_cache
-from pyepo.utils import _EPS
+from pyepo.utils import _EPS, objective_offset
 
 if TYPE_CHECKING:
     from pyepo.data.dataset import optDataset
@@ -115,6 +115,11 @@ class SPOPlusFunc(Function):
         # _check_sol(c, w, z)
         # solve
         sol, obj = _solve_or_cache(2 * cp - c, module)
+        # drop the bare objective constant
+        offset = objective_offset(module.optmodel)
+        if offset:
+            obj = obj - offset
+            z = z - offset
         # calculate loss
         if is_minimize(module.optmodel.modelSense):
             loss = -obj + 2 * torch.einsum("bi,bi->b", cp, w) - z.squeeze(dim=-1)

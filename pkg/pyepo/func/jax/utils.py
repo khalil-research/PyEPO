@@ -12,6 +12,7 @@ import numpy as np
 from pyepo.func._common import is_minimize, solution_pool_tolerance
 from pyepo.func.utils import _solve_batch_np
 from pyepo.model.mpax import optMpaxModel
+from pyepo.utils import objective_offset
 
 try:
     from jax.extend.core import concrete_or_error as _concrete_or_error
@@ -83,6 +84,10 @@ def _solve_batch_mpax(cost, optmodel):
     # obj in true sense
     if not minimize:
         obj = -obj
+    # add the bare objective constant
+    offset = objective_offset(optmodel)
+    if offset:
+        obj = obj + offset
     return sol, obj
 
 
@@ -127,6 +132,10 @@ def _cache_in_pass(cost, optmodel, solpool):
     select = jnp.argmin if is_minimize(optmodel.modelSense) else jnp.argmax
     ind = select(solpool_obj, axis=1)
     obj = jnp.take_along_axis(solpool_obj, ind[:, None], axis=1).squeeze(1)
+    # add the bare objective constant
+    offset = objective_offset(optmodel)
+    if offset:
+        obj = obj + offset
     return solpool[ind], obj
 
 

@@ -73,6 +73,7 @@ class TestSolveCacheHelpers:
 
         m = MagicMock()
         m.modelSense = EPO.MINIMIZE if sense == "min" else EPO.MAXIMIZE
+        m.problem = None
         cost = jnp.array([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]])
         pool = jnp.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
         sol, obj = _cache_in_pass(cost, m, pool)

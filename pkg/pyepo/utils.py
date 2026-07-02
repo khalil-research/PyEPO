@@ -32,6 +32,20 @@ def getArgs(model: optModel) -> dict:
     return model.get_config()
 
 
+def objective_offset(model: optModel) -> float:
+    """
+    Bare objective constant of a compiled DSL problem.
+
+    Args:
+        model: optimization model
+
+    Returns:
+        float: objective constant, 0.0 for models without one
+    """
+    problem = getattr(model, "problem", None)
+    return float(problem.obj_offset) if problem is not None else 0.0
+
+
 def costToNumpy(
     c: np.ndarray | torch.Tensor | list,
     dtype: Any = np.float32,

@@ -20,7 +20,7 @@ from pyepo.func._common import (
     validate_positive_int,
 )
 from pyepo.model.mpax import optMpaxModel
-from pyepo.utils import costToNumpy
+from pyepo.utils import costToNumpy, objective_offset
 
 if TYPE_CHECKING:
     from pyepo.func.abcmodule import optModule
@@ -114,6 +114,10 @@ def _solve_batch(
         # obj sense
         if not is_minimize(optmodel.modelSense):
             obj = -obj
+        # add the bare objective constant
+        offset = objective_offset(optmodel)
+        if offset:
+            obj = obj + offset
         # match input dtype
         sol, obj = sol.to(dtype), obj.to(dtype)
     # host solving on numpy costs
@@ -198,6 +202,10 @@ def _cache_in_pass(
     ind = select(solpool_obj, dim=1)
     obj = solpool_obj.gather(1, ind.view(-1, 1)).squeeze(1)
     sol = solpool[ind]
+    # add the bare objective constant
+    offset = objective_offset(optmodel)
+    if offset:
+        obj = obj + offset
     return sol, obj, solpool
 
 

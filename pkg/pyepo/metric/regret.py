@@ -15,14 +15,13 @@ from pyepo.func.runtime import create_solver_pool, normalize_processes
 from pyepo.func.utils import _close_pool, _solve_batch
 from pyepo.metric._common import (
     normalize_regret,
-    objective_offset,
     regret_from_objective,
     require_linear_objective,
     torch_evaluation,
     validate_cost_vectors,
     validate_prediction_batch,
 )
-from pyepo.utils import costToNumpy
+from pyepo.utils import costToNumpy, objective_offset
 
 if TYPE_CHECKING:
     from collections.abc import Callable

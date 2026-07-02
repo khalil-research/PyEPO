@@ -14,7 +14,6 @@ import torch
 from pyepo import EPO
 from pyepo.metric._common import (
     normalize_regret,
-    objective_offset,
     regret_from_objective,
     require_linear_objective,
     torch_evaluation,
@@ -23,7 +22,7 @@ from pyepo.metric._common import (
     validate_retry_count,
     validate_tolerance,
 )
-from pyepo.utils import costToNumpy
+from pyepo.utils import costToNumpy, objective_offset
 
 if TYPE_CHECKING:
     from torch import nn
