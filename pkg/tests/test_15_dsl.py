@@ -597,23 +597,24 @@ def test_assignment_solves_to_permutation(backend):
     np.testing.assert_allclose(P.sum(axis=1), 1)
 
 
-@pytest.mark.parametrize("backend", _BACKENDS)
+@pytest.mark.parametrize("backend", [*_BACKENDS, pytest.param("mpax", marks=requires_mpax)])
 def test_qp_objective_solves(backend):
-    # objective c @ x + xT Sig x
+    # objective c @ x + xT Sig x (convention: xᵀQx, not ½xᵀQx)
     Sig = np.array([[2.0, 0.5], [0.5, 1.0]])
     x = dsl.Variable(2, lb=0)
     c = dsl.Parameter(2)
     comp = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1]).compile(
         backend=backend, **_kw(backend)
     )
+    atol = solver_atol(comp, exact=1e-3, first_order=1e-2)
     comp.setObj(np.zeros(2))  # zero linear cost: pure quadratic
     _, obj = comp.solve()
     grid = np.linspace(0, 1, 2001)
     brute = min(np.array([t, 1 - t]) @ Sig @ np.array([t, 1 - t]) for t in grid)
-    assert obj == pytest.approx(brute, abs=1e-3)
-    comp.setObj([1.0, 1.0])  # + linear term
+    assert obj == pytest.approx(brute, abs=atol)
+    comp.setObj([1.0, 1.0])  # + linear term: c @ x = 1 on the simplex
     _, obj2 = comp.solve()
-    assert obj2 == pytest.approx(obj + 1.0, abs=1e-3)
+    assert obj2 == pytest.approx(obj + 1.0, abs=atol)
 
 
 @pytest.mark.parametrize("backend", _ALL)
@@ -907,19 +908,6 @@ def test_mpax_torch_cost_returns_tensor():
     mpx.setObj(torch.ones(3))
     w, _ = mpx.solve()
     assert isinstance(w, torch.Tensor) and len(w) == 3
-
-
-@requires_mpax
-def test_mpax_qp_objective_solves():
-    Sig = np.array([[2.0, 0.5], [0.5, 1.0]], np.float32)
-    x = dsl.Variable(2, lb=0)
-    c = dsl.Parameter(2)
-    mpx = dsl.Problem(dsl.Minimize(c @ x + x @ Sig @ x), [x.sum() == 1]).compile(backend="mpax")
-    mpx.setObj(np.zeros(2, np.float32))
-    _, obj = mpx.solve()
-    grid = np.linspace(0, 1, 2001)
-    brute = min(np.array([t, 1 - t]) @ Sig @ np.array([t, 1 - t]) for t in grid)
-    assert obj == pytest.approx(float(brute), abs=1e-2)  # xᵀQx (not ½xᵀQx)
 
 
 @requires_mpax

@@ -125,7 +125,6 @@ def finite_diff_grad(loss_fn, x, eps=1e-3):
 class _ContractTorch:
     """Torch autodiff harness for the shared contract."""
 
-    name = "torch"
     registry = LOSS_REGISTRY
 
     def inputs(self, c, w, z):
@@ -159,7 +158,6 @@ class _ContractTorch:
 class _ContractJax:
     """JAX autodiff harness for the shared contract."""
 
-    name = "jax"
     registry = JAX_LOSS_REGISTRY
 
     def inputs(self, c, w, z):

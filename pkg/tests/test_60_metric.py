@@ -80,6 +80,20 @@ def _loader(n=16, d=4, batch_size=8):
     return DataLoader(ds, batch_size=batch_size)
 
 
+def _sp():
+    """3x3 shortest path (MINIMIZE)."""
+    from pyepo.model.grb.shortestpath import shortestPathModel
+
+    return shortestPathModel(grid=(3, 3))
+
+
+def _ks():
+    """3-item knapsack (MAXIMIZE)."""
+    from pyepo.model.grb.knapsack import knapsackModel
+
+    return knapsackModel(weights=np.array([[3.0, 4.0, 5.0]]), capacity=np.array([8.0]))
+
+
 # ============================================================
 # MSE (no solver)
 # ============================================================
@@ -182,25 +196,15 @@ class TestDataloaderPredictionValidation:
 class TestCalRegret:
     """Per-sample regret invariants."""
 
-    def _sp(self):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        return shortestPathModel(grid=(3, 3))
-
-    def _ks(self):
-        from pyepo.model.grb.knapsack import knapsackModel
-
-        return knapsackModel(weights=np.array([[3.0, 4.0, 5.0]]), capacity=np.array([8.0]))
-
     def test_zero_with_true_cost(self):
-        m = self._sp()
+        m = _sp()
         cost = np.random.RandomState(42).rand(m.num_cost) + 0.1
         m.setObj(cost)
         _, true_obj = m.solve()
         assert abs(calRegret(m, cost, cost, true_obj)) < 1e-6
 
     def test_non_negative_minimize(self):
-        m = self._sp()
+        m = _sp()
         rng = np.random.RandomState(42)
         ct, cp = rng.rand(m.num_cost) + 0.1, rng.rand(m.num_cost) + 0.1
         m.setObj(ct)
@@ -208,7 +212,7 @@ class TestCalRegret:
         assert calRegret(m, cp, ct, true_obj) >= -1e-6
 
     def test_non_negative_maximize(self):
-        m = self._ks()
+        m = _ks()
         rng = np.random.RandomState(42)
         ct, cp = rng.rand(3) + 1.0, rng.rand(3) + 1.0
         m.setObj(ct)
@@ -270,18 +274,13 @@ class TestCalRegret:
 class TestSPOError:
     """Batch SPOError invariants."""
 
-    def _sp(self):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        return shortestPathModel(grid=(3, 3))
-
     def test_perfect_prediction_zero(self):
-        m = self._sp()
+        m = _sp()
         costs = np.random.RandomState(42).rand(10, m.num_cost) + 0.1
         assert abs(SPOError(costs, costs, m)) < 1e-6
 
     def test_non_negative(self):
-        m = self._sp()
+        m = _sp()
         rng = np.random.RandomState(42)
         true_c = rng.rand(10, m.num_cost) + 0.1
         pred_c = rng.rand(10, m.num_cost) + 0.1
@@ -292,20 +291,15 @@ class TestSPOError:
 class TestCalUnambRegret:
     """Per-sample unambiguous-regret invariants."""
 
-    def _sp(self):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        return shortestPathModel(grid=(3, 3))
-
     def test_zero_with_true_cost(self):
-        m = self._sp()
+        m = _sp()
         cost = np.random.RandomState(42).rand(m.num_cost) + 0.1
         m.setObj(cost)
         _, true_obj = m.solve()
         assert abs(calUnambRegret(m, cost, cost, true_obj)) < 1e-3
 
     def test_non_negative(self):
-        m = self._sp()
+        m = _sp()
         rng = np.random.RandomState(42)
         ct, cp = rng.rand(m.num_cost) + 0.1, rng.rand(m.num_cost) + 0.1
         m.setObj(ct)
@@ -313,9 +307,7 @@ class TestCalUnambRegret:
         assert calUnambRegret(m, cp, ct, true_obj) >= -1e-3
 
     def test_non_negative_maximize(self):
-        from pyepo.model.grb.knapsack import knapsackModel
-
-        m = knapsackModel(weights=np.array([[3.0, 4.0, 5.0]]), capacity=np.array([8.0]))
+        m = _ks()
         rng = np.random.RandomState(42)
         ct, cp = rng.rand(m.num_cost) + 1.0, rng.rand(m.num_cost) + 1.0
         m.setObj(ct)
@@ -323,7 +315,7 @@ class TestCalUnambRegret:
         assert calUnambRegret(m, cp, ct, true_obj) >= -1e-3
 
     def test_at_least_standard_regret(self):
-        m = self._sp()
+        m = _sp()
         rng = np.random.RandomState(7)
         ct, cp = rng.rand(m.num_cost) + 0.1, rng.rand(m.num_cost) + 0.1
         m.setObj(ct)
@@ -497,14 +489,13 @@ class TestSkScorer:
         from sklearn.linear_model import LinearRegression
 
         import pyepo
-        from pyepo.model.grb.shortestpath import shortestPathModel
         from pyepo.twostage import sklearnPred
 
         # nonlinear costs + noise keep the linear fit imperfect, so regret is asymmetric
         x, c = pyepo.data.shortestpath.genData(
             20, NUM_FEAT, (3, 3), deg=4, noise_width=0.5, seed=42
         )
-        optmodel = shortestPathModel(grid=(3, 3))
+        optmodel = _sp()
         est = sklearnPred(LinearRegression())
         est.fit(x, c)
         cp = est.predict(x)

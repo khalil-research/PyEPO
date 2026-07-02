@@ -19,7 +19,20 @@ from pyepo.utils import costToNumpy
 from .conftest import requires_cuda, requires_gurobi
 
 
-class ConfigModel(optModel):
+class _ValuesModel(optModel):
+    """Solver-free base: size and solve derive from ``self.values``."""
+
+    def _getModel(self):
+        return None, list(range(len(self.values)))
+
+    def setObj(self, c):
+        self.cost = np.asarray(c)
+
+    def solve(self):
+        return np.zeros(len(self.values)), 0.0
+
+
+class ConfigModel(_ValuesModel):
     """Solver-free model with custom reconstruction config."""
 
     def __init__(self, values, label="default"):
@@ -34,17 +47,8 @@ class ConfigModel(optModel):
             "label": self.label,
         }
 
-    def _getModel(self):
-        return None, list(range(len(self.values)))
 
-    def setObj(self, c):
-        self.cost = np.asarray(c)
-
-    def solve(self):
-        return np.zeros(len(self.values)), 0.0
-
-
-class AutoConfigModel(optModel):
+class AutoConfigModel(_ValuesModel):
     """Solver-free model that relies on optModel's automatic config capture."""
 
     def __init__(self, values, **kwargs):
@@ -52,17 +56,8 @@ class AutoConfigModel(optModel):
         self.kwargs = kwargs
         super().__init__()
 
-    def _getModel(self):
-        return None, list(range(len(self.values)))
 
-    def setObj(self, c):
-        self.cost = np.asarray(c)
-
-    def solve(self):
-        return np.zeros(len(self.values)), 0.0
-
-
-class VarArgsConfigModel(optModel):
+class VarArgsConfigModel(_ValuesModel):
     """Solver-free model whose constructor needs positional replay."""
 
     def __init__(self, *values, label="default"):
@@ -70,32 +65,14 @@ class VarArgsConfigModel(optModel):
         self.label = label
         super().__init__()
 
-    def _getModel(self):
-        return None, list(range(len(self.values)))
 
-    def setObj(self, c):
-        self.cost = np.asarray(c)
-
-    def solve(self):
-        return np.zeros(len(self.values)), 0.0
-
-
-class PosOnlyConfigModel(optModel):
+class PosOnlyConfigModel(_ValuesModel):
     """Solver-free model with a positional-only constructor argument."""
 
     def __init__(self, values, /, label="default"):
         self.values = values
         self.label = label
         super().__init__()
-
-    def _getModel(self):
-        return None, list(range(len(self.values)))
-
-    def setObj(self, c):
-        self.cost = np.asarray(c)
-
-    def solve(self):
-        return np.zeros(len(self.values)), 0.0
 
 
 class _NoDeepcopy:
@@ -108,7 +85,7 @@ class _NoDeepcopy:
         raise TypeError("not deepcopyable")
 
 
-class CustomConfigModel(optModel):
+class CustomConfigModel(_ValuesModel):
     """Custom config should control reconstruction for unusual constructor inputs."""
 
     def __init__(self, resource=None, values=None):
@@ -117,15 +94,6 @@ class CustomConfigModel(optModel):
 
     def get_config(self):
         return {"values": self.values.copy()}
-
-    def _getModel(self):
-        return None, list(range(len(self.values)))
-
-    def setObj(self, c):
-        self.cost = np.asarray(c)
-
-    def solve(self):
-        return np.zeros(len(self.values)), 0.0
 
 
 # ============================================================
