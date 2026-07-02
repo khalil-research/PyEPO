@@ -932,7 +932,6 @@ class TestVRP:
         _, obj2 = m2.solve()
         _, obj1 = m.solve()
         np.testing.assert_allclose(obj1, obj2, atol=1e-4)
-
         m2.setObj(-_VRP_COST)
         np.testing.assert_allclose(m.solve()[1], obj1, atol=1e-4)
 
@@ -1001,6 +1000,52 @@ class TestVRP:
             rel.relax()
         with pytest.raises(RuntimeError):
             rel.getTour([0] * m.num_cost)
+
+
+class _VrpCallbackStub:
+    """Feeds a fixed incumbent to the RCI callback and captures cbLazy calls."""
+
+    def __init__(self, grb_model, incumbent):
+        self._x = grb_model._x
+        self._n = grb_model._n
+        self._q = grb_model._q
+        self._Q = grb_model._Q
+        self._edges = grb_model._edges
+        self._lazy_constrs = []
+        self._vals = incumbent
+        self.lazy_added = []
+
+    def cbGetSolution(self, x):
+        if isinstance(x, dict):
+            return dict(self._vals)
+        # single-Var query
+        (key,) = (e for e in self._edges if self._x[e].sameAs(x))
+        return self._vals[key]
+
+    def cbLazy(self, constr):
+        self.lazy_added.append(constr)
+
+
+@requires_gurobi
+def test_vrp_rci_callback_records_tight_cuts_without_adding():
+    from gurobipy import GRB
+
+    from pyepo.model.grb.vrp import vrpRCIModel
+
+    m = _make_vrp("grb", "RCI")[0]
+    zeros = {e: 0.0 for e in m._model._edges}
+    # routes 0-1-2-4-0 (demand 5 = capacity) and 0-3-0: the RCI cut on {1,2,4} is tight
+    routes = {**zeros, (0, 1): 1.0, (1, 2): 1.0, (2, 4): 1.0, (0, 4): 1.0, (0, 3): 2.0}
+    stub = _VrpCallbackStub(m._model, routes)
+    vrpRCIModel._vrp_callback(stub, GRB.Callback.MIPSOL)
+    assert len(stub._lazy_constrs) == 1  # recorded for binding-constraint extraction
+    assert stub.lazy_added == []  # a satisfied cut is not fed to the solver
+    # customer subtour 1-2-4-1 violates the same cut: recorded and added
+    subtour = {**zeros, (1, 2): 1.0, (2, 4): 1.0, (1, 4): 1.0, (0, 3): 2.0}
+    stub = _VrpCallbackStub(m._model, subtour)
+    vrpRCIModel._vrp_callback(stub, GRB.Callback.MIPSOL)
+    assert len(stub._lazy_constrs) == 1
+    assert len(stub.lazy_added) == 1
 
 
 @requires_gurobi

@@ -143,12 +143,13 @@ class vrpRCIModel(vrpABModel):
         """
         if where != GRB.Callback.MIPSOL:
             return
+        xvals = model.cbGetSolution(model._x)
         # customer-side active edges
         uf = unionFind(model._n)
         for u, v in model._edges:
             if u == 0 or v == 0:
                 continue
-            if model.cbGetSolution(model._x[u, v]) > _EDGE_ACTIVE_TOL:
+            if xvals[u, v] > _EDGE_ACTIVE_TOL:
                 uf.union(u, v)
         # rounded-capacity / subtour cut per non-trivial component
         for component in _uf_components(uf):
@@ -160,9 +161,11 @@ class vrpRCIModel(vrpABModel):
             edges_s = [(u, v) for u in component for v in component if u < v]
             if (len(edges_s) >= len(component)) or (k > 1):
                 constr = gp.quicksum(model._x[e] for e in edges_s) <= len(component) - k
-                model.cbLazy(constr)
                 # track for downstream binding-constraint extraction
                 model._lazy_constrs.append(constr)
+                # feed the solver violated cuts only
+                if sum(xvals[e] for e in edges_s) > len(component) - k + _EDGE_ACTIVE_TOL:
+                    model.cbLazy(constr)
 
 
 class vrpMTZModel(vrpABModel):
