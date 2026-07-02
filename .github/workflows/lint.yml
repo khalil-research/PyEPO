@@ -6,9 +6,14 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   ruff:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
 
@@ -18,18 +23,20 @@ jobs:
           python-version: "3.12"
 
       - name: Install ruff
-        run: pip install ruff
+        # pinned to the pre-commit rev (.pre-commit-config.yaml)
+        run: pip install ruff==0.15.14
 
       - name: Ruff check
         working-directory: ./pkg
-        run: ruff check pyepo
+        run: ruff check pyepo tests
 
       - name: Ruff format check
         working-directory: ./pkg
-        run: ruff format --check pyepo
+        run: ruff format --check pyepo tests
 
   pyright:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
 
@@ -37,6 +44,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+          cache: pip
 
       - name: Install package and pyright
         working-directory: ./pkg

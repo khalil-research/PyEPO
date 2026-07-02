@@ -121,9 +121,7 @@ def _away_step_frank_wolfe(
             add_new, v_norm_sq, vertex_norms[batch_idx, free_idx]
         )
         # displaced mass is dropped
-        weights[batch_idx, free_idx] = torch.where(
-            add_new, gamma_fw, weights[batch_idx, free_idx]
-        )
+        weights[batch_idx, free_idx] = torch.where(add_new, gamma_fw, weights[batch_idx, free_idx])
         # away subtract, then clear FP residue so dropped atoms leave the active set
         weights[batch_idx, away_idx] = weights[batch_idx, away_idx] - gamma_away
         weights = weights.clamp(min=0.0)

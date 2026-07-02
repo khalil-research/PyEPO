@@ -6,9 +6,9 @@ repos:
     hooks:
       - id: ruff-check
         args: [--fix]
-        files: ^pkg/pyepo/.*\.py$
+        files: ^pkg/(pyepo|tests)/.*\.py$
       - id: ruff-format
-        files: ^pkg/pyepo/.*\.py$
+        files: ^pkg/(pyepo|tests)/.*\.py$
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
