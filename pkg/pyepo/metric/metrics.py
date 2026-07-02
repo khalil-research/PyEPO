@@ -11,10 +11,10 @@ import numpy as np
 
 from pyepo.metric._common import (
     normalize_regret,
-    require_linear_objective,
     validate_numpy_cost_batches,
 )
 from pyepo.metric.regret import calRegret
+from pyepo.utils import require_linear_objective
 
 if TYPE_CHECKING:
     from pyepo.model.opt import ModelSpec, optModel

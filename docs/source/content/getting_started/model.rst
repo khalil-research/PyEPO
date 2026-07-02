@@ -103,6 +103,8 @@ Whether a coefficient is predicted or known is decided by its type: a ``Paramete
 
 ``c @ x`` is a 1-D inner product; for a multi-dimensional cost use ``(c * x).sum()`` (elementwise, then reduced). A quadratic objective term needs a backend with QP support: Gurobi, COPT, MPAX, or Pyomo with a QP-capable solver.
 
+.. note:: A quadratic objective term is solve-only. Compiling warns; ``pyepo.func`` training methods and ``pyepo.metric`` metrics reject the model with an error. Quadratic constraints carry no such restriction.
+
 
 Constraints
 -----------

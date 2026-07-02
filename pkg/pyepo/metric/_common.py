@@ -18,8 +18,6 @@ if TYPE_CHECKING:
 
     from torch import nn
 
-    from pyepo.model.opt import optModel
-
 
 def regret_from_objective(obj, true_obj, model_sense):
     """Return the signed regret gap for a minimization or maximization model."""
@@ -28,13 +26,6 @@ def regret_from_objective(obj, true_obj, model_sense):
     if model_sense == EPO.MAXIMIZE:
         return true_obj - obj
     raise ValueError("Invalid modelSense.")
-
-
-def require_linear_objective(optmodel: optModel) -> None:
-    """Reject models carrying a quadratic objective term."""
-    problem = getattr(optmodel, "problem", None)
-    if problem is not None and getattr(problem, "obj_Q", None) is not None:
-        raise ValueError("Regret metrics require a linear objective.")
 
 
 @contextmanager

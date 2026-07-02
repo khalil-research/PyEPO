@@ -33,6 +33,21 @@ def objective_offset(model: optModel) -> float:
     return float(problem.obj_offset) if problem is not None else 0.0
 
 
+def require_linear_objective(optmodel: optModel) -> None:
+    """
+    Reject compiled DSL models carrying a quadratic objective term.
+
+    Args:
+        optmodel: optimization model
+    """
+    problem = getattr(optmodel, "problem", None)
+    if problem is not None and getattr(problem, "obj_Q", None) is not None:
+        raise ValueError(
+            "A quadratic objective term is solve-only; "
+            "training methods and regret metrics require a linear objective."
+        )
+
+
 def costToNumpy(
     c: np.ndarray | torch.Tensor | list,
     dtype: Any = np.float32,

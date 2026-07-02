@@ -9,6 +9,8 @@ solver is absent) and check golden equivalence to the legacy hand-written
 classes plus solve properties.
 """
 
+import logging
+
 import numpy as np
 import pytest
 
@@ -1047,3 +1049,31 @@ def test_problem_repr():
     prob = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 5)) @ x <= 2])
     text = repr(prob)
     assert "max" in text and "5 vars" in text and "cost dim=5" in text
+
+
+@requires_gurobi
+class TestQuadObjectiveSolveOnly:
+    """Quadratic objective term: compile warns, solving still works."""
+
+    def _quad_problem(self):
+        x = dsl.Variable(2, lb=0.0, ub=1.0)
+        c = dsl.Parameter(2)
+        return dsl.Problem(dsl.Minimize(c @ x + x @ np.eye(2) @ x), [x.sum() <= 2.0])
+
+    def test_compile_warns_and_solves(self, caplog):
+        with caplog.at_level(logging.WARNING, logger="pyepo.dsl.problem"):
+            comp = self._quad_problem().compile(backend="gurobi")
+        assert "solve-only" in caplog.text
+        # min c'x + x'x over [0,1]^2 with c = 1 has optimum x = 0
+        comp.setObj(np.array([1.0, 1.0]))
+        sol, obj = comp.solve()
+        np.testing.assert_allclose(to_np(sol), [0.0, 0.0], atol=1e-6)
+        np.testing.assert_allclose(obj, 0.0, atol=1e-6)
+
+    def test_linear_compile_does_not_warn(self, caplog):
+        x = dsl.Variable(2, lb=0.0, ub=1.0)
+        c = dsl.Parameter(2)
+        prob = dsl.Problem(dsl.Minimize(c @ x), [x.sum() <= 2.0])
+        with caplog.at_level(logging.WARNING, logger="pyepo.dsl.problem"):
+            prob.compile(backend="gurobi")
+        assert "solve-only" not in caplog.text

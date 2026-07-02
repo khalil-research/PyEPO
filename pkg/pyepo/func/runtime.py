@@ -15,6 +15,7 @@ from pyepo.func._common import is_minimize, validate_probability
 from pyepo.func.utils import _close_pool, _init_worker_model
 from pyepo.model.mpax import optMpaxModel
 from pyepo.model.opt import optModel
+from pyepo.utils import require_linear_objective
 
 if TYPE_CHECKING:
     import logging
@@ -119,6 +120,7 @@ def init_runtime(
     """Validate common module arguments and initialize solver runtime state."""
     if not isinstance(optmodel, optModel):
         raise TypeError("arg model is not an optModel")
+    require_linear_objective(optmodel)
     is_minimize(optmodel.modelSense)
     validate_probability(solve_ratio, "solve_ratio")
     if reduction not in ("mean", "sum", "none"):

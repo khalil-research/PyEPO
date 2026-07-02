@@ -13,10 +13,13 @@ linear part, and an optional parameter-free quadratic term ``obj_Q``.
 from __future__ import annotations
 
 import copy as _copy
+import logging
 
 import numpy as np
 
 from pyepo import EPO
+
+logger = logging.getLogger(__name__)
 
 
 def _dense_row(A):
@@ -176,10 +179,19 @@ class Problem:
         (HiGHS, GLPK, CBC, SCIP, Ipopt); routing a native solver through them is
         wasteful indirection.
 
+        A quadratic objective term compiles for solving only; training
+        methods and regret metrics require a linear objective.
+
         Args:
             backend: solver backend name (``"gurobi"``, ``"copt"``, ``"pyomo"``, ``"ortools"``, ``"mpax"``).
             **kwargs: backend options -- ``solver=`` (generic backends), ``timelimit=`` (seconds), or native solver parameters.
         """
+        # a quadratic objective term compiles for solving only
+        if self.obj_Q is not None:
+            logger.warning(
+                "Quadratic objective term: the compiled model is solve-only; "
+                "training methods and regret metrics require a linear objective."
+            )
         # route to the backend compiler
         if backend == "gurobi":
             from pyepo.model.grb.compile import compileProblem

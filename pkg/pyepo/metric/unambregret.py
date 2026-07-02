@@ -15,14 +15,13 @@ from pyepo import EPO
 from pyepo.metric._common import (
     normalize_regret,
     regret_from_objective,
-    require_linear_objective,
     torch_evaluation,
     validate_cost_vectors,
     validate_prediction_batch,
     validate_retry_count,
     validate_tolerance,
 )
-from pyepo.utils import costToNumpy, objective_offset
+from pyepo.utils import costToNumpy, objective_offset, require_linear_objective
 
 if TYPE_CHECKING:
     from torch import nn

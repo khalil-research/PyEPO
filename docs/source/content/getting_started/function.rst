@@ -4,7 +4,7 @@ Training Methods
 Overview
 ========
 
-``pyepo.func`` provides PyTorch autograd modules that wrap an optimization solver for end-to-end training. All modules assume a linear objective with known, fixed constraints; the cost vector is predicted from contextual features.
+``pyepo.func`` provides PyTorch autograd modules that wrap an optimization solver for end-to-end training. All modules assume a linear objective with known, fixed constraints; the cost vector is predicted from contextual features. A DSL-compiled model with a quadratic objective term is rejected at construction.
 
 Every module accepts ``processes`` for parallel solving. All except ``CaVE`` accept ``solve_ratio < 1`` with ``dataset`` for solution-pool caching (see :doc:`../advanced/pool`); ``CaVE`` repurposes ``solve_ratio`` for its projection branch. Modules that return a loss also accept ``reduction`` (``"mean"``, ``"sum"``, or ``"none"``).
 

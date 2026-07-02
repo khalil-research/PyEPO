@@ -7,6 +7,7 @@ accordingly.
 """
 
 import pickle
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -14,7 +15,7 @@ import torch
 
 from pyepo.model.opt import ModelSpec, optModel
 from pyepo.model.utils import getTspTour, unionFind
-from pyepo.utils import costToNumpy
+from pyepo.utils import costToNumpy, require_linear_objective
 
 from .conftest import requires_cuda, requires_gurobi
 
@@ -348,3 +349,18 @@ class TestGetConfig:
         sol2, obj2 = model2.solve()
         np.testing.assert_allclose(obj1, obj2, atol=1e-6)
         np.testing.assert_allclose(sol1, sol2, atol=1e-6)
+
+
+class TestRequireLinearObjective:
+    """Solve-only guard for quadratic-objective DSL models."""
+
+    def test_rejects_quadratic_objective(self):
+        model = SimpleNamespace(problem=SimpleNamespace(obj_Q=np.eye(2)))
+        with pytest.raises(ValueError, match="linear objective"):
+            require_linear_objective(model)
+
+    def test_accepts_linear_dsl_model(self):
+        require_linear_objective(SimpleNamespace(problem=SimpleNamespace(obj_Q=None)))
+
+    def test_accepts_non_dsl_model(self):
+        require_linear_objective(SimpleNamespace())

@@ -447,9 +447,22 @@ class TestConstructorGuards:
 
         return shortestPathModel(grid=(3, 3))
 
+    @pytest.fixture
+    def quad_model(self):
+        from pyepo import dsl
+
+        x = dsl.Variable(3, lb=0.0, ub=1.0)
+        c = dsl.Parameter(3)
+        prob = dsl.Problem(dsl.Minimize(c @ x + x @ np.eye(3) @ x), [x.sum() <= 3.0])
+        return prob.compile(backend="gurobi")
+
     def test_invalid_model_type_raises(self, func_frontend):
         with pytest.raises(TypeError):
             func_frontend.SPOPlus("not_a_model")
+
+    def test_quadratic_objective_raises(self, func_frontend, quad_model):
+        with pytest.raises(ValueError, match="linear objective"):
+            func_frontend.SPOPlus(quad_model)
 
     def test_invalid_processes_raises(self, func_frontend, model):
         with pytest.raises(ValueError):
