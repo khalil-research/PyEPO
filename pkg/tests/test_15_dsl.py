@@ -660,6 +660,7 @@ def test_setobj_scatters_when_dims_coincide(backend):
     assert obj == pytest.approx(-2.0, abs=atol)
 
 
+@requires_gurobi
 def test_setobj_applies_permutation():
     # a permuted full-coverage prediction lands on the permuted positions
     x = dsl.Variable(3, lb=0, ub=1)
@@ -671,6 +672,7 @@ def test_setobj_applies_permutation():
     assert obj == pytest.approx(-1.0, abs=1e-6)
 
 
+@requires_gurobi
 def test_setobj_rejects_wrong_length():
     x = dsl.Variable(3, lb=0, ub=1)
     c = dsl.Parameter(3)
@@ -679,6 +681,7 @@ def test_setobj_rejects_wrong_length():
         comp.setObj(np.array([5.0]))  # no silent broadcast
 
 
+@requires_gurobi
 def test_setfullobj_matches_scatter():
     # the internal full-space protocol agrees with the user-facing scatter
     x = dsl.Variable(2, lb=0, ub=1)
