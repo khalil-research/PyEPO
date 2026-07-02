@@ -9,13 +9,14 @@ from tests.support.backends import (
     _HAS_GUROBI,
     requires_copt,
     requires_gurobi,
+    requires_jax,
     requires_mpax,
     requires_ortools,
 )
-from tests.support.helpers import BATCH, GRID, NUM_DATA, NUM_FEAT
+from tests.support.helpers import BATCH, GRID, NUM_DATA, NUM_FEAT, _ContractJax, _ContractTorch
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def sp_data():
     """Shortest-path optDataset + loader (CPU)."""
     if not _HAS_GUROBI:
@@ -30,7 +31,7 @@ def sp_data():
     return optmodel, dataset, DataLoader(dataset, batch_size=BATCH, shuffle=False)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def ks_data():
     """Knapsack optDataset + loader (CPU, MAXIMIZE)."""
     if not _HAS_GUROBI:
@@ -89,6 +90,12 @@ def _ks_optmodel(backend, weights):
     return knapsackModel(weights=weights, capacity=[10.0])
 
 
+@pytest.fixture(scope="module")
+def sp_mpax_data():
+    """Shortest-path optDataset + loader on MPAX."""
+    return _sp_dataset("mpax")
+
+
 @pytest.fixture(scope="module", params=_PIPELINE_BACKENDS)
 def sp_pipeline(request):
     return _sp_dataset(request.param)
@@ -126,11 +133,24 @@ def sp_constrs_data():
     return optmodel, dataset, loader
 
 
+@pytest.fixture(
+    params=[
+        pytest.param("torch"),
+        pytest.param("jax", marks=requires_jax),
+    ]
+)
+def contract_backend(request):
+    """Expose one frontend's autodiff harness to the shared contract."""
+    return _ContractTorch() if request.param == "torch" else _ContractJax()
+
+
 __all__ = [
+    "contract_backend",
     "ks_data",
     "ks_pipeline",
     "sp_constrs_data",
     "sp_data",
+    "sp_mpax_data",
     "sp_pipeline",
     "sp_truth",
 ]

@@ -1,4 +1,10 @@
-"""Pure validation and helper tests for :mod:`pyepo.metric`."""
+#!/usr/bin/env python
+"""Pure validation and helper tests for :mod:`pyepo.metric`.
+
+Solver-free layer: numpy-level input validation and per-sample validators of
+``pyepo.metric._common``. Dataloader-level torch validation and solver-backed
+metric behavior live in test_60.
+"""
 
 from types import SimpleNamespace
 

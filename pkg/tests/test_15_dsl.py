@@ -15,7 +15,14 @@ import pytest
 from pyepo import EPO, dsl
 from pyepo.model.opt import optModel
 
-from .conftest import requires_copt, requires_gurobi, requires_mpax, requires_ortools, to_np
+from .conftest import (
+    requires_copt,
+    requires_gurobi,
+    requires_mpax,
+    requires_ortools,
+    solver_atol,
+    to_np,
+)
 
 # ============================================================
 # Variable / Parameter construction
@@ -647,7 +654,7 @@ def test_setobj_scatters_when_dims_coincide(backend):
     )
     comp.setObj(np.array([1.0, -3.0]))  # full coefficients [2, -2]
     sol, obj = comp.solve()
-    atol = 1e-2 if backend == "mpax" else 1e-6
+    atol = solver_atol(comp, exact=1e-6, first_order=1e-2)
     assert np.allclose(to_np(sol), [0.0, 1.0], atol=atol)
     assert obj == pytest.approx(-2.0, abs=atol)
 
@@ -723,7 +730,7 @@ def test_partial_prediction_solves(backend):
     )
     comp.setObj(np.array([1.0, 1.0]))  # short predicted cost; setObj scatters it
     sol, obj = comp.solve()  # full: [x0, x1, y0, y1]
-    atol = 1e-2 if backend == "mpax" else 1e-6  # MPAX is first-order PDHG
+    atol = solver_atol(comp, exact=1e-6, first_order=1e-2)
     assert len(sol) == 4 and np.allclose(to_np(sol), [1, 1, 0, 0], atol=atol)
     assert obj == pytest.approx(2.0, abs=atol)  # full objective c @ x + d @ y
 
@@ -737,7 +744,7 @@ def test_objective_constant_in_solve(backend):
     comp = prob.compile(backend=backend, **_kw(backend))
     comp.setObj(np.array([1.0, -1.0]))
     sol, obj = comp.solve()
-    atol = 1e-2 if backend == "mpax" else 1e-3
+    atol = solver_atol(comp, exact=1e-3, first_order=1e-2)
     assert np.allclose(to_np(sol), [0.5, 1.0], atol=atol)
     assert obj == pytest.approx(-0.25, abs=atol)
 
@@ -988,19 +995,3 @@ def test_problem_repr():
     assert "max" in text and "5 vars" in text and "cost dim=5" in text
 
 
-@pytest.mark.parametrize("backend", _ALL)
-def test_partial_prediction_regret_is_full_objective(backend):
-    # min c x + d y, x + y >= 1, binary; known d = 3, true c = 1, mispredict c_hat = 5
-    from pyepo.metric.regret import calRegret
-
-    x = dsl.Variable(1, lb=0, ub=1)
-    y = dsl.Variable(1, lb=0, ub=1)
-    c = dsl.Parameter(1)
-    d = np.array([3.0])
-    comp = dsl.Problem(dsl.Minimize(c @ x + d @ y), [x[0] + y[0] >= 1]).compile(
-        backend=backend, **_kw(backend)
-    )
-    comp.setObj([1.0])  # true cost
-    _, z = comp.solve()  # full optimal objective = 1
-    reg = calRegret(comp, np.array([5.0]), np.array([1.0]), z)
-    assert reg == pytest.approx(2.0, abs=1e-4)  # full regret (cost-space would give -1)

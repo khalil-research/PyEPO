@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 import numpy as np
-import pytest
 import torch
 from torch import nn
 
-from tests.support.backends import requires_jax
 from tests.support.registry import JAX_LOSS_REGISTRY, LOSS_REGISTRY
 
 NUM_DATA = 32
@@ -45,6 +43,34 @@ def take_batch(loader, n=4):
     """Return the first ``n`` rows of the loader's first batch."""
     x, c, w, z = next(iter(loader))
     return x[:n], c[:n], w[:n], z[:n]
+
+
+def max_knapsack():
+    """MAXIMIZE knapsack shared by the torch and jax truth gates."""
+    from pyepo.model.grb.knapsack import knapsackModel
+
+    return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
+
+
+def fw_knapsack():
+    """Small MAXIMIZE knapsack shared by the Frank-Wolfe gates."""
+    from pyepo.model.grb.knapsack import knapsackModel
+
+    return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
+
+
+def partial_dsl_model():
+    """Partial-prediction DSL model (3 predicted items + 2 fixed-cost extras)."""
+    from pyepo import EPO, dsl
+
+    items = dsl.Variable(3, vtype=EPO.BINARY)
+    extra = dsl.Variable(2, vtype=EPO.BINARY)
+    cost = dsl.Parameter(3)
+    prob = dsl.Problem(
+        dsl.Maximize(cost @ items + np.array([1.0, 2.0]) @ extra),
+        [items.sum() + extra.sum() <= 3],
+    )
+    return prob.compile(backend="gurobi")
 
 
 def call_op(fn, sig, cp, c, w, z):
@@ -161,17 +187,6 @@ class _ContractJax:
         return bool(np.isfinite(np.asarray(x)).all())
 
 
-@pytest.fixture(
-    params=[
-        pytest.param("torch"),
-        pytest.param("jax", marks=requires_jax),
-    ]
-)
-def contract_backend(request):
-    """Expose one frontend's autodiff harness to the shared contract."""
-    return _ContractTorch() if request.param == "torch" else _ContractJax()
-
-
 __all__ = [
     "BATCH",
     "GRID",
@@ -179,8 +194,10 @@ __all__ = [
     "NUM_FEAT",
     "LinearPred",
     "call_op",
-    "contract_backend",
     "finite_diff_grad",
+    "fw_knapsack",
+    "max_knapsack",
+    "partial_dsl_model",
     "solver_atol",
     "sp_jax_pred",
     "take_batch",

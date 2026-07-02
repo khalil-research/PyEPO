@@ -5,7 +5,9 @@ Per-sample helpers (calRegret, calUnambRegret, SPOError) are checked
 for the invariants that matter: perfect prediction => zero, regret >= 0 for both
 senses, and unambiguous regret >= standard regret. The dataloader-level
 regret() / unambRegret() / MSE() are run on a tiny untrained predictor to verify
-they return sane floats. MSE needs no solver.
+they return sane floats. MSE needs no solver. Numpy-level input validation of
+``pyepo.metric._common`` lives in test_61; dataloader-level torch validation
+stays here.
 """
 
 import importlib
@@ -25,9 +27,6 @@ from pyepo.metric.unambregret import calUnambRegret, unambRegret
 from .conftest import (
     _HAS_FLAX,
     _HAS_GUROBI,
-    BATCH,
-    GRID,
-    NUM_DATA,
     NUM_FEAT,
     LinearPred,
     requires_gurobi,
@@ -223,6 +222,22 @@ class TestCalRegret:
         m.setObj(cost)
         _, true_obj = m.solve()
         assert abs(calRegret(m, cost, cost, true_obj)) < 1e-6
+
+    def test_partial_prediction_uses_full_objective(self):
+        # min c x + d y, x + y >= 1; known d = 3, true c = 1, mispredict c_hat = 5
+        from pyepo import dsl
+
+        x = dsl.Variable(1, lb=0, ub=1)
+        y = dsl.Variable(1, lb=0, ub=1)
+        c = dsl.Parameter(1)
+        d = np.array([3.0])
+        m = dsl.Problem(dsl.Minimize(c @ x + d @ y), [x[0] + y[0] >= 1]).compile(
+            backend="gurobi"
+        )
+        m.setObj([1.0])  # true cost
+        _, z = m.solve()  # full optimal objective = 1
+        reg = calRegret(m, np.array([5.0]), np.array([1.0]), z)
+        assert reg == pytest.approx(2.0, abs=1e-4)  # full regret (cost-space would give -1)
 
     def test_rejects_quadratic_objective(self):
         from pyepo import dsl
@@ -500,22 +515,10 @@ class TestSkScorer:
 class TestDataloaderMetricsMpax:
     """pyepo.metric.regret accepts a plain callable f(x_numpy) -> array."""
 
-    @pytest.fixture(scope="class")
-    def mpax_data(self):
-        import pyepo
-        from pyepo.data.dataset import optDataset
-        from pyepo.model.mpax.shortestpath import shortestPathModel
-
-        x, c = pyepo.data.shortestpath.genData(NUM_DATA, NUM_FEAT, GRID, seed=42)
-        optmodel = shortestPathModel(grid=GRID)
-        dataset = optDataset(optmodel, x, c)
-        loader = DataLoader(dataset, batch_size=BATCH, shuffle=False)
-        return optmodel, dataset, loader
-
-    def test_callable_returns_non_negative_float(self, mpax_data):
+    def test_callable_returns_non_negative_float(self, sp_mpax_data):
         import pyepo
 
-        optmodel, _ds, loader = mpax_data
+        optmodel, _ds, loader = sp_mpax_data
 
         def fn(x):
             return np.ones((x.shape[0], optmodel.num_cost), dtype=np.float32)
@@ -523,10 +526,10 @@ class TestDataloaderMetricsMpax:
         reg = pyepo.metric.regret(fn, optmodel, loader)
         assert isinstance(reg, float) and reg >= 0
 
-    def test_callable_reductions_consistent(self, mpax_data):
+    def test_callable_reductions_consistent(self, sp_mpax_data):
         import pyepo
 
-        optmodel, ds, loader = mpax_data
+        optmodel, ds, loader = sp_mpax_data
 
         def fn(x):
             return np.ones((x.shape[0], optmodel.num_cost), dtype=np.float32)

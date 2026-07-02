@@ -28,6 +28,7 @@ from .conftest import (
     requires_gurobi,
     requires_mpax,
     requires_ortools,
+    solver_atol,
     to_np,
 )
 
@@ -1121,10 +1122,10 @@ def _parity_case(problem, backend):
     if problem == "knapsack":
         return _make_knapsack("grb")[0], _make_knapsack(backend)[0], _KNAP_COST, 1e-4
     if problem == "shortestpath":
-        # exact LP solvers match Gurobi tightly; MPAX is first-order PDHG (~1e-3)
         cost = np.random.RandomState(42).rand(12)
-        atol = 1e-2 if backend == "mpax" else 1e-4
-        return _make_shortestpath("grb")[0], _make_shortestpath(backend)[0], cost, atol
+        m2 = _make_shortestpath(backend)[0]
+        atol = solver_atol(m2, exact=1e-4, first_order=1e-2)
+        return _make_shortestpath("grb")[0], m2, cost, atol
     cov, revenue = _portfolio_data()
     return _make_portfolio("grb", cov), _make_portfolio(backend, cov), revenue[0], 1e-4
 
@@ -1312,6 +1313,7 @@ class TestFactory:
     def test_solver_kwarg_forwarded(self):
         kp = predefined.knapsackModel(_FAC_W, _FAC_CAP, backend="pyomo", solver="gurobi")
         assert isinstance(kp, _fac_submodule("pyomo").knapsackModel)
+        assert kp.solver == "gurobi"
 
     @requires_gurobi
     def test_tsp_formulation_dispatch(self):

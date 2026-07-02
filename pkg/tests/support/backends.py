@@ -81,15 +81,10 @@ requires_jax_gpu = pytest.mark.skipif(
 )
 
 __all__ = [
-    "_HAS_CLARABEL",
-    "_HAS_COPT",
     "_HAS_CUDA",
     "_HAS_FLAX",
     "_HAS_GUROBI",
-    "_HAS_JAX",
-    "_HAS_JAX_GPU",
     "_HAS_MPAX",
-    "_HAS_ORTOOLS",
     "_HAS_PYOMO",
     "requires_clarabel",
     "requires_copt",

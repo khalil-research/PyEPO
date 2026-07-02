@@ -13,6 +13,9 @@ from .conftest import (
     PARTIAL_PREDICTION_SMOKE_OPS,
     call_op,
     finite_diff_grad,
+    fw_knapsack,
+    max_knapsack,
+    partial_dsl_model,
     requires_clarabel,
     requires_gurobi,
     requires_jax,
@@ -41,9 +44,7 @@ def _perturbed_setup(sense):
 
         _x, c = pyepo.data.shortestpath.genData(8, NUM_FEAT, GRID, seed=SEED)
         return shortestPathModel(grid=GRID), np.asarray(c, np.float32)
-    from pyepo.model.grb.knapsack import knapsackModel
-
-    model = knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
+    model = max_knapsack()
     c = (np.random.RandomState(0).rand(8, model.num_cost) + 0.5).astype(np.float32)
     return model, c
 
@@ -95,9 +96,7 @@ class TestPGTwoSidesParity:
             from pyepo.model.grb.shortestpath import shortestPathModel
 
             return shortestPathModel(grid=GRID)
-        from pyepo.model.grb.knapsack import knapsackModel
-
-        return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
+        return max_knapsack()
 
     @pytest.mark.parametrize("sense", ["min", "max"])
     def test_two_sides_grad_matches_torch(self, sense):
@@ -191,22 +190,10 @@ class TestCaVEGuards:
             jax.jit(lambda p: jcave(p, jnp.asarray(tight)))(jnp.asarray(pred))
 
 
-def _partial_model():
-    """Partial-prediction DSL model."""
-    from pyepo import EPO, dsl
-
-    items = dsl.Variable(3, vtype=EPO.BINARY)
-    extra = dsl.Variable(2, vtype=EPO.BINARY)
-    cost = dsl.Parameter(3)
-    dfix = np.array([1.0, 2.0])
-    prob = dsl.Problem(dsl.Maximize(cost @ items + dfix @ extra), [items.sum() + extra.sum() <= 3])
-    return prob.compile(backend="gurobi")
-
-
 def _partial_data(n=4):
     from pyepo.data.dataset import optDataset
 
-    model = _partial_model()
+    model = partial_dsl_model()
     rng = np.random.RandomState(0)
     c = (rng.rand(n, model.num_cost) + 0.5).astype(np.float32)
     x = rng.rand(n, NUM_FEAT).astype(np.float32)
@@ -224,7 +211,7 @@ class TestPartialPrediction:
         from pyepo.func.jax.perturbed import _perturb
         from pyepo.func.jax.utils import _full_cost, _mask_pred
 
-        model = _partial_model()
+        model = partial_dsl_model()
         full = _full_cost(jnp.ones((2, model.num_cost)), model)
         raw = np.random.RandomState(0).randn(2, 3, full.shape[-1]).astype(np.float32)
         noises = _mask_pred(jnp.asarray(raw), model)
@@ -870,9 +857,7 @@ class TestRegularized:
     """Regularized FW gradients."""
 
     def _knapsack(self):
-        from pyepo.model.grb.knapsack import knapsackModel
-
-        return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
+        return fw_knapsack()
 
     def test_opt_grad_matches_finite_difference(self):
         import jax

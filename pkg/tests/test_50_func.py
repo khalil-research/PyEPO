@@ -31,6 +31,9 @@ from .conftest import (
     SOLUTION_OPS,
     call_op,
     finite_diff_grad,
+    fw_knapsack,
+    max_knapsack,
+    partial_dsl_model,
     requires_clarabel,
     requires_gurobi,
     requires_jax,
@@ -603,19 +606,6 @@ class TestMultiplicativePerturbPartial:
     """Multiplicative partial-prediction perturbation."""
 
     @staticmethod
-    def _model():
-        from pyepo import dsl
-
-        items = dsl.Variable(3, vtype=EPO.BINARY)
-        extra = dsl.Variable(2, vtype=EPO.BINARY)
-        cost = dsl.Parameter(3)
-        prob = dsl.Problem(
-            dsl.Maximize(cost @ items + np.array([1.0, 2.0]) @ extra),
-            [items.sum() + extra.sum() <= 3],
-        )
-        return prob.compile(backend="gurobi")
-
-    @staticmethod
     def _inputs(optmodel, n_samples=3):
         from pyepo.func.utils import _mask_pred
 
@@ -629,7 +619,7 @@ class TestMultiplicativePerturbPartial:
     def test_fixed_positions_unperturbed(self, name):
         from pyepo.func.perturbed import perturbedFenchelYoungMul, perturbedOptMul
 
-        optmodel = self._model()
+        optmodel = partial_dsl_model()
         cls = perturbedOptMul if name == "DPOMul" else perturbedFenchelYoungMul
         mod = cls(optmodel, n_samples=3, sigma=1.0, processes=1)
         full, noises, fixed = self._inputs(optmodel)
@@ -643,7 +633,7 @@ class TestMultiplicativePerturbPartial:
     def test_expected_solution_factor_is_one_at_fixed(self):
         from pyepo.func.perturbed import perturbedFenchelYoungMul
 
-        optmodel = self._model()
+        optmodel = partial_dsl_model()
         mod = perturbedFenchelYoungMul(optmodel, n_samples=3, sigma=1.0, processes=1)
         full, noises, fixed = self._inputs(optmodel)
         # unit solutions expose the weighting factor directly
@@ -678,9 +668,8 @@ class TestListwiseLTRTarget:
     def test_maximize_favors_high_objective(self):
         from pyepo.data.dataset import optDataset
         from pyepo.func.rank import listwiseLearningToRank
-        from pyepo.model.grb.knapsack import knapsackModel
 
-        optmodel = knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0, 3.0]], capacity=[10.0])
+        optmodel = max_knapsack()
         costs = (np.random.RandomState(0).rand(8, optmodel.num_cost) + 0.5).astype(np.float32)
         dataset = optDataset(optmodel, np.zeros((8, 2), np.float32), costs)
         mod = listwiseLearningToRank(optmodel, processes=1, dataset=dataset)
@@ -756,19 +745,12 @@ class TestSPOPlusGradient:
         np.testing.assert_allclose(cp.grad.numpy(), expected, atol=1e-4)
 
 
-def _fw_knapsack():
-    """Knapsack shared by Frank-Wolfe tests."""
-    from pyepo.model.grb.knapsack import knapsackModel
-
-    return knapsackModel(weights=[[3.0, 4.0, 2.0, 5.0]], capacity=[7.0])
-
-
 @requires_gurobi
 class TestRegularizedFrankWolfe:
     def test_compute_regularization_includes_lambd(self):
         from pyepo.func.regularized import RFWO
 
-        m = RFWO(_fw_knapsack(), lambd=3.0, max_iter=5)
+        m = RFWO(fw_knapsack(), lambd=3.0, max_iter=5)
         # Omega(y) = (lambd/2)||y||^2 = 1.5 * 0.5 = 0.75
         y = torch.tensor([[0.5, 0.5, 0.0, 0.0]])
         assert torch.allclose(m.compute_regularization(y), torch.tensor([0.75]))
@@ -786,7 +768,7 @@ class TestRegularizedFrankWolfe:
             return sol, torch.zeros(cp.shape[0], dtype=cp.dtype, device=cp.device)
 
         monkeypatch.setattr(regularized, "_solve_or_cache", fake_solve_or_cache)
-        m = RFWO(_fw_knapsack(), max_iter=3, tol=1e-6)
+        m = RFWO(fw_knapsack(), max_iter=3, tol=1e-6)
         theta = torch.tensor([[0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0]])
         m._frank_wolfe(theta)
         assert batch_sizes and all(bs == 2 for bs in batch_sizes)
@@ -794,7 +776,7 @@ class TestRegularizedFrankWolfe:
     def test_extreme_theta_collapses_to_vertex(self):
         from pyepo.func.regularized import RFWO
 
-        m = RFWO(_fw_knapsack(), max_iter=10, tol=1e-6)
+        m = RFWO(fw_knapsack(), max_iter=10, tol=1e-6)
         mu, _vertices, weights = m._frank_wolfe(torch.tensor([[100.0, -100.0, -100.0, -100.0]]))
         assert mu.shape == (1, 4)
         assert mu[0, 0].item() > 0.99
@@ -803,7 +785,7 @@ class TestRegularizedFrankWolfe:
     def test_mu_equals_weighted_sum_of_vertices(self):
         from pyepo.func.regularized import RFWO
 
-        m = RFWO(_fw_knapsack(), max_iter=12, tol=1e-6)
+        m = RFWO(fw_knapsack(), max_iter=12, tol=1e-6)
         theta = torch.tensor([[1.0, 1.5, 2.0, 0.5], [2.0, 1.0, 1.0, 2.0]])
         mu, V, w = m._frank_wolfe(theta)
         assert torch.allclose(mu, (w.unsqueeze(-1) * V).sum(dim=1), atol=1e-5)
@@ -811,7 +793,7 @@ class TestRegularizedFrankWolfe:
     def test_smaller_lambd_closer_to_vertex(self):
         from pyepo.func.regularized import RFWO
 
-        opt = _fw_knapsack()
+        opt = fw_knapsack()
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0]])
         ip_sol = torch.tensor([[1.0, 1.0, 0.0, 0.0]])
         sharp = RFWO(opt, lambd=0.05, max_iter=30)(cp)
@@ -822,7 +804,7 @@ class TestRegularizedFrankWolfe:
     def test_backward_matches_finite_difference(self, lambd):
         from pyepo.func.regularized import RFWO
 
-        m = RFWO(_fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8)
+        m = RFWO(fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8)
         torch.manual_seed(0)
         cp = (torch.rand(1, 4) * 2 + 1.0).requires_grad_(True)
         target = torch.randn_like(cp)
@@ -911,7 +893,7 @@ class TestRegularizedFrankWolfeFenchelYoung:
         from pyepo.func.regularized import RFY
 
         lambd = 1.7
-        fy = RFY(_fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="none")
+        fy = RFY(fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="none")
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]])
         w = torch.tensor([[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]])
         loss = fy(cp, w)
@@ -925,7 +907,7 @@ class TestRegularizedFrankWolfeFenchelYoung:
         from pyepo.func.regularized import RFY
 
         lambd = 1.0
-        fy = RFY(_fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="mean")
+        fy = RFY(fw_knapsack(), lambd=lambd, max_iter=30, tol=1e-8, reduction="mean")
         cp = torch.tensor([[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]], requires_grad=True)
         w = torch.tensor([[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]])
         fy(cp, w).backward()
@@ -1215,7 +1197,7 @@ class TestLossGradientTruth:
 
 
 # ============================================================
-# CaVE (cone-aligned cosine) — needs binding constraints + Clarabel
+# torch: CaVE (cone-aligned cosine) — needs binding constraints + Clarabel
 # ============================================================
 
 
