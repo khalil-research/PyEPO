@@ -993,5 +993,3 @@ def test_problem_repr():
     prob = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 5)) @ x <= 2])
     text = repr(prob)
     assert "max" in text and "5 vars" in text and "cost dim=5" in text
-
-

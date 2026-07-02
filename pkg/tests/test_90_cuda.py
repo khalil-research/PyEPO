@@ -48,6 +48,8 @@ def _assert_grads_cuda(model):
 
 @requires_cuda_gurobi
 class TestOpsCUDA:
+    """Every op keeps outputs and grads on CUDA."""
+
     # .mean() is an identity on the scalar losses, so one body covers both kinds
     @pytest.mark.parametrize("name", [*SOLUTION_OPS, *LOSS_OPS])
     def test_output_and_grad_on_cuda(self, name, sp_data):
@@ -63,6 +65,8 @@ class TestOpsCUDA:
 
 @requires_cuda_gurobi
 class TestMaximizeCUDA:
+    """MAXIMIZE ops on CUDA."""
+
     def test_spo_plus_knapsack(self, ks_data):
         optmodel, _ds, loader = ks_data
         x, c, w, z = _cuda_batch(loader)
@@ -75,6 +79,8 @@ class TestMaximizeCUDA:
 
 @requires_cuda_gurobi
 class TestMetricsCUDA:
+    """Dataloader metrics with a CUDA predictor."""
+
     def test_regret_and_mse(self, sp_data):
         optmodel, _ds, loader = sp_data
         pred = LinearPred(NUM_FEAT, optmodel.num_cost).to(_DEVICE)

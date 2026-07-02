@@ -72,6 +72,8 @@ def test_noise_changes_costs(generator, args, noise_kw):
 
 
 class TestKnapsackData:
+    """Knapsack generator shapes."""
+
     def test_output_shapes(self):
         weights, x, c = knapsack.genData(50, 5, 8, dim=2, deg=1, seed=42)
         assert weights.shape == (2, 8)
@@ -80,6 +82,8 @@ class TestKnapsackData:
 
 
 class TestShortestPathData:
+    """Shortest-path generator shapes and positivity."""
+
     @pytest.mark.parametrize("grid", [(4, 4), (3, 5)])
     def test_output_shapes(self, grid):
         x, c = shortestpath.genData(20, 5, grid, deg=1, seed=42)
@@ -93,6 +97,8 @@ class TestShortestPathData:
 
 
 class TestTSPData:
+    """TSP generator shapes."""
+
     @pytest.mark.parametrize("num_nodes", [6, 8])
     def test_output_shapes(self, num_nodes):
         x, c = tsp.genData(20, 5, num_nodes, seed=42)
@@ -102,6 +108,8 @@ class TestTSPData:
 
 
 class TestPortfolioData:
+    """Portfolio generator shapes and covariance."""
+
     def test_output_shapes(self):
         cov, x, r = portfolio.genData(30, 5, 8, seed=42)
         assert cov.shape == (8, 8)
@@ -115,4 +123,3 @@ class TestPortfolioData:
     def test_covariance_psd(self):
         cov, _, _ = portfolio.genData(10, 3, 6, seed=42)
         assert np.all(np.linalg.eigvalsh(cov) >= -1e-10)
-

@@ -86,6 +86,8 @@ def _loader(n=16, d=4, batch_size=8):
 
 
 class TestMSE:
+    """MSE values, mode handling, and edge cases."""
+
     def test_perfect_prediction_zero(self):
         d = 4
         costs = torch.randn(16, d)
@@ -120,6 +122,8 @@ class TestMSE:
 
 
 class TestDataloaderPredictionValidation:
+    """Prediction validation before any solver work."""
+
     optmodel = SimpleNamespace(num_cost=4)
 
     def test_mse_rejects_wrong_prediction_shape(self):
@@ -176,6 +180,8 @@ class TestDataloaderPredictionValidation:
 
 @requires_gurobi
 class TestCalRegret:
+    """Per-sample regret invariants."""
+
     def _sp(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
 
@@ -231,9 +237,7 @@ class TestCalRegret:
         y = dsl.Variable(1, lb=0, ub=1)
         c = dsl.Parameter(1)
         d = np.array([3.0])
-        m = dsl.Problem(dsl.Minimize(c @ x + d @ y), [x[0] + y[0] >= 1]).compile(
-            backend="gurobi"
-        )
+        m = dsl.Problem(dsl.Minimize(c @ x + d @ y), [x[0] + y[0] >= 1]).compile(backend="gurobi")
         m.setObj([1.0])  # true cost
         _, z = m.solve()  # full optimal objective = 1
         reg = calRegret(m, np.array([5.0]), np.array([1.0]), z)
@@ -264,6 +268,8 @@ class TestCalRegret:
 
 @requires_gurobi
 class TestSPOError:
+    """Batch SPOError invariants."""
+
     def _sp(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
 
@@ -284,6 +290,8 @@ class TestSPOError:
 
 @requires_gurobi
 class TestCalUnambRegret:
+    """Per-sample unambiguous-regret invariants."""
+
     def _sp(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
 
@@ -381,6 +389,8 @@ class TestCalUnambRegret:
 
 @requires_gurobi
 class TestDataloaderMetrics:
+    """Dataloader-level metrics on an untrained predictor."""
+
     def test_regret_minimize(self, sp_data):
         import pyepo
 
@@ -481,6 +491,8 @@ class TestDataloaderMetrics:
 
 @requires_gurobi
 class TestSkScorer:
+    """sklearn regret scorer."""
+
     def test_scorer_argument_orientation(self):
         from sklearn.linear_model import LinearRegression
 
@@ -573,6 +585,8 @@ class TestDataloaderMetricsParity:
 
 
 class TestAutoSkScorer:
+    """auto-sklearn regret scorer."""
+
     def test_raises_without_autosklearn(self):
         from pyepo.metric.metrics import makeAutoSkScorer
         from pyepo.twostage.autosklearnpred import _HAS_AUTO

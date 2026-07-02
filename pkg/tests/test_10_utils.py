@@ -99,6 +99,8 @@ class PosOnlyConfigModel(optModel):
 
 
 class _NoDeepcopy:
+    """Value that refuses deepcopy."""
+
     def __init__(self, values):
         self.values = values
 
@@ -132,6 +134,8 @@ class CustomConfigModel(optModel):
 
 
 class TestUnionFind:
+    """Union-find merge and path compression."""
+
     def test_initial_each_singleton(self):
         uf = unionFind(5)
         for i in range(5):
@@ -169,6 +173,8 @@ class TestUnionFind:
 
 
 class TestGetTspTour:
+    """Tour extraction from edge selections."""
+
     @staticmethod
     def _all_edges(n):
         return [(i, j) for i in range(n) for j in range(i + 1, n)]
@@ -211,6 +217,8 @@ class TestGetTspTour:
 
 
 class TestCostToNumpy:
+    """Cost-vector conversion and dtype rules."""
+
     def test_torch_tensor_detached(self):
         c = torch.tensor([1.0, 2.0, 3.0], dtype=torch.float64, requires_grad=True)
         out = costToNumpy(c)
@@ -242,6 +250,8 @@ class TestCostToNumpy:
 
 
 class TestModelSpec:
+    """Constructor capture, snapshots, and rebuild."""
+
     def test_rebuild_has_clean_independent_config(self):
         model = ConfigModel([1, 2, 3], label="x")
         rebuilt = model.rebuild()
@@ -347,6 +357,8 @@ class TestModelSpec:
 
 @requires_gurobi
 class TestGetConfig:
+    """get_config on real solver models."""
+
     def test_shortestpath_args(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
 

@@ -14,6 +14,8 @@ from pyepo.twostage.autosklearnpred import _HAS_AUTO, autoSklearnPred
 
 
 class TestSklearnPred:
+    """Multi-output wrapping of sklearn regressors."""
+
     def test_wraps_into_multioutput(self):
         from sklearn.linear_model import LinearRegression
         from sklearn.multioutput import MultiOutputRegressor
@@ -37,6 +39,8 @@ class TestSklearnPred:
 
 
 class TestAutoSklearnPred:
+    """auto-sklearn guard and metric dispatch."""
+
     def test_raises_when_missing(self):
         if _HAS_AUTO:
             pytest.skip("auto-sklearn is installed; skip negative test")

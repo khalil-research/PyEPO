@@ -76,6 +76,8 @@ def test_train_minimize(name, sp_data):
 
 @requires_gurobi
 class TestMaximizeEndToEnd:
+    """MAXIMIZE training loops."""
+
     def test_spo_plus_knapsack(self, ks_data):
         optmodel, _ds, loader = ks_data
         predmodel = LinearPred(NUM_FEAT, optmodel.num_cost)
@@ -103,6 +105,8 @@ class TestMaximizeEndToEnd:
 
 @requires_gurobi
 class TestSpecialDatasets:
+    """Dataset variants that only matter end to end."""
+
     def test_knn_dataset(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
 

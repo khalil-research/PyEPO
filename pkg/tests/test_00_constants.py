@@ -5,11 +5,12 @@ Fastest layer: pure enum semantics, no solver. Runs first so a broken import
 or constant fails before any expensive solver test.
 """
 
-from pyepo import EPO
 from pyepo.EPO import MAXIMIZE, MINIMIZE, ModelSense
 
 
 class TestModelSense:
+    """ModelSense values and aliases."""
+
     def test_integer_values(self):
         # losses rely on these exact signs to flip min/max
         assert MINIMIZE == 1
@@ -18,7 +19,3 @@ class TestModelSense:
     def test_members_match_enum(self):
         assert ModelSense.MINIMIZE is MINIMIZE
         assert ModelSense.MAXIMIZE is MAXIMIZE
-
-    def test_reexported_on_EPO(self):
-        assert EPO.MINIMIZE is MINIMIZE
-        assert EPO.MAXIMIZE is MAXIMIZE

@@ -23,6 +23,8 @@ from pyepo.metric.unambregret import calUnambRegret, unambRegret
 
 
 class TestRegretFromObj:
+    """Sense-signed regret gap."""
+
     def test_minimize(self):
         assert regret_from_objective(3.0, 1.0, EPO.MINIMIZE) == 2.0
 
@@ -39,6 +41,8 @@ class TestRegretFromObj:
 
 
 class TestNormalizeRegret:
+    """Regret normalization and epsilon guard."""
+
     def test_normalizes_by_absolute_optimum_sum(self):
         assert normalize_regret(6.0, 3.0) == pytest.approx(2.0)
 
@@ -50,6 +54,8 @@ class TestNormalizeRegret:
 
 
 class TestSPOErrorValidation:
+    """SPOError input validation before solver access."""
+
     model = SimpleNamespace(num_cost=4)
 
     def test_validation_preserves_cost_dtype(self):
@@ -100,6 +106,8 @@ class TestSPOErrorValidation:
 
 
 class TestSingleRegretValidation:
+    """Per-sample metric input validation."""
+
     @staticmethod
     def _call(metric, pred_cost, true_cost, true_obj=0.0):
         metric(SimpleNamespace(num_cost=4), pred_cost, true_cost, true_obj)
@@ -150,6 +158,8 @@ class TestSingleRegretValidation:
 
 
 class TestUnambRegretValidation:
+    """Tolerance and retry-budget validation."""
+
     @pytest.mark.parametrize(
         ("kwargs", "exc", "match"),
         [

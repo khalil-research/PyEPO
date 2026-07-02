@@ -84,6 +84,8 @@ class _SolutionTypeModel(_GoodModel):
 
 
 class TestDatasetInputContract:
+    """Shared constructor contract across dataset classes."""
+
     @pytest.mark.parametrize(("dataset_cls", "kwargs"), _DATASET_BUILDERS)
     def test_rejects_non_optmodel(self, dataset_cls, kwargs):
         rng = np.random.RandomState(0)
@@ -102,6 +104,8 @@ class TestDatasetInputContract:
 
 
 class TestOptDatasetErrors:
+    """Malformed solve() returns surface as errors."""
+
     def test_bad_solve_return_raises(self):
         rng = np.random.RandomState(0)
         x = rng.randn(_N, NUM_FEAT).astype(np.float32)
@@ -177,6 +181,8 @@ class TestOptDatasetGurobi:
 
 @requires_gurobi
 class TestOptDatasetKNN:
+    """kNN smoothing and parameter guards."""
+
     def _model_data(self, n=12):
         from pyepo.model.grb.shortestpath import shortestPathModel
 
@@ -231,6 +237,8 @@ class TestOptDatasetKNN:
 
 @requires_gurobi
 class TestOptDatasetConstrs:
+    """Binding-constraint extraction for CaVE."""
+
     def test_construct_shortestpath(self):
         from pyepo.model.grb.shortestpath import shortestPathModel
 

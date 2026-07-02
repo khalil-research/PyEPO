@@ -15,7 +15,7 @@ import torch
 import pyepo
 import pyepo.func as F
 
-from .conftest import NUM_FEAT, LinearPred, take_batch
+from .conftest import NUM_FEAT, LinearPred, solver_atol, take_batch
 
 _STEPS = 2
 
@@ -26,9 +26,11 @@ class TestBackendPipeline:
     def test_dataset_objs_consistent(self, sp_pipeline):
         # objs == costs·sols confirms the solve (incl. the MPAX dlpack round-trip)
         # returns internally consistent tensors on this backend
-        _optmodel, dataset, _loader = sp_pipeline
+        optmodel, dataset, _loader = sp_pipeline
         recon = (dataset.costs * dataset.sols).sum(dim=1)
-        np.testing.assert_allclose(recon.numpy(), dataset.objs.numpy().ravel(), atol=1e-2)
+        np.testing.assert_allclose(
+            recon.numpy(), dataset.objs.numpy().ravel(), atol=solver_atol(optmodel)
+        )
 
     def test_spoplus(self, sp_pipeline):
         optmodel, _ds, loader = sp_pipeline
@@ -64,7 +66,9 @@ class TestBackendPipeline:
         # MAXIMIZE: objs match recon (sign flip correct) and SPO+ stays non-negative
         optmodel, dataset, loader = ks_pipeline
         recon = (dataset.costs * dataset.sols).sum(dim=1)
-        np.testing.assert_allclose(recon.numpy(), dataset.objs.numpy().ravel(), atol=1e-2)
+        np.testing.assert_allclose(
+            recon.numpy(), dataset.objs.numpy().ravel(), atol=solver_atol(optmodel)
+        )
         assert (dataset.objs.numpy() >= -1e-3).all()
         _x, c, w, z = take_batch(loader)
         cp = (c * 1.2).clone().detach().requires_grad_(True)

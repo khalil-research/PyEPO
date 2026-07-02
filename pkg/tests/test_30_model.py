@@ -44,6 +44,8 @@ requires_omo = pytest.mark.skipif(
 
 
 class TestOptModelBase:
+    """optModel ABC contract and shared validators."""
+
     def test_cannot_instantiate_abstract(self):
         with pytest.raises(TypeError):
             optModel()
@@ -117,6 +119,8 @@ class TestOptModelBase:
 
 
 class TestProblemConstructorValidation:
+    """Constructor rejection of malformed problem data."""
+
     @pytest.mark.parametrize("grid", [(1, 1), (0, 3), (2,), (2, 3, 4), (2.5, 3)])
     def test_shortestpath_rejects_invalid_grid(self, grid):
         from pyepo.model.grb.shortestpath import shortestPathModel
@@ -171,6 +175,8 @@ class TestProblemConstructorValidation:
 
 
 class TestProblemConfigIsolation:
+    """get_config snapshots are independent of the model."""
+
     def test_knapsack_config_is_independent(self):
         from pyepo.model.grb.knapsack import knapsackModel
 
@@ -264,6 +270,8 @@ _KNAP_BACKENDS = [
 
 @pytest.mark.parametrize("backend", _KNAP_BACKENDS)
 class TestKnapsack:
+    """Knapsack contract across backends."""
+
     def test_init_and_num_cost(self, backend):
         m, _ = _make_knapsack(backend)
         assert m.modelSense == EPO.MAXIMIZE
@@ -497,6 +505,8 @@ _SP_BACKENDS = [
 
 @pytest.mark.parametrize("backend", _SP_BACKENDS)
 class TestShortestPath:
+    """Shortest-path contract across backends."""
+
     def test_init_and_num_cost(self, backend):
         m, _ = _make_shortestpath(backend)
         assert m.modelSense == EPO.MINIMIZE
@@ -596,6 +606,8 @@ _PORTFOLIO_BACKENDS = [
 
 @pytest.mark.parametrize("backend", _PORTFOLIO_BACKENDS)
 class TestPortfolio:
+    """Portfolio contract across backends."""
+
     def test_init_and_num_cost(self, backend):
         cov, _ = _portfolio_data()
         m = _make_portfolio(backend, cov)
@@ -686,6 +698,8 @@ _TSP_PARAMS = [
 
 @pytest.mark.parametrize("backend,formulation", _TSP_PARAMS)
 class TestTSP:
+    """TSP contract across backends and formulations."""
+
     def test_init_and_num_cost(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         assert m.num_nodes == 4
@@ -868,6 +882,8 @@ _VRP_PARAMS = [
 
 @pytest.mark.parametrize("backend,formulation", _VRP_PARAMS)
 class TestVRP:
+    """CVRP contract across backends and formulations."""
+
     def test_init_and_num_cost(self, backend, formulation):
         m, _ = _make_vrp(backend, formulation)
         assert m.num_nodes == _VRP_NUM_NODES
@@ -1148,6 +1164,8 @@ def test_parity_vs_gurobi(problem, backend):
 
 @requires_ortools
 class TestOrtCpSatGuards:
+    """CP-SAT integer-only guards."""
+
     def test_float_weights_raise(self):
         from pyepo.model.ort.knapsack import knapsackCpModel
 
@@ -1205,6 +1223,8 @@ if _HAS_MPAX:
 
 @requires_mpax
 class TestMpaxQP:
+    """MPAX quadratic-objective path."""
+
     @pytest.fixture
     def model(self):
         return _MpaxBoxQP(Q_diag=[2.0, 4.0, 6.0, 8.0])

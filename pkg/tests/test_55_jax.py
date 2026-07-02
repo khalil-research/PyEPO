@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-"""Tests for the JAX training frontend."""
+"""Tests for the JAX training frontend.
+
+Torch-vs-JAX parity first (both frontends required), then jax-only helpers,
+jit/eager guards, and independent correctness gates (closed forms and finite
+differences on mpax or gurobi). Contracts shared with torch live in test_50.
+"""
 
 import numpy as np
 import pytest
@@ -274,7 +279,6 @@ class TestPartialPrediction:
 @requires_jax
 @requires_gurobi
 def test_full_prediction_lift_includes_offset():
-    """Full-prediction lift includes fixed offsets."""
     import jax.numpy as jnp
     import torch
 
@@ -417,6 +421,8 @@ class TestMaskPred:
 
 @requires_mpax
 class TestBatchSolve:
+    """Native MPAX batch solve vs the callback path."""
+
     def test_callback_matches_native(self):
         import jax.numpy as jnp
 
@@ -471,8 +477,9 @@ class TestMultiprocessing:
 
 @requires_mpax
 class TestJit:
+    """jit/eager equivalence and guards."""
+
     def test_spoplus_jit_matches_eager(self):
-        """jit gradient matches eager."""
         import jax
         import jax.numpy as jnp
 
@@ -491,7 +498,6 @@ class TestJit:
         np.testing.assert_allclose(g_jit, g_eager, atol=1e-4)
 
     def test_jit_caching_raises_clear_error(self):
-        """Caching loss rejects jit."""
         import jax
         import jax.numpy as jnp
 
@@ -595,6 +601,8 @@ class TestSPOPlusClosedForm:
 
 @requires_jax
 class TestBlackbox:
+    """NID and DBB closed-form gradients."""
+
     def _setup(self, sense):
         model, c = _perturbed_setup(sense)
         pred = (c * 1.3).astype(np.float32)

@@ -1,5 +1,12 @@
 #!/usr/bin/env python
-"""Tests for pyepo.func losses, helpers, and optModule runtime."""
+"""Tests for pyepo.func losses, helpers, and optModule runtime.
+
+Layered from solver-free helpers upward: pure tensor helpers and the shared
+frontend runtime, frontend-shared forward/backward and constructor contracts
+(torch & jax), then torch-only sense handling and deep correctness gates
+(closed forms, finite differences, CaVE). JAX-only behavior and torch-vs-jax
+parity live in test_55.
+"""
 
 from unittest.mock import MagicMock
 
@@ -68,6 +75,8 @@ class TestLossRegistry:
 
 
 class TestCacheInPass:
+    """Solution-pool selection by objective."""
+
     def _mock_model(self, sense):
         m = MagicMock()
         m.modelSense = sense
@@ -103,6 +112,8 @@ class TestCacheInPass:
 
 
 class TestCheckSol:
+    """Objective-solution consistency checker."""
+
     def test_correct_passes(self):
         _check_sol(
             torch.tensor([[1.0, 2.0, 3.0]]), torch.tensor([[1.0, 0.0, 1.0]]), torch.tensor([4.0])
@@ -118,6 +129,8 @@ class TestCheckSol:
 
 
 class TestSumGammaDistribution:
+    """Sum-of-Gamma sampler guards and sampling."""
+
     @pytest.mark.parametrize(
         "kwargs, match",
         [
@@ -149,6 +162,8 @@ class TestSumGammaDistribution:
 
 
 class TestSolutionPool:
+    """Pool bootstrap and dedup."""
+
     def test_missing_pool_raises_stable_error(self):
         from pyepo.func._common import require_solution_pool
 
@@ -225,6 +240,8 @@ class TestPerturbedInternals:
 
 
 class _RuntimeModel(optModel):
+    """Minimal solver-free optModel for runtime tests."""
+
     def _getModel(self):
         return None, [0]
 
@@ -236,6 +253,8 @@ class _RuntimeModel(optModel):
 
 
 class TestSharedRuntime:
+    """Pool creation and runtime state binding."""
+
     def test_single_process_needs_no_pool(self):
         assert create_solver_pool(_RuntimeModel(), 1) is None
 
@@ -747,6 +766,8 @@ class TestSPOPlusGradient:
 
 @requires_gurobi
 class TestRegularizedFrankWolfe:
+    """RFWO regularized-solver behavior."""
+
     def test_compute_regularization_includes_lambd(self):
         from pyepo.func.regularized import RFWO
 
@@ -825,6 +846,8 @@ class TestRegularizedFrankWolfe:
 @requires_gurobi
 @pytest.mark.slow
 class TestAwayStepFrankWolfe:
+    """Away-step Frank-Wolfe convergence and active set."""
+
     def _sp_module(self, max_iter=10000, tol=1e-7, lambd=1.0):
         from pyepo.func.regularized import RFWO
         from pyepo.model.grb.shortestpath import shortestPathModel
@@ -889,6 +912,8 @@ class TestAwayStepFrankWolfe:
 
 @requires_gurobi
 class TestRegularizedFrankWolfeFenchelYoung:
+    """RFY loss values and gradients."""
+
     def test_forward_matches_formula(self):
         from pyepo.func.regularized import RFY
 
@@ -1204,6 +1229,8 @@ class TestLossGradientTruth:
 @requires_gurobi
 @requires_clarabel
 class TestCaVE:
+    """CaVE reductions, gradients, and heuristic branch."""
+
     @pytest.fixture
     def setup(self):
         from pyepo.func.cave import CaVE
