@@ -788,21 +788,22 @@ def test_aux_variable_solves(backend):
     assert len(sol) == 3 and obj == pytest.approx(1.5)  # x.sum() <= y <= 1.5
 
 
+@pytest.mark.parametrize(("kwarg", "value"), [("TimeLimit", 12.5), ("timelimit", 7.5)])
 @pytest.mark.parametrize("backend", _BACKENDS)
-def test_solver_params_silent_default(backend):
+def test_solver_params_silent_default(backend, kwarg, value):
     x = dsl.Variable(3, vtype=EPO.BINARY)
     c = dsl.Parameter(3)
     comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 3)) @ x <= 2]).compile(
-        backend=backend, TimeLimit=12.5
+        backend=backend, **{kwarg: value}
     )
 
     def param(model, name):
         return getattr(model.Params, name) if backend == "gurobi" else model.getParam(name)
 
     silent = "OutputFlag" if backend == "gurobi" else "Logging"  # solver output flag
-    assert param(comp._model, "TimeLimit") == 12.5  # user param applied
+    assert param(comp._model, "TimeLimit") == value  # user param applied (canonical or raw)
     assert param(comp._model, silent) == 0  # silent by default
-    assert param(comp.relax()._model, "TimeLimit") == 12.5  # params survive relax
+    assert param(comp.relax()._model, "TimeLimit") == value  # params survive relax
 
 
 @pytest.mark.parametrize("backend", _BACKENDS)
@@ -985,17 +986,6 @@ def test_problem_repr():
     prob = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 5)) @ x <= 2])
     text = repr(prob)
     assert "max" in text and "5 vars" in text and "cost dim=5" in text
-
-
-@pytest.mark.parametrize("backend", _BACKENDS)
-def test_canonical_timelimit_param(backend):
-    x = dsl.Variable(3, vtype=EPO.BINARY)
-    c = dsl.Parameter(3)
-    comp = dsl.Problem(dsl.Maximize(c @ x), [np.ones((1, 3)) @ x <= 2]).compile(
-        backend=backend, timelimit=7.5
-    )
-    tl = comp._model.Params.TimeLimit if backend == "gurobi" else comp._model.getParam("TimeLimit")
-    assert tl == 7.5  # canonical name maps to TimeLimit
 
 
 @pytest.mark.parametrize("backend", _ALL)

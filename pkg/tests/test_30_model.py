@@ -717,13 +717,6 @@ class TestTSP:
         assert tour[0] == tour[-1]
         assert len(set(tour[:-1])) == m.num_nodes
 
-    def test_setObj_rejects_bad_shape(self, backend, formulation):
-        m, _ = _make_tsp(backend, formulation)
-        with pytest.raises(ValueError):
-            m.setObj(np.ones(3))
-        with pytest.raises(ValueError, match="one-dimensional"):
-            m.setObj(np.ones((2, m.num_cost)))
-
     def test_copy_preserves_objective_and_is_independent(self, backend, formulation):
         m, _ = _make_tsp(backend, formulation)
         cost = np.random.RandomState(42).rand(m.num_cost)
@@ -784,6 +777,25 @@ class TestTSP:
             rel.relax()
         with pytest.raises(RuntimeError):
             rel.getTour([0] * m.num_cost)
+
+
+# setObj lives on the shared base for GG/MTZ; only DFJ overrides it
+_TSP_SETOBJ_PARAMS = [
+    pytest.param("grb", "GG", marks=requires_gurobi),
+    pytest.param("grb", "DFJ", marks=requires_gurobi),
+    pytest.param("copt", "GG", marks=requires_copt),
+    pytest.param("copt", "DFJ", marks=requires_copt),
+    pytest.param("omo", "GG", marks=requires_omo),
+]
+
+
+@pytest.mark.parametrize("backend,formulation", _TSP_SETOBJ_PARAMS)
+def test_tsp_setObj_rejects_bad_shape(backend, formulation):
+    m, _ = _make_tsp(backend, formulation)
+    with pytest.raises(ValueError):
+        m.setObj(np.ones(3))
+    with pytest.raises(ValueError, match="one-dimensional"):
+        m.setObj(np.ones((2, m.num_cost)))
 
 
 _TSP_CONSISTENCY = [

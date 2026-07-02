@@ -217,60 +217,6 @@ class TestPerturbedInternals:
 
 
 # ============================================================
-# both: forward/backward contracts
-# ============================================================
-# `contract_backend` runs the same assertions on Torch and JAX.
-
-
-@requires_gurobi
-class TestForwardBackwardContract:
-    """Shared forward/backward contract."""
-
-    @pytest.mark.parametrize("name", SOLUTION_OPS)
-    def test_solution_forward_and_backward(self, name, contract_backend, sp_data):
-        be = contract_backend
-        optmodel, dataset, loader = sp_data
-        entry = be.registry[name]
-        _x, c, w, z = take_batch(loader)
-        cp, c2, w2, z2 = be.inputs(c, w, z)
-        op = entry.build(optmodel, dataset, "mean")
-        out = be.forward(op, entry.sig, cp, c2, w2, z2)
-        assert be.shape(out) == be.shape(cp)
-        assert be.finite(out)
-        g = be.grad(op, entry.sig, cp, c2, w2, z2)
-        assert be.shape(g) == be.shape(cp)
-        assert be.finite(g)
-
-    @pytest.mark.parametrize("name", LOSS_OPS)
-    def test_loss_scalar_and_backward(self, name, contract_backend, sp_data):
-        be = contract_backend
-        optmodel, dataset, loader = sp_data
-        entry = be.registry[name]
-        _x, c, w, z = take_batch(loader)
-        cp, c2, w2, z2 = be.inputs(c, w, z)
-        op = entry.build(optmodel, dataset, "mean")
-        out = be.forward(op, entry.sig, cp, c2, w2, z2)
-        assert be.ndim(out) == 0
-        g = be.grad(op, entry.sig, cp, c2, w2, z2)
-        assert be.finite(g)
-
-    @pytest.mark.parametrize("name", LOSS_OPS)
-    def test_loss_reduction_modes(self, name, contract_backend, sp_data):
-        be = contract_backend
-        optmodel, dataset, loader = sp_data
-        entry = be.registry[name]
-        _x, c, w, z = take_batch(loader)
-        cp, c2, w2, z2 = be.inputs(c, w, z)
-        # most losses reduce to (batch,); lsLTR keeps a (batch, pool) grid
-        none = be.forward(entry.build(optmodel, dataset, "none"), entry.sig, cp, c2, w2, z2)
-        assert be.shape(none)[0] == be.shape(cp)[0]
-        mean = be.forward(entry.build(optmodel, dataset, "mean"), entry.sig, cp, c2, w2, z2)
-        total = be.forward(entry.build(optmodel, dataset, "sum"), entry.sig, cp, c2, w2, z2)
-        np.testing.assert_allclose(float(be.to_np(mean)), float(be.to_np(none).mean()), atol=1e-5)
-        np.testing.assert_allclose(float(be.to_np(total)), float(be.to_np(none).sum()), atol=1e-5)
-
-
-# ============================================================
 # neutral: shared frontend runtime
 # ============================================================
 
@@ -401,6 +347,60 @@ class TestSharedRuntime:
 
 
 # ============================================================
+# both: forward/backward contracts
+# ============================================================
+# `contract_backend` runs the same assertions on Torch and JAX.
+
+
+@requires_gurobi
+class TestForwardBackwardContract:
+    """Shared forward/backward contract."""
+
+    @pytest.mark.parametrize("name", SOLUTION_OPS)
+    def test_solution_forward_and_backward(self, name, contract_backend, sp_data):
+        be = contract_backend
+        optmodel, dataset, loader = sp_data
+        entry = be.registry[name]
+        _x, c, w, z = take_batch(loader)
+        cp, c2, w2, z2 = be.inputs(c, w, z)
+        op = entry.build(optmodel, dataset, "mean")
+        out = be.forward(op, entry.sig, cp, c2, w2, z2)
+        assert be.shape(out) == be.shape(cp)
+        assert be.finite(out)
+        g = be.grad(op, entry.sig, cp, c2, w2, z2)
+        assert be.shape(g) == be.shape(cp)
+        assert be.finite(g)
+
+    @pytest.mark.parametrize("name", LOSS_OPS)
+    def test_loss_scalar_and_backward(self, name, contract_backend, sp_data):
+        be = contract_backend
+        optmodel, dataset, loader = sp_data
+        entry = be.registry[name]
+        _x, c, w, z = take_batch(loader)
+        cp, c2, w2, z2 = be.inputs(c, w, z)
+        op = entry.build(optmodel, dataset, "mean")
+        out = be.forward(op, entry.sig, cp, c2, w2, z2)
+        assert be.ndim(out) == 0
+        g = be.grad(op, entry.sig, cp, c2, w2, z2)
+        assert be.finite(g)
+
+    @pytest.mark.parametrize("name", LOSS_OPS)
+    def test_loss_reduction_modes(self, name, contract_backend, sp_data):
+        be = contract_backend
+        optmodel, dataset, loader = sp_data
+        entry = be.registry[name]
+        _x, c, w, z = take_batch(loader)
+        cp, c2, w2, z2 = be.inputs(c, w, z)
+        # most losses reduce to (batch,); lsLTR keeps a (batch, pool) grid
+        none = be.forward(entry.build(optmodel, dataset, "none"), entry.sig, cp, c2, w2, z2)
+        assert be.shape(none)[0] == be.shape(cp)[0]
+        mean = be.forward(entry.build(optmodel, dataset, "mean"), entry.sig, cp, c2, w2, z2)
+        total = be.forward(entry.build(optmodel, dataset, "sum"), entry.sig, cp, c2, w2, z2)
+        np.testing.assert_allclose(float(be.to_np(mean)), float(be.to_np(none).mean()), atol=1e-5)
+        np.testing.assert_allclose(float(be.to_np(total)), float(be.to_np(none).sum()), atol=1e-5)
+
+
+# ============================================================
 # both: optModule init validation (torch & jax frontends)
 # ============================================================
 
@@ -416,31 +416,6 @@ def func_frontend(request):
 
 
 @requires_gurobi
-class TestOptModuleInit:
-    def _model(self):
-        from pyepo.model.grb.shortestpath import shortestPathModel
-
-        return shortestPathModel(grid=(3, 3))
-
-    def test_invalid_model_type_raises(self, func_frontend):
-        with pytest.raises(TypeError):
-            func_frontend.SPOPlus("not_a_model")
-
-    def test_invalid_processes_raises(self, func_frontend):
-        with pytest.raises(ValueError):
-            func_frontend.SPOPlus(self._model(), processes=-1)
-
-    @pytest.mark.parametrize("ratio", INVALID_RATIOS)
-    def test_invalid_solve_ratio_raises(self, func_frontend, ratio):
-        with pytest.raises(ValueError, match="solve_ratio"):
-            func_frontend.SPOPlus(self._model(), solve_ratio=ratio)
-
-    def test_solve_ratio_lt1_requires_dataset(self, func_frontend):
-        with pytest.raises(TypeError):
-            func_frontend.SPOPlus(self._model(), solve_ratio=0.5, dataset=None)
-
-
-@requires_gurobi
 class TestConstructorGuards:
     """Shared constructor validation."""
 
@@ -449,6 +424,23 @@ class TestConstructorGuards:
         from pyepo.model.grb.shortestpath import shortestPathModel
 
         return shortestPathModel(grid=(3, 3))
+
+    def test_invalid_model_type_raises(self, func_frontend):
+        with pytest.raises(TypeError):
+            func_frontend.SPOPlus("not_a_model")
+
+    def test_invalid_processes_raises(self, func_frontend, model):
+        with pytest.raises(ValueError):
+            func_frontend.SPOPlus(model, processes=-1)
+
+    @pytest.mark.parametrize("ratio", INVALID_RATIOS)
+    def test_invalid_solve_ratio_raises(self, func_frontend, model, ratio):
+        with pytest.raises(ValueError, match="solve_ratio"):
+            func_frontend.SPOPlus(model, solve_ratio=ratio)
+
+    def test_solve_ratio_lt1_requires_dataset(self, func_frontend, model):
+        with pytest.raises(TypeError):
+            func_frontend.SPOPlus(model, solve_ratio=0.5, dataset=None)
 
     @pytest.mark.parametrize(
         "name",
@@ -586,48 +578,6 @@ class TestMaximizeSense:
         assert out.shape == cp.shape
         out.sum().backward()
         assert torch.isfinite(cp.grad).all()
-
-    def test_blackbox_grad_matches_estimator(self, ks_data):
-        from pyepo.func.blackbox import blackboxOpt
-        from pyepo.func.utils import _solve_batch
-
-        optmodel, _dataset, loader = ks_data
-        _x, c, _w, _z = take_batch(loader)
-        mod = blackboxOpt(optmodel, lambd=10, processes=1)
-        cp = (c * 1.2).clone().detach().requires_grad_(True)
-        torch.manual_seed(0)
-        target = torch.randn_like(cp)
-        (mod(cp) * target).sum().backward()
-        # MAXIMIZE: perturb against the upstream gradient and flip the sign
-        sol_p, _ = _solve_batch(cp.detach(), optmodel, 1, None)
-        sol_q, _ = _solve_batch(cp.detach() - mod.lambd * target, optmodel, 1, None)
-        expected = -(sol_q - sol_p) / mod.lambd
-        assert torch.allclose(cp.grad, expected, atol=solver_atol(optmodel))
-
-    def test_implicit_mle_grad_matches_estimator(self, ks_data):
-        from pyepo.func.perturbed import implicitMLE
-        from pyepo.utils import _EPS
-
-        optmodel, _dataset, loader = ks_data
-        _x, c, _w, _z = take_batch(loader)
-        mod = implicitMLE(optmodel, processes=1, n_samples=3, sigma=1.0)
-        cp = (c * 1.2).clone().detach()
-        torch.manual_seed(0)
-        target = torch.randn_like(cp)
-        cpg = cp.clone().requires_grad_(True)
-        (mod(cpg) * target).sum().backward()
-        # Same default Sum-of-Gamma draw as the module.
-        noises = sumGammaDistribution(kappa=5).sample(
-            size=(cp.shape[0], mod.n_samples, cp.shape[1]),
-            device=torch.device("cpu"),
-            dtype=torch.float32,
-        )
-        ptb_c = cp.unsqueeze(1) + mod.sigma * noises
-        # MAXIMIZE: perturb against the upstream gradient and flip the sign
-        ptb_sols = _solve_3d_batch(optmodel, ptb_c)
-        ptb_sols_neg = _solve_3d_batch(optmodel, ptb_c - mod.lambd * target.unsqueeze(1))
-        expected = -(ptb_sols_neg - ptb_sols).mean(dim=1) / (mod.lambd + _EPS)
-        assert torch.allclose(cpg.grad, expected, atol=solver_atol(optmodel))
 
 
 @requires_gurobi
@@ -891,6 +841,7 @@ class TestRegularizedFrankWolfe:
 
 
 @requires_gurobi
+@pytest.mark.slow
 class TestAwayStepFrankWolfe:
     def _sp_module(self, max_iter=10000, tol=1e-7, lambd=1.0):
         from pyepo.func.regularized import RFWO
@@ -1114,6 +1065,18 @@ class TestSolutionGradientTruth:
         expected = (sol_q - sol_p) / mod.lambd
         assert torch.allclose(cpg.grad, expected, atol=self.atol)
 
+    def test_blackbox_opt_maximize(self, ks_data):
+        from pyepo.func.utils import _solve_batch
+
+        optmodel, mod, cp, target = self._setup(ks_data, "DBB")
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        # MAXIMIZE: perturb against the upstream gradient and flip the sign
+        sol_p, _ = _solve_batch(cp, optmodel, 1, None)
+        sol_q, _ = _solve_batch(cp - mod.lambd * target, optmodel, 1, None)
+        expected = -(sol_q - sol_p) / mod.lambd
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
+
     @pytest.mark.parametrize("mul", [False, True])
     def test_perturbed_opt(self, sp_truth, mul, monkeypatch):
         # Record actual solves to avoid MPAX re-solve noise.
@@ -1152,6 +1115,19 @@ class TestSolutionGradientTruth:
         ptb_sols = _solve_3d_batch(optmodel, ptb_c)
         ptb_sols_pos = _solve_3d_batch(optmodel, ptb_c + mod.lambd * target.unsqueeze(1))
         expected = (ptb_sols_pos - ptb_sols).mean(dim=1) / (mod.lambd + _EPS)
+        assert torch.allclose(cpg.grad, expected, atol=self.atol)
+
+    def test_implicit_mle_maximize(self, ks_data):
+        from pyepo.utils import _EPS
+
+        optmodel, mod, cp, target = self._setup(ks_data, "IMLE")
+        cpg = cp.clone().requires_grad_(True)
+        (mod(cpg) * target).sum().backward()
+        ptb_c = self._imle_noise_ptb(cp, mod)
+        # MAXIMIZE: perturb against the upstream gradient and flip the sign
+        ptb_sols = _solve_3d_batch(optmodel, ptb_c)
+        ptb_sols_neg = _solve_3d_batch(optmodel, ptb_c - mod.lambd * target.unsqueeze(1))
+        expected = -(ptb_sols_neg - ptb_sols).mean(dim=1) / (mod.lambd + _EPS)
         assert torch.allclose(cpg.grad, expected, atol=self.atol)
 
     def test_adaptive_implicit_mle(self, sp_truth):

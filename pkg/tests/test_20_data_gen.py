@@ -19,7 +19,13 @@ _GENERATORS = [
     pytest.param(portfolio.genData, (10, 3, 4), id="portfolio"),
 ]
 
-_NOISE_WIDTH_GENERATORS = _GENERATORS[:3]
+# generator plus the name of its noise kwarg
+_NOISE_GENERATORS = [
+    pytest.param(knapsack.genData, (10, 3, 4), "noise_width", id="knapsack"),
+    pytest.param(shortestpath.genData, (10, 3, (3, 3)), "noise_width", id="shortestpath"),
+    pytest.param(tsp.genData, (10, 3, 5), "noise_width", id="tsp"),
+    pytest.param(portfolio.genData, (10, 3, 4), "noise_level", id="portfolio"),
+]
 
 
 @pytest.mark.parametrize(("generator", "args"), _GENERATORS)
@@ -29,11 +35,11 @@ def test_invalid_degree_rejected(generator, args, deg):
         generator(*args, deg=deg)
 
 
-@pytest.mark.parametrize(("generator", "args"), _NOISE_WIDTH_GENERATORS)
-@pytest.mark.parametrize("noise_width", [-0.1, np.nan, np.inf, True])
-def test_invalid_noise_width_rejected(generator, args, noise_width):
-    with pytest.raises(ValueError):
-        generator(*args, noise_width=noise_width)
+@pytest.mark.parametrize(("generator", "args", "noise_kw"), _NOISE_GENERATORS)
+@pytest.mark.parametrize("noise", [-0.1, np.nan, np.inf, True])
+def test_invalid_noise_rejected(generator, args, noise_kw, noise):
+    with pytest.raises(ValueError, match=noise_kw):
+        generator(*args, **{noise_kw: noise})
 
 
 @pytest.mark.parametrize(("generator", "args"), _GENERATORS)
@@ -58,10 +64,10 @@ def test_higher_degree_finite(generator, args):
     assert np.all(np.isfinite(generator(*args, deg=3, seed=42)[-1]))
 
 
-@pytest.mark.parametrize(("generator", "args"), _NOISE_WIDTH_GENERATORS)
-def test_noise_changes_costs(generator, args):
-    c0 = generator(*args, noise_width=0, seed=42)[-1]
-    c1 = generator(*args, noise_width=0.5, seed=42)[-1]
+@pytest.mark.parametrize(("generator", "args", "noise_kw"), _NOISE_GENERATORS)
+def test_noise_changes_costs(generator, args, noise_kw):
+    c0 = generator(*args, **{noise_kw: 0}, seed=42)[-1]
+    c1 = generator(*args, **{noise_kw: 0.5}, seed=42)[-1]
     assert not np.array_equal(c0, c1)
 
 
@@ -110,12 +116,3 @@ class TestPortfolioData:
         cov, _, _ = portfolio.genData(10, 3, 6, seed=42)
         assert np.all(np.linalg.eigvalsh(cov) >= -1e-10)
 
-    def test_noise_changes_revenue(self):
-        _, _, r0 = portfolio.genData(20, 3, 4, noise_level=0, seed=42)
-        _, _, r1 = portfolio.genData(20, 3, 4, noise_level=2, seed=42)
-        assert not np.array_equal(r0, r1)
-
-    @pytest.mark.parametrize("noise_level", [-0.1, np.nan, np.inf, True])
-    def test_invalid_noise_level_rejected(self, noise_level):
-        with pytest.raises(ValueError, match="noise_level"):
-            portfolio.genData(10, 3, 4, noise_level=noise_level)
