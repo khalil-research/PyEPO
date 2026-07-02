@@ -78,8 +78,11 @@ class vrpRCIModel(vrpABModel):
                 # interior edges
                 edges_s = [(u, v) for u in component for v in component if u < v]
                 if (len(edges_s) >= len(component)) or (k > 1):
-                    constr = sum(self._x[e] for e in edges_s) <= len(component) - k
-                    self.addLazyConstr(constr)
+                    # violated cuts only
+                    lhs = sum(self.getSolution(self._x[e]) for e in edges_s)
+                    if lhs > len(component) - k + _EDGE_ACTIVE_TOL:
+                        constr = sum(self._x[e] for e in edges_s) <= len(component) - k
+                        self.addLazyConstr(constr)
 
     def _getModel(self) -> tuple:
         """
