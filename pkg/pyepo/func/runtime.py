@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import multiprocessing as mp
 import weakref
 from dataclasses import dataclass
@@ -63,6 +64,10 @@ def normalize_processes(
     return cpu_count if processes == 0 else processes
 
 
+# unique pool ids
+_pool_ids = itertools.count()
+
+
 def create_solver_pool(
     optmodel: optModel,
     processes: int,
@@ -74,6 +79,7 @@ def create_solver_pool(
         return None
     pool = ProcessingPool(
         processes,
+        id=f"pyepo-{next(_pool_ids)}",
         initializer=_init_worker_model,
         initargs=(optmodel.to_spec(),),
     )
