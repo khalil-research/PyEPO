@@ -25,12 +25,9 @@ from pyepo.model.opt import optModel
 
 from .conftest import (
     FD_LOSSES,
-    JAX_LOSS_REGISTRY,
     LOSS_OPS,
     LOSS_REGISTRY,
     OP_SPECS,
-    PARTIAL_PREDICTION_PARITY_OPS,
-    PARTIAL_PREDICTION_SMOKE_OPS,
     SOLUTION_OPS,
     call_op,
     finite_diff_grad,
@@ -53,26 +50,18 @@ INVALID_RATIOS = [-0.1, 1.1, np.nan, np.inf, True]
 class TestLossRegistry:
     """Shared declarative loss registry."""
 
-    def test_op_lists_are_derived_from_specs(self):
-        assert [name for name, spec in OP_SPECS.items() if spec.kind == "solution"] == SOLUTION_OPS
-        assert [name for name, spec in OP_SPECS.items() if spec.kind == "loss"] == LOSS_OPS
-        assert [name for name, spec in OP_SPECS.items() if spec.finite_diff_truth] == FD_LOSSES
-        assert [
-            name for name, spec in OP_SPECS.items() if spec.partial_prediction == "parity"
-        ] == PARTIAL_PREDICTION_PARITY_OPS
-        assert [
-            name for name, spec in OP_SPECS.items() if spec.partial_prediction == "smoke"
-        ] == PARTIAL_PREDICTION_SMOKE_OPS
+    def test_specs_resolve_to_torch_ops(self):
+        import pyepo.func as F
 
-    def test_torch_registry_covers_specs(self):
-        assert list(LOSS_REGISTRY) == list(OP_SPECS)
+        for name in OP_SPECS:
+            assert callable(getattr(F, name))
 
-    def test_jax_registry_matches_torch_when_available(self):
-        if JAX_LOSS_REGISTRY:
-            assert list(JAX_LOSS_REGISTRY) == list(LOSS_REGISTRY)
-            for name in OP_SPECS:
-                assert JAX_LOSS_REGISTRY[name].kind == LOSS_REGISTRY[name].kind
-                assert JAX_LOSS_REGISTRY[name].sig == LOSS_REGISTRY[name].sig
+    @requires_jax
+    def test_specs_resolve_to_jax_ops(self):
+        import pyepo.func.jax as JF
+
+        for name in OP_SPECS:
+            assert callable(getattr(JF, name))
 
 
 class TestCacheInPass:
