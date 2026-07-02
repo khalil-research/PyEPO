@@ -84,8 +84,8 @@ loss, using a Flax linear layer and an optax optimizer:
 Jitted Training on MPAX
 =======================
 
-With the MPAX backend, the whole training step -- prediction, batch solve, and
-optimizer update -- compiles into one ``jax.jit`` function. Continuing the
+With the MPAX backend, the whole training step (prediction, batch solve, and
+optimizer update) compiles into one ``jax.jit`` function. Continuing the
 setup above with an MPAX model:
 
 .. code-block:: python
@@ -111,10 +111,10 @@ runs on the CPU inside ``jax.pure_callback``.
 Solution-Returning Modules and RNG Keys
 =======================================
 
-Solution-returning modules such as ``DPO`` compose with a task loss written in
-plain ``jax.numpy``. The randomized losses (the perturbed family) draw noise
-internally when run eagerly; under ``jax.jit`` they require an explicit
-``key=``, which becomes a traced argument:
+Solution-returning modules such as ``DPO`` are trained through a task loss
+written in plain ``jax.numpy``. The randomized losses (the perturbed family)
+draw noise internally when run eagerly; under ``jax.jit`` they require an
+explicit ``key=``, which becomes a traced argument:
 
 .. code-block:: python
 
@@ -142,7 +142,8 @@ error rather than silently freezing one noise draw.
 Evaluation
 ==========
 
-Evaluation works as in PyTorch; ``pyepo.metric.regret`` accepts a JAX callable:
+Evaluation works as in PyTorch; ``pyepo.metric.regret`` accepts a JAX callable.
+Evaluate on a held-out test set in real experiments:
 
 .. code-block:: python
 
