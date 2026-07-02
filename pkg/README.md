@@ -1,12 +1,12 @@
-# PyEPO: A PyTorch-based End-to-End Predict-then-Optimize Tool
+# PyEPO: A PyTorch/JAX-based End-to-End Predict-then-Optimize Tool
 
-``PyEPO`` (PyTorch-based End-to-End Predict-then-Optimize Tool) is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with linear objective functions. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), [MPAX](https://github.com/MIT-Lu-Lab/MPAX), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules.
+``PyEPO`` is a Python-based, open-source software that supports modeling and solving predict-then-optimize problems with linear objective functions. The core capability of ``PyEPO`` is to build optimization models with [GurobiPy](https://www.gurobi.com/), [COPT](https://www.shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), [MPAX](https://github.com/MIT-Lu-Lab/MPAX), or any other solvers and algorithms, then embed the optimization model into an artificial neural network for the end-to-end training. For this purpose, ``PyEPO`` implements various methods as [PyTorch](https://pytorch.org/) autograd modules, with a mirroring [JAX](https://jax.readthedocs.io/) frontend.
 
 ## Features
 
-- Implement **SPO+**, **PG**, **DPO** (additive and multiplicative perturbations), **PFYL** (additive and multiplicative perturbations), **I-MLE**, **AI-MLE**, L2-regularized **RFWO/RFYL**, **DBB**, **NID**, **CaVE**, **NCE**, and **LTR**
-- Support [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
-- Symbolic modeling with `pyepo.dsl`: define an LP, MIP, or QP once, then compile it to any backend
+- Implement **SPO+**, **PG**, **DPO** (additive and multiplicative perturbations), **PFYL** (additive and multiplicative perturbations), **I-MLE**, **AI-MLE**, L2-regularized **RFWO/RFYL**, **DBB**, **NID**, **CaVE**, **NCE**, **CMAP**, and **LTR**
+- Support [Gurobi](https://www.gurobi.com/), [COPT](https://www.shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and [MPAX](https://github.com/MIT-Lu-Lab/MPAX) API
+- Symbolic modeling with `pyepo.dsl`: define an LP, MIP, or supported fixed-quadratic objective once, then compile it to any backend
 - JAX frontend (`pyepo.func.jax`): train any loss in JAX/Flax with `jax.grad`
 - Support parallel computing for optimization solvers
 - Support solution caching to speed up training

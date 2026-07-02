@@ -25,7 +25,7 @@ class blackboxOpt(optModule):
     \\mathbf{w}^*(\\hat{\\mathbf{c}})) / \\lambda`. Larger ``lambd`` smooths
     more (recommended 10-20).
 
-    Reference: Vlastelica et al. (2019) `<https://arxiv.org/abs/1912.02175>`_
+    Reference: Vlastelica et al. (2020) `<https://openreview.net/forum?id=BkevoJSYPB>`_
     """
 
     def __init__(self, optmodel, lambd=10, processes=1, solve_ratio=1.0, dataset=None):
@@ -84,7 +84,7 @@ class negativeIdentity(optModule):
     -\\mathbf{I}` for minimization (and :math:`+\\mathbf{I}` for maximization),
     a straight-through gradient estimator needing no extra solve.
 
-    Reference: Sahoo et al. (2022) `<https://arxiv.org/abs/2205.15213>`_
+    Reference: Sahoo et al. (2023) `<https://openreview.net/forum?id=JZMR727O29>`_
     """
 
     def __init__(self, optmodel, processes=1, solve_ratio=1.0, dataset=None):

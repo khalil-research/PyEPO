@@ -55,7 +55,7 @@ If you use the **CaVE** loss, please also cite:
 
 `PyEPO` is a Python library for predict-then-optimize. It focuses on problems where a model predicts objective coefficients and the feasible region is fixed, then trains the predictor against downstream decision quality rather than prediction error alone.
 
-`PyEPO` models optimization problems with [GurobiPy](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), or [MPAX](https://github.com/MIT-Lu-Lab/MPAX), and exposes the optimization layer through PyTorch and JAX training frontends. The symbolic `pyepo.dsl` frontend can define LPs, MIPs, and supported fixed-quadratic objective terms, then compile the same model to a PyEPO backend.
+`PyEPO` models optimization problems with [GurobiPy](https://www.gurobi.com/), [COPT](https://www.shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), or [MPAX](https://github.com/MIT-Lu-Lab/MPAX), and exposes the optimization layer through PyTorch and JAX training frontends. The symbolic `pyepo.dsl` frontend can define LPs, MIPs, and supported fixed-quadratic objective terms, then compile the same model to a PyEPO backend.
 
 For end-to-end learning on **binary linear programs** (TSP, CVRP, knapsack, ...), `PyEPO` includes **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12), a cone-alignment loss that uses binding-constraint normals at the true optimum. CaVE requires `optDatasetConstrs` and a Gurobi-backed `optModel` for extracting binding constraints. In the CVRP-20 setup from notebook 04 (`num_data=1000`, 10 epochs, single process), CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with `solve_ratio=0.3` trains 10.5x faster with higher final regret.
 
@@ -92,18 +92,18 @@ To **reproduce the experiments** in the original paper, use the code and instruc
 ## Features
 
 - **End-to-end gradient surrogates** for predict-then-optimize, covering the seven families in the docs:
-  - *Surrogate losses*: convex upper bound on regret (**SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922)) and finite-difference directional gradient (**PG** [[11]](https://arxiv.org/abs/2402.03256)).
+  - *Surrogate losses*: convex upper bound on regret (**SPO+** [[1]](https://doi.org/10.1287/mnsc.2020.3922)) and finite-difference directional gradient (**PG** [[11]](https://proceedings.neurips.cc/paper_files/paper/2024/hash/907a9fb75a408f6c3a2ae1bf84c39e44-Abstract-Conference.html)).
   - *Perturbed methods*: Monte Carlo gradients over random cost perturbations: **DPO** and **PFYL** [[5]](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html) [[6]](https://arxiv.org/abs/2207.13513), **I-MLE** [[9]](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html), **AI-MLE** [[10]](https://ojs.aaai.org/index.php/AAAI/article/view/26103).
   - *Regularized methods*: L2-regularized Frank-Wolfe over the convex hull of feasible solutions: **RFWO** and **RFYL** [[6]](https://arxiv.org/abs/2207.13513).
-  - *Black-box methods*: surrogate backward rules for discrete solvers: **DBB** [[3]](https://arxiv.org/abs/1912.02175) (interpolation) and **NID** [[4]](https://arxiv.org/abs/2205.15213) (signed identity).
+  - *Black-box methods*: surrogate backward rules for discrete solvers: **DBB** [[3]](https://openreview.net/forum?id=BkevoJSYPB) (interpolation) and **NID** [[4]](https://openreview.net/forum?id=JZMR727O29) (signed identity).
   - *Cone-aligned estimation*: project the predicted cost onto binding-constraint normals at the true optimum; binary linear programs only: **CaVE** [[13]](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12).
   - *Contrastive methods*: margin against a cached pool of non-optimal solutions: **NCE** and **CMAP** [[7]](https://www.ijcai.org/proceedings/2021/390).
   - *Learning to rank*: rank the true optimum highest among the pool: pointwise / pairwise / listwise **LTR** [[8]](https://proceedings.mlr.press/v162/mandi22a.html).
-- **Multi-solver backend** under a unified `optModel` API: [Gurobi](https://www.gurobi.com/), [COPT](https://shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and the GPU-native [MPAX](https://github.com/MIT-Lu-Lab/MPAX) PDHG solver.
+- **Multi-solver backend** under a unified `optModel` API: [Gurobi](https://www.gurobi.com/), [COPT](https://www.shanshu.ai/copt), [Pyomo](http://www.pyomo.org/), [Google OR-Tools](https://developers.google.com/optimization), and the GPU-native [MPAX](https://github.com/MIT-Lu-Lab/MPAX) PDHG solver.
 - **Symbolic modeling** with `pyepo.dsl`: define an LP, MIP, or supported fixed-quadratic objective once with `Variable`, `Parameter`, and constraints, then compile it to a PyEPO backend. The compiled model is an `optModel` and works with PyEPO training methods.
 - **Parallel solving** via a Pathos worker pool to amortize per-instance ILP solves across a mini-batch.
 - **Solution caching** [[7]](https://www.ijcai.org/proceedings/2021/390) reuses previously computed optima to skip redundant solver calls in contrastive and ranking training.
-- **kNN-smoothed targets** [[12]](https://arxiv.org/abs/2310.04328) replace each label with a neighborhood aggregate for noise-robust regret.
+- **kNN-smoothed targets** [[12]](https://www.ijcai.org/proceedings/2024/538) replace each label with a neighborhood aggregate for noise-robust regret.
 
 ## Installation
 
@@ -134,12 +134,12 @@ git clone -b main --depth 1 https://github.com/khalil-research/PyEPO.git
 Install the package from the local checkout.
 
 ```bash
-pip install PyEPO/pkg/.
+pip install ./PyEPO/pkg
 ```
 
 ### Solver Backends
 
-`PyEPO` compiles optimization models onto a solver backend. A bare `pip install pyepo` does not install a solver backend. The default backend is Gurobi; for a license-free setup, use Pyomo or OR-Tools with an open solver.
+`PyEPO` compiles optimization models onto a solver backend. A bare `pip install pyepo` does not install one; each backend has a pip extra that installs its package alongside `PyEPO`, e.g. `pip install pyepo[gurobi]` (also `copt`, `pyomo`, `ortools`, `mpax`, `cave` for the Clarabel-based CaVE loss, or `all`). The default backend is Gurobi; for a license-free setup, use Pyomo or OR-Tools with an open solver.
 
 
 ## Dependencies
@@ -161,7 +161,6 @@ Solver and frontend packages depend on the backend you use: GurobiPy, COPT, Pyom
 An end-to-end predict-then-optimize example. The optimization model is defined with `pyepo.dsl` and compiled to Gurobi; change `backend` to use another PyEPO backend such as COPT, Pyomo, OR-Tools, or MPAX.
 
 ```python
-import numpy as np
 import pyepo
 from pyepo import EPO, dsl
 import torch
@@ -244,14 +243,14 @@ for epoch in range(10):
 ## Reference
 * [1] [Elmachtoub, A. N., & Grigas, P. (2021). Smart "predict, then optimize". Management Science.](https://doi.org/10.1287/mnsc.2020.3922)
 * [2] [Mandi, J., Stuckey, P. J., & Guns, T. (2020). Smart predict-and-optimize for hard combinatorial optimization problems. In Proceedings of the AAAI Conference on Artificial Intelligence.](https://doi.org/10.1609/aaai.v34i02.5521)
-* [3] [Vlastelica, M., Paulus, A., Musil, V., Martius, G., & Rolinek, M. (2019). Differentiation of blackbox combinatorial solvers. arXiv preprint arXiv:1912.02175.](https://arxiv.org/abs/1912.02175)
-* [4] [Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2022). Backpropagation through combinatorial algorithms: Identity with projection works. arXiv preprint arXiv:2205.15213.](https://arxiv.org/abs/2205.15213)
+* [3] [Vlastelica, M., Paulus, A., Musil, V., Martius, G., & Rolinek, M. (2020). Differentiation of blackbox combinatorial solvers. In International Conference on Learning Representations.](https://openreview.net/forum?id=BkevoJSYPB)
+* [4] [Sahoo, S. S., Paulus, A., Vlastelica, M., Musil, V., Kuleshov, V., & Martius, G. (2023). Backpropagation through combinatorial algorithms: Identity with projection works. In International Conference on Learning Representations.](https://openreview.net/forum?id=JZMR727O29)
 * [5] [Berthet, Q., Blondel, M., Teboul, O., Cuturi, M., Vert, J. P., & Bach, F. (2020). Learning with differentiable perturbed optimizers. Advances in neural information processing systems, 33, 9508-9519.](https://papers.nips.cc/paper/2020/hash/6bb56208f672af0dd65451f869fedfd9-Abstract.html)
 * [6] [Dalle, G., Baty, L., Bouvier, L., & Parmentier, A. (2022). Learning with Combinatorial Optimization Layers: a Probabilistic Approach. arXiv:2207.13513.](https://arxiv.org/abs/2207.13513)
 * [7] [Mulamba, M., Mandi, J., Diligenti, M., Lombardi, M., Bucarey, V., & Guns, T. (2021). Contrastive losses and solution caching for predict-and-optimize. Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence.](https://www.ijcai.org/proceedings/2021/390)
 * [8] [Mandi, J., Bucarey, V., Mulamba, M., & Guns, T. (2022). Decision-focused learning: through the lens of learning to rank. Proceedings of the 39th International Conference on Machine Learning.](https://proceedings.mlr.press/v162/mandi22a.html)
 * [9] [Niepert, M., Minervini, P., & Franceschi, L. (2021). Implicit MLE: backpropagating through discrete exponential family distributions. Advances in Neural Information Processing Systems, 34, 14567-14579.](https://proceedings.neurips.cc/paper_files/paper/2021/hash/7a430339c10c642c4b2251756fd1b484-Abstract.html)
 * [10] [Minervini, P., Franceschi, L., & Niepert, M. (2023, June). Adaptive perturbation-based gradient estimation for discrete latent variable models. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 8, pp. 9200-9208).](https://ojs.aaai.org/index.php/AAAI/article/view/26103)
-* [11] [Gupta, V., & Huang, M. (2024). Decision-Focused Learning with Directional Gradients. Training, 50(100), 150.](https://arxiv.org/abs/2402.03256)
-* [12] [Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.](https://arxiv.org/abs/2310.04328)
+* [11] [Gupta, V., & Huang, M. (2024). Decision-Focused Learning with Directional Gradients. Advances in Neural Information Processing Systems, 37.](https://proceedings.neurips.cc/paper_files/paper/2024/hash/907a9fb75a408f6c3a2ae1bf84c39e44-Abstract-Conference.html)
+* [12] [Schutte, N., Postek, K., & Yorke-Smith, N. (2024). Robust Losses for Decision-Focused Learning. Proceedings of the Thirty-Third International Joint Conference on Artificial Intelligence.](https://www.ijcai.org/proceedings/2024/538)
 * [13] [Tang, B., & Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).](https://link.springer.com/chapter/10.1007/978-3-031-60599-4_12)

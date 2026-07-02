@@ -205,7 +205,7 @@ class optDatasetKNN(optDataset):
     are cached for training, providing a robust supervision signal under noisy
     or out-of-distribution feature observations.
 
-    Reference: Schutte et al. (2023) `<https://arxiv.org/abs/2310.04328>`_
+    Reference: Schutte et al. (2024) `<https://www.ijcai.org/proceedings/2024/538>`_
 
     Attributes:
         model (optModel): Optimization model

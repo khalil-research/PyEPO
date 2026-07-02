@@ -113,7 +113,7 @@ class perturbationGradient(optModule):
     (default) vs central differencing. Needs only the true cost, not the true
     optimal solution.
 
-    Reference: Gupta & Huang (2024) `<https://arxiv.org/abs/2402.03256>`_
+    Reference: Gupta & Huang (2024) `<https://proceedings.neurips.cc/paper_files/paper/2024/hash/907a9fb75a408f6c3a2ae1bf84c39e44-Abstract-Conference.html>`_
     """
 
     def __init__(

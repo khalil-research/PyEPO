@@ -289,5 +289,5 @@ Per-instance constraint matrices have different row counts (different constraint
   # optDataLoader pads ragged per-instance constraint matrices
   dataloader_constr = optDataLoader(dataset_constr, batch_size=32, shuffle=True)
 
-.. [#f1] Schutte, N., Postek, K., & Yorke-Smith, N. (2023). Robust Losses for Decision-Focused Learning. arXiv preprint arXiv:2310.04328.
+.. [#f1] Schutte, N., Postek, K., & Yorke-Smith, N. (2024). Robust Losses for Decision-Focused Learning. Proceedings of the Thirty-Third International Joint Conference on Artificial Intelligence.
 .. [#f2] Tang, B., & Khalil, E. B. (2024). CaVE: A Cone-Aligned Approach for Fast Predict-then-Optimize with Binary Linear Programs. In Integration of Constraint Programming, Artificial Intelligence, and Operations Research (pp. 193-210).

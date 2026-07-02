@@ -37,7 +37,7 @@ class blackboxOpt(optModule):
     Returns a predicted solution -- pair with an objective-value task loss
     such as L1 against :math:`z^*(\\mathbf{c})`.
 
-    Reference: Vlastelica et al. (2019) `<https://arxiv.org/abs/1912.02175>`_
+    Reference: Vlastelica et al. (2020) `<https://openreview.net/forum?id=BkevoJSYPB>`_
     """
 
     def __init__(
@@ -141,7 +141,7 @@ class negativeIdentity(optModule):
     Returns a predicted solution; pair with an objective-value task loss
     (e.g., L1 against :math:`z^*(\\mathbf{c})`).
 
-    Reference: Sahoo et al. (2022) `<https://arxiv.org/abs/2205.15213>`_
+    Reference: Sahoo et al. (2023) `<https://openreview.net/forum?id=JZMR727O29>`_
     """
 
     def __init__(
