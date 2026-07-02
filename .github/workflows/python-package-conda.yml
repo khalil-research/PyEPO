@@ -8,8 +8,7 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 5
+    timeout-minutes: 60
 
     steps:
     - uses: actions/checkout@v5
@@ -17,24 +16,20 @@ jobs:
       uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: pyepo-build
-        python-version: 3.9
+        python-version: "3.9"
         auto-activate: false
         conda-remove-defaults: true
         channels: conda-forge,pytorch,gurobi
         channel-priority: strict
     - name: Install Conda-Build and Anaconda-Client
-      run: conda install conda-build anaconda-client
+      run: conda install -n pyepo-build conda-build anaconda-client --yes
     - name: Build Conda Package
       run: conda build ./pkg -c conda-forge -c pytorch -c gurobi
-    - name: Extract Package Version
-      run: |
-        PACKAGE_VERSION=$(conda search --json -c local pyepo | jq -r '.pyepo[-1].version')
-        echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
-    - name: Find and Upload Conda Package
+    - name: Upload Conda Package
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
       run: |
+        # --output only computes the path; the build above produced the package
         PKG_PATH=$(conda build --output ./pkg -c conda-forge -c pytorch -c gurobi)
         echo "Package path: $PKG_PATH"
-        conda install -n pyepo-build anaconda-client --yes
         conda run -n pyepo-build anaconda upload --user pyepo $PKG_PATH
