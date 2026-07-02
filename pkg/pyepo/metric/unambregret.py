@@ -57,7 +57,8 @@ def unambRegret(
     Args:
         predmodel: a regression neural network for cost prediction
         optmodel: a PyEPO optimization model
-        dataloader: PyTorch DataLoader over an ``optDataset``
+        dataloader: PyTorch DataLoader over an ``optDataset`` (fields beyond
+            ``(x, c, w, z)`` are ignored)
         tolerance: precision used when rounding predicted costs to find ties
         max_iter: maximum number of solve retries with relaxed tolerance
 
@@ -72,8 +73,8 @@ def unambRegret(
     with torch_evaluation(predmodel) as device:
         # load data
         for data in dataloader:
-            x, c, w, z = data
-            x, c, w, z = x.to(device), c.to(device), w.to(device), z.to(device)
+            x, c, _, z = data[:4]
+            x, c, z = x.to(device), c.to(device), z.to(device)
             # pred cost
             with torch.no_grad():
                 cp = costToNumpy(predmodel(x))

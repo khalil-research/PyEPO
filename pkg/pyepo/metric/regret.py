@@ -65,7 +65,8 @@ def regret(
             JAX callable ``f(x_numpy) -> cost_array``
         optmodel: a PyEPO optimization model
         dataloader: PyTorch DataLoader over an ``optDataset`` (yielding
-            ``(x, c, w, z)`` tuples)
+            ``(x, c, w, z, ...)`` tuples; fields beyond the first four,
+            e.g. CaVE tight constraints, are ignored)
         processes: number of processors, 1 for single-core, 0 for all of
             cores; a fresh worker pool is spawned per call, each worker
             rebuilding the model from its constructor args
@@ -89,7 +90,7 @@ def regret(
         with torch_evaluation(torch_model) as device:
             # load data
             for data in dataloader:
-                x, c, _, z = data
+                x, c, _, z = data[:4]
                 if torch_model is not None:
                     x, c, z = x.to(device), c.to(device), z.to(device)
                     with torch.no_grad():
