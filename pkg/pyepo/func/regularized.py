@@ -120,7 +120,7 @@ def _away_step_frank_wolfe(
         vertex_norms[batch_idx, free_idx] = torch.where(
             add_new, v_norm_sq, vertex_norms[batch_idx, free_idx]
         )
-        # displaced mass is dropped, not merged
+        # displaced mass is dropped
         weights[batch_idx, free_idx] = torch.where(
             add_new, gamma_fw, weights[batch_idx, free_idx]
         )

@@ -139,7 +139,7 @@ def _away_step_frank_wolfe(theta, module, use_cache=False):
         w = w.at[bidx, match_idx].add(gamma_fw * (has_match & use_fw).astype(theta.dtype))
         vt = vt.at[bidx, free_idx].set(jnp.where(add_new[:, None], v, vt[bidx, free_idx]))
         vn = vn.at[bidx, free_idx].set(jnp.where(add_new, vnv, vn[bidx, free_idx]))
-        # displaced mass is dropped, not merged
+        # displaced mass is dropped
         w = w.at[bidx, free_idx].set(jnp.where(add_new, gamma_fw, w[bidx, free_idx]))
         # away subtract, then clear FP residue so dropped atoms leave the active set
         w = w.at[bidx, away_idx].add(-gamma_away)

@@ -78,7 +78,7 @@ def create_solver_pool(
     """Create a worker pool, optionally tied to an owner's lifetime."""
     if processes == 1:
         return None
-    # preload the optmodel per worker unless the owner never solves in workers
+    # optional per-worker optmodel preload
     init_kwargs = (
         {"initializer": _init_worker_model, "initargs": (optmodel.to_spec(),)}
         if with_solver

@@ -79,7 +79,7 @@ def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
     bound = sig.bind(None, *args, **kwargs)
     init_args = []
     config = {}
-    # non-empty *args pin every preceding parameter to its position
+    # *args force positional capture
     has_extras = any(
         sig.parameters[name].kind is inspect.Parameter.VAR_POSITIONAL and value
         for name, value in bound.arguments.items()
