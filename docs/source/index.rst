@@ -3,15 +3,15 @@
 
 PyEPO Documentation
 ===================
-``PyEPO`` is a PyTorch/JAX-based library for end-to-end predict-then-optimize training.
+``PyEPO`` is a PyTorch- and JAX-based library for end-to-end predict-then-optimize training.
 
-New to PyEPO? Start with :doc:`content/intro`, install ``PyEPO`` and a solver backend, then follow the :doc:`content/getting_started/workflow`.
+New to PyEPO? Start with :doc:`content/intro`, install ``PyEPO`` and a solver backend, then follow :doc:`content/getting_started/workflow`.
 
 
 Quick Example
 +++++++++++++
 
-End-to-end training of a knapsack predictor defined with the DSL and the SPO+ loss. The example uses Gurobi; without a license, install another backend and change ``backend=``:
+This example trains a knapsack predictor end to end with a DSL-defined optimization model and the SPO+ loss. It uses Gurobi. If you do not have a Gurobi license, install another backend and change ``backend=``:
 
 .. code-block:: python
 
@@ -53,7 +53,7 @@ End-to-end training of a knapsack predictor defined with the DSL and the SPO+ lo
    # decision quality (on the training set here; split off a test set for real evaluation)
    print("Training regret:", pyepo.metric.regret(predmodel, optmodel, dataloader))
 
-Prefer JAX? ``pyepo.func.jax`` follows the PyTorch loss API for ``jax.grad``-based training; see :doc:`content/frontends/jax`.
+Prefer JAX? ``pyepo.func.jax`` follows the PyTorch loss API for ``jax.grad``-based training. See :doc:`content/frontends/jax`.
 
 
 .. toctree::

@@ -5,7 +5,7 @@ Evaluation
 Regret
 ======
 
-``pyepo.metric.regret`` evaluates the decision quality of a prediction model, usually on a held-out test set. Regret is defined as :math:`l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^\top \mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{c}^\top \mathbf{w}^*(\mathbf{c})`, which measures the excess cost of the predicted solution over the true optimum. By default the instances are aggregated as the normalized regret :math:`\sum_i l_i \, / \, \sum_i |\mathbf{c}_i^\top \mathbf{w}^*(\mathbf{c}_i)|`, dimensionless and comparable across problem scales; ``reduction`` switches to ``"sum"``, ``"mean"``, or ``"none"`` (per-instance array). ``processes`` parallelizes the solving, as in training (``0`` uses all available cores).
+``pyepo.metric.regret`` evaluates the decision quality of a prediction model, usually on a held-out test set. Regret is :math:`l_{Regret}(\hat{\mathbf{c}}, \mathbf{c}) = \mathbf{c}^\top \mathbf{w}^*(\hat{\mathbf{c}}) - \mathbf{c}^\top \mathbf{w}^*(\mathbf{c})`, the excess cost of the predicted solution over the true optimum. By default, instances are aggregated as normalized regret, :math:`\sum_i l_i \, / \, \sum_i |\mathbf{c}_i^\top \mathbf{w}^*(\mathbf{c}_i)|`, which is dimensionless and comparable across problem scales. Use ``reduction`` to switch to ``"sum"``, ``"mean"``, or ``"none"`` (a per-instance array). ``processes`` parallelizes the solves, as in training. Set ``processes=0`` to use all available cores.
 
 .. autofunction:: pyepo.metric.regret
     :noindex:
@@ -27,7 +27,7 @@ When a predicted cost vector :math:`\hat{\mathbf{c}}` yields multiple optimal so
   :alt: learning curves
   :class: light-bg
 
-``unambRegret`` returns only the normalized value (no ``reduction`` option). For each instance it adds a constraint restricting the feasible region to the tie set and re-solves for the worst case, so it is slower than ``regret`` and needs a backend that implements ``addConstr``.
+``unambRegret`` returns only the normalized value. It does not expose a ``reduction`` option. For each instance, it adds a constraint that restricts the feasible region to the tie set and then re-solves for the worst case. This makes it slower than ``regret`` and requires a backend that implements ``addConstr``.
 
 .. autofunction:: pyepo.metric.unambRegret
     :noindex:

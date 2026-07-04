@@ -8,7 +8,7 @@ predicts :math:`\hat{\mathbf{c}}`, then the predicted costs are used to solve
 the optimization problem.
 
 The two-stage model does not train through the optimization model, but it is
-evaluated with the same decision-quality metrics as end-to-end methods.
+evaluated with the same decision-quality metrics used for end-to-end methods.
 
 
 When to Use It

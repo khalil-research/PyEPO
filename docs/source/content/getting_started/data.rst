@@ -13,7 +13,7 @@ Data Generator
 
 Each generator produces feature-cost pairs :math:`(\mathbf{x}, \mathbf{c})`. The feature vector :math:`\mathbf{x}_i \in \mathbb{R}^p` follows a standard multivariate Gaussian distribution :math:`\mathcal{N}(0, \mathbf{I})`, and the cost :math:`\mathbf{c}_i \in \mathbb{R}^d` is computed from a polynomial function :math:`f(\mathbf{x}_i)` scaled by a multiplicative noise factor :math:`\boldsymbol{\epsilon}_i \sim U(1-\bar{\epsilon}, 1+\bar{\epsilon})`.
 
-Common parameters across all generators:
+Common parameters across the generators:
 
 * **num_data** (:math:`n`): number of data samples
 
@@ -21,7 +21,7 @@ Common parameters across all generators:
 
 * **deg** (:math:`deg`): polynomial degree of the mapping :math:`f(\mathbf{x}_i)`
 
-* **noise_width** (:math:`\bar{\epsilon}`): noise half-width (shortest path, knapsack, TSP; portfolio uses ``noise_level`` instead; see below)
+* **noise_width** (:math:`\bar{\epsilon}`): noise half-width for shortest path, knapsack, and TSP. Portfolio uses ``noise_level`` instead; see below.
 
 * **seed**: random seed for reproducibility
 
@@ -29,7 +29,7 @@ Common parameters across all generators:
 Shortest Path
 -------------
 
-A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0.5) entries maps the feature vector into the cost coefficients: :math:`c_i^j = \tfrac{1}{{3.5}^{deg}} \big[\big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j`.
+A random matrix :math:`\mathcal{B} \in \mathbb{R}^{d \times p}` with Bernoulli(0.5) entries maps the feature vector to the cost coefficients: :math:`c_i^j = \tfrac{1}{{3.5}^{deg}} \big[\big(\tfrac{1}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + 3\big)^{deg} + 1\big] \cdot \epsilon_i^j`.
 
 .. autofunction:: pyepo.data.shortestpath.genData
     :noindex:
@@ -86,7 +86,7 @@ Portfolio
 
 Let :math:`\bar{r}_{ij} = \big(\tfrac{0.05}{\sqrt{p}}(\mathcal{B} \mathbf{x}_i)_j + {0.1}^{\frac{1}{deg}}\big)^{deg}`. The expected return is :math:`\mathbf{r}_i = \bar{\mathbf{r}}_i + \mathbf{L} \mathbf{f} + 0.01 \tau \boldsymbol{\epsilon}`, and the covariance matrix is :math:`\mathbf{\Sigma} = \mathbf{L} \mathbf{L}^{\intercal} + (0.01 \tau)^2 \mathbf{I}`, where :math:`\mathcal{B}` has Bernoulli(0.5) entries, :math:`\mathbf{L} \sim U(-0.0025\tau, 0.0025\tau)`, and :math:`\mathbf{f}, \boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})`.
 
-Unlike the other generators, portfolio noise is controlled by **noise_level** (:math:`\tau`), which scales both the factor loadings :math:`\mathbf{L}` and the residual noise; ``noise_width`` does not apply here.
+Unlike the other generators, portfolio noise is controlled by **noise_level** (:math:`\tau`), which scales both the factor loadings :math:`\mathbf{L}` and the residual noise. ``noise_width`` does not apply here.
 
 .. autofunction:: pyepo.data.portfolio.genData
     :noindex:
@@ -104,7 +104,7 @@ Unlike the other generators, portfolio noise is controlled by **noise_level** (:
 Built-in Problem Models
 =======================
 
-``PyEPO`` includes built-in models for several classic problems. Each is built by a factory that takes a ``backend`` keyword (default ``"gurobi"``). Pair one with generated data and an ``optDataset``:
+``PyEPO`` includes built-in models for several classic problems. Each model is built by a factory that takes a ``backend`` keyword (default ``"gurobi"``). Pair a model with generated data and an ``optDataset``:
 
 .. code-block:: python
 
@@ -116,7 +116,7 @@ Built-in Problem Models
    optmodel = model.shortestPathModel(grid)                  # default Gurobi
    dataset = pyepo.data.dataset.optDataset(optmodel, x, c)
 
-Switch the solver with ``backend``. The generic backends take a ``solver=`` argument naming the open solver to run:
+Switch the solver with ``backend``. The generic backends take a ``solver=`` argument that names the solver to run:
 
 .. code-block:: python
 
@@ -130,7 +130,7 @@ Switch the solver with ``backend``. The generic backends take a ``solver=`` argu
 Shortest Path Model
 -------------------
 
-Minimum-cost path from the northwest to the southeast corner of an ``(h, w)`` grid, formulated as a minimum-cost-flow LP. Backends: gurobi, copt, pyomo, ortools, mpax.
+Minimum-cost path from the northwest to the southeast corner of an ``(h, w)`` grid, formulated as a minimum-cost-flow LP. Supported backends: gurobi, copt, pyomo, ortools, mpax.
 
 .. autofunction:: pyepo.model.shortestPathModel
 
@@ -138,7 +138,7 @@ Minimum-cost path from the northwest to the southeast corner of an ``(h, w)`` gr
 Knapsack Model
 --------------
 
-Multi-dimensional 0/1 knapsack: maximize value subject to per-dimension capacities. ``weights`` has shape ``(dim, n_items)`` and ``capacity`` has length ``dim``. Backends: gurobi, copt, pyomo, ortools, mpax (LP relaxation).
+Multi-dimensional 0/1 knapsack: maximize value subject to per-dimension capacities. ``weights`` has shape ``(dim, n_items)`` and ``capacity`` has length ``dim``. Supported backends: gurobi, copt, pyomo, ortools, mpax (LP relaxation).
 
 .. code-block:: python
 
@@ -152,7 +152,7 @@ Multi-dimensional 0/1 knapsack: maximize value subject to per-dimension capaciti
 Traveling Salesperson Model
 ---------------------------
 
-Shortest tour visiting each city once. ``formulation`` is ``"DFJ"`` (lazy subtour elimination), ``"GG"``, or ``"MTZ"``. Backends: gurobi and copt (all three); pyomo (GG, MTZ). On gurobi, ``recycle_cuts=True`` keeps the subtour cuts found in one solve for later solves.
+Shortest tour visiting each city once. ``formulation`` is ``"DFJ"`` (lazy subtour elimination), ``"GG"``, or ``"MTZ"``. Supported backends: gurobi and copt (all three formulations), and pyomo (GG, MTZ). On gurobi, ``recycle_cuts=True`` keeps subtour cuts found in one solve for later solves.
 
 .. code-block:: python
 
@@ -164,7 +164,7 @@ Shortest tour visiting each city once. ``formulation`` is ``"DFJ"`` (lazy subtou
 Capacitated Vehicle Routing Model
 ---------------------------------
 
-Shortest vehicle routes from a depot that serve every customer within capacity. ``formulation`` is ``"RCI"`` (lazy rounded-capacity cuts) or ``"MTZ"``. Backends: gurobi and copt (both); pyomo (MTZ). On gurobi, ``"RCI"`` also accepts ``recycle_cuts=True`` to keep the cuts found in one solve for later solves.
+Shortest vehicle routes from a depot that serve every customer within capacity. ``formulation`` is ``"RCI"`` (lazy rounded-capacity cuts) or ``"MTZ"``. Supported backends: gurobi and copt (both formulations), and pyomo (MTZ). On gurobi, ``"RCI"`` also accepts ``recycle_cuts=True`` to keep cuts found in one solve for later solves.
 
 .. code-block:: python
 
@@ -177,7 +177,7 @@ Shortest vehicle routes from a depot that serve every customer within capacity. 
 Portfolio Model
 ---------------
 
-Mean-variance allocation that maximizes return under a risk budget. Backends: gurobi, copt, pyomo.
+Mean-variance allocation that maximizes return under a risk budget. Supported backends: gurobi, copt, pyomo.
 
 .. code-block:: python
 
@@ -191,9 +191,9 @@ Mean-variance allocation that maximizes return under a risk budget. Backends: gu
 optDataset
 ==========
 
-``pyepo.data.optDataset`` is a PyTorch ``Dataset`` that stores features and cost coefficients, and **solves the optimization problem to obtain optimal solutions and objective values**. The features and costs can be any arrays; the generators above are just a convenience.
+``pyepo.data.optDataset`` is a PyTorch ``Dataset`` that stores features and cost coefficients, and **solves the optimization problem to obtain optimal solutions and objective values**. The features and costs can come from any arrays. The generators above are only a convenience.
 
-``optDataset`` precomputes :math:`\mathbf{w}^*(\mathbf{c})` and :math:`z^*(\mathbf{c})` at construction time. If those labels already exist from another source, skip ``optDataset`` and feed ``(x, c, w, z)`` batches to ``pyepo.func`` modules directly.
+``optDataset`` precomputes :math:`\mathbf{w}^*(\mathbf{c})` and :math:`z^*(\mathbf{c})` at construction time. If those labels already exist from another source, you can skip ``optDataset`` and feed ``(x, c, w, z)`` batches to ``pyepo.func`` modules directly.
 
 .. autoclass:: pyepo.data.dataset.optDataset
     :noindex:
@@ -226,7 +226,7 @@ The following example shows how to use ``optDataset`` with a PyTorch ``DataLoade
 optDatasetKNN
 =============
 
-``pyepo.data.optDatasetKNN`` is a PyTorch ``Dataset`` that implements the k-nearest neighbors (kNN) robust loss [#f1]_ for predict-then-optimize training. It stores features and cost coefficients, and computes the **mean k-nearest-neighbor solutions and the corresponding optimal objective values**.
+``pyepo.data.optDatasetKNN`` is a PyTorch ``Dataset`` that implements the k-nearest neighbors (kNN) robust loss [#f1]_ for predict-then-optimize training. It stores features and cost coefficients, then computes the **mean k-nearest-neighbor solutions and the corresponding optimal objective values**.
 
 For a runnable walkthrough, see the `08 kNN Robust Losses <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb>`_ notebook.
 
@@ -260,14 +260,14 @@ optDatasetConstrs
 
 ``pyepo.data.dataset.optDatasetConstrs`` is a PyTorch ``Dataset`` for the CaVE [#f2]_ cone-aligned loss. In addition to the features, costs, optimal solutions, and objective values stored by ``optDataset``, it also extracts the **normals of the binding constraints at the optimal vertex** for each instance. CaVE then projects the sense-flipped predicted cost vector onto the cone spanned by these normals.
 
-``optDatasetConstrs`` currently requires a Gurobi-backed ``optModel``. The dataset also checks that the optimal vertex is binary, since CaVE is defined for binary linear programs; it raises on infeasible instances or non-binary optima unless ``skip_infeas=True``, which drops them instead.
+``optDatasetConstrs`` currently requires a Gurobi-backed ``optModel``. The dataset also checks that the optimal vertex is binary, since CaVE is defined for binary linear programs. It raises on infeasible instances or non-binary optima unless ``skip_infeas=True``, which drops them instead.
 
 For a runnable walkthrough that uses ``optDatasetConstrs`` end-to-end with the CaVE loss, see the `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_ notebook.
 
 .. autoclass:: pyepo.data.dataset.optDatasetConstrs
     :noindex:
 
-Per-instance constraint matrices have different row counts (different constraints bind at different vertices), so batch with ``optDataLoader``, which pads them automatically:
+Per-instance constraint matrices can have different row counts because different constraints bind at different vertices. Batch them with ``optDataLoader``, which pads them automatically:
 
 .. autoclass:: pyepo.data.dataset.optDataLoader
     :noindex:

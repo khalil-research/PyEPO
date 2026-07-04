@@ -3,8 +3,8 @@ Solver Backends
 
 ``PyEPO`` separates the training frontend from the optimization backend. A
 backend supplies the ``optModel`` interface: update the objective with
-``setObj``, solve with ``solve``. The training methods depend only on this
-interface, so the same training code runs on any backend.
+``setObj`` and solve with ``solve``. Training methods depend only on this
+interface, so the same training code can run on any backend.
 
 Supported Backends
 ==================
@@ -20,23 +20,23 @@ Supported Backends
    * - ``gurobi``
      - commercial, free academic license
      - LP, MIP, QP, quadratic constraints
-     - the default backend; supports lazy-constraint callbacks (TSP DFJ, VRP RCI) and cut recycling
+     - default backend with lazy-constraint callbacks (TSP DFJ, VRP RCI) and cut recycling
    * - ``copt``
      - commercial, free academic license
      - LP, MIP, QP, quadratic constraints
-     - same callback support as Gurobi
+     - callback support matches Gurobi
    * - ``pyomo``
      - open (the modeling layer)
      - whatever the chosen solver supports
-     - ``solver=`` names the engine: GLPK, CBC, HiGHS, SCIP, or a licensed solver; QP needs a QP-capable solver
+     - ``solver=`` names the engine: GLPK, CBC, HiGHS, SCIP, or a licensed solver. QP needs a QP-capable solver
    * - ``ortools``
      - open
      - LP, MIP (no quadratics)
-     - pywraplp with ``solver=`` (default ``"scip"``); a CP-SAT variant handles integer-only models
+     - pywraplp with ``solver=`` (default ``"scip"``). The CP-SAT variant handles integer-only models
    * - ``mpax``
      - open
      - LP, QP
-     - JAX-based first-order (PDHG) solver on GPU; solves whole batches at once; **continuous only**: integer variables are relaxed with a warning
+     - JAX-based first-order (PDHG) solver on GPU. Solves whole batches at once. **Continuous only**: integer variables are relaxed with a warning
 
 Selecting a Backend
 ===================
@@ -71,12 +71,12 @@ MPAX: GPU Batch Solving
 =======================
 
 MPAX solves an entire mini-batch in one GPU dispatch, so ``optDataset``
-construction and every training step avoid the per-instance solver loop. With
-the JAX frontend the solve is traceable, and the whole training step compiles
+construction and each training step avoid the per-instance solver loop. With
+the JAX frontend, the solve is traceable and the whole training step compiles
 under ``jax.jit`` (see :doc:`frontends/jax`). The PyTorch frontend uses the
-same batched solve through a dlpack bridge. PDHG is a continuous first-order
-method, so integer and binary variables are relaxed to their bounds and
-solutions may be fractional. PyEPO warns when this happens.
+same batched solve through a DLPack bridge. PDHG is a continuous first-order
+method, so integer and binary variables are relaxed to their bounds. Solutions
+may therefore be fractional. PyEPO warns when this relaxation is used.
 
 Related Pages
 =============

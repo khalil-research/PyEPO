@@ -1,10 +1,10 @@
 kNN Robust Losses
 +++++++++++++++++
 
-The kNN robust loss makes the training labels more robust to noise. For each
-instance it builds k blended costs, one per nearest neighbor in feature space,
-solves each blend, and stores the averaged solution and objective, so the
-labels are local averages rather than single-instance values.
+The kNN robust loss makes training labels more robust to noise. For each
+instance, it builds k blended costs, one per nearest neighbor in feature space,
+solves each blend, and stores the averaged solution and objective. The labels
+therefore become local averages rather than single-instance values.
 
 
 What Changes
@@ -17,10 +17,10 @@ each instance. ``optDatasetKNN`` instead computes neighborhood labels:
    :width: 760
    :alt: kNN robust loss label aggregation
 
-This setting applies when nearby feature vectors are expected to have similar
+This setting is useful when nearby feature vectors are expected to have similar
 decisions, but individual labels may be noisy. Construction costs k solves per
-instance. When labels are clean or neighborhoods are heterogeneous, the
-smoothing only biases them; use ``optDataset`` then.
+instance. When labels are clean or neighborhoods are heterogeneous, smoothing
+can add bias. In that case, use ``optDataset``.
 
 
 Minimal Example
@@ -63,7 +63,7 @@ Use ``pyepo.data.dataset.optDatasetKNN`` in place of ``optDataset``:
 Parameters
 ==========
 
-* ``k`` sets the number of neighbors used for each aggregate label; the
+* ``k`` sets the number of neighbors used for each aggregate label. The
   instance itself is excluded, and ``1 <= k < num_data`` must hold.
 * ``weight`` is the self-weight in the mix: ``weight=1`` keeps the original cost
   (no smoothing), and smaller values pull the cost toward the neighbors.

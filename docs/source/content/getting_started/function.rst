@@ -4,11 +4,11 @@ Training Methods
 Overview
 ========
 
-``pyepo.func`` provides PyTorch autograd modules that wrap an optimization solver for end-to-end training. All modules assume a linear objective with known, fixed constraints; the cost vector is predicted from contextual features. A DSL-compiled model with a quadratic objective term is rejected at construction.
+``pyepo.func`` provides PyTorch autograd modules that wrap an optimization solver for end-to-end training. All modules assume a linear objective with known, fixed constraints. The cost vector is predicted from contextual features. If a DSL-compiled model includes a quadratic objective term, the training module raises at construction.
 
-Every module accepts ``processes`` for parallel solving. All except ``CaVE`` accept ``solve_ratio < 1`` with ``dataset`` for solution-pool caching (see :doc:`../advanced/pool`); ``CaVE`` repurposes ``solve_ratio`` for its projection branch. Modules that return a loss also accept ``reduction`` (``"mean"``, ``"sum"``, or ``"none"``).
+Every module accepts ``processes`` for parallel solving. All modules except ``CaVE`` accept ``solve_ratio < 1`` with ``dataset`` for solution-pool caching (see :doc:`../advanced/pool`). ``CaVE`` uses ``solve_ratio`` for its projection branch instead. Modules that return a loss also accept ``reduction`` (``"mean"``, ``"sum"``, or ``"none"``).
 
-Each method below is presented with its definition followed by a runnable training loop; all loops build on the shared **Common Setup**.
+Each method below is presented with its definition followed by a runnable training loop. All loops build on the shared **Common Setup**.
 
 
 Choosing a Method
@@ -16,12 +16,12 @@ Choosing a Method
 
 The modules differ in what they return, which determines how you use them:
 
-* **Loss-returning**: return a scalar loss, passed directly to ``.backward()``: SPO+, PG, PFYL, RFYL, CaVE, NCE, CMAP, LTR.
-* **Solution-returning**: return a predicted, expected, or regularized solution, on which you define a task loss: DPO, I-MLE, AI-MLE, RFWO, DBB, NID.
+* **Loss-returning**: return a scalar loss that can be passed directly to ``.backward()``: SPO+, PG, PFYL, RFYL, CaVE, NCE, CMAP, LTR.
+* **Solution-returning**: return a predicted, expected, or regularized solution. You then define a task loss on that output: DPO, I-MLE, AI-MLE, RFWO, DBB, NID.
 
 A combined name like ``DPO+MSE`` or ``NID+L1`` denotes a solution-returning module (DPO, NID) followed by a task loss (here MSE or L1) on its output.
 
-The table below summarizes each module's return type, typical supervision, and notes.
+The table below summarizes each module's return type, typical supervision signal, and main caveats.
 
 .. list-table::
    :header-rows: 1
@@ -80,7 +80,7 @@ The table below summarizes each module's return type, typical supervision, and n
 Common Setup
 ============
 
-All training loops below share the same setup: a DSL-defined knapsack problem with a linear predictor. The examples use PyTorch; JAX follows the same method families, see :doc:`../frontends/jax`. For a runnable walkthrough, see the `03 Training and Testing <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_ notebook.
+All training loops below share the same setup: a DSL-defined knapsack problem with a linear predictor. The examples use PyTorch. JAX follows the same method families. See :doc:`../frontends/jax`. For a runnable walkthrough, see the `03 Training and Testing <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_ notebook.
 
 .. code-block:: python
 
@@ -126,7 +126,7 @@ Surrogate losses replace the non-differentiable regret with a differentiable tra
 Smart Predict-then-Optimize+ Loss (SPO+)
 ----------------------------------------
 
-SPO+ [#f1]_ is a convex surrogate for the SPO loss (regret), the decision error of the downstream optimization.
+SPO+ [#f1]_ is a convex surrogate for the SPO loss, also called regret: the decision error of the downstream optimization.
 
 The derivation starts from the observation that for any :math:`\alpha \geq 0`,
 
@@ -134,7 +134,7 @@ The derivation starts from the observation that for any :math:`\alpha \geq 0`,
 
    \mathrm{regret}(\hat{\mathbf{c}}, \mathbf{c}) \leq \max_{\mathbf{w} \in \mathcal{S}} \big\{ \mathbf{c}^\top \mathbf{w} - \alpha\, \hat{\mathbf{c}}^\top \mathbf{w} \big\} + z^*(\alpha \hat{\mathbf{c}}) - z^*(\mathbf{c}).
 
-Setting :math:`\alpha = 2` and bounding :math:`z^*(2 \hat{\mathbf{c}}) \leq 2 \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c})`, since :math:`z^*` is a minimum and :math:`\mathbf{w}^*(\mathbf{c})` is feasible, gives the SPO+ loss,
+Set :math:`\alpha = 2`. Because :math:`z^*` is a minimum and :math:`\mathbf{w}^*(\mathbf{c})` is feasible, :math:`z^*(2 \hat{\mathbf{c}}) \leq 2 \hat{\mathbf{c}}^\top \mathbf{w}^*(\mathbf{c})`. This gives the SPO+ loss,
 
 .. math::
 
@@ -215,7 +215,7 @@ Perturbed methods estimate gradients by Monte Carlo averaging over random pertur
 Differentiable Perturbed Optimizer (DPO)
 ----------------------------------------
 
-DPO [#f5]_ uses Monte Carlo sampling to estimate solutions by optimizing randomly perturbed costs. Its custom backward pass provides a gradient estimator for end-to-end training. ``DPO`` is the additive Gaussian version; ``DPOMul`` is the multiplicative version for sign-sensitive oracles [#f6]_. The multiplicative variant assumes predicted costs already have the intended nonzero sign. For nonnegative-cost problems, use a positive-output predictor such as ``nn.Softplus()`` plus a small epsilon.
+DPO [#f5]_ uses Monte Carlo sampling to estimate solutions by optimizing randomly perturbed costs. Its custom backward pass provides a gradient estimator for end-to-end training. ``DPO`` is the additive Gaussian version; ``DPOMul`` is the multiplicative version for sign-sensitive oracles [#f6]_. The multiplicative variant assumes predicted costs already have the intended nonzero sign. For nonnegative-cost problems, use a positive-output predictor such as ``nn.Softplus()`` with a small epsilon.
 
 DPO replaces the piecewise-constant solution map :math:`\hat{\mathbf{c}} \mapsto \mathbf{w}^*(\hat{\mathbf{c}})` with the expectation over a random perturbation,
 
@@ -264,7 +264,7 @@ Training loop (swap ``predmodel`` for ``positive_predmodel`` when using ``DPOMul
 Perturbed Fenchel-Young Loss (PFYL)
 -----------------------------------
 
-PFYL [#f5]_ uses the same perturbed expected solution as DPO inside a Fenchel-Young loss, comparing it directly with the true optimal solution. It returns a scalar loss. ``PFY`` is the additive Gaussian version; ``PFYMul`` is the multiplicative sign-preserving variant with the same sign convention as ``DPOMul``.
+PFYL [#f5]_ uses the same perturbed expected solution as DPO inside a Fenchel-Young loss and compares it directly with the true optimal solution. It returns a scalar loss. ``PFY`` is the additive Gaussian version; ``PFYMul`` is the multiplicative sign-preserving variant with the same sign convention as ``DPOMul``.
 
 Let :math:`F(\hat{\mathbf{c}}) = \mathbb{E}_{\boldsymbol{\xi}}\big[ \min_{\mathbf{w} \in \mathcal{S}} (\hat{\mathbf{c}} + \sigma \boldsymbol{\xi})^\top \mathbf{w} \big]` be the expected perturbed minimum, and let :math:`\Omega` be its Fenchel conjugate. The perturbed Fenchel-Young loss is
 
@@ -312,7 +312,7 @@ Training loop (swap ``predmodel`` for ``positive_predmodel`` when using ``PFYMul
 Implicit Maximum Likelihood Estimator (I-MLE)
 ---------------------------------------------
 
-I-MLE [#f9]_ uses the perturb-and-MAP framework, sampling noise from a Sum-of-Gamma distribution and interpolating the loss function to approximate finite differences. ``lambd`` controls the interpolation step.
+I-MLE [#f9]_ uses the perturb-and-MAP framework. It samples noise from a Sum-of-Gamma distribution and interpolates the loss function to approximate finite differences. ``lambd`` controls the interpolation step.
 
 I-MLE is framed as imitation learning: bring the model distribution :math:`p(\mathbf{w} \mid \hat{\mathbf{c}})` closer to a target distribution :math:`q(\mathbf{w} \mid \hat{\mathbf{c}})` by minimizing their KL divergence. An upstream task gradient :math:`\mathbf{d} = \nabla_{\mathbf{w}} \mathcal{L}(\hat{\mathbf{c}}, \cdot) \big|_{\mathbf{w} = \mathbf{w}^*(\hat{\mathbf{c}})}` induces a virtual update :math:`\hat{\mathbf{c}}' = \hat{\mathbf{c}} + \lambda \mathbf{d}`, and the gradient is estimated by a directional finite difference between the smoothed solutions at :math:`\hat{\mathbf{c}}'` and :math:`\hat{\mathbf{c}}`:
 
@@ -348,13 +348,13 @@ Adaptive Implicit Maximum Likelihood Estimator (AI-MLE)
 
 AI-MLE [#f10]_ extends I-MLE with an adaptive interpolation step.
 
-AI-MLE uses the same finite-difference estimator as I-MLE but replaces the fixed step size :math:`\lambda` with an adaptive choice driven by the magnitudes of the predicted cost and the upstream gradient,
+AI-MLE uses the same finite-difference estimator as I-MLE, but replaces the fixed step size :math:`\lambda` with an adaptive choice driven by the magnitudes of the predicted cost and the upstream gradient,
 
 .. math::
 
    \lambda_t = \alpha_t \cdot \frac{\|\hat{\mathbf{c}}\|_2}{\|\mathbf{d}\|_2},
 
-where :math:`\mathbf{d}` is the upstream task gradient and :math:`\alpha_t > 0` is tuned online: when an exponential moving average of the fraction of nonzero gradient entries drops below one, :math:`\alpha_t` is increased; otherwise it is decreased. This rescaling keeps the perturbation magnitude commensurate with :math:`\hat{\mathbf{c}}` and decouples the step from the absolute scale of :math:`\mathbf{d}`, removing the need to tune :math:`\lambda` by hand.
+where :math:`\mathbf{d}` is the upstream task gradient and :math:`\alpha_t > 0` is tuned online. When an exponential moving average of the fraction of nonzero gradient entries drops below one, :math:`\alpha_t` is increased; otherwise it is decreased. This rescaling keeps the perturbation magnitude commensurate with :math:`\hat{\mathbf{c}}` and decouples the step from the absolute scale of :math:`\mathbf{d}`, removing the need to tune :math:`\lambda` by hand.
 
 .. autoclass:: pyepo.func.AIMLE
     :noindex:
@@ -388,7 +388,7 @@ A pure linear optimization layer is not differentiable: the optimal solution :ma
 
 which is unique, lies inside :math:`\mathrm{conv}(\mathcal{S})`, and varies continuously with :math:`\hat{\mathbf{c}}`. This deterministic smoothing is dual to the stochastic smoothing of the perturbed methods above: both replace the piecewise-constant solution map with a continuous surrogate, the former via a convex regularizer and the latter via Monte Carlo averaging over a noise distribution [#f6]_.
 
-PyEPO implements the L2 special case :math:`\Omega(\mathbf{w}) = \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2` and solves the regularized program with batched Frank-Wolfe iteration. Frank-Wolfe accesses :math:`\mathrm{conv}(\mathcal{S})` through the original LP/ILP solver of :math:`\mathcal{S}` (a *linear minimization oracle*). ``lambd`` is the L2 strength :math:`\lambda`; ``max_iter`` caps Frank-Wolfe iterations and ``tol`` is the convergence tolerance.
+PyEPO implements the L2 special case :math:`\Omega(\mathbf{w}) = \tfrac{\lambda}{2} \|\mathbf{w}\|_2^2` and solves the regularized program with batched Frank-Wolfe iteration. Frank-Wolfe accesses :math:`\mathrm{conv}(\mathcal{S})` through the original LP/ILP solver for :math:`\mathcal{S}`, used as a *linear minimization oracle*. ``lambd`` is the L2 strength :math:`\lambda`. ``max_iter`` caps Frank-Wolfe iterations, and ``tol`` is the convergence tolerance.
 
 
 L2 Regularized Frank-Wolfe Optimizer (RFWO)
@@ -474,13 +474,13 @@ Training loop:
 Black-Box Methods
 =================
 
-Black-box methods replace the zero gradient of the discrete solver with a surrogate backward rule. The training loops below define an objective-value loss on the returned solution.
+Black-box methods replace the zero gradient of the discrete solver with a surrogate backward rule. The training loops below define an objective-value loss on the solution returned by the module.
 
 
 Differentiable Black-Box Optimizer (DBB)
 ----------------------------------------
 
-DBB [#f3]_ estimates gradients by interpolating the solver output between the predicted cost and a perturbed one. ``lambd`` is a smoothing hyperparameter.
+DBB [#f3]_ estimates gradients by comparing the solver output at the predicted cost with the output at a perturbed cost. ``lambd`` is the smoothing hyperparameter.
 
 Given an upstream gradient :math:`\mathbf{d} = \nabla_{\mathbf{w}} \mathcal{L}(\hat{\mathbf{c}}, \cdot) \big|_{\mathbf{w} = \mathbf{w}^*(\hat{\mathbf{c}})}`, DBB approximates the vector-Jacobian product by interpolating the loss between :math:`\hat{\mathbf{c}}` and a perturbed cost :math:`\hat{\mathbf{c}} + \lambda \mathbf{d}`, yielding
 
@@ -488,7 +488,7 @@ Given an upstream gradient :math:`\mathbf{d} = \nabla_{\mathbf{w}} \mathcal{L}(\
 
    \frac{\partial \mathcal{L}(\hat{\mathbf{c}}, \cdot)}{\partial \hat{\mathbf{c}}} \approx \frac{\mathbf{w}^*(\hat{\mathbf{c}} + \lambda \mathbf{d}) - \mathbf{w}^*(\hat{\mathbf{c}})}{\lambda}.
 
-Larger :math:`\lambda` smooths more aggressively; the recommended range is 10 to 20. Unlike SPO+, the resulting surrogate is nonconvex in :math:`\hat{\mathbf{c}}`, which weakens convergence guarantees even when the predictor is convex in its parameters.
+Larger :math:`\lambda` smooths more aggressively. The recommended range is 10 to 20. Unlike SPO+, the resulting surrogate is nonconvex in :math:`\hat{\mathbf{c}}`, which weakens convergence guarantees even when the predictor is convex in its parameters.
 
 .. autoclass:: pyepo.func.DBB
     :noindex:
@@ -515,7 +515,7 @@ Training loop:
 Negative Identity Backpropagation (NID)
 ---------------------------------------
 
-NID [#f4]_ treats the solver as a negative identity mapping during backpropagation; it is hyperparameter-free.
+NID [#f4]_ treats the solver as a negative identity mapping during backpropagation. It is hyperparameter-free.
 
 NID approximates the solver Jacobian by the (signed) identity, :math:`\partial \mathbf{w}^*(\hat{\mathbf{c}}) / \partial \hat{\mathbf{c}} \approx -\mathbf{I}` for a minimization problem (and :math:`+\mathbf{I}` for maximization). Given an upstream gradient :math:`\mathbf{d} = \partial \mathcal{L}(\hat{\mathbf{c}}, \cdot) / \partial \mathbf{w}^*(\hat{\mathbf{c}})`, the chain rule gives a sign-flipped straight-through estimator,
 
@@ -550,13 +550,13 @@ Training loop:
 Cone-Aligned Estimation
 =======================
 
-Cone-aligned losses supervise the *predicted cost vector* directly by aligning it with the polyhedral cone of binding-constraint normals at the true optimum, rather than supervising on the optimal solution itself.
+Cone-aligned losses supervise the *predicted cost vector* directly. They align it with the polyhedral cone of binding-constraint normals at the true optimum, rather than supervising the optimal solution itself.
 
 
 Cone-Aligned Vector Estimation (CaVE)
 -------------------------------------
 
-CaVE [#f12]_ is a surrogate loss for **binary linear programs** (TSP, CVRP, knapsack, shortest path with binary edges, etc.). For each instance, it projects the sense-flipped predicted cost vector onto the polyhedral cone spanned by the binding-constraint normals at the true optimal vertex, then minimizes ``1 - cos(pred, proj)``.
+CaVE [#f12]_ is a surrogate loss for **binary linear programs** such as TSP, CVRP, knapsack, and shortest path with binary edges. For each instance, it projects the sense-flipped predicted cost vector onto the polyhedral cone spanned by the binding-constraint normals at the true optimal vertex, then minimizes ``1 - cos(pred, proj)``.
 
 For a runnable walkthrough, see the `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_ notebook.
 
@@ -566,9 +566,9 @@ Let :math:`K(\mathbf{w}^*(\mathbf{c}))` be the polyhedral cone spanned by the co
 
    \mathcal{L}_{\mathrm{CaVE}}(\hat{\mathbf{c}}, K) = 1 - \frac{(-\hat{\mathbf{c}})^\top \mathbf{p}}{\|\hat{\mathbf{c}}\|_2\, \|\mathbf{p}\|_2}.
 
-When :math:`-\hat{\mathbf{c}}` already lies inside the cone, :math:`\mathbf{p} = -\hat{\mathbf{c}}` and the loss is zero; the further :math:`-\hat{\mathbf{c}}` strays outside the cone, the larger the loss.
+When :math:`-\hat{\mathbf{c}}` already lies inside the cone, :math:`\mathbf{p} = -\hat{\mathbf{c}}` and the loss is zero. The further :math:`-\hat{\mathbf{c}}` strays outside the cone, the larger the loss.
 
-CaVE uses two solvers at different stages: a Gurobi-backed ``optModel`` extracts the binding-constraint normals when the dataset is built, and Clarabel projects the predicted cost onto that cone during training. This avoids solving an ILP in every training step. ``max_iter`` caps the Clarabel iterations; the default ``max_iter=3`` is the paper's **CaVE+** preset, which under-converges the projection on purpose so it stays interior to the cone. Raising it changes the loss, not just its precision.
+CaVE uses two solvers at different stages. A Gurobi-backed ``optModel`` extracts the binding-constraint normals when the dataset is built, and Clarabel projects the predicted cost onto that cone during training. This avoids solving an ILP in every training step. ``max_iter`` caps the Clarabel iterations. The default ``max_iter=3`` is the paper's **CaVE+** preset, which under-converges the projection on purpose so it stays inside the cone. Raising it changes the loss, not just its precision.
 
 Setting ``solve_ratio < 1`` enables the **CaVE-Hybrid** update: each batch uses the QP projection with probability ``solve_ratio`` and otherwise uses a blend of the normalized predicted cost and the average binding-constraint normal. ``inner_ratio`` controls the blend.
 
@@ -576,9 +576,9 @@ Setting ``solve_ratio < 1`` enables the **CaVE-Hybrid** update: each batch uses 
     :width: 100%
     :align: center
 
-    CVRP-20 results from notebook 04: ``num_data=1000``, 10 epochs, single process. In this setup, CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with ``solve_ratio=0.3`` trains 10.5x faster than SPO+, at a final regret higher than both.
+    CVRP-20 results from notebook 04: ``num_data=1000``, 10 epochs, single process. In this setup, CaVE+ trains 8.2x faster than SPO+. CaVE-Hybrid with ``solve_ratio=0.3`` trains 10.5x faster than SPO+, with a final regret higher than both.
 
-Training data comes from ``pyepo.data.dataset.optDatasetConstrs``, which extracts the binding-constraint normals at the optimum for each instance. Per-instance constraint counts are ragged, so batch it with ``pyepo.data.dataset.optDataLoader``, which zero-pads them automatically. CaVE currently requires a Gurobi-backed ``optModel``.
+Training data comes from ``pyepo.data.dataset.optDatasetConstrs``, which extracts the binding-constraint normals at the optimum for each instance. Per-instance constraint counts are ragged, so batch the dataset with ``pyepo.data.dataset.optDataLoader``. It zero-pads the constraint matrices automatically. CaVE currently requires a Gurobi-backed ``optModel``.
 
 .. autoclass:: pyepo.func.CaVE
     :noindex:
@@ -620,7 +620,7 @@ If you use the **CaVE** loss, please cite:
 Contrastive Methods
 ===================
 
-Contrastive methods train against a pool of cached non-optimal solutions, treated as negative examples. ``solve_ratio`` controls how often new instances are solved exactly during training; ``dataset`` seeds the pool and is required by these methods. See :doc:`../advanced/pool` for details on the solution-pool mechanism.
+Contrastive methods train against a pool of cached non-optimal solutions, treated as negative examples. ``solve_ratio`` controls how often new instances are solved exactly during training. ``dataset`` seeds the pool and is required by these methods. See :doc:`../advanced/pool` for details on the solution-pool mechanism.
 
 
 Noise Contrastive Estimation (NCE)
@@ -696,7 +696,7 @@ Training loop:
 Learning to Rank
 ================
 
-Learning to rank [#f8]_ treats predict-then-optimize training as ranking a pool of feasible solutions: predicted costs assign scores to solutions, and the loss encourages the optimal solution to rank highest. Each variant differs in how it scores the ranking. Like contrastive methods, LTR uses ``solve_ratio`` and ``dataset`` to manage the pool.
+Learning to rank [#f8]_ treats predict-then-optimize training as ranking a pool of feasible solutions. Predicted costs assign scores to solutions, and the loss encourages the optimal solution to rank highest. Each variant scores the ranking differently. Like contrastive methods, LTR uses ``solve_ratio`` and ``dataset`` to manage the pool.
 
 * **Pointwise** regresses each predicted score :math:`\hat{\mathbf{c}}^\top \mathbf{w}` toward the true value :math:`\mathbf{c}^\top \mathbf{w}` for every :math:`\mathbf{w} \in \Gamma`.
 * **Pairwise** enforces a margin between the optimal solution and each suboptimal one.
@@ -788,7 +788,7 @@ Training loop:
 Parallel Computation
 ====================
 
-All ``pyepo.func`` modules support parallel solving during training via the ``processes`` parameter (``0`` uses all available cores).
+All ``pyepo.func`` modules support parallel solving during training through the ``processes`` parameter. Set ``processes=0`` to use all available cores.
 
 .. image:: ../../images/parallel-tsp.png
    :width: 650

@@ -3,9 +3,9 @@ Optimization Models
 
 ``PyEPO`` trains predict-then-optimize models with a linear objective and unknown cost coefficients: only the cost is predicted, while the constraints are fixed.
 
-``optModel`` is the interface that ``PyEPO`` trains against. It wraps an optimization solver or algorithm behind a ``setObj`` / ``solve`` contract. There are two ways to produce one. For linear and integer programs supported by the DSL, define the problem with ``pyepo.dsl`` and compile it to a backend. For a custom algorithm or constraint generation, write an ``optModel`` subclass directly. Both are covered below.
+``optModel`` is the interface that ``PyEPO`` trains against. It wraps an optimization solver or algorithm behind a ``setObj`` / ``solve`` contract. There are two ways to create one. For linear and integer programs supported by the DSL, define the problem with ``pyepo.dsl`` and compile it to a backend. For a custom algorithm or constraint generation, write an ``optModel`` subclass directly. Both paths are covered below.
 
-``PyEPO`` also includes built-in problem models: shortest path, knapsack, traveling salesperson, capacitated vehicle routing, and portfolio. See :doc:`data` for running them with generated data.
+``PyEPO`` also includes built-in models for shortest path, knapsack, traveling salesperson, capacitated vehicle routing, and portfolio problems. See :doc:`data` for examples using generated data.
 
 For a runnable walkthrough, see the `01 Optimization Model <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_ notebook.
 
@@ -13,7 +13,7 @@ For a runnable walkthrough, see the `01 Optimization Model <https://colab.resear
 Defining Models with the DSL
 ============================
 
-Describe the problem once with ``Variable``, ``Parameter``, and constraints, then compile it to a backend. A binary program with a predicted cost and linear constraints:
+Describe the problem once with ``Variable``, ``Parameter``, and constraints, then compile it to a backend. The example below is a binary program with a predicted cost and linear constraints:
 
 .. code-block:: python
 
@@ -32,9 +32,9 @@ Describe the problem once with ``Variable``, ``Parameter``, and constraints, the
 
 The compiled model is an ``optModel``. During training, ``pyepo.func`` calls ``setObj`` and ``solve``.
 
-All backends share this interface and are selected with ``backend=``. Gurobi and COPT are commercial solvers. Pyomo and OR-Tools can use open solvers such as HiGHS, GLPK, CBC, and SCIP. MPAX solves linear and quadratic programs on GPU.
+All backends share this interface and are selected with ``backend=``. Gurobi and COPT are commercial solvers. Pyomo and OR-Tools can use open solvers such as HiGHS, GLPK, CBC, and SCIP. MPAX solves linear and quadratic programs on the GPU.
 
-``compile`` forwards keyword arguments to the backend. ``solver=`` applies only to the generic backends (``pyomo`` / ``ortools``) and names the solver they run; ``timelimit=`` (seconds) sets a time limit where the backend supports one; any other keyword is passed through as a native solver parameter where the backend accepts one:
+``compile`` forwards keyword arguments to the backend. ``solver=`` applies only to the generic backends (``pyomo`` / ``ortools``) and names the solver they run. ``timelimit=`` sets a time limit in seconds where the backend supports one. Any other keyword is passed through as a native solver parameter where the backend accepts one:
 
 .. list-table::
    :header-rows: 1
@@ -54,7 +54,7 @@ All backends share this interface and are selected with ``backend=``. Gurobi and
      - any native COPT parameter
    * - ``pyomo``
      - open solver name (default ``"glpk"``)
-     - maps to the chosen solver's own option (GLPK, CBC, SCIP, HiGHS, Ipopt, Gurobi, CPLEX); with any other solver it raises, so pass the native option as a keyword instead
+     - maps to the chosen solver's own option for GLPK, CBC, SCIP, HiGHS, Ipopt, Gurobi, or CPLEX. With any other solver, pass the native option as a keyword instead
      - passed through as solver options
    * - ``ortools``
      - pywraplp solver name (default ``"scip"``)
@@ -90,7 +90,7 @@ A ``Variable`` takes a shape (an integer or a tuple), an optional ``vtype``, and
 Objectives
 ----------
 
-Whether a coefficient is predicted or known is decided by its type: a ``Parameter`` is predicted (``c``), while a numpy array is fixed (``d``, ``Q``). The predicted cost enters linearly; a known quadratic term may be added. Below, ``d`` is a numpy array, ``y`` another ``Variable``, ``Q`` a numpy matrix, and ``k`` an index.
+Whether a coefficient is predicted or known is determined by its type: a ``Parameter`` is predicted (``c``), while a numpy array is fixed (``d``, ``Q``). The predicted cost enters linearly. A known quadratic term may also be added. Below, ``d`` is a numpy array, ``y`` is another ``Variable``, ``Q`` is a numpy matrix, and ``k`` is an index.
 
 .. code-block:: python
 
@@ -101,15 +101,15 @@ Whether a coefficient is predicted or known is decided by its type: a ``Paramete
    dsl.Minimize((d + c) @ x)                      # a known base d plus the predicted c
    dsl.Minimize(c @ x + x @ Q @ x)                # predicted linear plus a known quadratic
 
-``c @ x`` is a 1-D inner product; for a multi-dimensional cost use ``(c * x).sum()`` (elementwise, then reduced). A quadratic objective term needs a backend with QP support: Gurobi, COPT, MPAX, or Pyomo with a QP-capable solver.
+``c @ x`` is a 1-D inner product. For a multi-dimensional cost, use ``(c * x).sum()`` (elementwise, then reduced). A quadratic objective term needs a backend with QP support: Gurobi, COPT, MPAX, or Pyomo with a QP-capable solver.
 
-.. note:: A quadratic objective term is solve-only. Compiling warns; ``pyepo.func`` training methods and ``pyepo.metric`` metrics reject the model with an error. Quadratic constraints carry no such restriction.
+.. note:: A quadratic objective term is solve-only. Compiling warns, and ``pyepo.func`` training methods and ``pyepo.metric`` metrics reject the model with an error. Quadratic constraints carry no such restriction.
 
 
 Constraints
 -----------
 
-Constraints are fixed across instances; only the cost is predicted. Pass them as a list to ``Problem``.
+Constraints are fixed across instances. Only the cost is predicted. Pass constraints as a list to ``Problem``.
 
 .. code-block:: python
 
@@ -118,27 +118,27 @@ Constraints are fixed across instances; only the cost is predicted. Pass them as
    x.sum(axis=1) == 1                             # per-axis sums, e.g. an assignment
    x @ Q @ x <= gamma                             # quadratic (Gurobi, COPT, or QP-capable Pyomo)
 
-For a linear or quadratic objective with fixed constraints, the DSL is all you need; the rest of this page is the lower-level ``optModel`` interface for cases it cannot express.
+For a linear or quadratic objective with fixed constraints, the DSL is all you need. The rest of this page covers the lower-level ``optModel`` interface for cases the DSL cannot express.
 
 
 The optModel Interface
 ======================
 
-The DSL compiles to an ``optModel``. Implement one directly when you need:
+The DSL compiles to an ``optModel``. Implement an ``optModel`` directly when you need:
 
-* a **custom solving algorithm**, for example a hand-written ADMM, a graph algorithm, or a heuristic, rather than a general solver;
+* a **custom solving algorithm**, such as a hand-written ADMM method, a graph algorithm, or a heuristic, rather than a general solver;
 * **constraint generation** through solver callbacks (lazy constraints, cutting planes), which a one-shot model definition cannot express.
 
 A subclass implements the solving interface:
 
-* ``_getModel(self)``: build the model and return ``(model, variables)``. ``model`` is whatever ``solve`` needs (a solver model, a graph, or ``None``); ``variables`` sets ``num_cost``.
+* ``_getModel(self)``: build the model and return ``(model, variables)``. ``model`` is whatever ``solve`` needs (a solver model, a graph, or ``None``). ``variables`` sets ``num_cost``.
 * ``setObj(self, c)``: store the cost vector ``c`` of length ``num_cost``.
 * ``solve(self)``: solve and return ``(sol, obj)``. ``sol`` is a length-``num_cost`` array **aligned to the cost order** (``sol[i]`` is the value of the variable whose cost is ``c[i]``), and ``obj`` is the objective value.
-* ``num_cost``: number of cost coefficients; defaults to ``len(self.x)``.
+* ``num_cost``: number of cost coefficients. Defaults to ``len(self.x)``.
 
-Constructor arguments are captured automatically for ``rebuild()`` and multiprocessing, so most subclasses only define the solving interface. A model whose constructor needs special handling can override ``get_config`` instead.
+Constructor arguments are captured automatically for ``rebuild()`` and multiprocessing, so most subclasses only need to define the solving interface. If a model constructor needs special handling, override ``get_config``.
 
-For a maximization problem, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__`` or ``_getModel``; the default is minimization. The Gurobi and COPT bases detect the sense from the solver model automatically.
+For a maximization problem, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__`` or ``_getModel``. The default is minimization. The Gurobi and COPT bases detect the sense from the solver model automatically.
 
 .. autoclass:: pyepo.model.opt.optModel
     :noindex:
@@ -148,7 +148,7 @@ For a maximization problem, set ``self.modelSense = EPO.MAXIMIZE`` in ``__init__
 Custom Algorithm
 ----------------
 
-When the problem is solved by your own algorithm rather than a general solver, inherit from ``optModel`` and implement ``solve`` directly. Anything that returns a cost-aligned solution works: a graph algorithm, dynamic programming, a hand-written ADMM, or a heuristic. The example solves a grid shortest path with NetworkX and Dijkstra:
+When the problem is solved by your own algorithm rather than a general solver, inherit from ``optModel`` and implement ``solve`` directly. Anything that returns a cost-aligned solution can be wrapped this way: a graph algorithm, dynamic programming, a hand-written ADMM method, or a heuristic. The example below solves a grid shortest path with NetworkX and Dijkstra:
 
 .. code-block:: python
 
@@ -191,7 +191,7 @@ The same pattern wraps any algorithm: build state in ``_getModel``, store the co
 Solver Backend Subclass
 -----------------------
 
-To use a solver's modeling API directly, inherit from a backend base class and implement ``_getModel``; ``setObj``, ``solve``, and ``num_cost`` come from the base. The GurobiPy version of the program above:
+To use a solver's modeling API directly, inherit from a backend base class and implement ``_getModel``. ``setObj``, ``solve``, and ``num_cost`` come from the base class. The GurobiPy version of the program above is:
 
 .. code-block:: python
 
@@ -210,7 +210,7 @@ To use a solver's modeling API directly, inherit from a backend base class and i
            m.addConstr(5*x[0] + 4*x[1] + 6*x[2] + 2*x[3] + 3*x[4] <= 15)
            return m, x
 
-The other backends follow the same shape with their own APIs: ``optCoptModel`` (COPT), ``optOmoModel`` (Pyomo), and ``optOrtModel`` / ``optOrtCpModel`` (OR-Tools). Of these, ``optOmoModel`` and ``optOrtModel`` take a ``solver=`` argument; ``optOrtCpModel`` (CP-SAT) is integer-only with a fixed solver. ``optMpaxModel`` is different: it has no solver model object, so ``_getModel`` fills the standard-form matrices ``A``, ``b``, ``G``, ``h``, ``l``, ``u`` (and an optional PSD ``Q``) and returns ``(None, [])``.
+The other backends follow the same shape with their own APIs: ``optCoptModel`` (COPT), ``optOmoModel`` (Pyomo), and ``optOrtModel`` / ``optOrtCpModel`` (OR-Tools). Of these, ``optOmoModel`` and ``optOrtModel`` take a ``solver=`` argument. ``optOrtCpModel`` (CP-SAT) is integer-only with a fixed solver. ``optMpaxModel`` is different: it has no solver model object, so ``_getModel`` fills the standard-form matrices ``A``, ``b``, ``G``, ``h``, ``l``, ``u`` (and an optional positive semidefinite ``Q``) and returns ``(None, [])``.
 
 .. autoclass:: pyepo.model.mpax.optMpaxModel
     :noindex:

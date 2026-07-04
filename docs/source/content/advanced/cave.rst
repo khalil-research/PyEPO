@@ -3,8 +3,8 @@ CaVE
 
 CaVE is a training loss for binary linear programs. It uses the binding
 constraints at the true optimum as supervision for the predicted cost vector.
-These labels are prepared by ``optDatasetConstrs`` and consumed by the
-``CaVE`` loss.
+``optDatasetConstrs`` prepares these labels, and the ``CaVE`` loss consumes
+them during training.
 
 What CaVE Uses
 ==============
@@ -23,7 +23,7 @@ normals at that solution. CaVE uses this condition directly:
 
 The dataset stores the cone information. During training, ``CaVE`` projects the
 sense-flipped predicted cost onto that cone and penalizes the angle between the
-prediction and its projection.
+prediction and the projection.
 
 
 Minimal Example
@@ -34,8 +34,8 @@ It adds ``tight_ctrs``, the binding-constraint normals at the true optimum,
 to the usual ``(x, c, w, z)`` batch.
 
 The number of binding constraints can differ across instances, so the batch
-needs padding; ``optDataLoader`` applies it automatically (an existing
-``DataLoader`` can instead pass ``collate_fn=collate_tight_constraints``):
+needs padding. ``optDataLoader`` applies the padding automatically. An existing
+``DataLoader`` can instead pass ``collate_fn=collate_tight_constraints``:
 
 .. code-block:: python
 
@@ -79,11 +79,11 @@ Solver Requirements
 
 CaVE currently targets binary linear programs. Extracting binding-constraint
 normals requires a Gurobi-backed ``optModel``. ``optDatasetConstrs`` raises on
-infeasible instances or non-binary optima; pass ``skip_infeas=True`` to drop
+infeasible instances or non-binary optima. Pass ``skip_infeas=True`` to drop
 such instances instead.
 
 Clarabel is used internally by the ``CaVE`` loss for the cone projection during
-training. ``max_iter`` caps the Clarabel iterations; the default ``max_iter=3``
+training. ``max_iter`` caps the Clarabel iterations. The default ``max_iter=3``
 is the paper's **CaVE+** preset, which under-converges the projection on
 purpose so it stays interior to the cone. Raising it changes the loss, not
 just its precision. Setting ``solve_ratio < 1`` enables the **CaVE-Hybrid**
@@ -99,8 +99,8 @@ Performance Example
    :align: center
 
    CVRP-20 results from notebook 04: ``num_data=1000``, 10 epochs, single process.
-   In this setup, CaVE+ trains 8.2x faster than SPO+; CaVE-Hybrid with
-   ``solve_ratio=0.3`` trains 10.5x faster than SPO+, at a final regret higher
+   In this setup, CaVE+ trains 8.2x faster than SPO+. CaVE-Hybrid with
+   ``solve_ratio=0.3`` trains 10.5x faster than SPO+, with a final regret higher
    than both.
 
 

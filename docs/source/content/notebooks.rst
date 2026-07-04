@@ -1,13 +1,13 @@
 Notebooks
 +++++++++
 
-The notebooks are Colab examples grouped by topic. Each entry links to the related documentation page.
+The notebooks are Colab examples grouped by topic. Each entry links to the most closely related documentation page.
 
 
 Getting Started
 ===============
 
-* `01 Optimization Model <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_: build an ``optModel`` from a GurobiPy / COPT / Pyomo / OR-Tools / MPAX backend. Pairs with :doc:`getting_started/model`.
+* `01 Optimization Model <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/01%20Optimization%20Model.ipynb>`_: build an ``optModel`` with a GurobiPy, COPT, Pyomo, OR-Tools, or MPAX backend. Pairs with :doc:`getting_started/model`.
 * `02 Optimization Dataset <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/02%20Optimization%20Dataset.ipynb>`_: generate synthetic data and wrap it in ``optDataset``. Pairs with :doc:`getting_started/data`.
 * `03 Training and Testing <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/03%20Training%20and%20Testing.ipynb>`_: train method families on a shortest-path dataset. Pairs with :doc:`getting_started/function` and :doc:`getting_started/evaluation`.
 
@@ -23,7 +23,7 @@ GPU Acceleration
 ================
 
 * `09 Solving on MPAX with PDHG <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb>`_: batch-solve LPs on GPU via MPAX, end-to-end without CPU round-trips. See the MPAX backend (``optMpaxModel``) in the *Solver Backend Subclass* section of :doc:`getting_started/model`.
-* `10 JAX Frontend <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb>`_: train PyEPO losses in JAX/Flax with ``jax.grad``. MPAX is GPU-native and jittable; non-JAX backends run through ``jax.pure_callback``. Pairs with :doc:`frontends/jax`.
+* `10 JAX Frontend <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb>`_: train PyEPO losses in JAX/Flax with ``jax.grad``. MPAX is GPU-native and jittable. Non-JAX backends run through ``jax.pure_callback``. Pairs with :doc:`frontends/jax`.
 
 
 Applied Examples

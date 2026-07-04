@@ -1,13 +1,13 @@
 Solution Pool
 +++++++++++++
 
-End-to-end predict-then-optimize training involves repeated solving of
-optimization problems. A solution pool [#f1]_ stores previously computed
-solutions and uses them as an inner approximation of the feasible region.
+End-to-end predict-then-optimize training repeatedly solves optimization
+problems. A solution pool [#f1]_ stores previously computed solutions and uses
+them as an inner approximation of the feasible region.
 
 When the pool is used, PyEPO selects the best cached solution under the
 predicted cost (lowest objective for minimization, highest for maximization)
-instead of solving the original linear/integer program.
+instead of solving the original linear or integer program.
 
 Algorithm
 =========
@@ -47,16 +47,16 @@ probability :math:`p_{\text{solve}}` corresponds to ``solve_ratio``.
 Usage
 =====
 
-Every ``pyepo.func`` module supports the solution pool except ``CaVE``, which
-has no pool and repurposes ``solve_ratio`` for its projection branch (see
-:doc:`cave`).
+Every ``pyepo.func`` module supports the solution pool except ``CaVE``.
+``CaVE`` has no pool and uses ``solve_ratio`` for its projection branch instead
+(see :doc:`cave`).
 
 ``solve_ratio`` sets the probability of solving exactly. PyEPO draws the coin
-once per batch rather than per instance, so it is the expected fraction of
-batches solved. The default is 1.0 (no caching). When ``solve_ratio`` is less
-than 1, pass ``dataset`` to seed the pool with initial solutions; the
-contrastive (``NCE`` / ``CMAP``) and learning-to-rank losses require
-``dataset`` even at the default.
+once per batch rather than per instance, so this is the expected fraction of
+batches solved. The default is 1.0, which disables caching. When
+``solve_ratio`` is less than 1, pass ``dataset`` to seed the pool with initial
+solutions. The contrastive (``NCE`` / ``CMAP``) and learning-to-rank losses
+require ``dataset`` even at the default.
 
 Example with SPO+ (other functions work the same way):
 

@@ -3,11 +3,11 @@ PyTorch Frontend
 
 ``pyepo.func`` provides the PyTorch training methods. Each method is an
 autograd module that wraps an ``optModel``. The forward pass solves the
-optimization problem; the backward pass applies the method's gradient rule.
+optimization problem. The backward pass applies the method's gradient rule.
 Training uses standard PyTorch optimizers.
 
 Method selection and per-method training loops are in
-:doc:`../getting_started/function`; this page shows the calling conventions.
+:doc:`../getting_started/function`. This page shows the calling conventions.
 
 
 Training
@@ -56,7 +56,7 @@ The ``optDataset`` batch is ``(x, c, w, z)``:
 * ``w``: optimal solution under ``c``.
 * ``z``: optimal objective value under ``c``.
 
-Some methods use only a subset of these values; the per-method inputs are
+Some methods use only a subset of these values. The per-method inputs are
 listed in the summary table of :doc:`../getting_started/function`.
 
 
@@ -64,7 +64,7 @@ Solution-Returning Modules
 ==========================
 
 Solution-returning modules such as ``DPO`` are trained through a task loss on
-their output. The perturbed modules draw noise internally; pass ``seed=`` for
+their output. Perturbed modules draw noise internally. Pass ``seed=`` for
 reproducibility.
 
 .. code-block:: python
@@ -85,10 +85,10 @@ GPU
 ===
 
 The predictor and the batch can live on CUDA. Every backend except MPAX
-solves on the CPU; MPAX solves the batch on the GPU (see
+solves on the CPU. MPAX solves the batch on the GPU (see
 :doc:`../solver_backends`). The losses expect all tensor inputs on one
-device, so move the whole batch. A CPU backend receives CPU copies
-internally, and the loss and gradients come back on the batch's device:
+device, so move the whole batch together. A CPU backend receives CPU copies
+internally, and the loss and gradients are returned on the batch's device:
 
 .. code-block:: python
 
@@ -120,6 +120,6 @@ Shared Options
 Common constructor options:
 
 * ``processes`` controls the worker pool used for batch solving.
-* ``solve_ratio`` enables solution-pool caching when set below ``1`` (CaVE repurposes this knob for its projection branch; see :doc:`../advanced/cave`).
-* ``dataset`` seeds the solution pool whenever ``solve_ratio < 1``; contrastive and ranking methods require it always.
+* ``solve_ratio`` enables solution-pool caching when set below ``1``. CaVE uses this option for its projection branch instead. See :doc:`../advanced/cave`.
+* ``dataset`` seeds the solution pool whenever ``solve_ratio < 1``. Contrastive and ranking methods always require it.
 * ``reduction`` controls how per-instance losses are aggregated when the method supports it.
