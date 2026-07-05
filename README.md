@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/pyepo.svg?style=flat-square)](https://pypi.org/project/pyepo/)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg?style=flat-square)
 [![PyPI version](https://img.shields.io/pypi/v/pyepo.svg?style=flat-square)](https://pypi.org/project/pyepo/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/pyepo?style=flat-square)](https://pepy.tech/project/pyepo)
+[![PyPI Downloads](https://img.shields.io/badge/dynamic/json?url=https://pypistats.org/api/packages/pyepo/recent&query=%24.data.last_month&label=downloads&suffix=/month&style=flat-square)](https://pepy.tech/project/pyepo)
 [![Conda version](https://img.shields.io/conda/vn/pyepo/pyepo.svg?style=flat-square)](https://anaconda.org/pyepo/pyepo)
 [![Conda Downloads](https://img.shields.io/conda/dn/pyepo/pyepo.svg?style=flat-square)](https://anaconda.org/pyepo/pyepo)
 [![Docs](https://img.shields.io/badge/docs-online-green.svg?style=flat-square)](https://khalil-research.github.io/PyEPO)
