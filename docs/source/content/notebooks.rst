@@ -15,7 +15,7 @@ Getting Started
 Method Deep Dives
 =================
 
-* `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_: train with the cone-aligned CaVE loss on TSP. Pairs with the *Cone-Aligned Estimation* section of :doc:`getting_started/function`.
+* `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_: train with the cone-aligned CaVE loss on TSP. Pairs with :doc:`getting_started/methods/cone`.
 * `08 kNN Robust Losses <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb>`_: train with the kNN robust loss via ``optDatasetKNN``. Pairs with the *optDatasetKNN* section of :doc:`getting_started/data`.
 
 
