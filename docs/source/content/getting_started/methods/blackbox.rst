@@ -27,7 +27,7 @@ Training loop:
 
 .. code-block:: python
 
-   dbb = pyepo.func.DBB(optmodel, lambd=10, processes=2)
+   dbb = pyepo.func.DBB(optmodel, lambd=10, processes=1)
    criterion = nn.L1Loss()
 
    for epoch in range(20):
@@ -62,7 +62,7 @@ Training loop:
 
 .. code-block:: python
 
-   nid = pyepo.func.NID(optmodel, processes=2)
+   nid = pyepo.func.NID(optmodel, processes=1)
    criterion = nn.L1Loss()
 
    for epoch in range(20):

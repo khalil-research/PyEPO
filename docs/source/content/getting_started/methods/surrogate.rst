@@ -39,7 +39,7 @@ Training loop:
 
 .. code-block:: python
 
-   spo = pyepo.func.SPOPlus(optmodel, processes=2)
+   spo = pyepo.func.SPOPlus(optmodel, processes=1)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:
@@ -78,7 +78,7 @@ Training loop:
 
 .. code-block:: python
 
-   pg = pyepo.func.PG(optmodel, sigma=0.1, two_sides=False, processes=2)
+   pg = pyepo.func.PG(optmodel, sigma=0.1, two_sides=False, processes=1)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:

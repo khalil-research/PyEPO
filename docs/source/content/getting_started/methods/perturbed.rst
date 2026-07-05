@@ -39,9 +39,9 @@ Training loop (swap ``predmodel`` for ``positive_predmodel`` when using ``DPOMul
 
 .. code-block:: python
 
-   dpo = pyepo.func.DPO(optmodel, n_samples=10, sigma=0.5, processes=2)
+   dpo = pyepo.func.DPO(optmodel, n_samples=10, sigma=0.5, processes=1)
    # if using DPOMul, replace predmodel with positive_predmodel below
-   # dpo = pyepo.func.DPOMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+   # dpo = pyepo.func.DPOMul(optmodel, n_samples=10, sigma=0.5, processes=1)
 
    criterion = nn.MSELoss()
 
@@ -90,9 +90,9 @@ Training loop (swap ``predmodel`` for ``positive_predmodel`` when using ``PFYMul
 
 .. code-block:: python
 
-   pfy = pyepo.func.PFY(optmodel, n_samples=10, sigma=0.5, processes=2)
+   pfy = pyepo.func.PFY(optmodel, n_samples=10, sigma=0.5, processes=1)
    # if using PFYMul, replace predmodel with positive_predmodel below
-   # pfy = pyepo.func.PFYMul(optmodel, n_samples=10, sigma=0.5, processes=2)
+   # pfy = pyepo.func.PFYMul(optmodel, n_samples=10, sigma=0.5, processes=1)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:
@@ -124,7 +124,7 @@ Training loop:
 
 .. code-block:: python
 
-   imle = pyepo.func.IMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=2)
+   imle = pyepo.func.IMLE(optmodel, n_samples=10, sigma=1.0, lambd=10, processes=1)
    criterion = nn.L1Loss()
 
    for epoch in range(20):
@@ -158,7 +158,7 @@ Training loop (the adaptive step works with far fewer samples than I-MLE):
 
 .. code-block:: python
 
-   aimle = pyepo.func.AIMLE(optmodel, n_samples=2, sigma=1.0, processes=2)
+   aimle = pyepo.func.AIMLE(optmodel, n_samples=2, sigma=1.0, processes=1)
    criterion = nn.L1Loss()
 
    for epoch in range(20):

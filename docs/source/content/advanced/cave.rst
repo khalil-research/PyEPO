@@ -63,7 +63,7 @@ needs padding. ``optDataLoader`` applies the padding automatically. An existing
 
    # linear predictor and CaVE loss
    predmodel = nn.Linear(5, optmodel.num_cost)
-   cave = pyepo.func.CaVE(optmodel, processes=2)
+   cave = pyepo.func.CaVE(optmodel, processes=1)
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
    for x, c, w, z, tight_ctrs in dataloader_constr:

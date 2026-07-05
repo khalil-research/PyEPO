@@ -37,7 +37,7 @@ Training loop:
 
 .. code-block:: python
 
-   ltr = pyepo.func.ptLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   ltr = pyepo.func.ptLTR(optmodel, processes=1, solve_ratio=0.05, dataset=dataset)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:
@@ -59,7 +59,7 @@ Training loop:
 
 .. code-block:: python
 
-   ltr = pyepo.func.prLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   ltr = pyepo.func.prLTR(optmodel, processes=1, solve_ratio=0.05, dataset=dataset)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:
@@ -81,7 +81,7 @@ Training loop:
 
 .. code-block:: python
 
-   ltr = pyepo.func.lsLTR(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   ltr = pyepo.func.lsLTR(optmodel, processes=1, solve_ratio=0.05, dataset=dataset)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:

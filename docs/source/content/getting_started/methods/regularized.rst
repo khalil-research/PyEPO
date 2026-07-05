@@ -31,7 +31,7 @@ Training loop:
 
 .. code-block:: python
 
-   rfwo = pyepo.func.RFWO(optmodel, lambd=1.0, processes=2)
+   rfwo = pyepo.func.RFWO(optmodel, lambd=1.0, processes=1)
    criterion = nn.MSELoss()
 
    for epoch in range(20):
@@ -83,7 +83,7 @@ Training loop:
 
 .. code-block:: python
 
-   rfyl = pyepo.func.RFY(optmodel, lambd=1.0, processes=2)
+   rfyl = pyepo.func.RFY(optmodel, lambd=1.0, processes=1)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:

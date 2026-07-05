@@ -46,7 +46,7 @@ Training loop (the batch carries ``tight_ctrs`` in addition to ``(x, c, w, z)``)
    dataset_constr = optDatasetConstrs(optmodel, feat, costs)
    dataloader_constr = optDataLoader(dataset_constr, batch_size=32, shuffle=True)
 
-   cave = pyepo.func.CaVE(optmodel, processes=2)
+   cave = pyepo.func.CaVE(optmodel, processes=1)
 
    for epoch in range(20):
        for x, c, w, z, tight_ctrs in dataloader_constr:

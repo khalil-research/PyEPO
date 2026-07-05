@@ -33,7 +33,7 @@ Training loop:
 
 .. code-block:: python
 
-   nce = pyepo.func.NCE(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   nce = pyepo.func.NCE(optmodel, processes=1, solve_ratio=0.05, dataset=dataset)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:
@@ -65,7 +65,7 @@ Training loop:
 
 .. code-block:: python
 
-   cmap = pyepo.func.CMAP(optmodel, processes=2, solve_ratio=0.05, dataset=dataset)
+   cmap = pyepo.func.CMAP(optmodel, processes=1, solve_ratio=0.05, dataset=dataset)
 
    for epoch in range(20):
        for x, c, w, z in dataloader:

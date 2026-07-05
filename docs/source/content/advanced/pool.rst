@@ -64,7 +64,7 @@ Example with SPO+ (other functions work the same way):
 
    import pyepo
 
-   spo = pyepo.func.SPOPlus(optmodel, processes=2, solve_ratio=0.7, dataset=dataset)
+   spo = pyepo.func.SPOPlus(optmodel, processes=1, solve_ratio=0.7, dataset=dataset)
 
 
 Related Pages

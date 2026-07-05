@@ -49,7 +49,7 @@ Use ``pyepo.data.dataset.optDatasetKNN`` in place of ``optDataset``:
    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 
    predmodel = nn.Linear(5, optmodel.num_cost)
-   spo = pyepo.func.SPOPlus(optmodel, processes=2)
+   spo = pyepo.func.SPOPlus(optmodel, processes=1)
    optimizer = torch.optim.Adam(predmodel.parameters(), lr=1e-3)
 
    for x, c, w, z in dataloader:
