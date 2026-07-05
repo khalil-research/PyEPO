@@ -1,5 +1,5 @@
-The optModel Interface
-++++++++++++++++++++++
+Custom Models
++++++++++++++
 
 The DSL compiles to an ``optModel``. Implement an ``optModel`` directly when you need:
 

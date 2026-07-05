@@ -1,5 +1,5 @@
-Built-in Problem Models
-+++++++++++++++++++++++
+Built-in Models
++++++++++++++++
 
 ``PyEPO`` includes built-in models for several classic problems. Each model is built by a factory that takes a ``backend`` keyword (default ``"gurobi"``). Pair a model with generated data (:doc:`../data/generators`) and an ``optDataset`` (:doc:`../data/datasets`):
 

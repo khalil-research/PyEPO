@@ -1,5 +1,5 @@
-Defining Models with the DSL
-++++++++++++++++++++++++++++
+DSL Models
+++++++++++
 
 Describe the problem once with ``Variable``, ``Parameter``, and constraints, then compile it to a backend. The example below is a binary program with a predicted cost and linear constraints:
 
@@ -106,4 +106,4 @@ Constraints are fixed across instances. Only the cost is predicted. Pass constra
    x.sum(axis=1) == 1                             # per-axis sums, e.g. an assignment
    x @ Q @ x <= gamma                             # quadratic (Gurobi, COPT, or QP-capable Pyomo)
 
-For a linear or quadratic objective with fixed constraints, the DSL is all you need. For cases the DSL cannot express, see :doc:`interface`.
+For a linear or quadratic objective with fixed constraints, the DSL is all you need. For cases the DSL cannot express, see :doc:`custom`.

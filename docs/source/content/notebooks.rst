@@ -22,7 +22,7 @@ Method Deep Dives
 GPU Acceleration
 ================
 
-* `09 Solving on MPAX with PDHG <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb>`_: batch-solve LPs on GPU via MPAX, end-to-end without CPU round-trips. See the MPAX backend (``optMpaxModel``) in the *Solver Backend Subclass* section of :doc:`getting_started/model/interface`.
+* `09 Solving on MPAX with PDHG <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb>`_: batch-solve LPs on GPU via MPAX, end-to-end without CPU round-trips. See the MPAX backend (``optMpaxModel``) in the *Solver Backend Subclass* section of :doc:`getting_started/model/custom`.
 * `10 JAX Frontend <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb>`_: train PyEPO losses in JAX/Flax with ``jax.grad``. MPAX is GPU-native and jittable. Non-JAX backends run through ``jax.pure_callback``. Pairs with :doc:`frontends/jax`.
 
 
