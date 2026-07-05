@@ -32,4 +32,5 @@ jobs:
         # --output only computes the path; the build above produced the package
         PKG_PATH=$(conda build --output ./pkg -c conda-forge -c pytorch -c gurobi)
         echo "Package path: $PKG_PATH"
-        anaconda upload --user pyepo $PKG_PATH
+        # anaconda-client lives in base; run it there regardless of the active env
+        conda run -n base anaconda upload --user pyepo "$PKG_PATH"
