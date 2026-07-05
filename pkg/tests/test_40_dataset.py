@@ -295,6 +295,46 @@ class TestOptDatasetConstrs:
         with pytest.raises(ValueError, match="binary"):
             optDatasetConstrs(model, x, c)
 
+    def test_binding_inequality_extracted_as_le_normal(self):
+        from pyepo.model.grb.knapsack import knapsackModel
+
+        # single <= capacity constraint the optimum fills exactly (slack 0)
+        model = knapsackModel(weights=np.array([[1.0, 1.0, 1.0]]), capacity=np.array([2.0]))
+        x = np.zeros((2, NUM_FEAT), dtype=np.float32)
+        # costs favour items 0 and 1: both selected, total weight 2 == capacity
+        c = np.tile([3.0, 2.0, 1.0], (2, 1)).astype(np.float32)
+        ds = optDatasetConstrs(model, x, c)
+        # the tight <= row is the item-weight vector, kept in <= orientation
+        rows = ds.ctrs[0].numpy()
+        assert any(np.allclose(r, [1.0, 1.0, 1.0]) for r in rows)
+
+
+@requires_gurobi
+class TestOrientConstraintRow:
+    """Canonical <= orientation of a single lazy-constraint normal (pure)."""
+
+    def test_orients_each_sense(self):
+        from gurobipy import GRB
+
+        from pyepo.data.dataset import _orient_constraint_row
+
+        row = np.array([1.0, -2.0, 3.0])
+        # <= kept as-is
+        (le,) = _orient_constraint_row(row, GRB.LESS_EQUAL)
+        np.testing.assert_array_equal(le, row)
+        # >= negated to <=
+        (ge,) = _orient_constraint_row(row, GRB.GREATER_EQUAL)
+        np.testing.assert_array_equal(ge, -row)
+        # == splits into <= and >=
+        eq = _orient_constraint_row(row, GRB.EQUAL)
+        np.testing.assert_array_equal(np.stack(eq), np.stack([row, -row]))
+
+    def test_rejects_unknown_sense(self):
+        from pyepo.data.dataset import _orient_constraint_row
+
+        with pytest.raises(ValueError, match="Invalid constraint sense"):
+            _orient_constraint_row(np.array([1.0]), "?")
+
 
 class TestCollateTightConstraints:
     """Pure: ragged binding-constraint matrices pad to a common batch shape."""

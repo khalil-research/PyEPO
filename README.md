@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/khalil-research/PyEPO?style=flat-square)](https://github.com/khalil-research/PyEPO/stargazers)
 [![Tests](https://img.shields.io/github/actions/workflow/status/khalil-research/PyEPO/test.yml?branch=main&style=flat-square&label=tests)](https://github.com/khalil-research/PyEPO/actions/workflows/test.yml)
+[![Coverage](https://img.shields.io/coverallsCoverage/github/khalil-research/PyEPO?branch=main&style=flat-square)](https://coveralls.io/github/khalil-research/PyEPO?branch=main)
 [![Python](https://img.shields.io/pypi/pyversions/pyepo.svg?style=flat-square)](https://pypi.org/project/pyepo/)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg?style=flat-square)
 [![PyPI version](https://img.shields.io/pypi/v/pyepo.svg?style=flat-square)](https://pypi.org/project/pyepo/)

@@ -48,3 +48,44 @@ jobs:
     - name: Run tests
       working-directory: ./pkg
       run: python -m pytest tests/ -v --tb=short
+
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
+        cache: pip
+        cache-dependency-path: pkg/pyproject.toml
+
+    - name: Install dependencies
+      working-directory: ./pkg
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov gurobipy pyomo
+        # solver backends, best effort: same skip-clean policy as the test job,
+        # one line per package so a missing wheel does not drop the others
+        pip install coptpy || true
+        pip install ortools || true
+        pip install highspy || true
+        pip install "jax[cpu]" || true
+        pip install mpax || true
+        pip install clarabel || true
+        pip install flax optax || true
+        pip install -e .
+
+    - name: Run tests with coverage
+      working-directory: ./pkg
+      run: python -m pytest tests/ --cov=pyepo --cov-report=lcov:coverage.lcov
+
+    - name: Upload coverage to Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        file: pkg/coverage.lcov
+        base-path: pkg

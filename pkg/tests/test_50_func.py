@@ -25,6 +25,8 @@ from pyepo.func.runtime import (
 from pyepo.func.utils import (
     _cache_in_pass,
     _check_sol,
+    _close_pool,
+    _solve_with_obj_in_worker,
     _update_solution_pool,
     sumGammaDistribution,
 )
@@ -110,6 +112,14 @@ class TestCacheInPass:
         assert sol.shape == (5, 4)
         assert obj.shape == (5,)
 
+    def test_casts_mismatched_pool_dtype(self):
+        # float64 pool + float32 costs: pool adopts the cost dtype before matmul
+        cp = torch.tensor([[1.0, 2.0, 3.0]], dtype=torch.float32)
+        solpool = torch.eye(3, dtype=torch.float64)
+        sol, _obj, out = _cache_in_pass(cp, self._mock_model(EPO.MINIMIZE), solpool)
+        assert out.dtype == torch.float32
+        assert sol.dtype == torch.float32
+
 
 class TestCheckSol:
     """Objective-solution consistency checker."""
@@ -185,6 +195,13 @@ class TestSolutionPool:
         for update in updates:
             pool = _update_solution_pool(torch.tensor(update), pool)
         assert pool.shape[0] == expected_rows
+
+    def test_update_pool_casts_mismatched_dtype(self):
+        # float64 pool + float32 update: pool adopts the update dtype, row appended
+        solpool = torch.zeros((1, 3), dtype=torch.float64)
+        out = _update_solution_pool(torch.ones((1, 3), dtype=torch.float32), solpool)
+        assert out.dtype == torch.float32
+        assert out.shape == (2, 3)
 
 
 class TestFrankWolfeFreeSlot:
@@ -366,6 +383,32 @@ class TestSharedRuntime:
                 require_solpool=False,
                 unique=lambda x: x,
             )
+
+
+class TestWorkerPoolHelpers:
+    """Process-pool worker init contract and best-effort shutdown."""
+
+    def test_worker_solve_requires_initialized_model(self, monkeypatch):
+        from pyepo.func import utils as func_utils
+
+        # a worker that solves before _init_worker_model ran must fail loudly
+        monkeypatch.setattr(func_utils, "_worker_model", None)
+        with pytest.raises(RuntimeError, match="_init_worker_model"):
+            _solve_with_obj_in_worker(np.zeros(4, dtype=np.float32))
+
+    def test_close_pool_swallows_shutdown_errors(self):
+        class _BrokenPool:
+            def close(self):
+                raise RuntimeError("already closed")
+
+            def join(self):
+                pass
+
+            def clear(self):
+                pass
+
+        # best-effort shutdown: a failing pool must not propagate
+        _close_pool(_BrokenPool())
 
 
 # ============================================================
