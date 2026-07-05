@@ -3,14 +3,16 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/khalil-research/PyEPO?style=flat-square)](https://github.com/khalil-research/PyEPO/stargazers)
 [![Tests](https://img.shields.io/github/actions/workflow/status/khalil-research/PyEPO/test.yml?branch=main&style=flat-square&label=tests)](https://github.com/khalil-research/PyEPO/actions/workflows/test.yml)
+[![Lint](https://img.shields.io/github/actions/workflow/status/khalil-research/PyEPO/lint.yml?branch=main&style=flat-square&label=lint)](https://github.com/khalil-research/PyEPO/actions/workflows/lint.yml)
 [![Coverage](https://img.shields.io/coverallsCoverage/github/khalil-research/PyEPO?branch=main&style=flat-square)](https://coveralls.io/github/khalil-research/PyEPO?branch=main)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=flat-square)](https://github.com/astral-sh/ruff)
 [![Python](https://img.shields.io/pypi/pyversions/pyepo.svg?style=flat-square)](https://pypi.org/project/pyepo/)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg?style=flat-square)
 [![PyPI version](https://img.shields.io/pypi/v/pyepo.svg?style=flat-square)](https://pypi.org/project/pyepo/)
 [![PyPI Downloads](https://img.shields.io/badge/dynamic/json?url=https://pypistats.org/api/packages/pyepo/recent&query=%24.data.last_month&label=downloads&suffix=/month&style=flat-square)](https://pepy.tech/project/pyepo)
 [![Conda version](https://img.shields.io/conda/vn/pyepo/pyepo.svg?style=flat-square)](https://anaconda.org/pyepo/pyepo)
 [![Conda Downloads](https://img.shields.io/conda/dn/pyepo/pyepo.svg?style=flat-square)](https://anaconda.org/pyepo/pyepo)
-[![Docs](https://img.shields.io/badge/docs-online-green.svg?style=flat-square)](https://khalil-research.github.io/PyEPO)
+[![Docs](https://img.shields.io/github/actions/workflow/status/khalil-research/PyEPO/docs.yml?branch=main&style=flat-square&label=docs)](https://khalil-research.github.io/PyEPO)
 [![Paper](https://img.shields.io/badge/MPC-10.1007/s12532--024--00255--x-blue.svg?style=flat-square)](https://link.springer.com/article/10.1007/s12532-024-00255-x)
 
 <p align="center"><img width="100%" src="images/logo1.png" /></p>
