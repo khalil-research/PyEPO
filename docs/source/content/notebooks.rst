@@ -16,13 +16,13 @@ Method Deep Dives
 =================
 
 * `04 CaVE for Binary Linear Programs <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/04%20CaVE%20for%20Binary%20Linear%20Programs.ipynb>`_: train with the cone-aligned CaVE loss on TSP. Pairs with :doc:`getting_started/methods/cone`.
-* `08 kNN Robust Losses <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb>`_: train with the kNN robust loss via ``optDatasetKNN``. Pairs with the *optDatasetKNN* section of :doc:`getting_started/data`.
+* `08 kNN Robust Losses <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/08%20kNN%20Robust%20Losses.ipynb>`_: train with the kNN robust loss via ``optDatasetKNN``. Pairs with :doc:`getting_started/data/datasets`.
 
 
 GPU Acceleration
 ================
 
-* `09 Solving on MPAX with PDHG <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb>`_: batch-solve LPs on GPU via MPAX, end-to-end without CPU round-trips. See the MPAX backend (``optMpaxModel``) in the *Solver Backend Subclass* section of :doc:`getting_started/model`.
+* `09 Solving on MPAX with PDHG <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/09%20Solving%20on%20MPAX%20with%20PDHG.ipynb>`_: batch-solve LPs on GPU via MPAX, end-to-end without CPU round-trips. See the MPAX backend (``optMpaxModel``) in the *Solver Backend Subclass* section of :doc:`getting_started/model/interface`.
 * `10 JAX Frontend <https://colab.research.google.com/github/khalil-research/PyEPO/blob/main/notebooks/10%20JAX%20Frontend.ipynb>`_: train PyEPO losses in JAX/Flax with ``jax.grad``. MPAX is GPU-native and jittable. Non-JAX backends run through ``jax.pure_callback``. Pairs with :doc:`frontends/jax`.
 
 

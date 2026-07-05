@@ -65,7 +65,7 @@ pass through as native solver parameters where the backend accepts them.
    prob.compile(backend="gurobi", timelimit=10)
    prob.compile(backend="gurobi", MIPGap=0.01)
 
-The full per-backend keyword table is in :doc:`getting_started/model`.
+The full per-backend keyword table is in :doc:`getting_started/model/dsl`.
 
 MPAX: GPU Batch Solving
 =======================
