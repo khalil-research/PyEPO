@@ -17,6 +17,7 @@ import torch
 from pyepo import EPO
 from pyepo.func.runtime import (
     bind_runtime_state,
+    close_runtime,
     create_solver_pool,
     init_runtime,
     init_solution_pool,
@@ -269,6 +270,17 @@ class _RuntimeModel(optModel):
         return [0], 0.0
 
 
+class _NoDeepcopyRuntimeValue:
+    def __deepcopy__(self, memo):
+        raise TypeError("not deepcopyable")
+
+
+class _UncopyableRuntimeModel(_RuntimeModel):
+    def __init__(self, resource):
+        self.resource = resource
+        super().__init__()
+
+
 class TestSharedRuntime:
     """Pool creation and runtime state binding."""
 
@@ -290,6 +302,55 @@ class TestSharedRuntime:
         finalize.assert_called_once()
         assert finalize.call_args.args[0] is owner
         assert finalize.call_args.args[2] is pool
+
+    def test_multi_process_rejects_nonreconstructable_model_before_starting_workers(
+        self, monkeypatch
+    ):
+        pool_factory = MagicMock()
+        monkeypatch.setattr("pyepo.func.runtime.ProcessingPool", pool_factory)
+
+        with pytest.raises(TypeError, match=r"get_config\(\)/from_config\(\)"):
+            create_solver_pool(_UncopyableRuntimeModel(_NoDeepcopyRuntimeValue()), 2)
+
+        pool_factory.assert_not_called()
+
+    def test_close_runtime_reaps_workers_once_and_reverts_to_serial(self, monkeypatch):
+        class _Pool:
+            def __init__(self):
+                self.calls = []
+
+            def close(self):
+                self.calls.append("close")
+
+            def join(self):
+                self.calls.append("join")
+
+            def clear(self):
+                self.calls.append("clear")
+
+        class _Owner:
+            pass
+
+        pool = _Pool()
+        monkeypatch.setattr("pyepo.func.runtime.ProcessingPool", MagicMock(return_value=pool))
+        owner = _Owner()
+        runtime = init_runtime(
+            owner,
+            _RuntimeModel(),
+            processes=2,
+            solve_ratio=1,
+            reduction="mean",
+            seed=None,
+            logger=MagicMock(),
+        )
+        bind_runtime_state(owner, runtime)
+
+        close_runtime(owner)
+        close_runtime(owner)
+
+        assert pool.calls == ["close", "join", "clear"]
+        assert owner.pool is None
+        assert owner.processes == 1
 
     def test_process_zero_expands_to_cpu_count(self, monkeypatch):
         monkeypatch.setattr("pyepo.func.runtime.mp.cpu_count", lambda: 7)
@@ -396,19 +457,24 @@ class TestWorkerPoolHelpers:
         with pytest.raises(RuntimeError, match="_init_worker_model"):
             _solve_with_obj_in_worker(np.zeros(4, dtype=np.float32))
 
-    def test_close_pool_swallows_shutdown_errors(self):
+    def test_close_pool_continues_after_a_shutdown_error(self):
         class _BrokenPool:
+            def __init__(self):
+                self.calls = []
+
             def close(self):
+                self.calls.append("close")
                 raise RuntimeError("already closed")
 
             def join(self):
-                pass
+                self.calls.append("join")
 
             def clear(self):
-                pass
+                self.calls.append("clear")
 
-        # best-effort shutdown: a failing pool must not propagate
-        _close_pool(_BrokenPool())
+        pool = _BrokenPool()
+        _close_pool(pool)
+        assert pool.calls == ["close", "join", "clear"]
 
 
 # ============================================================

@@ -65,8 +65,37 @@ def normalize_processes(
     return cpu_count if processes == 0 else processes
 
 
-# unique pool ids
+# Unique pool ids and finalizers. The finalizer is a last-resort guard only;
+# modules expose ``close`` so normal control flow releases workers explicitly.
 _pool_ids = itertools.count()
+_pool_finalizers: dict[int, weakref.finalize] = {}
+
+
+def _finalize_pool(pool: ProcessingPool) -> None:
+    """Close a pool from a weakref finalizer and drop its registration."""
+    try:
+        _close_pool(pool)
+    finally:
+        _pool_finalizers.pop(id(pool), None)
+
+
+def close_solver_pool(pool: ProcessingPool | None) -> None:
+    """Idempotently close a solver pool and detach its fallback finalizer."""
+    if pool is None:
+        return
+    finalizer = _pool_finalizers.pop(id(pool), None)
+    if finalizer is not None and finalizer.alive:
+        finalizer()
+    else:
+        _close_pool(pool)
+
+
+def close_runtime(owner: Any) -> None:
+    """Release an owner's workers; later calls fall back to serial solving."""
+    close_solver_pool(getattr(owner, "pool", None))
+    owner.pool = None
+    if getattr(owner, "processes", 1) > 1:
+        owner.processes = 1
 
 
 def create_solver_pool(
@@ -76,18 +105,18 @@ def create_solver_pool(
     owner=None,
     with_solver: bool = True,
 ) -> ProcessingPool | None:
-    """Create a worker pool, optionally tied to an owner's lifetime."""
+    """Create a worker pool after validating its reconstruction recipe."""
     if processes == 1:
         return None
     # optional per-worker optmodel preload
-    init_kwargs = (
-        {"initializer": _init_worker_model, "initargs": (optmodel.to_spec(),)}
-        if with_solver
-        else {}
-    )
+    init_kwargs = {}
+    if with_solver:
+        spec = optmodel.to_spec()
+        spec.validate_serializable()
+        init_kwargs = {"initializer": _init_worker_model, "initargs": (spec,)}
     pool = ProcessingPool(processes, id=f"pyepo-{next(_pool_ids)}", **init_kwargs)
     if owner is not None:
-        weakref.finalize(owner, _close_pool, pool)
+        _pool_finalizers[id(pool)] = weakref.finalize(owner, _finalize_pool, pool)
     return pool
 
 

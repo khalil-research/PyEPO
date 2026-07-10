@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 import math
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -33,13 +34,13 @@ _warned_mpax_device_mismatch = False
 
 
 def _close_pool(pool) -> None:
-    """Best-effort shutdown of a pathos ProcessingPool; swallows shutdown errors."""
-    try:
-        pool.close()
-        pool.join()
-        pool.clear()
-    except Exception:  # noqa: BLE001  intentional best-effort shutdown
-        pass
+    """Best-effort shutdown that always attempts every pool-cleanup stage."""
+    if pool is None:
+        return
+    # A failed close must not prevent join/clear from reaping child workers.
+    for method_name in ("close", "join", "clear"):
+        with suppress(Exception):
+            getattr(pool, method_name)()
 
 
 def _solve_or_cache(cp: torch.Tensor, module: optModule) -> tuple[torch.Tensor, torch.Tensor]:

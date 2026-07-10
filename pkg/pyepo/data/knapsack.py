@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from pyepo.data._validation import validate_degree, validate_nonnegative
+from pyepo._validation import validate_degree, validate_nonnegative
 
 
 def genData(

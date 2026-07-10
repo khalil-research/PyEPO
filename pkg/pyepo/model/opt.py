@@ -22,27 +22,61 @@ if TYPE_CHECKING:
     from pyepo.EPO import ModelSense
 
 
+@dataclass(frozen=True)
+class _SnapshotFailure:
+    """Marker retained during construction until a model is asked to rebuild."""
+
+    type_name: str
+    reason: str
+
+
 def _snapshot(value):
-    """Deep-copy a constructor argument, keeping the reference if it cannot be copied."""
+    """Deep-copy a constructor argument without retaining unsafe references."""
     try:
         return deepcopy(value)
-    except Exception:  # noqa: BLE001 -- any copy failure falls back to a reference
-        return value
+    except Exception as exc:  # noqa: BLE001 -- third-party solver objects vary
+        return _SnapshotFailure(type(value).__qualname__, str(exc))
 
 
-def _snapshot_args(args: tuple) -> tuple:
+def _require_reconstructable(value) -> None:
+    """Raise a useful error instead of leaking an original mutable reference."""
+    if isinstance(value, _SnapshotFailure):
+        raise TypeError(
+            f"Cannot reconstruct a model: {value.type_name} cannot be deep-copied "
+            f"({value.reason}). Override get_config()/from_config() with standalone values."
+        )
+    if isinstance(value, dict):
+        for item in value.values():
+            _require_reconstructable(item)
+    elif isinstance(value, (list, tuple, set, frozenset)):
+        for item in value:
+            _require_reconstructable(item)
+
+
+def _snapshot_args(args: tuple, *, strict: bool = False) -> tuple:
     """Snapshot a tuple of positional constructor arguments."""
-    return tuple(_snapshot(v) for v in args)
+    result = tuple(_snapshot(v) for v in args)
+    if strict:
+        _require_reconstructable(result)
+    return result
 
 
-def _snapshot_config(config: dict) -> dict:
+def _snapshot_config(config: dict, *, strict: bool = False) -> dict:
     """Snapshot a dict of keyword constructor arguments."""
-    return {k: _snapshot(v) for k, v in config.items()}
+    result = {k: _snapshot(v) for k, v in config.items()}
+    if strict:
+        _require_reconstructable(result)
+    return result
 
 
 @dataclass(frozen=True, init=False)
 class ModelSpec:
-    """Serializable recipe for building a fresh optimization model."""
+    """Independent, serializable recipe for building a fresh optimization model.
+
+    Models with constructor arguments that cannot be deep-copied must override
+    :meth:`optModel.get_config` (and, when needed, ``from_config``) to return
+    a standalone reconstruction configuration.
+    """
 
     model_type: type[optModel]
     _args: tuple
@@ -55,22 +89,34 @@ class ModelSpec:
         args: tuple = (),
     ) -> None:
         object.__setattr__(self, "model_type", model_type)
-        object.__setattr__(self, "_args", _snapshot_args(args))
-        object.__setattr__(self, "_config", _snapshot_config(config))
+        object.__setattr__(self, "_args", _snapshot_args(args, strict=True))
+        object.__setattr__(self, "_config", _snapshot_config(config, strict=True))
 
     @property
     def args(self) -> tuple:
         """Return an independent copy of positional constructor arguments."""
-        return _snapshot_args(self._args)
+        return _snapshot_args(self._args, strict=True)
 
     @property
     def config(self) -> dict:
         """Return an independent copy of keyword constructor arguments."""
-        return _snapshot_config(self._config)
+        return _snapshot_config(self._config, strict=True)
 
     def build(self) -> optModel:
         """Build a fresh model without sharing mutable configuration values."""
-        return self.model_type.from_config(self._config, self._args)
+        return self.model_type.from_config(self.config, self.args)
+
+    def validate_serializable(self) -> None:
+        """Verify that Pathos workers can serialize this reconstruction recipe."""
+        try:
+            import dill
+
+            dill.dumps(self)
+        except Exception as exc:
+            raise TypeError(
+                "ModelSpec is not serializable for multiprocessing. Override "
+                "get_config()/from_config() with standalone serializable values."
+            ) from exc
 
 
 def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
@@ -89,7 +135,8 @@ def _capture_init_config(init, args, kwargs) -> tuple[tuple, dict]:
         if i == 0:
             continue
         kind = sig.parameters[name].kind
-        # snapshot each argument; values that cannot be deep-copied keep a reference
+        # Snapshot each argument. Unsupported values become a marker so model
+        # construction still works, but rebuilding/multiprocessing fails early.
         if kind is inspect.Parameter.VAR_KEYWORD:
             config.update({k: _snapshot(v) for k, v in value.items()})
         elif kind is inspect.Parameter.VAR_POSITIONAL:
@@ -162,12 +209,12 @@ class optModel(ABC):
 
     def get_config(self) -> dict:
         """Return the constructor configuration for this model."""
-        return _snapshot_config(self.__dict__.get("_init_config", {}))
+        return _snapshot_config(self.__dict__.get("_init_config", {}), strict=True)
 
     @classmethod
     def from_config(cls, config: dict, args: tuple = ()) -> Self:
         """Build a model from a configuration produced by ``get_config``."""
-        return cls(*_snapshot_args(args), **_snapshot_config(config))
+        return cls(*_snapshot_args(args, strict=True), **_snapshot_config(config, strict=True))
 
     def to_spec(self) -> ModelSpec:
         """Return a serializable, immutable-snapshot rebuild recipe."""

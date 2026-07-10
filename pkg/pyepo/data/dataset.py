@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
 from pyepo import EPO
-from pyepo.data._validation import validate_positive_int, validate_probability
+from pyepo._validation import validate_positive_int, validate_probability
 from pyepo.model.opt import optModel
 
 if TYPE_CHECKING:

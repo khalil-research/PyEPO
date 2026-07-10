@@ -13,7 +13,13 @@ import torch
 from torch import nn
 
 from pyepo.func._common import require_solution_pool
-from pyepo.func.runtime import Reduction, bind_runtime_state, init_runtime, init_solution_pool
+from pyepo.func.runtime import (
+    Reduction,
+    bind_runtime_state,
+    close_runtime,
+    init_runtime,
+    init_solution_pool,
+)
 from pyepo.func.utils import _solve_in_pass
 
 if TYPE_CHECKING:
@@ -86,6 +92,16 @@ class optModule(nn.Module):
         if self.reduction == "sum":
             return torch.sum(loss)
         return loss
+
+    def close(self) -> None:
+        """Release multiprocessing workers; subsequent calls solve serially."""
+        close_runtime(self)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.close()
 
     def _refresh_solution_pool(self, cost: torch.Tensor) -> torch.Tensor:
         """Optionally solve, then return the initialized pool on ``cost``'s device and dtype."""

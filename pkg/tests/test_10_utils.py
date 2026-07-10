@@ -292,6 +292,12 @@ class TestModelSpec:
         assert model.get_config()["nested"] == {"tag": ["x"]}
         assert model.rebuild().kwargs == {"nested": {"tag": ["x"]}}
 
+    def test_auto_config_rejects_uncopyable_constructor_input(self):
+        model = AutoConfigModel([1, 2, 3], resource=_NoDeepcopy([4, 5]))
+
+        with pytest.raises(TypeError, match=r"get_config\(\)/from_config\(\)"):
+            model.to_spec()
+
     def test_auto_config_replays_varargs(self):
         model = VarArgsConfigModel(1, 2, 3, label="x")
         spec = model.to_spec()
