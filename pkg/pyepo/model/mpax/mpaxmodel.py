@@ -16,7 +16,7 @@ import torch
 try:
     import jax
     from jax import numpy as jnp
-    from jax.experimental.sparse import BCOO, bcoo_concatenate
+    from jax.experimental.sparse import BCOO, BCSR, bcoo_concatenate
     from mpax import create_lp, create_qp, raPDHG
     from mpax.termination import TerminationStatus
 
@@ -126,6 +126,8 @@ class optMpaxModel(optModel):
         # cache JAX GPU device (None if CPU-only)
         self._gpu_device = next((d for d in jax.devices() if d.platform == "gpu"), None)
         self._has_jax_gpu = self._gpu_device is not None
+        # NumPy arrays expose no JAX device (NumPy 2 uses the string "cpu").
+        self.b = jnp.asarray(self.b)
         self._move_to_device(self._gpu_device or self.b.device)
 
     def __repr__(self) -> str:
@@ -138,7 +140,9 @@ class optMpaxModel(optModel):
             # dense-to-BCOO fallback reserves one slot per dense matrix entry.
             for name in ("A", "G", "Q"):
                 matrix = getattr(self, name)
-                if matrix is not None and not isinstance(matrix, BCOO):
+                if isinstance(matrix, BCSR):
+                    setattr(self, name, matrix.to_bcoo())
+                elif matrix is not None and not isinstance(matrix, BCOO):
                     setattr(self, name, BCOO.fromdense(matrix))
         # LP path
         if self.Q is None:

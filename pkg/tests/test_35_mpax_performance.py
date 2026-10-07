@@ -9,6 +9,78 @@ from .conftest import requires_mpax
 pytestmark = requires_mpax
 
 
+@pytest.mark.parametrize("sparse", [False, True])
+@pytest.mark.parametrize("quadratic", [False, True])
+def test_custom_numpy_model_solves_on_a_jax_device(sparse, quadratic):
+    import jax
+
+    from pyepo.model.mpax.mpaxmodel import optMpaxModel
+
+    class NumpyModel(optMpaxModel):
+        use_sparse_matrix = sparse
+
+        def _getModel(self):
+            self.A = np.array([[1, 1]], dtype=np.float32)
+            self.b = np.array([1], dtype=np.float32)
+            self.G = np.array([[1, 0]], dtype=np.float32)
+            self.h = np.zeros(1, dtype=np.float32)
+            self.l = np.zeros(2, dtype=np.float32)
+            self.u = np.ones(2, dtype=np.float32)
+            self.Q = 2 * np.eye(2, dtype=np.float32) if quadratic else None
+            return None, []
+
+    model = NumpyModel()
+    assert isinstance(model.device, jax.Device)
+    model.setObj([1, 2])
+    sol, obj = model.solve()
+    np.testing.assert_allclose(sol.cpu(), [0.75, 0.25] if quadratic else [1, 0], atol=1e-3)
+    assert obj == pytest.approx(1.875 if quadratic else 1, abs=1e-3)
+    model.setObj([[1, 2], [2, 1]])
+    sols, objs, _ = model.batch_optimize(model.c)
+    np.testing.assert_allclose(
+        np.asarray(sols),
+        [[0.75, 0.25], [0.25, 0.75]] if quadratic else [[1, 0], [0, 1]],
+        atol=1e-3,
+    )
+    np.testing.assert_allclose(np.asarray(objs), 1.875 if quadratic else 1, atol=1e-3)
+
+
+@pytest.mark.parametrize("quadratic", [False, True])
+def test_custom_bcsr_model_preserves_sparse_solves_and_cuts(quadratic):
+    import jax.numpy as jnp
+    from jax.experimental.sparse import BCOO, BCSR
+
+    from pyepo.model.mpax.mpaxmodel import optMpaxModel
+
+    class BcsrModel(optMpaxModel):
+        def _getModel(self):
+            self.A = BCSR.fromdense(jnp.array([[1, 1]], dtype=jnp.float32))
+            self.b = jnp.array([1], dtype=jnp.float32)
+            self.G = BCSR.fromdense(jnp.array([[1, 0]], dtype=jnp.float32))
+            self.h = jnp.zeros(1, dtype=jnp.float32)
+            self.l = jnp.zeros(2, dtype=jnp.float32)
+            self.u = jnp.ones(2, dtype=jnp.float32)
+            self.Q = BCSR.fromdense(2 * jnp.eye(2, dtype=jnp.float32)) if quadratic else None
+            return None, []
+
+    model = BcsrModel()
+    for matrix, entries in ((model.A, 2), (model.G, 1)):
+        assert isinstance(matrix, BCOO)
+        assert matrix.nse == entries
+    if quadratic:
+        assert isinstance(model.Q, BCOO)
+        assert model.Q.nse == 2
+    model.setObj([1, 2])
+    sol, obj = model.solve()
+    np.testing.assert_allclose(sol.cpu(), [0.75, 0.25] if quadratic else [1, 0], atol=1e-3)
+    assert obj == pytest.approx(1.875 if quadratic else 1, abs=1e-3)
+    cut = model.addConstr([1, 0], 0.5)
+    cut.setObj([1, 2])
+    sol, obj = cut.solve()
+    np.testing.assert_allclose(sol.cpu(), [0.5, 0.5], atol=1e-3)
+    assert obj == pytest.approx(2 if quadratic else 1.5, abs=1e-3)
+
+
 def test_dense_lp_construction_does_not_allocate_quadratic_matrix():
     import jax
 
