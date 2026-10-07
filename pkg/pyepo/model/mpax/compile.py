@@ -18,10 +18,12 @@ import logging
 
 import numpy as np
 import torch
+from scipy import sparse
 
 try:
     import jax
     from jax import numpy as jnp
+    from jax.experimental.sparse import BCOO
 except ImportError:
     jax = None
     jnp = None
@@ -44,7 +46,7 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
     MPAX-backed (JAX LP / QP) compiled DSL problem.
     """
 
-    use_sparse_matrix = False
+    use_sparse_matrix = True
 
     def _getModel(self) -> tuple:
         # assemble MPAX standard-form matrices from the finalized IR
@@ -64,11 +66,7 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
             np.where(np.isposinf(prob.var_ub), np.inf, prob.var_ub).astype(np.float32)
         )
         # quadratic objective (None ⇒ LP); Q = 2·obj_Q for MPAX's ½xᵀQx convention
-        self.Q = (
-            jnp.asarray(2.0 * np.asarray(prob.obj_Q.todense(), np.float32))
-            if prob.obj_Q is not None
-            else None
-        )
+        self.Q = self._matrix(2.0 * prob.obj_Q) if prob.obj_Q is not None else None
         return None, []
 
     def _emit_constraints(self):
@@ -80,7 +78,7 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
                 raise NotImplementedError(
                     "MPAX supports a quadratic objective only, not quadratic constraints."
                 )
-            A = np.asarray(A.todense(), dtype=np.float32)
+            A = A.astype(np.float32)
             b = np.asarray(b, dtype=np.float32).reshape(-1)
             if sense == "==":
                 A_eq.append(A)
@@ -91,10 +89,18 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
             else:
                 G.append(A)  # A x >= b
                 h.append(b)
-        self.A = jnp.asarray(np.vstack(A_eq) if A_eq else np.zeros((0, n), np.float32))
+        self.A = self._matrix(sparse.vstack(A_eq) if A_eq else sparse.coo_matrix((0, n)))
         self.b = jnp.asarray(np.concatenate(b_eq) if b_eq else np.zeros(0, np.float32))
-        self.G = jnp.asarray(np.vstack(G) if G else np.zeros((0, n), np.float32))
+        self.G = self._matrix(sparse.vstack(G) if G else sparse.coo_matrix((0, n)))
         self.h = jnp.asarray(np.concatenate(h) if h else np.zeros(0, np.float32))
+
+    def _matrix(self, matrix):
+        matrix = matrix.astype(np.float32).tocoo()
+        matrix.sum_duplicates()
+        matrix.eliminate_zeros()
+        if self.use_sparse_matrix:
+            return BCOO.from_scipy_sparse(matrix)
+        return jnp.asarray(matrix.toarray())
 
     def _apply_params(self):
         # MPAX (first-order PDHG) has no time-limit knob; accept `timelimit` and ignore it
@@ -143,7 +149,7 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
                     np.float32
                 )
                 coef[..., prob.c_pred_index] += arr
-            self.c = jnp.asarray(coef)
+            self.c = jax.device_put(jnp.asarray(coef), self.device)
         if self.modelSense == EPO.MAXIMIZE:
             self.c = -self.c
 
@@ -159,20 +165,5 @@ class compiledMpaxProblem(compiledBase, optMpaxModel):
         # add coef @ x <= rhs  ->  -coef @ x >= -rhs  to a fresh copy
         new_model = self.copy()
         row = -jnp.asarray(np.asarray(coef, np.float32)).reshape(1, -1)
-        new_model.G = row if new_model.G.shape[0] == 0 else jnp.vstack([new_model.G, row])
-        new_model.h = jnp.append(new_model.h, -float(rhs))
-        new_model._rebuild_jit()
+        new_model._append_inequality(row, -float(rhs))
         return new_model
-
-    def _move_to_device(self, device):
-        # move the constraint matrices / bounds onto the cost's device, rebuild the jit
-        self.device = device
-        self.A = jax.device_put(self.A, device)
-        self.b = jax.device_put(self.b, device)
-        self.G = jax.device_put(self.G, device)
-        self.h = jax.device_put(self.h, device)
-        self.l = jax.device_put(self.l, device)
-        self.u = jax.device_put(self.u, device)
-        if self.Q is not None:
-            self.Q = jax.device_put(self.Q, device)
-        self._rebuild_jit()

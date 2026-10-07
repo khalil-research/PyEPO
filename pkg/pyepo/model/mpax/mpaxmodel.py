@@ -16,6 +16,7 @@ import torch
 try:
     import jax
     from jax import numpy as jnp
+    from jax.experimental.sparse import BCOO, bcoo_concatenate
     from mpax import create_lp, create_qp, raPDHG
     from mpax.termination import TerminationStatus
 
@@ -89,19 +90,20 @@ class optMpaxModel(optModel):
     minimization). Dense vs sparse matrices can be toggled by overriding the
     class attribute ``use_sparse_matrix`` (default ``True``).
 
-    A jitted single-instance solver and a ``vmap``-batched solver
-    (``batch_optimize``) are pre-compiled on construction, so
-    ``optDataset`` can solve every training instance in a single dispatch.
+    A single-instance solver and a ``vmap``-batched solver
+    (``batch_optimize``) are wrapped in JIT on construction. Compilation
+    happens on the first call for each input shape and dtype.
 
     Attributes:
-        A (jnp.ndarray): equality-constraint matrix (Ax = b)
+        A (jax.Array | BCOO): equality-constraint matrix (Ax = b)
         b (jnp.ndarray): equality-constraint right-hand side
-        G (jnp.ndarray): inequality-constraint matrix (Gx >= h)
+        G (jax.Array | BCOO): inequality-constraint matrix (Gx >= h)
         h (jnp.ndarray): inequality-constraint right-hand side
         l (jnp.ndarray): variable lower bounds
         u (jnp.ndarray): variable upper bounds
-        Q (jnp.ndarray | None): PSD quadratic-objective matrix; ``None`` ⇒ LP
+        Q (jax.Array | BCOO | None): PSD quadratic-objective matrix; ``None`` ⇒ LP
         use_sparse_matrix (bool): whether to use sparse matrices
+        device: JAX device holding the model arrays and executing solves
     """
 
     use_sparse_matrix: bool = True
@@ -124,16 +126,24 @@ class optMpaxModel(optModel):
         # cache JAX GPU device (None if CPU-only)
         self._gpu_device = next((d for d in jax.devices() if d.platform == "gpu"), None)
         self._has_jax_gpu = self._gpu_device is not None
-        # JIT pre-compile (LP/QP dispatch on self.Q)
-        self._rebuild_jit()
+        self._move_to_device(self._gpu_device or self.b.device)
 
     def __repr__(self) -> str:
         return "optMpaxModel " + self.__class__.__name__
 
     def _rebuild_jit(self) -> None:
         """Rebuild solve functions; dispatches LP/QP from self.Q."""
+        if self.use_sparse_matrix:
+            # Convert outside tracing, using the actual nonzero count. MPAX's
+            # dense-to-BCOO fallback reserves one slot per dense matrix entry.
+            for name in ("A", "G", "Q"):
+                matrix = getattr(self, name)
+                if matrix is not None and not isinstance(matrix, BCOO):
+                    setattr(self, name, BCOO.fromdense(matrix))
         # LP path
         if self.Q is None:
+            # Keep LP construction inside tracing: dense create_lp otherwise
+            # eagerly allocates an unused n-by-n quadratic objective matrix.
             solve_fn = partial(
                 self._jitted_solve_lp,
                 A=self.A,
@@ -193,21 +203,10 @@ class optMpaxModel(optModel):
             if self._gpu_device is not None:
                 self.c = jax.device_put(self.c, self._gpu_device)
             # move constraints and bounds to device
-            if self.device != self.c.device:
-                self.device = self.c.device
-                self.A = jax.device_put(self.A, self.device)
-                self.b = jax.device_put(self.b, self.device)
-                self.G = jax.device_put(self.G, self.device)
-                self.h = jax.device_put(self.h, self.device)
-                self.l = jax.device_put(self.l, self.device)
-                self.u = jax.device_put(self.u, self.device)
-                if self.Q is not None:
-                    self.Q = jax.device_put(self.Q, self.device)
-                # rebuild JIT for new device
-                self._rebuild_jit()
+            self._move_to_device(self.c.device)
         # c is already a NumPy array
         else:
-            self.c = jnp.array(c, dtype=jnp.float32)
+            self.c = jax.device_put(jnp.array(c, dtype=jnp.float32), self.device)
         # change sign for maximization
         if self.modelSense == EPO.MAXIMIZE:
             self.c = -self.c
@@ -282,9 +281,10 @@ class optMpaxModel(optModel):
         self.device = None
         self._gpu_device = None
         # copy new model
-        new_model = deepcopy(self)
-        # restore device
-        self.device, self._gpu_device = device, gpu_device
+        try:
+            new_model = deepcopy(self)
+        finally:
+            self.device, self._gpu_device = device, gpu_device
         new_model.device, new_model._gpu_device = device, gpu_device
         return new_model
 
@@ -306,13 +306,26 @@ class optMpaxModel(optModel):
         rhs = -rhs
         # copy
         new_model = self.copy()
-        # add constraint
-        if new_model.G.shape[0] == 0:
-            new_model.G = coefs
-            new_model.h = jnp.array([rhs])
-        else:
-            new_model.G = jnp.vstack([new_model.G, coefs])
-            new_model.h = jnp.append(new_model.h, rhs)
-        # rebuild JIT with updated constraints
-        new_model._rebuild_jit()
+        new_model._append_inequality(coefs, rhs)
         return new_model
+
+    def _append_inequality(self, row, rhs) -> None:
+        """Append a row in MPAX's >= convention without densifying the model."""
+        row = jax.device_put(row, self.device)
+        if self.use_sparse_matrix:
+            self.G = bcoo_concatenate([self.G, BCOO.fromdense(row)], dimension=0)
+        else:
+            self.G = jnp.concatenate([self.G, row], axis=0)
+        self.h = jnp.append(self.h, rhs)
+        self._rebuild_jit()
+
+    def _move_to_device(self, device) -> None:
+        """Rebuild captured arrays only when their device actually changes."""
+        if self.device == device:
+            return
+        self.device = device
+        for name in ("A", "b", "G", "h", "l", "u", "Q"):
+            value = getattr(self, name)
+            if value is not None:
+                setattr(self, name, jax.device_put(value, device))
+        self._rebuild_jit()

@@ -9,6 +9,7 @@ import numpy as np
 
 try:
     import jax.numpy as jnp
+    from jax.experimental.sparse import BCOO
 except ImportError:
     jnp = None
 
@@ -34,18 +35,27 @@ class shortestPathModel(shortestPathBase, optMpaxModel):
         num_nodes = self.grid[0] * self.grid[1]
         num_arcs = len(self.arcs)
         # node-arc incidence: +1 outgoing, -1 incoming
-        A_np = np.zeros((num_nodes, num_arcs), dtype=np.float32)
-        for arc_idx, (start, end) in enumerate(self.arcs):
-            A_np[start, arc_idx] = 1
-            A_np[end, arc_idx] = -1
-        self.A = jnp.array(A_np)
+        endpoints = np.asarray(self.arcs, dtype=np.int32).reshape(-1)
+        indices = np.column_stack((endpoints, np.repeat(np.arange(num_arcs), 2)))
+        values = np.tile(np.array([1, -1], dtype=np.float32), num_arcs)
+        self.A = BCOO(
+            (jnp.asarray(values), jnp.asarray(indices, dtype=jnp.int32)),
+            shape=(num_nodes, num_arcs),
+            unique_indices=True,
+        )
+        if not self.use_sparse_matrix:
+            self.A = self.A.todense()
         # supply / demand: source sends 1, sink receives 1
         b_np = np.zeros(num_nodes, dtype=np.float32)
         b_np[0] = 1
         b_np[num_nodes - 1] = -1
         self.b = jnp.array(b_np)
         # no inequality constraints
-        self.G = jnp.zeros((0, num_arcs), dtype=jnp.float32)
+        self.G = (
+            BCOO.fromdense(jnp.zeros((0, num_arcs), dtype=jnp.float32), nse=0)
+            if self.use_sparse_matrix
+            else jnp.zeros((0, num_arcs), dtype=jnp.float32)
+        )
         self.h = jnp.zeros((0,), dtype=jnp.float32)
         # variable bounds: x in [0, 1]
         self.l = jnp.zeros(num_arcs, dtype=jnp.float32)

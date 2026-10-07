@@ -88,6 +88,8 @@ class optDataset(Dataset):
         model: optModel,
         feats: np.ndarray | torch.Tensor,
         costs: np.ndarray | torch.Tensor,
+        *,
+        solve_batch_size: int = 128,
     ) -> None:
         """
         Build the dataset and precompute optimal labels.
@@ -96,7 +98,11 @@ class optDataset(Dataset):
             model: an instance of optModel
             feats: data features
             costs: costs of objective function
+            solve_batch_size: maximum MPAX precomputation batch size; other
+                backends keep their sequential solve path.
         """
+        validate_positive_int(solve_batch_size, "solve_batch_size")
+        self.solve_batch_size = solve_batch_size
         feats, costs = _validate_inputs(model, feats, costs)
         self.model = model
         # data
@@ -113,7 +119,7 @@ class optDataset(Dataset):
         """
         A method to get optimal solutions for all cost vectors
         """
-        # MPAX fast path: vmap-solve the whole dataset in a single dispatch
+        # MPAX fast path: bounded vmap batches
         if _opt_mpax_model_cls is not None and isinstance(self.model, _opt_mpax_model_cls):
             return self._get_sols_mpax_batch()
         sols = []
@@ -127,18 +133,33 @@ class optDataset(Dataset):
 
     def _get_sols_mpax_batch(self) -> tuple[np.ndarray, np.ndarray]:
         """
-        A method to batch-solve every cost vector in one MPAX vmap call.
+        Solve bounded batches, padding the tail to reuse the compiled shape.
         """
         logger.info("Optimizing for optDataset (MPAX batched)...")
         from pyepo.model.mpax.mpaxmodel import _warn_if_not_optimal
 
         model = cast("_optMpaxModelT", self.model)
-        model._setFullObj(model._fullCost(self.costs))
-        sols, objs, status = model.batch_optimize(model.c)
-        _warn_if_not_optimal(status)
-        # writable copy; torch.as_tensor warns on JAX read-only buffers
-        sols_np = np.array(sols, dtype=np.float32)
-        objs_np = np.array(objs, dtype=np.float32)
+        count = len(self.costs)
+        if not count:
+            return np.empty((0, model.A.shape[1]), np.float32), np.empty((0, 1), np.float32)
+        batch_size = min(self.solve_batch_size, count)
+        sols_np = np.empty((count, model.A.shape[1]), dtype=np.float32)
+        objs_np = np.empty(count, dtype=np.float32)
+        for start in range(0, count, batch_size):
+            costs = self.costs[start : start + batch_size]
+            size = len(costs)
+            if size < batch_size:
+                if isinstance(costs, torch.Tensor):
+                    costs = torch.cat([costs, costs[-1:].expand(batch_size - size, -1)])
+                else:
+                    costs = np.concatenate(
+                        [costs, np.repeat(costs[-1:], batch_size - size, axis=0)]
+                    )
+            model._setFullObj(model._fullCost(costs))
+            sols, objs, status = model.batch_optimize(model.c)
+            _warn_if_not_optimal(status[:size])
+            sols_np[start : start + size] = np.asarray(sols[:size])
+            objs_np[start : start + size] = np.asarray(objs[:size])
         # jitted_solve returns c·sol where the objective write already negated c for MAX
         if self.model.modelSense == EPO.MAXIMIZE:
             objs_np = -objs_np

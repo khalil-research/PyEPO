@@ -100,6 +100,28 @@ class TestMpaxGpuBridge:
     CPU-only jax, but keeps the GPU bridge under test wherever both are present
     instead of relying on manual verification."""
 
+    def test_solver_arrays_and_results_really_reside_on_gpu(self):
+        import jax
+        import numpy as np
+        from mpax.termination import TerminationStatus
+
+        from pyepo.model.mpax.shortestpath import shortestPathModel
+
+        model = shortestPathModel((3, 3))
+        model.setObj(torch.ones((4, model.num_cost), device=_DEVICE))
+        result = jax.block_until_ready(model.batch_optimize(model.c))
+        for array in jax.tree_util.tree_leaves((model.A, model.G, model.b, model.c, result)):
+            assert array.device.platform == "gpu"
+        sol, obj, status = result
+        np.testing.assert_array_equal(np.asarray(status), int(TerminationStatus.OPTIMAL))
+        np.testing.assert_allclose(np.asarray(obj), 4, atol=1e-3)
+        np.testing.assert_allclose(
+            np.asarray(jax.vmap(lambda x: model.A @ x)(sol)),
+            np.broadcast_to(np.asarray(model.b), (4, 9)),
+            atol=1e-3,
+        )
+        assert np.min(np.asarray(sol)) >= -1e-3
+
     def test_spoplus_loss_and_grad_on_cuda(self):
         from pyepo.data.shortestpath import genData
         from pyepo.model.mpax.shortestpath import shortestPathModel
